@@ -212,7 +212,7 @@ namespace hpx
             Callback && cb, Arg0 && arg0)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -227,7 +227,7 @@ namespace hpx
             Arg0 && arg0)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -244,7 +244,7 @@ namespace hpx
         Arg0 && arg0)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -258,7 +258,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -273,7 +273,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -288,7 +288,7 @@ namespace hpx
         Arg0 && arg0)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -500,7 +500,7 @@ namespace hpx
             Callback && cb, Arg0 && arg0 , Arg1 && arg1)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -515,7 +515,7 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -532,7 +532,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -546,7 +546,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -561,7 +561,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -576,7 +576,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -788,7 +788,7 @@ namespace hpx
             Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -803,7 +803,7 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -820,7 +820,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -834,7 +834,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -849,7 +849,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -864,7 +864,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -1076,7 +1076,7 @@ namespace hpx
             Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -1091,7 +1091,7 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -1108,7 +1108,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -1122,7 +1122,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -1137,7 +1137,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -1152,7 +1152,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -1364,7 +1364,7 @@ namespace hpx
             Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -1379,7 +1379,7 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -1396,7 +1396,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -1410,7 +1410,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -1425,7 +1425,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -1440,7 +1440,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -1652,7 +1652,7 @@ namespace hpx
             Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -1667,7 +1667,7 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -1684,7 +1684,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -1698,7 +1698,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -1713,7 +1713,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -1728,7 +1728,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -1940,7 +1940,7 @@ namespace hpx
             Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -1955,7 +1955,7 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -1972,7 +1972,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -1986,7 +1986,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -2001,7 +2001,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -2016,7 +2016,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -2228,7 +2228,7 @@ namespace hpx
             Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -2243,7 +2243,7 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -2260,7 +2260,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -2274,7 +2274,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -2289,7 +2289,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -2304,7 +2304,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -2516,7 +2516,7 @@ namespace hpx
             Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -2531,7 +2531,7 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -2548,7 +2548,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -2562,7 +2562,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -2577,7 +2577,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -2592,7 +2592,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -2804,7 +2804,7 @@ namespace hpx
             Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -2819,7 +2819,7 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -2836,7 +2836,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -2850,7 +2850,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -2865,7 +2865,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -2880,7 +2880,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -3092,7 +3092,7 @@ namespace hpx
             Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -3107,7 +3107,7 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -3124,7 +3124,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -3138,7 +3138,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -3153,7 +3153,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -3168,7 +3168,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -3380,7 +3380,7 @@ namespace hpx
             Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -3395,7 +3395,7 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -3412,7 +3412,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -3426,7 +3426,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -3441,7 +3441,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -3456,7 +3456,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -3668,7 +3668,7 @@ namespace hpx
             Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -3683,7 +3683,7 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -3700,7 +3700,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -3714,7 +3714,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -3729,7 +3729,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -3744,7 +3744,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -3956,7 +3956,7 @@ namespace hpx
             Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -3971,7 +3971,7 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -3988,7 +3988,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -4002,7 +4002,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -4017,7 +4017,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -4032,7 +4032,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -4244,7 +4244,7 @@ namespace hpx
             Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -4259,7 +4259,7 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -4276,7 +4276,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -4290,7 +4290,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -4305,7 +4305,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -4320,7 +4320,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -4532,7 +4532,7 @@ namespace hpx
             Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -4547,7 +4547,7 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -4564,7 +4564,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -4578,7 +4578,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -4593,7 +4593,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -4608,7 +4608,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -4820,7 +4820,7 @@ namespace hpx
             Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -4835,7 +4835,7 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -4852,7 +4852,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -4866,7 +4866,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -4881,7 +4881,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -4896,7 +4896,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -5108,7 +5108,7 @@ namespace hpx
             Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -5123,7 +5123,7 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -5140,7 +5140,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -5154,7 +5154,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -5169,7 +5169,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -5184,7 +5184,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -5396,7 +5396,7 @@ namespace hpx
             Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -5411,7 +5411,7 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -5428,7 +5428,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -5442,7 +5442,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -5457,7 +5457,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -5472,7 +5472,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -5684,7 +5684,7 @@ namespace hpx
             Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -5699,7 +5699,7 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -5716,7 +5716,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -5730,7 +5730,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -5745,7 +5745,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -5760,7 +5760,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),

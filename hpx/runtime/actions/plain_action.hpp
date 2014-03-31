@@ -55,7 +55,7 @@ namespace hpx { namespace actions
         typedef hpx::util::tuple<> arguments_type;
         typedef action<
             components::server::plain_function<Derived>,
-            remote_result_type, arguments_type, Derived
+            result_type, arguments_type, Derived
         > base_type;
 
         // Only localities are valid targets for a plain action
@@ -217,13 +217,13 @@ namespace hpx { namespace actions
             Derived>
     {
     public:
-        typedef util::unused_type result_type;
+        typedef void result_type;
         typedef util::unused_type remote_result_type;
 
         typedef hpx::util::tuple<> arguments_type;
         typedef action<
             components::server::plain_function<Derived>,
-            remote_result_type, arguments_type, Derived
+            result_type, arguments_type, Derived
         > base_type;
 
         // Only localities are valid targets for a plain action

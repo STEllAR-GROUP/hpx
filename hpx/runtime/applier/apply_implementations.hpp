@@ -393,7 +393,7 @@ namespace hpx
             HPX_ENUM_FWD_ARGS(N, Arg, arg))
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
 
             return apply_r_p<Action>(addr,
@@ -407,7 +407,7 @@ namespace hpx
             naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
 
             return apply_r_p<Action>(addr,
@@ -423,7 +423,7 @@ namespace hpx
         threads::thread_priority priority, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
 
         return apply_p<Action>(
@@ -437,7 +437,7 @@ namespace hpx
         HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
 
         return apply_p<Action>(

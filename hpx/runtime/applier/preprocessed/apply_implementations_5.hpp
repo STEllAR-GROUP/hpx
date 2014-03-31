@@ -222,7 +222,7 @@ namespace hpx
             Arg0 && arg0)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -234,7 +234,7 @@ namespace hpx
             naming::id_type const& gid, Arg0 && arg0)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -248,7 +248,7 @@ namespace hpx
         threads::thread_priority priority, Arg0 && arg0)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -260,7 +260,7 @@ namespace hpx
         Arg0 && arg0)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -499,7 +499,7 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -511,7 +511,7 @@ namespace hpx
             naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -525,7 +525,7 @@ namespace hpx
         threads::thread_priority priority, Arg0 && arg0 , Arg1 && arg1)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -537,7 +537,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -776,7 +776,7 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -788,7 +788,7 @@ namespace hpx
             naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -802,7 +802,7 @@ namespace hpx
         threads::thread_priority priority, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -814,7 +814,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -1053,7 +1053,7 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -1065,7 +1065,7 @@ namespace hpx
             naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -1079,7 +1079,7 @@ namespace hpx
         threads::thread_priority priority, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -1091,7 +1091,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -1330,7 +1330,7 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -1342,7 +1342,7 @@ namespace hpx
             naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
             return apply_r_p<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -1356,7 +1356,7 @@ namespace hpx
         threads::thread_priority priority, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -1368,7 +1368,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
         return apply_p<Action>(
             new actions::typed_continuation<result_type>(contgid),

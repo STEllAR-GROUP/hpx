@@ -37,12 +37,12 @@ namespace hpx { namespace lcos
       , typename DirectExecute
     >
     struct dataflow
-        : dataflow_base<Result, typename Action::result_type>
+        : dataflow_base<Result, typename Action::remote_result_type>
     {
-        typedef typename Action::result_type remote_result_type;
+        typedef typename Action::remote_result_type remote_result_type;
         typedef Result result_type;
         typedef
-            dataflow_base<Result, typename Action::result_type>
+            dataflow_base<Result, typename Action::remote_result_type>
             base_type;
 
         typedef stubs::dataflow stub_type;

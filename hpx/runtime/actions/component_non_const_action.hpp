@@ -34,7 +34,7 @@ namespace hpx { namespace actions
             remote_result_type;
 
         typedef hpx::util::tuple<> arguments_type;
-        typedef action<Component, remote_result_type, arguments_type, Derived>
+        typedef action<Component, result_type, arguments_type, Derived>
             base_type;
 
     protected:
@@ -211,7 +211,7 @@ namespace hpx { namespace actions
         typedef util::unused_type remote_result_type;
 
         typedef hpx::util::tuple<> arguments_type;
-        typedef action<Component, remote_result_type, arguments_type, Derived>
+        typedef action<Component, result_type, arguments_type, Derived>
             base_type;
 
     protected:

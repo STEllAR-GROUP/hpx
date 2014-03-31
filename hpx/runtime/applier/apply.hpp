@@ -400,7 +400,7 @@ namespace hpx
             naming::id_type const& gid, threads::thread_priority priority)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
 
             return apply_r_p<Action>(addr,
@@ -414,7 +414,7 @@ namespace hpx
             naming::id_type const& gid)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
 
             return apply_r<Action>(addr,
@@ -429,7 +429,7 @@ namespace hpx
         threads::thread_priority priority)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
 
         return apply_p<Action>(
@@ -442,7 +442,7 @@ namespace hpx
     apply_c (naming::id_type const& contgid, naming::id_type const& gid)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
 
         return apply_p<Action>(

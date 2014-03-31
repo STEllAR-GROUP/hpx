@@ -29,7 +29,7 @@ namespace hpx { namespace actions
             remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type> arguments_type;
-        typedef action<Component const, remote_result_type, arguments_type, Derived>
+        typedef action<Component const, result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -217,7 +217,7 @@ namespace hpx { namespace actions
         typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type> arguments_type;
-        typedef action<Component const, remote_result_type, arguments_type, Derived>
+        typedef action<Component const, result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -419,7 +419,7 @@ namespace hpx { namespace actions
             remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type , typename util::decay<T1>::type> arguments_type;
-        typedef action<Component const, remote_result_type, arguments_type, Derived>
+        typedef action<Component const, result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -607,7 +607,7 @@ namespace hpx { namespace actions
         typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type , typename util::decay<T1>::type> arguments_type;
-        typedef action<Component const, remote_result_type, arguments_type, Derived>
+        typedef action<Component const, result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -809,7 +809,7 @@ namespace hpx { namespace actions
             remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type> arguments_type;
-        typedef action<Component const, remote_result_type, arguments_type, Derived>
+        typedef action<Component const, result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -997,7 +997,7 @@ namespace hpx { namespace actions
         typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type> arguments_type;
-        typedef action<Component const, remote_result_type, arguments_type, Derived>
+        typedef action<Component const, result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -1199,7 +1199,7 @@ namespace hpx { namespace actions
             remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type> arguments_type;
-        typedef action<Component const, remote_result_type, arguments_type, Derived>
+        typedef action<Component const, result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -1387,7 +1387,7 @@ namespace hpx { namespace actions
         typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type> arguments_type;
-        typedef action<Component const, remote_result_type, arguments_type, Derived>
+        typedef action<Component const, result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -1589,7 +1589,7 @@ namespace hpx { namespace actions
             remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type> arguments_type;
-        typedef action<Component const, remote_result_type, arguments_type, Derived>
+        typedef action<Component const, result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -1777,7 +1777,7 @@ namespace hpx { namespace actions
         typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type> arguments_type;
-        typedef action<Component const, remote_result_type, arguments_type, Derived>
+        typedef action<Component const, result_type, arguments_type, Derived>
             base_type;
     protected:
         

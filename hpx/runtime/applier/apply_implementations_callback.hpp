@@ -272,7 +272,7 @@ namespace hpx
             Callback && cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
 
             return apply_r_p_cb<Action>(addr,
@@ -289,7 +289,7 @@ namespace hpx
             HPX_ENUM_FWD_ARGS(N, Arg, arg))
         {
             typedef
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
                 result_type;
 
             return apply_r_p_cb<Action>(addr,
@@ -308,7 +308,7 @@ namespace hpx
         HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
 
         return apply_p_cb<Action>(
@@ -324,7 +324,7 @@ namespace hpx
         Callback && cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
 
         return apply_p_cb<Action>(
@@ -341,7 +341,7 @@ namespace hpx
         Callback && cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
 
         return apply_p_cb<Action>(
@@ -358,7 +358,7 @@ namespace hpx
         HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         typedef
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
             result_type;
 
         return apply_p_cb<Action>(
