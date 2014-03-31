@@ -32,7 +32,11 @@ namespace hpx { namespace naming
 
         std::string port_str(boost::lexical_cast<std::string>(loc.get_port()));
 
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
         std::string address = ibverbs ? loc.get_ibverbs_address() : loc.get_address();
+#else
+        std::string address = loc.get_address();
+#endif
 
         // try to directly create an endpoint from the address
         try {
@@ -94,7 +98,11 @@ namespace hpx { namespace naming
         exception_list errors;
 
         std::string port_str(boost::lexical_cast<std::string>(loc.get_port()));
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
         std::string address = ibverbs ? loc.get_ibverbs_address() : loc.get_address();
+#else
+        std::string address = loc.get_address();
+#endif
 
         // try to directly create an endpoint from the address
         try {
