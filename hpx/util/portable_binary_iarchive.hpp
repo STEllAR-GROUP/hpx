@@ -274,7 +274,7 @@ public:
 
     template <typename Container>
     portable_binary_iarchive(Container const& buffer,
-            std::vector<serialization_chunk>* chunks,
+            std::vector<serialization_chunk> const* chunks,
             boost::uint64_t inbound_data_size, unsigned flags_value = 0)
       : primitive_base_t(buffer, chunks, inbound_data_size),
         archive_base_t(flags_value)
@@ -302,17 +302,6 @@ public:
         else {
             this->primitive_base_t::load_array(a);
         }
-    }
-
-    template <typename T>
-    bool load_array(T** data, std::size_t size, unsigned int)
-    {
-        // If we need to potentially flip bytes we serialize each element
-        // separately.
-        if (this->flags() & disable_array_optimization)
-            return false;
-
-        return this->primitive_base_t::load_array(data, size);
     }
 
     void load_array(boost::serialization::array<float>& a, unsigned int)

@@ -60,18 +60,11 @@ namespace hpx { namespace util
     enum chunk_type
     {
         chunk_type_index = 0,
-        chunk_type_pointer = 1,
-        chunk_type_owns_pointer = 2
+        chunk_type_pointer = 1
     };
 
     struct serialization_chunk
     {
-        ~serialization_chunk()
-        {
-            if (type_ == chunk_type_owns_pointer)
-                delete [] reinterpret_cast<char*>(data_.pos_);
-        }
-
         chunk_data data_;       // index or pointer
         std::size_t size_;      // size of the serialization_chunk starting at index_/pos_
         boost::uint8_t type_;   // chunk_type
@@ -95,96 +88,6 @@ namespace hpx { namespace util
         retval.data_.cpos_ = pos;
         return retval;
     }
-
-    inline serialization_chunk create_owning_pointer_chunk(void const* pos,
-        std::size_t size)
-    {
-        serialization_chunk retval = {
-            { 0 }, size, static_cast<boost::uint8_t>(chunk_type_owns_pointer)
-        };
-        retval.data_.cpos_ = pos;
-        return retval;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // very similar to vector<>, just that it can release() it's data
-    class managed_chunk
-    {
-    public:
-        managed_chunk()
-          : size_(0), data_(0)
-        {}
-
-        managed_chunk(managed_chunk const& rhs)
-          : size_(rhs.size_), data_(new char [rhs.size_])
-        {
-            std::memcpy(data_, rhs.data_, size_);
-        }
-        managed_chunk(managed_chunk&& rhs)
-          : size_(rhs.size_), data_(rhs.data_)
-        {
-            rhs.size_ = 0;
-            rhs.data_ = 0;
-        }
-
-        managed_chunk& operator=(managed_chunk const& rhs)
-        {
-            if (this != &rhs)
-            {
-                char* t = new char [rhs.size_];
-                delete [] data_;
-                size_ = rhs.size_;
-                data_ = t;
-            }
-            return *this;
-        }
-
-        managed_chunk& operator=(managed_chunk&& rhs)
-        {
-            delete [] data_;
-            size_ = rhs.size_;
-            data_ = rhs.data_;
-            rhs.size_ = 0;
-            rhs.data_ = 0;
-            return *this;
-        }
-
-        ~managed_chunk()
-        {
-            delete [] data_;
-        }
-
-        void resize(std::size_t size)
-        {
-            if (size_ < size)
-            {
-                char* t = new char[size];
-                std::memcpy(t, data_, size_);
-                size_ = size;
-            }
-            else if (size_ > size)
-            {
-                size_ = size;
-            }
-        }
-
-        char* release()
-        {
-            char* data = data_;
-            data_ = 0;
-            size_ = 0;
-            return data;
-        }
-
-        char* data() { return data_; }
-        char const* data() const { return data_; }
-
-        std::size_t size() const { return size_; }
-
-    private:
-        std::size_t size_;
-        char* data_;
-    };
 }}
 
 #endif // PORTABLE_BINARY_ARCHIVE_HPP

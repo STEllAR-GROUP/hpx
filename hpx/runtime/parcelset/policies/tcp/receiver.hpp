@@ -40,8 +40,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
     class connection_handler;
 
     class receiver
-      : public parcelport_connection<receiver, std::vector<char>,
-            util::managed_chunk>
+      : public parcelport_connection<receiver, std::vector<char>, std::vector<char> >
     {
     public:
         receiver(boost::asio::io_service& io_service, connection_handler& parcelport)

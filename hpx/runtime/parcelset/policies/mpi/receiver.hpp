@@ -24,7 +24,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
     class connection_handler;
 
     class receiver
-      : public parcelport_connection<receiver, std::vector<char>, util::managed_chunk>
+      : public parcelport_connection<receiver, std::vector<char>, std::vector<char> >
     {
         typedef bool(receiver::*next_function_type)();
     public:

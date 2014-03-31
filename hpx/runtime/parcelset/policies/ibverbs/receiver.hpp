@@ -36,7 +36,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
       : public parcelport_connection<
             receiver
           , std::vector<char, allocator<message::payload_size> >
-          , util::managed_chunk
+          , std::vector<char>
         >
     {
         typedef bool(receiver::*next_function_type)(boost::system::error_code &);
