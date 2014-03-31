@@ -36,7 +36,7 @@ namespace hpx { namespace parcelset
         typedef
             typename connection_handler_traits<ConnectionHandler>::connection_type
             connection;
-
+    public:
         static const char * connection_handler_name()
         {
             return connection_handler_traits<ConnectionHandler>::name();
@@ -141,9 +141,8 @@ namespace hpx { namespace parcelset
             io_service_pool_.stop();
             if (blocking) {
                 connection_cache_.shutdown();
-
-                io_service_pool_.join();
                 connection_handler().do_stop();
+                io_service_pool_.join();
                 connection_cache_.clear();
                 io_service_pool_.clear();
             }

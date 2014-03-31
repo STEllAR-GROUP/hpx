@@ -226,7 +226,9 @@ addressing_service::addressing_service(
         gva_cache_->reserve(ini_.get_agas_local_cache_size());
 
     if (service_type == service_mode_bootstrap)
+    {
         launch_bootstrap(pp, ini_);
+    }
 }
 
 void addressing_service::initialize(parcelset::parcelport& pp)
@@ -315,9 +317,10 @@ void addressing_service::launch_bootstrap(
     boost::uint32_t used_cores = rt.assign_cores(
         pp.get_locality_name(), cores_needed);
     rt.get_config().set_used_cores(used_cores);
+    rt.get_config().set_agas_locality(ini_.get_parcelport_address());
     rt.assign_cores();
 
-    naming::locality const ep = ini_.get_agas_locality();
+    naming::locality const ep = ini_.get_parcelport_address();
     naming::gid_type const here =
         naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX);
 

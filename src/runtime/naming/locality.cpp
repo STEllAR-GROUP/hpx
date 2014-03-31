@@ -23,7 +23,7 @@ namespace hpx { namespace naming
 {
     ///////////////////////////////////////////////////////////////////////////
     locality::iterator_type accept_begin(locality const& loc,
-        boost::asio::io_service& io_service)
+        boost::asio::io_service& io_service, bool ibverbs)
     {
         using boost::asio::ip::tcp;
 
@@ -32,13 +32,15 @@ namespace hpx { namespace naming
 
         std::string port_str(boost::lexical_cast<std::string>(loc.get_port()));
 
+        std::string address = ibverbs ? loc.get_ibverbs_address() : loc.get_address();
+
         // try to directly create an endpoint from the address
         try {
             tcp::endpoint ep;
-            if (util::get_endpoint(loc.get_address(), loc.get_port(), ep))
+            if (util::get_endpoint(address, loc.get_port(), ep))
             {
                 return locality::iterator_type(
-                    tcp::resolver::iterator::create(ep, loc.get_address(), port_str));
+                    tcp::resolver::iterator::create(ep, address, port_str));
             }
         }
         catch (boost::system::system_error const& e) {
@@ -49,7 +51,7 @@ namespace hpx { namespace naming
         try {
             // resolve the given address
             tcp::resolver resolver(io_service);
-            tcp::resolver::query query(loc.get_address(), port_str);
+            tcp::resolver::query query(address, port_str);
 
             return locality::iterator_type(resolver.resolve(query));
         }
@@ -66,7 +68,7 @@ namespace hpx { namespace naming
             tcp::resolver::query query(boost::asio::ip::host_name(), port_str);
 
             return locality::iterator_type(detail::is_valid_endpoint(
-                loc.get_address()), resolver.resolve(query));
+                address), resolver.resolve(query));
         }
         catch (boost::system::system_error const& e) {
             errors.add(e);
@@ -75,7 +77,7 @@ namespace hpx { namespace naming
         // report errors
         hpx::util::osstream strm;
         strm << errors.get_message() << " (while trying to resolve: "
-             << loc.get_address() << ":" << loc.get_port() << ")";
+             << address << ":" << loc.get_port() << ")";
 
         HPX_THROW_EXCEPTION(network_error, "accept_begin",
             hpx::util::osstream_get_string(strm));
@@ -84,7 +86,7 @@ namespace hpx { namespace naming
 
     //////////////////////////////////////////////////////////////////////////
     locality::iterator_type connect_begin(locality const& loc,
-        boost::asio::io_service& io_service)
+        boost::asio::io_service& io_service, bool ibverbs)
     {
         using boost::asio::ip::tcp;
 
@@ -92,14 +94,15 @@ namespace hpx { namespace naming
         exception_list errors;
 
         std::string port_str(boost::lexical_cast<std::string>(loc.get_port()));
+        std::string address = ibverbs ? loc.get_ibverbs_address() : loc.get_address();
 
         // try to directly create an endpoint from the address
         try {
             tcp::endpoint ep;
-            if (util::get_endpoint(loc.get_address(), loc.get_port(), ep))
+            if (util::get_endpoint(address, loc.get_port(), ep))
             {
                 return locality::iterator_type(tcp::resolver::iterator::create(
-                    ep, loc.get_address(), port_str));
+                    ep, address, port_str));
             }
         }
         catch (boost::system::system_error const& e) {
@@ -111,8 +114,8 @@ namespace hpx { namespace naming
             // resolve the given address
             tcp::resolver resolver(io_service);
             tcp::resolver::query query(
-                !loc.get_address().empty() ?
-                    loc.get_address() :
+                !address.empty() ?
+                    address :
                     boost::asio::ip::host_name(),
                 port_str);
 
@@ -125,7 +128,7 @@ namespace hpx { namespace naming
         // report errors
         hpx::util::osstream strm;
         strm << errors.get_message() << " (while trying to connect to: "
-             << loc.get_address() << ":" << loc.get_port() << ")";
+             << address << ":" << loc.get_port() << ")";
 
         HPX_THROW_EXCEPTION(network_error, "connect_begin",
             hpx::util::osstream_get_string(strm));
@@ -138,6 +141,9 @@ namespace hpx { namespace naming
     void locality::save(Archive& ar, const unsigned int version) const
     {
         ar.save(address_);
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+        ar.save(ibverbs_address_);
+#endif
         ar.save(port_);
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
@@ -158,6 +164,9 @@ namespace hpx { namespace naming
         }
 
         ar.load(address_);
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+        ar.load(ibverbs_address_);
+#endif
         ar.load(port_);
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)

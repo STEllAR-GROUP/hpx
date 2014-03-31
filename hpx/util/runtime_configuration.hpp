@@ -59,9 +59,13 @@ namespace hpx { namespace util
 
         // Get the AGAS locality to use
         naming::locality get_agas_locality() const;
+        void set_agas_locality(naming::locality const & agas_locality);
 
         // Get the HPX network address to use
         naming::locality get_parcelport_address() const;
+
+        // Get the IP of the ibverbs adapter to use
+        std::string get_ibverbs_address() const;
 
         // Get the size of the ipc parcelport data buffer cache
         std::size_t get_ipc_data_buffer_cache_size() const;
@@ -125,7 +129,7 @@ namespace hpx { namespace util
         boost::uint64_t get_max_message_size() const;
 
     private:
-        std::ptrdiff_t init_stack_size(char const* entryname, 
+        std::ptrdiff_t init_stack_size(char const* entryname,
             char const* defaultvaluestr, std::ptrdiff_t defaultvalue) const;
 
         std::ptrdiff_t init_small_stack_size() const;
@@ -145,6 +149,7 @@ namespace hpx { namespace util
 
     private:
         mutable boost::uint32_t num_localities;
+        naming::locality agas_locality_;
         std::ptrdiff_t small_stacksize;
         std::ptrdiff_t medium_stacksize;
         std::ptrdiff_t large_stacksize;

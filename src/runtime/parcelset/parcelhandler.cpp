@@ -218,7 +218,7 @@ namespace hpx { namespace parcelset
                     "_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}",
                 "zero_copy_optimization = ${HPX_PARCEL_" + name_uc +
                     "_ZERO_COPY_OPTIMIZATION:"
-                    "$[hpx.parcel." + name + ".array_optimization]}",
+                    "$[hpx.parcel.zero_copy_optimization]}",
                 "enable_security = ${HPX_PARCEL_" + name_uc +
                     "_ENABLE_SECURITY:"
                     "$[hpx.parcel.enable_security]}",

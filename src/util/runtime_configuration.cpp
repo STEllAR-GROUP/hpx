@@ -28,6 +28,13 @@
 #include <boost/spirit/include/qi_alternative.hpp>
 #include <boost/spirit/include/qi_sequence.hpp>
 
+#if (defined(__linux) || defined(linux) || defined(__linux__))
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/types.h>
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
 namespace hpx { namespace util { namespace coroutines { namespace detail { namespace posix
@@ -423,6 +430,11 @@ namespace hpx { namespace util
     // TODO: implement for AGAS v2
     naming::locality runtime_configuration::get_agas_locality() const
     {
+        if(agas_locality_)
+        {
+            return agas_locality_;
+        }
+
         // load all components as described in the configuration information
         if (has_section("hpx.agas")) {
             util::section const* sec = get_section("hpx.agas");
@@ -433,6 +445,9 @@ namespace hpx { namespace util
                 return
                     naming::locality(
                         sec->get_entry("address", HPX_INITIAL_IP_ADDRESS)
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS) // FIXME
+                      , ""
+#endif
                       , boost::lexical_cast<boost::uint16_t>(cfg_port)
 #if defined(HPX_HAVE_PARCELPORT_MPI)
                       , mpi_environment::enabled() ? 0 : -1
@@ -443,11 +458,19 @@ namespace hpx { namespace util
         return
             naming::locality(
                 HPX_INITIAL_IP_ADDRESS
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+              , ""
+#endif
               , HPX_INITIAL_IP_PORT
 #if defined(HPX_HAVE_PARCELPORT_MPI)
               , mpi_environment::enabled() ? 0 : -1
 #endif
             );
+    }
+
+    void runtime_configuration::set_agas_locality(naming::locality const & agas_locality)
+    {
+        agas_locality_ = agas_locality;
     }
 
     // HPX network address configuration information has to be stored in the
@@ -467,11 +490,82 @@ namespace hpx { namespace util
                     sec->get_entry("port", HPX_INITIAL_IP_PORT));
 
                 return naming::locality(
-                    sec->get_entry("address", HPX_INITIAL_IP_ADDRESS),
-                    boost::lexical_cast<boost::uint16_t>(cfg_port));
+                    sec->get_entry("address", HPX_INITIAL_IP_ADDRESS)
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+                  , get_ibverbs_address()
+#endif
+                  , boost::lexical_cast<boost::uint16_t>(cfg_port)
+                );
             }
         }
-        return naming::locality(HPX_INITIAL_IP_ADDRESS, HPX_INITIAL_IP_PORT);
+        return
+            naming::locality(
+                HPX_INITIAL_IP_ADDRESS
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+              , get_ibverbs_address()
+#endif
+              , HPX_INITIAL_IP_PORT
+            );
+    }
+
+    std::string runtime_configuration::get_ibverbs_address() const
+    {
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+        if(has_section("hpx.parcel.ibverbs"))
+        {
+            util::section const * sec = get_section("hpx.parcel.ibverbs");
+            if(NULL != sec) {
+                std::string ibverbs_enabled(
+                    sec->get_entry("enabled", "0"));
+                //if(boost::lexical_cast<int>(ibverbs_enabled))
+                {
+#if (defined(__linux) || defined(linux) || defined(__linux__))
+                    std::string ibverbs_ifname(
+                        sec->get_entry("ifname", HPX_PARCELPORT_IBVERBS_IFNAME));
+
+                    ifaddrs *ifap;
+                    getifaddrs(&ifap);
+                    for(ifaddrs *cur = ifap; cur != NULL; cur = cur->ifa_next)
+                    {
+                        if(std::string(cur->ifa_name) == ibverbs_ifname)
+                        {
+                            char buf[1024] = {0};
+                            switch(cur->ifa_addr->sa_family)
+                            {
+                                case AF_INET:
+                                    {
+                                        inet_ntop(
+                                            cur->ifa_addr->sa_family
+                                          , &((sockaddr_in *)cur->ifa_addr)->sin_addr
+                                          , buf
+                                          , 1024
+                                        );
+                                        freeifaddrs(ifap);
+                                        return buf;
+                                    }
+                                case AF_INET6:
+                                    {
+                                        inet_ntop(
+                                            cur->ifa_addr->sa_family
+                                          , &((sockaddr_in6 *)cur->ifa_addr)->sin6_addr
+                                          , buf
+                                          , 1024
+                                        );
+                                        freeifaddrs(ifap);
+                                        return buf;
+                                    }
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+                    freeifaddrs(ifap);
+#endif
+                }
+            }
+        }
+#endif
+        return "";
     }
 
     std::size_t runtime_configuration::get_ipc_data_buffer_cache_size() const

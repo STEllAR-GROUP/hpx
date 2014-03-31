@@ -341,10 +341,18 @@ endif()
 ################################################################################
 hpx_option(HPX_HAVE_PARCELPORT_IBVERBS BOOL "Enable parcelport based on RDMA ibverbs operations (default: OFF)." OFF ADVANCED)
 if(HPX_HAVE_PARCELPORT_IBVERBS)
+  hpx_option(HPX_PARCELPORT_IBVERBS_IFNAME STRING "The interface name of the ibverbs capable network adapter (default: ib0)" "ib0" ADVANCED)
+  hpx_option(HPX_PARCELPORT_IBVERBS_MESSAGE_PAYLOAD STRING "Size of the message payload not sent with RDMA (default: 512 byte)" "512" ADVANCED)
+  hpx_option(HPX_PARCELPORT_IBVERBS_MEMORY_CHUNK_SIZE STRING "Number of bytes a chunk in the memory pool can hold (default: 64MB)" "67108864" ADVANCED)
+  hpx_option(HPX_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS STRING "Maximum number of chunks that can be allocated (default: 100)" "100" ADVANCED)
   find_package(HPX_Ibverbs)
   find_package(HPX_Rdmacm)
   if(IBVERBS_FOUND AND RDMACM_FOUND)
     hpx_add_config_define(HPX_HAVE_PARCELPORT_IBVERBS)
+    hpx_add_config_define(HPX_PARCELPORT_IBVERBS_IFNAME "\"${HPX_PARCELPORT_IBVERBS_IFNAME}\"")
+    hpx_add_config_define(HPX_PARCELPORT_IBVERBS_MESSAGE_PAYLOAD "${HPX_PARCELPORT_IBVERBS_MESSAGE_PAYLOAD}")
+    hpx_add_config_define(HPX_PARCELPORT_IBVERBS_MEMORY_CHUNK_SIZE "${HPX_PARCELPORT_IBVERBS_MEMORY_CHUNK_SIZE}")
+    hpx_add_config_define(HPX_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS "${HPX_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS}")
   endif()
 endif()
 
@@ -605,7 +613,7 @@ hpx_option(HPX_THREAD_MAINTAIN_IDLE_RATES BOOL
     ON ADVANCED)
 if(HPX_THREAD_MAINTAIN_IDLE_RATES)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_IDLE_RATES 1)
-  hpx_option(HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES BOOL 
+  hpx_option(HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES BOOL
     "Enable measuring thread creation and cleanup times (default: OFF)"
     OFF ADVANCED)
   if(HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES)

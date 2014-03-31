@@ -140,9 +140,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 HPX_IBVERBS_RESET_EC(ec);
                 return;
             }
-            
+
             close_operation_.store(true);
-            
+
             BOOST_SCOPE_EXIT(&close_operation_) {
                 close_operation_.store(false);
             } BOOST_SCOPE_EXIT_END
@@ -151,7 +151,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
             // wait for pending operations to return
             while (executing_operation_.load())
                 ;
-            
+
             if(event_channel_)
             {
                 rdma_destroy_event_channel(event_channel_);
@@ -166,7 +166,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 rdma_destroy_id(listener_);
                 listener_ = 0;
             }
-            
+
             HPX_IBVERBS_RESET_EC(ec);
         }
 
@@ -205,7 +205,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
         template <typename Parcelport>
         boost::shared_ptr<receiver> accept(
-            Parcelport & parcelport, boost::system::error_code &ec)
+            Parcelport & parcelport, memory_pool & pool, boost::system::error_code &ec)
         {
             boost::shared_ptr<receiver> rcv;
             if (close_operation_.load() || !event_channel_) {
@@ -226,8 +226,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 cm_params.initiator_depth = cm_params.responder_resources = 1;
                 cm_params.rnr_retry_count = 7; // infinite retry
 
-                rcv.reset(new receiver(parcelport));
-                rcv->context().build_connection(event.id, ec);
+                rcv.reset(new receiver(parcelport, pool));
+                rcv->context().build_connection(parcelport, event.id, ec);
                 if(ec)
                 {
                     rcv.reset();
@@ -273,7 +273,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         void on_disconnect(rdma_cm_id * id)
         {
         }
-    
+
     private:
         rdma_event_channel *event_channel_;
         rdma_cm_id *listener_;

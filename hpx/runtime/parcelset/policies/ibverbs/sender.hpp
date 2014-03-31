@@ -11,7 +11,7 @@
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/runtime/parcelset/policies/ibverbs/context.hpp>
 #include <hpx/runtime/parcelset/policies/ibverbs/messages.hpp>
-#include <hpx/runtime/parcelset/policies/ibverbs/data_buffer.hpp>
+#include <hpx/runtime/parcelset/policies/ibverbs/allocator.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
@@ -24,8 +24,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
     void add_sender(connection_handler & handler,
         boost::shared_ptr<sender> const& sender_connection);
 
+    ibv_mr register_buffer(connection_handler & handler,
+        ibv_pd * pd, char * buffer, std::size_t size, int access);
+
     class sender
-      : public parcelset::parcelport_connection<sender, data_buffer>
+      : public parcelset::parcelport_connection<
+            sender
+          , std::vector<char, allocator<message::payload_size> >
+        >//data_buffer>
     {
         typedef bool(sender::*next_function_type)();
     public:
@@ -42,15 +48,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
             >
             postprocess_function_type;
 
-        sender(connection_handler & handler, naming::locality const& there,
+        sender(connection_handler & handler, memory_pool & pool, naming::locality const& there,
             performance_counters::parcels::gatherer& parcels_sent)
-          : parcelport_(handler), there_(there), parcels_sent_(parcels_sent)
+          : context_(), parcelport_(handler), there_(there), parcels_sent_(parcels_sent), memory_pool_(pool)
         {
-            boost::system::error_code ec;
-            std::string buffer_size_str = get_config_entry("hpx.parcel.ibverbs.buffer_size", "4096");
-
-            buffer_size_ = boost::lexical_cast<std::size_t>(buffer_size_str);
-            mr_buffer_ = context_.set_buffer_size(buffer_size_, ec);
         }
 
         ~sender()
@@ -76,10 +77,16 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
         boost::shared_ptr<parcel_buffer_type> get_buffer(parcel const & p, std::size_t arg_size)
         {
-            if(!buffer_ || (buffer_ && !buffer_->parcels_decoded_))
+            if(!buffer_)
             {
-                buffer_ = boost::shared_ptr<parcel_buffer_type>(new parcel_buffer_type());
-                buffer_->data_.set_mr_buffer(mr_buffer_, buffer_size_);
+                boost::system::error_code ec;
+                buffer_
+                    = boost::shared_ptr<parcel_buffer_type>(
+                        new parcel_buffer_type(
+                            allocator<message::payload_size>(memory_pool_)
+                        )
+                    );
+                buffer_->data_.reserve(arg_size);
             }
             return buffer_;
         }
@@ -90,14 +97,15 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         {
             /// Increment sends and begin timer.
             buffer_->data_point_.time_ = timer_.elapsed_nanoseconds();
+            HPX_ASSERT(buffer_->num_chunks_.first == 0u);
 
             handler_ = handler;
             postprocess_ = parcel_postprocess;
-            
-            next(&sender::send_data);
+
+            send_size();
             add_sender(parcelport_, shared_from_this());
         }
-        
+
         bool done()
         {
             next_function_type f = 0;
@@ -124,20 +132,91 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         }
 
     private:
+        bool send_size()
+        {
+            boost::system::error_code & ec = boost::system::throws;
+            std::size_t size = buffer_->data_.size();
+            HPX_ASSERT(buffer_->num_chunks_.first == 0u);
+            if(size <= message::payload_size)
+            {
+                context_.connection().send_small_msg(&buffer_->data_[0], size, ec);
+                return next(&sender::sent_small_msg);
+            }
+            else
+            {
+                context_.send_size(buffer_->data_.size(), ec);
+                mr_ = register_buffer(
+                    parcelport_
+                  , context_.pd_
+                  , &buffer_->data_[0]
+                  , buffer_->data_.size()
+                  , IBV_ACCESS_LOCAL_WRITE);
+                return next(&sender::sent_size);
+            }
+        }
+
+        bool sent_small_msg()
+        {
+            boost::system::error_code & ec = boost::system::throws;
+            if(context_.check_wc<false>(MSG_SIZE, ec))
+            {
+                context_.post_receive(ec);
+                return next(&sender::read_ack);
+            }
+            return false;
+        }
+
+        bool sent_size()
+        {
+            boost::system::error_code & ec = boost::system::throws;
+            if(context_.check_wc<false>(MSG_SIZE, ec))
+            {
+                context_.post_receive(ec);
+                return next(&sender::read_mr);
+            }
+            return false;
+        }
+
+        bool read_mr()
+        {
+            if(context_.check_wc<false>(MSG_MR, boost::system::throws))
+            {
+                return send_data();
+            }
+            return false;
+        }
+
         bool send_data()
         {
-            context_.write(buffer_->data_, boost::system::throws);
-            return next(&sender::read_ack);
+            context_.connection().write_remote(
+                &buffer_->data_[0]
+              , &mr_
+              , buffer_->data_.size()
+              , boost::system::throws
+            );
+            return next(&sender::sent_data);
+        }
+
+        bool sent_data()
+        {
+            boost::system::error_code & ec = boost::system::throws;
+            if(context_.check_wc<false>(MSG_DATA, ec))
+            {
+                context_.post_receive(ec);
+                return next(&sender::read_ack);
+            }
+            return false;
         }
 
         bool read_ack()
         {
-            if(context_.try_read_ack(boost::system::throws))
+            boost::system::error_code & ec = boost::system::throws;
+            if(context_.check_wc<false>(MSG_DONE, ec))
             {
                 next(0);
                 return true;
             }
-            return next(&sender::read_ack);
+            return false;
         }
 
         bool next(next_function_type f)
@@ -149,15 +228,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
         /// Context for the parcelport_connection.
         client_context context_;
-        std::size_t buffer_size_;
-        char * mr_buffer_;
-        
+
         hpx::lcos::local::spinlock mtx_;
         next_function_type next_;
-        
+
         handler_function_type handler_;
         postprocess_function_type postprocess_;
-        
+
         connection_handler & parcelport_;
 
         /// the other (receiving) end of this connection
@@ -165,6 +242,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         /// Counters and their data containers.
         util::high_resolution_timer timer_;
         performance_counters::parcels::gatherer& parcels_sent_;
+
+        memory_pool & memory_pool_;
+        ibv_mr mr_;
     };
 }}}}
 

@@ -479,6 +479,8 @@ void notify_worker(notification_header const& header)
             hpx::util::osstream_get_string(strm));
     }
 
+    rt.get_config().set_agas_locality(header.locality_ns_address.locality_);
+
     // set our prefix
     agas_client.set_local_locality(header.prefix);
     rt.get_config().parse("assigned locality",
