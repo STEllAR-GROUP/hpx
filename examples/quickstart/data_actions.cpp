@@ -25,9 +25,10 @@ struct plain_data
     /// does no hooking at all.
     template <typename F>
     static HPX_STD_FUNCTION<hpx::threads::thread_function_type>
-    decorate_action(hpx::naming::address::address_type, F const& f)
+    decorate_action(hpx::naming::address::address_type, F && f)
     {
-        return HPX_STD_FUNCTION<hpx::threads::thread_function_type>(f);
+        return HPX_STD_FUNCTION<hpx::threads::thread_function_type>(
+            std::forward<F>(f));
     }
 
     /// This is the default hook implementation for schedule_thread which

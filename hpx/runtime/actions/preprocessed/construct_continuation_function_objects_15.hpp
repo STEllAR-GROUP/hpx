@@ -23,7 +23,7 @@ namespace detail
         template <typename Func
            >
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
            ) const
         {
             try {
@@ -66,7 +66,7 @@ namespace detail
         template <typename Func
            >
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
            ) const
         {
             try {
@@ -115,7 +115,7 @@ namespace detail
         template <typename Func
           , typename Arg0>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0) const
         {
             try {
@@ -158,7 +158,7 @@ namespace detail
         template <typename Func
           , typename Arg0>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0) const
         {
             try {
@@ -207,7 +207,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1) const
         {
             try {
@@ -250,7 +250,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1) const
         {
             try {
@@ -299,7 +299,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2) const
         {
             try {
@@ -342,7 +342,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2) const
         {
             try {
@@ -391,7 +391,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3) const
         {
             try {
@@ -434,7 +434,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3) const
         {
             try {
@@ -483,7 +483,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4) const
         {
             try {
@@ -526,7 +526,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4) const
         {
             try {
@@ -575,7 +575,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5) const
         {
             try {
@@ -618,7 +618,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5) const
         {
             try {
@@ -667,7 +667,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6) const
         {
             try {
@@ -710,7 +710,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6) const
         {
             try {
@@ -759,7 +759,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7) const
         {
             try {
@@ -802,7 +802,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7) const
         {
             try {
@@ -851,7 +851,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8) const
         {
             try {
@@ -894,7 +894,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8) const
         {
             try {
@@ -943,7 +943,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9) const
         {
             try {
@@ -986,7 +986,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9) const
         {
             try {
@@ -1035,7 +1035,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10) const
         {
             try {
@@ -1078,7 +1078,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10) const
         {
             try {
@@ -1127,7 +1127,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11) const
         {
             try {
@@ -1170,7 +1170,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11) const
         {
             try {
@@ -1219,7 +1219,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12) const
         {
             try {
@@ -1262,7 +1262,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12) const
         {
             try {
@@ -1311,7 +1311,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13) const
         {
             try {
@@ -1354,7 +1354,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13) const
         {
             try {
@@ -1403,7 +1403,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14) const
         {
             try {
@@ -1446,7 +1446,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14) const
         {
             try {

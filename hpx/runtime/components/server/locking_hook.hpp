@@ -39,12 +39,12 @@ namespace hpx { namespace components
         /// for this component instance.
         template <typename F>
         static HPX_STD_FUNCTION<threads::thread_function_type>
-        decorate_action(naming::address::address_type lva, F const& f)
+        decorate_action(naming::address::address_type lva, F && f)
         {
-            return HPX_STD_BIND(&locking_hook::thread_function,
+            return util::bind(&locking_hook::thread_function,
                 get_lva<this_component_type>::call(lva),
-                HPX_STD_PLACEHOLDERS::_1,
-                base_type::decorate_action(lva, f));
+                util::placeholders::_1,
+                base_type::decorate_action(lva, std::forward<F>(f)));
         }
 
     protected:

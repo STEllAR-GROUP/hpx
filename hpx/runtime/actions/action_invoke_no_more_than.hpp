@@ -84,13 +84,13 @@ namespace hpx { namespace actions { namespace detail
 
         template <typename F>
         static HPX_STD_FUNCTION<threads::thread_function_type>
-        call(naming::address::address_type lva, F const& f, boost::mpl::false_)
+        call(naming::address::address_type lva, F && f, boost::mpl::false_)
         {
             typedef typename Action::component_type component_type;
             return util::bind(
                 &action_decorate_function::thread_function,
                 util::placeholders::_1,
-                component_type::decorate_action(lva, f)
+                component_type::decorate_action(lva, std::forward<F>(f))
             );
         }
 
@@ -107,13 +107,13 @@ namespace hpx { namespace actions { namespace detail
 
         template <typename F>
         static HPX_STD_FUNCTION<threads::thread_function_type>
-        call(naming::address::address_type lva, F const& f, boost::mpl::true_)
+        call(naming::address::address_type lva, F && f, boost::mpl::true_)
         {
             typedef typename Action::component_type component_type;
             return util::bind(
                 &action_decorate_function::thread_function_future,
                 util::placeholders::_1,
-                component_type::decorate_action(lva, f)
+                component_type::decorate_action(lva, std::forward<F>(f))
             );
         }
 

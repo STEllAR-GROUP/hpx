@@ -84,7 +84,7 @@ namespace detail
         template <typename Func
           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)) const
         {
             try {
@@ -131,7 +131,7 @@ namespace detail
         template <typename Func
           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)) const
         {
             try {

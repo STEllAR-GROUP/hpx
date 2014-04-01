@@ -10,12 +10,12 @@
 
 namespace detail
 {
-
-
-
-
-
-
+    
+    
+    
+    
+    
+    
     template <typename Action>
     struct continuation_thread_function_void_0
     {
@@ -23,7 +23,7 @@ namespace detail
         template <typename Func
            >
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
            ) const
         {
             try {
@@ -34,15 +34,15 @@ namespace detail
                 cont->trigger();
             }
             catch (...) {
-
+                
                 cont->trigger_error(boost::current_exception());
             }
             return threads::terminated;
         }
     };
-
-
-
+    
+    
+    
     template <typename Action>
     struct construct_continuation_thread_function_voidN<Action, 0>
     {
@@ -54,11 +54,11 @@ namespace detail
             return util::bind(util::one_shot(
                 continuation_thread_function_void_0<Action>()),
                 cont, std::forward<Func>(func)
-
+              
                     );
         }
     };
-
+    
     template <typename Action>
     struct continuation_thread_function_0
     {
@@ -66,7 +66,7 @@ namespace detail
         template <typename Func
            >
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
            ) const
         {
             try {
@@ -78,7 +78,7 @@ namespace detail
                 ));
             }
             catch (...) {
-
+                
                 cont->trigger_error(boost::current_exception());
             }
             return threads::terminated;
@@ -95,19 +95,19 @@ namespace detail
             return util::bind(util::one_shot(
                 continuation_thread_function_0<Action>()),
                 cont, std::forward<Func>(func)
-
+              
                     );
         }
     };
 }
 namespace detail
 {
-
-
-
-
-
-
+    
+    
+    
+    
+    
+    
     template <typename Action>
     struct continuation_thread_function_void_1
     {
@@ -115,7 +115,7 @@ namespace detail
         template <typename Func
           , typename Arg0>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0) const
         {
             try {
@@ -126,15 +126,15 @@ namespace detail
                 cont->trigger();
             }
             catch (...) {
-
+                
                 cont->trigger_error(boost::current_exception());
             }
             return threads::terminated;
         }
     };
-
-
-
+    
+    
+    
     template <typename Action>
     struct construct_continuation_thread_function_voidN<Action, 1>
     {
@@ -150,7 +150,7 @@ namespace detail
                     util::get< 0>(std::forward<Arguments>( args)));
         }
     };
-
+    
     template <typename Action>
     struct continuation_thread_function_1
     {
@@ -158,7 +158,7 @@ namespace detail
         template <typename Func
           , typename Arg0>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0) const
         {
             try {
@@ -170,7 +170,7 @@ namespace detail
                 ));
             }
             catch (...) {
-
+                
                 cont->trigger_error(boost::current_exception());
             }
             return threads::terminated;
@@ -194,12 +194,12 @@ namespace detail
 }
 namespace detail
 {
-
-
-
-
-
-
+    
+    
+    
+    
+    
+    
     template <typename Action>
     struct continuation_thread_function_void_2
     {
@@ -207,7 +207,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1) const
         {
             try {
@@ -218,15 +218,15 @@ namespace detail
                 cont->trigger();
             }
             catch (...) {
-
+                
                 cont->trigger_error(boost::current_exception());
             }
             return threads::terminated;
         }
     };
-
-
-
+    
+    
+    
     template <typename Action>
     struct construct_continuation_thread_function_voidN<Action, 2>
     {
@@ -242,7 +242,7 @@ namespace detail
                     util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)));
         }
     };
-
+    
     template <typename Action>
     struct continuation_thread_function_2
     {
@@ -250,7 +250,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1) const
         {
             try {
@@ -262,7 +262,7 @@ namespace detail
                 ));
             }
             catch (...) {
-
+                
                 cont->trigger_error(boost::current_exception());
             }
             return threads::terminated;
@@ -286,12 +286,12 @@ namespace detail
 }
 namespace detail
 {
-
-
-
-
-
-
+    
+    
+    
+    
+    
+    
     template <typename Action>
     struct continuation_thread_function_void_3
     {
@@ -299,7 +299,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2) const
         {
             try {
@@ -310,15 +310,15 @@ namespace detail
                 cont->trigger();
             }
             catch (...) {
-
+                
                 cont->trigger_error(boost::current_exception());
             }
             return threads::terminated;
         }
     };
-
-
-
+    
+    
+    
     template <typename Action>
     struct construct_continuation_thread_function_voidN<Action, 3>
     {
@@ -334,7 +334,7 @@ namespace detail
                     util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)));
         }
     };
-
+    
     template <typename Action>
     struct continuation_thread_function_3
     {
@@ -342,7 +342,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2) const
         {
             try {
@@ -354,7 +354,7 @@ namespace detail
                 ));
             }
             catch (...) {
-
+                
                 cont->trigger_error(boost::current_exception());
             }
             return threads::terminated;
@@ -378,12 +378,12 @@ namespace detail
 }
 namespace detail
 {
-
-
-
-
-
-
+    
+    
+    
+    
+    
+    
     template <typename Action>
     struct continuation_thread_function_void_4
     {
@@ -391,7 +391,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3) const
         {
             try {
@@ -402,15 +402,15 @@ namespace detail
                 cont->trigger();
             }
             catch (...) {
-
+                
                 cont->trigger_error(boost::current_exception());
             }
             return threads::terminated;
         }
     };
-
-
-
+    
+    
+    
     template <typename Action>
     struct construct_continuation_thread_function_voidN<Action, 4>
     {
@@ -426,7 +426,7 @@ namespace detail
                     util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)));
         }
     };
-
+    
     template <typename Action>
     struct continuation_thread_function_4
     {
@@ -434,7 +434,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3) const
         {
             try {
@@ -446,7 +446,7 @@ namespace detail
                 ));
             }
             catch (...) {
-
+                
                 cont->trigger_error(boost::current_exception());
             }
             return threads::terminated;
@@ -470,12 +470,12 @@ namespace detail
 }
 namespace detail
 {
-
-
-
-
-
-
+    
+    
+    
+    
+    
+    
     template <typename Action>
     struct continuation_thread_function_void_5
     {
@@ -483,7 +483,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4) const
         {
             try {
@@ -494,15 +494,15 @@ namespace detail
                 cont->trigger();
             }
             catch (...) {
-
+                
                 cont->trigger_error(boost::current_exception());
             }
             return threads::terminated;
         }
     };
-
-
-
+    
+    
+    
     template <typename Action>
     struct construct_continuation_thread_function_voidN<Action, 5>
     {
@@ -518,7 +518,7 @@ namespace detail
                     util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)));
         }
     };
-
+    
     template <typename Action>
     struct continuation_thread_function_5
     {
@@ -526,7 +526,7 @@ namespace detail
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
         BOOST_FORCEINLINE result_type operator()(
-            continuation_type cont, Func const& func
+            continuation_type cont, Func && func
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4) const
         {
             try {
@@ -538,7 +538,7 @@ namespace detail
                 ));
             }
             catch (...) {
-
+                
                 cont->trigger_error(boost::current_exception());
             }
             return threads::terminated;

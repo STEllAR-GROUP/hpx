@@ -848,8 +848,8 @@ namespace hpx { namespace actions
             typedef typename boost::remove_reference<Arguments_>::type arguments_type;
             return detail::construct_continuation_thread_function_voidN<
                     derived_type,
-                    util::tuple_size<arguments_type>::value>::call(
-                cont, std::forward<Func>(func), std::forward<Arguments_>(args));
+                    util::tuple_size<arguments_type>::value
+                >::call(cont, std::forward<Func>(func), std::forward<Arguments_>(args));
         }
 
         template <typename Func, typename Arguments_>
@@ -861,8 +861,8 @@ namespace hpx { namespace actions
             typedef typename boost::remove_reference<Arguments_>::type arguments_type;
             return detail::construct_continuation_thread_functionN<
                     derived_type,
-                    util::tuple_size<arguments_type>::value>::call(
-                cont, std::forward<Func>(func), std::forward<Arguments_>(args));
+                    util::tuple_size<arguments_type>::value
+                >::call(cont, std::forward<Func>(func), std::forward<Arguments_>(args));
         }
 
         // bring in all overloads for

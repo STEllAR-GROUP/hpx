@@ -10,10 +10,10 @@
 
 namespace hpx
 {
-
+    
     template <
         typename Action
-
+       
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 0
@@ -23,7 +23,7 @@ namespace hpx
     >::type
     async_continue(
         naming::id_type const& gid
-
+       
       , F && f)
     {
         typedef
@@ -44,10 +44,10 @@ namespace hpx
            );
         return p.get_future();
     }
-
+    
     template <
         typename Component, typename Result, typename Arguments, typename Derived
-
+       
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 0
@@ -56,20 +56,20 @@ namespace hpx
         >
     >::type
     async_continue(
-        hpx::actions::action<Component, Result, Arguments, Derived>
+        hpx::actions::action<Component, Result, Arguments, Derived> 
       , naming::id_type const& gid
-
+       
       , F && f)
     {
         return async_continue<Derived>(
             gid
-
+           
           , std::forward<F>(f));
     }
 }
 namespace hpx
 {
-
+    
     template <
         typename Action
       , typename Arg0
@@ -103,7 +103,7 @@ namespace hpx
           , std::forward<Arg0>( arg0 ));
         return p.get_future();
     }
-
+    
     template <
         typename Component, typename Result, typename Arguments, typename Derived
       , typename Arg0
@@ -115,7 +115,7 @@ namespace hpx
         >
     >::type
     async_continue(
-        hpx::actions::action<Component, Result, Arguments, Derived>
+        hpx::actions::action<Component, Result, Arguments, Derived> 
       , naming::id_type const& gid
       , Arg0 && arg0
       , F && f)
@@ -128,7 +128,7 @@ namespace hpx
 }
 namespace hpx
 {
-
+    
     template <
         typename Action
       , typename Arg0 , typename Arg1
@@ -162,7 +162,7 @@ namespace hpx
           , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
         return p.get_future();
     }
-
+    
     template <
         typename Component, typename Result, typename Arguments, typename Derived
       , typename Arg0 , typename Arg1
@@ -174,7 +174,7 @@ namespace hpx
         >
     >::type
     async_continue(
-        hpx::actions::action<Component, Result, Arguments, Derived>
+        hpx::actions::action<Component, Result, Arguments, Derived> 
       , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1
       , F && f)
@@ -187,7 +187,7 @@ namespace hpx
 }
 namespace hpx
 {
-
+    
     template <
         typename Action
       , typename Arg0 , typename Arg1 , typename Arg2
@@ -221,7 +221,7 @@ namespace hpx
           , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
         return p.get_future();
     }
-
+    
     template <
         typename Component, typename Result, typename Arguments, typename Derived
       , typename Arg0 , typename Arg1 , typename Arg2
@@ -233,7 +233,7 @@ namespace hpx
         >
     >::type
     async_continue(
-        hpx::actions::action<Component, Result, Arguments, Derived>
+        hpx::actions::action<Component, Result, Arguments, Derived> 
       , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2
       , F && f)
@@ -246,7 +246,7 @@ namespace hpx
 }
 namespace hpx
 {
-
+    
     template <
         typename Action
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
@@ -280,7 +280,7 @@ namespace hpx
           , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
         return p.get_future();
     }
-
+    
     template <
         typename Component, typename Result, typename Arguments, typename Derived
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
@@ -292,7 +292,7 @@ namespace hpx
         >
     >::type
     async_continue(
-        hpx::actions::action<Component, Result, Arguments, Derived>
+        hpx::actions::action<Component, Result, Arguments, Derived> 
       , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3
       , F && f)
@@ -305,7 +305,7 @@ namespace hpx
 }
 namespace hpx
 {
-
+    
     template <
         typename Action
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
@@ -339,7 +339,7 @@ namespace hpx
           , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
         return p.get_future();
     }
-
+    
     template <
         typename Component, typename Result, typename Arguments, typename Derived
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
@@ -351,7 +351,7 @@ namespace hpx
         >
     >::type
     async_continue(
-        hpx::actions::action<Component, Result, Arguments, Derived>
+        hpx::actions::action<Component, Result, Arguments, Derived> 
       , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4
       , F && f)
@@ -364,7 +364,7 @@ namespace hpx
 }
 namespace hpx
 {
-
+    
     template <
         typename Action
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5
@@ -398,7 +398,7 @@ namespace hpx
           , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
         return p.get_future();
     }
-
+    
     template <
         typename Component, typename Result, typename Arguments, typename Derived
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5
@@ -410,7 +410,7 @@ namespace hpx
         >
     >::type
     async_continue(
-        hpx::actions::action<Component, Result, Arguments, Derived>
+        hpx::actions::action<Component, Result, Arguments, Derived> 
       , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5
       , F && f)
@@ -423,7 +423,7 @@ namespace hpx
 }
 namespace hpx
 {
-
+    
     template <
         typename Action
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6
@@ -457,7 +457,7 @@ namespace hpx
           , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
         return p.get_future();
     }
-
+    
     template <
         typename Component, typename Result, typename Arguments, typename Derived
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6
@@ -469,7 +469,7 @@ namespace hpx
         >
     >::type
     async_continue(
-        hpx::actions::action<Component, Result, Arguments, Derived>
+        hpx::actions::action<Component, Result, Arguments, Derived> 
       , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6
       , F && f)
@@ -482,7 +482,7 @@ namespace hpx
 }
 namespace hpx
 {
-
+    
     template <
         typename Action
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7
@@ -516,7 +516,7 @@ namespace hpx
           , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
         return p.get_future();
     }
-
+    
     template <
         typename Component, typename Result, typename Arguments, typename Derived
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7
@@ -528,7 +528,7 @@ namespace hpx
         >
     >::type
     async_continue(
-        hpx::actions::action<Component, Result, Arguments, Derived>
+        hpx::actions::action<Component, Result, Arguments, Derived> 
       , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7
       , F && f)
@@ -541,7 +541,7 @@ namespace hpx
 }
 namespace hpx
 {
-
+    
     template <
         typename Action
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8
@@ -575,7 +575,7 @@ namespace hpx
           , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
         return p.get_future();
     }
-
+    
     template <
         typename Component, typename Result, typename Arguments, typename Derived
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8
@@ -587,7 +587,7 @@ namespace hpx
         >
     >::type
     async_continue(
-        hpx::actions::action<Component, Result, Arguments, Derived>
+        hpx::actions::action<Component, Result, Arguments, Derived> 
       , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8
       , F && f)
@@ -600,7 +600,7 @@ namespace hpx
 }
 namespace hpx
 {
-
+    
     template <
         typename Action
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9
@@ -634,7 +634,7 @@ namespace hpx
           , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
         return p.get_future();
     }
-
+    
     template <
         typename Component, typename Result, typename Arguments, typename Derived
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9
@@ -646,7 +646,7 @@ namespace hpx
         >
     >::type
     async_continue(
-        hpx::actions::action<Component, Result, Arguments, Derived>
+        hpx::actions::action<Component, Result, Arguments, Derived> 
       , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9
       , F && f)
@@ -659,7 +659,7 @@ namespace hpx
 }
 namespace hpx
 {
-
+    
     template <
         typename Action
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10
@@ -693,7 +693,7 @@ namespace hpx
           , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ));
         return p.get_future();
     }
-
+    
     template <
         typename Component, typename Result, typename Arguments, typename Derived
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10
@@ -705,7 +705,7 @@ namespace hpx
         >
     >::type
     async_continue(
-        hpx::actions::action<Component, Result, Arguments, Derived>
+        hpx::actions::action<Component, Result, Arguments, Derived> 
       , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10
       , F && f)
@@ -718,7 +718,7 @@ namespace hpx
 }
 namespace hpx
 {
-
+    
     template <
         typename Action
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11
@@ -752,7 +752,7 @@ namespace hpx
           , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ));
         return p.get_future();
     }
-
+    
     template <
         typename Component, typename Result, typename Arguments, typename Derived
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11
@@ -764,7 +764,7 @@ namespace hpx
         >
     >::type
     async_continue(
-        hpx::actions::action<Component, Result, Arguments, Derived>
+        hpx::actions::action<Component, Result, Arguments, Derived> 
       , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11
       , F && f)
@@ -777,7 +777,7 @@ namespace hpx
 }
 namespace hpx
 {
-
+    
     template <
         typename Action
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12
@@ -811,7 +811,7 @@ namespace hpx
           , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ));
         return p.get_future();
     }
-
+    
     template <
         typename Component, typename Result, typename Arguments, typename Derived
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12
@@ -823,7 +823,7 @@ namespace hpx
         >
     >::type
     async_continue(
-        hpx::actions::action<Component, Result, Arguments, Derived>
+        hpx::actions::action<Component, Result, Arguments, Derived> 
       , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12
       , F && f)
@@ -836,7 +836,7 @@ namespace hpx
 }
 namespace hpx
 {
-
+    
     template <
         typename Action
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13
@@ -870,7 +870,7 @@ namespace hpx
           , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ));
         return p.get_future();
     }
-
+    
     template <
         typename Component, typename Result, typename Arguments, typename Derived
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13
@@ -882,7 +882,7 @@ namespace hpx
         >
     >::type
     async_continue(
-        hpx::actions::action<Component, Result, Arguments, Derived>
+        hpx::actions::action<Component, Result, Arguments, Derived> 
       , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13
       , F && f)
@@ -895,7 +895,7 @@ namespace hpx
 }
 namespace hpx
 {
-
+    
     template <
         typename Action
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14
@@ -929,7 +929,7 @@ namespace hpx
           , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ));
         return p.get_future();
     }
-
+    
     template <
         typename Component, typename Result, typename Arguments, typename Derived
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14
@@ -941,7 +941,7 @@ namespace hpx
         >
     >::type
     async_continue(
-        hpx::actions::action<Component, Result, Arguments, Derived>
+        hpx::actions::action<Component, Result, Arguments, Derived> 
       , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14
       , F && f)

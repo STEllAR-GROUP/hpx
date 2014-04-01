@@ -73,12 +73,12 @@ namespace hpx { namespace components
         /// action.
         template <typename F>
         static HPX_STD_FUNCTION<threads::thread_function_type>
-        decorate_action(naming::address::address_type lva, F const& f)
+        decorate_action(naming::address::address_type lva, F && f)
         {
             using util::placeholders::_1;
             return util::bind(&migration_support::thread_function,
                 get_lva<this_component_type>::call(lva),
-                _1, base_type::decorate_action(lva, f));
+                _1, base_type::decorate_action(lva, std::forward<F>(f)));
         }
 
     protected:
