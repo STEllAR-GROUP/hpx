@@ -100,7 +100,7 @@ visit __stellar_hpx_buildbot__.
     [[Name                       ][Recommended Version][Minimum Version ]]
 
     [[[*Compilers]]]
-    [[__visual_cxx__ (x64)       ][2013               ][2010            ]]
+    [[__visual_cxx__ (x64)       ][2013               ][2012            ]]
 
     [[[*Build System]]]
     [[__cmake__                  ][2.8.4              ][2.8.4           ]]
