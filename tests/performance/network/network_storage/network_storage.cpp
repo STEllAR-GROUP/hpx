@@ -25,22 +25,32 @@
 // The principal problem can be summarized as follows:
 //
 // Put data into remote memory
-//    Pass user data pointer into serialize_buffer (0 copy)
-//    Copy data into parcelport for transmission. (1 copy)
-//    Transmit data into remote parcelport buffer
-//    Copy data from parcelport into serialize_buffer (2 copy)
-//    Copy data from serialize buffer into remote host storage (3 copy)
+//    1 Pass user data pointer into serialize_buffer (0 copy)
+//    2 Copy data into parcelport for transmission. (1 copy)
+//    3 Transmit data into remote parcelport buffer
+//    4 Copy data from parcelport into serialize_buffer (2 copy)
+//    5 Copy data from serialize buffer into remote host storage (3 copy ?)
 //
 // Get data from remote memory
-//    Allocate temporary buffer and copy from host storage into it (1 copy)
-//    Wrap storage in serialie_buffer and give to parcelport for return
-//    Copy data from serializ_buffer into parcelport for transmission (2 copy)
-//    Receive data into local parcelport buffer
-//    Copy from parcelport buffer into serialize_buffer (3 copy)
-//    Copy from serialize buffer into user memory (4 copy)
+//    1 Allocate temporary buffer and copy from host storage into it (1 copy)
+//    2 Wrap storage in serialize_buffer and give to parcelport for return
+//    3 Copy data from serialize_buffer into parcelport for transmission (2 copy)
+//    4 Receive data into local parcelport buffer
+//    5 Copy parcelport buffer to serialize_buffer(user data pointer) (3 copy)
 //
-// It is the final copy in each case I am trying to remove by customizing the
-// allocator to pass from the parcelport directly into user memory.
+// The ideal situation would be as follows
+//
+// Put into remote memory
+//    1 Pass user data pointer into serialize_buffer (0 copy)
+//    2 Copy data into parcelport for transmission. (1 copy)
+//    3 Transmit data into remote parcelport buffer
+//    4 Copy data from parcelport into serialize_buffer(user data pointer) (2 copy)
+//
+// Get data from remote memory
+//    1 Request serialize buffer from parcelport (0 copy)
+//    2 Copy from storage into serialize_buffer (1 copy)
+//    4 Receive data into local parcelport buffer
+//    5 Copy parcelport buffer to serialize_buffer(user data pointer) (2 copy)
 //
 // To make each process run a main function and participate in the test,
 // use a command line of the kind (no mpiexec assumed)
@@ -56,6 +66,7 @@
 // a background thread can be spawned to check for ready futures and remove
 // them from the waiting list. The vars are used for this bookkeeping task.
 //
+#define MAX_RANKS 64
 std::vector<std::vector<hpx::future<int>>> ActiveFutures;
 hpx::lcos::local::spinlock                 FuturesMutex;
 boost::atomic<bool>                        FuturesActive;
@@ -71,9 +82,13 @@ hpx::lcos::barrier unique_barrier;
 //
 char *local_storage = NULL;
 //
-const int         iterations = 10;
-const int local_storage_size = (256 * 1024 * 1024);
-const int      transfer_size = (16 * 1024 * 1024);
+typedef struct {
+    boost::uint64_t iterations;
+    boost::uint64_t local_storage_MB;
+    boost::uint64_t global_storage_MB;
+    boost::uint64_t transfer_size_B;
+    boost::uint64_t threads;
+} test_options;
 
 //----------------------------------------------------------------------------
 #define DEBUG_LEVEL 0
@@ -86,9 +101,9 @@ const int      transfer_size = (16 * 1024 * 1024);
 #define TEST_SUCCESS 1
 
 //----------------------------------------------------------------------------
-void allocate_local_storage()
+void allocate_local_storage(uint64_t local_storage_bytes)
 {
-    local_storage = new char[local_storage_size];
+    local_storage = new char[local_storage_bytes];
 }
 
 //----------------------------------------------------------------------------
@@ -103,7 +118,7 @@ void delete_local_storage()
 //
 // The function does not need to be asynchronous as it completes immediately,
 // but we return a future as this test needs to mimic "asynchronous" storage
-hpx::future<int> copy_to_local_storage(char const* src, uint32_t offset, int length)
+hpx::future<int> copy_to_local_storage(char const* src, uint32_t offset, uint64_t length)
 {
     char *dest = &local_storage[offset];
     std::copy(src, src + length, dest);
@@ -117,7 +132,7 @@ hpx::future<int> copy_to_local_storage(char const* src, uint32_t offset, int len
 //
 // The function does not need to be asynchronous as it completes immediately,
 // but we return a future as this test needs to mimic "asynchronous" storage
-hpx::future<int> copy_from_local_storage(char *dest, uint32_t offset, int length)
+hpx::future<int> copy_from_local_storage(char *dest, uint32_t offset, uint64_t length)
 {
     char const* src = &local_storage[offset];
     std::copy(src, src + length, dest);
@@ -240,7 +255,7 @@ namespace Storage {
     // A PUT into memory on this locality from a requester sending a
     // TransferBuffer
     hpx::future<int> CopyToStorage(TransferBuffer const& srcbuffer,
-        uint32_t address, int length)
+        uint32_t address, uint64_t length)
     {
         boost::shared_array<char> src = srcbuffer.data_array();
         return copy_to_local_storage(src.get(), address, length);
@@ -250,7 +265,7 @@ namespace Storage {
     // A GET from memory on this locality is returned to the requester in the
     // TransferBuffer
     hpx::future<TransferBufferReceive> CopyFromStorage(
-        uint32_t address, int length, std::size_t remote_buffer)
+        uint32_t address, uint64_t length, std::size_t remote_buffer)
     {
         // we must allocate a return buffer
         std::allocator<char> allocator;
@@ -348,19 +363,38 @@ hpx::lcos::barrier create_barrier(std::size_t num_localities, char const* symnam
 }
 
 //----------------------------------------------------------------------------
+void barrier_wait()
+{
+    unique_barrier.wait();
+}
+
+//----------------------------------------------------------------------------
 // Test speed of write/put
 void test_write(
     uint64_t rank, uint64_t nranks, uint64_t num_transfer_slots,
     std::mt19937& gen, std::uniform_int_distribution<>& random_rank,
-    std::uniform_int_distribution<>& random_slot)
+    std::uniform_int_distribution<>& random_slot,
+    test_options &options
+    )
 {
     CopyToStorage_action actWrite;
-
     //
-    unique_barrier.wait();
+    DEBUG_OUTPUT(1,
+        std::cout << "Entering Barrier at start of write on rank " << rank << std::endl;
+    );
+    //
+    barrier_wait();
+    //
+    DEBUG_OUTPUT(1,
+        std::cout << "Passed Barrier at start of write on rank " << rank << std::endl;
+    );
+    //
     hpx::util::high_resolution_timer timerWrite;
     //
-    for(int i = 0; i < iterations; i++) {
+    for(int i = 0; i < options.iterations; i++) {
+        DEBUG_OUTPUT(1,
+            std::cout << "Starting iteration " << i << " on rank " << rank << std::endl;
+        );
         //
         // start a thread which will clear any completed futures from our list.
         //
@@ -373,25 +407,28 @@ void test_write(
             // pick a random locality to send to
             int send_rank = random_rank(gen);
             // get the pointer to the current packet send buffer
-            char *buffer = &local_storage[i*transfer_size];
+            char *buffer = &local_storage[i*options.transfer_size_B];
             // Get the HPX locality from the dest rank
             hpx::id_type locality = hpx::naming::get_id_from_locality_id(send_rank);
             // pick a random slot to write our data into
             int memory_slot = random_slot(gen);
-            uint32_t memory_offset = memory_slot*transfer_size;
+            uint32_t memory_offset = static_cast<uint32_t>(memory_slot*options.transfer_size_B);
 
             // Execute a PUT on whatever locality we chose
             // Create a serializable memory buffer ready for sending.
             // Do not copy any data. Protect this with a mutex to ensure the
             // background thread removing completed futures doesn't collide
             {
+                DEBUG_OUTPUT(5,
+                    std::cout << "Put from rank " << rank << " on rank " << send_rank << std::endl;
+                );
                 ++FuturesWaiting[send_rank];
                 hpx::lcos::local::spinlock::scoped_lock lk(FuturesMutex);
                 ActiveFutures[send_rank].push_back(
                     hpx::async(actWrite, locality,
                         TransferBuffer(static_cast<char*>(buffer),
-                            transfer_size, TransferBuffer::reference),
-                        memory_offset, transfer_size
+                            options.transfer_size_B, TransferBuffer::reference),
+                        memory_offset, options.transfer_size_B
                     ).then(
                         hpx::launch::sync,
                         [=](hpx::future<int> fut) -> int {
@@ -422,15 +459,23 @@ void test_write(
         hpx::future<int> result = when_all(final_list).then(hpx::launch::sync, reduce);
         result.get();
     }
-    unique_barrier.wait();
+    barrier_wait();
     //
-    double writeMB = nranks*local_storage_size*iterations / (1024.0*1024.0);
+    double writeMB   = static_cast<double>(nranks*options.local_storage_MB*options.iterations);
     double writeTime = timerWrite.elapsed();
-    double writeBW = writeMB / writeTime;
+    double writeBW   = writeMB / writeTime;
+    double IOPS      = static_cast<double>(options.iterations*num_transfer_slots);
+    double IOPs_s    = IOPS/writeTime;
     if(rank == 0) {
         std::cout << "Total time         : " << writeTime << "\n";
-        std::cout << "Memory Transferred : " << writeMB << "MB \n";
-        std::cout << "Aggregate BW Write : " << writeBW << "MB/s" << std::endl;
+        std::cout << "Memory Transferred : " << writeMB   << "MB\n";
+        std::cout << "Number of IOPs     : " << IOPS      << "\n";
+        std::cout << "IOPs/s             : " << IOPs_s    << "\n";
+        std::cout << "Aggregate BW Write : " << writeBW   << "MB/s" << std::endl;
+        // a complete set of results that our python matplotlib script will ingest
+        char const* msg = "CSVData, write, ranks, %1%, threads, %2%, Memory, %3%, IOPsize, %4%, IOPS/s, %5%, BW, %6%, ";
+        std::cout << (boost::format(msg) % nranks % options.threads % writeMB % options.transfer_size_B
+          % IOPs_s % writeBW ) << std::endl;
     }
 }
 
@@ -439,16 +484,28 @@ void test_write(
 void test_read(
     uint64_t rank, uint64_t nranks, uint64_t num_transfer_slots,
     std::mt19937& gen, std::uniform_int_distribution<>& random_rank,
-    std::uniform_int_distribution<>& random_slot)
+    std::uniform_int_distribution<>& random_slot,
+    test_options &options
+    )
 {
     CopyFromStorage_action actRead;
-
+    //
+    DEBUG_OUTPUT(1,
+        std::cout << "Entering Barrier at start of read on rank " << rank << std::endl;
+    );
+    //
+    barrier_wait();
+    //
+    DEBUG_OUTPUT(1,
+        std::cout << "Passed Barrier at start of read on rank " << rank << std::endl;
+    );
+    //
     // this is mostly the same as the put loop, except that the received future
     // is not an int, but a transfer buffer which we have to copy out of.
     //
     hpx::util::high_resolution_timer timerRead;
     //
-    for(int i = 0; i < iterations; i++) {
+    for(int i = 0; i < options.iterations; i++) {
         //
         // start a thread which will clear any completed futures from our list.
         //
@@ -461,23 +518,24 @@ void test_read(
             // pick a random locality to send to
             int send_rank = random_rank(gen);
             // get the pointer to the current packet send buffer
-            char *buffer = &local_storage[i*transfer_size];
+            char *buffer = &local_storage[i*options.transfer_size_B];
             // Get the HPX locality from the dest rank
             hpx::id_type locality = hpx::naming::get_id_from_locality_id(send_rank);
             // pick a random slot to write our data into
             int memory_slot = random_slot(gen);
-            uint32_t memory_offset = memory_slot*transfer_size;
+            uint32_t memory_offset = static_cast<uint32_t>(memory_slot*options.transfer_size_B);
 
-            // Execute a PUT on whatever locality we chose
-            // Create a serializable memory buffer ready for sending.
-            // Do not copy any data. Protect this with a mutex to ensure the
-            // background thread removing completed futures doesn't collide
+            // Execute a GET on whatever locality we chose
+            // We pass the pointer to our local memory in the PUT, and it is used
+            // by the serialization routines so that the copy from parcelport memory
+            // is performed directly into our user memory. This avoids the need
+            // to copy the data from a serialization buffer into our memory
             {
                 ++FuturesWaiting[send_rank];
                 hpx::lcos::local::spinlock::scoped_lock lk(FuturesMutex);
                 ActiveFutures[send_rank].push_back(
                     hpx::async(
-                        actRead, locality, memory_offset, transfer_size,
+                        actRead, locality, memory_offset, options.transfer_size_B,
                         reinterpret_cast<std::size_t>(buffer)
                     ).then(
                         hpx::launch::sync,
@@ -514,15 +572,23 @@ void test_read(
         hpx::future<int> result = when_all(final_list).then(hpx::launch::sync, reduce);
         result.get();
     }
-    unique_barrier.wait();
+    barrier_wait();
     //
-    double readMB = nranks*local_storage_size*iterations / (1024.0*1024.0);
+    double readMB = static_cast<double>(nranks*options.local_storage_MB*options.iterations);
     double readTime = timerRead.elapsed();
     double readBW = readMB / readTime;
+    double IOPS      = static_cast<double>(options.iterations*num_transfer_slots);
+    double IOPs_s    = IOPS/readTime;
     if(rank == 0) {
         std::cout << "Total time         : " << readTime << "\n";
         std::cout << "Memory Transferred : " << readMB << "MB \n";
+        std::cout << "Number of IOPs     : " << IOPS      << "\n";
+        std::cout << "IOPs/s             : " << IOPs_s    << "\n";
         std::cout << "Aggregate BW Read  : " << readBW << "MB/s" << std::endl;
+        // a complete set of results that our python matplotlib script will ingest
+        char const* msg = "CSVData, read, ranks, %1%, threads, %2%, Memory, %3%, IOPsize, %4%, IOPS/s, %5%, BW, %6%, ";
+        std::cout << (boost::format(msg) % nranks % options.threads % readMB % options.transfer_size_B
+          % IOPs_s % readBW ) << std::endl;
     }
 }
 
@@ -536,18 +602,19 @@ void create_barrier_startup()
     // synchronize
     if(0 == rank) {
         uint64_t nranks = hpx::get_num_localities().get();
-        unique_barrier = create_barrier(nranks, "/DSM_barrier");
+        unique_barrier = create_barrier(nranks, "/0/DSM_barrier");
     }
 }
 
+//----------------------------------------------------------------------------
 void find_barrier_startup()
 {
     hpx::id_type here = hpx::find_here();
     uint64_t rank = hpx::naming::get_locality_id_from_id(here);
 
-    if (0 != rank) {
-        // Find a registered barrier object from its symbolic name.
-        unique_barrier = hpx::agas::resolve_name_sync("/DSM_barrier");
+    if (rank != 0) {
+        hpx::id_type id = hpx::agas::resolve_name_sync("/0/DSM_barrier");
+        unique_barrier = hpx::lcos::barrier(id);
     }
 }
 
@@ -555,7 +622,7 @@ void find_barrier_startup()
 // Main test loop which randomly sends packets of data from one locality to
 // another looping over the entire buffer address space and timing the total
 // transmit/receive time to see how well we're doing.
-int hpx_main(int argc, char* argv[])
+int hpx_main(boost::program_options::variables_map& vm)
 {
     hpx::id_type                    here = hpx::find_here();
     uint64_t                        rank = hpx::naming::get_locality_id_from_id(here);
@@ -565,12 +632,31 @@ int hpx_main(int argc, char* argv[])
     std::vector<hpx::id_type>    remotes = hpx::find_remote_localities();
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
     //
+    if (nranks>MAX_RANKS) {
+      std::cerr << "This test can only be run using " << MAX_RANKS
+        << " nodes, please recompile this test with the MAX_RANKS set to a higher number " << std::endl;
+      return 1;
+    }
+
     char const* msg = "hello world from OS-thread %1% on locality %2% rank %3% hostname %4%";
     std::cout << (boost::format(msg) % current % hpx::get_locality_id() % rank % name.c_str()) << std::endl;
     //
-    allocate_local_storage();
+    // extract command line argument
+    test_options options;
+    options.transfer_size_B   = vm["transferKB"].as<boost::uint64_t>() * 1024;
+    options.local_storage_MB  = vm["localMB"].as<boost::uint64_t>();
+    options.global_storage_MB = vm["globalMB"].as<boost::uint64_t>();
+    options.iterations        = vm["iterations"].as<boost::uint64_t>();
+
+    options.threads           = hpx::get_os_thread_count();
+
     //
-    uint64_t num_transfer_slots = local_storage_size / transfer_size;
+    if (options.global_storage_MB>0) {
+      options.local_storage_MB = options.global_storage_MB/nranks;
+    }
+    allocate_local_storage(options.local_storage_MB*1024*1024);
+    //
+    uint64_t num_transfer_slots = 1024*1024*options.local_storage_MB / options.transfer_size_B;
     //
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -582,27 +668,82 @@ int hpx_main(int argc, char* argv[])
         FuturesWaiting[i].store(0);
     }
 
-    test_write(rank, nranks, num_transfer_slots, gen, random_rank, random_slot);
-    test_read(rank, nranks, num_transfer_slots, gen, random_rank, random_slot);
-
+    test_write(rank, nranks, num_transfer_slots, gen, random_rank, random_slot, options);
+    test_read (rank, nranks, num_transfer_slots, gen, random_rank, random_slot, options);
     //
     delete_local_storage();
 
     // release barrier object
     unique_barrier = hpx::invalid_id;
+    DEBUG_OUTPUT(2,
+        std::cout << "Unregistering Barrier " << rank << std::endl;
+    );
     if (0 == rank)
-        hpx::agas::unregister_name_sync("/DSM_barrier");
+        hpx::agas::unregister_name_sync("/0/DSM_barrier");
 
-    return hpx::finalize();
+    DEBUG_OUTPUT(2,
+        std::cout << "Calling finalize" << rank << std::endl;
+    );
+    if (rank==0)
+      return hpx::finalize();
+    else return 0;
 }
 
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
+    // Configure application-specific options
+    boost::program_options::options_description
+       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
+
+    desc_commandline.add_options()
+        ( "localMB",
+          boost::program_options::value<boost::uint64_t>()->default_value(256),
+          "Sets the storage capacity (in MB) on each node.\n"
+          "The total storage will be num_ranks * localMB")
+        ;
+
+    desc_commandline.add_options()
+        ( "globalMB",
+          boost::program_options::value<boost::uint64_t>()->default_value(0),
+          "Sets the storage capacity (in MB) for the entire job.\n"
+          "The storage per node will be globalMB / num_ranks\n"
+          "By default, localMB is used, setting this overrides localMB value."
+          )
+        ;
+
+    desc_commandline.add_options()
+        ( "transferKB",
+          boost::program_options::value<boost::uint64_t>()->default_value(64),
+          "Sets the default block transfer size (in KB).\n"
+          "Each put/get IOP will be this size")
+        ;
+
+    desc_commandline.add_options()
+        ( "iterations",
+          boost::program_options::value<boost::uint64_t>()->default_value(5),
+          "The number of iterations over the global memory.\n")
+        ;
+/*
+    desc_commandline.add_options()
+        ( "distribution",
+          boost::program_options::value<boost::uint64_t>()->default_value(5),
+          "Specify the distribution of data blocks to send/receive\n"
+          "0 : random \n"
+          "1 : block cyclic")
+        ;
+*/
     // make sure our barrier was already created before hpx_main runs
+    DEBUG_OUTPUT(2,
+        std::cout << "Registering create_barrier startup function " << std::endl;
+    );
     hpx::register_pre_startup_function(&create_barrier_startup);
+    DEBUG_OUTPUT(2,
+        std::cout << "Registering find_barrier startup function " << std::endl;
+    );
     hpx::register_startup_function(&find_barrier_startup);
 
-    return hpx::init(argc, argv);
+    // Initialize and run HPX
+    return hpx::init(desc_commandline, argc, argv);
 }
 
