@@ -125,8 +125,9 @@ namespace hpx { namespace lcos { namespace local
             template <typename Lock>
             void signal_locked(boost::int64_t count, Lock& l)
             {
+                // release no more threads than we get resources
                 value_ += count;
-                while (value_ >= 0)
+                for (boost::int64_t i = 0; value_ >= 0 && i < count; ++i)
                 {
                     if (!cond_.notify_one(l))
                         break;
