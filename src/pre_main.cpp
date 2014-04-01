@@ -91,11 +91,7 @@ find_barrier(char const* symname)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Symbolic names of global boot barrier objects
-static const char* const second_barrier = "/0/agas/barrier#2";
-#if !defined(HPX_USE_FAST_BOOTSTRAP_SYNCHRONIZATION)
-static const char* const third_barrier = "/0/agas/barrier#3";
-static const char* const fourth_barrier = "/0/agas/barrier#4";
-#endif
+static const char* const startup_barrier_name = "/0/agas/startup_barrier";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Install performance counter startup functions for core subsystems.
@@ -169,10 +165,7 @@ bool pre_main(runtime_mode mode)
         LBT_(info) << "(2nd stage) pre_main: loaded components"
             << (exit_requested ? ", application exit has been requested" : "");
 
-        lcos::barrier second_stage;
-#if !defined(HPX_USE_FAST_BOOTSTRAP_SYNCHRONIZATION)
-        lcos::barrier third_stage, fourth_stage;
-#endif
+        lcos::barrier startup_barrier;
 
         // {{{ Second and third stage barrier creation.
         if (agas_client.is_bootstrap())
@@ -190,11 +183,8 @@ bool pre_main(runtime_mode mode)
 
             if (num_localities > 1)
             {
-                second_stage = create_barrier(num_localities, second_barrier);
-#if !defined(HPX_USE_FAST_BOOTSTRAP_SYNCHRONIZATION)
-                third_stage = create_barrier(num_localities, third_barrier);
-                fourth_stage = create_barrier(num_localities, fourth_barrier);
-#endif
+                startup_barrier = create_barrier(num_localities, startup_barrier_name);
+
                 // retrieve list of resolved localities
                 rt.get_parcel_handler().set_resolved_localities(
                     agas_client.get_resolved_localities());
@@ -205,11 +195,7 @@ bool pre_main(runtime_mode mode)
         else // Hosted.
         {
             // Initialize the barrier clients (find them in AGAS)
-            second_stage = find_barrier(second_barrier);
-#if !defined(HPX_USE_FAST_BOOTSTRAP_SYNCHRONIZATION)
-            third_stage = find_barrier(third_barrier);
-            fourth_stage = find_barrier(fourth_barrier);
-#endif
+            startup_barrier = find_barrier(startup_barrier_name);
 
             // retrieve list of resolved localities
             rt.get_parcel_handler().set_resolved_localities(
@@ -226,14 +212,10 @@ bool pre_main(runtime_mode mode)
         // Second stage bootstrap synchronizes component loading across all
         // localities, ensuring that the component namespace tables are fully
         // populated before user code is executed.
-        if (second_stage)
+        if (startup_barrier)
         {
-            second_stage.wait();
+            startup_barrier.wait();
             LBT_(info) << "(2nd stage) pre_main: passed 2nd stage boot barrier";
-
-            // Tear down the second stage barrier.
-            if (agas_client.is_bootstrap())
-                agas::unregister_name_sync(second_barrier);
         }
 
 #if defined(HPX_USE_FAST_BOOTSTRAP_SYNCHRONIZATION)
@@ -253,33 +235,29 @@ bool pre_main(runtime_mode mode)
         LBT_(info) << "(3rd stage) pre_main: ran pre-startup functions";
 
         // Third stage separates pre-startup and startup function phase.
-        if (third_stage)
+        if (startup_barrier)
         {
-            third_stage.wait();
+            startup_barrier.wait();
             LBT_(info) << "(3rd stage) pre_main: passed 3rd stage boot barrier";
-
-            // Tear down the third stage barrier.
-            if (agas_client.is_bootstrap())
-                agas::unregister_name_sync(third_barrier);
         }
 
         runtime_support::call_startup_functions(find_here(), false);
         LBT_(info) << "(4th stage) pre_main: ran startup functions";
+#endif
 
-        if (fourth_stage)
+        if (startup_barrier)
         {
             // Forth stage bootstrap synchronizes startup functions across all
             // localities. This is done after component loading to guarantee that
             // all user code, including startup functions, are only run after the
             // component tables are populated.
-            fourth_stage.wait();
+            startup_barrier.wait();
             LBT_(info) << "(4th stage) pre_main: passed 4th stage boot barrier";
 
-            // Tear down the fourth stage barrier.
+            // Tear down the startup barrier.
             if (agas_client.is_bootstrap())
-                agas::unregister_name_sync(fourth_barrier);
+                agas::unregister_name_sync(startup_barrier_name);
         }
-#endif
     }
 
     // Enable logging. Even if we terminate at this point we will see all
