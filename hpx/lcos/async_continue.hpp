@@ -77,7 +77,7 @@ namespace hpx
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<
                     Action
-                >::remote_result_type
+                >::result_type
             >::type
         continuation_result_type;
 

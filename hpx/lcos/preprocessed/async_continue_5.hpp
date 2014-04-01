@@ -10,10 +10,10 @@
 
 namespace hpx
 {
-    
+
     template <
         typename Action
-       
+
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 0
@@ -23,7 +23,7 @@ namespace hpx
     >::type
     async_continue(
         naming::id_type const& gid
-       
+
       , F && f)
     {
         typedef
@@ -33,7 +33,7 @@ namespace hpx
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<
                     Action
-                >::remote_result_type
+                >::result_type
             >::type
         continuation_result_type;
         lcos::promise<result_type> p;
@@ -44,10 +44,10 @@ namespace hpx
            );
         return p.get_future();
     }
-    
+
     template <
         typename Component, typename Result, typename Arguments, typename Derived
-       
+
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 0
@@ -56,20 +56,20 @@ namespace hpx
         >
     >::type
     async_continue(
-        hpx::actions::action<Component, Result, Arguments, Derived> 
+        hpx::actions::action<Component, Result, Arguments, Derived>
       , naming::id_type const& gid
-       
+
       , F && f)
     {
         return async_continue<Derived>(
             gid
-           
+
           , std::forward<F>(f));
     }
 }
 namespace hpx
 {
-    
+
     template <
         typename Action
       , typename Arg0
@@ -92,7 +92,7 @@ namespace hpx
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<
                     Action
-                >::remote_result_type
+                >::result_type
             >::type
         continuation_result_type;
         lcos::promise<result_type> p;
@@ -103,7 +103,7 @@ namespace hpx
           , std::forward<Arg0>( arg0 ));
         return p.get_future();
     }
-    
+
     template <
         typename Component, typename Result, typename Arguments, typename Derived
       , typename Arg0
@@ -115,7 +115,7 @@ namespace hpx
         >
     >::type
     async_continue(
-        hpx::actions::action<Component, Result, Arguments, Derived> 
+        hpx::actions::action<Component, Result, Arguments, Derived>
       , naming::id_type const& gid
       , Arg0 && arg0
       , F && f)
@@ -128,7 +128,7 @@ namespace hpx
 }
 namespace hpx
 {
-    
+
     template <
         typename Action
       , typename Arg0 , typename Arg1
@@ -151,7 +151,7 @@ namespace hpx
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<
                     Action
-                >::remote_result_type
+                >::result_type
             >::type
         continuation_result_type;
         lcos::promise<result_type> p;
@@ -162,7 +162,7 @@ namespace hpx
           , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
         return p.get_future();
     }
-    
+
     template <
         typename Component, typename Result, typename Arguments, typename Derived
       , typename Arg0 , typename Arg1
@@ -174,7 +174,7 @@ namespace hpx
         >
     >::type
     async_continue(
-        hpx::actions::action<Component, Result, Arguments, Derived> 
+        hpx::actions::action<Component, Result, Arguments, Derived>
       , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1
       , F && f)
@@ -187,7 +187,7 @@ namespace hpx
 }
 namespace hpx
 {
-    
+
     template <
         typename Action
       , typename Arg0 , typename Arg1 , typename Arg2
@@ -210,7 +210,7 @@ namespace hpx
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<
                     Action
-                >::remote_result_type
+                >::result_type
             >::type
         continuation_result_type;
         lcos::promise<result_type> p;
@@ -221,7 +221,7 @@ namespace hpx
           , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
         return p.get_future();
     }
-    
+
     template <
         typename Component, typename Result, typename Arguments, typename Derived
       , typename Arg0 , typename Arg1 , typename Arg2
@@ -233,7 +233,7 @@ namespace hpx
         >
     >::type
     async_continue(
-        hpx::actions::action<Component, Result, Arguments, Derived> 
+        hpx::actions::action<Component, Result, Arguments, Derived>
       , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2
       , F && f)
@@ -246,7 +246,7 @@ namespace hpx
 }
 namespace hpx
 {
-    
+
     template <
         typename Action
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
@@ -269,7 +269,7 @@ namespace hpx
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<
                     Action
-                >::remote_result_type
+                >::result_type
             >::type
         continuation_result_type;
         lcos::promise<result_type> p;
@@ -280,7 +280,7 @@ namespace hpx
           , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
         return p.get_future();
     }
-    
+
     template <
         typename Component, typename Result, typename Arguments, typename Derived
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
@@ -292,7 +292,7 @@ namespace hpx
         >
     >::type
     async_continue(
-        hpx::actions::action<Component, Result, Arguments, Derived> 
+        hpx::actions::action<Component, Result, Arguments, Derived>
       , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3
       , F && f)
@@ -305,7 +305,7 @@ namespace hpx
 }
 namespace hpx
 {
-    
+
     template <
         typename Action
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
@@ -328,7 +328,7 @@ namespace hpx
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<
                     Action
-                >::remote_result_type
+                >::result_type
             >::type
         continuation_result_type;
         lcos::promise<result_type> p;
@@ -339,7 +339,7 @@ namespace hpx
           , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
         return p.get_future();
     }
-    
+
     template <
         typename Component, typename Result, typename Arguments, typename Derived
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
@@ -351,7 +351,7 @@ namespace hpx
         >
     >::type
     async_continue(
-        hpx::actions::action<Component, Result, Arguments, Derived> 
+        hpx::actions::action<Component, Result, Arguments, Derived>
       , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4
       , F && f)

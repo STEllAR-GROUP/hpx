@@ -92,7 +92,7 @@ namespace hpx
         Callback && cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         if (!traits::action_is_target_valid<Action>::call(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
@@ -187,7 +187,7 @@ namespace hpx
         Callback && cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         if (!traits::action_is_target_valid<Action>::call(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
@@ -216,7 +216,7 @@ namespace hpx
         HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         if (!traits::action_is_target_valid<Action>::call(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb",
                 "the target (destination) does not match the action type");
             return false;
         }
@@ -272,7 +272,7 @@ namespace hpx
             Callback && cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
         {
             typedef
-                typename hpx::actions::extract_action<Action>::remote_result_type
+                typename hpx::actions::extract_action<Action>::result_type
                 result_type;
 
             return apply_r_p_cb<Action>(addr,
@@ -289,7 +289,7 @@ namespace hpx
             HPX_ENUM_FWD_ARGS(N, Arg, arg))
         {
             typedef
-                typename hpx::actions::extract_action<Action>::remote_result_type
+                typename hpx::actions::extract_action<Action>::result_type
                 result_type;
 
             return apply_r_p_cb<Action>(addr,
@@ -308,7 +308,7 @@ namespace hpx
         HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         typedef
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::result_type
             result_type;
 
         return apply_p_cb<Action>(
@@ -324,7 +324,7 @@ namespace hpx
         Callback && cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         typedef
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::result_type
             result_type;
 
         return apply_p_cb<Action>(
@@ -341,7 +341,7 @@ namespace hpx
         Callback && cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         typedef
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::result_type
             result_type;
 
         return apply_p_cb<Action>(
@@ -358,7 +358,7 @@ namespace hpx
         HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         typedef
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::result_type
             result_type;
 
         return apply_p_cb<Action>(

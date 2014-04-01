@@ -137,7 +137,7 @@ hpx::future<int> copy_from_local_storage(char *dest, uint32_t offset, uint64_t l
     char const* src = &local_storage[offset];
     std::copy(src, src + length, dest);
     //  memcpy(dest, src, length);
-    return hpx::make_ready_future<int>(TEST_SUCCESS);
+    return hpx::make_ready_future<int>(1);
 }
 
 //----------------------------------------------------------------------------
@@ -310,7 +310,6 @@ HPX_REGISTER_PLAIN_ACTION(CopyFromStorage_action);
 int RemoveCompletions()
 {
     int num_removed = 0;
-    //
     while(FuturesActive)
     {
         {
@@ -320,7 +319,8 @@ int RemoveCompletions()
                     fut != futvec.end(); /**/)
                 {
                     if(fut->is_ready()){
-                        if(fut->get() != TEST_SUCCESS) {
+                        int ret = fut->get();
+                        if(ret != TEST_SUCCESS) {
                             throw std::runtime_error("Remote put/get failed");
                         }
                         num_removed++;
@@ -391,7 +391,7 @@ void test_write(
     //
     hpx::util::high_resolution_timer timerWrite;
     //
-    for(int i = 0; i < options.iterations; i++) {
+    for(boost::uint64_t i = 0; i < options.iterations; i++) {
         DEBUG_OUTPUT(1,
             std::cout << "Starting iteration " << i << " on rank " << rank << std::endl;
         );
@@ -431,7 +431,7 @@ void test_write(
                         memory_offset, options.transfer_size_B
                     ).then(
                         hpx::launch::sync,
-                        [=](hpx::future<int> fut) -> int {
+                        [send_rank](hpx::future<int> fut) -> int {
                             int result = fut.get();
                             --FuturesWaiting[send_rank];
                             return result;
@@ -505,7 +505,7 @@ void test_read(
     //
     hpx::util::high_resolution_timer timerRead;
     //
-    for(int i = 0; i < options.iterations; i++) {
+    for(boost::uint64_t i = 0; i < options.iterations; i++) {
         //
         // start a thread which will clear any completed futures from our list.
         //
@@ -743,7 +743,10 @@ int main(int argc, char* argv[])
     );
     hpx::register_startup_function(&find_barrier_startup);
 
-    // Initialize and run HPX
-    return hpx::init(desc_commandline, argc, argv);
+    // Initialize and run HPX, this test requires to run hpx_main on all localities
+    std::vector<std::string> cfg;
+    cfg.push_back("hpx.run_hpx_main!=1");
+
+    return hpx::init(desc_commandline, argc, argv, cfg);
 }
 

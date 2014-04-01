@@ -828,7 +828,6 @@ namespace hpx { namespace actions
     {
         typedef Component component_type;
         typedef Derived derived_type;
-        typedef Result remote_result_type;
         typedef Arguments arguments_type;
 
         typedef void action_tag;

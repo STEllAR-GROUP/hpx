@@ -97,5 +97,5 @@ namespace hpx { namespace actions
     }
 }}
 
-HPX_REGISTER_TYPED_CONTINUATION(hpx::util::unused_type, hpx_unused_typed_continuation);
+HPX_REGISTER_TYPED_CONTINUATION(void, hpx_void_typed_continuation);
 

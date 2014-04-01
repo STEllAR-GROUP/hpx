@@ -10,7 +10,7 @@
 
 namespace hpx
 {
-    
+
     namespace applier { namespace detail
     {
         template <typename Action, typename Callback,
@@ -21,15 +21,15 @@ namespace hpx
             Arg0 && arg0)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            
-            
+
+
             parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(priority,
                     util::forward_as_tuple(std::forward<Arg0>( arg0 ))));
-            
+
             hpx::applier::get_applier().get_parcel_handler()
                 .put_parcel(p, std::forward<Callback>(cb));
-            return false; 
+            return false;
         }
         template <typename Action, typename Callback,
             typename Arg0>
@@ -42,7 +42,7 @@ namespace hpx
                 std::forward<Arg0>( arg0 ));
         }
     }}
-    
+
     template <typename Action, typename Callback,
         typename Arg0>
     inline bool
@@ -50,22 +50,22 @@ namespace hpx
         Callback && cb, Arg0 && arg0)
     {
         if (!traits::action_is_target_valid<Action>::call(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
-        
+
         naming::address addr;
         if (agas::is_local_address_cached(gid, addr)) {
-            
+
             bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 std::forward<Arg0>( arg0 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), 0);
             return result;
         }
-        
+
         return applier::detail::apply_r_p_cb<Action>(addr, gid, priority,
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ));
     }
@@ -92,7 +92,7 @@ namespace hpx
         return apply_p_cb<Derived>(gid, actions::action_priority<Derived>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ));
     }
-    
+
     namespace applier { namespace detail
     {
         template <typename Action, typename Callback,
@@ -104,15 +104,15 @@ namespace hpx
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
             actions::continuation_type cont(c);
-            
-            
+
+
             parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(priority,
                     util::forward_as_tuple(std::forward<Arg0>( arg0 ))), cont);
-            
+
             hpx::applier::get_applier().get_parcel_handler()
               .put_parcel(p, std::forward<Callback>(cb));
-            return false; 
+            return false;
         }
         template <typename Action, typename Callback,
             typename Arg0>
@@ -126,7 +126,7 @@ namespace hpx
                 std::forward<Arg0>( arg0 ));
         }
     }}
-    
+
     template <typename Action, typename Callback,
         typename Arg0>
     inline bool
@@ -135,21 +135,21 @@ namespace hpx
         Callback && cb, Arg0 && arg0)
     {
         if (!traits::action_is_target_valid<Action>::call(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
-        
+
         if (addr.locality_ == hpx::get_locality()) {
-            
+
             bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 std::forward<Arg0>( arg0 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), 0);
             return result;
         }
-        
+
         return applier::detail::apply_r_p_cb<Action>(addr, c, gid, priority,
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ));
     }
@@ -161,20 +161,20 @@ namespace hpx
         Arg0 && arg0)
     {
         if (!traits::action_is_target_valid<Action>::call(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb",
                 "the target (destination) does not match the action type");
             return false;
         }
-        
+
         naming::address addr;
         if (agas::is_local_address_cached(gid, addr)) {
-            
+
             bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 std::forward<Arg0>( arg0 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), 0);
             return result;
         }
-        
+
         return applier::detail::apply_r_p_cb<Action>(addr, c, gid, priority,
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ));
     }
@@ -201,7 +201,7 @@ namespace hpx
         return apply_p<Derived>(c, gid, actions::action_priority<Derived>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ));
     }
-    
+
     namespace applier { namespace detail
     {
         template <typename Action, typename Callback,
@@ -212,7 +212,7 @@ namespace hpx
             Callback && cb, Arg0 && arg0)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::remote_result_type
+                typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -227,7 +227,7 @@ namespace hpx
             Arg0 && arg0)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::remote_result_type
+                typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -244,7 +244,7 @@ namespace hpx
         Arg0 && arg0)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -258,7 +258,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -273,7 +273,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -288,7 +288,7 @@ namespace hpx
         Arg0 && arg0)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -298,7 +298,7 @@ namespace hpx
 }
 namespace hpx
 {
-    
+
     namespace applier { namespace detail
     {
         template <typename Action, typename Callback,
@@ -309,15 +309,15 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            
-            
+
+
             parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(priority,
                     util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ))));
-            
+
             hpx::applier::get_applier().get_parcel_handler()
                 .put_parcel(p, std::forward<Callback>(cb));
-            return false; 
+            return false;
         }
         template <typename Action, typename Callback,
             typename Arg0 , typename Arg1>
@@ -330,7 +330,7 @@ namespace hpx
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
         }
     }}
-    
+
     template <typename Action, typename Callback,
         typename Arg0 , typename Arg1>
     inline bool
@@ -338,22 +338,22 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1)
     {
         if (!traits::action_is_target_valid<Action>::call(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
-        
+
         naming::address addr;
         if (agas::is_local_address_cached(gid, addr)) {
-            
+
             bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), 0);
             return result;
         }
-        
+
         return applier::detail::apply_r_p_cb<Action>(addr, gid, priority,
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
     }
@@ -380,7 +380,7 @@ namespace hpx
         return apply_p_cb<Derived>(gid, actions::action_priority<Derived>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
     }
-    
+
     namespace applier { namespace detail
     {
         template <typename Action, typename Callback,
@@ -392,15 +392,15 @@ namespace hpx
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
             actions::continuation_type cont(c);
-            
-            
+
+
             parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(priority,
                     util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ))), cont);
-            
+
             hpx::applier::get_applier().get_parcel_handler()
               .put_parcel(p, std::forward<Callback>(cb));
-            return false; 
+            return false;
         }
         template <typename Action, typename Callback,
             typename Arg0 , typename Arg1>
@@ -414,7 +414,7 @@ namespace hpx
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
         }
     }}
-    
+
     template <typename Action, typename Callback,
         typename Arg0 , typename Arg1>
     inline bool
@@ -423,21 +423,21 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1)
     {
         if (!traits::action_is_target_valid<Action>::call(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
-        
+
         if (addr.locality_ == hpx::get_locality()) {
-            
+
             bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), 0);
             return result;
         }
-        
+
         return applier::detail::apply_r_p_cb<Action>(addr, c, gid, priority,
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
     }
@@ -449,20 +449,20 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1)
     {
         if (!traits::action_is_target_valid<Action>::call(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb",
                 "the target (destination) does not match the action type");
             return false;
         }
-        
+
         naming::address addr;
         if (agas::is_local_address_cached(gid, addr)) {
-            
+
             bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), 0);
             return result;
         }
-        
+
         return applier::detail::apply_r_p_cb<Action>(addr, c, gid, priority,
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
     }
@@ -489,7 +489,7 @@ namespace hpx
         return apply_p<Derived>(c, gid, actions::action_priority<Derived>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
     }
-    
+
     namespace applier { namespace detail
     {
         template <typename Action, typename Callback,
@@ -500,7 +500,7 @@ namespace hpx
             Callback && cb, Arg0 && arg0 , Arg1 && arg1)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::remote_result_type
+                typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -515,7 +515,7 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::remote_result_type
+                typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -532,7 +532,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -546,7 +546,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -561,7 +561,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -576,7 +576,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -586,7 +586,7 @@ namespace hpx
 }
 namespace hpx
 {
-    
+
     namespace applier { namespace detail
     {
         template <typename Action, typename Callback,
@@ -597,15 +597,15 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            
-            
+
+
             parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(priority,
                     util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ))));
-            
+
             hpx::applier::get_applier().get_parcel_handler()
                 .put_parcel(p, std::forward<Callback>(cb));
-            return false; 
+            return false;
         }
         template <typename Action, typename Callback,
             typename Arg0 , typename Arg1 , typename Arg2>
@@ -618,7 +618,7 @@ namespace hpx
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
         }
     }}
-    
+
     template <typename Action, typename Callback,
         typename Arg0 , typename Arg1 , typename Arg2>
     inline bool
@@ -626,22 +626,22 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
         if (!traits::action_is_target_valid<Action>::call(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
-        
+
         naming::address addr;
         if (agas::is_local_address_cached(gid, addr)) {
-            
+
             bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), 0);
             return result;
         }
-        
+
         return applier::detail::apply_r_p_cb<Action>(addr, gid, priority,
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
     }
@@ -668,7 +668,7 @@ namespace hpx
         return apply_p_cb<Derived>(gid, actions::action_priority<Derived>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
     }
-    
+
     namespace applier { namespace detail
     {
         template <typename Action, typename Callback,
@@ -680,15 +680,15 @@ namespace hpx
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
             actions::continuation_type cont(c);
-            
-            
+
+
             parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(priority,
                     util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ))), cont);
-            
+
             hpx::applier::get_applier().get_parcel_handler()
               .put_parcel(p, std::forward<Callback>(cb));
-            return false; 
+            return false;
         }
         template <typename Action, typename Callback,
             typename Arg0 , typename Arg1 , typename Arg2>
@@ -702,7 +702,7 @@ namespace hpx
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
         }
     }}
-    
+
     template <typename Action, typename Callback,
         typename Arg0 , typename Arg1 , typename Arg2>
     inline bool
@@ -711,21 +711,21 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
         if (!traits::action_is_target_valid<Action>::call(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
-        
+
         if (addr.locality_ == hpx::get_locality()) {
-            
+
             bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), 0);
             return result;
         }
-        
+
         return applier::detail::apply_r_p_cb<Action>(addr, c, gid, priority,
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
     }
@@ -737,20 +737,20 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
         if (!traits::action_is_target_valid<Action>::call(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb",
                 "the target (destination) does not match the action type");
             return false;
         }
-        
+
         naming::address addr;
         if (agas::is_local_address_cached(gid, addr)) {
-            
+
             bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), 0);
             return result;
         }
-        
+
         return applier::detail::apply_r_p_cb<Action>(addr, c, gid, priority,
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
     }
@@ -777,7 +777,7 @@ namespace hpx
         return apply_p<Derived>(c, gid, actions::action_priority<Derived>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
     }
-    
+
     namespace applier { namespace detail
     {
         template <typename Action, typename Callback,
@@ -788,7 +788,7 @@ namespace hpx
             Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::remote_result_type
+                typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -803,7 +803,7 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::remote_result_type
+                typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -820,7 +820,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -834,7 +834,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -849,7 +849,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -864,7 +864,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -874,7 +874,7 @@ namespace hpx
 }
 namespace hpx
 {
-    
+
     namespace applier { namespace detail
     {
         template <typename Action, typename Callback,
@@ -885,15 +885,15 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            
-            
+
+
             parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(priority,
                     util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ))));
-            
+
             hpx::applier::get_applier().get_parcel_handler()
                 .put_parcel(p, std::forward<Callback>(cb));
-            return false; 
+            return false;
         }
         template <typename Action, typename Callback,
             typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
@@ -906,7 +906,7 @@ namespace hpx
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
         }
     }}
-    
+
     template <typename Action, typename Callback,
         typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     inline bool
@@ -914,22 +914,22 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
         if (!traits::action_is_target_valid<Action>::call(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
-        
+
         naming::address addr;
         if (agas::is_local_address_cached(gid, addr)) {
-            
+
             bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), 0);
             return result;
         }
-        
+
         return applier::detail::apply_r_p_cb<Action>(addr, gid, priority,
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
     }
@@ -956,7 +956,7 @@ namespace hpx
         return apply_p_cb<Derived>(gid, actions::action_priority<Derived>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
     }
-    
+
     namespace applier { namespace detail
     {
         template <typename Action, typename Callback,
@@ -968,15 +968,15 @@ namespace hpx
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
             actions::continuation_type cont(c);
-            
-            
+
+
             parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(priority,
                     util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ))), cont);
-            
+
             hpx::applier::get_applier().get_parcel_handler()
               .put_parcel(p, std::forward<Callback>(cb));
-            return false; 
+            return false;
         }
         template <typename Action, typename Callback,
             typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
@@ -990,7 +990,7 @@ namespace hpx
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
         }
     }}
-    
+
     template <typename Action, typename Callback,
         typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     inline bool
@@ -999,21 +999,21 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
         if (!traits::action_is_target_valid<Action>::call(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
-        
+
         if (addr.locality_ == hpx::get_locality()) {
-            
+
             bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), 0);
             return result;
         }
-        
+
         return applier::detail::apply_r_p_cb<Action>(addr, c, gid, priority,
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
     }
@@ -1025,20 +1025,20 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
         if (!traits::action_is_target_valid<Action>::call(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb",
                 "the target (destination) does not match the action type");
             return false;
         }
-        
+
         naming::address addr;
         if (agas::is_local_address_cached(gid, addr)) {
-            
+
             bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), 0);
             return result;
         }
-        
+
         return applier::detail::apply_r_p_cb<Action>(addr, c, gid, priority,
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
     }
@@ -1065,7 +1065,7 @@ namespace hpx
         return apply_p<Derived>(c, gid, actions::action_priority<Derived>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
     }
-    
+
     namespace applier { namespace detail
     {
         template <typename Action, typename Callback,
@@ -1076,7 +1076,7 @@ namespace hpx
             Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::remote_result_type
+                typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -1091,7 +1091,7 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::remote_result_type
+                typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -1108,7 +1108,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -1122,7 +1122,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -1137,7 +1137,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -1152,7 +1152,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -1162,7 +1162,7 @@ namespace hpx
 }
 namespace hpx
 {
-    
+
     namespace applier { namespace detail
     {
         template <typename Action, typename Callback,
@@ -1173,15 +1173,15 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            
-            
+
+
             parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(priority,
                     util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ))));
-            
+
             hpx::applier::get_applier().get_parcel_handler()
                 .put_parcel(p, std::forward<Callback>(cb));
-            return false; 
+            return false;
         }
         template <typename Action, typename Callback,
             typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
@@ -1194,7 +1194,7 @@ namespace hpx
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
         }
     }}
-    
+
     template <typename Action, typename Callback,
         typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     inline bool
@@ -1202,22 +1202,22 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
         if (!traits::action_is_target_valid<Action>::call(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
-        
+
         naming::address addr;
         if (agas::is_local_address_cached(gid, addr)) {
-            
+
             bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), 0);
             return result;
         }
-        
+
         return applier::detail::apply_r_p_cb<Action>(addr, gid, priority,
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
     }
@@ -1244,7 +1244,7 @@ namespace hpx
         return apply_p_cb<Derived>(gid, actions::action_priority<Derived>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
     }
-    
+
     namespace applier { namespace detail
     {
         template <typename Action, typename Callback,
@@ -1256,15 +1256,15 @@ namespace hpx
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
             actions::continuation_type cont(c);
-            
-            
+
+
             parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(priority,
                     util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ))), cont);
-            
+
             hpx::applier::get_applier().get_parcel_handler()
               .put_parcel(p, std::forward<Callback>(cb));
-            return false; 
+            return false;
         }
         template <typename Action, typename Callback,
             typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
@@ -1278,7 +1278,7 @@ namespace hpx
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
         }
     }}
-    
+
     template <typename Action, typename Callback,
         typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     inline bool
@@ -1287,21 +1287,21 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
         if (!traits::action_is_target_valid<Action>::call(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
-        
+
         if (addr.locality_ == hpx::get_locality()) {
-            
+
             bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), 0);
             return result;
         }
-        
+
         return applier::detail::apply_r_p_cb<Action>(addr, c, gid, priority,
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
     }
@@ -1313,20 +1313,20 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
         if (!traits::action_is_target_valid<Action>::call(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb",
                 "the target (destination) does not match the action type");
             return false;
         }
-        
+
         naming::address addr;
         if (agas::is_local_address_cached(gid, addr)) {
-            
+
             bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), 0);
             return result;
         }
-        
+
         return applier::detail::apply_r_p_cb<Action>(addr, c, gid, priority,
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
     }
@@ -1353,7 +1353,7 @@ namespace hpx
         return apply_p<Derived>(c, gid, actions::action_priority<Derived>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
     }
-    
+
     namespace applier { namespace detail
     {
         template <typename Action, typename Callback,
@@ -1364,7 +1364,7 @@ namespace hpx
             Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::remote_result_type
+                typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -1379,7 +1379,7 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
         {
             typedef
-                typename hpx::actions::extract_action<Action>::remote_result_type
+                typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
@@ -1396,7 +1396,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -1410,7 +1410,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -1425,7 +1425,7 @@ namespace hpx
         Callback && cb, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
@@ -1440,7 +1440,7 @@ namespace hpx
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
         typedef
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),

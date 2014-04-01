@@ -345,6 +345,7 @@ namespace hpx { namespace actions
     template <typename Result>
     struct typed_continuation : continuation
     {
+
         typed_continuation()
         {}
 
@@ -445,7 +446,7 @@ namespace hpx { namespace traits
 {
     template <>
     struct needs_automatic_registration<
-            hpx::actions::typed_continuation<hpx::util::unused_type> >
+            hpx::actions::typed_continuation<void> >
         : boost::mpl::false_
     {};
 }}
@@ -454,7 +455,7 @@ namespace hpx { namespace actions
 {
     ///////////////////////////////////////////////////////////////////////////
     template <>
-    struct typed_continuation<hpx::util::unused_type> : continuation
+    struct typed_continuation<void> : continuation
     {
         typed_continuation()
         {}
@@ -492,12 +493,12 @@ namespace hpx { namespace actions
         void trigger() const
         {
             LLCO_(info)
-                << "typed_continuation<hpx::util::unused_type>::trigger("
+                << "typed_continuation<void>::trigger("
                 << this->get_gid() << ")";
             if (f_.empty()) {
                 if (!this->get_gid()) {
                     HPX_THROW_EXCEPTION(invalid_status,
-                        "typed_continuation<hpx::util::unused_type>::trigger",
+                        "typed_continuation<void>::trigger",
                         "attempt to trigger invalid LCO (the id is invalid)");
                     return;
                 }
@@ -516,7 +517,7 @@ namespace hpx { namespace actions
     private:
         char const* get_continuation_name() const
         {
-            return "hpx_unused_typed_continuation";
+            return "hpx_void_typed_continuation";
         }
 
         /// serialization support
