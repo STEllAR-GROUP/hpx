@@ -41,7 +41,7 @@ namespace hpx { namespace util { namespace detail {
               , OArchive
             >
             base_type;
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -160,7 +160,7 @@ namespace hpx { namespace util { namespace detail {
         {
             return Vtable::empty;
         }
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -218,7 +218,7 @@ namespace hpx { namespace util { namespace detail {
               , OArchive
             >
             base_type;
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -337,7 +337,7 @@ namespace hpx { namespace util { namespace detail {
         {
             return Vtable::empty;
         }
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -395,7 +395,7 @@ namespace hpx { namespace util { namespace detail {
               , OArchive
             >
             base_type;
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -514,7 +514,7 @@ namespace hpx { namespace util { namespace detail {
         {
             return Vtable::empty;
         }
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -572,7 +572,7 @@ namespace hpx { namespace util { namespace detail {
               , OArchive
             >
             base_type;
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -691,7 +691,7 @@ namespace hpx { namespace util { namespace detail {
         {
             return Vtable::empty;
         }
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -749,7 +749,7 @@ namespace hpx { namespace util { namespace detail {
               , OArchive
             >
             base_type;
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -868,7 +868,7 @@ namespace hpx { namespace util { namespace detail {
         {
             return Vtable::empty;
         }
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -926,7 +926,7 @@ namespace hpx { namespace util { namespace detail {
               , OArchive
             >
             base_type;
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -1045,7 +1045,7 @@ namespace hpx { namespace util { namespace detail {
         {
             return Vtable::empty;
         }
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -1103,7 +1103,7 @@ namespace hpx { namespace util { namespace detail {
               , OArchive
             >
             base_type;
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -1222,7 +1222,7 @@ namespace hpx { namespace util { namespace detail {
         {
             return Vtable::empty;
         }
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -1280,7 +1280,7 @@ namespace hpx { namespace util { namespace detail {
               , OArchive
             >
             base_type;
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -1399,7 +1399,7 @@ namespace hpx { namespace util { namespace detail {
         {
             return Vtable::empty;
         }
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -1457,7 +1457,7 @@ namespace hpx { namespace util { namespace detail {
               , OArchive
             >
             base_type;
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -1576,7 +1576,7 @@ namespace hpx { namespace util { namespace detail {
         {
             return Vtable::empty;
         }
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -1634,7 +1634,7 @@ namespace hpx { namespace util { namespace detail {
               , OArchive
             >
             base_type;
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -1753,7 +1753,7 @@ namespace hpx { namespace util { namespace detail {
         {
             return Vtable::empty;
         }
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -1811,7 +1811,7 @@ namespace hpx { namespace util { namespace detail {
               , OArchive
             >
             base_type;
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -1930,7 +1930,7 @@ namespace hpx { namespace util { namespace detail {
         {
             return Vtable::empty;
         }
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -1988,7 +1988,7 @@ namespace hpx { namespace util { namespace detail {
               , OArchive
             >
             base_type;
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -2107,7 +2107,7 @@ namespace hpx { namespace util { namespace detail {
         {
             return Vtable::empty;
         }
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -2165,7 +2165,7 @@ namespace hpx { namespace util { namespace detail {
               , OArchive
             >
             base_type;
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -2284,7 +2284,7 @@ namespace hpx { namespace util { namespace detail {
         {
             return Vtable::empty;
         }
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -2342,7 +2342,7 @@ namespace hpx { namespace util { namespace detail {
               , OArchive
             >
             base_type;
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -2461,7 +2461,7 @@ namespace hpx { namespace util { namespace detail {
         {
             return Vtable::empty;
         }
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -2519,7 +2519,7 @@ namespace hpx { namespace util { namespace detail {
               , OArchive
             >
             base_type;
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -2638,7 +2638,7 @@ namespace hpx { namespace util { namespace detail {
         {
             return Vtable::empty;
         }
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -2696,7 +2696,7 @@ namespace hpx { namespace util { namespace detail {
               , OArchive
             >
             base_type;
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -2815,7 +2815,7 @@ namespace hpx { namespace util { namespace detail {
         {
             return Vtable::empty;
         }
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -2873,7 +2873,7 @@ namespace hpx { namespace util { namespace detail {
               , OArchive
             >
             base_type;
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -2992,7 +2992,7 @@ namespace hpx { namespace util { namespace detail {
         {
             return Vtable::empty;
         }
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -3050,7 +3050,7 @@ namespace hpx { namespace util { namespace detail {
               , OArchive
             >
             base_type;
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -3169,7 +3169,7 @@ namespace hpx { namespace util { namespace detail {
         {
             return Vtable::empty;
         }
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -3227,7 +3227,7 @@ namespace hpx { namespace util { namespace detail {
               , OArchive
             >
             base_type;
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -3346,7 +3346,7 @@ namespace hpx { namespace util { namespace detail {
         {
             return Vtable::empty;
         }
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -3404,7 +3404,7 @@ namespace hpx { namespace util { namespace detail {
               , OArchive
             >
             base_type;
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -3523,7 +3523,7 @@ namespace hpx { namespace util { namespace detail {
         {
             return Vtable::empty;
         }
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -3581,7 +3581,7 @@ namespace hpx { namespace util { namespace detail {
               , OArchive
             >
             base_type;
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -3700,7 +3700,7 @@ namespace hpx { namespace util { namespace detail {
         {
             return Vtable::empty;
         }
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -3758,7 +3758,7 @@ namespace hpx { namespace util { namespace detail {
               , OArchive
             >
             base_type;
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -3877,7 +3877,7 @@ namespace hpx { namespace util { namespace detail {
         {
             return Vtable::empty;
         }
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -3935,7 +3935,7 @@ namespace hpx { namespace util { namespace detail {
               , OArchive
             >
             base_type;
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -4054,7 +4054,7 @@ namespace hpx { namespace util { namespace detail {
         {
             return Vtable::empty;
         }
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -4112,7 +4112,7 @@ namespace hpx { namespace util { namespace detail {
               , OArchive
             >
             base_type;
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
@@ -4231,7 +4231,7 @@ namespace hpx { namespace util { namespace detail {
         {
             return Vtable::empty;
         }
-        vtable_ptr()
+        vtable_ptr() BOOST_NOEXCEPT
         {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;

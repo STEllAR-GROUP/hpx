@@ -127,7 +127,7 @@ namespace hpx { namespace util { namespace detail
             R(BOOST_PP_ENUM_PARAMS(N, A))
           , IArchive
           , OArchive
-        > *get_ptr()
+        > *get_ptr() BOOST_NOEXCEPT
         {
             return
                 get_empty_table<

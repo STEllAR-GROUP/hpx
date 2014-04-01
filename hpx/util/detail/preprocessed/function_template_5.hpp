@@ -79,7 +79,7 @@ namespace hpx { namespace util {
         {
             assign(other);
         }
-        function_base(function_base && other)
+        function_base(function_base && other) BOOST_NOEXCEPT
             : vptr(other.vptr)
             , object(other.object)
         {
@@ -159,7 +159,7 @@ namespace hpx { namespace util {
         {
             return assign(t);
         }
-        function_base & operator=(function_base && t)
+        function_base & operator=(function_base && t) BOOST_NOEXCEPT
         {
             if(this != &t)
             {
@@ -171,7 +171,7 @@ namespace hpx { namespace util {
             }
             return *this;
         }
-        function_base &swap(function_base& f)
+        function_base &swap(function_base& f) BOOST_NOEXCEPT
         {
             std::swap(vptr, f.vptr);
             std::swap(object, f.object);
@@ -189,7 +189,7 @@ namespace hpx { namespace util {
         {
             return empty();
         }
-        void reset()
+        void reset() BOOST_NOEXCEPT
         {
             if (!empty())
             {
@@ -198,7 +198,7 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        static vtable_ptr_type* get_empty_table_ptr()
+        static vtable_ptr_type* get_empty_table_ptr() BOOST_NOEXCEPT
         {
             return detail::get_empty_table<
                         R()
@@ -208,7 +208,7 @@ namespace hpx { namespace util {
                     >();
         }
         template <typename Functor>
-        static vtable_ptr_type* get_table_ptr()
+        static vtable_ptr_type* get_table_ptr() BOOST_NOEXCEPT
         {
             return detail::get_table<
                         Functor
@@ -329,7 +329,7 @@ namespace hpx { namespace util {
         {
             assign(other);
         }
-        function_base(function_base && other)
+        function_base(function_base && other) BOOST_NOEXCEPT
             : vptr(other.vptr)
             , object(other.object)
         {
@@ -409,7 +409,7 @@ namespace hpx { namespace util {
         {
             return assign(t);
         }
-        function_base & operator=(function_base && t)
+        function_base & operator=(function_base && t) BOOST_NOEXCEPT
         {
             if(this != &t)
             {
@@ -421,7 +421,7 @@ namespace hpx { namespace util {
             }
             return *this;
         }
-        function_base &swap(function_base& f)
+        function_base &swap(function_base& f) BOOST_NOEXCEPT
         {
             std::swap(vptr, f.vptr);
             std::swap(object, f.object);
@@ -439,7 +439,7 @@ namespace hpx { namespace util {
         {
             return empty();
         }
-        void reset()
+        void reset() BOOST_NOEXCEPT
         {
             if (!empty())
             {
@@ -448,7 +448,7 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        static vtable_ptr_type* get_empty_table_ptr()
+        static vtable_ptr_type* get_empty_table_ptr() BOOST_NOEXCEPT
         {
             return detail::get_empty_table<
                         R(A0)
@@ -458,7 +458,7 @@ namespace hpx { namespace util {
                     >();
         }
         template <typename Functor>
-        static vtable_ptr_type* get_table_ptr()
+        static vtable_ptr_type* get_table_ptr() BOOST_NOEXCEPT
         {
             return detail::get_table<
                         Functor
@@ -579,7 +579,7 @@ namespace hpx { namespace util {
         {
             assign(other);
         }
-        function_base(function_base && other)
+        function_base(function_base && other) BOOST_NOEXCEPT
             : vptr(other.vptr)
             , object(other.object)
         {
@@ -659,7 +659,7 @@ namespace hpx { namespace util {
         {
             return assign(t);
         }
-        function_base & operator=(function_base && t)
+        function_base & operator=(function_base && t) BOOST_NOEXCEPT
         {
             if(this != &t)
             {
@@ -671,7 +671,7 @@ namespace hpx { namespace util {
             }
             return *this;
         }
-        function_base &swap(function_base& f)
+        function_base &swap(function_base& f) BOOST_NOEXCEPT
         {
             std::swap(vptr, f.vptr);
             std::swap(object, f.object);
@@ -689,7 +689,7 @@ namespace hpx { namespace util {
         {
             return empty();
         }
-        void reset()
+        void reset() BOOST_NOEXCEPT
         {
             if (!empty())
             {
@@ -698,7 +698,7 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        static vtable_ptr_type* get_empty_table_ptr()
+        static vtable_ptr_type* get_empty_table_ptr() BOOST_NOEXCEPT
         {
             return detail::get_empty_table<
                         R(A0 , A1)
@@ -708,7 +708,7 @@ namespace hpx { namespace util {
                     >();
         }
         template <typename Functor>
-        static vtable_ptr_type* get_table_ptr()
+        static vtable_ptr_type* get_table_ptr() BOOST_NOEXCEPT
         {
             return detail::get_table<
                         Functor
@@ -829,7 +829,7 @@ namespace hpx { namespace util {
         {
             assign(other);
         }
-        function_base(function_base && other)
+        function_base(function_base && other) BOOST_NOEXCEPT
             : vptr(other.vptr)
             , object(other.object)
         {
@@ -909,7 +909,7 @@ namespace hpx { namespace util {
         {
             return assign(t);
         }
-        function_base & operator=(function_base && t)
+        function_base & operator=(function_base && t) BOOST_NOEXCEPT
         {
             if(this != &t)
             {
@@ -921,7 +921,7 @@ namespace hpx { namespace util {
             }
             return *this;
         }
-        function_base &swap(function_base& f)
+        function_base &swap(function_base& f) BOOST_NOEXCEPT
         {
             std::swap(vptr, f.vptr);
             std::swap(object, f.object);
@@ -939,7 +939,7 @@ namespace hpx { namespace util {
         {
             return empty();
         }
-        void reset()
+        void reset() BOOST_NOEXCEPT
         {
             if (!empty())
             {
@@ -948,7 +948,7 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        static vtable_ptr_type* get_empty_table_ptr()
+        static vtable_ptr_type* get_empty_table_ptr() BOOST_NOEXCEPT
         {
             return detail::get_empty_table<
                         R(A0 , A1 , A2)
@@ -958,7 +958,7 @@ namespace hpx { namespace util {
                     >();
         }
         template <typename Functor>
-        static vtable_ptr_type* get_table_ptr()
+        static vtable_ptr_type* get_table_ptr() BOOST_NOEXCEPT
         {
             return detail::get_table<
                         Functor
@@ -1079,7 +1079,7 @@ namespace hpx { namespace util {
         {
             assign(other);
         }
-        function_base(function_base && other)
+        function_base(function_base && other) BOOST_NOEXCEPT
             : vptr(other.vptr)
             , object(other.object)
         {
@@ -1159,7 +1159,7 @@ namespace hpx { namespace util {
         {
             return assign(t);
         }
-        function_base & operator=(function_base && t)
+        function_base & operator=(function_base && t) BOOST_NOEXCEPT
         {
             if(this != &t)
             {
@@ -1171,7 +1171,7 @@ namespace hpx { namespace util {
             }
             return *this;
         }
-        function_base &swap(function_base& f)
+        function_base &swap(function_base& f) BOOST_NOEXCEPT
         {
             std::swap(vptr, f.vptr);
             std::swap(object, f.object);
@@ -1189,7 +1189,7 @@ namespace hpx { namespace util {
         {
             return empty();
         }
-        void reset()
+        void reset() BOOST_NOEXCEPT
         {
             if (!empty())
             {
@@ -1198,7 +1198,7 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        static vtable_ptr_type* get_empty_table_ptr()
+        static vtable_ptr_type* get_empty_table_ptr() BOOST_NOEXCEPT
         {
             return detail::get_empty_table<
                         R(A0 , A1 , A2 , A3)
@@ -1208,7 +1208,7 @@ namespace hpx { namespace util {
                     >();
         }
         template <typename Functor>
-        static vtable_ptr_type* get_table_ptr()
+        static vtable_ptr_type* get_table_ptr() BOOST_NOEXCEPT
         {
             return detail::get_table<
                         Functor
@@ -1329,7 +1329,7 @@ namespace hpx { namespace util {
         {
             assign(other);
         }
-        function_base(function_base && other)
+        function_base(function_base && other) BOOST_NOEXCEPT
             : vptr(other.vptr)
             , object(other.object)
         {
@@ -1409,7 +1409,7 @@ namespace hpx { namespace util {
         {
             return assign(t);
         }
-        function_base & operator=(function_base && t)
+        function_base & operator=(function_base && t) BOOST_NOEXCEPT
         {
             if(this != &t)
             {
@@ -1421,7 +1421,7 @@ namespace hpx { namespace util {
             }
             return *this;
         }
-        function_base &swap(function_base& f)
+        function_base &swap(function_base& f) BOOST_NOEXCEPT
         {
             std::swap(vptr, f.vptr);
             std::swap(object, f.object);
@@ -1439,7 +1439,7 @@ namespace hpx { namespace util {
         {
             return empty();
         }
-        void reset()
+        void reset() BOOST_NOEXCEPT
         {
             if (!empty())
             {
@@ -1448,7 +1448,7 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        static vtable_ptr_type* get_empty_table_ptr()
+        static vtable_ptr_type* get_empty_table_ptr() BOOST_NOEXCEPT
         {
             return detail::get_empty_table<
                         R(A0 , A1 , A2 , A3 , A4)
@@ -1458,7 +1458,7 @@ namespace hpx { namespace util {
                     >();
         }
         template <typename Functor>
-        static vtable_ptr_type* get_table_ptr()
+        static vtable_ptr_type* get_table_ptr() BOOST_NOEXCEPT
         {
             return detail::get_table<
                         Functor
@@ -1579,7 +1579,7 @@ namespace hpx { namespace util {
         {
             assign(other);
         }
-        function_base(function_base && other)
+        function_base(function_base && other) BOOST_NOEXCEPT
             : vptr(other.vptr)
             , object(other.object)
         {
@@ -1659,7 +1659,7 @@ namespace hpx { namespace util {
         {
             return assign(t);
         }
-        function_base & operator=(function_base && t)
+        function_base & operator=(function_base && t) BOOST_NOEXCEPT
         {
             if(this != &t)
             {
@@ -1671,7 +1671,7 @@ namespace hpx { namespace util {
             }
             return *this;
         }
-        function_base &swap(function_base& f)
+        function_base &swap(function_base& f) BOOST_NOEXCEPT
         {
             std::swap(vptr, f.vptr);
             std::swap(object, f.object);
@@ -1689,7 +1689,7 @@ namespace hpx { namespace util {
         {
             return empty();
         }
-        void reset()
+        void reset() BOOST_NOEXCEPT
         {
             if (!empty())
             {
@@ -1698,7 +1698,7 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        static vtable_ptr_type* get_empty_table_ptr()
+        static vtable_ptr_type* get_empty_table_ptr() BOOST_NOEXCEPT
         {
             return detail::get_empty_table<
                         R(A0 , A1 , A2 , A3 , A4 , A5)
@@ -1708,7 +1708,7 @@ namespace hpx { namespace util {
                     >();
         }
         template <typename Functor>
-        static vtable_ptr_type* get_table_ptr()
+        static vtable_ptr_type* get_table_ptr() BOOST_NOEXCEPT
         {
             return detail::get_table<
                         Functor
@@ -1829,7 +1829,7 @@ namespace hpx { namespace util {
         {
             assign(other);
         }
-        function_base(function_base && other)
+        function_base(function_base && other) BOOST_NOEXCEPT
             : vptr(other.vptr)
             , object(other.object)
         {
@@ -1909,7 +1909,7 @@ namespace hpx { namespace util {
         {
             return assign(t);
         }
-        function_base & operator=(function_base && t)
+        function_base & operator=(function_base && t) BOOST_NOEXCEPT
         {
             if(this != &t)
             {
@@ -1921,7 +1921,7 @@ namespace hpx { namespace util {
             }
             return *this;
         }
-        function_base &swap(function_base& f)
+        function_base &swap(function_base& f) BOOST_NOEXCEPT
         {
             std::swap(vptr, f.vptr);
             std::swap(object, f.object);
@@ -1939,7 +1939,7 @@ namespace hpx { namespace util {
         {
             return empty();
         }
-        void reset()
+        void reset() BOOST_NOEXCEPT
         {
             if (!empty())
             {
@@ -1948,7 +1948,7 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        static vtable_ptr_type* get_empty_table_ptr()
+        static vtable_ptr_type* get_empty_table_ptr() BOOST_NOEXCEPT
         {
             return detail::get_empty_table<
                         R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
@@ -1958,7 +1958,7 @@ namespace hpx { namespace util {
                     >();
         }
         template <typename Functor>
-        static vtable_ptr_type* get_table_ptr()
+        static vtable_ptr_type* get_table_ptr() BOOST_NOEXCEPT
         {
             return detail::get_table<
                         Functor
@@ -2079,7 +2079,7 @@ namespace hpx { namespace util {
         {
             assign(other);
         }
-        function_base(function_base && other)
+        function_base(function_base && other) BOOST_NOEXCEPT
             : vptr(other.vptr)
             , object(other.object)
         {
@@ -2159,7 +2159,7 @@ namespace hpx { namespace util {
         {
             return assign(t);
         }
-        function_base & operator=(function_base && t)
+        function_base & operator=(function_base && t) BOOST_NOEXCEPT
         {
             if(this != &t)
             {
@@ -2171,7 +2171,7 @@ namespace hpx { namespace util {
             }
             return *this;
         }
-        function_base &swap(function_base& f)
+        function_base &swap(function_base& f) BOOST_NOEXCEPT
         {
             std::swap(vptr, f.vptr);
             std::swap(object, f.object);
@@ -2189,7 +2189,7 @@ namespace hpx { namespace util {
         {
             return empty();
         }
-        void reset()
+        void reset() BOOST_NOEXCEPT
         {
             if (!empty())
             {
@@ -2198,7 +2198,7 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        static vtable_ptr_type* get_empty_table_ptr()
+        static vtable_ptr_type* get_empty_table_ptr() BOOST_NOEXCEPT
         {
             return detail::get_empty_table<
                         R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
@@ -2208,7 +2208,7 @@ namespace hpx { namespace util {
                     >();
         }
         template <typename Functor>
-        static vtable_ptr_type* get_table_ptr()
+        static vtable_ptr_type* get_table_ptr() BOOST_NOEXCEPT
         {
             return detail::get_table<
                         Functor

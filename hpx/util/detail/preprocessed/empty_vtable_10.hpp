@@ -28,7 +28,7 @@ namespace hpx { namespace util { namespace detail
             R()
           , IArchive
           , OArchive
-        > *get_ptr()
+        > *get_ptr() BOOST_NOEXCEPT
         {
             return
                 get_empty_table<
@@ -65,7 +65,7 @@ namespace hpx { namespace util { namespace detail
             R(A0)
           , IArchive
           , OArchive
-        > *get_ptr()
+        > *get_ptr() BOOST_NOEXCEPT
         {
             return
                 get_empty_table<
@@ -102,7 +102,7 @@ namespace hpx { namespace util { namespace detail
             R(A0 , A1)
           , IArchive
           , OArchive
-        > *get_ptr()
+        > *get_ptr() BOOST_NOEXCEPT
         {
             return
                 get_empty_table<
@@ -139,7 +139,7 @@ namespace hpx { namespace util { namespace detail
             R(A0 , A1 , A2)
           , IArchive
           , OArchive
-        > *get_ptr()
+        > *get_ptr() BOOST_NOEXCEPT
         {
             return
                 get_empty_table<
@@ -176,7 +176,7 @@ namespace hpx { namespace util { namespace detail
             R(A0 , A1 , A2 , A3)
           , IArchive
           , OArchive
-        > *get_ptr()
+        > *get_ptr() BOOST_NOEXCEPT
         {
             return
                 get_empty_table<
@@ -213,7 +213,7 @@ namespace hpx { namespace util { namespace detail
             R(A0 , A1 , A2 , A3 , A4)
           , IArchive
           , OArchive
-        > *get_ptr()
+        > *get_ptr() BOOST_NOEXCEPT
         {
             return
                 get_empty_table<
@@ -250,7 +250,7 @@ namespace hpx { namespace util { namespace detail
             R(A0 , A1 , A2 , A3 , A4 , A5)
           , IArchive
           , OArchive
-        > *get_ptr()
+        > *get_ptr() BOOST_NOEXCEPT
         {
             return
                 get_empty_table<
@@ -287,7 +287,7 @@ namespace hpx { namespace util { namespace detail
             R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
           , IArchive
           , OArchive
-        > *get_ptr()
+        > *get_ptr() BOOST_NOEXCEPT
         {
             return
                 get_empty_table<
@@ -324,7 +324,7 @@ namespace hpx { namespace util { namespace detail
             R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
           , IArchive
           , OArchive
-        > *get_ptr()
+        > *get_ptr() BOOST_NOEXCEPT
         {
             return
                 get_empty_table<
@@ -361,7 +361,7 @@ namespace hpx { namespace util { namespace detail
             R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
           , IArchive
           , OArchive
-        > *get_ptr()
+        > *get_ptr() BOOST_NOEXCEPT
         {
             return
                 get_empty_table<
@@ -398,7 +398,7 @@ namespace hpx { namespace util { namespace detail
             R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
           , IArchive
           , OArchive
-        > *get_ptr()
+        > *get_ptr() BOOST_NOEXCEPT
         {
             return
                 get_empty_table<
@@ -435,7 +435,7 @@ namespace hpx { namespace util { namespace detail
             R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
           , IArchive
           , OArchive
-        > *get_ptr()
+        > *get_ptr() BOOST_NOEXCEPT
         {
             return
                 get_empty_table<
@@ -472,7 +472,7 @@ namespace hpx { namespace util { namespace detail
             R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
           , IArchive
           , OArchive
-        > *get_ptr()
+        > *get_ptr() BOOST_NOEXCEPT
         {
             return
                 get_empty_table<
@@ -509,7 +509,7 @@ namespace hpx { namespace util { namespace detail
             R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
           , IArchive
           , OArchive
-        > *get_ptr()
+        > *get_ptr() BOOST_NOEXCEPT
         {
             return
                 get_empty_table<

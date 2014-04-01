@@ -90,17 +90,17 @@ namespace hpx { namespace util
         struct is_empty_function_impl
         {
             // in the general case the functor is not empty
-            static bool call(Functor const&, boost::mpl::false_)
+            static bool call(Functor const&, boost::mpl::false_) BOOST_NOEXCEPT
             {
                 return false;
             }
 
-            static bool call(Functor const& f, boost::mpl::true_)
+            static bool call(Functor const& f, boost::mpl::true_) BOOST_NOEXCEPT
             {
                 return f == 0;
             }
 
-            static bool call(Functor const& f)
+            static bool call(Functor const& f) BOOST_NOEXCEPT
             {
                 return call(f
                     , boost::mpl::or_<
@@ -112,7 +112,7 @@ namespace hpx { namespace util
         };
 
         template <typename Functor>
-        bool is_empty_function(Functor const& f)
+        bool is_empty_function(Functor const& f) BOOST_NOEXCEPT
         {
             return is_empty_function_impl<Functor>::call(f);
         }
@@ -122,7 +122,7 @@ namespace hpx { namespace util
             , typename IArchive
             , typename OArchive
         >
-        bool is_empty_function(function<Sig, IArchive, OArchive> const& f)
+        bool is_empty_function(function<Sig, IArchive, OArchive> const& f) BOOST_NOEXCEPT
         {
             return f.empty();
         }
@@ -130,7 +130,7 @@ namespace hpx { namespace util
         template <
             typename Sig
         >
-        bool is_empty_function(function_nonser<Sig> const& f)
+        bool is_empty_function(function_nonser<Sig> const& f) BOOST_NOEXCEPT
         {
             return f.empty();
         }
@@ -156,7 +156,7 @@ namespace hpx { namespace util
 
         template <typename Functor>
         function(
-            Functor f
+            Functor && f
           , typename ::boost::disable_if<
                 typename boost::is_same<
                     function
@@ -164,14 +164,14 @@ namespace hpx { namespace util
                 >::type
             >::type * = 0
         )
-            : base_type(std::move(f))
+            : base_type(std::forward<Functor>(f))
         {}
 
         function(function const & other)
             : base_type(static_cast<base_type const &>(other))
         {}
 
-        function(function && other)
+        function(function && other) BOOST_NOEXCEPT
             : base_type(std::move(static_cast<base_type &&>(other)))
         {}
 
@@ -181,13 +181,13 @@ namespace hpx { namespace util
             return *this;
         }
 
-        function& operator=(function && t)
+        function& operator=(function && t) BOOST_NOEXCEPT
         {
             this->base_type::operator=(std::move(static_cast<base_type &&>(t)));
             return *this;
         }
 
-        void clear() { reset(); }
+        void clear() BOOST_NOEXCEPT { reset(); }
 
     private:
         friend class boost::serialization::access;
@@ -257,7 +257,7 @@ namespace hpx { namespace util
 
         template <typename Functor>
         function(
-            Functor f
+            Functor && f
           , typename ::boost::disable_if<
                 typename boost::is_same<
                     function
@@ -265,14 +265,14 @@ namespace hpx { namespace util
                 >::type
             >::type * = 0
         )
-            : base_type(std::move(f))
+            : base_type(std::forward<Functor>(f))
         {}
 
         function(function const & other)
             : base_type(static_cast<base_type const &>(other))
         {}
 
-        function(function && other)
+        function(function && other) BOOST_NOEXCEPT
             : base_type(std::move(static_cast<base_type &&>(other)))
         {}
 
@@ -282,13 +282,13 @@ namespace hpx { namespace util
             return *this;
         }
 
-        function& operator=(function && t)
+        function& operator=(function && t) BOOST_NOEXCEPT
         {
             this->base_type::operator=(std::move(static_cast<base_type &&>(t)));
             return *this;
         }
 
-        void clear() { reset(); }
+        void clear() BOOST_NOEXCEPT { reset(); }
     };
 
 
@@ -306,7 +306,7 @@ namespace hpx { namespace util
 
         template <typename Functor>
         function_nonser(
-            Functor f
+            Functor && f
           , typename ::boost::disable_if<
                 typename boost::is_same<
                     function_nonser
@@ -314,14 +314,14 @@ namespace hpx { namespace util
                 >::type
             >::type * = 0
         )
-            : base_type(std::move(f))
+            : base_type(std::forward<Functor>(f))
         {}
 
         function_nonser(function_nonser const & other)
             : base_type(static_cast<base_type const &>(other))
         {}
 
-        function_nonser(function_nonser && other)
+        function_nonser(function_nonser && other) BOOST_NOEXCEPT
             : base_type(std::move(static_cast<base_type &&>(other)))
         {}
 
@@ -331,13 +331,13 @@ namespace hpx { namespace util
             return *this;
         }
 
-        function_nonser& operator=(function_nonser && t)
+        function_nonser& operator=(function_nonser && t) BOOST_NOEXCEPT
         {
             this->base_type::operator=(std::move(static_cast<base_type &&>(t)));
             return *this;
         }
 
-        void clear() { reset(); }
+        void clear() BOOST_NOEXCEPT { reset(); }
     };
 }}
 
@@ -453,7 +453,7 @@ namespace hpx { namespace util {
             assign(other);
         }
 
-        function_base(function_base && other)
+        function_base(function_base && other) BOOST_NOEXCEPT
             : vptr(other.vptr)
             , object(other.object)
         {
@@ -540,7 +540,7 @@ namespace hpx { namespace util {
             return assign(t);
         }
 
-        function_base & operator=(function_base && t)
+        function_base & operator=(function_base && t) BOOST_NOEXCEPT
         {
             if(this != &t)
             {
@@ -554,7 +554,7 @@ namespace hpx { namespace util {
             return *this;
         }
 
-        function_base &swap(function_base& f)
+        function_base &swap(function_base& f) BOOST_NOEXCEPT
         {
             std::swap(vptr, f.vptr);
             std::swap(object, f.object);
@@ -576,7 +576,7 @@ namespace hpx { namespace util {
             return empty();
         }
 
-        void reset()
+        void reset() BOOST_NOEXCEPT
         {
             if (!empty())
             {
@@ -586,7 +586,7 @@ namespace hpx { namespace util {
             }
         }
 
-        static vtable_ptr_type* get_empty_table_ptr()
+        static vtable_ptr_type* get_empty_table_ptr() BOOST_NOEXCEPT
         {
             return detail::get_empty_table<
                         R(BOOST_PP_ENUM_PARAMS(N, A))
@@ -597,7 +597,7 @@ namespace hpx { namespace util {
         }
 
         template <typename Functor>
-        static vtable_ptr_type* get_table_ptr()
+        static vtable_ptr_type* get_table_ptr() BOOST_NOEXCEPT
         {
             return detail::get_table<
                         Functor
