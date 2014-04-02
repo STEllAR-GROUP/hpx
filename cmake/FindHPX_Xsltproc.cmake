@@ -9,7 +9,7 @@ endif()
 
 if(NOT XSLTPROC_ROOT)
   if($ENV{XSLTPROC_ROOT})
-    set(XSLTPROC_ROOT $ENV{XSLTPROC_ROOT})
+    set(XSLTPROC_ROOT "$ENV{XSLTPROC_ROOT}")
   endif()
 endif()
 

@@ -22,7 +22,7 @@ macro(add_hpx_source_group)
     if (NOT GROUP_ROOT)
       set(GROUP_ROOT ".")
     endif()
-    get_filename_component(root ${GROUP_ROOT} ABSOLUTE)
+    get_filename_component(root "${GROUP_ROOT}" ABSOLUTE)
 
     foreach(target ${targets})
       string(REGEX REPLACE "${root}" "" relpath "${target}")

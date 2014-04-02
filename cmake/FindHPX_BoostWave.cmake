@@ -10,9 +10,9 @@ endif()
 
 if(NOT BOOSTWAVE_ROOT)
   if(BOOST_ROOT)
-      set(BOOSTWAVE_ROOT ${BOOST_ROOT})
+      set(BOOSTWAVE_ROOT "${BOOST_ROOT}")
   elseif($ENV{BOOST_ROOT})
-      set(BOOSTWAVE_ROOT $ENV{BOOST_ROOT})
+      set(BOOSTWAVE_ROOT "$ENV{BOOST_ROOT}")
   endif()
 endif()
 

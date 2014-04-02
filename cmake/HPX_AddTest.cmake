@@ -64,7 +64,7 @@ macro(add_hpx_test category name)
 
   add_test(
     NAME "${category}.${name}"
-    COMMAND ${CMAKE_SOURCE_DIR}/python/scripts/hpx_run_test.py
+    COMMAND "${CMAKE_SOURCE_DIR}/python/scripts/hpx_run_test.py"
             --log-stdout
             "[${test_output}]")
 endmacro()

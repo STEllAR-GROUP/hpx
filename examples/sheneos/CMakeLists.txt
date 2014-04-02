@@ -8,8 +8,7 @@ find_package(HPX_HDF5)
 
 if(HDF5_CPP_FOUND)
   if(HDF5_THREAD_SAFE)
-
-    include_directories(${HDF5_INCLUDE_DIR} ${HDF5_CPP_INCLUDE_DIR})
+    include_directories("${HDF5_INCLUDE_DIR}" "${HDF5_CPP_INCLUDE_DIR}")
 
     # add a custom target for this example
     add_hpx_pseudo_target(examples.sheneos.sheneos)

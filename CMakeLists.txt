@@ -59,7 +59,7 @@ endif()
 ################################################################################
 set(HPX_INTERNAL_CMAKE ON)
 
-set(CMAKE_MODULE_PATH ${hpx_SOURCE_DIR}/cmake)
+set(CMAKE_MODULE_PATH "${hpx_SOURCE_DIR}/cmake")
 
 # include additional macro definitions
 include(HPX_Utils)
@@ -139,10 +139,9 @@ endif()
 ################################################################################
 # search path configuration
 ################################################################################
-hpx_include_directories(${hpx_SOURCE_DIR})
-hpx_include_directories(${CMAKE_BINARY_DIR})
+hpx_include_directories("${hpx_SOURCE_DIR}" "${CMAKE_BINARY_DIR}")
 if(${BOOST_MINOR_VERSION} LESS 53)
-  hpx_include_directories(${hpx_SOURCE_DIR}/external/atomic)
+  hpx_include_directories("${hpx_SOURCE_DIR}/external/atomic")
 else()
   set(BOOST_LIBRARIES ${BOOST_LIBRARIES} atomic)
 endif()
@@ -156,12 +155,12 @@ if(HPX_USE_GENERIC_COROUTINE_CONTEXT)
   endif()
 endif()
 if(${BOOST_MINOR_VERSION} LESS 53)
-  hpx_include_directories(${hpx_SOURCE_DIR}/external/lockfree)
+  hpx_include_directories("${hpx_SOURCE_DIR}/external/lockfree")
 endif()
-hpx_include_directories(${hpx_SOURCE_DIR}/external/cache)
-hpx_include_directories(${hpx_SOURCE_DIR}/external/endian)
+hpx_include_directories("${hpx_SOURCE_DIR}/external/cache"
+                        "${hpx_SOURCE_DIR}/external/endian")
 if(${BOOST_MINOR_VERSION} LESS 49)
-  hpx_include_directories(${hpx_SOURCE_DIR}/external/serialization)
+  hpx_include_directories("${hpx_SOURCE_DIR}/external/serialization")
 endif()
 
 ###############################################################################
@@ -176,7 +175,7 @@ hpx_option(HPX_NATIVE_MIC BOOL
 # Boost headers
 # FIXME: push changes upstream
 if(HPX_NATIVE_MIC)
-  hpx_include_directories(${hpx_SOURCE_DIR}/external/asio)
+  hpx_include_directories("${hpx_SOURCE_DIR}/external/asio")
 endif()
 
 if(HPX_NATIVE_MIC)
@@ -195,9 +194,9 @@ endif()
 
 ###############################################################################
 if(UNIX)
-  hpx_link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
+  hpx_link_directories("${CMAKE_BINARY_DIR}/lib/hpx")
 else()
-  hpx_link_directories(${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/lib/hpx)
+  hpx_link_directories("${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/lib/hpx")
 endif()
 
 ###############################################################################
@@ -217,8 +216,8 @@ endif()
 # ships
 find_package(HPX_Boost)
 
-hpx_include_sys_directories(${BOOST_INCLUDE_DIR})
-hpx_link_sys_directories(${BOOST_LIBRARY_DIR})
+hpx_include_sys_directories("${BOOST_INCLUDE_DIR}")
+hpx_link_sys_directories("${BOOST_LIBRARY_DIR}")
 
 if(NOT MSVC)
   set(hpx_LIBRARIES ${BOOST_FOUND_LIBRARIES})
@@ -687,8 +686,8 @@ endif()
 if(NOT APPLE)
   find_package(HPX_Hwloc)
   if(HWLOC_FOUND)
-    hpx_include_sys_directories(${HWLOC_INCLUDE_DIR})
-    hpx_link_sys_directories(${HWLOC_LIBRARY_DIR})
+    hpx_include_sys_directories("${HWLOC_INCLUDE_DIR}")
+    hpx_link_sys_directories("${HWLOC_LIBRARY_DIR}")
     hpx_add_definitions(-DHPX_HAVE_HWLOC)
     set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${HWLOC_LIBRARY})
   endif()
@@ -705,8 +704,8 @@ if(SODIUM_FOUND)
 
   hpx_add_config_define(HPX_HAVE_SODIUM)
 
-  hpx_include_sys_directories(${SODIUM_INCLUDE_DIR})
-  hpx_link_sys_directories(${SODIUM_LIBRARY_DIR})
+  hpx_include_sys_directories("${SODIUM_INCLUDE_DIR}")
+  hpx_link_sys_directories("${SODIUM_LIBRARY_DIR}")
   if(MSVC)
     hpx_add_config_define(SODIUM_STATIC)
   endif()
@@ -792,8 +791,8 @@ if(HPX_HAVE_ITTNOTIFY)
   if(AMPLIFIER_FOUND)
     hpx_info("itt" "Binding to Intel Amplifier tool is enabled.")
     hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
-    hpx_include_sys_directories(${AMPLIFIER_INCLUDE_DIR})
-    hpx_link_sys_directories(${AMPLIFIER_LIBRARY_DIR})
+    hpx_include_sys_directories("${AMPLIFIER_INCLUDE_DIR}")
+    hpx_link_sys_directories("${AMPLIFIER_LIBRARY_DIR}")
     set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${AMPLIFIER_LIBRARY})
   else()
     set(HPX_HAVE_ITTNOTIFY OFF FORCE)
@@ -962,8 +961,8 @@ if(HPX_GOOGLE_PERFTOOLS)
   find_package(HPX_GooglePerftools)
   if(GOOGLE_PERFTOOLS_FOUND)
     set(hpx_LIBRARIES ${hpx_LIBRARIES} ${GOOGLE_PERFTOOLS_LIBRARY})
-    hpx_include_sys_directories(${GOOGLE_PERFTOOLS_INCLUDE_DIR})
-    hpx_link_sys_directories(${GOOGLE_PERFTOOLS_LIBRARY_DIR})
+    hpx_include_sys_directories("${GOOGLE_PERFTOOLS_INCLUDE_DIR}")
+    hpx_link_sys_directories("${GOOGLE_PERFTOOLS_LIBRARY_DIR}")
     hpx_add_config_define(HPX_GOOGLE_PERFTOOLS)
   endif()
 endif()
@@ -1673,8 +1672,8 @@ foreach(def ${HPX_CONFIG_DEFINITIONS})
     endif()
 endforeach()
 
-configure_file(${hpx_SOURCE_DIR}/cmake/templates/config_defines.hpp.in
-               ${CMAKE_BINARY_DIR}/hpx/config/defines.hpp
+configure_file("${hpx_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
+               "${CMAKE_BINARY_DIR}/hpx/config/defines.hpp"
                @ONLY)
 
 ################################################################################
@@ -1693,7 +1692,7 @@ if(NOT HPX_NO_INSTALL)
   # Install all HPX header that have been configured using various
   # cmake options
   install(
-    DIRECTORY ${CMAKE_BINARY_DIR}/hpx/
+    DIRECTORY "${CMAKE_BINARY_DIR}/hpx/"
     DESTINATION include/hpx
     COMPONENT core
     FILES_MATCHING PATTERN "*.hpp"
@@ -1848,20 +1847,20 @@ if(NOT HPX_NO_INSTALL)
   endif()
 
   install(
-    FILES ${hpx_SOURCE_DIR}/LICENSE_1_0.txt
+    FILES "${hpx_SOURCE_DIR}/LICENSE_1_0.txt"
     DESTINATION share/hpx-${HPX_VERSION}
     COMPONENT license)
 
   if(HPX_BUILD_DOCUMENTATION)
     # Install HPX documentation files
     if(MSVC)
-      set(doc_dir ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
+      set(doc_dir "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
     else()
-      set(doc_dir ${CMAKE_BINARY_DIR})
+      set(doc_dir "${CMAKE_BINARY_DIR}")
     endif()
 
     install(
-      DIRECTORY ${doc_dir}/share/hpx-${HPX_VERSION}/docs/
+      DIRECTORY "${doc_dir}/share/hpx-${HPX_VERSION}/docs/"
       DESTINATION share/hpx-${HPX_VERSION}/docs
       COMPONENT docs
       OPTIONAL
@@ -1873,16 +1872,16 @@ if(NOT HPX_NO_INSTALL)
 #      DESTINATION ${doc_dir}/share/hpx-${HPX_VERSION}/)
 
     install(
-      FILES ${hpx_SOURCE_DIR}/docs/index.html
+      FILES "${hpx_SOURCE_DIR}/docs/index.html"
       DESTINATION share/hpx-${HPX_VERSION}/
       COMPONENT docs)
 
-#    file(COPY ${hpx_SOURCE_DIR}/docs/html/src/
-#      DESTINATION ${doc_dir}/share/hpx-${HPX_VERSION}/docs/html/src
+#    file(COPY "${hpx_SOURCE_DIR}/docs/html/src/"
+#      DESTINATION "${doc_dir}/share/hpx-${HPX_VERSION}/docs/html/src"
 #      FILES_MATCHING PATTERN "*.css")
 
     install(
-      DIRECTORY ${hpx_SOURCE_DIR}/docs/html/src/
+      DIRECTORY "${hpx_SOURCE_DIR}/docs/html/src/"
       DESTINATION share/hpx-${HPX_VERSION}/docs/html/src
       COMPONENT docs
       FILES_MATCHING PATTERN "*.css"
@@ -1893,7 +1892,7 @@ if(NOT HPX_NO_INSTALL)
 #      FILES_MATCHING PATTERN "*.png")
 
     install(
-      DIRECTORY ${hpx_SOURCE_DIR}/docs/html/images/
+      DIRECTORY "${hpx_SOURCE_DIR}/docs/html/images/"
       DESTINATION share/hpx-${HPX_VERSION}/docs/html/images
       COMPONENT docs
       FILES_MATCHING PATTERN "*.png"
@@ -1905,11 +1904,10 @@ endif()
 # External build system support (FindHPX.cmake and pkg-config).
 ################################################################################
 set(HPX_LINK_DIRECTORIES
-    ${CMAKE_INSTALL_PREFIX}/lib/hpx ${HPX_LINK_DIRECTORIES})
+    "${CMAKE_INSTALL_PREFIX}/lib/hpx" ${HPX_LINK_DIRECTORIES})
 set(HPX_INCLUDE_DIRECTORIES
-    ${CMAKE_INSTALL_PREFIX}/include ${HPX_INCLUDE_DIRECTORIES})
-set(HPX_INCLUDE_DIRECTORIES
-    ${CMAKE_INSTALL_PREFIX}/include/hpx/external ${HPX_INCLUDE_DIRECTORIES})
+    "${CMAKE_INSTALL_PREFIX}/include" ${HPX_INCLUDE_DIRECTORIES}
+    "${CMAKE_INSTALL_PREFIX}/include/hpx/external")
 
 list(REMOVE_DUPLICATES HPX_LINK_DIRECTORIES)
 list(REMOVE_DUPLICATES HPX_INCLUDE_DIRECTORIES)
@@ -1954,12 +1952,12 @@ list(REMOVE_DUPLICATES external_libraries_name)
 
 if(HPX_NO_INSTALL)
 #  foreach(PREFIX ${HPX_PREFIX})
-#    list(REMOVE_ITEM HPX_INCLUDE_DIRECTORIES ${PREFIX}/include)
-#    list(REMOVE_ITEM HPX_INCLUDE_DIRECTORIES ${PREFIX}/include/hpx/external)
+#    list(REMOVE_ITEM HPX_INCLUDE_DIRECTORIES "${PREFIX}/include)"
+#                                             "${PREFIX}/include/hpx/external")
 #  endforeach()
 else()
-  list(REMOVE_ITEM HPX_INCLUDE_DIRECTORIES ${hpx_SOURCE_DIR})
-  list(REMOVE_ITEM HPX_INCLUDE_DIRECTORIES ${CMAKE_BINARY_DIR})
+  list(REMOVE_ITEM HPX_INCLUDE_DIRECTORIES "${hpx_SOURCE_DIR}"
+                                           "${CMAKE_BINARY_DIR}")
 endif()
 
 foreach(directory ${HPX_INCLUDE_DIRECTORIES})
@@ -1996,16 +1994,16 @@ list(REMOVE_DUPLICATES external_definitions)
 set(cmake_dir cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 
 if(MSVC)
-  set(output_dir ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
+  set(output_dir "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
 else()
-  set(output_dir ${CMAKE_BINARY_DIR})
+  set(output_dir "${CMAKE_BINARY_DIR}")
 endif()
 
 string(REGEX REPLACE "([ ()])" "\\\\\\1" HPX_PREFIX "${HPX_PREFIX}")
 if(HPX_NO_INSTALL)
-  set(external_cmake_path ${hpx_SOURCE_DIR}/cmake)
+  set(external_cmake_path "${hpx_SOURCE_DIR}/cmake")
 else()
-    set(external_cmake_path ${CMAKE_INSTALL_PREFIX}/share/hpx-${HPX_VERSION}/cmake)
+    set(external_cmake_path "${CMAKE_INSTALL_PREFIX}/share/hpx-${HPX_VERSION}/cmake")
 endif()
 
 set(hpx_link_flag_target_properties "")
@@ -2013,42 +2011,42 @@ if(MSVC AND HPX_LINK_FLAG_TARGET_PROPERTIES)
   set(hpx_link_flag_target_properties "${HPX_LINK_FLAG_TARGET_PROPERTIES}")
 endif()
 
-configure_file(${hpx_SOURCE_DIR}/cmake/templates/FindHPX.cmake.in
-               ${output_dir}/share/${cmake_dir}/Modules/FindHPX.cmake
+configure_file("${hpx_SOURCE_DIR}/cmake/templates/FindHPX.cmake.in"
+               "${output_dir}/share/${cmake_dir}/Modules/FindHPX.cmake"
                ESCAPE_QUOTES @ONLY)
 
 if(NOT HPX_NO_INSTALL)
-  install(FILES ${output_dir}/share/${cmake_dir}/Modules/FindHPX.cmake
-          DESTINATION share/${cmake_dir}/Modules)
+  install(FILES "${output_dir}/share/${cmake_dir}/Modules/FindHPX.cmake"
+          DESTINATION "share/${cmake_dir}/Modules")
 endif()
 
 if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
-    configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_application.pc.in
-                   ${output_dir}/lib/pkgconfig/hpx_application.pc
+    configure_file("${hpx_SOURCE_DIR}/cmake/templates/hpx_application.pc.in"
+                   "${output_dir}/lib/pkgconfig/hpx_application.pc"
                    @ONLY)
-    configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_component.pc.in
-                   ${output_dir}/lib/pkgconfig/hpx_component.pc
+    configure_file("${hpx_SOURCE_DIR}/cmake/templates/hpx_component.pc.in"
+                   "${output_dir}/lib/pkgconfig/hpx_component.pc"
                    @ONLY)
 else()
-    configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_application_debug.pc.in
-                   ${output_dir}/lib/pkgconfig/hpx_application_debug.pc
+    configure_file("${hpx_SOURCE_DIR}/cmake/templates/hpx_application_debug.pc.in"
+                   "${output_dir}/lib/pkgconfig/hpx_application_debug.pc"
                    @ONLY)
 
-    configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_component_debug.pc.in
-                   ${output_dir}/lib/pkgconfig/hpx_component_debug.pc
+    configure_file("${hpx_SOURCE_DIR}/cmake/templates/hpx_component_debug.pc.in"
+                   "${output_dir}/lib/pkgconfig/hpx_component_debug.pc"
                    @ONLY)
 endif()
 
 if(NOT HPX_NO_INSTALL)
   if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
-    install(FILES ${output_dir}/lib/pkgconfig/hpx_application.pc
+    install(FILES "${output_dir}/lib/pkgconfig/hpx_application.pc"
             DESTINATION lib/pkgconfig)
-    install(FILES ${output_dir}/lib/pkgconfig/hpx_component.pc
+    install(FILES "${output_dir}/lib/pkgconfig/hpx_component.pc"
             DESTINATION lib/pkgconfig)
   else()
-    install(FILES ${output_dir}/lib/pkgconfig/hpx_application_debug.pc
+    install(FILES "${output_dir}/lib/pkgconfig/hpx_application_debug.pc"
             DESTINATION lib/pkgconfig)
-    install(FILES ${output_dir}/lib/pkgconfig/hpx_component_debug.pc
+    install(FILES "${output_dir}/lib/pkgconfig/hpx_component_debug.pc"
             DESTINATION lib/pkgconfig)
   endif()
 endif()
@@ -2056,4 +2054,4 @@ endif()
 # Create a symlink in share pointing to the latest HPX installation
 execute_process(COMMAND
   "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx"
-  WORKING_DIRECTORY ${output_dir}/share)
+  WORKING_DIRECTORY "${output_dir}/share")

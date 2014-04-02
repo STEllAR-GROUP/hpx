@@ -16,7 +16,7 @@ add_hpx_pseudo_dependencies(
 
 hpx_option(HPX_BENCHMARK_SCRIPTS_PATH PATH
   "Directory to place batch scripts in"
-  ${hpx_BINARY_DIR}/scripts
+  "${hpx_BINARY_DIR}/scripts"
   ADVANCED)
 
 # our windows batch script needs to know the lib path for boost/hpx
@@ -26,8 +26,8 @@ if (WIN32)
   file(TO_NATIVE_PATH "${BOOST_LIBRARY_DIR};${HPX_PREFIX}/lib/hpx" LIB_PATH)
 
   # generate a simple batch file for convenience
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/network_storage.bat.in
-    ${HPX_BENCHMARK_SCRIPTS_PATH}/network_storage.bat
+  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/network_storage.bat.in"
+    "${HPX_BENCHMARK_SCRIPTS_PATH}/network_storage.bat"
     @ONLY)
 else()
 #-------------------------------------------------------
@@ -49,7 +49,7 @@ else()
   #set(LD_LIBRARY_PATH "${HPX_LIBRARY_OUTPUT_DIRECTORY_${CMAKE_CFG_INTDIR}}" CACHE PATH "Path to set when generating script tests")
 
 # Make sure scripts dir exists
-  execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${HPX_BENCHMARK_SCRIPTS_PATH})
+  execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${HPX_BENCHMARK_SCRIPTS_PATH}")
 
 #--------------------------------------------------
 # Slurm script generator for
@@ -57,8 +57,8 @@ else()
 #--------------------------------------------------
   set(SCRIPT_NAME "slurm-test-HPX-storage")
   ADD_CUSTOM_COMMAND(
-      DEPENDS   ${CMAKE_CURRENT_SOURCE_DIR}/${SCRIPT_NAME}.sh.in
-      COMMAND   ${CMAKE_COMMAND}
+      DEPENDS   "${CMAKE_CURRENT_SOURCE_DIR}/${SCRIPT_NAME}.sh.in"
+      COMMAND   "${CMAKE_COMMAND}"
       ARGS      -DEXE_PATH="$<TARGET_FILE:network_storage_exe>"
                 -DMPIEXEC="${MPIEXEC}"
                 -DSCRIPT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
@@ -66,12 +66,13 @@ else()
                 -DSCRIPT_DEST_DIR="${HPX_BENCHMARK_SCRIPTS_PATH}"
                 -DLIB_PATH="${LD_LIBRARY_PATH}"
                 -DJOB_OPTIONS1="${SLURM_JOB_OPTIONS1}"
-                -P ${CMAKE_CURRENT_SOURCE_DIR}/copy_script.cmake
-      OUTPUT    ${TESTING_SCRIPTS_PATH}/${SCRIPT_NAME}.sh
+                -P "${CMAKE_CURRENT_SOURCE_DIR}/copy_script.cmake"
+      OUTPUT    "${TESTING_SCRIPTS_PATH}/${SCRIPT_NAME}.sh"
+      VERBATIM
   )
 
   add_custom_target(script-network-storage
       ALL
-      DEPENDS ${TESTING_SCRIPTS_PATH}/slurm-test-HPX-storage.sh
+      DEPENDS "${TESTING_SCRIPTS_PATH}/slurm-test-HPX-storage.sh"
   )
 endif()

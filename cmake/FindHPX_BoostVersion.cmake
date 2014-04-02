@@ -14,16 +14,16 @@ macro(get_boost_version)
   if(NOT BOOST_USE_SYSTEM)
     if(NOT BOOST_ROOT)
       if(NOT $ENV{BOOST_ROOT} STREQUAL "")
-        set(BOOST_ROOT $ENV{BOOST_ROOT})
+        set(BOOST_ROOT "$ENV{BOOST_ROOT}")
       elseif(NOT $ENV{BOOST} STREQUAL "")
-        set(BOOST_ROOT $ENV{BOOST})
+        set(BOOST_ROOT "$ENV{BOOST}")
       endif()
     endif()
 
     if(NOT BOOST_LIBRARY_DIR AND BOOST_ROOT)
-      find_path(BOOST_LIBRARY_DIR lib PATHS ${BOOST_ROOT}/stage64 ${BOOST_ROOT}/stage ${BOOST_ROOT} NO_DEFAULT_PATH)
+      find_path(BOOST_LIBRARY_DIR lib PATHS "${BOOST_ROOT}/stage64" "${BOOST_ROOT}/stage" "${BOOST_ROOT}" NO_DEFAULT_PATH)
       if(${BOOST_LIBRARY_DIR} STREQUAL BOOST_LIBRARY_DIR-NOTFOUND)
-        find_path(BOOST_LIBRARY_DIR lib64 PATHS ${BOOST_ROOT}/stage64 ${BOOST_ROOT}/stage ${BOOST_ROOT} NO_DEFAULT_PATH)
+        find_path(BOOST_LIBRARY_DIR lib64 PATHS "${BOOST_ROOT}/stage64" "${BOOST_ROOT}/stage" "${BOOST_ROOT}" NO_DEFAULT_PATH)
         if(${BOOST_LIBRARY_DIR} STREQUAL BOOST_LIBRARY_DIR-NOTFOUND)
           set(BOOST_LIBRARY_DIR "${BOOST_LIBRARY_DIR}/lib64" )
         endif()
@@ -34,11 +34,11 @@ macro(get_boost_version)
     endif()
 
     if(NOT BOOST_INCLUDE_DIR AND BOOST_ROOT)
-      find_path(BOOST_INCLUDE_DIR boost PATHS ${BOOST_ROOT} ${BOOST_ROOT}/include NO_DEFAULT_PATH)
+      find_path(BOOST_INCLUDE_DIR boost PATHS "${BOOST_ROOT}" "${BOOST_ROOT}/include" NO_DEFAULT_PATH)
     endif()
 
     # Locate include directory
-    find_path(BOOST_VERSION_HPP boost/version.hpp PATHS ${BOOST_INCLUDE_DIR} NO_DEFAULT_PATH)
+    find_path(BOOST_VERSION_HPP boost/version.hpp PATHS "${BOOST_INCLUDE_DIR}" NO_DEFAULT_PATH)
 
     if(${BOOST_VERSION_HPP} STREQUAL BOOST_VERSION_HPP-NOTFOUND)
       set(boost_possible_suffixes
@@ -54,7 +54,7 @@ macro(get_boost_version)
       endif()
 
       find_path(BOOST_VERSION_HPP boost/version.hpp
-          PATHS ${BOOST_INCLUDE_DIR}
+          PATHS "${BOOST_INCLUDE_DIR}"
           PATH_SUFFIXES ${boost_possible_suffixes}
           NO_DEFAULT_PATH)
 
@@ -92,7 +92,7 @@ macro(get_boost_version)
 
   endif()
 
-  set(BOOST_VERSION_HPP ${BOOST_VERSION_HPP}/boost/version.hpp)
+  set(BOOST_VERSION_HPP "${BOOST_VERSION_HPP}/boost/version.hpp")
   hpx_info("boost.version" "Using ${BOOST_VERSION_HPP} as Boost version.hpp header.")
 
   # Get Boost version

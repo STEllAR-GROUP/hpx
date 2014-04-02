@@ -11,10 +11,10 @@ if(HPX_HAVE_VALGRIND)
   endif()
 
   if(NOT VALGRIND_ROOT AND NOT $ENV{HOME_VALGRIND} STREQUAL "")
-    set(VALGRIND_ROOT $ENV{HOME_VALGRIND})
+    set(VALGRIND_ROOT "$ENV{HOME_VALGRIND}")
   endif()
   if(NOT VALGRIND_ROOT AND NOT $ENV{VALGRIND_ROOT} STREQUAL "")
-    set(VALGRIND_ROOT $ENV{VALGRIND_ROOT})
+    set(VALGRIND_ROOT "$ENV{VALGRIND_ROOT}")
   endif()
 
 
@@ -23,7 +23,7 @@ if(HPX_HAVE_VALGRIND)
     HEADER_PATHS include)
 
   if(VALGRIND_INCLUDE_DIR)
-    hpx_include_sys_directories(${VALGRIND_INCLUDE_DIR})
+    hpx_include_sys_directories("${VALGRIND_INCLUDE_DIR}")
     hpx_add_config_define(HPX_HAVE_VALGRIND)
   endif()
 endif()

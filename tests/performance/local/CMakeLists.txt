@@ -14,7 +14,9 @@ find_package(HPX_OpenMP)
 if(MSVC)
   set(boost_library_dependencies)
 else()
-  set(boost_library_dependencies ${BOOST_PROGRAM_OPTIONS_LIBRARY} ${BOOST_SYSTEM_LIBRARY} ${BOOST_CHRONO_LIBRARY})
+  set(boost_library_dependencies "${BOOST_PROGRAM_OPTIONS_LIBRARY}"
+                                 "${BOOST_SYSTEM_LIBRARY}"
+                                 "${BOOST_CHRONO_LIBRARY}")
 endif()
 
 set(benchmarks
@@ -38,7 +40,7 @@ if(OPENMP_FOUND)
 endif()
 
 if(QTHREADS_FOUND)
-  include_directories(${QTHREADS_INCLUDE_DIR})
+  include_directories("${QTHREADS_INCLUDE_DIR}")
 
   set(benchmarks
       ${benchmarks}
@@ -48,15 +50,15 @@ if(QTHREADS_FOUND)
 
   set(qthreads_homogeneous_timed_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies}
-                   ${QTHREADS_LIBRARY})
+                   "${QTHREADS_LIBRARY}")
 
   set(qthreads_heterogeneous_timed_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies}
-                   ${QTHREADS_LIBRARY})
+                   "${QTHREADS_LIBRARY}")
 endif()
 
 if(TBB_FOUND)
-  include_directories(${TBB_INCLUDE_DIR})
+  include_directories("${TBB_INCLUDE_DIR}")
 
   set(benchmarks
       ${benchmarks}
@@ -65,11 +67,11 @@ if(TBB_FOUND)
 
   set(tbb_homogeneous_timed_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies}
-                   ${TBB_LIBRARY})
+                   "${TBB_LIBRARY}")
 endif()
 
 if(SWARM_FOUND)
-  include_directories(${SWARM_INCLUDE_DIR})
+  include_directories("${SWARM_INCLUDE_DIR}")
 
   set(benchmarks
       ${benchmarks}
@@ -78,7 +80,7 @@ if(SWARM_FOUND)
 
   set(swarm_homogeneous_timed_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies}
-                   ${SWARM_LIBRARY})
+                   "${SWARM_LIBRARY}")
 endif()
 
 set(hpx_homogeneous_timed_task_spawn_executors_FLAGS DEPENDENCIES iostreams_component)
@@ -88,7 +90,7 @@ set(delay_baseline_FLAGS NOLIBS
     DEPENDENCIES ${boost_library_dependencies})
 
 set(delay_baseline_threaded_FLAGS NOLIBS
-    DEPENDENCIES ${boost_library_dependencies} ${BOOST_THREAD_LIBRARY})
+    DEPENDENCIES ${boost_library_dependencies} "${BOOST_THREAD_LIBRARY}")
 
 set(print_heterogeneous_payloads_FLAGS NOLIBS
     DEPENDENCIES ${boost_library_dependencies})

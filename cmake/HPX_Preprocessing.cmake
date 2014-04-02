@@ -32,36 +32,36 @@ else()
     endif()
 
     macro(hpx_partial_preprocess_header file)
-        hpx_list_contains(FILE_ADDED_ALREADY ${file} ${HPX_PREPROCESS_HEADERS})
+        hpx_list_contains(FILE_ADDED_ALREADY "${file}" ${HPX_PREPROCESS_HEADERS})
 
-        get_property(include_dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+        get_property(include_dirs DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" PROPERTY INCLUDE_DIRECTORIES)
         set(include_dirs ${include_dirs} ${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES})
         foreach(dir ${include_dirs})
-            hpx_list_contains(INCLUDE_DIR_ADDED_ALREADY ${dir} ${HPX_PREPROCESS_INCLUDE_DIRS})
+            hpx_list_contains(INCLUDE_DIR_ADDED_ALREADY "${dir}" ${HPX_PREPROCESS_INCLUDE_DIRS})
             if(NOT INCLUDE_DIR_ADDED_ALREADY)
                 hpx_debug("preprocessing" "Adding ${dir} to list of additional include directories")
-                set(HPX_PREPROCESS_INCLUDE_DIRS ${HPX_PREPROCESS_INCLUDE_DIRS} ${dir} CACHE INTERNAL "")
+                set(HPX_PREPROCESS_INCLUDE_DIRS ${HPX_PREPROCESS_INCLUDE_DIRS} "${dir}" CACHE INTERNAL "")
             endif()
         endforeach()
 
         if(NOT FILE_ADDED_ALREADY)
             hpx_debug("preprocessing" "Adding ${file} to list of targets to preprocess")
             set(HPX_PREPROCESS_HEADERS ${HPX_PREPROCESS_HEADERS} ${file} CACHE INTERNAL "")
-            hpx_parse_arguments(HPX_PREPROCESS_HEADERS_${file} "GUARD;LIMIT" "" ${ARGN})
-            if(HPX_PREPROCESS_HEADERS_${file}_LIMIT)
-                set(HPX_PREPROCESS_HEADERS_${file}_LIMIT ${HPX_PREPROCESS_HEADERS_${file}_LIMIT} CACHE INTERNAL "" FORCE)
+            hpx_parse_arguments("HPX_PREPROCESS_HEADERS_${file}" "GUARD;LIMIT" "" ${ARGN})
+            if("HPX_PREPROCESS_HEADERS_${file}_LIMIT")
+                set("HPX_PREPROCESS_HEADERS_${file}_LIMIT" "${HPX_PREPROCESS_HEADERS_${file}_LIMIT}" CACHE INTERNAL "" FORCE)
             else()
-                set(HPX_PREPROCESS_HEADERS_${file}_LIMIT "HPX_LIMIT" CACHE INTERNAL "" FORCE)
+                set("HPX_PREPROCESS_HEADERS_${file}_LIMIT" "HPX_LIMIT" CACHE INTERNAL "" FORCE)
             endif()
 
-            if(HPX_PREPROCESS_HEADERS_${file}_GUARD)
-                set(HPX_PREPROCESS_HEADERS_${file}_GUARD ${HPX_PREPROCESS_HEADERS_${file}_GUARD} CACHE INTERNAL "" FORCE)
+            if("HPX_PREPROCESS_HEADERS_${file}_GUARD")
+                set("HPX_PREPROCESS_HEADERS_${file}_GUARD" "${HPX_PREPROCESS_HEADERS_${file}_GUARD}" CACHE INTERNAL "" FORCE)
             else()
                 string(TOUPPER "${file}" THIS_GUARD)
                 string(REGEX REPLACE "/" "_" THIS_GUARD "${THIS_GUARD}")
                 string(REGEX REPLACE "\\." "_" THIS_GUARD "${THIS_GUARD}")
                 string(REGEX REPLACE "HPX_" "HPX_PREPROCESSED_" THIS_GUARD "${THIS_GUARD}")
-                set(HPX_PREPROCESS_HEADERS_${file}_GUARD ${THIS_GUARD} CACHE INTERNAL "" FORCE)
+                set("HPX_PREPROCESS_HEADERS_${file}_GUARD" "${THIS_GUARD}" CACHE INTERNAL "" FORCE)
             endif()
         endif()
     endmacro()
@@ -78,10 +78,10 @@ else()
             set(HPX_PREPROCESS_GUARD ${HPX_PREPROCESS_HEADERS_${file}_GUARD})
             get_filename_component(PREPROCESS_DIR "${file}" PATH)
             get_filename_component(PREPROCESS_HEADER "${file}" NAME_WE)
-            set(HPX_PREPROCESS_HEADER ${PREPROCESS_DIR}/preprocessed/${PREPROCESS_HEADER})
+            set(HPX_PREPROCESS_HEADER "${PREPROCESS_DIR}/preprocessed/${PREPROCESS_HEADER}")
             configure_file(
-                ${hpx_SOURCE_DIR}/cmake/templates/preprocess_include.hpp.in
-                ${hpx_SOURCE_DIR}/${HPX_PREPROCESS_HEADER}.hpp
+                "${hpx_SOURCE_DIR}/cmake/templates/preprocess_include.hpp.in"
+                "${hpx_SOURCE_DIR}/${HPX_PREPROCESS_HEADER}.hpp"
                 ESCAPE_QUOTES
                 @ONLY
             )
@@ -139,19 +139,19 @@ else()
             set(HPX_WAVE_ARGUMENTS "${HPX_WAVE_ARGUMENTS}-D__GXX_EXPERIMENTAL_CXX0X__\n")
         endif()
 
-        set(output_dir ${CMAKE_BINARY_DIR})
+        set(output_dir "${CMAKE_BINARY_DIR}")
         hpx_info("preprocessing" "output_dir: ${output_dir}")
 
         configure_file(
-            ${hpx_SOURCE_DIR}/cmake/templates/wave.cfg.in
-            ${output_dir}/preprocess/wave.cfg
+            "${hpx_SOURCE_DIR}/cmake/templates/wave.cfg.in"
+            "${output_dir}/preprocess/wave.cfg"
             ESCAPE_QUOTES
             @ONLY
         )
 
         configure_file(
-            ${hpx_SOURCE_DIR}/cmake/templates/preprocess_hpx.cpp.in
-            ${output_dir}/preprocess/preprocess_hpx.cpp
+            "${hpx_SOURCE_DIR}/cmake/templates/preprocess_hpx.cpp.in"
+            "${output_dir}/preprocess/preprocess_hpx.cpp"
             ESCAPE_QUOTES
             @ONLY
         )
@@ -160,22 +160,23 @@ else()
             set(HPX_PREPROCESSING_LIMITS ${HPX_PREPROCESSING_LIMITS} "hpx_partial_preprocess_headers_${limit}")
 
             add_custom_command(
-                OUTPUT ${output_dir}/preprocess/hpx_preprocessed_${limit}.touch
-                COMMAND ${BOOSTWAVE_PROGRAM}
-                ARGS -o- -DHPX_LIMIT=${limit} ${output_dir}/preprocess/preprocess_hpx.cpp --license=${hpx_SOURCE_DIR}/preprocess/preprocess_license.hpp --config-file ${output_dir}/preprocess/wave.cfg
+                OUTPUT "${output_dir}/preprocess/hpx_preprocessed_${limit}.touch"
+                COMMAND "${BOOSTWAVE_PROGRAM}"
+                ARGS -o- "-DHPX_LIMIT=${limit}" "${output_dir}/preprocess/preprocess_hpx.cpp" "--license=${hpx_SOURCE_DIR}/preprocess/preprocess_license.hpp" --config-file "${output_dir}/preprocess/wave.cfg"
+                VERBATIM
             )
             add_custom_target(
-                hpx_partial_preprocess_headers_${limit}
-                DEPENDS ${output_dir}/preprocess/hpx_preprocessed_${limit}.touch
+                "hpx_partial_preprocess_headers_${limit}"
+                DEPENDS "${output_dir}/preprocess/hpx_preprocessed_${limit}.touch"
             )
-            set_target_properties(hpx_partial_preprocess_headers_${limit}
+            set_target_properties("hpx_partial_preprocess_headers_${limit}"
                 PROPERTIES FOLDER "Preprocessing/Dependencies")
         endforeach()
 
         add_custom_target(
             hpx_partial_preprocess_headers
             DEPENDS ${HPX_PREPROCESSING_LIMITS}
-            WORKING_DIRECTORY ${output_dir}/preprocess
+            WORKING_DIRECTORY "${output_dir}/preprocess"
         )
         set_target_properties(hpx_partial_preprocess_headers
             PROPERTIES FOLDER "Preprocessing")

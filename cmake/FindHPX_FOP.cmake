@@ -9,7 +9,7 @@ endif()
 
 if(NOT FOP_ROOT)
   if($ENV{FOP_ROOT})
-    set(FOP_ROOT $ENV{FOP_ROOT})
+    set(FOP_ROOT "$ENV{FOP_ROOT}")
   endif()
 endif()
 

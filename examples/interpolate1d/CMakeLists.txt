@@ -8,8 +8,7 @@ find_package(HPX_HDF5)
 
 if(HDF5_CPP_FOUND)
   if(HDF5_FOUND)
-    include_directories(${HDF5_INCLUDE_DIR})
-    include_directories(${HDF5_CPP_INCLUDE_DIR})
+    include_directories("${HDF5_INCLUDE_DIR}" "${HDF5_CPP_INCLUDE_DIR}")
 
     # just recurse into all components subdirectories and execute the scripts there
     set(subdirs

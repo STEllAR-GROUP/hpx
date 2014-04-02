@@ -91,7 +91,7 @@ if(NOT CMAKE_CROSSCOMPILING)
             string(REGEX MATCH "(argument unused during compilation|unknown warning option)" ${name}_HAS_UNUSED_ARGUMENT_WARNING ${${name}_STDERR})
           endif()
         endif()
-        file(WRITE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.${${name}_LANGUAGE}.log ${${name}_STDERR} ${${name}_STDOUT} "\n")
+        file(WRITE "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.${${name}_LANGUAGE}.log" ${${name}_STDERR} ${${name}_STDOUT} "\n")
     endif()
   endmacro()
 else()
@@ -108,14 +108,14 @@ else()
   
     set(${name_RESULT} "test")
     try_compile(
-      ${name}_RESULT ${${name}_OUTPUT_DIR} ${${name}_SOURCE}
+      "${name}_RESULT" "${${name}_OUTPUT_DIR}" "${${name}_SOURCE}"
       COMPILE_DEFINITIONS "${${name}_FLAGS_STRING}"
-      OUTPUT_VARIABLE ${name}_OUT
-      COPY_FILE ${${name}_OUTPUT})
+      OUTPUT_VARIABLE "${name}_OUT"
+      COPY_FILE "${${name}_OUTPUT}")
     
     hpx_debug("compile" "${${name}_OUT}")
     if(${name}_OUT)
-      file(WRITE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.${${name}_LANGUAGE}.log ${${name}_OUT})
+      file(WRITE "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.${${name}_LANGUAGE}.log" ${${name}_OUT})
     endif()
     if(${name}_RESULT)
       set(${name}_RESULT "0")

@@ -12,10 +12,10 @@ endif()
 # This if statement is specific to APEX, and should not be copied into other
 # Find cmake scripts.
 if(NOT APEX_ROOT AND NOT $ENV{HOME_APEX} STREQUAL "")
-  set(APEX_ROOT $ENV{HOME_APEX})
+  set(APEX_ROOT "$ENV{HOME_APEX}")
 endif()
 if(NOT APEX_ROOT AND NOT $ENV{APEX_ROOT} STREQUAL "")
-  set(APEX_ROOT $ENV{APEX_ROOT})
+  set(APEX_ROOT "$ENV{APEX_ROOT}")
 endif()
 
 # Need to add -L$(APEX_ROOT)/x86_64/lib -lApex
@@ -28,13 +28,13 @@ hpx_find_package(APEX
 
 if(APEX_FOUND)
   set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${APEX_LIBRARY})
-  hpx_include_sys_directories(${APEX_INCLUDE_DIR})
-  hpx_link_sys_directories(${APEX_LIBRARY_DIR})
+  hpx_include_sys_directories("${APEX_INCLUDE_DIR}")
+  hpx_link_sys_directories("${APEX_LIBRARY_DIR}")
   hpx_add_config_define(HPX_HAVE_APEX)
 
   # APEX can support the amplifier interface, so enable that, too
   if(NOT AMPLIFIER_ROOT)
-    set(AMPLIFIER_ROOT ${APEX_ROOT})
+    set(AMPLIFIER_ROOT "${APEX_ROOT}")
     set(HPX_HAVE_ITTNOTIFY ON)
   endif()
 endif()
