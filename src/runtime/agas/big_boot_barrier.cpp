@@ -479,11 +479,12 @@ void notify_worker(notification_header const& header)
             hpx::util::osstream_get_string(strm));
     }
 
-    rt.get_config().set_agas_locality(header.locality_ns_address.locality_);
+    util::runtime_configuration& cfg = rt.get_config();
+    cfg.set_agas_locality(header.locality_ns_address.locality_);
 
     // set our prefix
     agas_client.set_local_locality(header.prefix);
-    rt.get_config().parse("assigned locality",
+    cfg.parse("assigned locality",
         boost::str(boost::format("hpx.locality!=%1%")
                   % naming::get_locality_id_from_gid(header.prefix)));
 
@@ -559,10 +560,10 @@ void notify_worker(notification_header const& header)
     //  , response_heap_type::block_type::heap_size);
 
     // store number of initial localities
-    rt.get_config().set_num_localities(header.num_localities);
+    cfg.set_num_localities(header.num_localities);
 
     // store number of used cores by other localities
-    rt.get_config().set_used_cores(header.used_cores);
+    cfg.set_used_cores(header.used_cores);
     rt.assign_cores();
 
 #if defined(HPX_HAVE_SECURITY)
@@ -578,7 +579,7 @@ void notify_worker(notification_header const& header)
     get_big_boot_barrier().apply(
         naming::get_locality_id_from_gid(header.prefix)
       , 0
-      , rt.get_config().get_agas_locality()
+      , cfg.get_agas_locality()
       , new actions::transfer_action<register_worker_security_action>(
             util::forward_as_tuple(hdr)));
 #endif

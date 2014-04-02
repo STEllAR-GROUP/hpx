@@ -77,7 +77,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         }
 
         void insert(void const* key,
-            boost::shared_ptr<tss_cleanup_function> func, void* tss_data)
+            boost::shared_ptr<tss_cleanup_function> const& func, void* tss_data)
         {
             data_.insert(std::make_pair(key, tss_data_node(func, tss_data)));
         }
@@ -143,7 +143,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     }
 
     void add_new_tss_node(void const* key,
-        boost::shared_ptr<tss_cleanup_function> func, void* tss_data)
+        boost::shared_ptr<tss_cleanup_function> const& func, void* tss_data)
     {
         hpx::threads::thread_self* self = hpx::threads::get_self_ptr();
         if (NULL == self)
@@ -173,7 +173,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     }
 
     void set_tss_data(void const* key,
-        boost::shared_ptr<tss_cleanup_function> func,
+        boost::shared_ptr<tss_cleanup_function> const& func,
         void* tss_data, bool cleanup_existing)
     {
         if (tss_data_node* const current_node = find_tss_data(key))

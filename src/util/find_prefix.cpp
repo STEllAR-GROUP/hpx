@@ -63,7 +63,7 @@ namespace hpx { namespace util
         return HPX_PREFIX;
     }
 
-    std::string find_prefixes(std::string suffix, std::string library)
+    std::string find_prefixes(std::string const& suffix, std::string const& library)
     {
         std::string prefixes = find_prefix(library);
         typedef boost::tokenizer<boost::char_separator<char> > tokenizer;

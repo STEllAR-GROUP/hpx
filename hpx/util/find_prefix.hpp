@@ -18,7 +18,8 @@ namespace hpx { namespace util
     HPX_EXPORT std::string find_prefix(std::string library = "hpx");
 
     // return a list of paths delimited by HPX_INI_PATH_DELIMITER
-    HPX_EXPORT std::string find_prefixes(std::string suffix, std::string library = "hpx");
+    HPX_EXPORT std::string find_prefixes(std::string const& suffix,
+        std::string const& library = "hpx");
 
     // return the full path of the current executable
     HPX_EXPORT std::string get_executable_filename(char const* argv0 = 0);

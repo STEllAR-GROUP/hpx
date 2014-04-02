@@ -127,7 +127,7 @@ namespace hpx { namespace lcos
             threads::thread_init_data& data,
             threads::thread_state_enum initial_state)
         {
-            threads::register_work_plain(data, initial_state);
+            threads::register_work_plain(data, initial_state); //-V106
         }
     };
 }}

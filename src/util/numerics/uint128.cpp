@@ -48,7 +48,7 @@ namespace hpx { namespace util { namespace numerics
         if (!sz [0]) return;
 
         unsigned int radix = 10;
-        unsigned int i = 0;
+        std::size_t i = 0;
         bool minus = false;
 
         if (sz [i] == '-') {
@@ -65,7 +65,8 @@ namespace hpx { namespace util { namespace numerics
             };
         };
 
-        for (; i < strlen (sz); ++i) {
+        std::size_t len = strlen (sz);
+        for (; i < len; ++i) {
             unsigned int n = 0;
             if (sz [i] >= '0' && sz [i] <= (std::min)(('0' + (int)radix), (int)'9'))
                 n = sz [i] - '0';

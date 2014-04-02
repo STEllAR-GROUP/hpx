@@ -319,7 +319,7 @@ namespace hpx { namespace components { namespace server
             threads::thread_init_data& data,
             threads::thread_state_enum initial_state)
         {
-            hpx::threads::register_work_plain(data, initial_state);
+            hpx::threads::register_work_plain(data, initial_state); //-V106
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -357,7 +357,7 @@ namespace hpx { namespace components { namespace server
 
         bool load_component_static(
             util::section& ini, std::string const& instance,
-            std::string const& component, boost::filesystem::path lib,
+            std::string const& component, boost::filesystem::path const& lib,
             naming::gid_type const& prefix, naming::resolver_client& agas_client,
             bool isdefault, bool isenabled,
             boost::program_options::options_description& options,

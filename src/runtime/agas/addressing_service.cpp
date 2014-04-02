@@ -316,8 +316,9 @@ void addressing_service::launch_bootstrap(
     boost::uint32_t cores_needed = rt.assign_cores();
     boost::uint32_t used_cores = rt.assign_cores(
         pp.get_locality_name(), cores_needed);
-    rt.get_config().set_used_cores(used_cores);
-    rt.get_config().set_agas_locality(ini_.get_parcelport_address());
+    util::runtime_configuration& cfg = rt.get_config();
+    cfg.set_used_cores(used_cores);
+    cfg.set_agas_locality(ini_.get_parcelport_address());
     rt.assign_cores();
 
     naming::locality const ep = ini_.get_parcelport_address();

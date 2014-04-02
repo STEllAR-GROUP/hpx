@@ -82,8 +82,8 @@ namespace hpx { namespace util { namespace coroutines
 
             void cleanup(bool cleanup_existing = true);
 
-            void reinit(boost::shared_ptr<tss_cleanup_function> f, void* data,
-                bool cleanup_existing)
+            void reinit(boost::shared_ptr<tss_cleanup_function> const& f,
+                void* data, bool cleanup_existing)
             {
                 cleanup(cleanup_existing);
                 func_ = f;
@@ -102,13 +102,13 @@ namespace hpx { namespace util { namespace coroutines
         HPX_EXPORT void* get_tss_data(void const* key);
 
         HPX_EXPORT void add_new_tss_node(void const* key,
-            boost::shared_ptr<tss_cleanup_function> func, void* tss_data);
+            boost::shared_ptr<tss_cleanup_function> const& func, void* tss_data);
 
         HPX_EXPORT void erase_tss_node(void const* key,
             bool cleanup_existing = false);
 
         HPX_EXPORT void set_tss_data(void const* key,
-            boost::shared_ptr<tss_cleanup_function> func, void* tss_data = 0,
+            boost::shared_ptr<tss_cleanup_function> const& func, void* tss_data = 0,
             bool cleanup_existing = false);
 
         ///////////////////////////////////////////////////////////////////////

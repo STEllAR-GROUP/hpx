@@ -44,7 +44,7 @@ namespace hpx { namespace components { namespace server
             threads::thread_init_data& data,
             threads::thread_state_enum initial_state)
         {
-            hpx::threads::register_work_plain(data, initial_state);
+            hpx::threads::register_work_plain(data, initial_state); //-V106
         }
     };
 }}}

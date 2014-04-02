@@ -179,7 +179,7 @@ namespace hpx { namespace components
             threads::thread_init_data& data,
             threads::thread_state_enum initial_state)
         {
-            hpx::threads::register_work_plain(data, initial_state);
+            hpx::threads::register_work_plain(data, initial_state); //-V106
         }
 
 #if defined(HPX_HAVE_SECURITY)

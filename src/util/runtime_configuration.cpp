@@ -220,18 +220,18 @@ namespace hpx { namespace util
     }
 
     void runtime_configuration::post_initialize_ini(
-        std::string& hpx_ini_file,
-        std::vector<std::string> const& cmdline_ini_defs)
+        std::string& hpx_ini_file_,
+        std::vector<std::string> const& cmdline_ini_defs_)
     {
         // add explicit configuration information if its provided
-        if (!hpx_ini_file.empty()) {
-            util::init_ini_data_base(*this, hpx_ini_file);
+        if (!hpx_ini_file_.empty()) {
+            util::init_ini_data_base(*this, hpx_ini_file_);
             need_to_call_pre_initialize = true;
         }
 
         // let the command line override the config file.
-        if (!cmdline_ini_defs.empty()) {
-            this->parse("command line definitions", cmdline_ini_defs);
+        if (!cmdline_ini_defs_.empty()) {
+            this->parse("command line definitions", cmdline_ini_defs_);
             need_to_call_pre_initialize = true;
         }
     }

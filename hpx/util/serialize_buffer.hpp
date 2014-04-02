@@ -141,7 +141,7 @@ namespace hpx { namespace util
         template <typename Archive>
         void save(Archive& ar, const unsigned int version) const
         {
-            ar << size_ << alloc_;
+            ar << size_ << alloc_; //-V128
 
             typedef typename
                 boost::serialization::use_array_optimization<Archive>::template apply<
@@ -175,7 +175,7 @@ namespace hpx { namespace util
         void load(Archive& ar, const unsigned int version)
         {
             using util::placeholders::_1;
-            ar >> size_ >> alloc_;
+            ar >> size_ >> alloc_; //-V128
 
             data_.reset(alloc_.allocate(size_),
                 util::bind(&serialize_buffer::deleter<allocator_type>, _1,
@@ -286,7 +286,7 @@ namespace hpx { namespace util
         template <typename Archive>
         void save(Archive& ar, const unsigned int version) const
         {
-            ar << size_;
+            ar << size_; //-V128
 
             typedef typename
                 boost::serialization::use_array_optimization<Archive>::template apply<
@@ -319,7 +319,7 @@ namespace hpx { namespace util
         template <typename Archive>
         void load(Archive& ar, const unsigned int version)
         {
-            ar >> size_;
+            ar >> size_; //-V128
             data_.reset(new T[size_]);
 
             typedef typename
