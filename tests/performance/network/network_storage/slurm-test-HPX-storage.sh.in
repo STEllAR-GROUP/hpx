@@ -1,5 +1,11 @@
 #!/bin/bash
 
+#   Copyright (c) 2014 John Biddiscombe
+#   Adapted from stuff found originally somewhere on the internet
+#
+#   Distributed under the Boost Software License, Version 1.0. (See accompanying
+#   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
 # This function writes a slurm script. 
 # We can call it with different parameter 
 # settings to create different experiments
@@ -51,7 +57,8 @@ _EOF_
 
 chmod 775 ${DIR_NAME}/submit-job.bash
 
-echo "cd ${DIR_NAME}; sbatch submit-job.bash; cd \$BASEDIR" >> run_jobs.bash
+echo "cd ${DIR_NAME}; sbatch submit-job.bash; cd \$BASEDIR" > run_jobs.bash
+echo "echo \"Use find . -name \*.out -exec grep CSVData {} \;\" " >> run_jobs.bash
 
 }
 
@@ -66,7 +73,6 @@ echo "#!/bin/bash" > run_jobs.bash
 echo "BASEDIR=$BASEDIR" >> run_jobs.bash
 echo "cd $BASEDIR" >> run_jobs.bash
 chmod 775 run_jobs.bash
-echo "Use find . -name \*.out -exec grep CSVData {} \;"
 
 #
 # 
@@ -93,7 +99,8 @@ do
       do
         LOCAL_SIZE=$(printf "%.0f" $( bc <<< "scale=6;(128 * $TRANSFERSIZE * $THREADS_PERTASK)/1024" ))
         LOCAL_SIZE=$(echo $((LOCAL_SIZE>512?512:LOCAL_SIZE)))
-        PROGRAM_PARAMS="--hpx:run-hpx-main -Ihpx.parcel.${PARCELTYPE}.enable=1 --hpx:threads=${THREADS_PERTASK} --hpx:bind=balanced --localMB=${LOCAL_SIZE} --transferKB=${TRANSFERSIZE}"
+        PROGRAM_PARAMS="--hpx:run-hpx-main -Ihpx.parcel.${PARCELTYPE}.enable=1 --hpx:threads=${THREADS_PERTASK} --hpx:bind=balanced " \
+                       "--localMB=${LOCAL_SIZE} --transferKB=${TRANSFERSIZE} --parceltype=${PARCELTYPE} "
         write_script
       done
     done
