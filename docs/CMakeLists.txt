@@ -42,7 +42,7 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/error.hpp"
     "${hpx_SOURCE_DIR}/hpx/exception.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/get_ptr.hpp"
-    "${hpx_SOURCE_DIR}/hpx/runtime/actions/action_supp"ort.hpp"
+    "${hpx_SOURCE_DIR}/hpx/runtime/actions/action_support.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/actions/component_non_const_action.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/components/new.hpp"
