@@ -425,8 +425,9 @@ namespace hpx { namespace parcelset
     connection_type parcelhandler::find_appropriate_connection_type(
         naming::locality const& dest)
     {
+        connection_type dest_type = dest.get_type();
 #if defined(HPX_HAVE_PARCELPORT_IPC)
-        if (dest.get_type() == connection_tcp) {
+        if (dest_type == connection_tcp || dest_type == connection_mpi) {
             std::string enable_ipc =
                 get_config_entry("hpx.parcel.ipc.enable", "0");
 
@@ -444,7 +445,7 @@ namespace hpx { namespace parcelset
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
         // FIXME: add check if ibverbs are really available for this destination.
 
-        if (dest.get_type() == connection_tcp) {
+        if (dest_type == connection_tcp || dest_type == connection_mpi) {
             std::string enable_ibverbs =
                 get_config_entry("hpx.parcel.ibverbs.enable", "0");
             if (use_alternative_parcelports_ &&
@@ -458,7 +459,7 @@ namespace hpx { namespace parcelset
 #if defined(HPX_HAVE_PARCELPORT_MPI)
         // FIXME: add check if MPI is really available for this destination.
 
-        if (dest.get_type() == connection_tcp) {
+        if (dest_type == connection_tcp || dest_type == connection_mpi) {
             if ((use_alternative_parcelports_ ||
                  get_config_entry("hpx.parcel.bootstrap", "tcp") == "mpi") &&
                  util::mpi_environment::enabled() &&
