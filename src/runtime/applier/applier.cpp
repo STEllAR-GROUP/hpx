@@ -441,7 +441,6 @@ namespace hpx { namespace applier
         HPX_ASSERT(!cont || size == 1);
 
         // schedule a thread for each of the destinations
-        threads::threadmanager_base& tm = get_thread_manager();
         for (std::size_t i = 0; i != size; ++i)
         {
             naming::address const& addr = addrs[i];

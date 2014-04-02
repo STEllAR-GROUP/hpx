@@ -426,6 +426,7 @@ namespace hpx { namespace parcelset
         naming::locality const& dest)
     {
         connection_type dest_type = dest.get_type();
+
 #if defined(HPX_HAVE_PARCELPORT_IPC)
         if (dest_type == connection_tcp || dest_type == connection_mpi) {
             std::string enable_ipc =
@@ -478,7 +479,7 @@ namespace hpx { namespace parcelset
             }
         }
 #endif
-        return dest.get_type();
+        return dest_type;
     }
 
     // this function  will be called right after pre_main
