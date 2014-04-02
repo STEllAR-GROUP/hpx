@@ -90,8 +90,8 @@ if(NOT HPX_BUILD_DOCUMENTATION)
 
 else()
 
-  set(BOOSTBOOK_DTD_PATH ${hpx_SOURCE_DIR}/external/boostbook/dtd/)
-  set(BOOSTBOOK_XSL_PATH ${hpx_SOURCE_DIR}/external/boostbook/xsl/)
+  set(BOOSTBOOK_DTD_PATH "${hpx_SOURCE_DIR}/external/boostbook/dtd/")
+  set(BOOSTBOOK_XSL_PATH "${hpx_SOURCE_DIR}/external/boostbook/xsl/")
 
   # Generate catalog file for XSLT processing
   macro(hpx_write_boostbook_catalog file)
@@ -149,7 +149,7 @@ else()
     if(input_path STREQUAL "")
       set(input_path "${CMAKE_CURRENT_SOURCE_DIR}/${${name}_SOURCE}")
     else()
-      set(input_path ${${name}_SOURCE})
+      set(input_path "${${name}_SOURCE}")
     endif()
 
     set(git_commit_option "")
@@ -167,7 +167,7 @@ else()
       set(doc_source_dir "'''file:///${hpx_SOURCE_DIR}'''")
     endif()
     add_custom_command(OUTPUT ${name}.xml
-      COMMAND ${BOOSTQUICKBOOK_PROGRAM}
+      COMMAND "${BOOSTQUICKBOOK_PROGRAM}"
           "--output-file=${name}.xml"
           "${git_commit_option}"
           "${doxygen_option}"
@@ -177,7 +177,8 @@ else()
           ${${name}_QUICKBOOK_ARGS}
           "${input_path}"
       COMMENT "Generating BoostBook XML file ${name}.xml from ${${name}_SOURCE}."
-      DEPENDS ${${name}_SOURCE} ${${name}_DEPENDENCIES})
+      DEPENDS "${${name}_SOURCE}" ${${name}_DEPENDENCIES}
+      VERBATIM)
   endmacro()
 
   # BoostBook XML -> DocBook
@@ -187,37 +188,39 @@ else()
     if(NOT BOOST_ROOT)
       set(BOOST_ROOT_FOR_DOCS ".")
     else()
-      set(BOOST_ROOT_FOR_DOCS ${BOOST_ROOT})
+      set(BOOST_ROOT_FOR_DOCS "${BOOST_ROOT}")
     endif()
 
     if(WIN32)
-      add_custom_command(OUTPUT ${name}.dbk
+      add_custom_command(OUTPUT "${name}.dbk"
         COMMAND set XML_CATALOG_FILES=${${name}_CATALOG}
-        COMMAND ${XSLTPROC_PROGRAM} ${${name}_XSLTPROC_ARGS}
+        COMMAND "${XSLTPROC_PROGRAM}" ${${name}_XSLTPROC_ARGS}
                 "--stringparam" "boost.graphics.root" "images/"
                 "--stringparam" "admon.graphics.path" "images/"
                 "--stringparam" "callout.graphics.path" "images/"
                 "--stringparam" "boost.root" "${BOOST_ROOT_FOR_DOCS}"
                 "--stringparam" "html.stylesheet" "src/boostbook.css"
-                "--xinclude" "-o" ${name}.dbk
-                "--path" ${CMAKE_CURRENT_BINARY_DIR}
-                ${BOOSTBOOK_XSL_PATH}/docbook.xsl ${${name}_SOURCE}
+                "--xinclude" "-o" "${name}.dbk"
+                "--path" "${CMAKE_CURRENT_BINARY_DIR}"
+                "${BOOSTBOOK_XSL_PATH}/docbook.xsl" "${${name}_SOURCE}"
         COMMENT "Generating DocBook file ${name}.dbk from ${${name}_SOURCE}."
-        DEPENDS ${${name}_SOURCE} ${${name}_DEPENDENCIES})
+        DEPENDS "${${name}_SOURCE}" ${${name}_DEPENDENCIES}
+        VERBATIM)
     else()
-      add_custom_command(OUTPUT ${name}.dbk
-        COMMAND "XML_CATALOG_FILES=${${name}_CATALOG}" ${XSLTPROC_PROGRAM}
+      add_custom_command(OUTPUT "${name}.dbk"
+        COMMAND "XML_CATALOG_FILES=${${name}_CATALOG}" "${XSLTPROC_PROGRAM}"
                 ${${name}_XSLTPROC_ARGS}
                 "--stringparam" "boost.graphics.root" "images/"
                 "--stringparam" "admon.graphics.path" "images/"
                 "--stringparam" "callout.graphics.path" "images/"
                 "--stringparam" "boost.root" "${BOOST_ROOT_FOR_DOCS}"
                 "--stringparam" "html.stylesheet" "src/boostbook.css"
-                "--xinclude" "-o" ${name}.dbk
-                "--path" ${CMAKE_CURRENT_BINARY_DIR}
-                ${BOOSTBOOK_XSL_PATH}/docbook.xsl ${${name}_SOURCE}
+                "--xinclude" "-o" "${name}.dbk"
+                "--path" "${CMAKE_CURRENT_BINARY_DIR}"
+                "${BOOSTBOOK_XSL_PATH}/docbook.xsl" "${${name}_SOURCE}"
         COMMENT "Generating DocBook file ${name}.dbk from ${${name}_SOURCE}."
-        DEPENDS ${${name}_SOURCE} ${${name}_DEPENDENCIES})
+        DEPENDS "${${name}_SOURCE}" ${${name}_DEPENDENCIES}
+        VERBATIM)
     endif()
   endmacro()
 
@@ -228,27 +231,28 @@ else()
     if(NOT BOOST_ROOT)
       set(BOOST_ROOT_FOR_DOCS ".")
     else()
-      set(BOOST_ROOT_FOR_DOCS ${BOOST_ROOT})
+      set(BOOST_ROOT_FOR_DOCS "${BOOST_ROOT}")
     endif()
 
     if(WIN32)
-      add_custom_command(OUTPUT ${name}.fo
+      add_custom_command(OUTPUT "${name}.fo"
         COMMAND set XML_CATALOG_FILES=${${name}_CATALOG}
-        COMMAND ${XSLTPROC_PROGRAM} ${${name}_XSLTPROC_ARGS}
+        COMMAND "${XSLTPROC_PROGRAM}" ${${name}_XSLTPROC_ARGS}
                 "--stringparam" "paper.type" "USLetter"
                 "--stringparam" "admon.graphics.extension" ".png"
                 "--stringparam" "img.src.path" "${hpx_SOURCE_DIR}/docs/html/"
                 "--stringparam" "boost.graphics.root" "${hpx_SOURCE_DIR}/docs/html/images/"
                 "--stringparam" "admon.graphics.path" "${hpx_SOURCE_DIR}/docs/html/images/"
                 "--stringparam" "callout.graphics.path" "${hpx_SOURCE_DIR}/docs/html/images/"
-                "--xinclude" "-o" ${name}.fo
-                "--path" ${CMAKE_CURRENT_BINARY_DIR}
-                ${BOOSTBOOK_XSL_PATH}/fo.xsl ${${name}_SOURCE}
+                "--xinclude" "-o" "${name}.fo"
+                "--path" "${CMAKE_CURRENT_BINARY_DIR}"
+                "${BOOSTBOOK_XSL_PATH}/fo.xsl" "${${name}_SOURCE}"
         COMMENT "Generating XSL-FO file ${name}.fo from ${${name}_SOURCE}."
-        DEPENDS ${${name}_SOURCE} ${${name}_DEPENDENCIES})
+        DEPENDS "${${name}_SOURCE}" ${${name}_DEPENDENCIES}
+        VERBATIM)
     else()
-      add_custom_command(OUTPUT ${name}.fo
-        COMMAND "XML_CATALOG_FILES=${${name}_CATALOG}" ${XSLTPROC_PROGRAM}
+      add_custom_command(OUTPUT "${name}.fo"
+        COMMAND "XML_CATALOG_FILES=${${name}_CATALOG}" "${XSLTPROC_PROGRAM}"
                 ${${name}_XSLTPROC_ARGS}
                 "--stringparam" "paper.type" "USLetter"
                 "--stringparam" "admon.graphics.extension" ".png"
@@ -256,11 +260,12 @@ else()
                 "--stringparam" "boost.graphics.root" "${hpx_SOURCE_DIR}/docs/html/images/"
                 "--stringparam" "admon.graphics.path" "${hpx_SOURCE_DIR}/docs/html/images/"
                 "--stringparam" "callout.graphics.path" "${hpx_SOURCE_DIR}/docs/html/images/"
-                "--xinclude" "-o" ${name}.fo
-                "--path" ${CMAKE_CURRENT_BINARY_DIR}
-                ${BOOSTBOOK_XSL_PATH}/fo.xsl ${${name}_SOURCE}
+                "--xinclude" "-o" "${name}.fo"
+                "--path" "${CMAKE_CURRENT_BINARY_DIR}"
+                "${BOOSTBOOK_XSL_PATH}/fo.xsl" "${${name}_SOURCE}"
         COMMENT "Generating XSL-FO file ${name}.fo from ${${name}_SOURCE}."
-        DEPENDS ${${name}_SOURCE} ${${name}_DEPENDENCIES})
+        DEPENDS "${${name}_SOURCE}" ${${name}_DEPENDENCIES}
+        VERBATIM)
     endif()
   endmacro()
 
@@ -274,11 +279,12 @@ else()
       set(DOCS_OUTPUT_DIR "/${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/")
     endif()
 
-    add_custom_command(OUTPUT ${name}.pdf
-      COMMAND ${FOP_PROGRAM} ${${name}_FOP_ARGS}
-              ${${name}_SOURCE} ${DOCS_OUTPUT_DIR}/${name}.pdf
+    add_custom_command(OUTPUT "${name}.pdf"
+      COMMAND "${FOP_PROGRAM}" ${${name}_FOP_ARGS}
+              "${${name}_SOURCE}" "${DOCS_OUTPUT_DIR}/${name}.pdf"
       COMMENT "Generating PDF file ${name}.pdf from ${${name}_SOURCE}."
-      DEPENDS ${${name}_SOURCE} ${${name}_DEPENDENCIES})
+      DEPENDS "${${name}_SOURCE}" ${${name}_DEPENDENCIES}
+      VERBATIM)
   endmacro()
 
   # DocBook -> HTML
@@ -288,7 +294,7 @@ else()
     if(NOT BOOST_ROOT)
       set(BOOST_ROOT_FOR_DOCS ".")
     else()
-      set(BOOST_ROOT_FOR_DOCS ${BOOST_ROOT})
+      set(BOOST_ROOT_FOR_DOCS "${BOOST_ROOT}")
     endif()
 
     hpx_debug("hpx_docbook_to_html.${name}" "SINGLEPAGE: ${${name}_SINGLEPAGE}")
@@ -302,11 +308,11 @@ else()
     if(${${name}_SINGLEPAGE})
       set(main_xsl_script "html-single.xsl")
       set(main_xsl_script_output "${DOCS_OUTPUT_DIR}/${name}.html")
-      set(main_xsl_script_manifest ${name}_singlepage_HTML.manifest)
+      set(main_xsl_script_manifest "${name}_singlepage_HTML.manifest")
     else()
       set(main_xsl_script "html.xsl")
       set(main_xsl_script_output "${DOCS_OUTPUT_DIR}/")
-      set(main_xsl_script_manifest ${name}_HTML.manifest)
+      set(main_xsl_script_manifest "${name}_HTML.manifest")
     endif()
 
     hpx_debug("hpx_docbook_to_html.${name}" "main_xsl_script: ${main_xsl_script}")
@@ -315,7 +321,7 @@ else()
     if(WIN32)
       add_custom_command(OUTPUT ${main_xsl_script_manifest}
         COMMAND set XML_CATALOG_FILES=${${name}_CATALOG}
-        COMMAND ${XSLTPROC_PROGRAM} ${${name}_XSLTPROC_ARGS}
+        COMMAND "${XSLTPROC_PROGRAM}" ${${name}_XSLTPROC_ARGS}
                 "--stringparam" "boost.graphics.root" "images/"
                 "--stringparam" "admon.graphics.path" "images/"
                 "--stringparam" "boost.root" "${BOOST_ROOT_FOR_DOCS}"
@@ -323,13 +329,14 @@ else()
                 "--stringparam" "manifest" "${CMAKE_CURRENT_BINARY_DIR}/${main_xsl_script_manifest}"
                 "--xinclude"
                 "-o" "${main_xsl_script_output}"
-                "--path" ${CMAKE_CURRENT_BINARY_DIR}
-                ${BOOSTBOOK_XSL_PATH}/${main_xsl_script} ${${name}_SOURCE}
+                "--path" "${CMAKE_CURRENT_BINARY_DIR}"
+                "${BOOSTBOOK_XSL_PATH}/${main_xsl_script}" "${${name}_SOURCE}"
         COMMENT "Generating HTML from ${${name}_SOURCE}."
-        DEPENDS ${${name}_SOURCE} ${${name}_DEPENDENCIES})
+        DEPENDS "${${name}_SOURCE}" ${${name}_DEPENDENCIES}
+        VERBATIM)
     else()
       add_custom_command(OUTPUT ${main_xsl_script_manifest}
-        COMMAND "XML_CATALOG_FILES=${${name}_CATALOG}" ${XSLTPROC_PROGRAM}
+        COMMAND "XML_CATALOG_FILES=${${name}_CATALOG}" "${XSLTPROC_PROGRAM}"
                 ${${name}_XSLTPROC_ARGS}
                 "--stringparam" "boost.graphics.root" "images/"
                 "--stringparam" "admon.graphics.path" "images/"
@@ -338,10 +345,11 @@ else()
                 "--stringparam" "manifest" "${CMAKE_CURRENT_BINARY_DIR}/${main_xsl_script_manifest}"
                 "--xinclude"
                 "-o" "${main_xsl_script_output}"
-                "--path" ${CMAKE_CURRENT_BINARY_DIR}
-                ${BOOSTBOOK_XSL_PATH}/${main_xsl_script} ${${name}_SOURCE}
+                "--path" "${CMAKE_CURRENT_BINARY_DIR}"
+                "${BOOSTBOOK_XSL_PATH}/${main_xsl_script}" "${${name}_SOURCE}"
         COMMENT "Generating HTML from ${${name}_SOURCE}."
-        DEPENDS ${${name}_SOURCE} ${${name}_DEPENDENCIES})
+        DEPENDS "${${name}_SOURCE}" ${${name}_DEPENDENCIES}
+        VERBATIM)
     endif()
   endmacro()
 
@@ -356,22 +364,22 @@ else()
       ${name}_DEPENDENCIES)
 
     hpx_quickbook_to_boostbook(${name}
-      SOURCE ${${name}_SOURCE}
+      SOURCE "${${name}_SOURCE}"
       DEPENDENCIES ${${name}_DEPENDENCIES}
       QUICKBOOK_ARGS ${${name}_QUICKBOOK_ARGS})
 
     hpx_boostbook_to_docbook(${name}
-      SOURCE ${name}.xml
+      SOURCE "${name}.xml"
       CATALOG ${${name}_CATALOG}
       XSLTPROC_ARGS ${${name}_XSLTPROC_ARGS})
 
-    set(docbook_source ${name}.dbk)
+    set(docbook_source "${name}.dbk")
     if(BOOSTAUTOINDEX_FOUND)
       hpx_generate_auto_index(${name}
-        INDEX ${${name}_INDEX}
-        SOURCE ${name}.dbk
+        INDEX "${${name}_INDEX}"
+        SOURCE "${name}.dbk"
         AUTOINDEX_ARGS ${${name}_AUTOINDEX_ARGS})
-      set(docbook_source ${name}_auto_index.dbk)
+      set(docbook_source "${name}_auto_index.dbk")
     endif()
 
     hpx_debug("hpx_quickbook_to_html.${name}" "SINGLEPAGE: ${${name}_SINGLEPAGE}")
@@ -411,11 +419,12 @@ else()
       "source_to_doxygen.${name}" "Doxygen dependencies"
       ${name}_DEPENDENCIES)
 
-    add_custom_command(OUTPUT ${name}/index.xml
-      COMMAND ${DOXYGEN_PROGRAM} ${${name}_DOXYGEN_ARGS}
-              ${CMAKE_CURRENT_BINARY_DIR}/${name}.doxy
+    add_custom_command(OUTPUT "${name}/index.xml"
+      COMMAND "${DOXYGEN_PROGRAM}" ${${name}_DOXYGEN_ARGS}
+              "${CMAKE_CURRENT_BINARY_DIR}/${name}.doxy"
       COMMENT "Generating Doxygen."
-      DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${name}.doxy ${${name}_DEPENDENCIES})
+      DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/${name}.doxy" ${${name}_DEPENDENCIES}
+      VERBATIM)
   endmacro()
 
   # Collect chunked Doxygen XML
@@ -423,25 +432,27 @@ else()
     hpx_parse_arguments(${name} "SOURCE;DEPENDENCIES;CATALOG;XSLTPROC_ARGS" "" ${ARGN})
 
     if(WIN32)
-      add_custom_command(OUTPUT ${name}.doxygen.xml
+      add_custom_command(OUTPUT "${name}.doxygen.xml"
         COMMAND set XML_CATALOG_FILES=${${name}_CATALOG}
-        COMMAND ${XSLTPROC_PROGRAM} ${${name}_XSLTPROC_ARGS}
-                "--stringparam" "doxygen.xml.path" ${CMAKE_CURRENT_BINARY_DIR}/${name}
-                "--xinclude" "-o" ${name}.doxygen.xml
-                "--path" ${CMAKE_CURRENT_BINARY_DIR}
-                ${BOOSTBOOK_XSL_PATH}/doxygen/collect.xsl ${${name}_SOURCE}
+        COMMAND "${XSLTPROC_PROGRAM}" ${${name}_XSLTPROC_ARGS}
+                "--stringparam" "doxygen.xml.path" "${CMAKE_CURRENT_BINARY_DIR}/${name}"
+                "--xinclude" "-o" "${name}.doxygen.xml"
+                "--path" "${CMAKE_CURRENT_BINARY_DIR}"
+                "${BOOSTBOOK_XSL_PATH}/doxygen/collect.xsl" "${${name}_SOURCE}"
         COMMENT "Collecting Doxygen XML files."
-        DEPENDS ${${name}_SOURCE} ${${name}_DEPENDENCIES})
+        DEPENDS "${${name}_SOURCE}" ${${name}_DEPENDENCIES}
+        VERBATIM)
     else()
-      add_custom_command(OUTPUT ${name}.doxygen.xml
-        COMMAND "XML_CATALOG_FILES=${${name}_CATALOG}" ${XSLTPROC_PROGRAM}
+      add_custom_command(OUTPUT "${name}.doxygen.xml"
+        COMMAND "XML_CATALOG_FILES=${${name}_CATALOG}" "${XSLTPROC_PROGRAM}"
                 ${${name}_XSLTPROC_ARGS}
-                "--stringparam" "doxygen.xml.path" ${CMAKE_CURRENT_BINARY_DIR}/${name}
-                "--xinclude" "-o" ${name}.doxygen.xml
-                "--path" ${CMAKE_CURRENT_BINARY_DIR}
-                ${BOOSTBOOK_XSL_PATH}/doxygen/collect.xsl ${${name}_SOURCE}
+                "--stringparam" "doxygen.xml.path" "${CMAKE_CURRENT_BINARY_DIR}/${name}"
+                "--xinclude" "-o" "${name}.doxygen.xml"
+                "--path" "${CMAKE_CURRENT_BINARY_DIR}"
+                "${BOOSTBOOK_XSL_PATH}/doxygen/collect.xsl" "${${name}_SOURCE}"
         COMMENT "Collecting Doxygen XML files."
-        DEPENDS ${${name}_SOURCE} ${${name}_DEPENDENCIES})
+        DEPENDS "${${name}_SOURCE}" ${${name}_DEPENDENCIES}
+        VERBATIM)
     endif()
   endmacro()
 
@@ -450,27 +461,29 @@ else()
     hpx_parse_arguments(${name} "SOURCE;DEPENDENCIES;CATALOG;XSLTPROC_ARGS" "" ${ARGN})
 
     if(WIN32)
-      add_custom_command(OUTPUT ${name}.xml
+      add_custom_command(OUTPUT "${name}.xml"
         COMMAND set XML_CATALOG_FILES=${${name}_CATALOG}
-        COMMAND ${XSLTPROC_PROGRAM} ${${name}_XSLTPROC_ARGS}
+        COMMAND "${XSLTPROC_PROGRAM}" ${${name}_XSLTPROC_ARGS}
                 "--stringparam" "boost.doxygen.header.prefix" "hpx"
-                "--xinclude" "-o" ${name}.xml
-                "--path" ${CMAKE_CURRENT_BINARY_DIR}
-                ${BOOSTBOOK_XSL_PATH}/doxygen/doxygen2boostbook.xsl
-                ${${name}_SOURCE}
+                "--xinclude" "-o" "${name}.xml"
+                "--path" "${CMAKE_CURRENT_BINARY_DIR}"
+                "${BOOSTBOOK_XSL_PATH}/doxygen/doxygen2boostbook.xsl"
+                "${${name}_SOURCE}"
         COMMENT "Generating BoostBook XML file ${name}.xml from ${${name}_SOURCE}."
-        DEPENDS ${${name}_SOURCE} ${${name}_DEPENDENCIES})
+        DEPENDS "${${name}_SOURCE}" ${${name}_DEPENDENCIES}
+        VERBATIM)
     else()
-      add_custom_command(OUTPUT ${name}.xml
-        COMMAND "XML_CATALOG_FILES=${${name}_CATALOG}" ${XSLTPROC_PROGRAM}
+      add_custom_command(OUTPUT "${name}.xml"
+        COMMAND "XML_CATALOG_FILES=${${name}_CATALOG}" "${XSLTPROC_PROGRAM}"
                 ${${name}_XSLTPROC_ARGS}
                 "--stringparam" "boost.doxygen.header.prefix" "hpx"
-                "--xinclude" "-o" ${name}.xml
-                "--path" ${CMAKE_CURRENT_BINARY_DIR}
-                ${BOOSTBOOK_XSL_PATH}/doxygen/doxygen2boostbook.xsl
-                ${${name}_SOURCE}
+                "--xinclude" "-o" "${name}.xml"
+                "--path" "${CMAKE_CURRENT_BINARY_DIR}"
+                "${BOOSTBOOK_XSL_PATH}/doxygen/doxygen2boostbook.xsl"
+                "${${name}_SOURCE}"
         COMMENT "Generating BoostBook XML file ${name}.xml from ${${name}_SOURCE}."
-        DEPENDS ${${name}_SOURCE} ${${name}_DEPENDENCIES})
+        DEPENDS "${${name}_SOURCE}" ${${name}_DEPENDENCIES}
+        VERBATIM)
     endif()
   endmacro()
 
@@ -485,17 +498,17 @@ else()
       DOXYGEN_ARGS ${${name}_DOXYGEN_ARGS})
 
     hpx_collect_doxygen(${name}
-      SOURCE ${name}/index.xml
+      SOURCE "${name}/index.xml"
       CATALOG ${${name}_CATALOG}
       XSLTPROC_ARGS ${${name}_XSLTPROC_ARGS})
 
     hpx_doxygen_to_boostbook(${name}
-      SOURCE ${name}.doxygen.xml
+      SOURCE "${name}.doxygen.xml"
       CATALOG ${${name}_CATALOG}
       XSLTPROC_ARGS ${${name}_XSLTPROC_ARGS})
 
     if(${name}_TARGET)
-      add_custom_target(${${name}_TARGET} DEPENDS ${name}.xml
+      add_custom_target(${${name}_TARGET} DEPENDS "${name}.xml"
         DEPENDENCIES ${${name}_DEPENDENCIES})
     endif()
   endmacro()
@@ -517,16 +530,17 @@ else()
     if(input_path STREQUAL "")
       set(input_path "${CMAKE_CURRENT_SOURCE_DIR}/${${name}_INDEX}")
     else()
-      set(input_path ${${name}_INDEX})
+      set(input_path "${${name}_INDEX}")
     endif()
 
-    add_custom_command(OUTPUT ${name}_auto_index.dbk
-      COMMAND ${BOOSTAUTOINDEX_PROGRAM} ${${name}_AUTOINDEX_ARGS}
+    add_custom_command(OUTPUT "${name}_auto_index.dbk"
+      COMMAND "${BOOSTAUTOINDEX_PROGRAM}" ${${name}_AUTOINDEX_ARGS}
               "--script=${input_path}"
               "--in=${${name}_SOURCE}"
               "--out=${name}_auto_index.dbk"
       COMMENT "Generating auto index."
-      DEPENDS ${${name}_SOURCE} ${${name}_INDEX})
+      DEPENDS "${${name}_SOURCE}" "${${name}_INDEX}"
+      VERBATIM)
   endmacro()
 
 endif()

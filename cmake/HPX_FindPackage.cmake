@@ -22,7 +22,7 @@ macro(hpx_find_headers name)
   # ${name}_USE_SYSTEM is not defined.
   if(NOT ${name}_USE_SYSTEM)
     if(NOT ${name}_ROOT AND NOT $ENV{${name}_ROOT} STREQUAL "")
-      set(${name}_ROOT $ENV{${name}_ROOT})
+      set(${name}_ROOT "$ENV{${name}_ROOT}")
     endif()
   endif()
 
@@ -69,7 +69,7 @@ macro(hpx_find_package name)
     if(NOT ${name}_ROOT)
       set(${name}_ROOT ${name}_ROOT-NOTFOUND)
     else()
-      string(REPLACE "\\" "/" ${name}_ROOT ${${name}_ROOT})
+      string(REPLACE "\\" "/" ${name}_ROOT "${${name}_ROOT}")
     endif()
 
     if(NOT ${name}_LIBRARY)
@@ -86,10 +86,10 @@ macro(hpx_find_package name)
 
     set(${name}_FOUND OFF CACHE BOOL "Found ${name}.")
 
-    set(${name}_ROOT ${${name}_ROOT} CACHE PATH "${name} root directory.")
-    set(${name}_LIBRARY ${${name}_LIBRARY} CACHE FILEPATH "${name} shared library.")
-    set(${name}_LIBRARY_DIR ${${name}_LIBRARY_DIR} CACHE PATH "${name} library directory.")
-    set(${name}_INCLUDE_DIR ${${name}_INCLUDE_DIR} CACHE PATH "${name} include directory.")
+    set(${name}_ROOT "${${name}_ROOT}" CACHE PATH "${name} root directory.")
+    set(${name}_LIBRARY "${${name}_LIBRARY}" CACHE FILEPATH "${name} shared library.")
+    set(${name}_LIBRARY_DIR "${${name}_LIBRARY_DIR}" CACHE PATH "${name} library directory.")
+    set(${name}_INCLUDE_DIR "${${name}_INCLUDE_DIR}" CACHE PATH "${name} include directory.")
     mark_as_advanced(FORCE
       ${name}_FOUND
       ${name}_ROOT
@@ -145,8 +145,8 @@ macro(hpx_find_package name)
       DEFAULT_MSG ${name}_LIBRARY ${name}_INCLUDE_DIR)
 
     if(${name}_FOUND)
-      get_filename_component(${name}_ROOT ${${name}_INCLUDE_DIR} PATH)
-      get_filename_component(${name}_LIBRARY_DIR ${${name}_LIBRARY} PATH)
+      get_filename_component(${name}_ROOT "${${name}_INCLUDE_DIR}" PATH)
+      get_filename_component(${name}_LIBRARY_DIR "${${name}_LIBRARY}" PATH)
 
       set(${name}_FOUND ON CACHE BOOL "Found ${name}." FORCE)
     else()
@@ -169,10 +169,10 @@ macro(hpx_find_package name)
       set(${name}_FOUND OFF CACHE BOOL "Found ${name}." FORCE)
     endif()
 
-    set(${name}_ROOT ${${name}_ROOT} CACHE PATH "${name} root directory.")
-    set(${name}_LIBRARY ${${name}_LIBRARY} CACHE FILEPATH "${name} shared library.")
-    set(${name}_LIBRARY_DIR ${${name}_LIBRARY_DIR} CACHE PATH "${name} library directory.")
-    set(${name}_INCLUDE_DIR ${${name}_INCLUDE_DIR} CACHE PATH "${name} include directory.")
+    set(${name}_ROOT "${${name}_ROOT}" CACHE PATH "${name} root directory.")
+    set(${name}_LIBRARY "${${name}_LIBRARY}" CACHE FILEPATH "${name} shared library.")
+    set(${name}_LIBRARY_DIR "${${name}_LIBRARY_DIR}" CACHE PATH "${name} library directory.")
+    set(${name}_INCLUDE_DIR "${${name}_INCLUDE_DIR}" CACHE PATH "${name} include directory.")
 
     mark_as_advanced(FORCE
       ${name}_FOUND

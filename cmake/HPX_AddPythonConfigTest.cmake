@@ -21,7 +21,7 @@ macro(add_hpx_python_config_test name variable)
   elseif("${variable}" STREQUAL "OFF")
     set(${variable} OFF CACHE STRING "${name} state.")
   else()
-    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests)
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests")
 
     set(test_source "")
 

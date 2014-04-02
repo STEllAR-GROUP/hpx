@@ -14,11 +14,11 @@ hpx_find_package(EXODUS
   HEADER_PATHS include cbind/include)
 
 if($ENV{EXODUS_ROOT})
-  set(EXODUS_FORTRAN_ROOT $ENV{EXODUS_ROOT})
+  set(EXODUS_FORTRAN_ROOT "$ENV{EXODUS_ROOT}")
 endif()
 
 if(EXODUS_ROOT)
-  set(EXODUS_FORTRAN_ROOT ${EXODUS_ROOT})
+  set(EXODUS_FORTRAN_ROOT "${EXODUS_ROOT}")
 endif()
 
 hpx_find_package(EXODUS_FORTRAN

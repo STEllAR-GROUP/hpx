@@ -119,32 +119,32 @@ macro(add_hpx_executable name)
 
   if(HPX_SET_OUTPUT_PATH AND NOT ${name}_OUTPUT_SUFFIX)
     if(MSVC)
-      set_target_properties(${name}_exe PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY_RELEASE ${HPX_RUNTIME_OUTPUT_DIRECTORY_RELEASE}
-        RUNTIME_OUTPUT_DIRECTORY_DEBUG ${HPX_RUNTIME_OUTPUT_DIRECTORY_DEBUG}
-        RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${HPX_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL}
-        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${HPX_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO})
+      set_target_properties("${name}_exe" PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${HPX_RUNTIME_OUTPUT_DIRECTORY_RELEASE}"
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${HPX_RUNTIME_OUTPUT_DIRECTORY_DEBUG}"
+        RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${HPX_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL}"
+        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${HPX_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO}")
     else()
-      set_target_properties(${name}_exe PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY ${HPX_RUNTIME_OUTPUT_DIRECTORY})
+      set_target_properties("${name}_exe" PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${HPX_RUNTIME_OUTPUT_DIRECTORY}")
     endif()
   elseif(${name}_OUTPUT_SUFFIX)
     if(MSVC)
-      set_target_properties(${name}_exe PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release/${${name}_OUTPUT_SUFFIX}
-        RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/Debug/${${name}_OUTPUT_SUFFIX}
-        RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_BINARY_DIR}/MinSizeRel/${${name}_OUTPUT_SUFFIX}
-        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/RelWithDebInfo/${${name}_OUTPUT_SUFFIX})
+      set_target_properties("${name}_exe" PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release/${${name}_OUTPUT_SUFFIX}"
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/Debug/${${name}_OUTPUT_SUFFIX}"
+        RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}/MinSizeRel/${${name}_OUTPUT_SUFFIX}"
+        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/RelWithDebInfo/${${name}_OUTPUT_SUFFIX}")
     else()
-      set_target_properties(${name}_exe PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${${name}_OUTPUT_SUFFIX})
+      set_target_properties("${name}_exe" PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${${name}_OUTPUT_SUFFIX}")
     endif()
   endif()
 
   set_target_properties(${name}_exe PROPERTIES OUTPUT_NAME ${name})
 
   if(${name}_FOLDER)
-    set_target_properties(${name}_exe PROPERTIES FOLDER ${${name}_FOLDER})
+    set_target_properties(${name}_exe PROPERTIES FOLDER "${${name}_FOLDER}")
   endif()
 
   set_property(TARGET ${name}_exe APPEND
@@ -243,7 +243,7 @@ macro(add_hpx_executable name)
 
   if(NOT HPX_NO_INSTALL)
     if(${name}_INSTALL_SUFFIX)
-      hpx_executable_install(${name}_exe ${${name}_INSTALL_SUFFIX})
+      hpx_executable_install("${name}_exe" "${${name}_INSTALL_SUFFIX}")
     else()
       hpx_executable_install(${name}_exe bin)
     endif()

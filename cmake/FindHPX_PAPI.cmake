@@ -12,7 +12,7 @@ endif()
 # This if statement is specific to PAPI, and should not be copied into other
 # Find cmake scripts.
 if(NOT PAPI_ROOT AND NOT $ENV{HOME_PAPI} STREQUAL "")
-  set(PAPI_ROOT $ENV{HOME_PAPI})
+  set(PAPI_ROOT "$ENV{HOME_PAPI}")
 endif()
 
 hpx_find_package(PAPI

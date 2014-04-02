@@ -11,7 +11,7 @@ endif()
 # This if statement is specific to GSL, and should not be copied into other
 # Find cmake scripts.
 if(NOT GSL_ROOT AND NOT $ENV{HOME_GSL} STREQUAL "")
-  set(GSL_ROOT $ENV{HOME_GSL})
+  set(GSL_ROOT "$ENV{HOME_GSL}")
 endif()
 
 if(GSL_USE_SYSTEM)
@@ -19,7 +19,7 @@ if(GSL_USE_SYSTEM)
 endif()
 
 if(GSL_ROOT)
-  set(GSLCBLAS_ROOT ${GSL_ROOT})
+  set(GSLCBLAS_ROOT "${GSL_ROOT}")
 endif()
 
 hpx_find_package(GSL

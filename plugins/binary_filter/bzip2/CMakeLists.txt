@@ -21,14 +21,14 @@ endif()
 macro(add_bzip2_module)
   hpx_debug("add_bzip2_module" "BZIP2_FOUND: ${BZIP2_FOUND}")
   if(HPX_HAVE_COMPRESSION_BZIP2 AND BZIP2_FOUND)
-    hpx_include_sys_directories(${BZIP2_INCLUDE_DIR})
-    hpx_link_sys_directories(${BZIP2_LIBRARY_DIR})
+    hpx_include_sys_directories("${BZIP2_INCLUDE_DIR}")
+    hpx_link_sys_directories("${BZIP2_LIBRARY_DIR}")
 
     add_hpx_library(compress_bzip2
-      SOURCES ${hpx_SOURCE_DIR}/plugins/binary_filter/bzip2/bzip2_serialization_filter.cpp
-      HEADERS ${hpx_SOURCE_DIR}/hpx/plugins/binary_filter/bzip2_serialization_filter.hpp
+      SOURCES "${hpx_SOURCE_DIR}/plugins/binary_filter/bzip2/bzip2_serialization_filter.cpp"
+      HEADERS "${hpx_SOURCE_DIR}/hpx/plugins/binary_filter/bzip2_serialization_filter.hpp"
       FOLDER "Core/Plugins/Compression"
-      DEPENDENCIES ${BZIP2_LIBRARY})
+      DEPENDENCIES "${BZIP2_LIBRARY}")
 
     set_property(TARGET compress_bzip2_lib APPEND
       PROPERTY COMPILE_DEFINITIONS

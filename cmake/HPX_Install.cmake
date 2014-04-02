@@ -48,8 +48,8 @@ endmacro()
 
 macro(hpx_library_install name suffix)
   if(NOT HPX_NO_INSTALL)
-    hpx_get_target_file(lib ${name})
-    hpx_get_target_path(output_dir ${name})
+    hpx_get_target_file(lib "${name}")
+    hpx_get_target_path(output_dir "${name}")
 
     if(UNIX)
       set(targets ${lib} ${lib}.${HPX_SOVERSION} ${lib}.${HPX_VERSION})
@@ -85,7 +85,7 @@ endmacro()
 
 macro(hpx_archive_install name suffix)
   if(NOT HPX_NO_INSTALL)
-    hpx_get_target_location(location ${name})
+    hpx_get_target_location(location "${name}")
 
     set(target_directory "${CMAKE_INSTALL_PREFIX}/${suffix}")
 

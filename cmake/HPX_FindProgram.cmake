@@ -24,7 +24,7 @@ macro(hpx_find_program name)
 
       set(rooted_paths)
       foreach(path ${${name}_PROGRAM_PATHS})
-        list(APPEND rooted_paths ${${name}_ROOT}/${path})
+        list(APPEND rooted_paths "${${name}_ROOT}/${path}")
       endforeach()
 
       if(${name}_ROOT)
@@ -67,8 +67,8 @@ macro(hpx_find_program name)
 
       if(${name}_PROGRAM)
         set(${name}_FOUND ON CACHE BOOL "Found ${name}." FORCE)
-        set(${name}_ROOT ${${name}_ROOT} CACHE PATH "${name} root directory.")
-        set(${name}_PROGRAM ${${name}_PROGRAM} CACHE FILEPATH "${name} program.")
+        set(${name}_ROOT "${${name}_ROOT}" CACHE PATH "${name} root directory.")
+        set(${name}_PROGRAM "${${name}_PROGRAM}" CACHE FILEPATH "${name} program.")
       endif()
       mark_as_advanced(FORCE ${name}_ROOT ${name}_PROGRAM)
 

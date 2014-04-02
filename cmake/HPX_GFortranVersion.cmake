@@ -22,11 +22,11 @@ if(NOT MSVC)
     set(source_dir "$ENV{HPX_ROOT}/share/hpx/cmake/tests")
   endif()
 
-  file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests)
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests")
 
-  hpx_compile(gfortran_version SOURCE ${source_dir}/gfortran_version.fpp
+  hpx_compile(gfortran_version SOURCE "${source_dir}/gfortran_version.fpp"
     LANGUAGE Fortran
-    OUTPUT ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/gfortran_version)
+    OUTPUT "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/gfortran_version")
 
   if("${gfortran_version_RESULT}" STREQUAL "0")
     execute_process(
