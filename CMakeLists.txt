@@ -259,8 +259,8 @@ if(GCC_VERSION AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     hpx_error("gcc_config" "GCC 4.4.5 or higher is required. Specify HPX_IGNORE_GCC_VERSION=ON to overwrite this error.")
   endif()
 elseif(MSVC)
-  if(NOT (MSVC10 OR MSVC11 OR MSVC12))
-    hpx_error("msvc_config" "MSVC x64 2010 or higher is required.")
+  if(NOT (MSVC11 OR MSVC12))
+    hpx_error("msvc_config" "MSVC x64 2012 or higher is required.")
   elseif(NOT CMAKE_CL_64)
     hpx_warn("msvc_config" "MSVC (32Bit) will compile but will fail running larger applications because of limitations in the Windows OS.")
   endif()
@@ -1004,9 +1004,7 @@ if(MSVC)
 
   # VS2012 and above has a special flag for improving the debug experience by
   # adding more symbol information to the build
-  if(NOT MSVC10)
-    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -d2Zi+")
-  endif()
+  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -d2Zi+")
 
   # VS2013 and above know how to do link time constant data segment folding
   # VS2013 update 2 and above know how to remove debug information for 
@@ -1143,10 +1141,8 @@ if(MSVC)
     # which is benign
     hpx_append_flag(-wd4307)
 
-    if(MSVC11 OR MSVC12)
-      # MSVC2012/2013 are overeager to report 'qualifier applied to function type has no meaning; ignored'
-      hpx_append_flag(-wd4180)
-    endif()
+    #MSVC2012/2013 are overeager to report 'qualifier applied to function type has no meaning; ignored'
+    hpx_append_flag(-wd4180)
 
     # OpenMPI triggers a lot of forcing value to bool 'true' or 'false' (performance warning)
     if(MPI_FOUND)
