@@ -73,7 +73,7 @@ def minimum(iterable, default):
          return default
          
 #----------------------------------------------------------------------------
-def sizeof_fmt(num):
+def sizeof_bytes(num):
     for x in ['bytes','KB','MB','GB','TB']:
         if num < 1024.0:
             return "%.0f %s" % (num, x)
@@ -138,7 +138,7 @@ def plot_one_collection(graph_map, labelstrings, axes) :
     axes.set_title(labelstrings[2], fontsize=10)
     
 #----------------------------------------------------------------------------
-def plot_configuration(graph_map, names) :
+def plot_configuration(graph_map, axesnames, mapnames, titlefunction) :
 
     fig = plt.figure(figsize = options.fig_size[0])
     axes = []
@@ -179,7 +179,7 @@ def plot_configuration(graph_map, names) :
             param2_results = param1_results[param2_key]
             param2_keys    = sorted(param2_results.keys())
             print "param2_ type ", param2_key
-            plot_one_collection(param2_results, ["Nodes", "BW/GB/s", names[2] + " " + sizeof_fmt(param2_key)], axes[col + row*numcols])
+            plot_one_collection(param2_results, [axesnames[0], axesnames[1], mapnames[1] + " " + titlefunction(param2_key)], axes[col + row*numcols])
             col += 1
             if (col>=numcols):
               col = 0
@@ -230,8 +230,12 @@ for csvfile in args :
     with open(csvfile) as f:
       io = StringIO(f.read().replace(':', ','))
       reader = csv.reader(io)
-      Read_Net_Blocksize_Thread  = {}
-      Write_Net_Blocksize_Thread = {}
+      Read_Net_Blocksize_Thread   = {}
+      Write_Net_Blocksize_Thread  = {}
+      Read_Net_Thread_Blocksize   = {}
+      Write_Net_Thread_Blocksize  = {}
+      Read_Net_Nodes_Blocksize_T  = {}
+      Write_Net_Nodes_Blocksize_T = {}
       rownum = 0
       for row in reader:
           readflag = row[1].strip() in ("read")
@@ -240,7 +244,7 @@ for csvfile in args :
           Threads  = int(row[7])
           IOPsize  = int(row[11])
           IOPs     = float(row[13])
-          BW       = float(row[15])
+          BW       = float(row[15])/1024.0 
           if (BW==0.0) : 
             BW = 1.0
           #print "read=%i Network=%s Nodes=%4i Threads=%3i IOPsize=%9i IOPs=%6.1f BW=%6.1f"  % (readflag, Network, Nodes, Threads, IOPsize, IOPs, BW)
@@ -248,24 +252,35 @@ for csvfile in args :
           if (readflag):
             #print "Adding Read data ", [Nodes,BW]
             insert_safe(Read_Net_Blocksize_Thread, Network, IOPsize, Threads, [Nodes,BW])
+            insert_safe(Read_Net_Thread_Blocksize, Network, Threads, IOPsize, [Nodes,BW])
+            insert_safe(Read_Net_Nodes_Blocksize_T, Network, Nodes,  IOPsize, [Threads,BW])
           else :
             #print "Adding Write data ", [Nodes,BW]
             insert_safe(Write_Net_Blocksize_Thread, Network, IOPsize, Threads, [Nodes,BW])
+            insert_safe(Write_Net_Thread_Blocksize, Network, Threads, IOPsize, [Nodes,BW])
+            insert_safe(Write_Net_Nodes_Blocksize_T, Network, Nodes,  IOPsize, [Threads,BW])
           rownum += 1
           
     # output file path for svg/png
     base = os.path.splitext(csvfile)[0]
-    graphs_to_print = []
+    graphs_to_save = []
 
-    # generate one graph per blocksize for each threadcount
-    fig_Read1  = plot_configuration(Read_Net_Blocksize_Thread, ["Read", Network, "Block size", "Threads"])
-    graphs_to_print.append([fig_Read1,"Read1"])
+    # x-axis{Nodes}, y-axis{BW}, generate one graph per blocksize for each threadcount
+    fig_Read1  = plot_configuration(Read_Net_Blocksize_Thread, ["Nodes", "BW GB/s"], [Network, "Block size", "Threads"], sizeof_bytes)
+    graphs_to_save.append([fig_Read1,"Read-by-block"])
+    #fig_Write1 = plot_configuration(Write_Net_Blocksize_Thread, ["Write", Network, "Block size", "Threads"])
+    #graphs_to_print.append([fig_Write1,"Write-by-block"])
 
-    # generate graph using one set of data
-#    fig_Write1 = plot_configuration(Write_Net_Blocksize_Thread, ["Write", Network, "Block size", "Threads"])
-#    graphs_to_print.append([fig_Write1,"Write1"])
+    # generate one graph per threadcount for each blocksize
+    fig_Read2  = plot_configuration(Read_Net_Thread_Blocksize, ["Nodes", "BW GB/s"], [Network, "Threads", "Block size"], lambda x: str(x))
+    graphs_to_save.append([fig_Read2,"Read-by-thread"])
+
+    # generate one graph per node count for each blocksize
+    fig_Read3  = plot_configuration(Read_Net_Nodes_Blocksize_T, ["Threads", "BW GB/s"], [Network, "Nodes", "Block size"], lambda x: str(x))
+    graphs_to_save.append([fig_Read3,"Read-by-NodeBlock"])
+
     
-    for fig in graphs_to_print:
+    for fig in graphs_to_save:
       svg_name = base + "." + fig[1] + ".svg"
       png_name = base + "." + fig[1] + ".png"
       print "Writing %s and %s" % (svg_name, png_name)
