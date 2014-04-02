@@ -100,7 +100,7 @@ visit __stellar_hpx_buildbot__.
     [[Name                       ][Recommended Version][Minimum Version ]]
 
     [[[*Compilers]]]
-    [[__visual_cxx__ (x64)       ][2013               ][2010            ]]
+    [[__visual_cxx__ (x64)       ][2013               ][2012            ]]
 
     [[[*Build System]]]
     [[__cmake__                  ][2.8.4              ][2.8.4           ]]
@@ -114,7 +114,9 @@ visit __stellar_hpx_buildbot__.
 [note You need to build the following Boost libraries for __hpx__:
       Boost.DateTime, Boost.Filesystem, Boost.ProgramOptions, Boost.Regex,
       Boost.Serialization, Boost.System, Boost.Thread, Boost.Chrono (starting
-      Boost 1.49.0), and Boost.Atomic (starting Boost 1.53.0).]
+      Boost 1.49.0), and Boost.Atomic (starting Boost 1.53.0). It is important
+	  to note that MSVC2013 is unable to build Boost 1.55.0, a different boost
+	  version or compiler will be required.]
 
 Depending on the options you chose while building and installing __hpx__,
 you will find that __hpx__ may depend on several other libraries such as those
