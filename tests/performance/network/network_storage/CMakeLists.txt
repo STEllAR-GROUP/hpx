@@ -10,8 +10,15 @@ add_hpx_executable(network_storage
   FOLDER "Benchmarks/Network/network_storage")
 
 # add pseudo-target dependencies
+add_hpx_pseudo_target(
+  tests.performance.network.network_storage.network_storage)
+
 add_hpx_pseudo_dependencies(
   tests.performance.network.network_storage
+  tests.performance.network.network_storage.network_storage)
+
+add_hpx_pseudo_dependencies(
+  tests.performance.network.network_storage.network_storage
   network_storage_exe)
 
 hpx_option(HPX_BENCHMARK_SCRIPTS_PATH PATH

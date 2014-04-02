@@ -140,6 +140,8 @@ macro(add_hpx_component name)
     endif()
   endif()
 
+  list(REMOVE_DUPLICATES hpx_libs)
+
   target_link_libraries(${name}_component
     ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} ${hpx_libs})
 

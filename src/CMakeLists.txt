@@ -391,7 +391,6 @@ target_link_libraries(hpx
   ${hpx_RUNTIME_LIBRARIES}
   ${BOOST_FOUND_LIBRARIES})
 
-
 hpx_get_target_file(name hpx)
 
 set_property(TARGET hpx APPEND
