@@ -24,13 +24,18 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1103] - Work on test/scripts
+* [issue 1102] - Changed minimum requirement of window install to 2012
+* [issue 1101] - Changed minimum requirement of window install to 2012
+* [issue 1100] - Changed readme to no longer specify using MSVC 2010 compiler
 * [issue 1099] - Error returning futures from component actions
+* [issue 1098] - Improve storage test
 * [issue 1097] - data_actions quickstart example calls missing function
                  decorate_action of data_get_action
 * [issue 1096] - MPI parcelport broken with new zero copy optimization
 * [issue 1095] - Warning C4005: _WIN32_WINNT: Macro redefinition
 * [issue 1094] - Syntax error for -DHPX_UNIQUE_FUTURE_ALIAS in master
-* [issue 1094] - Syntax error for -DHPX_UNIQUE_FUTURE_ALIAS
+* [issue 1093] - Syntax error for -DHPX_UNIQUE_FUTURE_ALIAS
 * [issue 1092] - Rename unique_future<> back to future<>
 * [issue 1091] - Inconsistent error message
 * [issue 1090] - On windows 8.1 the examples crashed if using more than one os
