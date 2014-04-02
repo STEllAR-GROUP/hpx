@@ -88,6 +88,7 @@ typedef struct {
     boost::uint64_t global_storage_MB;
     boost::uint64_t transfer_size_B;
     boost::uint64_t threads;
+    std::string     network;
 } test_options;
 
 //----------------------------------------------------------------------------
@@ -137,7 +138,7 @@ hpx::future<int> copy_from_local_storage(char *dest, uint32_t offset, uint64_t l
     char const* src = &local_storage[offset];
     std::copy(src, src + length, dest);
     //  memcpy(dest, src, length);
-    return hpx::make_ready_future<int>(1);
+    return hpx::make_ready_future<int>(TEST_SUCCESS);
 }
 
 //----------------------------------------------------------------------------
@@ -273,7 +274,7 @@ namespace Storage {
 
         // allow the storage class to asynchronously copy the data into dest buffer
         hpx::future<int> fut = copy_from_local_storage(dest.get(), address, length);
-
+                                                                       
         // when the task completes, return a TransferBuffer
         return fut.then(hpx::launch::sync,
             [=](hpx::future<int> f) -> TransferBufferReceive {
@@ -473,8 +474,8 @@ void test_write(
         std::cout << "IOPs/s             : " << IOPs_s    << "\n";
         std::cout << "Aggregate BW Write : " << writeBW   << "MB/s" << std::endl;
         // a complete set of results that our python matplotlib script will ingest
-        char const* msg = "CSVData, write, ranks, %1%, threads, %2%, Memory, %3%, IOPsize, %4%, IOPS/s, %5%, BW, %6%, ";
-        std::cout << (boost::format(msg) % nranks % options.threads % writeMB % options.transfer_size_B
+        char const* msg = "CSVData, write, network, %1%, ranks, %2%, threads, %3%, Memory, %4%, IOPsize, %5%, IOPS/s, %6%, BW, %7%, ";
+        std::cout << (boost::format(msg) % options.network % nranks % options.threads % writeMB % options.transfer_size_B
           % IOPs_s % writeBW ) << std::endl;
     }
 }
@@ -586,8 +587,8 @@ void test_read(
         std::cout << "IOPs/s             : " << IOPs_s    << "\n";
         std::cout << "Aggregate BW Read  : " << readBW << "MB/s" << std::endl;
         // a complete set of results that our python matplotlib script will ingest
-        char const* msg = "CSVData, read, ranks, %1%, threads, %2%, Memory, %3%, IOPsize, %4%, IOPS/s, %5%, BW, %6%, ";
-        std::cout << (boost::format(msg) % nranks % options.threads % readMB % options.transfer_size_B
+        char const* msg = "CSVData, read, network, %1%, ranks, %2%, threads, %3%, Memory, %4%, IOPsize, %5%, IOPS/s, %6%, BW, %7%, ";
+        std::cout << (boost::format(msg) % options.network % nranks % options.threads % readMB % options.transfer_size_B
           % IOPs_s % readBW ) << std::endl;
     }
 }
@@ -647,8 +648,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     options.local_storage_MB  = vm["localMB"].as<boost::uint64_t>();
     options.global_storage_MB = vm["globalMB"].as<boost::uint64_t>();
     options.iterations        = vm["iterations"].as<boost::uint64_t>();
-
     options.threads           = hpx::get_os_thread_count();
+    options.network           = vm["parceltype"].as<std::string>();
 
     //
     if (options.global_storage_MB>0) {
@@ -724,7 +725,17 @@ int main(int argc, char* argv[])
           boost::program_options::value<boost::uint64_t>()->default_value(5),
           "The number of iterations over the global memory.\n")
         ;
-/*
+
+    // if the user does not set parceltype on the command line, 
+    // we use a default of unknowm so we don't mistake plots
+    desc_commandline.add_options()
+        ( "parceltype",
+          boost::program_options::value<std::string>()->default_value("unknown"),
+          "Pass in the parcelport network type being tested,"
+          "this value has no effect on the code and is used only in output "
+          "so that plotting scripts know what network type was active during the test.\n")
+        ;
+
     desc_commandline.add_options()
         ( "distribution",
           boost::program_options::value<boost::uint64_t>()->default_value(5),
@@ -732,7 +743,7 @@ int main(int argc, char* argv[])
           "0 : random \n"
           "1 : block cyclic")
         ;
-*/
+
     // make sure our barrier was already created before hpx_main runs
     DEBUG_OUTPUT(2,
         std::cout << "Registering create_barrier startup function " << std::endl;
