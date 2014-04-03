@@ -83,7 +83,7 @@ def sizeof_bytes(num):
 # plot N series of data onto a single graph
 # each series is a array, there are N arrays in the supplied map 
 # graph_map, a map of arrays of {x,y,other} data
-# labels, {xaxis, yaxis, series_variable} 
+# labelstrings, {xaxis, yaxis, series_variable} 
 def plot_one_collection(graph_map, labelstrings, axes) :
     print "Plotting %i graphs of '%s'" % (len(graph_map), labelstrings[2])
     # need to find min and max values for x-axis
@@ -146,49 +146,70 @@ def plot_configuration(graph_map, axesnames, mapnames, titlefunction) :
     # the supplied graphs come as a 2D array of params
     num_param1 = len(graph_map.keys())
     num_param2 = len(graph_map[graph_map.keys()[0]].keys())
-    numrows = num_param1
-    numcols = num_param2
-
+    
+    # All the graphs of param2 will be the same type, 
+    # but we need one legend per param1 regardless
+    # so num_param2legend is used in places to add space for the extra legend plot
+    num_param2legend = num_param2+1
+    doLegend         = True
+    numrows          = num_param1
+    numcols          = num_param2legend   
+    
     # if the arrays is 1xN or Nx1, rearrange the num rows/cols
-    # to fit the page a little better instead of having one long line of plots
+    # to fit the page a little better instead of having one long row/column of plots
+    rearranged = False
     if (num_param1==1) or (num_param2==1):
-      total = num_param1*num_param2
+      total = num_param1*num_param2legend
+      print "total is ", total
       better = int(math.sqrt(total))
       numrows = better
-      numcols = total/better     
-      print "Rearranged graphs using layout %i x %i" % (numrows, numcols)
-      
+      numcols = int(math.ceil(total/float(better)))
+      rearranged = True
+      print "Rearranged graphs from %i x %i using layout %i x %i" % (num_param1, num_param2, numrows, numcols)
+    
     # create an array of graphs for our parameter space
     # grid cells are defined by {row, col} from top left and down
     print "Creating array of graphs rows %i, cols %i" % (numrows, numcols)
-    for r in range(numrows):
-      for c in range(numcols):
-        axes.append( plt.subplot2grid((numrows, numcols), (r, c), colspan=1) )
-        
-    # loop over input arrays/maps and create the actual plot data for each graph
+    plot_index = 0
     row = 0
     col = 0
     graph_keys = sorted(graph_map.keys())
-    for param1_types in range(len(graph_keys)):
-        param1_key     = graph_keys[param1_types]
-        param1_results = graph_map[param1_key]
-        param1_keys    = sorted(param1_results.keys())
-        print "param1_ type ", param1_key
-        for param2_size in range(len(param1_keys)):
-            param2_key     = param1_keys[param2_size]
-            param2_results = param1_results[param2_key]
-            param2_keys    = sorted(param2_results.keys())
-            print "param2_ type ", param2_key
-            plot_one_collection(param2_results, [axesnames[0], axesnames[1], mapnames[1] + " " + titlefunction(param2_key)], axes[col + row*numcols])
-            col += 1
-            if (col>=numcols):
-              col = 0
-              row += 1
+    for param1_i in range(num_param1):
+      param1_key     = graph_keys[param1_i]
+      param1_results = graph_map[param1_key]
+      param1_keys    = sorted(param1_results.keys())
+      print "param1_ type ", param1_key
+      for param2_i in range(num_param2):
+        param2_key     = param1_keys[param2_i]
+        param2_results = param1_results[param2_key]
+        param2_keys    = sorted(param2_results.keys())
+        print "param2_ type ", param2_key
+        newplot = plt.subplot2grid((numrows, numcols), (row, col), colspan=1)
+        axes.append( newplot )
+        print "generating plot at {%i,%i}" % (row, col)
+        plot_one_collection(param2_results,
+          [axesnames[0], axesnames[1], mapnames[1] + " " + titlefunction(param2_key)],
+          newplot)
+        col += 1
+        if ((col % numcols)==0):
+          col = 0
+          row += 1
+      # at the end of each param2 group, there should be a legend
+      legend = plt.subplot2grid((numrows, numcols), (row, col), colspan=1)
+      legend.axis('off')
+      axes.append( legend )
+      legend.plot([1], label="multi\nline")
+      legend.plot([1], label="$2^{2^2}$")
+      legend.plot([1], label=r"$\frac{1}{2}\pi$")
+      legend.legend(loc=1, ncol=3, shadow=True)
+      print "added legend at {%i,%i}" % (row, col)
+      col += 1
+      # if we reach the end of the graph row
+      if ((col % numcols)==0):
+        col = 0
+        row += 1
         
-    # legendIndexWrite = 3
-    # legendIndexRead  = 7
-
-
+ 
     # for line in range(3):
         # axes[legendIndexWrite].plot([1], label=names[line], markersize=8, marker=markers[line/2],color=colors[line])
     # for line in range(3,6):
@@ -227,15 +248,27 @@ def insert_safe(a_map, key1, key2, key3, value) :
 # read results data in and generate arrays/maps of values
 # for each parcelport, threadcount, blocksize, ...
 for csvfile in args :
+
+    # output file path for svg/png
+    base = os.path.splitext(csvfile)[0]
+    # empty list of graphs we will be fill for exporting
+    graphs_to_save = []
+
+    # open the CSV file
     with open(csvfile) as f:
       io = StringIO(f.read().replace(':', ','))
       reader = csv.reader(io)
+      
+      # to plot something not already included, add it to this list
       Read_Net_Blocksize_Thread   = {}
       Write_Net_Blocksize_Thread  = {}
       Read_Net_Thread_Blocksize   = {}
       Write_Net_Thread_Blocksize  = {}
       Read_Net_Nodes_Blocksize_T  = {}
       Write_Net_Nodes_Blocksize_T = {}
+      
+      # loop over the CSV file lines, 
+      # if the CSV output is changed for the test, these offsets will need to be corrected
       rownum = 0
       for row in reader:
           readflag = row[1].strip() in ("read")
@@ -249,23 +282,23 @@ for csvfile in args :
             BW = 1.0
           #print "read=%i Network=%s Nodes=%4i Threads=%3i IOPsize=%9i IOPs=%6.1f BW=%6.1f"  % (readflag, Network, Nodes, Threads, IOPsize, IOPs, BW)
           
+          # we use a map structure 3 deep with an array at the leaf, 
+          # this allows us to store param1, param2, param3, {x,y} 
+          # combinations of params cen be plotted against each other
+          # by rearranging the map levels and {x,y} vars.
           if (readflag):
             #print "Adding Read data ", [Nodes,BW]
-            insert_safe(Read_Net_Blocksize_Thread, Network, IOPsize, Threads, [Nodes,BW])
-            insert_safe(Read_Net_Thread_Blocksize, Network, Threads, IOPsize, [Nodes,BW])
-            insert_safe(Read_Net_Nodes_Blocksize_T, Network, Nodes,  IOPsize, [Threads,BW])
+            insert_safe(Read_Net_Blocksize_Thread,  Network, IOPsize, Threads, [Nodes,BW])
+            insert_safe(Read_Net_Thread_Blocksize,  Network, Threads, IOPsize, [Nodes,BW])
+            insert_safe(Read_Net_Nodes_Blocksize_T, Network, Nodes,   IOPsize, [Threads,BW])
           else :
             #print "Adding Write data ", [Nodes,BW]
-            insert_safe(Write_Net_Blocksize_Thread, Network, IOPsize, Threads, [Nodes,BW])
-            insert_safe(Write_Net_Thread_Blocksize, Network, Threads, IOPsize, [Nodes,BW])
-            insert_safe(Write_Net_Nodes_Blocksize_T, Network, Nodes,  IOPsize, [Threads,BW])
+            insert_safe(Write_Net_Blocksize_Thread,  Network, IOPsize, Threads, [Nodes,BW])
+            insert_safe(Write_Net_Thread_Blocksize,  Network, Threads, IOPsize, [Nodes,BW])
+            insert_safe(Write_Net_Nodes_Blocksize_T, Network, Nodes,   IOPsize, [Threads,BW])
           rownum += 1
           
-    # output file path for svg/png
-    base = os.path.splitext(csvfile)[0]
-    graphs_to_save = []
-
-    # x-axis{Nodes}, y-axis{BW}, generate one graph per blocksize for each threadcount
+    # x-axis{Nodes}, y-axis{BW}, generate one graph per blocksize with series for each threadcount
     fig_Read1  = plot_configuration(Read_Net_Blocksize_Thread, ["Nodes", "BW GB/s"], [Network, "Block size", "Threads"], sizeof_bytes)
     graphs_to_save.append([fig_Read1,"Read-by-block"])
     #fig_Write1 = plot_configuration(Write_Net_Blocksize_Thread, ["Write", Network, "Block size", "Threads"])
