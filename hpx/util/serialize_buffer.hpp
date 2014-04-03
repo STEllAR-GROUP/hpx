@@ -101,31 +101,17 @@ namespace hpx { namespace util
         }
 
         template <typename Deallocator>
-        serialize_buffer (T* data, std::size_t size, init_mode mode,
+        serialize_buffer (T* data, std::size_t size,
                 allocator_type const& alloc, Deallocator const& dealloc)
           : data_()
           , size_(size)
           , alloc_(alloc)
         {
-            if (mode == copy) {
-                using util::placeholders::_1;
-                data_.reset(alloc_.allocate(size),
-                    util::bind(&serialize_buffer::deleter<allocator_type>, _1,
-                        alloc, size_));
-                if (size != 0)
-                    std::copy(data, data + size, data_.get());
-            }
-            else if (mode == reference) {
-                data_ = boost::shared_array<T>(data,
-                    &serialize_buffer::no_deleter);
-            }
-            else {
-                // take ownership
-                using util::placeholders::_1;
-                data_ = boost::shared_array<T>(data,
-                    util::bind(&serialize_buffer::deleter<Deallocator>, _1,
-                        dealloc, size_));
-            }
+            // if 2 allocators are specified we assume mode 'take'
+            using util::placeholders::_1;
+            data_ = boost::shared_array<T>(data,
+                util::bind(&serialize_buffer::deleter<Deallocator>, _1,
+                    dealloc, size_));
         }
 
         void take_buffer(T * data, std::size_t size)

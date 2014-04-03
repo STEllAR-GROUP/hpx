@@ -235,7 +235,7 @@ public:
 
     TransferBufferReceive(char* buffer, std::size_t length,
             std::size_t remote_buffer, std::allocator<char> deallocator) throw()
-      : SerializeToPointer(buffer, length, SerializeToPointer::take,
+      : SerializeToPointer(buffer, length,
             PointerAllocator(reinterpret_cast<PointerAllocator::pointer>(remote_buffer)),
             deallocator)
     {}
