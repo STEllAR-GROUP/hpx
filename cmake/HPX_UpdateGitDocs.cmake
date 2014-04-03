@@ -31,7 +31,7 @@ file(REMOVE_RECURSE "${CMAKE_BINARY_DIR}/gh-pages/docs/html/hpx")
 
 # copy all documentation files to target branch
 file(
-  COPY "${HPX_SOURCE_DIR}/docs/html"
+  COPY "${hpx_SOURCE_DIR}/docs/html"
   DESTINATION "${CMAKE_BINARY_DIR}/gh-pages/docs")
 
 if(HPX_BUILD_TYPE)
