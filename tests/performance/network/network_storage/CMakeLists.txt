@@ -82,7 +82,6 @@ else()
   )
 
   add_custom_target(script-network-storage
-      ALL
       DEPENDS "${TESTING_SCRIPTS_PATH}/slurm-test-HPX-storage.sh"
   )
 endif()
