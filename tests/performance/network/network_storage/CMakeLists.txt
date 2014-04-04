@@ -31,7 +31,7 @@ hpx_option(HPX_BENCHMARK_SCRIPTS_PATH PATH
 if (WIN32)
   # use path to build dir here, not install dir
   file(TO_NATIVE_PATH "${HPX_BUILD_PREFIX}/bin/network_storage.exe" EXE_PATH)
-  file(TO_NATIVE_PATH "${BOOST_LIBRARY_DIR};${HPX_PREFIX}/lib/hpx" LIB_PATH)
+  file(TO_NATIVE_PATH "${BOOST_LIBRARY_DIR};${HPX_BUILD_PREFIX}/lib/hpx" LIB_PATH)
 
   #message("EXE_PATH is ${EXE_PATH}, LIB_PATH=${LIB_PATH}")
 

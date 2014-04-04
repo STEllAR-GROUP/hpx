@@ -18,13 +18,18 @@ rem cd /d d:\build\hpx
 rem Get N-1 from argument
 set /a N=%1-1
 
-rem use "start /B" to suppress new window per task 
-
-echo "Starting %1 instances as part of HPX job"
-FOR /l %%x IN (0, 1, %N%) DO (
-  echo start /B @EXE_PATH@ -l%1 -%%x @EXE_PATH@ -l%1 -%%x -Ihpx.parcel.tcp.enable=1 -Ihpx.parcel.async_serialization=1 --hpx:threads=4 --localMB=512 --transferKB=1024 --iterations=5
-  start /B @EXE_PATH@ -l%1 -%%x -Ihpx.parcel.tcp.enable=1 -Ihpx.parcel.async_serialization=1 --hpx:threads=4 --localMB=512 --transferKB=1024 --iterations=5
-)
+rem
+rem for a single process we can perform a range of tests
+rem
+rem FOR %%b IN (64 128 256 512 1024 2048 4096 8192 16384 32768 65536) DO (
+rem   FOR /l %%t IN (1, 1, 12) DO (
+    echo "Starting %1 instances as part of HPX job"
+    FOR /l %%x IN (0, 1, %N%) DO (
+      rem use "start /B" to suppress new window per task 
+      start /B /WAIT D:\build\hpx\Debug\bin\network_storage.exe -l%1 -%%x -Ihpx.parcel.tcp.enable=1 -Ihpx.parcel.async_serialization=1 --hpx:threads=%%t --localMB=512 --transferKB=%%b --iterations=5
+    )
+rem   )
+rem )
  
 rem 2097152 65536
 rem
