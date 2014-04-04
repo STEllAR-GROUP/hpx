@@ -57,8 +57,7 @@ _EOF_
 
 chmod 775 ${DIR_NAME}/submit-job.bash
 
-echo "cd ${DIR_NAME}; sbatch submit-job.bash; cd \$BASEDIR" > run_jobs.bash
-echo "echo \"Use find . -name \*.out -exec grep CSVData {} \;\" " >> run_jobs.bash
+echo "cd ${DIR_NAME}; sbatch submit-job.bash; cd \$BASEDIR" >> run_jobs.bash
 
 }
 
@@ -91,11 +90,11 @@ SERVERS_PERNODE=1
 # "tcp" "mpi" "ibverbs"
 for NODES in 1 2 4 8 16
 do
-  for PARCELTYPE in "tcp" "ibverbs"
+  for PARCELTYPE in "mpi"
   do
     for TRANSFERSIZE in 1024 2048 4096 8192 16384
     do
-      for THREADS_PERTASK in 2 4 8 16 32 50
+      for THREADS_PERTASK in 2 4 8
       do
         LOCAL_SIZE=$(printf "%.0f" $( bc <<< "scale=6;(128 * $TRANSFERSIZE * $THREADS_PERTASK)/1024" ))
         LOCAL_SIZE=$(echo $((LOCAL_SIZE>512?512:LOCAL_SIZE)))
@@ -106,3 +105,5 @@ do
     done
   done
 done
+
+echo "echo \"Use find . -name \*.out -exec grep CSVData {} \;\" " >> run_jobs.bash

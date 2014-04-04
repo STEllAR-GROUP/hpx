@@ -85,15 +85,15 @@ def sizeof_bytes(num):
 # each series is a array, there are N arrays in the supplied map 
 # graph_map, a map of arrays of {x,y,other} data
 # labelstrings, {xaxis, yaxis, series_variable} 
-def plot_one_collection(graph_map, labelstrings, axes) :
-    print "Plotting %i graphs of '%s'" % (len(graph_map), labelstrings[2])
+def plot_one_collection(graph_map, labelstrings, axes, axisfunction) :
+    print "Plotting %i series of '%s'" % (len(graph_map), labelstrings[2])
     # need to find min and max values for x-axis
     # assume base 2 log scale {2^min, 2^max}
-    x1 = 0
-    x2 = 5
+    x1 = 100
+    x2 = 1
     # need to find min and max values for y-axis
-    y1 = 0
-    y2 = 5
+    y1 = -4
+    y2 = 1
     # restart markers and colours from beginning of list for each new graph
     localmarkers = itertools.cycle(markers)
     localcolours = itertools.cycle(colours)
@@ -101,7 +101,7 @@ def plot_one_collection(graph_map, labelstrings, axes) :
     num_series = len(series_keys)
     for index in range(len(series_keys)):
         key = series_keys[index]
-        series = graph_map[key]
+        series = sorted(graph_map[key])
         #print "The series is ", series
         # we can just plot the series directly, but just in case we add support
         # for error bars etc and use {x,y,stddev,etc...} in future, we will pull out 
@@ -111,27 +111,30 @@ def plot_one_collection(graph_map, labelstrings, axes) :
         axes.loglog(*zip(*values), basex=2, basey=2, markersize=8, marker=localmarkers.next(), color=localcolours.next())
         # track max x value for scaling of axes nicely
         xvalues = sorted([x[0] for x in values])
+        yvalues = sorted([x[1] for x in values])
         # we want a nice factor of 2 for our axes limits
-        x2 = maximum({x2,int(math.log(maximum(xvalues,8),2))},x2)
+        x1 = minimum({x1,int(math.ceil(math.log(minimum(xvalues,100),2)))},100)
+        x2 = maximum({x2,int(math.ceil(math.log(maximum(xvalues,1),2)))},1)
+        y2 = maximum({y2,int(math.ceil(math.log(maximum(yvalues,1),2)))},1)
     #print "Min and Max for X-axes are %f %f " % (x1, x2)
-    # generate x labels for each power of 2
+    # generate labels for each power of 2 on the axes
     xlabels = tuple(i for i in (2**x for x in range(x1,x2+1)) )
+    ylabels = tuple(i for i in (2**y for y in range(y1,y2+1)) )
     # setup the xaxis parameters
     axes.set_xscale('log', basex=2)
-    axes.set_xlim(minimum(xlabels,1), maximum(xlabels,3)*1.5)
+    axes.set_xlim(minimum(xlabels,1)*0.8, maximum(xlabels,3)*1.2)
     axes.set_xticklabels(xlabels)
+    axes.xaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(axisfunction))
     axes.set_xlabel(labelstrings[0])
-    ylabels = tuple(i for i in (2**x for x in range(x1,x2+1)) )
-    # ylabels should also be automatic, but for now, do them by hand
-    # these should be GB/s or MB/s etc etc
-    #ylabels = [0.125, 0.25, 0.5,1,2,4,8,16]
+    axes.tick_params(axis='x', which='major', labelsize=9)
+    axes.tick_params(axis='x', which='minor', labelsize=8)
     # setup the yaxis parameters
     axes.set_yscale('log', basey=2)
-    axes.set_ylim(0.01, 16 )
-    #axes.set_yticklabels(ylabels)
+    axes.set_ylim(minimum(ylabels,1), maximum(ylabels,3)*1.2)
+    axes.set_yticklabels(ylabels)
     axes.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda x, pos: str('%.2f' % x)))
     axes.set_ylabel(labelstrings[1])
-    axes.tick_params(axis='x', which='major', labelsize=9)
+ #   axes.tick_params(axis='x', which='major', labelsize=9)
     #
     # define some custom minor tick locations on y axis:
     #
@@ -144,7 +147,7 @@ def plot_one_collection(graph_map, labelstrings, axes) :
     axes.set_title(labelstrings[2], fontsize=10)
     
 #----------------------------------------------------------------------------
-def plot_configuration(graph_map, axesnames, mapnames, titlefunction, legendfunction) :
+def plot_configuration(graph_map, mapnames, axesnames, titlefunction, legendfunction, axisfunction) :
 
     fig = plt.figure(figsize = options.fig_size[0])
     axes = []
@@ -195,7 +198,7 @@ def plot_configuration(graph_map, axesnames, mapnames, titlefunction, legendfunc
         print "generating plot at {%i,%i}" % (row, col)
         plot_one_collection(param2_results,
           [axesnames[0], axesnames[1], mapnames[1] + " " + titlefunction(param2_key)],
-          newplot)
+          newplot,axisfunction)
         col += 1
         if ((col % numcols)==0):
           col = 0
@@ -259,12 +262,14 @@ for csvfile in args :
       reader = csv.reader(io)
       
       # to plot something not already included, add it to this list
-      Read_Net_Blocksize_Thread   = {}
-      Write_Net_Blocksize_Thread  = {}
-      Read_Net_Thread_Blocksize   = {}
-      Write_Net_Thread_Blocksize  = {}
-      Read_Net_Nodes_Blocksize_T  = {}
-      Write_Net_Nodes_Blocksize_T = {}
+      Read_Net_B_T_N  = {}
+      Read_Net_T_B_N  = {}
+      Read_Net_N_B_T  = {}
+      Read_Net_N_T_B  = {}
+      Write_Net_B_T_N = {}
+      Write_Net_T_B_N = {}
+      Write_Net_N_B_T = {}
+      Write_Net_N_T_B = {}
       
       # loop over the CSV file lines, 
       # if the CSV output is changed for the test, these offsets will need to be corrected
@@ -286,51 +291,68 @@ for csvfile in args :
           # combinations of params cen be plotted against each other
           # by rearranging the map levels and {x,y} vars.
           if (readflag):
-            #print "Adding Read data ", [Nodes,BW]
-            insert_safe(Read_Net_Blocksize_Thread,  Network, IOPsize, Threads, [Nodes,BW])
-            insert_safe(Read_Net_Thread_Blocksize,  Network, Threads, IOPsize, [Nodes,BW])
-            insert_safe(Read_Net_Nodes_Blocksize_T, Network, Nodes,   IOPsize, [Threads,BW])
+            insert_safe(Read_Net_B_T_N, Network, IOPsize, Threads, [Nodes,BW])
+            insert_safe(Read_Net_T_B_N, Network, Threads, IOPsize, [Nodes,BW])
+            insert_safe(Read_Net_N_B_T, Network, Nodes,   IOPsize, [Threads,BW])
+            insert_safe(Read_Net_N_T_B, Network, Nodes,   Threads, [IOPsize,BW])
           else :
-            #print "Adding Write data ", [Nodes,BW]
-            insert_safe(Write_Net_Blocksize_Thread,  Network, IOPsize, Threads, [Nodes,BW])
-            insert_safe(Write_Net_Thread_Blocksize,  Network, Threads, IOPsize, [Nodes,BW])
-            insert_safe(Write_Net_Nodes_Blocksize_T, Network, Nodes,   IOPsize, [Threads,BW])
+            insert_safe(Write_Net_B_T_N,  Network, IOPsize, Threads, [Nodes,BW])
+            insert_safe(Write_Net_T_B_N,  Network, Threads, IOPsize, [Nodes,BW])
+            insert_safe(Write_Net_N_B_T, Network, Nodes,   IOPsize, [Threads,BW])
+            insert_safe(Write_Net_N_T_B, Network, Nodes,   Threads, [IOPsize,BW])
           rownum += 1
        
-    # PLOT
-    # x-axis{Nodes}, y-axis{BW}, generate one graph per blocksize with series for each threadcount
-    fig_Read1  = plot_configuration(
-      Read_Net_Blocksize_Thread, 
-      ["Nodes", "BW GB/s"], 
-      [Network, "Block size", "Threads"], 
-      sizeof_bytes,    # convert block size to KB/MB/TB etc
-      lambda x: str(x) # just print threads with no formatting
+    #-------------------------------------------------------------------
+    # PLOT x-axis{Nodes}, y-axis{BW}, 
+    # generate one graph per blocksize with series for each threadcount
+    fig_Read_Net_B_T_N  = plot_configuration(Read_Net_B_T_N, 
+      [Network, "Block size", "Threads"], ["Nodes", "BW GB/s"], 
+      sizeof_bytes, lambda x: str(x), lambda x,pos: str(x)
       )
-    graphs_to_save.append([fig_Read1,"Read-by-block"])
-    #fig_Write1 = plot_configuration(Write_Net_Blocksize_Thread, ["Write", Network, "Block size", "Threads"])
-    #graphs_to_print.append([fig_Write1,"Write-by-block"])
+    graphs_to_save.append([fig_Read_Net_B_T_N,"fig_Read_Net_B_T_N"])
+    #-------------------------------------------------------------------
 
-    # PLOT
-    # generate one graph per threadcount for each blocksize
-    fig_Read2  = plot_configuration(
-      Read_Net_Thread_Blocksize, 
-      ["Nodes", "BW GB/s"], 
-      [Network, "Threads", "Block size"], 
-      lambda x: str(x), # just print threads with no formatting
-      sizeof_bytes,     # convert block size to KB/MB/TB etc
+    #-------------------------------------------------------------------
+    # PLOT x-axis{Nodes}, y-axis{BW}, 
+    # generate one graph per threadcount with series for each blocksize
+    fig_Read_Net_T_B_N  = plot_configuration(Read_Net_T_B_N, 
+      [Network, "Threads", "Block size"], ["Nodes", "BW GB/s"], 
+      lambda x: str(x), sizeof_bytes, lambda x,pos: str(x)
       )
-    graphs_to_save.append([fig_Read2,"Read-by-thread"])
+    graphs_to_save.append([fig_Read_Net_T_B_N,"fig_Read_Net_T_B_N"])
+    #-------------------------------------------------------------------
 
-    # PLOT
-    # generate one graph per node count for each blocksize
-    fig_Read3  = plot_configuration(
-      Read_Net_Nodes_Blocksize_T, 
-      ["Threads", "BW GB/s"], 
-      [Network, "Nodes", "Block size"], 
-      lambda x: str(x), # just print threads with no formatting
-      sizeof_bytes,     # convert block size to KB/MB/TB etc
+    #-------------------------------------------------------------------
+    # PLOT x-axis{Threads}, y-axis{BW},
+    # generate one graph per node count with series for each blocksize
+    fig_Read_Net_N_B_T  = plot_configuration(Read_Net_N_B_T, 
+      [Network, "Nodes", "Block size"], ["Threads", "BW GB/s"], 
+      lambda x: str(x), sizeof_bytes, lambda x,pos: str(x)
       )
-    graphs_to_save.append([fig_Read3,"Read-by-NodeBlock"])
+    graphs_to_save.append([fig_Read_Net_N_B_T,"fig_Read_Net_N_B_T"])
+    #
+    fig_Write_Net_N_B_T  = plot_configuration(Write_Net_N_B_T, 
+      [Network, "Nodes", "Block size"], ["Threads", "BW GB/s"], 
+      lambda x: str(x), sizeof_bytes, lambda x,pos: str(x)
+      )
+    graphs_to_save.append([fig_Write_Net_N_B_T,"fig_Write_Net_N_B_T"])
+    #-------------------------------------------------------------------
+
+    #-------------------------------------------------------------------
+    # PLOT x-axis{Blocksize}, y-axis{BW},
+    # generate one graph per node count with series for each threadcount
+    fig_Read_Net_N_T_B = plot_configuration(Read_Net_N_T_B, 
+      [Network, "Nodes", "Threads"], ["Block size", "BW GB/s"], 
+      lambda x: str(x), lambda x: str(x), lambda x,pos: sizeof_bytes(x)
+      )
+    graphs_to_save.append([fig_Read_Net_N_T_B,"fig_Read_Net_N_T_B"])
+    #
+    fig_Write_Net_N_T_B  = plot_configuration(Write_Net_N_T_B, 
+      [Network, "Nodes", "Threads"], ["Block size", "BW GB/s"], 
+      lambda x: str(x), lambda x: str(x), lambda x,pos: sizeof_bytes(x)
+      )
+    graphs_to_save.append([fig_Write_Net_N_T_B,"fig_Write_Net_N_T_B"])
+    #-------------------------------------------------------------------
 
     # save plots to png and svg    
     for fig in graphs_to_save:
@@ -338,5 +360,5 @@ for csvfile in args :
       png_name = base + "." + fig[1] + ".png"
       print "Writing %s and %s" % (svg_name, png_name)
       fig[0].savefig(svg_name)
-      fig[0].savefig(png_name)
+#      fig[0].savefig(png_name)
     

@@ -1,8 +1,11 @@
-message ("source dir is " ${SCRIPT_SOURCE_DIR})
-message ("dest dir is " ${SCRIPT_DEST_DIR})
+FILE(TO_NATIVE_PATH "${SCRIPT_SOURCE_DIR}/${SCRIPT_NAME}.sh.in" INFILE) 
+FILE(TO_NATIVE_PATH "${SCRIPT_DEST_DIR}/${SCRIPT_NAME}.sh" OUTFILE) 
+
+STRING(REPLACE "\"" "" FILE1 "${INFILE}")
+STRING(REPLACE "\"" "" FILE2 "${OUTFILE}")
 
 configure_file(
-  ${SCRIPT_SOURCE_DIR}/${SCRIPT_NAME}.sh.in 
-  ${SCRIPT_DEST_DIR}/${SCRIPT_NAME}.sh
+  "${FILE1}"
+  "${FILE2}"
   @ONLY
 )

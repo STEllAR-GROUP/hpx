@@ -67,10 +67,16 @@
 // them from the waiting list. The vars are used for this bookkeeping task.
 //
 #define MAX_RANKS 64
+
+//#define USE_CLEANING_THREAD
+
 std::vector<std::vector<hpx::future<int>>> ActiveFutures;
-hpx::lcos::local::spinlock                 FuturesMutex;
-boost::atomic<bool>                        FuturesActive;
 boost::array<boost::atomic<int>, 64>       FuturesWaiting;
+
+#ifdef USE_CLEANING_THREAD
+boost::atomic<bool>                        FuturesActive;
+hpx::lcos::local::spinlock                 FuturesMutex;
+#endif
 
 //----------------------------------------------------------------------------
 // Used at start and end of each loop for synchronization
@@ -294,6 +300,7 @@ namespace Storage {
 // normally these are in a header
 HPX_DEFINE_PLAIN_ACTION(Storage::CopyToStorage, CopyToStorage_action);
 HPX_REGISTER_PLAIN_ACTION_DECLARATION(CopyToStorage_action);
+HPX_ACTION_INVOKE_NO_MORE_THAN(CopyToStorage_action, 5);
 
 HPX_DEFINE_PLAIN_ACTION(Storage::CopyFromStorage, CopyFromStorage_action);
 HPX_REGISTER_PLAIN_ACTION_DECLARATION(CopyFromStorage_action);
@@ -304,6 +311,7 @@ HPX_REGISTER_PLAIN_ACTION(CopyToStorage_action);
 HPX_REGISTER_PLAIN_ACTION(CopyFromStorage_action);
 
 //----------------------------------------------------------------------------
+#ifdef USE_CLEANING_THREAD
 // the main message sending loop may generate many thousands of send requests
 // and each is associated with a future. To reduce the number we must wait on
 // this loop runs in a background thread and simply removes any completed futures
@@ -336,6 +344,7 @@ int RemoveCompletions()
     }
     return num_removed;
 }
+#endif
 
 //----------------------------------------------------------------------------
 // Take a vector of futures representing pass/fail and reduce to a single pass fail
@@ -391,16 +400,18 @@ void test_write(
     );
     //
     hpx::util::high_resolution_timer timerWrite;
-    //
+
     for(boost::uint64_t i = 0; i < options.iterations; i++) {
         DEBUG_OUTPUT(1,
             std::cout << "Starting iteration " << i << " on rank " << rank << std::endl;
         );
+#ifdef USE_CLEANING_THREAD
         //
         // start a thread which will clear any completed futures from our list.
         //
         FuturesActive = true;
         hpx::future<int> cleaner = hpx::async(RemoveCompletions);
+#endif
         //
         // Start main message sending loop
         //
@@ -414,6 +425,9 @@ void test_write(
             // pick a random slot to write our data into
             int memory_slot = random_slot(gen);
             uint32_t memory_offset = static_cast<uint32_t>(memory_slot*options.transfer_size_B);
+            DEBUG_OUTPUT(3,
+                std::cout << "Rank " << rank << " sending slot " << i << " to rank " << send_rank << std::endl;
+            );
 
             // Execute a PUT on whatever locality we chose
             // Create a serializable memory buffer ready for sending.
@@ -423,8 +437,10 @@ void test_write(
                 DEBUG_OUTPUT(5,
                     std::cout << "Put from rank " << rank << " on rank " << send_rank << std::endl;
                 );
+#ifdef USE_CLEANING_THREAD
                 ++FuturesWaiting[send_rank];
                 hpx::lcos::local::spinlock::scoped_lock lk(FuturesMutex);
+#endif
                 ActiveFutures[send_rank].push_back(
                     hpx::async(actWrite, locality,
                         TransferBuffer(static_cast<char*>(buffer),
@@ -440,6 +456,7 @@ void test_write(
                 );
             }
         }
+#ifdef USE_CLEANING_THREAD
         // tell the cleaning thread it's time to stop
         FuturesActive = false;
         // wait for cleanup thread to terminate before we reduce any remaining futures
@@ -447,6 +464,7 @@ void test_write(
         DEBUG_OUTPUT(2,
             std::cout << "Cleaning thread removed " << removed << std::endl;
         );
+#endif
         //
         std::vector<hpx::future<int>> final_list;
         for(uint64_t i = 0; i < nranks; i++) {
@@ -474,7 +492,7 @@ void test_write(
         std::cout << "IOPs/s             : " << IOPs_s    << "\n";
         std::cout << "Aggregate BW Write : " << writeBW   << "MB/s" << std::endl;
         // a complete set of results that our python matplotlib script will ingest
-        char const* msg = "CSVData, write, network, %1%, ranks, %2%, threads, %3%, Memory, %4%, IOPsize, %5%, IOPS/s, %6%, BW, %7%, ";
+        char const* msg = "CSVData, write, network, %1%, ranks, %2%, threads, %3%, Memory, %4%, IOPsize, %5%, IOPS/s, %6%, BW(MB/s), %7%, ";
         std::cout << (boost::format(msg) % options.network % nranks % options.threads % writeMB % options.transfer_size_B
           % IOPs_s % writeBW ) << std::endl;
     }
@@ -507,11 +525,13 @@ void test_read(
     hpx::util::high_resolution_timer timerRead;
     //
     for(boost::uint64_t i = 0; i < options.iterations; i++) {
+#ifdef USE_CLEANING_THREAD
         //
         // start a thread which will clear any completed futures from our list.
         //
         FuturesActive = true;
         hpx::future<int> cleaner = hpx::async(RemoveCompletions);
+#endif
         //
         // Start main message sending loop
         //
@@ -532,8 +552,10 @@ void test_read(
             // is performed directly into our user memory. This avoids the need
             // to copy the data from a serialization buffer into our memory
             {
+#ifdef USE_CLEANING_THREAD
                 ++FuturesWaiting[send_rank];
                 hpx::lcos::local::spinlock::scoped_lock lk(FuturesMutex);
+#endif
                 ActiveFutures[send_rank].push_back(
                     hpx::async(
                         actRead, locality, memory_offset, options.transfer_size_B,
@@ -552,6 +574,7 @@ void test_read(
                     );
             }
         }
+#ifdef USE_CLEANING_THREAD
         // tell the cleaning thread it's time to stop
         FuturesActive = false;
         // wait for cleanup thread to terminate before we reduce any remaining
@@ -560,6 +583,7 @@ void test_read(
         DEBUG_OUTPUT(2,
             std::cout << "Cleaning thread removed " << removed << std::endl;
         );
+#endif
         //
         std::vector<hpx::future<int>> final_list;
         for(uint64_t i = 0; i < nranks; i++) {
@@ -587,7 +611,7 @@ void test_read(
         std::cout << "IOPs/s             : " << IOPs_s    << "\n";
         std::cout << "Aggregate BW Read  : " << readBW << "MB/s" << std::endl;
         // a complete set of results that our python matplotlib script will ingest
-        char const* msg = "CSVData, read, network, %1%, ranks, %2%, threads, %3%, Memory, %4%, IOPsize, %5%, IOPS/s, %6%, BW, %7%, ";
+        char const* msg = "CSVData, read, network, %1%, ranks, %2%, threads, %3%, Memory, %4%, IOPsize, %5%, IOPS/s, %6%, BW(MB/s), %7%, ";
         std::cout << (boost::format(msg) % options.network % nranks % options.threads % readMB % options.transfer_size_B
           % IOPs_s % readBW ) << std::endl;
     }
@@ -658,6 +682,9 @@ int hpx_main(boost::program_options::variables_map& vm)
     allocate_local_storage(options.local_storage_MB*1024*1024);
     //
     uint64_t num_transfer_slots = 1024*1024*options.local_storage_MB / options.transfer_size_B;
+    DEBUG_OUTPUT(1,
+        std::cout << "num ranks " << nranks << ", num_transfer_slots " << num_transfer_slots << " on rank " << rank << std::endl;
+    );
     //
     std::random_device rd;
     std::mt19937 gen(rd());
