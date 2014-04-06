@@ -51,6 +51,8 @@ namespace hpx { namespace util
                             // ownership and manages the lifetime of it
         };
 
+        typedef T value_type;
+
         explicit serialize_buffer(allocator_type const& alloc = allocator_type())
           : size_(0)
           , alloc_(alloc)
@@ -124,6 +126,12 @@ namespace hpx { namespace util
                     util::bind(&serialize_buffer::deleter<Deallocator>, _1,
                         dealloc, size_));
             }
+        }
+
+        void take_buffer(T * data, std::size_t size)
+        {
+            size_ = size;
+            data_ = boost::shared_array<T>(data);
         }
 
         T* data() { return data_.get(); }
@@ -240,6 +248,8 @@ namespace hpx { namespace util
                             // ownership and manages the lifetime of it
          };
 
+        typedef T value_type;
+
         serialize_buffer()
           : size_(0)
         {}
@@ -269,6 +279,12 @@ namespace hpx { namespace util
                 // take ownership
                 data_ = boost::shared_array<T>(data);
             }
+        }
+
+        void take_buffer(T * data, std::size_t size)
+        {
+            size_ = size;
+            data_ = boost::shared_array<T>(data);
         }
 
         T* data() { return data_.get(); }

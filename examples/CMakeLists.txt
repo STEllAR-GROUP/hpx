@@ -18,6 +18,7 @@ set(subdirs
     jacobi
     jacobi_smp
     nqueen
+    mini_ghost
     performance_counters
     quickstart
     qt
