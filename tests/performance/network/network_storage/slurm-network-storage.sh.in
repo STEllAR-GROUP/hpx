@@ -16,6 +16,12 @@ JOB_NAME=$(printf 'hpx-N%04d-T%05d-t%02d-%s' ${NODES} ${TRANSFERSIZE} ${THREADS_
 DIR_NAME=$(printf 'hpx-N%04d-T%05d-t%02d-%s' ${NODES} ${TRANSFERSIZE} ${THREADS_PERTASK} ${PARCELTYPE})
 TASKS_PER_NODE=1
 
+if [ -d "$DIR_NAME" ]; then
+  # Directory already exists, skip generation of this job
+  echo "Exists already : Skipping $DIR_NAME"
+  return 1
+fi
+
 echo "Creating job $DIR_NAME"
 
 mkdir -p $DIR_NAME
@@ -45,13 +51,15 @@ export LD_LIBRARY_PATH=${LIB_PATH}:${LD_LIBRARY_PATH}
 export HDF5_PARAPREFIX=${BASEDIR}/${DIR_NAME}
 export BGLOCKLESSMPIO_F_TYPE=0x47504653
 export MV2_ALLTOALL_MEDIUM_MSG=524288
-export MpiDefault=none
-export MV2_IBA_HCA=roq
-export MV2_USE_RDMA_CM=1
-export MV2_USE_IWARP_MODE=1
-export MV2_ENABLE_AFFINITY=0
+#export MpiDefault=none
+#export MV2_IBA_HCA=roq
+#export MV2_USE_RDMA_CM=1
+#export MV2_USE_IWARP_MODE=1
+#export MV2_ENABLE_AFFINITY=0
+export LC_ALL="en_US.UTF-8"
 
-${MPIEXEC} -n $[${SERVERS_PERNODE} * $NODES] ${EXECUTABLE1} ${PROGRAM_PARAMS}
+#${MPIEXEC} -n $[${SERVERS_PERNODE} * $NODES] ${EXECUTABLE1} ${PROGRAM_PARAMS}
+srun -n $[${SERVERS_PERNODE} * $NODES] ${EXECUTABLE1} ${PROGRAM_PARAMS}
 
 _EOF_
 
@@ -77,29 +85,33 @@ chmod 775 run_jobs.bash
 # 
 #
 MPIEXEC="@MPIEXEC@"
-QUEUE=nvp0
+QUEUE=benchmark
 EXECUTABLE1=@EXE_PATH@
 LIB_PATH="@LIB_PATH@"
 JOB_OPTIONS1="@JOB_OPTIONS1@"
 MEMPERNODE=
-TIME="02:00:00"
+TIME="00:05:00"
 CLIENTS_PERNODE=0
 SERVERS_PERNODE=1
 
 # Loop through all the parameter combinations generating jobs for each
 # "tcp" "mpi" "ibverbs"
-for NODES in 1 2 4 8 16
+for NODES in 1 2 3 4 6 8 12 16 32
 do
-  for PARCELTYPE in "mpi"
+  for PARCELTYPE in "mpi" "ibverbs"
   do
-    for TRANSFERSIZE in 1024 2048 4096 8192 16384
+    if [ "$PARCELTYPE" != "tcp" ]; then 
+      TCP_ENABLE="-Ihpx.parcel.tcp.enable=0 -Ihpx.parcel.bootstrap=mpi"
+    else
+      TCP_ENABLE=""    
+    fi
+    for TRANSFERSIZE in 128 256 512 1024 2048 4096 8192 16384
     do
-      for THREADS_PERTASK in 2 4 8
+      for THREADS_PERTASK in 1 2 4 8 16
       do
         LOCAL_SIZE=$(printf "%.0f" $( bc <<< "scale=6;(128 * $TRANSFERSIZE * $THREADS_PERTASK)/1024" ))
         LOCAL_SIZE=$(echo $((LOCAL_SIZE>512?512:LOCAL_SIZE)))
-        PROGRAM_PARAMS="--hpx:run-hpx-main -Ihpx.parcel.${PARCELTYPE}.enable=1 --hpx:threads=${THREADS_PERTASK} --hpx:bind=balanced " \
-                       "--localMB=${LOCAL_SIZE} --transferKB=${TRANSFERSIZE} --parceltype=${PARCELTYPE} "
+        PROGRAM_PARAMS="-Ihpx.parcel.${PARCELTYPE}.enable=1 $TCP_ENABLE --hpx:threads=${THREADS_PERTASK} --hpx:bind=balanced --localMB=${LOCAL_SIZE} --transferKB=${TRANSFERSIZE} --parceltype=${PARCELTYPE} --distribution=1 --all-to-all=1 --iterations=10"
         write_script
       done
     done
