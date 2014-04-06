@@ -68,7 +68,7 @@
 //
 #define MAX_RANKS 64
 
-//#define USE_CLEANING_THREAD
+#define USE_CLEANING_THREAD
 
 std::vector<std::vector<hpx::future<int>>> ActiveFutures;
 boost::array<boost::atomic<int>, 64>       FuturesWaiting;
@@ -95,6 +95,8 @@ typedef struct {
     boost::uint64_t transfer_size_B;
     boost::uint64_t threads;
     std::string     network;
+    bool            all2all;
+    bool            distribution;
 } test_options;
 
 //----------------------------------------------------------------------------
@@ -300,7 +302,7 @@ namespace Storage {
 // normally these are in a header
 HPX_DEFINE_PLAIN_ACTION(Storage::CopyToStorage, CopyToStorage_action);
 HPX_REGISTER_PLAIN_ACTION_DECLARATION(CopyToStorage_action);
-HPX_ACTION_INVOKE_NO_MORE_THAN(CopyToStorage_action, 5);
+//HPX_ACTION_INVOKE_NO_MORE_THAN(CopyToStorage_action, 5);
 
 HPX_DEFINE_PLAIN_ACTION(Storage::CopyFromStorage, CopyFromStorage_action);
 HPX_REGISTER_PLAIN_ACTION_DECLARATION(CopyFromStorage_action);
@@ -401,7 +403,8 @@ void test_write(
     //
     hpx::util::high_resolution_timer timerWrite;
 
-    for(boost::uint64_t i = 0; i < options.iterations; i++) {
+    bool active = (rank==0) | (rank>0 && options.all2all);
+    for(boost::uint64_t i = 0; active && i < options.iterations; i++) {
         DEBUG_OUTPUT(1,
             std::cout << "Starting iteration " << i << " on rank " << rank << std::endl;
         );
@@ -416,8 +419,15 @@ void test_write(
         // Start main message sending loop
         //
         for(uint64_t i = 0; i < num_transfer_slots; i++) {
-            // pick a random locality to send to
-            int send_rank = random_rank(gen);
+            hpx::util::high_resolution_timer looptimer;
+            int send_rank;
+            if(options.distribution==0) {
+              // pick a random locality to send to
+              send_rank = random_rank(gen);
+            }
+            else {
+              send_rank = i % nranks;
+            }
             // get the pointer to the current packet send buffer
             char *buffer = &local_storage[i*options.transfer_size_B];
             // Get the HPX locality from the dest rank
@@ -425,8 +435,8 @@ void test_write(
             // pick a random slot to write our data into
             int memory_slot = random_slot(gen);
             uint32_t memory_offset = static_cast<uint32_t>(memory_slot*options.transfer_size_B);
-            DEBUG_OUTPUT(3,
-                std::cout << "Rank " << rank << " sending slot " << i << " to rank " << send_rank << std::endl;
+            DEBUG_OUTPUT(5,
+                std::cout << "Rank " << rank << " sending block " << i << " to rank " << send_rank << std::endl;
             );
 
             // Execute a PUT on whatever locality we chose
@@ -455,17 +465,22 @@ void test_write(
                         })
                 );
             }
+            DEBUG_OUTPUT(5,
+                std::cout << "Loop timer " << looptimer.elapsed() << std::endl;
+            );
         }
+        int removed = 0;
 #ifdef USE_CLEANING_THREAD
         // tell the cleaning thread it's time to stop
         FuturesActive = false;
         // wait for cleanup thread to terminate before we reduce any remaining futures
-        int removed = cleaner.get();
+        removed = cleaner.get();
         DEBUG_OUTPUT(2,
-            std::cout << "Cleaning thread removed " << removed << std::endl;
+            std::cout << "Cleaning thread rank " << rank << " removed " << removed << std::endl;
         );
 #endif
         //
+        hpx::util::high_resolution_timer movetimer;
         std::vector<hpx::future<int>> final_list;
         for(uint64_t i = 0; i < nranks; i++) {
             // move the contents of intermediate vector into final list
@@ -474,9 +489,17 @@ void test_write(
                 std::back_inserter(final_list));
             ActiveFutures[i].clear();
         }
-
+        double movetime = movetimer.elapsed();
+        //
+        int numwait = final_list.size();
+        hpx::util::high_resolution_timer futuretimer;
         hpx::future<int> result = when_all(final_list).then(hpx::launch::sync, reduce);
         result.get();
+        int total = numwait+removed;
+        DEBUG_OUTPUT(3,
+            std::cout << "Future timer, rank " << rank << " waiting on " << numwait << " total " << total << " "
+            << futuretimer.elapsed() << " Move time " << movetime << std::endl;
+        );
     }
     barrier_wait();
     //
@@ -524,7 +547,11 @@ void test_read(
     //
     hpx::util::high_resolution_timer timerRead;
     //
-    for(boost::uint64_t i = 0; i < options.iterations; i++) {
+    bool active = (rank==0) || (rank>0 && options.all2all);
+    for(boost::uint64_t i = 0; active && i < options.iterations; i++) {
+      DEBUG_OUTPUT(1,
+          std::cout << "Starting iteration " << i << " on rank " << rank << std::endl;
+      );
 #ifdef USE_CLEANING_THREAD
         //
         // start a thread which will clear any completed futures from our list.
@@ -536,8 +563,15 @@ void test_read(
         // Start main message sending loop
         //
         for(uint64_t i = 0; i < num_transfer_slots; i++) {
-            // pick a random locality to send to
-            int send_rank = random_rank(gen);
+            hpx::util::high_resolution_timer looptimer;
+            int send_rank;
+            if(options.distribution==0) {
+              // pick a random locality to send to
+              send_rank = random_rank(gen);
+            }
+            else {
+              send_rank = i % nranks;
+            }
             // get the pointer to the current packet send buffer
             char *buffer = &local_storage[i*options.transfer_size_B];
             // Get the HPX locality from the dest rank
@@ -581,10 +615,11 @@ void test_read(
         // futures
         int removed = cleaner.get();
         DEBUG_OUTPUT(2,
-            std::cout << "Cleaning thread removed " << removed << std::endl;
+            std::cout << "Cleaning thread rank " << rank << " removed " << removed << std::endl;
         );
 #endif
         //
+        hpx::util::high_resolution_timer movetimer;
         std::vector<hpx::future<int>> final_list;
         for(uint64_t i = 0; i < nranks; i++) {
             // move the contents of intermediate vector into final list
@@ -593,9 +628,17 @@ void test_read(
                 std::back_inserter(final_list));
             ActiveFutures[i].clear();
         }
-
+        double movetime = movetimer.elapsed();
+        //
+        int numwait = final_list.size();
+        hpx::util::high_resolution_timer futuretimer;
         hpx::future<int> result = when_all(final_list).then(hpx::launch::sync, reduce);
         result.get();
+        int total = numwait+removed;
+        DEBUG_OUTPUT(3,
+            std::cout << "Future timer, rank " << rank << " waiting on " << numwait << " total " << total << " "
+            << futuretimer.elapsed() << " Move time " << movetime << std::endl;
+        );
     }
     barrier_wait();
     //
@@ -674,6 +717,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     options.iterations        = vm["iterations"].as<boost::uint64_t>();
     options.threads           = hpx::get_os_thread_count();
     options.network           = vm["parceltype"].as<std::string>();
+    options.all2all           = vm["all-to-all"].as<bool>();
+    options.distribution      = vm["distribution"].as<boost::uint64_t>();
 
     //
     if (options.global_storage_MB>0) {
@@ -753,6 +798,12 @@ int main(int argc, char* argv[])
           "The number of iterations over the global memory.\n")
         ;
 
+    desc_commandline.add_options()
+        ( "all-to-all",
+          boost::program_options::value<bool>()->default_value(true),
+          "When set, all ranks send to all others, when off, only rank 0 send to the others.\n")
+        ;
+
     // if the user does not set parceltype on the command line, 
     // we use a default of unknowm so we don't mistake plots
     desc_commandline.add_options()
@@ -765,8 +816,10 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ( "distribution",
-          boost::program_options::value<boost::uint64_t>()->default_value(5),
-          "Specify the distribution of data blocks to send/receive\n"
+          boost::program_options::value<boost::uint64_t>()->default_value(1),
+          "Specify the distribution of data blocks to send/receive,\n"
+          "in random mode, blocks of data are sent from one rank to any other rank (including itself),"
+          "in block-cyclic mode, blocks of data are sent from one rank to other ranks in block-cyclic order,"
           "0 : random \n"
           "1 : block cyclic")
         ;
@@ -787,4 +840,5 @@ int main(int argc, char* argv[])
 
     return hpx::init(desc_commandline, argc, argv, cfg);
 }
+
 
