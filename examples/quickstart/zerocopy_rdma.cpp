@@ -79,8 +79,7 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 // Buffer object used on the client side to specify where to place the received
 // data
-typedef hpx::util::serialize_buffer<double>
-    receive_buffer_type;
+typedef hpx::util::serialize_buffer<double> general_buffer_type;
 
 // Buffer object used for sending the data back to the receiver.
 typedef hpx::util::serialize_buffer<double, pointer_allocator<double> >
@@ -91,7 +90,7 @@ struct zerocopy_server
   : hpx::components::managed_component_base<zerocopy_server>
 {
 private:
-    void release_transfer_buffer(double* d)
+    void release_lock()
     {
         // all we need to do is to unlock the data
         mtx_.unlock();
@@ -103,24 +102,37 @@ public:
     {
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // Retrieve an array of doubles to the given address
     transfer_buffer_type get_here(std::size_t size, std::size_t remote_buffer)
     {
         pointer_allocator<double> allocator(
             reinterpret_cast<double*>(remote_buffer), size);
 
-        // lock the mutex, will be unlock by the transfer buffer's deleter
+        // lock the mutex, will be unlocked by the transfer buffer's deleter
         mtx_.lock();
 
         // we use our data directly without copying
-        using hpx::util::placeholders::_1;
         return transfer_buffer_type(data_.data(), size,
             transfer_buffer_type::reference,
-            hpx::util::bind(
-                &zerocopy_server::release_transfer_buffer, this, _1
-            ));
+            hpx::util::bind(&zerocopy_server::release_lock, this),
+            allocator);
     }
-
     HPX_DEFINE_COMPONENT_CONST_ACTION(zerocopy_server, get_here, get_here_action);
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Retrieve an array of doubles
+    general_buffer_type get(std::size_t size)
+    {
+        // lock the mutex, will be unlocked by the transfer buffer's deleter
+        mtx_.lock();
+
+        // we use our data directly without copying
+        return general_buffer_type(data_.data(), size,
+            general_buffer_type::reference,
+            hpx::util::bind(&zerocopy_server::release_lock, this));
+    }
+    HPX_DEFINE_COMPONENT_CONST_ACTION(zerocopy_server, get, get_action);
 
 private:
     std::vector<double> data_;
@@ -134,6 +146,11 @@ typedef zerocopy_server::get_here_action zerocopy_get_here_action;
 HPX_REGISTER_ACTION_DECLARATION(zerocopy_get_here_action);
 HPX_REGISTER_ACTION(zerocopy_get_here_action);
 
+typedef zerocopy_server::get_action zerocopy_get_action;
+HPX_REGISTER_ACTION_DECLARATION(zerocopy_get_action);
+HPX_REGISTER_ACTION(zerocopy_get_action);
+
+///////////////////////////////////////////////////////////////////////////////
 struct zerocopy
   : hpx::components::client_base<
         zerocopy, hpx::components::stub_base<zerocopy_server> >
@@ -141,7 +158,7 @@ struct zerocopy
 private:
     // Copy he data once into the destination buffer if the get() operation was
     // entirely local (no data copies have been made so far).
-    static void transfer_data(receive_buffer_type recv,
+    static void transfer_data(general_buffer_type recv,
         hpx::future<transfer_buffer_type> f)
     {
         transfer_buffer_type buffer(f.get());
@@ -160,7 +177,8 @@ public:
       : base_type(std::move(fid))
     {}
 
-    hpx::future<void> get(receive_buffer_type& buff) const
+    //
+    hpx::future<void> get_here(general_buffer_type& buff) const
     {
         zerocopy_get_here_action act;
 
@@ -169,38 +187,59 @@ public:
         return hpx::async(act, this->get_gid(), buff.size(), buffer_address)
             .then(hpx::util::bind(&zerocopy::transfer_data, buff, _1));
     }
-    void get_sync(receive_buffer_type& buff) const
+    void get_here_sync(general_buffer_type& buff) const
     {
-        get(buff).get();
+        get_here(buff).get();
+    }
+
+    //
+    hpx::future<general_buffer_type> get(std::size_t size) const
+    {
+        zerocopy_get_action act;
+        return hpx::async(act, this->get_gid(), size);
+    }
+    general_buffer_type get_sync(std::size_t size) const
+    {
+        return get(size).get();
     }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-//     std::vector<hpx::id_type> localities = hpx::find_remote_localities();
+    std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
-//     BOOST_FOREACH(hpx::id_type id, localities)
-//     {
+    BOOST_FOREACH(hpx::id_type id, localities)
+    {
+        zerocopy zc = hpx::new_<zerocopy_server>(id, ZEROCOPY_DATASIZE);
 
-    hpx::id_type id = hpx::find_here();
+        general_buffer_type buffer(new double[ZEROCOPY_DATASIZE],
+            ZEROCOPY_DATASIZE, general_buffer_type::take);
 
-    zerocopy zc = hpx::new_<zerocopy_server>(id, ZEROCOPY_DATASIZE);
+        {
+            hpx::util::high_resolution_timer t;
 
-    receive_buffer_type buffer(new double[ZEROCOPY_DATASIZE],
-        ZEROCOPY_DATASIZE, receive_buffer_type::take);
+            for (int i = 0; i != 100; ++i)
+                zc.get_sync(ZEROCOPY_DATASIZE);
 
-    hpx::util::high_resolution_timer t;
+            double d = t.elapsed();
+            std::cout << "Elapsed time 'get' (locality "
+                        << hpx::naming::get_locality_id_from_id(id)
+                        << "): " << d << "[s]\n";
+        }
 
-    for (int i = 0; i != 100; ++i)
-        zc.get_sync(buffer);
+        {
+            hpx::util::high_resolution_timer t;
 
-    double d = t.elapsed();
-    std::cout << "Elapsed time (locality "
-                << hpx::naming::get_locality_from_id(id)
-                << "): " << d << "[s]\n";
+            for (int i = 0; i != 100; ++i)
+                zc.get_here_sync(buffer);
 
-//     }
+            double d = t.elapsed();
+            std::cout << "Elapsed time 'get_here' (locality "
+                        << hpx::naming::get_locality_id_from_id(id)
+                        << "): " << d << "[s]\n";
+        }
+    }
 
     return 0;
 }
