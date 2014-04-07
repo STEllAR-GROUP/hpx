@@ -1,4 +1,4 @@
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2013-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -67,8 +67,8 @@ namespace hpx { namespace util
             // create from const data implies 'copy' mode
             using util::placeholders::_1;
             data_.reset(alloc_.allocate(size),
-                util::bind(&serialize_buffer::deleter<allocator_type>, _1,
-                    alloc_, size_));
+                util::bind(&serialize_buffer::deleter<allocator_type>,
+                    _1, alloc_, size_));
             if (size != 0)
                 std::copy(data, data + size, data_.get());
         }
@@ -82,8 +82,8 @@ namespace hpx { namespace util
             if (mode == copy) {
                 using util::placeholders::_1;
                 data_.reset(alloc_.allocate(size),
-                    util::bind(&serialize_buffer::deleter<allocator_type>, _1,
-                        alloc_, size_));
+                    util::bind(&serialize_buffer::deleter<allocator_type>,
+                        _1, alloc_, size_));
                 if (size != 0)
                     std::copy(data, data + size, data_.get());
             }
@@ -95,8 +95,8 @@ namespace hpx { namespace util
                 // take ownership
                 using util::placeholders::_1;
                 data_ = boost::shared_array<T>(data,
-                    util::bind(&serialize_buffer::deleter<allocator_type>, _1,
-                        alloc_, size_));
+                    util::bind(&serialize_buffer::deleter<allocator_type>,
+                        _1, alloc_, size_));
             }
         }
 
@@ -110,14 +110,59 @@ namespace hpx { namespace util
             // if 2 allocators are specified we assume mode 'take'
             using util::placeholders::_1;
             data_ = boost::shared_array<T>(data,
-                util::bind(&serialize_buffer::deleter<Deallocator>, _1,
-                    dealloc, size_));
+                util::bind(&serialize_buffer::deleter<Deallocator>,
+                    _1, dealloc, size_));
         }
 
-        void take_buffer(T * data, std::size_t size)
+        // same set of constructors, but in addition taking a deleter
+        template <typename Deleter>
+        serialize_buffer (T const* data, std::size_t size,
+                Deleter const& deleter,
+                allocator_type const& alloc = allocator_type())
+          : data_()
+          , size_(size)
+          , alloc_(alloc)
         {
-            size_ = size;
-            data_ = boost::shared_array<T>(data);
+            // create from const data implies 'copy' mode
+            using util::placeholders::_1;
+            data_.reset(alloc_.allocate(size), deleter);
+            if (size != 0)
+                std::copy(data, data + size, data_.get());
+        }
+
+        template <typename Deleter>
+        serialize_buffer (T* data, std::size_t size, init_mode mode,
+                Deleter const& deleter,
+                allocator_type const& alloc = allocator_type())
+          : data_()
+          , size_(size)
+          , alloc_(alloc)
+        {
+            if (mode == copy) {
+                using util::placeholders::_1;
+                data_.reset(alloc_.allocate(size), deleter);
+                if (size != 0)
+                    std::copy(data, data + size, data_.get());
+            }
+            else {
+                // reference or take ownership, behavior is defined by deleter
+                using util::placeholders::_1;
+                data_ = boost::shared_array<T>(data, deleter);
+            }
+        }
+
+        // Deleter needs to use deallocator
+        template <typename Deallocator, typename Deleter>
+        serialize_buffer (T* data, std::size_t size,
+                allocator_type const& alloc, Deallocator const& dealloc,
+                Deleter const& deleter)
+          : data_()
+          , size_(size)
+          , alloc_(alloc)
+        {
+            // if 2 allocators are specified we assume mode 'take'
+            using util::placeholders::_1;
+            data_ = boost::shared_array<T>(data, deleter);
         }
 
         T* data() { return data_.get(); }
@@ -267,10 +312,32 @@ namespace hpx { namespace util
             }
         }
 
-        void take_buffer(T * data, std::size_t size)
+        // same set of constructors, but in addition taking a deleter
+        template <typename Deleter>
+        serialize_buffer (T const* data, std::size_t size,
+                Deleter const& deleter)
+          : data_(), size_(size)
         {
-            size_ = size;
-            data_ = boost::shared_array<T>(data);
+            // create from const data implies 'copy' mode
+            data_.reset(new T[size], deleter);
+            if (size != 0)
+                std::copy(data, data + size, data_.get());
+        }
+
+        template <typename Deleter>
+        serialize_buffer (T* data, std::size_t size, init_mode mode,
+                Deleter const& deleter)
+          : data_(), size_(size)
+        {
+            if (mode == copy) {
+                data_.reset(new T[size], deleter);
+                if (size != 0)
+                    std::copy(data, data + size, data_.get());
+            }
+            else {
+                // reference or take ownership, behavior is defined by deleter
+                data_ = boost::shared_array<T>(data, deleter);
+            }
         }
 
         T* data() { return data_.get(); }
@@ -371,17 +438,19 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for streaming with util::any, we don't want
     // util::serialize_buffer to be streamable
-    template <typename T>
-    struct supports_streaming_with_any<util::serialize_buffer<T> >
+    template <typename T, typename Allocator>
+    struct supports_streaming_with_any<util::serialize_buffer<T, Allocator> >
       : boost::mpl::false_
     {};
 
-    template <typename T>
-    struct type_size<util::serialize_buffer<T> >
+    ///////////////////////////////////////////////////////////////////////////
+    // Calculate the required amount of raw memory for serialization.
+    template <typename T, typename Allocator>
+    struct type_size<util::serialize_buffer<T, Allocator> >
     {
-        static std::size_t call(util::serialize_buffer<T> const& buffer_)
+        static std::size_t call(util::serialize_buffer<T, Allocator> const& b)
         {
-            return buffer_.size() * sizeof(T);
+            return b.size() * sizeof(T) + sizeof(std::size_t) + sizeof(Allocator);
         }
     };
 }}
