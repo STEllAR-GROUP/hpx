@@ -634,16 +634,19 @@ namespace hpx { namespace lcos
     private:
         struct invalidate
         {
-            explicit invalidate(future& f)
-              : f_(f)
+            explicit invalidate(future& f, bool reset_data = false)
+              : f_(f), reset_data_(reset_data)
             {}
 
             ~invalidate()
             {
+                if (reset_data_)
+                    f_.shared_state_->reset();
                 f_.shared_state_ = 0;
             }
 
             future& f_;
+            bool reset_data_;
         };
 
     private:
@@ -746,7 +749,7 @@ namespace hpx { namespace lcos
                     "this future has no valid shared state");
             }
 
-            invalidate on_exit(*this);
+            invalidate on_exit(*this, true);
 
             typedef typename shared_state_type::data_type data_type;
             data_type& data = this->shared_state_->get_result();
@@ -764,7 +767,7 @@ namespace hpx { namespace lcos
                 return detail::future_value<R>::get_default();
             }
 
-            invalidate on_exit(*this);
+            invalidate on_exit(*this, true);
 
             typedef typename shared_state_type::data_type data_type;
             data_type& data = this->shared_state_->get_result(ec);
@@ -815,6 +818,23 @@ namespace hpx { namespace lcos
         using base_type::wait_for;
         using base_type::wait_until;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        template <typename R>
+        void convert_to_future_void(future<R> f)
+        {
+            shared_future<R>(std::move(f)).get()
+        }
+    }
+
+    // allow to convert any future into a future<void>
+    template <typename R>
+    future<void> make_future_void(future<R> f)
+    {
+        return f.then(&detail::convert_to_future_void<R>);
+    }
 }}
 
 HPX_REGISTER_TYPED_CONTINUATION_DECLARATION(
@@ -979,6 +999,23 @@ namespace hpx { namespace lcos
         using base_type::wait_for;
         using base_type::wait_until;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        template <typename R>
+        void convert_to_shared_future_void(shared_future<R> f)
+        {
+            f.get()
+        }
+    }
+
+    // allow to convert any future into a future<void>
+    template <typename R>
+    shared_future<void> make_future_void(shared_future<R> f)
+    {
+        return f.then(&detail::convert_to_shared_future_void<R>);
+    }
 }}
 
 HPX_REGISTER_TYPED_CONTINUATION_DECLARATION(

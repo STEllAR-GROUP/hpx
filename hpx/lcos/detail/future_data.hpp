@@ -285,6 +285,10 @@ namespace detail
         {
             typename mutex_type::scoped_lock l(this->mtx_);
             state_ = empty;
+
+            // release any stored data and callback functions
+            data_ = data_type();
+            on_completed_ = completed_callback_type();
         }
 
         // continuation support
@@ -418,7 +422,7 @@ namespace detail
 
     protected:
         mutable mutex_type mtx_;
-        data_type data_;                      // protected data
+        data_type data_;                            // protected data
         completed_callback_type on_completed_;
 
     private:
