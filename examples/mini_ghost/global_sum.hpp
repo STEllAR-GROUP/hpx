@@ -16,6 +16,15 @@ namespace mini_ghost {
         typedef hpx::lcos::local::spinlock mutex_type;
 
     public:
+        global_sum()
+          : value_()
+        {
+        }
+        global_sum(global_sum const& rhs)
+          : value_(rhs.value_)
+        {
+        }
+
         hpx::future<T> add(std::size_t n, std::size_t & generation)
         {
             generation = 0;

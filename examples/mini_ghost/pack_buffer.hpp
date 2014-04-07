@@ -20,7 +20,7 @@ namespace mini_ghost {
         static void call(grid<Real> const & g, BufferType & buffer)
         {
             Real * data = new Real[g.nx_ * g.nz_];
-            buffer.take_buffer(data, g.nx_ * g.nz_);
+            buffer = BufferType(data, g.nx_ * g.nz_, BufferType::take);
             typename BufferType::value_type * src = buffer.data();
             for(std::size_t z = 0; z != g.nz_; ++z)
             {
@@ -40,7 +40,7 @@ namespace mini_ghost {
         static void call(grid<Real> const & g, BufferType & buffer)
         {
             Real * data = new Real[g.nx_ * g.nz_];
-            buffer.take_buffer(data, g.nx_ * g.nz_);
+            buffer = BufferType(data, g.nx_ * g.nz_, BufferType::take);
             typename BufferType::value_type * src = buffer.data();
             for(std::size_t z = 0; z != g.nz_; ++z)
             {
@@ -60,7 +60,7 @@ namespace mini_ghost {
         static void call(grid<Real> const & g, BufferType & buffer)
         {
             Real * data = new Real[g.ny_ * g.nz_];
-            buffer.take_buffer(data, g.ny_ * g.nz_);
+            buffer = BufferType(data, g.ny_ * g.nz_, BufferType::take);
             typename BufferType::value_type * src = buffer.data();
             for(std::size_t z = 0; z != g.nz_; ++z)
             {
@@ -80,7 +80,7 @@ namespace mini_ghost {
         static void call(grid<Real> const & g, BufferType & buffer)
         {
             Real * data = new Real[g.ny_ * g.nz_];
-            buffer.take_buffer(data, g.ny_ * g.nz_);
+            buffer = BufferType(data, g.ny_ * g.nz_, BufferType::take);
             typename BufferType::value_type * src = buffer.data();
             for(std::size_t z = 0; z != g.nz_; ++z)
             {
@@ -100,7 +100,7 @@ namespace mini_ghost {
         static void call(grid<Real> const & g, BufferType & buffer)
         {
             Real * data = new Real[g.nx_ * g.ny_];
-            buffer.take_buffer(data, g.nx_ * g.ny_);
+            buffer = BufferType(data, g.nx_ * g.ny_, BufferType::take);
             typename BufferType::value_type * src = buffer.data();
             for(std::size_t y = 0; y != g.ny_; ++y)
             {
@@ -120,7 +120,7 @@ namespace mini_ghost {
         static void call(grid<Real> const & g, BufferType & buffer)
         {
             Real * data = new Real[g.nx_ * g.ny_];
-            buffer.take_buffer(data, g.nx_ * g.ny_);
+            buffer = BufferType(data, g.nx_ * g.ny_, BufferType::take);
             typename BufferType::value_type * src = buffer.data();
             for(std::size_t y = 0; y != g.ny_; ++y)
             {

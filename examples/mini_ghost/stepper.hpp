@@ -14,6 +14,8 @@
 
 #include <hpx/include/components.hpp>
 
+#include <random>
+
 namespace mini_ghost {
     template <typename Real>
     struct stepper

@@ -34,6 +34,11 @@ namespace mini_ghost {
           , send_future_(hpx::make_ready_future())
         {}
 
+        send_buffer(send_buffer && rhs)
+          : dest_(std::move(rhs.dest_))
+          , send_future_(std::move(rhs.send_future_))
+        {}
+
         void operator()(grid<value_type> const & g, std::size_t step, std::size_t var)
         {
             if(dest_)

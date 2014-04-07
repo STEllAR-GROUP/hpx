@@ -51,13 +51,13 @@ namespace mini_ghost {
                     for(std::size_t x = 1; x != dst.nx_-1; ++x)
                     {
                         dst(x, y, z)
-                            = (
+                            = float((
                                 src(x-1, y, z)
                               + src(x, y-1, z)
                               + src(x, y, z)
                               + src(x+1, y, z)
                               + src(x, y+1, z)
-                            )/ 5.0;
+                            )/ 5.0);
                     }
                 }
             }
@@ -77,7 +77,7 @@ namespace mini_ghost {
                     for(std::size_t x = 1; x != dst.nx_-1; ++x)
                     {
                         dst(x, y, z)
-                            = (
+                            = float((
                                 src(x-1, y-1, z)
                               + src(x-1, y, z)
                               + src(x-1, y+1, z)
@@ -87,7 +87,7 @@ namespace mini_ghost {
                               + src(x+1, y-1, z)
                               + src(x+1, y, z)
                               + src(x+1, y+1, z)
-                            )/ 9.0;
+                            )/ 9.0);
                     }
                 }
             }
@@ -107,7 +107,7 @@ namespace mini_ghost {
                     for(std::size_t x = 1; x != dst.nx_-1; ++x)
                     {
                         dst(x, y, z)
-                            = (
+                            = float((
                                 src(x, y, z-1)
                               + src(x-1, y, z)
                               + src(x, y-1, z)
@@ -115,7 +115,7 @@ namespace mini_ghost {
                               + src(x+1, y, z)
                               + src(x, y+1, z)
                               + src(x, y, z+1)
-                            )/ 7.0;
+                            )/ 7.0);
 
                     }
                 }
@@ -136,7 +136,7 @@ namespace mini_ghost {
                     for(std::size_t x = 1; x != dst.nx_-1; ++x)
                     {
                         dst(x, y, z)
-                            = (
+                            = float((
                                 src(x-1, y-1, z-1)
                               + src(x-1, y-1, z)
                               + src(x-1, y-1, z+1)
@@ -164,7 +164,7 @@ namespace mini_ghost {
                               + src(x+1, y+1, z-1)
                               + src(x+1, y+1, z)
                               + src(x+1, y+1, z+1)
-                            )/ 27.0;
+                            )/ 27.0);
 
                     }
                 }

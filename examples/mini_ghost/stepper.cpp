@@ -529,16 +529,16 @@ namespace mini_ghost {
         switch (stencil)
         {
             case STENCIL_2D5PT:
-                divisor = 1.0/5.0;
+                divisor = 1.0f/5.0f;
                 break;
             case STENCIL_2D9PT:
-                divisor = 1.0/9.0;
+                divisor = 1.0f/9.0f;
                 break;
             case STENCIL_3D7PT:
-                divisor = 1.0/7.0;
+                divisor = 1.0f/7.0f;
                 break;
             case STENCIL_3D27PT:
-                divisor = 1.0/27.0;
+                divisor = 1.0f/27.0f;
                 break;
         }
 
