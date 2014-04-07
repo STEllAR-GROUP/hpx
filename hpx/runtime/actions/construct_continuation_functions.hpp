@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -26,7 +26,7 @@
 
 #define HPX_ACTION_DIRECT_ARGUMENT(z, n, data)                                \
     BOOST_PP_COMMA_IF(n)                                                      \
-    util::get<n>(std::forward<Arguments_>(data))                            \
+    util::get<n>(std::forward<Arguments_>(data))                              \
     /**/
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
@@ -112,7 +112,7 @@
     static HPX_STD_FUNCTION<threads::thread_function_type>
     construct_continuation_thread_object_function_void(
         continuation_type cont,
-        void (Object::* func)(BOOST_PP_ENUM_PARAMS(N, FArg)), Object* obj,
+        void (Object::* func)(BOOST_PP_ENUM_PARAMS(N, FArg)), Component* obj,
         Arguments_ && args)
     {
         return util::bind(util::one_shot(

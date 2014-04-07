@@ -62,7 +62,7 @@
     static HPX_STD_FUNCTION<threads::thread_function_type>
     construct_continuation_thread_object_function_void(
         continuation_type cont,
-        void (Object::* func)(), Object* obj,
+        void (Object::* func)(), Component* obj,
         Arguments_ && args)
     {
         return util::bind(util::one_shot(
@@ -217,7 +217,7 @@
     static HPX_STD_FUNCTION<threads::thread_function_type>
     construct_continuation_thread_object_function_void(
         continuation_type cont,
-        void (Object::* func)(FArg0), Object* obj,
+        void (Object::* func)(FArg0), Component* obj,
         Arguments_ && args)
     {
         return util::bind(util::one_shot(
@@ -372,7 +372,7 @@
     static HPX_STD_FUNCTION<threads::thread_function_type>
     construct_continuation_thread_object_function_void(
         continuation_type cont,
-        void (Object::* func)(FArg0 , FArg1), Object* obj,
+        void (Object::* func)(FArg0 , FArg1), Component* obj,
         Arguments_ && args)
     {
         return util::bind(util::one_shot(
@@ -527,7 +527,7 @@
     static HPX_STD_FUNCTION<threads::thread_function_type>
     construct_continuation_thread_object_function_void(
         continuation_type cont,
-        void (Object::* func)(FArg0 , FArg1 , FArg2), Object* obj,
+        void (Object::* func)(FArg0 , FArg1 , FArg2), Component* obj,
         Arguments_ && args)
     {
         return util::bind(util::one_shot(
@@ -682,7 +682,7 @@
     static HPX_STD_FUNCTION<threads::thread_function_type>
     construct_continuation_thread_object_function_void(
         continuation_type cont,
-        void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3), Object* obj,
+        void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3), Component* obj,
         Arguments_ && args)
     {
         return util::bind(util::one_shot(
@@ -837,7 +837,7 @@
     static HPX_STD_FUNCTION<threads::thread_function_type>
     construct_continuation_thread_object_function_void(
         continuation_type cont,
-        void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4), Object* obj,
+        void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4), Component* obj,
         Arguments_ && args)
     {
         return util::bind(util::one_shot(
@@ -992,7 +992,7 @@
     static HPX_STD_FUNCTION<threads::thread_function_type>
     construct_continuation_thread_object_function_void(
         continuation_type cont,
-        void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5), Object* obj,
+        void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5), Component* obj,
         Arguments_ && args)
     {
         return util::bind(util::one_shot(
@@ -1147,7 +1147,7 @@
     static HPX_STD_FUNCTION<threads::thread_function_type>
     construct_continuation_thread_object_function_void(
         continuation_type cont,
-        void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6), Object* obj,
+        void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6), Component* obj,
         Arguments_ && args)
     {
         return util::bind(util::one_shot(
@@ -1302,7 +1302,7 @@
     static HPX_STD_FUNCTION<threads::thread_function_type>
     construct_continuation_thread_object_function_void(
         continuation_type cont,
-        void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7), Object* obj,
+        void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7), Component* obj,
         Arguments_ && args)
     {
         return util::bind(util::one_shot(
@@ -1457,7 +1457,7 @@
     static HPX_STD_FUNCTION<threads::thread_function_type>
     construct_continuation_thread_object_function_void(
         continuation_type cont,
-        void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8), Object* obj,
+        void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8), Component* obj,
         Arguments_ && args)
     {
         return util::bind(util::one_shot(
@@ -1612,7 +1612,7 @@
     static HPX_STD_FUNCTION<threads::thread_function_type>
     construct_continuation_thread_object_function_void(
         continuation_type cont,
-        void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9), Object* obj,
+        void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9), Component* obj,
         Arguments_ && args)
     {
         return util::bind(util::one_shot(

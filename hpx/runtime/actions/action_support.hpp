@@ -815,6 +815,9 @@ namespace hpx { namespace actions
         return args.template get<N>();
     }
 
+    // bring in all overloads for
+    //    construct_continuation_thread_functionN()
+    //    construct_continuation_thread_function_voidN()
     #include <hpx/runtime/actions/construct_continuation_function_objects.hpp>
 
     ///////////////////////////////////////////////////////////////////////////
@@ -842,26 +845,22 @@ namespace hpx { namespace actions
         template <typename Func, typename Arguments_>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_continuation_thread_function_void(
-            continuation_type cont, Func && func,
-            Arguments_ && args)
+            continuation_type cont, Func && func, Arguments_ && args)
         {
             typedef typename boost::remove_reference<Arguments_>::type arguments_type;
             return detail::construct_continuation_thread_function_voidN<
-                    derived_type,
-                    util::tuple_size<arguments_type>::value
+                    derived_type, util::tuple_size<arguments_type>::value
                 >::call(cont, std::forward<Func>(func), std::forward<Arguments_>(args));
         }
 
         template <typename Func, typename Arguments_>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_continuation_thread_function(
-            continuation_type cont, Func && func,
-            Arguments_ && args)
+            continuation_type cont, Func && func, Arguments_ && args)
         {
             typedef typename boost::remove_reference<Arguments_>::type arguments_type;
             return detail::construct_continuation_thread_functionN<
-                    derived_type,
-                    util::tuple_size<arguments_type>::value
+                    derived_type, util::tuple_size<arguments_type>::value
                 >::call(cont, std::forward<Func>(func), std::forward<Arguments_>(args));
         }
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -46,7 +46,7 @@ namespace detail
 
 #define HPX_ACTION_DIRECT_ARGUMENT(z, n, data)                                \
     BOOST_PP_COMMA_IF(n)                                                      \
-    util::get<n>(std::forward<Arguments>(data))                             \
+    util::get<n>(std::forward<Arguments>(data))                               \
     /**/
 
 #include BOOST_PP_ITERATE()
