@@ -22,44 +22,129 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail
 {
-    template <typename Func, typename Future, typename Destination>
-    void invoke_continuation(Func& func, Future& future, Destination& dest,
+    template <typename Future>
+    struct transfer_result
+    {
+        template <typename Source, typename Destination>
+        void apply(Source src, Destination& dest, boost::mpl::false_) const
+        {
+            dest->set_data(src.get());
+        }
+
+        template <typename Source, typename Destination>
+        void apply(Source src, Destination& dest, boost::mpl::true_) const
+        {
+            src.get();
+            dest->set_data(util::unused);
+        }
+
+        template <typename Source, typename Destination>
+        void operator()(Source& src, Destination& dest) const
+        {
+            typedef typename boost::is_void<
+                typename lcos::detail::future_traits<Future>::type
+            >::type is_void;
+
+            apply(future_access::create<Future>(src), dest, is_void());
+        }
+    };
+
+    template <typename Func, typename Future, typename Continuation>
+    void invoke_continuation(Func& func, Future& future, Continuation& cont,
         boost::mpl::false_)
     {
         try {
-            dest.set_data(func(std::move(future)));
+            cont.set_data(func(std::move(future)));
         }
         catch (...) {
-            dest.set_exception(boost::current_exception());
+            cont.set_exception(boost::current_exception());
         }
     }
 
-    template <typename Func, typename Future, typename Destination>
-    void invoke_continuation(Func& func, Future& future, Destination& dest,
+    template <typename Func, typename Future, typename Continuation>
+    void invoke_continuation(Func& func, Future& future, Continuation& cont,
         boost::mpl::true_)
     {
         try {
             func(std::move(future));
-            dest.set_data(util::unused);
+            cont.set_data(util::unused);
         }
         catch (...) {
-            dest.set_exception(boost::current_exception());
+            cont.set_exception(boost::current_exception());
         }
     }
 
-    template <typename Func, typename Future, typename Destination>
-    void invoke_continuation(Func& func, Future& future, Destination& dest)
+    template <typename Func, typename Future, typename Continuation>
+    typename boost::disable_if<
+        traits::is_future<typename util::result_of<Func(Future)>::type>
+    >::type invoke_continuation(Func& func, Future& future, Continuation& cont)
     {
         typedef typename boost::is_void<
             typename util::result_of<Func(Future)>::type
-        >::type predicate;
+        >::type is_void;
 
-        invoke_continuation(func, future, dest, predicate());
+        invoke_continuation(func, future, cont, is_void());
     }
+
+    template <typename Func, typename Future, typename Continuation>
+    typename boost::enable_if<
+        traits::is_future<typename util::result_of<Func(Future)>::type>
+    >::type invoke_continuation(Func& func, Future& future, Continuation& cont)
+    {
+        try {
+            typedef
+                typename util::result_of<Func(Future)>::type
+                inner_future;
+            typedef
+                typename shared_state_ptr_for<inner_future>::type
+                inner_shared_state_ptr;
+
+            // take by value, as the future may go away immediately
+            inner_shared_state_ptr inner_state =
+                future_access::get_shared_state(func(std::move(future)));
+
+            if (inner_state.get() == 0)
+            {
+                HPX_THROW_EXCEPTION(no_state,
+                    "invoke_continuation",
+                    "the inner future has no valid shared state");
+            }
+
+            // Bind an on_completed handler to this future which will transfer
+            // its result to the new future.
+            boost::intrusive_ptr<Continuation> cont_(&cont);
+            inner_state->set_on_completed(util::bind(
+                transfer_result<inner_future>(),
+                inner_state, cont_));
+        }
+        catch (...) {
+            cont.set_exception(boost::current_exception());
+        }
+     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename ContResult>
+    struct continuation_result
+    {
+        typedef ContResult type;
+    };
+
+    template <typename ContResult>
+    struct continuation_result<future<ContResult> >
+    {
+        typedef ContResult type;
+    };
+
+    template <typename ContResult>
+    struct continuation_result<shared_future<ContResult> >
+    {
+        typedef ContResult type;
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, typename F, typename ContResult>
-    class continuation : public future_data<ContResult>
+    class continuation
+      : public future_data<typename continuation_result<ContResult>::type>
     {
     private:
         typedef future_data<ContResult> base_type;
@@ -305,151 +390,36 @@ namespace hpx { namespace lcos { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ContResult, typename Future, typename F>
-    inline typename shared_state_ptr<ContResult>::type
+    inline typename shared_state_ptr<
+        typename continuation_result<ContResult>::type
+    >::type
     make_continuation(Future& future, BOOST_SCOPED_ENUM(launch) policy,
         F && f)
     {
         typedef detail::continuation<Future, F, ContResult> shared_state;
+        typedef typename continuation_result<ContResult>::type result_type;
 
         // create a continuation
-        typename shared_state_ptr<ContResult>::type p(
+        typename shared_state_ptr<result_type>::type p(
             new shared_state(std::forward<F>(f)));
         static_cast<shared_state*>(p.get())->attach(future, policy);
         return std::move(p);
     }
 
     template <typename ContResult, typename Future, typename F>
-    inline typename shared_state_ptr<ContResult>::type
+    inline typename shared_state_ptr<
+        typename continuation_result<ContResult>::type
+    >::type
     make_continuation(Future& future, threads::executor& sched,
         F && f)
     {
         typedef detail::continuation<Future, F, ContResult> shared_state;
+        typedef typename continuation_result<ContResult>::type result_type;
 
         // create a continuation
-        typename shared_state_ptr<ContResult>::type p(
+        typename shared_state_ptr<result_type>::type p(
             new shared_state(std::forward<F>(f)));
         static_cast<shared_state*>(p.get())->attach(future, sched);
-        return std::move(p);
-    }
-}}}
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace detail
-{
-    template <typename Source, typename Destination>
-    void transfer_result(Source& src, Destination& dest, boost::mpl::false_)
-    {
-        dest.set_data(src.get());
-    }
-
-    template <typename Source, typename Destination>
-    void transfer_result(Source& src, Destination& dest, boost::mpl::true_)
-    {
-        src.get();
-        dest.set_data(util::unused);
-    }
-
-    template <typename Source, typename Destination>
-    void transfer_result(Source& src, Destination& dest)
-    {
-        typedef typename boost::is_void<
-            typename lcos::detail::future_traits<Source>::type
-        >::type predicate;
-
-        transfer_result(src, dest, predicate());
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename ContResult>
-    class unwrap_continuation : public future_data<ContResult>
-    {
-    private:
-        template <typename Inner>
-        void on_inner_ready(
-            typename shared_state_ptr_for<Inner>::type const& inner_state)
-        {
-            try {
-                Inner inner = future_access::create<Inner>(inner_state);
-
-                transfer_result(inner, *this);
-            }
-            catch (...) {
-                this->set_exception(boost::current_exception());
-            }
-        }
-
-        template <typename Outer>
-        void on_outer_ready(
-            typename shared_state_ptr_for<Outer>::type const& outer_state)
-        {
-            typedef typename future_traits<Outer>::type inner_future;
-            typedef
-                typename shared_state_ptr_for<inner_future>::type
-                inner_shared_state_ptr;
-
-            // Bind an on_completed handler to this future which will transfer
-            // its result to the new future.
-            boost::intrusive_ptr<unwrap_continuation> this_(this);
-            void (unwrap_continuation::*inner_ready)(
-                inner_shared_state_ptr const&) =
-                    &unwrap_continuation::on_inner_ready<inner_future>;
-
-            try {
-                // if we get here, this future is ready
-                Outer outer = future_access::create<Outer>(outer_state);
-
-                // take by value, as the future will go away immediately
-                inner_shared_state_ptr inner_state =
-                    future_access::get_shared_state(outer.get());
-
-                if (inner_state.get() == 0)
-                {
-                    HPX_THROW_EXCEPTION(no_state,
-                        "unwrap_continuation<ContResult>::on_outer_ready",
-                        "the inner future has no valid shared state");
-                }
-
-                inner_state->set_on_completed(
-                    util::bind(inner_ready, std::move(this_), inner_state));
-            }
-            catch (...) {
-                this->set_exception(boost::current_exception());
-            }
-        }
-
-    public:
-        template <typename Future>
-        void attach(Future& future)
-        {
-            typedef
-                typename shared_state_ptr_for<Future>::type
-                outer_shared_state_ptr;
-
-            // Bind an on_completed handler to this future which will wait for
-            // the inner future and will transfer its result to the new future.
-            boost::intrusive_ptr<unwrap_continuation> this_(this);
-            void (unwrap_continuation::*outer_ready)(
-                outer_shared_state_ptr const&) =
-                    &unwrap_continuation::on_outer_ready<Future>;
-
-            outer_shared_state_ptr const& outer_state =
-                future_access::get_shared_state(future);
-            outer_state->set_on_completed(
-                util::bind(outer_ready, std::move(this_), outer_state));
-        }
-    };
-
-    template <typename Future>
-    inline typename shared_state_ptr<
-        typename unwrap_result<Future>::type>::type
-    unwrap(Future& future, error_code& ec)
-    {
-        typedef typename unwrap_result<Future>::type result_type;
-        typedef detail::unwrap_continuation<result_type> shared_state;
-
-        // create a continuation
-        typename shared_state_ptr<result_type>::type p(new shared_state());
-        static_cast<shared_state*>(p.get())->attach(future);
         return std::move(p);
     }
 }}}

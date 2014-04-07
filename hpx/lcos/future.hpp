@@ -165,14 +165,15 @@ namespace hpx { namespace lcos { namespace detail
         >::type
     >
     {
-        typedef typename util::result_of<F(Future)>::type result;
+        typedef typename util::result_of<F(Future)>::type cont_result;
 
-        typedef lcos::future<
-            typename boost::mpl::eval_if<
-                traits::is_future<result>
-              , future_traits<result>
-              , boost::mpl::identity<result>
-            >::type> type;
+        typedef typename boost::mpl::eval_if<
+            traits::is_future<cont_result>
+          , future_traits<cont_result>
+          , boost::mpl::identity<cont_result>
+        >::type result_type;
+
+        typedef lcos::future<result_type> type;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -265,13 +266,20 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Future, typename F, typename ContResult>
     class continuation;
 
+    template <typename ContResult>
+    struct continuation_result;
+
     template <typename ContResult, typename Future, typename F>
-    inline typename shared_state_ptr<ContResult>::type
+    inline typename shared_state_ptr<
+        typename continuation_result<ContResult>::type
+    >::type
     make_continuation(Future& future, BOOST_SCOPED_ENUM(launch) policy,
         F && f);
 
     template <typename ContResult, typename Future, typename F>
-    inline typename shared_state_ptr<ContResult>::type
+    inline typename shared_state_ptr<
+        typename continuation_result<ContResult>::type
+    >::type
     make_continuation(Future& future, threads::executor& sched,
         F && f);
 
@@ -420,59 +428,67 @@ namespace hpx { namespace lcos { namespace detail
         //     returns.
         template <typename F>
         typename future_then_result<Derived, F>::type
-        then(F && f)
+        then(F && f, error_code& ec = throws)
         {
-            return then(launch::all, std::forward<F>(f));
+            return then(launch::all, std::forward<F>(f), ec);
         }
 
         template <typename F>
         typename future_then_result<Derived, F>::type
-        then(BOOST_SCOPED_ENUM(launch) policy, F && f)
+        then(BOOST_SCOPED_ENUM(launch) policy, F && f, error_code& ec = throws)
         {
             typedef
-                typename future_then_result<Derived, F>::type
+                typename future_then_result<Derived, F>::result_type
                 result_type;
 
             if (!shared_state_)
             {
-                HPX_THROW_EXCEPTION(no_state,
+                HPX_THROWS_IF(ec, no_state,
                     "future_base<R>::then",
                     "this future has no valid shared state");
-                return result_type();
+                return future<result_type>();
             }
 
-            typedef typename util::result_of<F(Derived)>::type result;
-            typedef typename shared_state_ptr<result>::type shared_state_ptr;
+            typedef
+                typename util::result_of<F(Derived)>::type
+                continuation_result_type;
+            typedef
+                typename shared_state_ptr<result_type>::type
+                shared_state_ptr;
 
             shared_state_ptr p =
-                detail::make_continuation<result>(*static_cast<Derived*>(this),
-                    policy, std::forward<F>(f));
-            return future_access::create<future<result> >(std::move(p));
+                detail::make_continuation<continuation_result_type>(
+                    *static_cast<Derived*>(this), policy, std::forward<F>(f));
+            return future_access::create<future<result_type> >(std::move(p));
         }
 
         template <typename F>
         typename future_then_result<Derived, F>::type
-        then(threads::executor& sched, F && f)
+        then(threads::executor& sched, F && f, error_code& ec = throws)
         {
             typedef
-                typename future_then_result<Derived, F>::type
+                typename future_then_result<Derived, F>::result_type
                 result_type;
 
             if (!shared_state_)
             {
-                HPX_THROW_EXCEPTION(no_state,
+                HPX_THROWS_IF(ec, no_state,
                     "future_base<R>::then",
                     "this future has no valid shared state");
-                return result_type();
+                return future<result_type>();
             }
 
-            typedef typename util::result_of<F(Derived)>::type result;
-            typedef typename shared_state_ptr<result>::type shared_state_ptr;
+            typedef
+                typename util::result_of<F(Derived)>::type
+                continuation_result_type;
+            typedef
+                typename shared_state_ptr<result_type>::type
+                shared_state_ptr;
 
             shared_state_ptr p =
-                detail::make_continuation<result>(*static_cast<Derived*>(this),
-                    sched, std::forward<F>(f));
-            return future_access::create<future<result> >(std::move(p));
+                detail::make_continuation<continuation_result_type>(
+                    *static_cast<Derived*>(this), sched, std::forward<F>(f));
+            return future_access::create<future<result_type> >(std::move(p));
         }
 
         // Notes:
@@ -501,30 +517,11 @@ namespace hpx { namespace lcos { namespace detail
         // Postcondition:
         //   - The returned future has valid() == true, regardless of the
         //     validity of the inner future.
+        template <typename Getter>
         typename future_unwrap_result<Derived>::type
-        unwrap(error_code& ec = throws)
+        unwrap(Getter getter, error_code& ec = throws)
         {
-            BOOST_STATIC_ASSERT_MSG(
-                traits::is_future<R>::value, "invalid use of unwrap");
-
-            typedef
-                typename future_unwrap_result<Derived>::type
-                result_type;
-
-            if (!shared_state_) {
-                HPX_THROWS_IF(ec, no_state,
-                    "future_base<R>::unwrap",
-                    "this future has not been initialized");
-                return result_type();
-            }
-
-            typedef
-                typename shared_state_ptr_for<result_type>::type
-                shared_state_ptr;
-
-            shared_state_ptr state =
-                lcos::detail::unwrap(*static_cast<Derived*>(this), ec);
-            return future_access::create<result_type>(std::move(state));
+            return then(getter, ec);
         }
 
         // Effects: blocks until the shared state is ready.
@@ -632,6 +629,15 @@ namespace hpx { namespace lcos
         typedef typename base_type::shared_state_type shared_state_type;
 
     private:
+        struct getter
+        {
+            BOOST_FORCEINLINE
+            R operator()(future f) const
+            {
+                return f.get();
+            }
+        };
+
         struct invalidate
         {
             explicit invalidate(future& f, bool reset_data = false)
@@ -693,7 +699,7 @@ namespace hpx { namespace lcos
         //     constructor invocation.
         //   - other.valid() == false.
         future(future<future> && other) BOOST_NOEXCEPT
-          : base_type(std::move(other.unwrap()))
+          : base_type(other.valid() ? std::move(other.unwrap()) : base_type())
         {}
 
         // Effects:
@@ -785,33 +791,33 @@ namespace hpx { namespace lcos
 
         template <typename F>
         typename detail::future_then_result<future, F>::type
-        then(F && f)
+        then(F && f, error_code& ec = throws)
         {
             invalidate on_exit(*this);
-            return base_type::then(std::forward<F>(f));
+            return base_type::then(std::forward<F>(f), ec);
         }
 
         template <typename F>
         typename detail::future_then_result<future, F>::type
-        then(BOOST_SCOPED_ENUM(launch) policy, F && f)
+        then(BOOST_SCOPED_ENUM(launch) policy, F && f, error_code& ec = throws)
         {
             invalidate on_exit(*this);
-            return base_type::then(policy, std::forward<F>(f));
+            return base_type::then(policy, std::forward<F>(f), ec);
         }
 
         template <typename F>
         typename detail::future_then_result<future, F>::type
-        then(threads::executor& sched, F && f)
+        then(threads::executor& sched, F && f, error_code& ec = throws)
         {
             invalidate on_exit(*this);
-            return base_type::then(sched, std::forward<F>(f));
+            return base_type::then(sched, std::forward<F>(f), ec);
         }
 
         typename detail::future_unwrap_result<future>::type
         unwrap(error_code& ec = throws)
         {
             invalidate on_exit(*this);
-            return base_type::unwrap(ec);
+            return base_type::unwrap(getter(), ec);
         }
 
         using base_type::wait;
@@ -852,6 +858,17 @@ namespace hpx { namespace lcos
     public:
         typedef R result_type;
         typedef typename base_type::shared_state_type shared_state_type;
+
+    private:
+        struct getter
+        {
+            BOOST_FORCEINLINE
+            typename detail::future_value<R>::const_lvref
+            operator()(shared_future const& f) const
+            {
+                return f.get();
+            }
+        };
 
     private:
         friend struct detail::future_access;
@@ -993,7 +1010,11 @@ namespace hpx { namespace lcos
 
         using base_type::then;
 
-        using base_type::unwrap;
+        typename detail::future_unwrap_result<shared_future>::type
+        unwrap(error_code& ec = throws)
+        {
+            return base_type::unwrap(getter(), ec);
+        }
 
         using base_type::wait;
         using base_type::wait_for;
