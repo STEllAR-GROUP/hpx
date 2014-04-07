@@ -62,9 +62,7 @@ namespace hpx { namespace util
             T* new_value = 0
             )
         {
-            if (0 != ptr_) //-V809
-                delete ptr_;
-
+            delete ptr_;
             ptr_ = new_value;
         }
 

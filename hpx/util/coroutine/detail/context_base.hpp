@@ -177,8 +177,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       m_phase = 0;
 #endif
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
-      if (m_thread_data)
-        delete_tss_storage(m_thread_data);
+      delete_tss_storage(m_thread_data);
 #endif
     }
 

@@ -207,11 +207,8 @@ struct merging_map : boost::noncopyable
             pointer p
             ) const
         {
-            if (p)
-            {
-                delete p;
-                p = 0;
-            }
+            delete p;
+            p = 0;
         }
     };
 
