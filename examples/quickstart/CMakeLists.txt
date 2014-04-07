@@ -32,6 +32,7 @@ set(example_programs
     timed_wake
     use_main_thread
     wait_composition
+    zerocopy_rdma
    )
 
 if(HPX_HAVE_CXX11_LAMBDAS)
