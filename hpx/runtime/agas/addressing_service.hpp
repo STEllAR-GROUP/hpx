@@ -62,7 +62,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     > iterate_types_function_type;
 
     typedef hpx::lcos::local::spinlock cache_mutex_type;
-    typedef hpx::lcos::local::mutex mutex_type;
+    typedef hpx::lcos::local::spinlock mutex_type;
     // }}}
 
     // {{{ gva cache
