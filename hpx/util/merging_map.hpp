@@ -208,7 +208,6 @@ struct merging_map : boost::noncopyable
             ) const
         {
             delete p;
-            p = 0;
         }
     };
 
