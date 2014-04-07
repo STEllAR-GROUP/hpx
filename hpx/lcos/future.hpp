@@ -825,7 +825,7 @@ namespace hpx { namespace lcos
         template <typename R>
         void convert_to_future_void(future<R> f)
         {
-            shared_future<R>(std::move(f)).get()
+            shared_future<R>(std::move(f)).get();
         }
     }
 
@@ -1006,7 +1006,7 @@ namespace hpx { namespace lcos
         template <typename R>
         void convert_to_shared_future_void(shared_future<R> f)
         {
-            f.get()
+            f.get();
         }
     }
 
