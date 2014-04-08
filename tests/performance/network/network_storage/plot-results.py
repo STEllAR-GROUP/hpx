@@ -45,8 +45,9 @@ import matplotlib.pyplot as plt
 #----------------------------------------------------------------------------
 # setup default size of plot if user didn't pass fig_size command line option
 try :
-    size = map(float, options.fig_size.split())
+    size = map(float, options.fig_size.split(','))
     if len(size) == 2 :
+        print "found size ", size
         options.fig_size = (size, [0.1, 0.1, 0.85, 0.85])
     elif len(size) == 6 :
         options.fig_size = (size[0:2], size[2:6])
@@ -189,16 +190,20 @@ def plot_configuration(graph_map, mapnames, axesnames, titlefunction, legendfunc
       param1_keys    = sorted(param1_results.keys())
       print "param1_ type ", param1_key
       for param2_i in range(num_param2):
-        param2_key     = param1_keys[param2_i]
-        param2_results = param1_results[param2_key]
-        param2_keys    = sorted(param2_results.keys())
-        print "param2_ type ", param2_key
         newplot = plt.subplot2grid((numrows, numcols), (row, col), colspan=1)
         axes.append( newplot )
-        print "generating plot at {%i,%i}" % (row, col)
-        plot_one_collection(param2_results,
-          [axesnames[0], axesnames[1], mapnames[1] + " " + titlefunction(param2_key)],
-          newplot,axisfunction)
+        try:
+          print "num params %i and keys" % num_param2, param1_keys
+          param2_key     = param1_keys[param2_i]
+          param2_results = param1_results[param2_key]
+          param2_keys    = sorted(param2_results.keys())
+          print "param2_ type ", param2_key
+          print "generating plot at {%i,%i}" % (row, col)
+          plot_one_collection(param2_results,
+            [axesnames[0], axesnames[1], mapnames[1] + " " + titlefunction(param2_key)],
+            newplot,axisfunction)
+        except:
+          print "Failed to plot {%i,%i}" % (row, col)
         col += 1
         if ((col % numcols)==0):
           col = 0
@@ -206,6 +211,7 @@ def plot_configuration(graph_map, mapnames, axesnames, titlefunction, legendfunc
       # at the end of each param2 group, there should be a legend
       leg = plt.subplot2grid((numrows, numcols), (row, col), colspan=1)
       leg.axis('off')
+      leg.set_title(graph_keys[param1_i], fontsize=11)
       axes.append( leg )
       # restart markers and colours from beginning of list for each new graph
       localmarkers = itertools.cycle(markers)
@@ -310,6 +316,12 @@ for csvfile in args :
       sizeof_bytes, lambda x: str(x), lambda x,pos: str(x)
       )
     graphs_to_save.append([fig_Read_Net_B_T_N,"fig_Read_Net_B_T_N"])
+    #
+    fig_Write_Net_B_T_N  = plot_configuration(Write_Net_B_T_N, 
+      [Network, "Block size", "Threads"], ["Nodes", "BW GB/s"], 
+      sizeof_bytes, lambda x: str(x), lambda x,pos: str(x)
+      )
+    graphs_to_save.append([fig_Write_Net_B_T_N,"fig_Write_Net_B_T_N"])
     #-------------------------------------------------------------------
 
     #-------------------------------------------------------------------
@@ -320,6 +332,12 @@ for csvfile in args :
       lambda x: str(x), sizeof_bytes, lambda x,pos: str(x)
       )
     graphs_to_save.append([fig_Read_Net_T_B_N,"fig_Read_Net_T_B_N"])
+    #
+    fig_Write_Net_T_B_N  = plot_configuration(Write_Net_T_B_N, 
+      [Network, "Threads", "Block size"], ["Nodes", "BW GB/s"], 
+      lambda x: str(x), sizeof_bytes, lambda x,pos: str(x)
+      )
+    graphs_to_save.append([fig_Write_Net_T_B_N,"fig_Write_Net_T_B_N"])
     #-------------------------------------------------------------------
 
     #-------------------------------------------------------------------
