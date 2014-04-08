@@ -26,7 +26,8 @@ namespace mini_ghost {
         }
 
         template<typename Action>
-        hpx::future<T> add(Action action, std::vector<hpx::id_type> ids, std::size_t & generation, std::size_t which, T val)
+        hpx::future<T> add(Action action, std::vector<hpx::id_type> ids,
+            std::size_t & generation, std::size_t which, T val)
         {
             generation = 0;
             hpx::future<void> f = gate_.get_future(ids.size(), &generation);
@@ -37,7 +38,14 @@ namespace mini_ghost {
                 hpx::apply(action, id, generation, which, val);
             }
 
-            return f.then(hpx::launch::sync, [this](hpx::future<void>) -> T { T v = value_; value_ = T(0); return v; });
+            return f.then(
+#if !defined(BOOST_MSVC)
+                hpx::launch::sync,
+#endif
+                [this](hpx::future<void>) -> T {
+                    T v = value_; value_ = T(0); return v;
+                }
+            );
         }
 
         void set_data(std::size_t generation, std::size_t which, T value)

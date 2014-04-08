@@ -117,7 +117,7 @@ namespace mini_ghost {
                                 grids[dst][var], grids[src][var]);
                             break;
                         default:
-                            std::cerr << "Unkown stencil\n";
+                            std::cerr << "Unknown stencil\n";
                             hpx::terminate();
                             break;
                     }
@@ -172,8 +172,10 @@ namespace mini_ghost {
                               , rank
                               , sum
                             ).then(
-                                hpx::launch::sync
-                              , [this, var, step](hpx::future<Real> value)
+#if !defined(BOOST_MSVC)
+                                hpx::launch::sync,
+#endif
+                                [this, var, step](hpx::future<Real> value)
                                 {
                                     if(rank == 0)
                                     {

@@ -44,7 +44,7 @@ namespace mini_ghost {
         template <typename Real>
         static void call(grid<Real> & dst, grid<Real> const & src)
         {
-            Real const divisor = 1.0/5.0;
+            Real const divisor = Real(1.0)/Real(5.0);
             for(std::size_t z = 1; z < dst.nz_-1; ++z)
             {
                 for(std::size_t y = 1; y < dst.ny_-1; ++y)
@@ -71,7 +71,7 @@ namespace mini_ghost {
         template <typename Real>
         static void call(grid<Real> & dst, grid<Real> const & src)
         {
-            Real const divisor = 1.0/5.0;
+            Real const divisor = Real(1.0)/Real(5.0);
             for(std::size_t z = 1; z != dst.nz_-1; ++z)
             {
                 for(std::size_t y = 1; y != dst.ny_-1; ++y)
@@ -102,7 +102,7 @@ namespace mini_ghost {
         template <typename Real>
         static void call(grid<Real> & dst, grid<Real> const & src)
         {
-            Real const divisor = 1.0/5.0;
+            Real const divisor = Real(1.0)/Real(5.0);
             for(std::size_t z = 1; z != dst.nz_-1; ++z)
             {
                 for(std::size_t y = 1; y != dst.ny_-1; ++y)
