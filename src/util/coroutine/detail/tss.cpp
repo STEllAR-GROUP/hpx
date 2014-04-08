@@ -82,6 +82,12 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
             data_.insert(std::make_pair(key, tss_data_node(func, tss_data)));
         }
 
+        void insert(void const* key, void* tss_data)
+        {
+            boost::shared_ptr<tss_cleanup_function> func;
+            data_.insert(std::make_pair(key, tss_data_node(func, tss_data)));
+        }
+
         void erase(void const* key, bool cleanup_existing)
         {
             tss_data_node* node = find(key);
@@ -110,12 +116,51 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
     std::size_t get_tss_thread_data(tss_storage* storage)
     {
-        return 0;
+        hpx::threads::thread_self* self = hpx::threads::get_self_ptr();
+        if (NULL == self)
+        {
+            boost::throw_exception(null_thread_id_exception());
+            return 0;
+        }
+
+        detail::tss_storage* tss_map = self->get_thread_tss_data();
+        if (NULL == tss_map)
+            return 0;
+
+        tss_data_node* node = tss_map->find(0);
+        if (0 == node)
+            return 0;
+
+        return node->get_data<std::size_t>();
     }
 
-    std::size_t set_tss_thread_data(tss_storage* storage, std::size_t)
+    std::size_t set_tss_thread_data(tss_storage* storage, std::size_t data)
     {
-        return 0;
+        hpx::threads::thread_self* self = hpx::threads::get_self_ptr();
+        if (NULL == self)
+        {
+            boost::throw_exception(null_thread_id_exception());
+            return 0;
+        }
+
+        detail::tss_storage* tss_map = self->get_or_create_thread_tss_data();
+        if (NULL == tss_map)
+        {
+            boost::throw_exception(std::bad_alloc());
+            return 0;
+        }
+
+        tss_data_node* node = tss_map->find(0);
+        if (0 == node)
+        {
+            tss_map->insert(0, new std::size_t(data));
+            return 0;
+        }
+
+        std::size_t prev_val = node->get_data<std::size_t>();
+        node->set_data(data);
+
+        return prev_val;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -153,7 +198,11 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         }
 
         detail::tss_storage* tss_map = self->get_or_create_thread_tss_data();
-        HPX_ASSERT(NULL != tss_map);
+        if (NULL == tss_map)
+        {
+            boost::throw_exception(std::bad_alloc());
+            return;
+        }
 
         tss_map->insert(key, func, tss_data);
     }

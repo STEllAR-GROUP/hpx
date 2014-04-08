@@ -36,6 +36,11 @@ namespace hpx { namespace util { namespace coroutines
             void* value_;
 
         public:
+            tss_data_node(void* val)
+              : func_(),
+                value_(val)
+            {}
+
             tss_data_node(boost::shared_ptr<tss_cleanup_function> f, void* val)
               : func_(f),
                 value_(val)
