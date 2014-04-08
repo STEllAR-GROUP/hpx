@@ -86,7 +86,9 @@ hpx::lcos::barrier unique_barrier;
 //
 // Each locality allocates a buffer of memory which is used to host transfers
 //
-char *local_storage = NULL;
+char                      *local_storage = NULL;
+hpx::lcos::local::spinlock storage_mutex;
+
 //
 typedef struct {
     boost::uint64_t iterations;
@@ -119,6 +121,12 @@ void allocate_local_storage(uint64_t local_storage_bytes)
 void delete_local_storage()
 {
     delete[] local_storage;
+}
+
+//----------------------------------------------------------------------------
+void release_storage_lock()
+{
+  storage_mutex.unlock();
 }
 
 //----------------------------------------------------------------------------
@@ -156,94 +164,79 @@ hpx::future<int> copy_from_local_storage(char *dest, uint32_t offset, uint64_t l
 // without copying from a result into another buffer.
 //
 template <typename T>
-class AllocatorPointer : public std::allocator<T>
+class pointer_allocator
 {
 public:
-    typedef T              value_type;
-    typedef T*             pointer;
-    typedef const T*       const_pointer;
-    typedef T&             reference;
-    typedef const T&       const_reference;
-    typedef std::size_t    size_type;
-    typedef std::ptrdiff_t difference_type;
+  typedef T value_type;
+  typedef T* pointer;
+  typedef const T* const_pointer;
+  typedef T& reference;
+  typedef const T& const_reference;
+  typedef std::size_t size_type;
+  typedef std::ptrdiff_t difference_type;
 
-    pointer the_pointer;
+  pointer_allocator() BOOST_NOEXCEPT
+    : pointer_(0), size_(0)
+  {
+  }
 
-    AllocatorPointer() throw() {}
+  pointer_allocator(pointer p, size_type size) BOOST_NOEXCEPT
+    : pointer_(p), size_(size)
+  {
+  }
 
-    pointer address(reference value) const { return &value; }
-    const_pointer address(const_reference value) const { return &value; }
+  pointer address(reference value) const { return &value; }
+  const_pointer address(const_reference value) const { return &value; }
 
-    pointer allocate(size_type n, const void *hint = 0)
-    {
-        return static_cast<T*>(the_pointer);
-    }
+  pointer allocate(size_type n, void const* hint = 0)
+  {
+    HPX_ASSERT(n == size_);
+    return static_cast<T*>(pointer_);
+  }
 
-    void deallocate(pointer p, size_type n) {}
-
-    AllocatorPointer(pointer a_pointer) throw() : std::allocator<T>()
-    {
-        this->the_pointer = a_pointer;
-    }
-    AllocatorPointer(const AllocatorPointer &a) throw() : std::allocator<T>(a)
-    {
-        this->the_pointer = a.the_pointer;
-    }
+  void deallocate(pointer p, size_type n)
+  {
+    HPX_ASSERT(p == pointer_ && n == size_);
+  }
 
 private:
-    // serialization support
-    friend class boost::serialization::access;
+  // serialization support
+  friend class boost::serialization::access;
 
-    template <typename Archive>
-    void load(Archive& ar, const unsigned int version)
-    {
-        std::size_t t = 0;
-        ar >> t;
-        the_pointer = reinterpret_cast<pointer>(t);
-    }
+  template <typename Archive>
+  void load(Archive& ar, unsigned int const version)
+  {
+    std::size_t t = 0;
+    ar >> size_ >> t;
+    pointer_ = reinterpret_cast<pointer>(t);
+  }
 
-    template <typename Archive>
-    void save(Archive& ar, const unsigned int version) const
-    {
-        std::size_t t = reinterpret_cast<std::size_t>(the_pointer);
-        ar << t;
-    }
+  template <typename Archive>
+  void save(Archive& ar, unsigned int const version) const
+  {
+    std::size_t t = reinterpret_cast<std::size_t>(pointer_);
+    ar << size_ << t;
+  }
 
-    BOOST_SERIALIZATION_SPLIT_MEMBER()
+  BOOST_SERIALIZATION_SPLIT_MEMBER()
+
+private:
+  pointer pointer_;
+  size_type size_;
 };
 
 //----------------------------------------------------------------------------
 // A simple Buffer for sending data, it does not need any special allocator
 // user data may be sent to another locality using zero copy by wrapping
 // it in one of these buffers
-typedef hpx::util::serialize_buffer<char> TransferBuffer;
-//
+typedef hpx::util::serialize_buffer<char> general_buffer_type;
+
+
 // When receiving data, we receive a hpx::serialize_buffer, we try to minimize
 // copying of data by providing a receive buffer with a fixed data pointer
 // so that data is placed directly into it.
-//
-// It doesn't produce any speedup, but is here to provide a basis for
-// experimentation
-typedef AllocatorPointer<char>                              PointerAllocator;
-typedef hpx::util::serialize_buffer<char, PointerAllocator> SerializeToPointer;
-
-//----------------------------------------------------------------------------
-// The TransferBufferReceive provides a constructor which copied from the
-// input buffer into the final memory location
-class TransferBufferReceive : public SerializeToPointer
-{
-public:
-    TransferBufferReceive() {}      // needed for serialization
-
-    TransferBufferReceive(char* buffer, std::size_t length,
-            std::size_t remote_buffer, std::allocator<char> deallocator) throw()
-      : SerializeToPointer(buffer, length,
-            PointerAllocator(reinterpret_cast<PointerAllocator::pointer>(remote_buffer)),
-            deallocator)
-    {}
-
-    ~TransferBufferReceive() {}
-};
+typedef pointer_allocator<char>                             PointerAllocator;
+typedef hpx::util::serialize_buffer<char, PointerAllocator> transfer_buffer_type;
 
 //----------------------------------------------------------------------------
 //
@@ -262,8 +255,8 @@ public:
 namespace Storage {
     //------------------------------------------------------------------------
     // A PUT into memory on this locality from a requester sending a
-    // TransferBuffer
-    hpx::future<int> CopyToStorage(TransferBuffer const& srcbuffer,
+    // general_buffer_type
+    hpx::future<int> CopyToStorage(general_buffer_type const& srcbuffer,
         uint32_t address, uint64_t length)
     {
         boost::shared_array<char> src = srcbuffer.data_array();
@@ -272,29 +265,39 @@ namespace Storage {
 
     //------------------------------------------------------------------------
     // A GET from memory on this locality is returned to the requester in the
-    // TransferBuffer
-    hpx::future<TransferBufferReceive> CopyFromStorage(
+    // transfer_buffer_type
+     hpx::future<transfer_buffer_type> CopyFromStorage(
         uint32_t address, uint64_t length, std::size_t remote_buffer)
     {
-        // we must allocate a return buffer
-        std::allocator<char> allocator;
-        boost::shared_array<char> dest(allocator.allocate(length), [](char*){});
+        // we must allocate a temporary buffer to copy from storage into
+        // we can't use the remote buffer supplied because it is a handle to memory on 
+        // the (possibly) remote node. We allocate here using a NULL deleter so the array will
+        // not be released by the shared_pointer
+        std::allocator<char> local_allocator;
+        boost::shared_array<char> local_buffer(local_allocator.allocate(length), [](char*){});
 
-        // allow the storage class to asynchronously copy the data into dest buffer
-        hpx::future<int> fut = copy_from_local_storage(dest.get(), address, length);
-                                                                       
-        // when the task completes, return a TransferBuffer
-        return fut.then(hpx::launch::sync,
-            [=](hpx::future<int> f) -> TransferBufferReceive {
-                int success = f.get();
-                if(success != TEST_SUCCESS) {
-                    throw std::runtime_error("Fail in Get");
-                }
-                // return the result buffer in a serializable hpx TransferBuffer
-                // tell the return buffer that it now owns the buffer using ::take mode
-                return TransferBufferReceive(dest.get(), length, remote_buffer, allocator);
+        // allow the storage class to asynchronously copy the data into buffer
+        hpx::future<int> fut = copy_from_local_storage(local_buffer.get(), address, length);
+
+        // wrap the remote buffer pointer in an allocator for return
+        pointer_allocator<char> return_allocator(
+          reinterpret_cast<char*>(remote_buffer), length);
+
+        // lock the mutex, will be unlocked by the transfer buffer's deleter
+        storage_mutex.lock();
+
+        return fut.then(
+//            hpx::launch::async,
+            // return the data in a transfer buffer
+            [=](hpx::future<int> fut) -> transfer_buffer_type {
+                return transfer_buffer_type(
+                    local_buffer.get(), length,
+                    transfer_buffer_type::take,
+                    hpx::util::bind(&release_storage_lock),
+                    return_allocator);
             }
         );
+
     }
 } // namespace storage
 
@@ -453,12 +456,12 @@ void test_write(
 #endif
                 ActiveFutures[send_rank].push_back(
                     hpx::async(actWrite, locality,
-                        TransferBuffer(static_cast<char*>(buffer),
-                            options.transfer_size_B, TransferBuffer::reference),
+                        general_buffer_type(static_cast<char*>(buffer),
+                            options.transfer_size_B, general_buffer_type::reference),
                         memory_offset, options.transfer_size_B
                     ).then(
                         hpx::launch::sync,
-                        [send_rank](hpx::future<int> fut) -> int {
+                        [send_rank](hpx::future<int> &&fut) -> int {
                             int result = fut.get();
                             --FuturesWaiting[send_rank];
                             return result;
@@ -522,6 +525,24 @@ void test_write(
 }
 
 //----------------------------------------------------------------------------
+// Copy the data once into the destination buffer if the get() operation was
+// entirely local (no data copies have been made so far).
+static void transfer_data(general_buffer_type recv,
+  hpx::future<transfer_buffer_type> f)
+{
+  transfer_buffer_type buffer(f.get());
+  if (buffer.data() != recv.data())
+  {
+    std::copy(buffer.data(), buffer.data() + buffer.size(), recv.data());
+  }
+  else {
+    DEBUG_OUTPUT(5,
+      std::cout << "Skipped copy due to matching pointers" << std::endl;
+    );
+  }
+}
+
+//----------------------------------------------------------------------------
 // Test speed of read/get
 void test_read(
     uint64_t rank, uint64_t nranks, uint64_t num_transfer_slots,
@@ -574,11 +595,18 @@ void test_read(
             }
             // get the pointer to the current packet send buffer
             char *buffer = &local_storage[i*options.transfer_size_B];
+
             // Get the HPX locality from the dest rank
             hpx::id_type locality = hpx::naming::get_id_from_locality_id(send_rank);
+
             // pick a random slot to write our data into
             int memory_slot = random_slot(gen);
             uint32_t memory_offset = static_cast<uint32_t>(memory_slot*options.transfer_size_B);
+
+
+            // create a transfer buffer object to receive the data being returned to us
+            general_buffer_type general_buffer(&local_storage[memory_offset],
+              options.transfer_size_B, general_buffer_type::reference);
 
             // Execute a GET on whatever locality we chose
             // We pass the pointer to our local memory in the PUT, and it is used
@@ -590,13 +618,18 @@ void test_read(
                 ++FuturesWaiting[send_rank];
                 hpx::lcos::local::spinlock::scoped_lock lk(FuturesMutex);
 #endif
+                using hpx::util::placeholders::_1;
+                std::size_t buffer_address = reinterpret_cast<std::size_t>(general_buffer.data());
+                //
                 ActiveFutures[send_rank].push_back(
                     hpx::async(
-                        actRead, locality, memory_offset, options.transfer_size_B,
-                        reinterpret_cast<std::size_t>(buffer)
+                        actRead, locality, memory_offset, options.transfer_size_B, buffer_address
                     ).then(
                         hpx::launch::sync,
-                        [=](hpx::future<TransferBufferReceive> fut) -> int {
+                        hpx::util::bind(&transfer_data, general_buffer, _1)
+                    ).then(
+                        hpx::launch::sync,
+                        [=](hpx::future<void> fut) -> int {
                             // Retrieve the serialized data buffer that was
                             // returned from the action
                             // try to minimize copies by receiving into our
