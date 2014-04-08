@@ -153,8 +153,6 @@ namespace mini_ghost {
 
         void flux_accumulate(std::size_t var);
 
-        void print_header(params<Real> & p);
-
         std::mt19937 gen;
         std::uniform_real_distribution<Real> random;
 
