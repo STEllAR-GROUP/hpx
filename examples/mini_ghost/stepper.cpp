@@ -172,9 +172,7 @@ namespace mini_ghost {
                               , rank
                               , sum
                             ).then(
-#if !defined(BOOST_MSVC)
                                 hpx::launch::sync,
-#endif
                                 [this, var, step](hpx::future<Real> value)
                                 {
                                     if(rank == 0)

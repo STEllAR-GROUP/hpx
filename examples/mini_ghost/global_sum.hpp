@@ -39,9 +39,7 @@ namespace mini_ghost {
             }
 
             return f.then(
-#if !defined(BOOST_MSVC)
                 hpx::launch::sync,
-#endif
                 [this](hpx::future<void>) -> T {
                     T v = value_; value_ = T(0); return v;
                 }
