@@ -24,6 +24,15 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1111] - hpx::threads::get_thread_data always returns zero
+* [issue 1110] - Remove unnecessary null pointer checks
+* [issue 1109] - More tests adjustments
+* [issue 1108] - Clarify build rules for "libboost_atomic-mt.so"?
+* [issue 1107] - Remove unnecessary null pointer checks
+* [issue 1106] - network_storage benchmark imporvements, adding legends to
+                 plots and tidying layout
+* [issue 1105] - Add more plot outputs and improve instructions doc
+* [issue 1104] - Complete quoting for parameters of some CMake commands
 * [issue 1103] - Work on test/scripts
 * [issue 1102] - Changed minimum requirement of window install to 2012
 * [issue 1101] - Changed minimum requirement of window install to 2012
@@ -47,6 +56,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1083] - Make shell examples copyable in docs
 * [issue 1082] - Implement proper termination detection during shutdown
 * [issue 1081] - Implement thread_specific_ptr for hpx::threads
+* [issue 1070] - Complete quoting for parameters of some CMake commands
 
 [endsect]
 

@@ -166,6 +166,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1007] - Components are not properly destroyed
 * [issue 1006] - Segfault/hang in set_data
 * [issue 1003] - Performance counter naming issue
+* [issue 982]  - Race condition during startup
 * [issue 912]  - OS X: component type not found in map
 * [issue 663]  - Create a buildbot slave based on Clang 3.2/OSX
 * [issue 636]  - Expose `this_locality::apply<act>(p1, p2);` for local execution
