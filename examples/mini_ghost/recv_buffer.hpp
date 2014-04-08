@@ -67,8 +67,7 @@ namespace mini_ghost {
         void set_buffer(buffer_type buffer, std::size_t step)
         {
             mutex_type::scoped_lock l(mtx_);
-            iterator it = get_buffer_entry(step);
-            it->second->set_value(buffer);
+            get_buffer_entry(step)->second->set_value(buffer);
         }
 
         buffer_type get_buffer(std::size_t step)

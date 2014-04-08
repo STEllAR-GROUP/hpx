@@ -33,9 +33,8 @@ namespace mini_ghost {
 
         void run(std::size_t num_spikes, std::size_t num_tsteps);
 
-        void set_global_sum(std::size_t idx, std::size_t generation, std::size_t which, Real value);
+        void set_global_sum(std::size_t generation, std::size_t which, Real value, std::size_t idx);
         HPX_DEFINE_COMPONENT_ACTION_TPL(stepper<Real>, set_global_sum, set_global_sum_action);
-
 
         void set_north_zone(buffer_type buffer, std::size_t step, std::size_t var);
         HPX_DEFINE_COMPONENT_ACTION_TPL(stepper<Real>, set_north_zone, set_north_zone_action);
@@ -156,11 +155,12 @@ namespace mini_ghost {
 
         void print_header(params<Real> & p);
 
+        void write_grid(std::string const & filename, grid<Real> & g);
+
         std::mt19937 gen;
         std::uniform_real_distribution<Real> random;
 
         std::size_t rank;
-        std::size_t num_neighs;
         std::vector<hpx::id_type> stepper_ids;
 
         std::vector<global_sum<Real> > global_sums;

@@ -54,17 +54,6 @@ namespace mini_ghost {
         dst = 1;
         setup_grids(p);
 
-        // First round of boundaries ...
-        for(std::size_t var = 0; var != num_vars; ++var)
-        {
-            send_buffer_norths[var](grids[src][var], 1, var);
-            send_buffer_souths[var](grids[src][var], 1, var);
-            send_buffer_easts [var](grids[src][var], 1, var);
-            send_buffer_wests [var](grids[src][var], 1, var);
-            send_buffer_fronts[var](grids[src][var], 1, var);
-            send_buffer_backs [var](grids[src][var], 1, var);
-        }
-
         if(p.rank == 0)
         {
             print_header(p);
@@ -84,24 +73,33 @@ namespace mini_ghost {
             std::size_t generation = 0;
             for(std::size_t step = 1; step != num_tsteps+1; ++step)
             {
-                // Report sum results for step-1
                 for(std::size_t var = 0; var != num_vars; ++var)
                 {
+                    std::string filename = "result_";
+                    filename += boost::lexical_cast<std::string>(rank);
+                    filename += "_";
+                    filename += boost::lexical_cast<std::string>(step);
+                    filename += "_";
+                    filename += boost::lexical_cast<std::string>(var);
+                    filename += ".ppm";
                     hpx::util::high_resolution_timer timer;
+
+                    // Receive boundaries ...
+                    if(step > 1)
+                    {
+                        recv_buffer_backs [var](grids[src][var], step);
+                        recv_buffer_fronts[var](grids[src][var], step);
+                        recv_buffer_easts [var](grids[src][var], step);
+                        recv_buffer_wests [var](grids[src][var], step);
+                        recv_buffer_norths[var](grids[src][var], step);
+                        recv_buffer_souths[var](grids[src][var], step);
+                    }
+
                     // Wait on the sum reduction ...
                     if(sum_futures[var].valid())
                         sum_futures[var].wait();
 
-                    // Receive boundaries ...
-                    recv_buffer_souths[var](grids[src][var], step);
-                    recv_buffer_norths[var](grids[src][var], step);
-                    recv_buffer_wests [var](grids[src][var], step);
-                    recv_buffer_easts [var](grids[src][var], step);
-                    recv_buffer_backs [var](grids[src][var], step);
-                    recv_buffer_fronts[var](grids[src][var], step);
-
                     flux_accumulate(var);
-                    //FIXME: do stencil update ...
                     switch (stencil)
                     {
                         case STENCIL_NONE:
@@ -131,31 +129,53 @@ namespace mini_ghost {
                     }
 
                     // Send boundaries ...
-                    send_buffer_norths[var](grids[dst][var], step+1, var);
-                    send_buffer_souths[var](grids[dst][var], step+1, var);
+                    send_buffer_backs [var](grids[dst][var], step+1, var);
+                    send_buffer_fronts[var](grids[dst][var], step+1, var);
                     send_buffer_easts [var](grids[dst][var], step+1, var);
                     send_buffer_wests [var](grids[dst][var], step+1, var);
-                    send_buffer_fronts[var](grids[dst][var], step+1, var);
-                    send_buffer_backs [var](grids[dst][var], step+1, var);
+                    send_buffer_norths[var](grids[dst][var], step+1, var);
+                    send_buffer_souths[var](grids[dst][var], step+1, var);
+
+                    write_grid(filename, grids[dst][var]);
 
                     if(grids_to_sum[var])
                     {
                         hpx::util::high_resolution_timer time_reduction;
                         // Sum grid ...
                         Real sum = 0;
-                        for(Real & value : grids[dst][var].data_)
+                        for(std::size_t z = 1; z <= nz; ++z)
                         {
-                            sum += value;
+                            for(std::size_t y = 1; y <= ny; ++y)
+                            {
+                                for(std::size_t x = 1; x <= nx; ++x)
+                                {
+                                    sum += grids[dst][var](x, y, z);
+                                }
+                            }
                         }
                         sum += flux_out[var];
 
                         sum_futures[var] =
-                            global_sums[var].add(stepper_ids.size(), generation).then(
+                            global_sums[var].add(
+                                hpx::util::bind(
+                                    set_global_sum_action()
+                                  , hpx::util::placeholders::_1 // The id to call the action on
+                                  , hpx::util::placeholders::_2 // The generation
+                                  , hpx::util::placeholders::_3 // Which rank calls this action
+                                  , hpx::util::placeholders::_4 // What value to sum
+                                  , var                   // Which partition to set
+                                )
+                              , stepper_ids
+                              , generation
+                              , rank
+                              , sum
+                            ).then(
                                 hpx::launch::sync
                               , [this, var, step](hpx::future<Real> value)
                                 {
                                     if(rank == 0)
                                     {
+                                        // Report sum results for step-1
                                         Real error_iter
                                             = std::abs(source_total[var] - value.get()) / source_total[var];
                                         bool terminate = error_iter > error_tol;
@@ -173,10 +193,6 @@ namespace mini_ghost {
                                     }
                                 }
                             );
-                        for(hpx::id_type id : stepper_ids)
-                        {
-                            hpx::apply(set_global_sum_action(), id, var, generation, rank, sum);
-                        }
                     }
                     std::swap(src, dst);
                 }
@@ -221,7 +237,7 @@ namespace mini_ghost {
     }
 
     template <typename Real>
-    void stepper<Real>::set_global_sum(std::size_t idx, std::size_t generation, std::size_t which, Real value)
+    void stepper<Real>::set_global_sum(std::size_t generation, std::size_t which, Real value, std::size_t idx)
     {
         HPX_ASSERT(which < stepper_ids.size());
         global_sums[idx].set_data(generation, which, value);
@@ -275,10 +291,9 @@ namespace mini_ghost {
         {
             my_px = 0;
         }
-        my_pz = p.rank / (p.npx*p.npz);
+        my_pz = p.rank / (p.npx*p.npy);
 
         // Set neighbors
-        num_neighs = 0;
         if(my_py != 0)
         {
             for(std::size_t var = 0; var != num_vars; ++var)
@@ -287,7 +302,6 @@ namespace mini_ghost {
                     = stepper_ids[p.rank - p.npx];
                 recv_buffer_souths[var].valid_ = true;
             }
-            ++num_neighs;
         }
         if(my_py != p.npy-1)
         {
@@ -297,7 +311,6 @@ namespace mini_ghost {
                     = stepper_ids[p.rank + p.npx];
                 recv_buffer_norths[var].valid_ = true;
             }
-            ++num_neighs;
         }
         if(my_px != 0)
         {
@@ -307,7 +320,6 @@ namespace mini_ghost {
                     = stepper_ids[p.rank - 1];
                 recv_buffer_wests[var].valid_ = true;
             }
-            ++num_neighs;
         }
         if(my_px != p.npx-1)
         {
@@ -317,7 +329,6 @@ namespace mini_ghost {
                     = stepper_ids[p.rank + 1];
                 recv_buffer_easts[var].valid_ = true;
             }
-            ++num_neighs;
         }
         if(my_pz != 0)
         {
@@ -327,7 +338,6 @@ namespace mini_ghost {
                     = stepper_ids[p.rank - (p.npx*p.npy)];
                 recv_buffer_backs[var].valid_ = true;
             }
-            ++num_neighs;
         }
         if(my_pz != p.npz-1)
         {
@@ -337,7 +347,6 @@ namespace mini_ghost {
                     = stepper_ids[p.rank + (p.npx*p.npy)];
                 recv_buffer_fronts[var].valid_ = true;
             }
-            ++num_neighs;
         }
     }
 
@@ -353,9 +362,9 @@ namespace mini_ghost {
         my_global_ny.first = p.ny * my_py + 1;
         my_global_nz.first = p.nz * my_pz + 1;
 
-        my_global_nx.second = my_global_nx.first + p.nx - 1;
-        my_global_ny.second = my_global_ny.first + p.ny - 1;
-        my_global_nz.second = my_global_nz.first + p.nz - 1;
+        my_global_nx.second = my_global_nx.first + p.nx + 1;
+        my_global_ny.second = my_global_ny.first + p.ny + 1;
+        my_global_nz.second = my_global_nz.first + p.nz + 1;
     }
 
     template <typename Real>
@@ -370,12 +379,12 @@ namespace mini_ghost {
             v = random(gen) * global_n;
         }
 
-        spikes(1,0) = static_cast<Real>(global_n);
+        spikes(0,0) = static_cast<Real>(global_n);
 
         spike_loc(0, 0) = std::size_t(-1);
         spike_loc(1, 0) = global_nx / 2;
-        spike_loc(2, 0) = global_nx / 2;
-        spike_loc(3, 0) = global_nx / 2;
+        spike_loc(2, 0) = global_ny / 2;
+        spike_loc(3, 0) = global_nz / 2;
 
         grid<Real> rspike_loc(3, p.num_spikes);
         for(Real & v : rspike_loc.data_)
@@ -421,52 +430,69 @@ namespace mini_ghost {
         std::vector<hpx::future<void> > sum_futures;
         grids[src].resize(p.num_vars);
         grids[dst].resize(p.num_vars);
-        if(p.debug_grid)
+        for(std::size_t var = 0; var != num_vars; ++var)
         {
-            for(auto & grid : grids[src])
+            grids[dst][var].resize(p.nx+2, p.ny+2, p.nz+2);
+            grids[src][var].resize(p.nx+2, p.ny+2, p.nz+2);
+            if(p.debug_grid)
             {
-                grid.resize(p.nx+1, p.ny+1, p.nz+1);
-                for(Real & value : grid.data_)
+                for(std::size_t z = 0; z != nz + 2; ++z)
                 {
-                    value = 0.0;
+                    for(std::size_t y = 0; y != ny + 2; ++y)
+                    {
+                        for(std::size_t x = 0; x != nx + 2; ++x)
+                        {
+                            grids[dst][var](x, y, z) = 0.0;
+                            grids[src][var](x, y, z) = 0.0;
+                        }
+                    }
                 }
+                std::string filename = "initial_";
+                filename += boost::lexical_cast<std::string>(rank);
+                filename += "_";
+                filename += boost::lexical_cast<std::string>(var);
+                filename += ".ppm";
+                write_grid(filename, grids[src][0]);
             }
-            for(auto & grid : grids[dst])
+            else
             {
-                grid.resize(p.nx+1, p.ny+1, p.nz+1);
-            }
-        }
-        else
-        {
-            std::size_t generation = 0;
-            std::size_t i = 0;
-            sum_futures.reserve(p.num_vars);
-            for(auto & grid : grids[src])
-            {
-                grid.resize(p.nx+1, p.ny+1, p.nz+1);
+                std::size_t generation = 0;
+                sum_futures.reserve(p.num_vars);
                 Real sum = 0;
-                for(Real & value : grid.data_)
+                for(std::size_t z = 0; z != nz + 2; ++z)
                 {
-                    value = random(gen);
-                    sum += value;
+                    for(std::size_t y = 0; y != ny + 2; ++y)
+                    {
+                        for(std::size_t x = 0; x != nx + 2; ++x)
+                        {
+                            Real value = random(gen);
+                            grids[dst][var](x, y, z) = value;
+                            grids[src][var](x, y, z) = value;
+                            sum += value;
+                        }
+                    }
                 }
                 sum_futures.push_back(
-                    global_sums[i].add(p.nranks, generation).then(
-                        [this, i](hpx::future<Real> value)
+                    global_sums[var].add(
+                        hpx::util::bind(
+                            set_global_sum_action()
+                          , hpx::util::placeholders::_1 // The id to call the action on
+                          , hpx::util::placeholders::_2 // The generation
+                          , hpx::util::placeholders::_3 // Which rank calls this action
+                          , hpx::util::placeholders::_4 // What value to sum
+                          , var                   // Which partition to set
+                        )
+                      , stepper_ids
+                      , generation
+                      , rank
+                      , sum
+                    ).then(
+                        [this, var](hpx::future<Real> value)
                         {
-                            source_total[i] = value.get();
+                            source_total[var] = value.get();
                         }
                     )
                 );
-                for(hpx::id_type id : stepper_ids)
-                {
-                    hpx::apply(set_global_sum_action(), id, i, generation, p.rank, sum);
-                }
-                ++i;
-            }
-            for(auto & grid : grids[dst])
-            {
-                grid.resize(p.nx+1, p.ny+1, p.nz+1);
             }
         }
 
@@ -506,10 +532,11 @@ namespace mini_ghost {
             std::size_t iy = spike_loc(2, spike);
             std::size_t iz = spike_loc(3, spike);
 
-            std::size_t idx = 0;
-            for(auto & grid : grids[src])
+            for(std::size_t var = 0; var != num_vars; ++var)
             {
-                grid(ix, iy, iz) = spikes(idx++, spike);
+                Real value = spikes(var, spike);
+                grids[src][var](ix, iy, iz) = value;
+                grids[dst][var](ix, iy, iz) = value;
             }
         }
 
@@ -517,7 +544,7 @@ namespace mini_ghost {
         {
             for(std::size_t var = 0; var != num_vars; ++var)
             {
-                source_total[var] = source_total[var] + spikes(var, spike);
+                source_total[var] += spikes(var, spike);
             }
         }
     }
@@ -544,9 +571,9 @@ namespace mini_ghost {
 
         if(my_px == 0)
         {
-            for(std::size_t z = 1; z != nz; ++z)
+            for(std::size_t z = 1; z <= nz; ++z)
             {
-                for(std::size_t y = 1; y != ny; ++y)
+                for(std::size_t y = 1; y <= ny; ++y)
                 {
                     flux_out[var] += grids[src][var](1, y, z) * divisor;
                 }
@@ -555,9 +582,9 @@ namespace mini_ghost {
 
         if(my_px == npx - 1)
         {
-            for(std::size_t z = 1; z != nz; ++z)
+            for(std::size_t z = 1; z <= nz; ++z)
             {
-                for(std::size_t y = 1; y != ny; ++y)
+                for(std::size_t y = 1; y <= ny; ++y)
                 {
                     flux_out[var] += grids[src][var](nx, y, z) * divisor;
                 }
@@ -566,9 +593,9 @@ namespace mini_ghost {
 
         if(my_py == 0)
         {
-            for(std::size_t z = 1; z != nz; ++z)
+            for(std::size_t z = 1; z <= nz; ++z)
             {
-                for(std::size_t x = 1; x != nx; ++x)
+                for(std::size_t x = 1; x <= nx; ++x)
                 {
                     flux_out[var] += grids[src][var](x, 1, z) * divisor;
                 }
@@ -577,9 +604,9 @@ namespace mini_ghost {
 
         if(my_py == npy - 1)
         {
-            for(std::size_t z = 1; z != nz; ++z)
+            for(std::size_t z = 1; z <= nz; ++z)
             {
-                for(std::size_t x = 1; x != nx; ++x)
+                for(std::size_t x = 1; x <= nx; ++x)
                 {
                     flux_out[var] += grids[src][var](x, ny, z) * divisor;
                 }
@@ -588,20 +615,20 @@ namespace mini_ghost {
 
         if(my_pz == 0)
         {
-            for(std::size_t y = 1; y != ny; ++y)
+            for(std::size_t y = 1; y <= ny; ++y)
             {
-                for(std::size_t x = 1; x != nx; ++x)
+                for(std::size_t x = 1; x <= nx; ++x)
                 {
                     flux_out[var] += grids[src][var](x, y, 1) * divisor;
                 }
             }
         }
 
-        if(my_py == npy - 1)
+        if(my_pz == npz - 1)
         {
-            for(std::size_t y = 1; y != ny; ++y)
+            for(std::size_t y = 1; y <= ny; ++y)
             {
-                for(std::size_t x = 1; x != nx; ++x)
+                for(std::size_t x = 1; x <= nx; ++x)
                 {
                     flux_out[var] += grids[src][var](x, y, nz) * divisor;
                 }
@@ -694,6 +721,58 @@ namespace mini_ghost {
         boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
         std::cout << "Program execution date " << to_simple_string(now) << "\n";
         std::cout << std::endl;
+    }
+
+    template <typename Real>
+    void stepper<Real>::write_grid(std::string const & filename, grid<Real> & g)
+    {
+        std::ofstream outfile(filename.c_str());
+        if(!outfile) std::cerr << "Cannot open file ...\n";
+        outfile << "P6 " << g.nx_ << " " << g.ny_ << " 255\n";
+        for(std::size_t y = 0; y < g.ny_; ++y)
+        {
+            for(std::size_t x = 0; x < g.nx_; ++x)
+            {
+                double tmp = g(x, y, 2);
+                int r = 0;
+                int g = 0;
+                int b = 0;
+
+                if(tmp >= 0)
+                {
+                    if(tmp < 0.25)
+                    {
+                        g = 254. * (tmp / 0.25);
+                        b = 254;
+                    }
+                    else if(tmp < 0.5)
+                    {
+                        g = 254;
+                        b = 254. - 254. * (tmp - 0.25) / 0.25;
+                    }
+                    else if(tmp < 0.75)
+                    {
+                        r = 254. * ((tmp - 0.5) / 0.25);
+                        g = 254;
+                    }
+                    else if(tmp < 1.0)
+                    {
+                        r = 254;
+                        g = 254. - 254. * (tmp - 0.75) / 0.25;
+                    }
+                    else
+                    {
+                        r = 254;
+                        g = 254;
+                        b = 254;
+                    }
+                }
+
+                outfile << (char)r << (char)g << (char)b;
+            }
+        }
+        outfile.flush();
+        outfile.close();
     }
 
     template struct stepper<float>;

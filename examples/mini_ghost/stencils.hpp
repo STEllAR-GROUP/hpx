@@ -44,20 +44,21 @@ namespace mini_ghost {
         template <typename Real>
         static void call(grid<Real> & dst, grid<Real> const & src)
         {
-            for(std::size_t z = 1; z != dst.nz_-1; ++z)
+            Real const divisor = 1.0/5.0;
+            for(std::size_t z = 1; z < dst.nz_-1; ++z)
             {
-                for(std::size_t y = 1; y != dst.ny_-1; ++y)
+                for(std::size_t y = 1; y < dst.ny_-1; ++y)
                 {
-                    for(std::size_t x = 1; x != dst.nx_-1; ++x)
+                    for(std::size_t x = 1; x < dst.nx_-1; ++x)
                     {
                         dst(x, y, z)
-                            = float((
+                            = (
                                 src(x-1, y, z)
                               + src(x, y-1, z)
                               + src(x, y, z)
                               + src(x+1, y, z)
                               + src(x, y+1, z)
-                            )/ 5.0);
+                            ) * divisor;
                     }
                 }
             }
@@ -70,6 +71,7 @@ namespace mini_ghost {
         template <typename Real>
         static void call(grid<Real> & dst, grid<Real> const & src)
         {
+            Real const divisor = 1.0/5.0;
             for(std::size_t z = 1; z != dst.nz_-1; ++z)
             {
                 for(std::size_t y = 1; y != dst.ny_-1; ++y)
@@ -77,7 +79,7 @@ namespace mini_ghost {
                     for(std::size_t x = 1; x != dst.nx_-1; ++x)
                     {
                         dst(x, y, z)
-                            = float((
+                            = (
                                 src(x-1, y-1, z)
                               + src(x-1, y, z)
                               + src(x-1, y+1, z)
@@ -87,7 +89,7 @@ namespace mini_ghost {
                               + src(x+1, y-1, z)
                               + src(x+1, y, z)
                               + src(x+1, y+1, z)
-                            )/ 9.0);
+                            ) * divisor;
                     }
                 }
             }
@@ -100,6 +102,7 @@ namespace mini_ghost {
         template <typename Real>
         static void call(grid<Real> & dst, grid<Real> const & src)
         {
+            Real const divisor = 1.0/5.0;
             for(std::size_t z = 1; z != dst.nz_-1; ++z)
             {
                 for(std::size_t y = 1; y != dst.ny_-1; ++y)
@@ -107,7 +110,7 @@ namespace mini_ghost {
                     for(std::size_t x = 1; x != dst.nx_-1; ++x)
                     {
                         dst(x, y, z)
-                            = float((
+                            = (
                                 src(x, y, z-1)
                               + src(x-1, y, z)
                               + src(x, y-1, z)
@@ -115,7 +118,7 @@ namespace mini_ghost {
                               + src(x+1, y, z)
                               + src(x, y+1, z)
                               + src(x, y, z+1)
-                            )/ 7.0);
+                            ) * divisor;
 
                     }
                 }

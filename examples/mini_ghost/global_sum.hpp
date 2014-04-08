@@ -25,18 +25,19 @@ namespace mini_ghost {
         {
         }
 
-        hpx::future<T> add(std::size_t n, std::size_t & generation)
+        template<typename Action>
+        hpx::future<T> add(Action action, std::vector<hpx::id_type> ids, std::size_t & generation, std::size_t which, T val)
         {
             generation = 0;
-            hpx::future<void> f = gate_.get_future(n, &generation);
-            value_ = 0;
+            hpx::future<void> f = gate_.get_future(ids.size(), &generation);
+            HPX_ASSERT(value_ == 0);
 
-            /*
-            Action action;
-            hpx::lcos::broadcast_with_index(action, component->stepper_ids, generation, value);
-            */
+            for(hpx::id_type const & id : ids)
+            {
+                hpx::apply(action, id, generation, which, val);
+            }
 
-            return f.then([this](hpx::future<void>) -> T { T v = value_; value_ = T(0); return v; });
+            return f.then(hpx::launch::sync, [this](hpx::future<void>) -> T { T v = value_; value_ = T(0); return v; });
         }
 
         void set_data(std::size_t generation, std::size_t which, T value)

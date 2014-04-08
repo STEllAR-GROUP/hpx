@@ -89,7 +89,7 @@ namespace hpx { namespace parcelset {
 
             ibv_pd *get_pd(ibv_context *context, boost::system::error_code & ec);
 
-            ibv_mr register_buffer(ibv_pd * pd, char * buffer, std::size_t size, int access);
+            ibv_mr register_buffer(ibv_pd * pd, char * buffer, std::size_t size);
             ibv_mr get_mr(ibv_pd * pd, char * buffer, std::size_t);
 
         private:

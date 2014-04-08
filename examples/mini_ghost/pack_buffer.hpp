@@ -126,7 +126,7 @@ namespace mini_ghost {
             {
                 for(std::size_t x = 0; x != g.nx_; ++x)
                 {
-                    *src = g(x, y, 0);
+                    *src = g(x, y, 1);
                     ++src;
                 }
             }

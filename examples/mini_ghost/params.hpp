@@ -187,7 +187,11 @@ namespace mini_ghost {
                 tmp_nz = tmp_nx;
             }
             std::size_t remainder = 0;
-            npx = nranks;
+
+            if(nranks > 1 && npx == 1 && npy == 1 && npz == 1)
+            {
+                npx = nranks;
+            }
 
             switch (scaling)
             {

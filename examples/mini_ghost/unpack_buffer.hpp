@@ -20,6 +20,7 @@ namespace mini_ghost {
         static void call(grid<Real> & g, BufferType buffer)
         {
             typename BufferType::value_type * src = buffer.data();
+            HPX_ASSERT(buffer.size() == g.nx_ * g.nz_);
             for(std::size_t z = 0; z != g.nz_; ++z)
             {
                 for(std::size_t x = 0; x != g.nx_; ++x)
@@ -38,6 +39,7 @@ namespace mini_ghost {
         static void call(grid<Real> & g, BufferType buffer)
         {
             typename BufferType::value_type * src = buffer.data();
+            HPX_ASSERT(buffer.size() == g.nx_ * g.nz_);
             for(std::size_t z = 0; z != g.nz_; ++z)
             {
                 for(std::size_t x = 0; x != g.nx_; ++x)
@@ -56,6 +58,7 @@ namespace mini_ghost {
         static void call(grid<Real> & g, BufferType buffer)
         {
             typename BufferType::value_type * src = buffer.data();
+            HPX_ASSERT(buffer.size() == g.nz_ * g.ny_);
             for(std::size_t z = 0; z != g.nz_; ++z)
             {
                 for(std::size_t y = 0; y != g.ny_; ++y)
@@ -74,6 +77,7 @@ namespace mini_ghost {
         static void call(grid<Real> & g, BufferType buffer)
         {
             typename BufferType::value_type * src = buffer.data();
+            HPX_ASSERT(buffer.size() == g.nz_ * g.ny_);
             for(std::size_t z = 0; z != g.nz_; ++z)
             {
                 for(std::size_t y = 0; y != g.ny_; ++y)
@@ -92,6 +96,7 @@ namespace mini_ghost {
         static void call(grid<Real> & g, BufferType buffer)
         {
             typename BufferType::value_type * src = buffer.data();
+            HPX_ASSERT(buffer.size() == g.nx_ * g.ny_);
             for(std::size_t y = 0; y != g.ny_; ++y)
             {
                 for(std::size_t x = 0; x != g.nx_; ++x)
@@ -110,6 +115,7 @@ namespace mini_ghost {
         static void call(grid<Real> & g, BufferType buffer)
         {
             typename BufferType::value_type * src = buffer.data();
+            HPX_ASSERT(buffer.size() == g.nx_ * g.ny_);
             for(std::size_t y = 0; y != g.ny_; ++y)
             {
                 for(std::size_t x = 0; x != g.nx_; ++x)

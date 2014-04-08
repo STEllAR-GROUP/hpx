@@ -25,7 +25,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         boost::shared_ptr<sender> const& sender_connection);
 
     ibv_mr register_buffer(connection_handler & handler,
-        ibv_pd * pd, char * buffer, std::size_t size, int access);
+        ibv_pd * pd, char * buffer, std::size_t size);
 
     class sender
       : public parcelset::parcelport_connection<
@@ -149,8 +149,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                     parcelport_
                   , context_.pd_
                   , &buffer_->data_[0]
-                  , buffer_->data_.size()
-                  , IBV_ACCESS_LOCAL_WRITE);
+                  , buffer_->data_.size());
+                HPX_ASSERT(buffer_->data_.size() <= mr_.length);
+                HPX_ASSERT(&buffer_->data_[0] == mr_.addr);
                 return next(&sender::sent_size);
             }
         }
