@@ -92,7 +92,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        detail::is_launch_policy<
+        traits::is_launch_policy<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -209,7 +209,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        detail::is_launch_policy<
+        traits::is_launch_policy<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -326,7 +326,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        detail::is_launch_policy<
+        traits::is_launch_policy<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -443,7 +443,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        detail::is_launch_policy<
+        traits::is_launch_policy<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -560,7 +560,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        detail::is_launch_policy<
+        traits::is_launch_policy<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -677,7 +677,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        detail::is_launch_policy<
+        traits::is_launch_policy<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -794,7 +794,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        detail::is_launch_policy<
+        traits::is_launch_policy<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -911,7 +911,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        detail::is_launch_policy<
+        traits::is_launch_policy<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -1028,7 +1028,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        detail::is_launch_policy<
+        traits::is_launch_policy<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -1145,7 +1145,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        detail::is_launch_policy<
+        traits::is_launch_policy<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -1262,7 +1262,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        detail::is_launch_policy<
+        traits::is_launch_policy<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -1379,7 +1379,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        detail::is_launch_policy<
+        traits::is_launch_policy<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -1496,7 +1496,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        detail::is_launch_policy<
+        traits::is_launch_policy<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -1613,7 +1613,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        detail::is_launch_policy<
+        traits::is_launch_policy<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -1730,7 +1730,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        detail::is_launch_policy<
+        traits::is_launch_policy<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<

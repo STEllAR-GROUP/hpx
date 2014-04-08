@@ -10,6 +10,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config/forceinline.hpp>
 #include <hpx/traits/is_future.hpp>
+#include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/date_time_chrono.hpp>
@@ -427,7 +428,12 @@ namespace hpx { namespace lcos { namespace detail
         //   - valid() == false on original future object immediately after it
         //     returns.
         template <typename F>
-        typename future_then_result<Derived, F>::type
+        typename boost::lazy_disable_if<
+            traits::is_launch_policy<
+                typename util::decay<F>::type
+            >
+          , future_then_result<Derived, F>
+        >::type
         then(F && f, error_code& ec = throws)
         {
             return then(launch::all, std::forward<F>(f), ec);
@@ -790,7 +796,12 @@ namespace hpx { namespace lcos
         using base_type::get_status;
 
         template <typename F>
-        typename detail::future_then_result<future, F>::type
+        typename boost::lazy_disable_if<
+            traits::is_launch_policy<
+                typename util::decay<F>::type
+            >
+          , detail::future_then_result<future, F>
+        >::type
         then(F && f, error_code& ec = throws)
         {
             invalidate on_exit(*this);
@@ -1045,18 +1056,6 @@ HPX_REGISTER_TYPED_CONTINUATION_DECLARATION(
 
 namespace hpx { namespace lcos
 {
-    ///////////////////////////////////////////////////////////////////////////
-    namespace local { namespace detail
-    {
-        template <typename Policy>
-        struct is_launch_policy
-          : boost::mpl::or_<
-                boost::is_same<BOOST_SCOPED_ENUM(launch), Policy>
-              , boost::is_base_and_derived<threads::executor, Policy>
-            >
-        {};
-    }}
-
     ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object
     template <typename Result>

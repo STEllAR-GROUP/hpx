@@ -19,6 +19,7 @@
 #include <hpx/util/tuple.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
+#include <hpx/traits/is_launch_policy.hpp>
 
 #include <boost/fusion/include/begin.hpp>
 #include <boost/fusion/include/deref.hpp>
@@ -462,7 +463,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, BOOST_PP_ENUM_PARAMS(N, typename F)>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        detail::is_launch_policy<
+        traits::is_launch_policy<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
