@@ -155,8 +155,6 @@ namespace mini_ghost {
 
         void print_header(params<Real> & p);
 
-        void write_grid(std::string const & filename, grid<Real> & g);
-
         std::mt19937 gen;
         std::uniform_real_distribution<Real> random;
 

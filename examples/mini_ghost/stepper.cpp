@@ -5,6 +5,7 @@
 
 #include <examples/mini_ghost/stepper.hpp>
 #include <examples/mini_ghost/stencils.hpp>
+#include <examples/mini_ghost/write_grid.hpp>
 
 #include <hpx/lcos/wait_all.hpp>
 
@@ -56,7 +57,7 @@ namespace mini_ghost {
 
         if(p.rank == 0)
         {
-            print_header(p);
+            p.print_header(num_sum_grid);
         }
     }
 
@@ -75,13 +76,6 @@ namespace mini_ghost {
             {
                 for(std::size_t var = 0; var != num_vars; ++var)
                 {
-                    std::string filename = "result_";
-                    filename += boost::lexical_cast<std::string>(rank);
-                    filename += "_";
-                    filename += boost::lexical_cast<std::string>(step);
-                    filename += "_";
-                    filename += boost::lexical_cast<std::string>(var);
-                    filename += ".ppm";
                     hpx::util::high_resolution_timer timer;
 
                     // Receive boundaries ...
@@ -136,7 +130,15 @@ namespace mini_ghost {
                     send_buffer_norths[var](grids[dst][var], step+1, var);
                     send_buffer_souths[var](grids[dst][var], step+1, var);
 
-                    write_grid(filename, grids[dst][var]);
+                    /*
+                    std::string filename = "result_";
+                    filename += boost::lexical_cast<std::string>(rank);
+                    filename += "_";
+                    filename += boost::lexical_cast<std::string>(step);
+                    filename += "_";
+                    filename += boost::lexical_cast<std::string>(var);
+                    write_grid(grids[dst][var], filename);
+                    */
 
                     if(grids_to_sum[var])
                     {
@@ -451,8 +453,7 @@ namespace mini_ghost {
                 filename += boost::lexical_cast<std::string>(rank);
                 filename += "_";
                 filename += boost::lexical_cast<std::string>(var);
-                filename += ".ppm";
-                write_grid(filename, grids[src][0]);
+                write_grid(grids[src][0], filename);
             }
             else
             {
@@ -634,145 +635,6 @@ namespace mini_ghost {
                 }
             }
         }
-    }
-
-    template <typename Real>
-    void stepper<Real>::print_header(params<Real> & p)
-    {
-        std::cout
-        << "\n"
-        << "======================================================================\n"
-        << "\n"
-        << "        Mantevo miniapp MiniGhost experiment\n"
-        << "        HPX port\n"
-        << "\n"
-        << "======================================================================\n"
-        << "\n";
-        switch (p.stencil)
-        {
-            case STENCIL_NONE:
-                std::cout << "No computation inserted\n";
-                break;
-            case STENCIL_2D5PT:
-                std::cout << "Computation: 5 pt difference stencil on a 2D grid (STENCIL_2D5PT)\n";
-                break;
-            case STENCIL_2D9PT:
-                std::cout << "Computation: 9 pt difference stencil on a 2D grid (STENCIL_2D9PT)\n";
-                break;
-            case STENCIL_3D7PT:
-                std::cout << "Computation: 7 pt difference stencil on a 3D grid (STENCIL_3D27PT)\n";
-                break;
-            case STENCIL_3D27PT:
-                std::cout << "Computation: 27 pt difference stencil on a 3D grid (STENCIL_3D27PT)\n";
-                break;
-            default:
-                std::cout << "** Warning ** Unkown compuation\n";
-                break;
-        }
-        std::cout << std::endl;
-
-        std::cout << "        Global Grid Dimension: "
-            << p.nx * p.npx << ", " << p.ny * p.npy << ", " << p.nz * p.npz << "\n";
-        std::cout << "        Local Grid Dimension : "
-            << p.nx << ", " << p.ny << ", " << p.nz << "\n";
-        std::cout << std::endl;
-
-        std::cout << "Number of variables: " << p.num_vars << "\n";
-        std::cout << std::endl;
-
-        std::cout
-            << "Error reported every " << p.report_diffusion << " time steps. "
-            << "Tolerance is " << p.error_tol << "\n";
-        std::cout
-            << "Number of variables reduced each time step: " << num_sum_grid
-            << "; requested " << p.percent_sum << "%\n";
-        std::cout << std::endl;
-
-        std::cout << "        Time Steps: " << p.num_tsteps << "\n";
-        std::cout << "        Task grid : " << p.npx << ", " << p.npy << ", " << p.npz << "\n";
-        std::cout << std::endl;
-
-        switch (p.scaling)
-        {
-            case SCALING_WEAK:
-                std::cout << "HPX version, weak scaling\n";
-                break;
-            case SCALING_STRONG:
-                std::cout << "HPX version, weak scaling\n";
-                break;
-            default:
-                std::cout << "HPX version, unkown scaling\n";
-                hpx::terminate();
-                break;
-        }
-
-        if(p.nranks == 1)
-        {
-            std::cout << "1 process executing\n";
-        }
-        else
-        {
-            std::cout << p.nranks << " processes executing\n";
-        }
-        std::cout << std::endl;
-
-        using namespace boost::posix_time;
-        using namespace boost::gregorian;
-        boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-        std::cout << "Program execution date " << to_simple_string(now) << "\n";
-        std::cout << std::endl;
-    }
-
-    template <typename Real>
-    void stepper<Real>::write_grid(std::string const & filename, grid<Real> & g)
-    {
-        std::ofstream outfile(filename.c_str());
-        if(!outfile) std::cerr << "Cannot open file ...\n";
-        outfile << "P6 " << g.nx_ << " " << g.ny_ << " 255\n";
-        for(std::size_t y = 0; y < g.ny_; ++y)
-        {
-            for(std::size_t x = 0; x < g.nx_; ++x)
-            {
-                double tmp = g(x, y, 2);
-                int r = 0;
-                int g = 0;
-                int b = 0;
-
-                if(tmp >= 0)
-                {
-                    if(tmp < 0.25)
-                    {
-                        g = 254. * (tmp / 0.25);
-                        b = 254;
-                    }
-                    else if(tmp < 0.5)
-                    {
-                        g = 254;
-                        b = 254. - 254. * (tmp - 0.25) / 0.25;
-                    }
-                    else if(tmp < 0.75)
-                    {
-                        r = 254. * ((tmp - 0.5) / 0.25);
-                        g = 254;
-                    }
-                    else if(tmp < 1.0)
-                    {
-                        r = 254;
-                        g = 254. - 254. * (tmp - 0.75) / 0.25;
-                    }
-                    else
-                    {
-                        r = 254;
-                        g = 254;
-                        b = 254;
-                    }
-                }
-
-                outfile << (char)r << (char)g << (char)b;
-            }
-        }
-        outfile.flush();
-        outfile.close();
     }
 
     template struct stepper<float>;

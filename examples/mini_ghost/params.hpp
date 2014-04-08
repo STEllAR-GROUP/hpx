@@ -8,6 +8,7 @@
 
 #include <hpx/hpx_finalize.hpp>
 #include <boost/program_options.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace mini_ghost {
     static const std::size_t SCALING_STRONG = 1;
@@ -279,6 +280,90 @@ namespace mini_ghost {
                           << std::endl;
                 hpx::terminate();
             }
+        }
+
+        void print_header(std::size_t num_sum_grid)
+        {
+            std::cout
+            << "\n"
+            << "======================================================================\n"
+            << "\n"
+            << "        Mantevo miniapp MiniGhost experiment\n"
+            << "        HPX port\n"
+            << "\n"
+            << "======================================================================\n"
+            << "\n";
+            switch (stencil)
+            {
+                case 20: //STENCIL_NONE:
+                    std::cout << "No computation inserted\n";
+                    break;
+                case 21: //STENCIL_2D5PT:
+                    std::cout << "Computation: 5 pt difference stencil on a 2D grid (STENCIL_2D5PT)\n";
+                    break;
+                case 22: //STENCIL_2D9PT:
+                    std::cout << "Computation: 9 pt difference stencil on a 2D grid (STENCIL_2D9PT)\n";
+                    break;
+                case 23: //STENCIL_3D7PT:
+                    std::cout << "Computation: 7 pt difference stencil on a 3D grid (STENCIL_3D27PT)\n";
+                    break;
+                case 24: //STENCIL_3D27PT:
+                    std::cout << "Computation: 27 pt difference stencil on a 3D grid (STENCIL_3D27PT)\n";
+                    break;
+                default:
+                    std::cout << "** Warning ** Unkown compuation\n";
+                    break;
+            }
+            std::cout << std::endl;
+
+            std::cout << "        Global Grid Dimension: "
+                << nx * npx << ", " << ny * npy << ", " << nz * npz << "\n";
+            std::cout << "        Local Grid Dimension : "
+                << nx << ", " << ny << ", " << nz << "\n";
+            std::cout << std::endl;
+
+            std::cout << "Number of variables: " << num_vars << "\n";
+            std::cout << std::endl;
+
+            std::cout
+                << "Error reported every " << report_diffusion << " time steps. "
+                << "Tolerance is " << error_tol << "\n";
+            std::cout
+                << "Number of variables reduced each time step: " << num_sum_grid
+                << "; requested " << percent_sum << "%\n";
+            std::cout << std::endl;
+
+            std::cout << "        Time Steps: " << num_tsteps << "\n";
+            std::cout << "        Task grid : " << npx << ", " << npy << ", " << npz << "\n";
+            std::cout << std::endl;
+
+            switch (scaling)
+            {
+                case SCALING_WEAK:
+                    std::cout << "HPX version, weak scaling\n";
+                    break;
+                case SCALING_STRONG:
+                    std::cout << "HPX version, weak scaling\n";
+                    break;
+                default:
+                    std::cout << "HPX version, unkown scaling\n";
+                    hpx::terminate();
+                    break;
+            }
+
+            if(nranks == 1)
+            {
+                std::cout << "1 process executing\n";
+            }
+            else
+            {
+                std::cout << nranks << " processes executing\n";
+            }
+            std::cout << std::endl;
+
+            boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
+            std::cout << "Program execution date " << to_simple_string(now) << "\n";
+            std::cout << std::endl;
         }
 
         std::size_t scaling;

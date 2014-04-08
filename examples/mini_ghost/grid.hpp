@@ -6,6 +6,8 @@
 #ifndef HPX_EXAMPLES_MINI_GRID_HPP
 #define HPX_EXAMPLES_MINI_GRID_HPP
 
+#include <vector>
+
 namespace mini_ghost {
 
     static const std::size_t NORTH   = 0;
