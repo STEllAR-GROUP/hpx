@@ -246,8 +246,7 @@ endif()
 hpx_include(GCCVersion)
 
 if(GCC_VERSION AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-               AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-               AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PathScale"))
+               AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
   hpx_info("gcc_config" "Compiler reports compatibility with GCC version ${GCC_VERSION_STR}")
 
   hpx_option(HPX_IGNORE_GCC_VERSION BOOL
@@ -1007,7 +1006,7 @@ if(MSVC)
   set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -d2Zi+")
 
   # VS2013 and above know how to do link time constant data segment folding
-  # VS2013 update 2 and above know how to remove debug information for
+  # VS2013 update 2 and above know how to remove debug information for 
   # non-referenced functions and data (-Zc:inline)
   if(MSVC12)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Zc:inline")

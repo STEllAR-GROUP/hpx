@@ -165,7 +165,6 @@ namespace hpx { namespace util
             {
                 if (detail::some_locks_are_not_ignored(held_locks))
                 {
-                    HPX_ASSERT(false);
                     std::string back_trace(hpx::detail::backtrace_direct());
                     if (back_trace.empty()) {
                         LERR_(debug)

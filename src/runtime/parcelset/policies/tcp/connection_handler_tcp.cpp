@@ -94,38 +94,36 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
     }
 
     void connection_handler::do_stop()
-    try {
-            // cancel all pending accept operations
-            if (NULL != acceptor_)
+    {
+        {
+            // cancel all pending read operations, close those sockets
+            lcos::local::spinlock::scoped_lock l(connections_mtx_);
+            BOOST_FOREACH(boost::shared_ptr<receiver> c,
+                accepted_connections_)
             {
                 boost::system::error_code ec;
-                acceptor_->close(ec);
-                delete acceptor_;
-                acceptor_ = NULL;
-            }
-            {
-                // cancel all pending read operations, close those sockets
-                lcos::local::spinlock::scoped_lock l(connections_mtx_);
-                BOOST_FOREACH(boost::shared_ptr<receiver> c,
-                    accepted_connections_)
-                {
-                    boost::system::error_code ec;
-                    boost::asio::ip::tcp::socket& s = c->socket();
-                    if (s.is_open()) {
-                        s.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-                        s.close(ec);    // close the socket to give it back to the OS
-                    }
+                boost::asio::ip::tcp::socket& s = c->socket();
+                if (s.is_open()) {
+                    s.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+                    s.close(ec);    // close the socket to give it back to the OS
                 }
-
-                accepted_connections_.clear();
-#if defined(HPX_HOLDON_TO_OUTGOING_CONNECTIONS)
-                write_connections_.clear();
-#endif
             }
+
+            accepted_connections_.clear();
+#if defined(HPX_HOLDON_TO_OUTGOING_CONNECTIONS)
+            write_connections_.clear();
+#endif
+        }
+
+        // cancel all pending accept operations
+        if (NULL != acceptor_)
+        {
+            boost::system::error_code ec;
+            acceptor_->close(ec);
+            delete acceptor_;
+            acceptor_ = NULL;
+        }
     }
-    // We just ignore exceptions here ...
-    catch(...)
-    {}
 
     boost::shared_ptr<sender> connection_handler::create_connection(
         naming::locality const& l, error_code& ec)

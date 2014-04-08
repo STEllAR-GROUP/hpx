@@ -30,7 +30,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
     class connection_handler;
 
     ibv_mr register_buffer(connection_handler & handler,
-        ibv_pd * pd, char * buffer, std::size_t size);
+        ibv_pd * pd, char * buffer, std::size_t size, int access);
 
     class receiver
       : public parcelport_connection<
@@ -130,9 +130,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                         parcelport_
                       , context_.pd_
                       , &buffer_->data_[0]
-                      , buffer_->data_.size());
-                    HPX_ASSERT(buffer_->data_.size() <= mr_.length);
-                    HPX_ASSERT(&buffer_->data_[0] == mr_.addr);
+                      , buffer_->data_.size()
+                      , IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE);
 
                     // write the newly received mr ...
                     context_.connection().send_mr(&mr_, ec);

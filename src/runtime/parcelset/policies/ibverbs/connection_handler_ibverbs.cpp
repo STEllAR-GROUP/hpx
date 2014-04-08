@@ -154,13 +154,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         stopped_ = true;
         // Wait until message handler returns
         std::size_t k = 0;
-        while(handling_accepts_)
+        while(handling_messages_)
         {
             hpx::lcos::local::spinlock::yield(k);
             ++k;
         }
         k = 0;
-        while(handling_messages_)
+        while(handling_accepts_)
         {
             hpx::lcos::local::spinlock::yield(k);
             ++k;
@@ -315,12 +315,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
     }
 
-    ibv_mr register_buffer(connection_handler & conn, ibv_pd * pd, char * buffer, std::size_t size)
+    ibv_mr register_buffer(connection_handler & conn, ibv_pd * pd, char * buffer, std::size_t size, int access)
     {
-        return conn.register_buffer(pd, buffer, size);
+        return conn.register_buffer(pd, buffer, size, access);
     }
 
-    ibv_mr connection_handler::register_buffer(ibv_pd * pd, char * buffer, std::size_t size)
+    ibv_mr connection_handler::register_buffer(ibv_pd * pd, char * buffer, std::size_t size, int access)
     {
         ibv_mr result = memory_pool_.get_mr(pd, buffer, size);
         if(result.addr == 0)
@@ -339,23 +339,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                         pd
                       , buffer
                       , size
-                      , IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE
+                      , access
                     );
                 it->second.insert(std::make_pair(buffer, mr));
                 return *mr.mr_;
-            }
-            if(size > jt->second.mr_->length)
-            {
-                ibverbs_mr mr;
-                jt->second = mr;
-                mr =
-                    ibverbs_mr(
-                        pd
-                      , buffer
-                      , size
-                      , IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE
-                    );
-                jt->second = mr;
             }
             return *jt->second.mr_;
         }
