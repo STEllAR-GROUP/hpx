@@ -36,6 +36,7 @@ int hpx_main(
         cout << HPX_SIZEOF(hpx::naming::gid_type)
              << HPX_SIZEOF(hpx::naming::id_type)
              << HPX_SIZEOF(hpx::naming::address)
+             << HPX_SIZEOF(hpx::threads::thread_data)
              << flush;
     }
 
