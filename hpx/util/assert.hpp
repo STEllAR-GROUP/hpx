@@ -8,6 +8,12 @@
 
 //  Note: There are no include guards. This is intentional.
 
+#if defined(HPX_USE_BOOST_ASSERT)
+#   include <boost/assert.hpp>
+#   define HPX_ASSERT(expr) BOOST_ASSERT(expr)
+#   define HPX_ASSERT_MSG(expr, msg) BOOST_ASSERT_MSG(expr, msg)
+#else
+
 /// \file assert.hpp
 
 #include <hpx/config/branch_hints.hpp>
@@ -131,3 +137,4 @@ namespace hpx
 
 #endif
 
+#endif
