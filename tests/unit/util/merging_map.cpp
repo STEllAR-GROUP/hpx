@@ -460,7 +460,7 @@ int main()
 
         table.apply(3, 3, incrementer<boost::uint32_t>(35), &map_type::default_data); // [3, 3]
 
-        std::cout << "-- [3, 3] += 35";
+        std::cout << "-- [3, 3] += 35\n";
 
         BOOST_FOREACH(map_type::const_reference e, table)
         {
