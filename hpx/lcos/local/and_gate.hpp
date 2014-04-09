@@ -126,10 +126,15 @@ namespace hpx { namespace lcos { namespace local
             if (received_segments_.count() == received_segments_.size())
             {
                 // we have received the last missing segment
-                promise_.set_value();           // fire event
-                promise_ = promise<void>();
+                promise<void> p = std::move(promise_);
                 received_segments_.reset();     // reset data store
-                return true;
+                {
+                    // Unlock the lock to avoid locking problems
+                    // when triggering the promise
+                    l.unlock();
+                    p.set_value();              // fire event
+                    return true;
+                }
             }
 
             return false;
