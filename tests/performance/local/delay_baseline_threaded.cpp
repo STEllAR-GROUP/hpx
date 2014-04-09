@@ -60,8 +60,7 @@ void print_results(
     {
         cout << "# BENCHMARK: " << benchmark_name << "\n";
 
-        cout << "# VERSION: " << HPX_GIT_COMMIT << " "
-                 << format_build_date(__DATE__) << "\n"
+        cout << "# VERSION: " << format_build_date(__DATE__) << "\n"
              << "#\n";
 
         // Note that if we change the number of fields above, we have to
@@ -71,7 +70,7 @@ void print_results(
                 "## 0:DELAY:Delay [micro-seconds] - Independent Variable\n"
                 "## 1:TASKS:# of Tasks - Independent Variable\n"
                 "## 2:OSTHRDS:OS-threads - Independent Variable\n"
-                "## 3:WTIME_THR:Total Walltime/Thread [seconds]\n"
+                "## 3:WTIME_THR:Total Walltime/Thread [micro-seconds]\n"
                 ;
     }
 
@@ -90,6 +89,11 @@ void invoke_n_workers(
     )
 {
     b.wait();
+
+    for (boost::uint64_t i = 0; i < tasks; ++i)
+    {
+        worker_timed(delay);
+    }
 
     // Start the clock.
     high_resolution_timer t;
