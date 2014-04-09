@@ -3,6 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/hpx_fwd.hpp>
 #include <examples/mini_ghost/flux_accumulate.hpp>
 #include <examples/mini_ghost/stepper.hpp>
 #include <examples/mini_ghost/stencils.hpp>
