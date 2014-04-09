@@ -82,13 +82,16 @@ void print_results(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void invoke_n_workers(
-    boost::barrier& b
-  , double& elapsed
+void invoke_n_workers_nowait(
+    double& elapsed
   , boost::uint64_t workers
     )
 {
-    b.wait();
+    // Warmup.
+    for (boost::uint64_t i = 0; i < tasks; ++i)
+    {
+        worker_timed(delay);
+    }
 
     for (boost::uint64_t i = 0; i < tasks; ++i)
     {
@@ -106,6 +109,17 @@ void invoke_n_workers(
     elapsed = t.elapsed();
 }
 
+void invoke_n_workers(
+    boost::barrier& b
+  , double& elapsed
+  , boost::uint64_t workers
+    )
+{
+    b.wait();
+
+    invoke_n_workers_nowait(elapsed, workers);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int app_main(
     variables_map& vm
@@ -114,20 +128,27 @@ int app_main(
     if (0 == tasks)
         throw std::invalid_argument("error: count of 0 tasks specified\n");
 
-    std::vector<double> elapsed(threads);
+    std::vector<double> elapsed(threads - 1);
     boost::thread_group workers;
-    boost::barrier b(threads);
+    boost::barrier b(threads - 1);
 
-    for (boost::uint32_t i = 0; i != threads; ++i)
+    for (boost::uint32_t i = 0; i != threads - 1; ++i)
+    {
         workers.add_thread(new boost::thread(invoke_n_workers,
             boost::ref(b), boost::ref(elapsed[i]), tasks));
-
-    workers.join_all();
+    }
 
     double total_elapsed = 0;
 
+    invoke_n_workers_nowait(total_elapsed, tasks);
+
+    workers.join_all();
+
     for (boost::uint64_t i = 0; i < elapsed.size(); ++i)
+    {
+        //cout << i << " " << elapsed[i] << "\n"; 
         total_elapsed += elapsed[i];
+    }
 
     // Print out the results.
     print_results(vm, total_elapsed / double(threads)
