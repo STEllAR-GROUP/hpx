@@ -9,7 +9,7 @@
 #ifndef HPX_TESTS_PERFORMANCE_WORKER_HPP
 #define HPX_TESTS_PERFORMANCE_WORKER_HPP
 
-#include <hpx/config.hpp>
+//#include <hpx/config.hpp>
 #include <hpx/util/hardware/timestamp.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <boost/cstdint.hpp>
