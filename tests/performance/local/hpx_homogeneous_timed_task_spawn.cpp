@@ -431,7 +431,7 @@ int hpx_main(
         {
             if (num_thread == i) continue;
     
-            register_work(boost::bind(stage_workers
+            register_work(boost::bind(&stage_workers
                                     , i
                                     , tasks_per_feeder
                                     , stage_worker
