@@ -35,12 +35,12 @@ namespace mini_ghost {
           , data_(nx*ny*nz)
         {}
 
-        void resize(std::size_t nx, std::size_t ny, std::size_t nz = 1)
+        void resize(std::size_t nx, std::size_t ny, std::size_t nz = 1, T val = T())
         {
             nx_ = nx;
             ny_ = ny;
             nz_ = nz;
-            data_.resize(nx*ny*nz);
+            data_.resize(nx*ny*nz, val);
         }
 
         T & operator()(std::size_t x, std::size_t y, std::size_t z = 0)

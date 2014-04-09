@@ -18,24 +18,25 @@ namespace mini_ghost {
     public:
         global_sum()
           : value_()
+          , generation_(0)
         {
         }
         global_sum(global_sum const& rhs)
           : value_(rhs.value_)
+          , generation_(rhs.generation_)
         {
         }
 
         template<typename Action>
         hpx::future<T> add(Action action, std::vector<hpx::id_type> ids,
-            std::size_t & generation, std::size_t which, T val)
+            std::size_t which, T val)
         {
-            generation = 0;
-            hpx::future<void> f = gate_.get_future(ids.size(), &generation);
+            hpx::future<void> f = gate_.get_future(ids.size(), &generation_);
             HPX_ASSERT(value_ == 0);
 
             for(hpx::id_type const & id : ids)
             {
-                hpx::apply(action, id, generation, which, val);
+                hpx::apply(action, id, generation_, which, val);
             }
 
             return f.then(
@@ -61,6 +62,7 @@ namespace mini_ghost {
         mutable mutex_type mtx_;
 
         T value_;
+        std::size_t generation_;
 
         hpx::lcos::local::base_and_gate<> gate_;        // synchronization gate
     };
