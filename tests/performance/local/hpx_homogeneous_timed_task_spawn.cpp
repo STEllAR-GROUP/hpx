@@ -82,6 +82,7 @@ std::string format_build_date(std::string timestamp)
 void print_results(
     boost::uint64_t cores
   , double walltime
+  , double warmup_estimate
   , std::vector<std::string> const& counter_shortnames
   , boost::shared_ptr<hpx::util::activate_counters> ac 
     )
@@ -110,9 +111,10 @@ void print_results(
                 "## 2:STASKS:# of Tasks to Suspend - Independent Variable\n"
                 "## 3:OSTHRDS:OS-threads - Independent Variable\n"
                 "## 4:WTIME:Total Walltime [seconds]\n"
+                "## 5:WARMUP:Total Walltime [seconds]\n"
                 ;
 
-        boost::uint64_t const last_index = 4;
+        boost::uint64_t const last_index = 5;
 
         for (boost::uint64_t i = 0; i < counter_shortnames.size(); ++i)
         {
@@ -128,12 +130,13 @@ void print_results(
         }
     }
 
-    cout << ( boost::format("%lu %lu %lu %lu %.14g")
+    cout << ( boost::format("%lu %lu %lu %lu %.14g %.14g")
             % delay 
             % tasks 
             % suspended_tasks
             % cores
             % walltime
+            % warmup_estimate
             );
 
     if (ac)
@@ -442,6 +445,8 @@ int hpx_main(
 
         stage_workers(num_thread, tasks_per_feeder, stage_worker);
 
+        double warmup_estimate = t.elapsed();
+
         // Schedule a low-priority thread; when it is executed, it checks to
         // make sure all the tasks (which are normal priority) have been 
         // executed, and then it
@@ -459,7 +464,8 @@ int hpx_main(
         // Stop the clock
         double time_elapsed = t.elapsed();
 
-        print_results(os_thread_count, time_elapsed, counter_shortnames, ac);
+        print_results(os_thread_count, time_elapsed, warmup_estimate
+                    , counter_shortnames, ac);
     }
 
     if (suspended_tasks != 0)
