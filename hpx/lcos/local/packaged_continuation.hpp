@@ -424,4 +424,56 @@ namespace hpx { namespace lcos { namespace detail
     }
 }}}
 
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace lcos { namespace detail
+{
+    class void_continuation : public future_data<void>
+    {
+    private:
+        template <typename Future>
+        void on_ready(
+            typename shared_state_ptr_for<Future>::type const& state)
+        {
+            try {
+                (void)state->get_result();
+                this->set_result(util::unused);
+            }
+            catch (...) {
+                this->set_exception(boost::current_exception());
+            }
+        }
+
+    public:
+        template <typename Future>
+        void attach(Future& future)
+        {
+            typedef
+                typename shared_state_ptr_for<Future>::type 
+                shared_state_ptr;
+
+            // Bind an on_completed handler to this future which will wait for
+            // the inner future and will transfer its result to the new future.
+            boost::intrusive_ptr<void_continuation> this_(this);
+            void (void_continuation::*ready)(shared_state_ptr const&) =
+                &void_continuation::on_ready<Future>;
+
+            shared_state_ptr const& state =
+                future_access::get_shared_state(future);
+            state->set_on_completed(util::bind(ready, std::move(this_), state));
+        }
+    };
+
+    template <typename Future>
+    inline typename shared_state_ptr<void>::type
+    make_void_continuation(Future& future)
+    {
+        typedef detail::void_continuation void_shared_state;
+
+        // create a continuation
+        typename shared_state_ptr<void>::type p(new void_shared_state());
+        static_cast<void_shared_state*>(p.get())->attach(future);
+        return std::move(p);
+    }
+}}}
+
 #endif
