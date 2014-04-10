@@ -64,7 +64,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     template <typename Scheduler>
     thread_pool_executor<Scheduler>::thread_pool_executor(std::size_t max_punits,
             std::size_t min_punits)
-      : scheduler_(max_punits), shutdown_sem_(0),
+      : scheduler_(max_punits, false), shutdown_sem_(0),
         states_(max_punits),
         current_concurrency_(0), max_current_concurrency_(0),
         tasks_scheduled_(0), tasks_completed_(0),
@@ -80,7 +80,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
         states_.resize(max_punits);
         for (std::size_t i = 0; i != max_punits; ++i)
-            states_[i].store(starting);
+            states_[i].store(initialized);
 
         // Inform the resource manager about this new executor. This causes the
         // resource manager to interact with this executor using the
@@ -94,7 +94,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         typedef boost::atomic<hpx::state> state_type;
         BOOST_FOREACH(state_type& state, states)
         {
-            if (state.load() == starting)
+            if (state.load() < running)
                 return true;
         }
         return false;
@@ -121,10 +121,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         rm.detach(cookie_);     // this releases proxy (manage_thread_pool_executor)
 
 #if defined(HPX_DEBUG)
-        // all resources should have been stopped at this point
+        // all resources should have been stopped at this point (or have never
+        // been initialized)
         for (std::size_t i = 0; i != states_.size(); ++i)
         {
-            HPX_ASSERT(states_[i].load() == stopping);
+            hpx::state s = states_[i].load();
+            HPX_ASSERT(s == initialized || s == stopping);
         }
 
         // all scheduled tasks should have completed executing
@@ -290,7 +292,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // execute all work
     template <typename Scheduler>
     void thread_pool_executor<Scheduler>::run(std::size_t virt_core,
-        std::size_t thread_num, lcos::local::barrier& b)
+        std::size_t thread_num)
     {
         // Set the state to 'running' only if it's still in 'starting' state,
         // otherwise our destructor is currently being executed, which means
@@ -302,8 +304,6 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
             scheduler_.add_punit(virt_core, thread_num);
             scheduler_.on_start_thread(virt_core);
-
-            b.wait();
 
             on_run_exit on_exit(current_concurrency_, shutdown_sem_);
 
@@ -319,9 +319,6 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             HPX_ASSERT(!scheduler_.get_thread_count(
                 unknown, thread_priority_default, thread_num));
 #endif
-        }
-        else {
-            b.wait();
         }
     }
 
@@ -368,18 +365,18 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     void thread_pool_executor<Scheduler>::add_processing_unit(
         std::size_t virt_core, std::size_t thread_num, error_code& ec)
     {
-        lcos::local::barrier b(2);
-        register_thread_nullary(
-            util::bind(
-                &thread_pool_executor::run, this,
-                virt_core, thread_num, boost::ref(b)
-            ),
-            "thread_pool_executor thread", threads::pending, true,
-            threads::thread_priority_normal, thread_num,
-            threads::thread_stacksize_default, ec);
-
-        // wait for the thread to actually run
-        b.wait();
+        state expected = initialized;
+        if (states_[virt_core].compare_exchange_strong(expected, starting))
+        {
+            register_thread_nullary(
+                util::bind(
+                    &thread_pool_executor::run, this,
+                    virt_core, thread_num
+                ),
+                "thread_pool_executor thread", threads::pending, true,
+                threads::thread_priority_normal, thread_num,
+                threads::thread_stacksize_default, ec);
+        }
     }
 
     // Remove the given processing unit from the scheduler.

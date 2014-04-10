@@ -91,7 +91,8 @@ namespace hpx { namespace threads { namespace policies
         };
         typedef init_parameter init_parameter_type;
 
-        local_queue_scheduler(init_parameter_type const& init)
+        local_queue_scheduler(init_parameter_type const& init,
+                bool deferred_initialization = true)
           : scheduler_base(init.num_queues_),
             max_queue_thread_count_(init.max_queue_thread_count_),
             queues_(init.num_queues_),
@@ -109,6 +110,12 @@ namespace hpx { namespace threads { namespace policies
             outside_numa_domain_masks_(init.num_queues_, topology_.get_machine_affinity_mask())
 #endif
         {
+            if (!deferred_initialization)
+            {
+                BOOST_ASSERT(init.num_queues_ != 0);
+                for (std::size_t i = 0; i < init.num_queues_; ++i)
+                    queues_[i] = new thread_queue_type(init.max_queue_thread_count_);
+            }
         }
 
         virtual ~local_queue_scheduler()
@@ -638,8 +645,11 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         void on_start_thread(std::size_t num_thread)
         {
-            queues_[num_thread] =
-                new thread_queue_type(max_queue_thread_count_);
+            if (0 == queues_[num_thread])
+            {
+                queues_[num_thread] =
+                    new thread_queue_type(max_queue_thread_count_);
+            }
 
             queues_[num_thread]->on_start_thread(num_thread);
 

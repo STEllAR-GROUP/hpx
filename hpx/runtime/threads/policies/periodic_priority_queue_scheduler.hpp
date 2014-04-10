@@ -44,8 +44,9 @@ namespace hpx { namespace threads { namespace policies
         typedef typename base_type::init_parameter_type
             init_parameter_type;
 
-        periodic_priority_queue_scheduler(init_parameter_type const& init)
-          : base_type(init)
+        periodic_priority_queue_scheduler(init_parameter_type const& init,
+                bool deferred_initialization = true)
+          : base_type(init, deferred_initialization)
         {}
 
         bool periodic_maintenance(bool running)

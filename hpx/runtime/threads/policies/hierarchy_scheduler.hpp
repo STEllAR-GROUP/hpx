@@ -155,8 +155,9 @@ namespace hpx { namespace threads { namespace policies
             }
         }
 
-        hierarchy_scheduler(init_parameter_type const& init)
-            : scheduler_base(init.num_queues_),
+        hierarchy_scheduler(init_parameter_type const& init,
+                bool deferred_initialization = true)
+          : scheduler_base(init.num_queues_),
             d(init.arity_),
             numa_sensitive_(init.numa_sensitive_)
         {

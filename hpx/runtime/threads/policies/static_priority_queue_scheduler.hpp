@@ -41,8 +41,9 @@ namespace hpx { namespace threads { namespace policies
         typedef typename base_type::init_parameter_type
             init_parameter_type;
 
-        static_priority_queue_scheduler(init_parameter_type const& init)
-          : base_type(init)
+        static_priority_queue_scheduler(init_parameter_type const& init,
+                bool deferred_initialization = true)
+          : base_type(init, deferred_initialization)
         {}
 
         /// Return the next thread to be executed, return false if non is

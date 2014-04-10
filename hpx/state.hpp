@@ -18,9 +18,10 @@ namespace hpx
 {
     enum state
     {
-        starting = BOOST_BINARY_U(001),
-        running  = BOOST_BINARY_U(010),
-        stopping = BOOST_BINARY_U(100)
+        initialized = BOOST_BINARY_U(000),
+        starting    = BOOST_BINARY_U(001),
+        running     = BOOST_BINARY_U(010),
+        stopping    = BOOST_BINARY_U(100)
     };
 
     namespace threads

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate
 //  Copyright (c)      2011 Bryce Lelbach
 //
@@ -12,6 +12,7 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/executors/thread_pool_executors.hpp>
 
 #endif
 

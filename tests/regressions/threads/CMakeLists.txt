@@ -8,12 +8,14 @@ set(tests
     block_os_threads_1036
     resume_priority
     thread_data_1111
+    thread_pool_executor_1112
     thread_rescheduling
     thread_suspend_pending
     thread_suspend_duration
    )
 
 set(block_os_threads_1036_PARAMETERS THREADS_PER_LOCALITY 4)
+set(thread_pool_executor_1112_PARAMETERS THREADS_PER_LOCALITY 4)
 set(thread_rescheduling_PARAMETERS THREADS_PER_LOCALITY 4)
 set(thread_suspend_pending_PARAMETERS THREADS_PER_LOCALITY 1)
 set(thread_suspend_duration_PARAMETERS THREADS_PER_LOCALITY 1)

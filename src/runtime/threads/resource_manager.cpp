@@ -172,7 +172,8 @@ namespace hpx { namespace threads
         }
 
         // adjust resource usage count
-        BOOST_FOREACH(coreids_type coreids, (*it).second.core_ids_)
+        proxy_data& p = (*it).second;
+        BOOST_FOREACH(coreids_type coreids, p.core_ids_)
         {
             HPX_ASSERT(punits_[coreids.first].use_count_ != 0);
             --punits_[coreids.first].use_count_;
