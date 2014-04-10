@@ -18,6 +18,7 @@ mini_ghost::params<grid_type::value_type> p;
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
+    hpx::util::high_resolution_timer timer_all;
     hpx::id_type    here = hpx::find_here();
     std::string     name = hpx::get_locality_name();
     p.rank = hpx::naming::get_locality_id_from_id(here);
@@ -36,6 +37,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     stepper->run(p.num_spikes, p.num_tsteps);
 
     mini_ghost::barrier_wait();
+    std::cout << "Total runtime: " << timer_all.elapsed() << "\n";
     if (p.rank==0)
       return hpx::finalize();
     else return 0;

@@ -369,7 +369,14 @@ namespace mini_ghost {
                     }
                 );
             }
-            sum_future.wait();
+
+            // FIXME: return future<void> from when_all
+            hpx::wait_all(
+                sum_future
+              , flux_out_future
+              , hpx::when_all(recv_futures)
+              , hpx::when_all(calc_futures.data_)
+            );
         }
 
         hpx::future<void> sum_grid(
