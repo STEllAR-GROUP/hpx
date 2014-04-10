@@ -467,7 +467,7 @@ namespace mini_ghost {
                     break;
             }
 
-            Real flux;
+            Real flux(0.0);
             if(my_px_ == 0)
             {
                 for(std::size_t z = 1; z < g.nz_-1; ++z)
