@@ -16,6 +16,8 @@ namespace mini_ghost {
     template <typename BufferType, std::size_t Zone, typename Action>
     struct send_buffer
     {
+        HPX_MOVABLE_BUT_NOT_COPYABLE(send_buffer);
+    public:
         typedef hpx::lcos::local::spinlock mutex_type;
 
         typedef typename BufferType::value_type value_type;
@@ -26,33 +28,22 @@ namespace mini_ghost {
 
         send_buffer()
           : dest_(hpx::invalid_id)
-          , send_future_(hpx::make_ready_future())
         {}
 
-        send_buffer(hpx::id_type dest)
-          : dest_(dest)
-          , send_future_(hpx::make_ready_future())
-        {}
-
-        send_buffer(send_buffer && rhs)
-          : dest_(std::move(rhs.dest_))
-          , send_future_(std::move(rhs.send_future_))
-        {}
+        send_buffer(send_buffer &&) = default;
+        send_buffer& operator=(send_buffer &&) = default;
 
         void operator()(grid<value_type> const & g, std::size_t step, std::size_t var)
         {
             if(dest_)
             {
-                send_future_.wait();
                 buffer_type buffer;
                 pack_buffer<Zone>::call(g, buffer);
-                send_future_ =
-                    hpx::async(Action(), dest_, buffer, step, var);
+                hpx::apply(Action(), dest_, buffer, step, var);
             }
         }
 
         hpx::id_type dest_;
-        hpx::future<void> send_future_;
     };
 }
 

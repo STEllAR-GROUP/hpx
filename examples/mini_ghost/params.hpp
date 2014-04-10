@@ -32,6 +32,9 @@ namespace mini_ghost {
             // Local z dimension (local for weak scaling, global when strong
             // scaling is selected.)
           , nz(100)
+          , nx_block(100)
+          , ny_block(100)
+          , nz_block(10)
             // Number of variables
           , num_vars(5)
             // (Approximate) number of variables that needs to be summed.
@@ -88,6 +91,18 @@ namespace mini_ghost {
                   boost::program_options::value<std::size_t>()->default_value(100),
                   "Local z dimension (local for weak scaling, global when strong\n"
                   "scaling is selected.)");
+            desc_commandline.add_options()
+                ( "nx_block",
+                  boost::program_options::value<std::size_t>(&nx_block)->default_value(100),
+                  "Block size in x direction (default: 100)");
+            desc_commandline.add_options()
+                ( "ny_block",
+                  boost::program_options::value<std::size_t>(&ny_block)->default_value(100),
+                  "Block size in y direction (default: 100)");
+            desc_commandline.add_options()
+                ( "nz_block",
+                  boost::program_options::value<std::size_t>(&nz_block)->default_value(10),
+                  "Block size in z direction (default: 10)");
             desc_commandline.add_options()
                 ( "ndim",
                   boost::program_options::value<std::size_t>(),
@@ -370,6 +385,9 @@ namespace mini_ghost {
         std::size_t nx;
         std::size_t ny;
         std::size_t nz;
+        std::size_t nx_block;
+        std::size_t ny_block;
+        std::size_t nz_block;
         std::size_t num_vars;
         std::size_t percent_sum;
         std::size_t num_spikes;

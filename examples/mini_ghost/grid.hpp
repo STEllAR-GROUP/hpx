@@ -16,6 +16,7 @@ namespace mini_ghost {
     static const std::size_t WEST    = 3;
     static const std::size_t BACK    = 4;
     static const std::size_t FRONT   = 5;
+    static const std::size_t NUM_NEIGHBORS   = 6;
 
     template <typename T>
     struct grid

@@ -16,6 +16,8 @@ namespace mini_ghost {
     template <typename BufferType, std::size_t Zone>
     struct recv_buffer
     {
+        HPX_MOVABLE_BUT_NOT_COPYABLE(recv_buffer);
+    public:
         typedef hpx::lcos::local::spinlock mutex_type;
 
         typedef typename BufferType::value_type value_type;
@@ -40,10 +42,8 @@ namespace mini_ghost {
           : valid_(false)
         {}
 
-        recv_buffer(recv_buffer const & other)
-          : buffer_map_(other.buffer_map_)
-          , valid_(other.valid_)
-        {}
+        recv_buffer(recv_buffer &&) = default;
+        recv_buffer& operator=(recv_buffer &&) = default;
 
         ~recv_buffer()
         {
@@ -56,11 +56,20 @@ namespace mini_ghost {
             }
         }
 
-        void operator()(grid<value_type> & g, std::size_t step)
+        hpx::future<void> operator()(grid<value_type> & g, std::size_t step)
         {
             if(valid_)
             {
-                unpack_buffer<Zone>::call(g, get_buffer(step));
+                return get_buffer(step).then(
+                    [&g](hpx::future<buffer_type> buffer_future)
+                    {
+                        unpack_buffer<Zone>::call(g, buffer_future.get());
+                    }
+                );
+            }
+            else
+            {
+                return hpx::make_ready_future();
             }
         }
 
@@ -70,16 +79,13 @@ namespace mini_ghost {
             get_buffer_entry(step)->second->set_value(buffer);
         }
 
-        buffer_type get_buffer(std::size_t step)
+        hpx::future<buffer_type> get_buffer(std::size_t step)
         {
-            buffer_type res;
+            hpx::future<buffer_type> res;
             {
                 mutex_type::scoped_lock l(mtx_);
                 iterator it = get_buffer_entry(step);
-                {
-                    hpx::util::scoped_unlock<mutex_type::scoped_lock> ul(l);
-                    res = it->second->get_future().get();
-                }
+                res = it->second->get_future();
                 HPX_ASSERT(buffer_map_.find(step) != buffer_map_.end());
                 buffer_map_.erase(it);
             }

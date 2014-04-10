@@ -8,7 +8,6 @@
 
 #include <examples/mini_ghost/barrier.hpp>
 #include <examples/mini_ghost/params.hpp>
-#include <examples/mini_ghost/run.hpp>
 #include <examples/mini_ghost/stepper.hpp>
 
 typedef mini_ghost::grid<double> grid_type;

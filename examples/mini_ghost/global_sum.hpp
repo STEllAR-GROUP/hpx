@@ -12,7 +12,7 @@ namespace mini_ghost {
     template <typename T>
     struct global_sum
     {
-    private:
+        HPX_MOVABLE_BUT_NOT_COPYABLE(global_sum);
         typedef hpx::lcos::local::spinlock mutex_type;
 
     public:
@@ -21,11 +21,9 @@ namespace mini_ghost {
           , generation_(0)
         {
         }
-        global_sum(global_sum const& rhs)
-          : value_(rhs.value_)
-          , generation_(rhs.generation_)
-        {
-        }
+
+        global_sum(global_sum &&) = default;
+        global_sum& operator=(global_sum &&) = default;
 
         template<typename Action>
         hpx::future<T> add(Action action, std::vector<hpx::id_type> ids,
