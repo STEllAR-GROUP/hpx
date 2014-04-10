@@ -158,7 +158,8 @@ namespace mini_ghost {
 
                                         if(nx_block == 0)
                                         {
-                                            dependencies.push_back(recv_futures[WEST]);
+                                            if(recv_buffer_west_.valid_)
+                                                dependencies.push_back(recv_futures[WEST]);
                                         }
                                         else
                                         {
@@ -167,7 +168,8 @@ namespace mini_ghost {
 
                                         if(nx_block == calc_futures.nx_-1)
                                         {
-                                            dependencies.push_back(recv_futures[EAST]);
+                                            if(recv_buffer_east_.valid_)
+                                                dependencies.push_back(recv_futures[EAST]);
                                         }
                                         else
                                         {
@@ -176,7 +178,8 @@ namespace mini_ghost {
 
                                         if(ny_block == 0)
                                         {
-                                            dependencies.push_back(recv_futures[SOUTH]);
+                                            if(recv_buffer_south_.valid_)
+                                                dependencies.push_back(recv_futures[SOUTH]);
                                         }
                                         else
                                         {
@@ -185,7 +188,8 @@ namespace mini_ghost {
 
                                         if(ny_block == calc_futures.ny_-1)
                                         {
-                                            dependencies.push_back(recv_futures[NORTH]);
+                                            if(recv_buffer_north_.valid_)
+                                                dependencies.push_back(recv_futures[NORTH]);
                                         }
                                         else
                                         {
@@ -194,7 +198,8 @@ namespace mini_ghost {
 
                                         if(nz_block == 0)
                                         {
-                                            dependencies.push_back(recv_futures[FRONT]);
+                                            if(recv_buffer_front_.valid_)
+                                                dependencies.push_back(recv_futures[FRONT]);
                                         }
                                         else
                                         {
@@ -203,7 +208,8 @@ namespace mini_ghost {
 
                                         if(nz_block == calc_futures.nz_-1)
                                         {
-                                            dependencies.push_back(recv_futures[BACK]);
+                                            if(recv_buffer_back_.valid_)
+                                                dependencies.push_back(recv_futures[BACK]);
                                         }
                                         else
                                         {
@@ -264,32 +270,32 @@ namespace mini_ghost {
                                             break;
                                     }
                                     // Setup send buffer dependencies ...
-                                    if(nx_block == 0)
+                                    if(send_buffer_west_.dest_ && nx_block == 0)
                                     {
                                         send_west_buffer_dependencies
                                             .push_back(calc_futures(nx_block, ny_block, nz_block));
                                     }
-                                    if(nx_block == calc_futures.nx_-1)
+                                    if(send_buffer_east_.dest_ && nx_block == calc_futures.nx_-1)
                                     {
                                         send_east_buffer_dependencies
                                             .push_back(calc_futures(nx_block, ny_block, nz_block));
                                     }
-                                    if(ny_block == 0)
+                                    if(send_buffer_south_.dest_ && ny_block == 0)
                                     {
                                         send_south_buffer_dependencies
                                             .push_back(calc_futures(nx_block, ny_block, nz_block));
                                     }
-                                    if(ny_block == calc_futures.ny_-1)
+                                    if(send_buffer_north_.dest_ && ny_block == calc_futures.ny_-1)
                                     {
                                         send_north_buffer_dependencies
                                             .push_back(calc_futures(nx_block, ny_block, nz_block));
                                     }
-                                    if(nz_block == 0)
+                                    if(send_buffer_front_.dest_ && nz_block == 0)
                                     {
                                         send_front_buffer_dependencies
                                             .push_back(calc_futures(nx_block, ny_block, nz_block));
                                     }
-                                    if(nz_block == calc_futures.nz_-1)
+                                    if(send_buffer_back_.dest_ && nz_block == calc_futures.nz_-1)
                                     {
                                         send_back_buffer_dependencies
                                             .push_back(calc_futures(nx_block, ny_block, nz_block));
@@ -638,6 +644,7 @@ namespace mini_ghost {
       , rank_(p.rank)
       , error_tol_(p.error_tol)
       , report_diffusion_(p.report_diffusion)
+      , sum_grid_(false)
     {
         grids_[dst_].resize(nx_+2, ny_+2, nz_+2, 0.0);
         grids_[src_].resize(nx_+2, ny_+2, nz_+2, 0.0);
