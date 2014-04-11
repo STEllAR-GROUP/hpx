@@ -30,8 +30,20 @@ namespace mini_ghost {
           : dest_(hpx::invalid_id)
         {}
 
+#ifndef _MSC_VER
         send_buffer(send_buffer &&) = default;
         send_buffer& operator=(send_buffer &&) = default;
+#else
+        send_buffer(send_buffer &&other)
+        {
+            this->dest_  = other.dest_;
+        }
+        send_buffer& operator=(send_buffer &&other)
+        {
+            this->dest_  = other.dest_;
+            return *this;
+        }
+#endif
 
         void operator()(grid<value_type> const & g, std::size_t step, std::size_t var)
         {

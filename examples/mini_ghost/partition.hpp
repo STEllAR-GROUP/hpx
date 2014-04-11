@@ -52,8 +52,80 @@ namespace mini_ghost {
           , hpx::future<void> & sum_future
         );
 
-        partition(partition && rhs) = default;
-        partition & operator=(partition && rhs) = default;
+#ifndef _MSC_VER
+        partition(partition &&) = default;
+        partition& operator=(partition &&) = default;
+#else
+        partition(partition &&other)
+        {
+            this->id_      = other.id_;
+            this->stencil_ = other.stencil_;
+            this->src_     = other.src_;
+            this->dst_     = other.dst_;
+            this->grids_   = std::move(other.grids_);
+
+            this->sum_allreduce_ = std::move(other.sum_allreduce_);
+            this->source_total_  = other.source_total_;
+            this->flux_out_      = other.flux_out_;
+
+            this->nx_        = other.nx_;
+            this->ny_        = other.ny_;
+            this->nz_        = other.nz_;
+
+            this->nx_block_  = other.nx_block_;
+            this->ny_block_  = other.ny_block_;
+            this->nz_block_  = other.nz_block_;
+
+            this->npx_       = other.npx_;
+            this->npy_       = other.npy_;
+            this->npz_       = other.npz_;
+
+            this->my_px_     = other.my_px_;
+            this->my_py_     = other.my_py_;
+            this->my_pz_     = other.my_pz_;
+
+            this->rank_      = other.rank_;
+
+            this->error_tol_         = other.error_tol_;
+            this->report_diffusion_  = other.report_diffusion_;
+            this->sum_grid_          = other.sum_grid_;
+        }
+        partition& operator=(partition &&other)
+        {
+            this->id_      = other.id_;
+            this->stencil_ = other.stencil_;
+            this->src_     = other.src_;
+            this->dst_     = other.dst_;
+            this->grids_ = std::move(other.grids_);
+
+            this->sum_allreduce_ = std::move(other.sum_allreduce_);
+            this->source_total_  = other.source_total_;
+            this->flux_out_      = other.flux_out_;
+
+            this->nx_        = other.nx_;
+            this->ny_        = other.ny_;
+            this->nz_        = other.nz_;
+
+            this->nx_block_  = other.nx_block_;
+            this->ny_block_  = other.ny_block_;
+            this->nz_block_  = other.nz_block_;
+
+            this->npx_       = other.npx_;
+            this->npy_       = other.npy_;
+            this->npz_       = other.npz_;
+
+            this->my_px_     = other.my_px_;
+            this->my_py_     = other.my_py_;
+            this->my_pz_     = other.my_pz_;
+
+            this->rank_      = other.rank_;
+
+            this->error_tol_         = other.error_tol_;
+            this->report_diffusion_  = other.report_diffusion_;
+            this->sum_grid_          = other.sum_grid_;
+            return *this;
+        }
+#endif
 
         void sum_allreduce(std::size_t which, std::size_t generation, Real value)
         {

@@ -22,9 +22,22 @@ namespace mini_ghost {
         {
         }
 
+#ifndef _MSC_VER
         global_sum(global_sum &&) = default;
         global_sum& operator=(global_sum &&) = default;
-
+#else
+        global_sum(global_sum &&other)
+        {
+            this->value_      = std::move(other.value_);
+            this->generation_ = other.generation_;
+        }
+        global_sum& operator=(global_sum &&other)
+        {
+            this->value_      = std::move(other.value_);
+            this->generation_ = other.generation_;
+            return *this;
+        }
+#endif
         template<typename Action>
         hpx::future<T> add(Action action, std::vector<hpx::id_type> ids,
             std::size_t which, T val)
