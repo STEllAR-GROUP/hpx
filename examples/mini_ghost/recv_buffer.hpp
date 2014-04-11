@@ -74,9 +74,34 @@ namespace mini_ghost {
         {
             if(valid_)
             {
+                double time_now = hpx::util::high_resolution_timer::now();
                 return get_buffer(step).then(
-                    [&g](hpx::future<buffer_type> buffer_future)
+                    [&g, time_now](hpx::future<buffer_type> buffer_future)
                     {
+                        hpx::util::high_resolution_timer timer(time_now);
+                        double elapsed = timer.elapsed();
+                        profiling::data().time_wait(elapsed);
+                        switch(Zone)
+                        {
+                            case EAST:
+                                profiling::data().time_wait_x(elapsed);
+                                break;
+                            case WEST:
+                                profiling::data().time_wait_x(elapsed);
+                                break;
+                            case NORTH:
+                                profiling::data().time_wait_y(elapsed);
+                                break;
+                            case SOUTH:
+                                profiling::data().time_wait_y(elapsed);
+                                break;
+                            case FRONT:
+                                profiling::data().time_wait_z(elapsed);
+                                break;
+                            case BACK:
+                                profiling::data().time_wait_z(elapsed);
+                                break;
+                        }
                         unpack_buffer<Zone>::call(g, buffer_future.get());
                     }
                 );

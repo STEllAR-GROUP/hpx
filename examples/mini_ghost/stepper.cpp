@@ -4,6 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+#include <examples/mini_ghost/profiling.hpp>
 #include <examples/mini_ghost/stepper.hpp>
 #include <examples/mini_ghost/stencils.hpp>
 #include <examples/mini_ghost/write_grid.hpp>
@@ -135,6 +136,7 @@ namespace mini_ghost {
             }
             hpx::wait_all(run_futures);
         }
+        profiling::data().time_wall(timer_all.elapsed());
     }
 
     template <typename Real>

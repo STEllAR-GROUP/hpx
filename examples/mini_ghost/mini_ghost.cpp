@@ -5,7 +5,9 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/lcos/local/counting_semaphore.hpp>
 
+#include <examples/mini_ghost/profiling.hpp>
 #include <examples/mini_ghost/barrier.hpp>
 #include <examples/mini_ghost/params.hpp>
 #include <examples/mini_ghost/stepper.hpp>
@@ -15,15 +17,37 @@ typedef mini_ghost::grid<double> grid_type;
 typedef mini_ghost::stepper<grid_type::value_type> stepper_type;
 
 mini_ghost::params<grid_type::value_type> p;
+hpx::lcos::local::spinlock profiling_data_mtx;
+boost::shared_ptr<hpx::lcos::local::counting_semaphore> profiling_data_sem;
+std::vector<mini_ghost::profiling::profiling_data> profiling_data;
+
+double init_start;
+
+void add_profile(mini_ghost::profiling::profiling_data const & pd)
+{
+    {
+        hpx::lcos::local::spinlock::scoped_lock l(profiling_data_mtx);
+        profiling_data.push_back(pd);
+        profiling_data_sem->signal();
+    }
+    if(p.rank == 0)
+    {
+        profiling_data_sem->wait();
+    }
+}
+
+HPX_PLAIN_ACTION(add_profile);
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
+    mini_ghost::profiling::data().time_init(hpx::util::high_resolution_timer::now() - init_start);
     hpx::util::high_resolution_timer timer_all;
     hpx::id_type    here = hpx::find_here();
     std::string     name = hpx::get_locality_name();
     p.rank = hpx::naming::get_locality_id_from_id(here);
     p.nranks = hpx::get_num_localities().get();
 
+    profiling_data_sem.reset(new hpx::lcos::local::counting_semaphore(p.nranks));
     p.setup(vm);
 
     hpx::id_type stepper_id
@@ -37,10 +61,22 @@ int hpx_main(boost::program_options::variables_map& vm)
     stepper->run(p.num_spikes, p.num_tsteps);
 
     mini_ghost::barrier_wait();
-    std::cout << "Total runtime: " << timer_all.elapsed() << "\n";
     if (p.rank==0)
-      return hpx::finalize();
-    else return 0;
+    {
+        add_profile(mini_ghost::profiling::data());
+        if(p.report_perf)
+            mini_ghost::profiling::report(std::cout, profiling_data, p);
+        else
+            std::cout << "Total runtime: " << timer_all.elapsed() << "\n";
+        std::ofstream fs("results.yaml");
+        mini_ghost::profiling::report(fs, profiling_data, p);
+        return hpx::finalize();
+    }
+    else
+    {
+        hpx::apply(add_profile_action(), hpx::find_root_locality(), mini_ghost::profiling::data());
+        return 0;
+    }
 }
 
 int main(int argc, char* argv[])
@@ -59,5 +95,6 @@ int main(int argc, char* argv[])
     std::vector<std::string> cfg;
     cfg.push_back("hpx.run_hpx_main!=1");
 
+    init_start = hpx::util::high_resolution_timer::now();
     return hpx::init(desc_commandline, argc, argv, cfg);
 }

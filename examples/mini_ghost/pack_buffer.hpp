@@ -19,6 +19,7 @@ namespace mini_ghost {
         template <typename Real, typename BufferType>
         static void call(grid<Real> const & g, BufferType & buffer)
         {
+            hpx::util::high_resolution_timer timer;
             Real * data = new Real[g.nx_ * g.nz_];
             buffer = BufferType(data, g.nx_ * g.nz_, BufferType::take);
             typename BufferType::value_type * src = buffer.data();
@@ -30,6 +31,9 @@ namespace mini_ghost {
                     ++src;
                 }
             }
+            double elapsed = timer.elapsed();
+            profiling::data().time_pack_y(elapsed);
+            profiling::data().time_pack(elapsed);
         }
     };
 
@@ -39,6 +43,7 @@ namespace mini_ghost {
         template <typename Real, typename BufferType>
         static void call(grid<Real> const & g, BufferType & buffer)
         {
+            hpx::util::high_resolution_timer timer;
             Real * data = new Real[g.nx_ * g.nz_];
             buffer = BufferType(data, g.nx_ * g.nz_, BufferType::take);
             typename BufferType::value_type * src = buffer.data();
@@ -50,6 +55,9 @@ namespace mini_ghost {
                     ++src;
                 }
             }
+            double elapsed = timer.elapsed();
+            profiling::data().time_pack_y(elapsed);
+            profiling::data().time_pack(elapsed);
         }
     };
 
@@ -59,6 +67,7 @@ namespace mini_ghost {
         template <typename Real, typename BufferType>
         static void call(grid<Real> const & g, BufferType & buffer)
         {
+            hpx::util::high_resolution_timer timer;
             Real * data = new Real[g.ny_ * g.nz_];
             buffer = BufferType(data, g.ny_ * g.nz_, BufferType::take);
             typename BufferType::value_type * src = buffer.data();
@@ -70,6 +79,9 @@ namespace mini_ghost {
                     ++src;
                 }
             }
+            double elapsed = timer.elapsed();
+            profiling::data().time_pack_x(elapsed);
+            profiling::data().time_pack(elapsed);
         }
     };
 
@@ -79,6 +91,7 @@ namespace mini_ghost {
         template <typename Real, typename BufferType>
         static void call(grid<Real> const & g, BufferType & buffer)
         {
+            hpx::util::high_resolution_timer timer;
             Real * data = new Real[g.ny_ * g.nz_];
             buffer = BufferType(data, g.ny_ * g.nz_, BufferType::take);
             typename BufferType::value_type * src = buffer.data();
@@ -90,6 +103,9 @@ namespace mini_ghost {
                     ++src;
                 }
             }
+            double elapsed = timer.elapsed();
+            profiling::data().time_pack_x(elapsed);
+            profiling::data().time_pack(elapsed);
         }
     };
 
@@ -99,6 +115,7 @@ namespace mini_ghost {
         template <typename Real, typename BufferType>
         static void call(grid<Real> const & g, BufferType & buffer)
         {
+            hpx::util::high_resolution_timer timer;
             Real * data = new Real[g.nx_ * g.ny_];
             buffer = BufferType(data, g.nx_ * g.ny_, BufferType::take);
             typename BufferType::value_type * src = buffer.data();
@@ -110,6 +127,9 @@ namespace mini_ghost {
                     ++src;
                 }
             }
+            double elapsed = timer.elapsed();
+            profiling::data().time_pack_z(elapsed);
+            profiling::data().time_pack(elapsed);
         }
     };
 
@@ -119,6 +139,7 @@ namespace mini_ghost {
         template <typename Real, typename BufferType>
         static void call(grid<Real> const & g, BufferType & buffer)
         {
+            hpx::util::high_resolution_timer timer;
             Real * data = new Real[g.nx_ * g.ny_];
             buffer = BufferType(data, g.nx_ * g.ny_, BufferType::take);
             typename BufferType::value_type * src = buffer.data();
@@ -130,6 +151,9 @@ namespace mini_ghost {
                     ++src;
                 }
             }
+            double elapsed = timer.elapsed();
+            profiling::data().time_pack_z(elapsed);
+            profiling::data().time_pack(elapsed);
         }
     };
 }

@@ -143,7 +143,7 @@ namespace mini_ghost {
             }
         }
 
-        void run(std::vector<hpx::id_type> & ids, std::size_t num_tsteps, hpx::lcos::local::spinlock & io_mutex)
+        hpx::future<void> run(std::vector<hpx::id_type> & ids, std::size_t num_tsteps, hpx::lcos::local::spinlock & io_mutex)
         {
             hpx::future<void> sum_future = hpx::make_ready_future();
             hpx::future<double> flux_out_future = hpx::make_ready_future(0.0);
@@ -183,18 +183,50 @@ namespace mini_ghost {
                         // Receive our new buffers and copy them into the grid
                         if(step > 1)
                         {
-                            recv_futures[BACK]
-                                = recv_buffer_back_ (grids_[src_], step);
-                            recv_futures[FRONT]
-                                = recv_buffer_front_(grids_[src_], step);
-                            recv_futures[EAST]
-                                = recv_buffer_east_ (grids_[src_], step);
-                            recv_futures[WEST]
-                                = recv_buffer_west_ (grids_[src_], step);
-                            recv_futures[NORTH]
-                                = recv_buffer_north_(grids_[src_], step);
-                            recv_futures[SOUTH]
-                                = recv_buffer_south_(grids_[src_], step);
+                            hpx::util::high_resolution_timer timer_recv;
+                            //if(recv_buffer_back_.valid_)
+                            {
+                                hpx::util::high_resolution_timer timer_recv_dir;
+                                recv_futures[BACK]
+                                    = recv_buffer_back_ (grids_[src_], step);
+                                profiling::data().time_recv_z(timer_recv_dir.elapsed());
+                            }
+                            //if(recv_buffer_front_.valid_)
+                            {
+                                hpx::util::high_resolution_timer timer_recv_dir;
+                                recv_futures[FRONT]
+                                    = recv_buffer_front_(grids_[src_], step);
+                                profiling::data().time_recv_z(timer_recv_dir.elapsed());
+                            }
+                            //if(recv_buffer_east_.valid_)
+                            {
+                                hpx::util::high_resolution_timer timer_recv_dir;
+                                recv_futures[EAST]
+                                    = recv_buffer_east_ (grids_[src_], step);
+                                profiling::data().time_recv_x(timer_recv_dir.elapsed());
+                            }
+                            //if(recv_buffer_west_.valid_)
+                            {
+                                hpx::util::high_resolution_timer timer_recv_dir;
+                                recv_futures[WEST]
+                                    = recv_buffer_west_ (grids_[src_], step);
+                                profiling::data().time_recv_x(timer_recv_dir.elapsed());
+                            }
+                            //if(recv_buffer_north_.valid_)
+                            {
+                                hpx::util::high_resolution_timer timer_recv_dir;
+                                recv_futures[NORTH]
+                                    = recv_buffer_north_(grids_[src_], step);
+                                profiling::data().time_recv_y(timer_recv_dir.elapsed());
+                            }
+                            //if(recv_buffer_south_.valid_)
+                            {
+                                hpx::util::high_resolution_timer timer_recv_dir;
+                                recv_futures[SOUTH]
+                                    = recv_buffer_south_(grids_[src_], step);
+                                profiling::data().time_recv_y(timer_recv_dir.elapsed());
+                            }
+                            profiling::data().time_recv(timer_recv.elapsed());
                         }
 
                         flux_out_future = flux_out_future.then(
@@ -377,54 +409,80 @@ namespace mini_ghost {
                         }
 
                         // Send boundaries ...
-                        hpx::when_all(send_back_buffer_dependencies).then(
-                            hpx::util::bind(
-                                boost::ref(send_buffer_back_)
-                              , boost::ref(grids_[dst_])
-                              , step + 1
-                              , id_
-                            )
-                        );
-                        hpx::when_all(send_front_buffer_dependencies).then(
-                            hpx::util::bind(
-                                boost::ref(send_buffer_front_)
-                              , boost::ref(grids_[dst_])
-                              , step + 1
-                              , id_
-                            )
-                        );
-                        hpx::when_all(send_east_buffer_dependencies).then(
-                            hpx::util::bind(
-                                boost::ref(send_buffer_east_)
-                              , boost::ref(grids_[dst_])
-                              , step + 1
-                              , id_
-                            )
-                        );
-                        hpx::when_all(send_west_buffer_dependencies).then(
-                            hpx::util::bind(
-                                boost::ref(send_buffer_west_)
-                              , boost::ref(grids_[dst_])
-                              , step + 1
-                              , id_
-                            )
-                        );
-                        hpx::when_all(send_north_buffer_dependencies).then(
-                            hpx::util::bind(
-                                boost::ref(send_buffer_north_)
-                              , boost::ref(grids_[dst_])
-                              , step + 1
-                              , id_
-                            )
-                        );
-                        hpx::when_all(send_south_buffer_dependencies).then(
-                            hpx::util::bind(
-                                boost::ref(send_buffer_south_)
-                              , boost::ref(grids_[dst_])
-                              , step + 1
-                              , id_
-                            )
-                        );
+                        hpx::util::high_resolution_timer timer_send;
+                        {
+                            hpx::util::high_resolution_timer timer_send_dir;
+                            hpx::when_all(send_back_buffer_dependencies).then(
+                                hpx::util::bind(
+                                    boost::ref(send_buffer_back_)
+                                  , boost::ref(grids_[dst_])
+                                  , step + 1
+                                  , id_
+                                )
+                            );
+                            profiling::data().time_send_z(timer_send_dir.elapsed());
+                        }
+                        {
+                            hpx::util::high_resolution_timer timer_send_dir;
+                            hpx::when_all(send_front_buffer_dependencies).then(
+                                hpx::util::bind(
+                                    boost::ref(send_buffer_front_)
+                                  , boost::ref(grids_[dst_])
+                                  , step + 1
+                                  , id_
+                                )
+                            );
+                            profiling::data().time_send_z(timer_send_dir.elapsed());
+                        }
+                        {
+                            hpx::util::high_resolution_timer timer_send_dir;
+                            hpx::when_all(send_east_buffer_dependencies).then(
+                                hpx::util::bind(
+                                    boost::ref(send_buffer_east_)
+                                  , boost::ref(grids_[dst_])
+                                  , step + 1
+                                  , id_
+                                )
+                            );
+                            profiling::data().time_send_x(timer_send_dir.elapsed());
+                        }
+                        {
+                            hpx::util::high_resolution_timer timer_send_dir;
+                            hpx::when_all(send_west_buffer_dependencies).then(
+                                hpx::util::bind(
+                                    boost::ref(send_buffer_west_)
+                                  , boost::ref(grids_[dst_])
+                                  , step + 1
+                                  , id_
+                                )
+                            );
+                            profiling::data().time_send_x(timer_send_dir.elapsed());
+                        }
+                        {
+                            hpx::util::high_resolution_timer timer_send_dir;
+                            hpx::when_all(send_north_buffer_dependencies).then(
+                                hpx::util::bind(
+                                    boost::ref(send_buffer_north_)
+                                  , boost::ref(grids_[dst_])
+                                  , step + 1
+                                  , id_
+                                )
+                            );
+                            profiling::data().time_send_y(timer_send_dir.elapsed());
+                        }
+                        {
+                            hpx::util::high_resolution_timer timer_send_dir;
+                            hpx::when_all(send_south_buffer_dependencies).then(
+                                hpx::util::bind(
+                                    boost::ref(send_buffer_south_)
+                                  , boost::ref(grids_[dst_])
+                                  , step + 1
+                                  , id_
+                                )
+                            );
+                            profiling::data().time_send_y(timer_send_dir.elapsed());
+                        }
+                        profiling::data().time_send(timer_send.elapsed());
 
                         /*
                         std::string filename = "result_";
@@ -443,12 +501,23 @@ namespace mini_ghost {
             }
 
             // FIXME: return future<void> from when_all
+            /*
             hpx::wait_all(
                 sum_future
               , flux_out_future
               , hpx::when_all(recv_futures)
               , hpx::when_all(calc_futures.data_)
             );
+            */
+            return
+                hpx::future<void>(
+                    hpx::when_all(
+                        sum_future
+                      , flux_out_future
+                      , hpx::when_all(recv_futures)
+                      , hpx::when_all(calc_futures.data_)
+                    )
+                );
         }
 
         hpx::future<void> sum_grid(
@@ -473,8 +542,9 @@ namespace mini_ghost {
                     hpx::when_all(dependencies).then(
                         [this, src, step, &ids, &io_mutex](hpx::future<std::vector<hpx::shared_future<void>>>)
                         {
+                            double time_now = hpx::util::high_resolution_timer::now();
+                            hpx::util::high_resolution_timer timer_comp;
                             grid<Real> & g = grids_[src];
-                            hpx::util::high_resolution_timer time_reduction;
                             // Sum grid ...
                             Real sum = 0;
                             for(std::size_t z = 1; z < g.nz_ - 1; ++z)
@@ -488,6 +558,7 @@ namespace mini_ghost {
                                 }
                             }
                             sum += flux_out_;
+                            profiling::data().time_sumgrid_comp(timer_comp.elapsed());
 
                             return
                                 sum_allreduce_.add(
@@ -504,8 +575,12 @@ namespace mini_ghost {
                                   , sum
                                 ).then(
                                     hpx::launch::sync,
-                                    [this, step, &io_mutex](hpx::future<Real> value)
+                                    [this, time_now, step, &io_mutex](hpx::future<Real> value)
                                     {
+                                        hpx::util::high_resolution_timer timer(time_now);
+                                        profiling::data().time_sumgrid_comm(timer.elapsed());
+                                        profiling::data().time_sumgrid(timer.elapsed());
+                                        profiling::data().num_sumgrid(1);
                                         if(rank_ == 0)
                                         {
                                             // Report sum results for step-1
