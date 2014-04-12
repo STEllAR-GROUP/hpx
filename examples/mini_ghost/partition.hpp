@@ -549,7 +549,7 @@ namespace mini_ghost {
             }
             else
             {
-                flux_out_ += flux_out_future.get();
+                flux_out_ += Real(flux_out_future.get());
                 flux_out_future = hpx::make_ready_future(0.0);
 
                 return
