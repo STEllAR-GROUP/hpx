@@ -53,50 +53,43 @@ namespace mini_ghost {
         );
 
         partition(partition &&other)
-          : recv_buffer_north_(std::move(other.recv_buffer_north_))
-          , send_buffer_north_(std::move(other.send_buffer_north_))
-          , recv_buffer_south_(std::move(other.recv_buffer_south_))
+          : send_buffer_north_(std::move(other.send_buffer_north_))
+          , recv_buffer_north_(std::move(other.recv_buffer_north_))
           , send_buffer_south_(std::move(other.send_buffer_south_))
-          , recv_buffer_east_(std::move(other.recv_buffer_east_))
+          , recv_buffer_south_(std::move(other.recv_buffer_south_))
           , send_buffer_east_(std::move(other.send_buffer_east_))
-          , recv_buffer_west_(std::move(other.recv_buffer_west_))
+          , recv_buffer_east_(std::move(other.recv_buffer_east_))
           , send_buffer_west_(std::move(other.send_buffer_west_))
-          , recv_buffer_front_(std::move(other.recv_buffer_front_))
+          , recv_buffer_west_(std::move(other.recv_buffer_west_))
           , send_buffer_front_(std::move(other.send_buffer_front_))
-          , recv_buffer_back_(std::move(other.recv_buffer_back_))
+          , recv_buffer_front_(std::move(other.recv_buffer_front_))
           , send_buffer_back_(std::move(other.send_buffer_back_))
+          , recv_buffer_back_(std::move(other.recv_buffer_back_))
+          , id_(other.id_)
+          , stencil_(other.stencil_)
+          , src_(other.src_)
+          , dst_(other.dst_)
+          , grids_(std::move(other.grids_))
+          , sum_allreduce_(std::move(other.sum_allreduce_))
+          , source_total_(other.source_total_)
+          , flux_out_(other.flux_out_)
+          , nx_(other.nx_)
+          , ny_(other.ny_)
+          , nz_(other.nz_)
+          , nx_block_(other.nx_block_)
+          , ny_block_(other.ny_block_)
+          , nz_block_(other.nz_block_)
+          , npx_(other.npx_)
+          , npy_(other.npy_)
+          , npz_(other.npz_)
+          , my_px_(other.my_px_)
+          , my_py_(other.my_py_)
+          , my_pz_(other.my_pz_)
+          , rank_(other.rank_)
+          , error_tol_(other.error_tol_)
+          , report_diffusion_(other.report_diffusion_)
+          , sum_grid_(other.sum_grid_)
         {
-            this->id_      = other.id_;
-            this->stencil_ = other.stencil_;
-            this->src_     = other.src_;
-            this->dst_     = other.dst_;
-            this->grids_   = std::move(other.grids_);
-
-            this->sum_allreduce_ = std::move(other.sum_allreduce_);
-            this->source_total_  = other.source_total_;
-            this->flux_out_      = other.flux_out_;
-
-            this->nx_        = other.nx_;
-            this->ny_        = other.ny_;
-            this->nz_        = other.nz_;
-
-            this->nx_block_  = other.nx_block_;
-            this->ny_block_  = other.ny_block_;
-            this->nz_block_  = other.nz_block_;
-
-            this->npx_       = other.npx_;
-            this->npy_       = other.npy_;
-            this->npz_       = other.npz_;
-
-            this->my_px_     = other.my_px_;
-            this->my_py_     = other.my_py_;
-            this->my_pz_     = other.my_pz_;
-
-            this->rank_      = other.rank_;
-
-            this->error_tol_         = other.error_tol_;
-            this->report_diffusion_  = other.report_diffusion_;
-            this->sum_grid_          = other.sum_grid_;
         }
         partition& operator=(partition &&other)
         {

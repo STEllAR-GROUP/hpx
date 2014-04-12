@@ -58,7 +58,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     stepper->init(p);
 
-    stepper->run(p.num_spikes, p.num_tsteps);
+    //stepper->run(p.num_spikes, p.num_tsteps);
 
     mini_ghost::barrier_wait();
     if (p.rank==0)
@@ -70,6 +70,7 @@ int hpx_main(boost::program_options::variables_map& vm)
             std::cout << "Total runtime: " << timer_all.elapsed() << "\n";
         std::ofstream fs("results.yaml");
         mini_ghost::profiling::report(fs, profiling_data, p);
+        std::cout << "finalizing ...\n";
         return hpx::finalize();
     }
     else

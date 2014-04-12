@@ -23,14 +23,21 @@ namespace mini_ghost {
         }
 
         global_sum(global_sum &&other)
-          : value_(std::move(other.value_))
-          , generation_(other.generation_)
+          : mtx_(std::move(other.mtx_))
+          , value_(std::move(other.value_))
+          , generation_(std::move(other.generation_))
+          , gate_(std::move(other.gate_))
         {
         }
         global_sum& operator=(global_sum &&other)
         {
-            this->value_      = std::move(other.value_);
-            this->generation_ = other.generation_;
+            if(this != &other)
+            {
+                mtx_        = std::move(other.mtx_);
+                value_      = std::move(other.value_);
+                generation_ = other.generation_;
+                gate_       = std::move(other.gate_);
+            }
             return *this;
         }
         template<typename Action>

@@ -43,14 +43,20 @@ namespace mini_ghost {
         {}
 
         recv_buffer(recv_buffer &&other)
+          : mtx_(std::move(other.mtx_))
+          , buffer_map_(std::move(other.buffer_map_))
+          , valid_(other.valid_)
         {
-            this->buffer_map_ = std::move(other.buffer_map_);
-            this->valid_      = other.valid_;
         }
+
         recv_buffer& operator=(recv_buffer &&other)
         {
-            this->buffer_map_ = std::move(other.buffer_map_);
-            this->valid_      = other.valid_;
+            if(this != &other)
+            {
+                mtx_        = std::move(other.mtx_);
+                buffer_map_ = std::move(other.buffer_map_);
+                valid_      = other.valid_;
+            }
             return *this;
         }
 

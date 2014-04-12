@@ -31,12 +31,15 @@ namespace mini_ghost {
         {}
 
         send_buffer(send_buffer &&other)
+          : dest_(std::move(other.dest_))
         {
-            this->dest_  = other.dest_;
         }
         send_buffer& operator=(send_buffer &&other)
         {
-            this->dest_  = other.dest_;
+            if(this != &other)
+            {
+                dest_  = std::move(other.dest_);
+            }
             return *this;
         }
 
