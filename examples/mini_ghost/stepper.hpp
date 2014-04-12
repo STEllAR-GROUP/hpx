@@ -15,7 +15,7 @@
 
 #include <hpx/include/components.hpp>
 
-#include <random>
+#include <boost/random.hpp>
 
 namespace mini_ghost {
     template <typename Real>
@@ -56,8 +56,8 @@ namespace mini_ghost {
         HPX_DEFINE_COMPONENT_ACTION_TPL(stepper<Real>, set_back_zone, set_back_zone_action);
 
     private:
-        std::mt19937 gen;
-        std::uniform_real_distribution<Real> random;
+        boost::random::mt19937 gen;
+        boost::random::uniform_real_distribution<Real> random;
 
         std::size_t rank;
         std::vector<hpx::id_type> stepper_ids;

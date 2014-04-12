@@ -71,7 +71,9 @@ namespace mini_ghost {
         std::size_t my_pz = p.rank / (p.npx*p.npy);
 
         // Initialize grids and spikes
-        std::vector<hpx::future<void> > partition_init_futures(p.num_vars);
+        std::vector<hpx::future<void> > partition_init_futures;//
+        partition_init_futures.reserve(p.num_vars);
+
         auto random_lambda = [this]() -> Real { return random(gen); };
         std::size_t num_sum_grid = 0;
         partitions_.reserve(p.num_vars);
@@ -86,6 +88,7 @@ namespace mini_ghost {
                   , random_lambda
                 )
             );
+            partition_init_futures.push_back(hpx::future<void>());
             partitions_.push_back(
                 partition_type(
                     var
@@ -126,11 +129,20 @@ namespace mini_ghost {
                 partition.insert_spike(spikes_[spike], spike);
                 run_futures.push_back(
                     hpx::async(
+                        hpx::util::bind(
+                            &partition_type::run
+                          , boost::ref(partition)
+                          , boost::ref(stepper_ids)
+                          , num_tsteps
+                          , boost::ref(io_mutex)
+                        )
+                /*
                         &partition_type::run
                       , boost::ref(partition)
                       , boost::ref(stepper_ids)
                       , num_tsteps
                       , boost::ref(io_mutex)
+                */
                     )
                 );
             }

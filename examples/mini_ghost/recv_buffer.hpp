@@ -42,10 +42,6 @@ namespace mini_ghost {
           : valid_(false)
         {}
 
-#ifndef _MSC_VER
-        recv_buffer(recv_buffer &&) = default;
-        recv_buffer& operator=(recv_buffer &&) = default;
-#else
         recv_buffer(recv_buffer &&other)
         {
             this->buffer_map_ = std::move(other.buffer_map_);
@@ -57,7 +53,6 @@ namespace mini_ghost {
             this->valid_      = other.valid_;
             return *this;
         }
-#endif
 
         ~recv_buffer()
         {

@@ -52,11 +52,19 @@ namespace mini_ghost {
           , hpx::future<void> & sum_future
         );
 
-#ifndef _MSC_VER
-        partition(partition &&) = default;
-        partition& operator=(partition &&) = default;
-#else
         partition(partition &&other)
+          : recv_buffer_north_(std::move(other.recv_buffer_north_))
+          , send_buffer_north_(std::move(other.send_buffer_north_))
+          , recv_buffer_south_(std::move(other.recv_buffer_south_))
+          , send_buffer_south_(std::move(other.send_buffer_south_))
+          , recv_buffer_east_(std::move(other.recv_buffer_east_))
+          , send_buffer_east_(std::move(other.send_buffer_east_))
+          , recv_buffer_west_(std::move(other.recv_buffer_west_))
+          , send_buffer_west_(std::move(other.send_buffer_west_))
+          , recv_buffer_front_(std::move(other.recv_buffer_front_))
+          , send_buffer_front_(std::move(other.send_buffer_front_))
+          , recv_buffer_back_(std::move(other.recv_buffer_back_))
+          , send_buffer_back_(std::move(other.send_buffer_back_))
         {
             this->id_      = other.id_;
             this->stencil_ = other.stencil_;
@@ -92,6 +100,18 @@ namespace mini_ghost {
         }
         partition& operator=(partition &&other)
         {
+            recv_buffer_north_ = std::move(other.recv_buffer_north_);
+            send_buffer_north_ = std::move(other.send_buffer_north_);
+            recv_buffer_south_ = std::move(other.recv_buffer_south_);
+            send_buffer_south_ = std::move(other.send_buffer_south_);
+            recv_buffer_east_ = std::move(other.recv_buffer_east_);
+            send_buffer_east_ = std::move(other.send_buffer_east_);
+            recv_buffer_west_ = std::move(other.recv_buffer_west_);
+            send_buffer_west_ = std::move(other.send_buffer_west_);
+            recv_buffer_front_ = std::move(other.recv_buffer_front_);
+            send_buffer_front_ = std::move(other.send_buffer_front_);
+            recv_buffer_back_ = std::move(other.recv_buffer_back_);
+            send_buffer_back_ = std::move(other.send_buffer_back_);
             this->id_      = other.id_;
             this->stencil_ = other.stencil_;
             this->src_     = other.src_;
@@ -125,7 +145,6 @@ namespace mini_ghost {
             this->sum_grid_          = other.sum_grid_;
             return *this;
         }
-#endif
 
         void sum_allreduce(std::size_t which, std::size_t generation, Real value)
         {
@@ -143,7 +162,9 @@ namespace mini_ghost {
             }
         }
 
-        hpx::future<void> run(std::vector<hpx::id_type> & ids, std::size_t num_tsteps, hpx::lcos::local::spinlock & io_mutex)
+        //hpx::future<void>
+        void
+        run(std::vector<hpx::id_type> & ids, std::size_t num_tsteps, hpx::lcos::local::spinlock & io_mutex)
         {
             hpx::future<void> sum_future = hpx::make_ready_future();
             hpx::future<double> flux_out_future = hpx::make_ready_future(0.0);
@@ -171,7 +192,7 @@ namespace mini_ghost {
                       , &calc_futures
                       , step
                     ]
-                    (hpx::future<void>)
+                    (hpx::future<void>) -> hpx::future<void>
                     {
                         std::vector<hpx::shared_future<void> > send_back_buffer_dependencies;
                         std::vector<hpx::shared_future<void> > send_front_buffer_dependencies;
@@ -501,14 +522,13 @@ namespace mini_ghost {
             }
 
             // FIXME: return future<void> from when_all
-            /*
             hpx::wait_all(
                 sum_future
               , flux_out_future
               , hpx::when_all(recv_futures)
               , hpx::when_all(calc_futures.data_)
             );
-            */
+            /*
             return
                 hpx::future<void>(
                     hpx::when_all(
@@ -518,6 +538,7 @@ namespace mini_ghost {
                       , hpx::when_all(calc_futures.data_)
                     )
                 );
+            */
         }
 
         hpx::future<void> sum_grid(
@@ -540,7 +561,7 @@ namespace mini_ghost {
 
                 return
                     hpx::when_all(dependencies).then(
-                        [this, src, step, &ids, &io_mutex](hpx::future<std::vector<hpx::shared_future<void>>>)
+                        [this, src, step, &ids, &io_mutex](hpx::future<std::vector<hpx::shared_future<void>>>) -> hpx::future<void>
                         {
                             double time_now = hpx::util::high_resolution_timer::now();
                             hpx::util::high_resolution_timer timer_comp;
