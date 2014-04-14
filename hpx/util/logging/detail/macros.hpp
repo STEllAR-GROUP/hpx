@@ -519,21 +519,9 @@ If defined, we don't use @ref macros_tss "TSS" as all.
 #elif defined(HPX_LOG_COMPILE_FAST_OFF)
 #undef HPX_LOG_COMPILE_FAST
 #else
-    // by default...
-    #if defined(NDEBUG)
-    // ... turned off in release
-    #else
-    // ... turned on in debug
+    // turn it on otherwise
     #define HPX_LOG_COMPILE_FAST
-    #endif
 #endif
-
-
-
-
-
-
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Defining filter Macros
