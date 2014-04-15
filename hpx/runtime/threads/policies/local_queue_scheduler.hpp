@@ -318,7 +318,7 @@ namespace hpx { namespace threads { namespace policies
                 mask_cref_type numa_domain = outside_numa_domain_masks_[num_thread];
 
                 // steal thread from other queue
-                for (std::size_t i = 0; i !=  queues_size; ++i)
+                for (std::size_t i = 1; i != queues_size; ++i)
                 {
                     // FIXME: Do a better job here.
                     std::size_t const idx = (i + num_thread) % queues_size;
@@ -340,7 +340,7 @@ namespace hpx { namespace threads { namespace policies
 
             else // not NUMA-sensitive
             {
-                for (std::size_t i = 0; i !=  queues_size; ++i)
+                for (std::size_t i = 1; i != queues_size; ++i)
                 {
                     // FIXME: Do a better job here.
                     std::size_t const idx = (i + num_thread) % queues_size;
@@ -544,7 +544,7 @@ namespace hpx { namespace threads { namespace policies
                 {
                     mask_cref_type numa_domain_mask =
                         numa_domain_masks_[num_thread];
-                    for (std::size_t i = 0; i !=  queues_size; ++i)
+                    for (std::size_t i = 1; i != queues_size; ++i)
                     {
                         // FIXME: Do a better job here.
                         std::size_t const idx = (i + num_thread) % queues_size;
@@ -570,7 +570,7 @@ namespace hpx { namespace threads { namespace policies
                 if (test(steals_outside_numa_domain_, num_thread)) {
                     mask_cref_type numa_domain_mask =
                         outside_numa_domain_masks_[num_thread];
-                    for (std::size_t i = 0; i !=  queues_size; ++i)
+                    for (std::size_t i = 1; i != queues_size; ++i)
                     {
                         // FIXME: Do a better job here.
                         std::size_t const idx = (i + num_thread) % queues_size;
@@ -595,7 +595,7 @@ namespace hpx { namespace threads { namespace policies
 
             else // not NUMA-sensitive
             {
-                for (std::size_t i = 0; i !=  queues_size; ++i)
+                for (std::size_t i = 1; i != queues_size; ++i)
                 {
                     // FIXME: Do a better job here.
                     std::size_t const idx = (i + num_thread) % queues_size;
