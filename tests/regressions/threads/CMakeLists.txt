@@ -9,6 +9,7 @@ set(tests
     resume_priority
     thread_data_1111
     thread_pool_executor_1112
+    thread_pool_executor_1114
     thread_rescheduling
     thread_suspend_pending
     thread_suspend_duration

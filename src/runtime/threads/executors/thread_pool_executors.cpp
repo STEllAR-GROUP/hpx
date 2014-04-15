@@ -393,6 +393,12 @@ namespace hpx { namespace threads { namespace executors
 {
 #if defined(HPX_LOCAL_SCHEDULER)
     ///////////////////////////////////////////////////////////////////////////
+    local_queue_executor::local_queue_executor()
+      : scheduled_executor(new detail::thread_pool_executor<
+            policies::local_queue_scheduler<lcos::local::spinlock> >(
+                get_os_thread_count(), 1))
+    {}
+
     local_queue_executor::local_queue_executor(
             std::size_t max_punits, std::size_t min_punits)
       : scheduled_executor(new detail::thread_pool_executor<
@@ -402,6 +408,12 @@ namespace hpx { namespace threads { namespace executors
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
+    local_priority_queue_executor::local_priority_queue_executor()
+      : scheduled_executor(new detail::thread_pool_executor<
+            policies::local_priority_queue_scheduler<lcos::local::spinlock> >(
+                get_os_thread_count(), 1))
+    {}
+
     local_priority_queue_executor::local_priority_queue_executor(
             std::size_t max_punits, std::size_t min_punits)
       : scheduled_executor(new detail::thread_pool_executor<
@@ -411,6 +423,12 @@ namespace hpx { namespace threads { namespace executors
 
 #if defined(HPX_STATIC_PRIORITY_SCHEDULER)
     ///////////////////////////////////////////////////////////////////////////
+    static_priority_queue_executor::static_priority_queue_executor()
+      : scheduled_executor(new detail::thread_pool_executor<
+            policies::static_priority_queue_scheduler<lcos::local::spinlock> >(
+                get_os_thread_count(), 1))
+    {}
+
     static_priority_queue_executor::static_priority_queue_executor(
             std::size_t max_punits, std::size_t min_punits)
       : scheduled_executor(new detail::thread_pool_executor<
