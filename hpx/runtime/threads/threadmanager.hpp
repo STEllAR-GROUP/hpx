@@ -415,10 +415,12 @@ namespace hpx { namespace threads
         /// to run on.
         virtual mask_cref_type get_pu_mask(topology const&, std::size_t) const = 0;
 
+#if HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS
         virtual boost::int64_t get_executed_threads(
             std::size_t num = std::size_t(-1), bool reset = false) = 0;
         virtual boost::int64_t get_executed_thread_phases(
             std::size_t num = std::size_t(-1), bool reset = false) = 0;
+#endif
 
 #if HPX_THREAD_MAINTAIN_LOCAL_STORAGE
         /// The get_thread_data function is part of the thread related
