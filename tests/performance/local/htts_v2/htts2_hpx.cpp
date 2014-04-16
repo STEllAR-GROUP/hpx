@@ -50,7 +50,7 @@ struct hpx_driver : htts2::driver
     int run_impl(boost::program_options::variables_map&) 
     {
         // Cold run
-//        kernel();
+        //kernel();
 
         // Hot run
         results_type results = kernel();
@@ -58,27 +58,6 @@ struct hpx_driver : htts2::driver
 
         return hpx::finalize();
     }
-
-    struct results_type
-    {
-        results_type()
-          : total_walltime_(0.0)
-          , warmup_walltime_(0.0)
-        {}
-        
-        results_type(
-            double total_walltime,    // nanoseconds
-            double warmup_walltime    // nanoseconds
-            )
-          : total_walltime_(total_walltime)
-          , warmup_walltime_(warmup_walltime)
-        {}
-
-        results_type(results_type const&) = default;
-
-        double total_walltime_;
-        double warmup_walltime_;
-    };
 
     hpx::threads::thread_state_enum payload_thread_function(
         hpx::threads::thread_state_ex_enum ex = hpx::threads::wait_signaled
@@ -149,6 +128,8 @@ struct hpx_driver : htts2::driver
         finished.wait();
     }
 
+    typedef double results_type;
+
     results_type kernel() 
     {
         ///////////////////////////////////////////////////////////////////////
@@ -178,8 +159,6 @@ struct hpx_driver : htts2::driver
 
         stage_tasks(this_osthread);
 
-        results.warmup_walltime_ = t.elapsed();
-
         ///////////////////////////////////////////////////////////////////////
         // Compute + Cooldown Phase 
 
@@ -207,7 +186,7 @@ struct hpx_driver : htts2::driver
         finished.wait();
 
         // w_M [nanoseconds]
-        results.total_walltime_ = t.elapsed();
+        results = t.elapsed();
 
         return results;
 
@@ -222,21 +201,20 @@ struct hpx_driver : htts2::driver
                 << "Tasks per OS-thread (Control Variable) [tasks/OS-threads],"
                 << "Payload Duration (Control Variable) [nanoseconds],"
                 << "Total Walltime [nanoseconds],"
-                << "Warmup Walltime [nanoseconds],"
+                << "Warmup Walltime [nanoseconds]"
                 << "\n";
 
         std::cout
-            << ( boost::format("%lu,%lu,%lu,%.14g,%.14g\n")
+            << ( boost::format("%lu,%lu,%lu,%.14g\n")
                % this->osthreads_ 
                % this->tasks_ 
                % this->payload_duration_ 
-               % results.total_walltime_ 
-               % results.warmup_walltime_
+               % results
                )
             ; 
     }
 
-    boost::atomic<boost::uint64_t> count_;
+//    boost::atomic<boost::uint64_t> count_;
 };
 
 int main(int argc, char** argv)

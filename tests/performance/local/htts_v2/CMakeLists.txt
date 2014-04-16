@@ -7,9 +7,9 @@
 # Find dependencies
 ################################################################################
 #find_package(HPX_Qthreads)
-find_package(HPX_TBB)
+#find_package(HPX_TBB)
 #find_package(HPX_SWARM)
-find_package(HPX_OpenMP)
+#find_package(HPX_OpenMP)
 
 if(MSVC)
   set(boost_library_dependencies)
@@ -30,13 +30,13 @@ if(OPENMP_FOUND)
   set(htts2_omp_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies})
 endif()
 
-#if(QTHREADS_FOUND)
-#  include_directories(${QTHREADS_INCLUDE_DIR})
-#
-#  set(benchmarks ${benchmarks} htts2_qthreads)
-#
-#  set(htts2_qthreads_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies} ${QTHREADS_LIBRARY})
-#endif()
+if(QTHREADS_FOUND)
+  include_directories(${QTHREADS_INCLUDE_DIR})
+
+  set(benchmarks ${benchmarks} htts2_qthreads)
+
+  set(htts2_qthreads_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies} ${QTHREADS_LIBRARY})
+endif()
 
 if(TBB_FOUND)
   include_directories(${TBB_INCLUDE_DIR})

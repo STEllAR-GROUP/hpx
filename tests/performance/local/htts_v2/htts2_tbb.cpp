@@ -99,7 +99,7 @@ struct tbb_driver : htts2::driver
     void run()
     {
         // Cold run
-        kernel();
+        //kernel();
 
         // Hot run
         results_type results = kernel();

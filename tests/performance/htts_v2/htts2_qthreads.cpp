@@ -8,18 +8,35 @@
 
 #include "htts2.hpp"
 
-#include <omp.h>
+#include <boost/lexical_cast.hpp>
 
-template <typename BaseClock = boost::chrono::steady_clock>
-struct omp_driver : htts2::driver
+#include <qthread/qthread.h>
+#include <qthread/qloop.h>
+
+typedef boost::chrono::steady_clock BaseClock;
+
+extern "C" void payload_function(
+    size_t start,
+    size_t stop,
+    void* payload_duration_ 
+    )
 {
-    omp_driver(int argc, char** argv)
+    htts2::payload<BaseClock>(reinterpret_cast<boost::uint64_t>
+        (payload_duration_ /* = p */));
+}
+
+struct qthreads_driver : htts2::driver
+{
+    qthreads_driver(int argc, char** argv)
       : htts2::driver(argc, argv)
     {}
 
     void run()
     {
-        omp_set_num_threads(this->osthreads_);
+        setenv("QT_HWPAR",
+            boost::lexical_cast<std::string>(this->osthreads_).c_str(), 1);
+
+        qthread_initialize(); 
 
         // Cold run
         //kernel();
@@ -39,24 +56,12 @@ struct omp_driver : htts2::driver
         results_type results;
 
         htts2::timer<BaseClock> t;
-    
-        #pragma omp parallel
-        #pragma omp single
-        {
-            // One stager per OS-thread.
-            for (boost::uint64_t n = 0; n < this->osthreads_; ++n)
-                #pragma omp task untied
-                for (boost::uint64_t m = 0; m < this->tasks_; ++m)
-                    #pragma omp task untied
-                    htts2::payload<BaseClock>(this->payload_duration_ /* = p */);
 
-            results.warmup_walltime_ = t.elapsed();
+        qt_loop(0, this->tasks_ * this->osthreads_, payload_function,
+            reinterpret_cast<void*>(this->payload_duration_));
 
-            #pragma omp taskwait
-
-            // w_M [nanoseconds]
-            results = t.elapsed();
-        }
+        // w_M [nanoseconds]
+        results = t.elapsed();
 
         return results;
 
@@ -78,7 +83,7 @@ struct omp_driver : htts2::driver
                % this->osthreads_ 
                % this->tasks_ 
                % this->payload_duration_ 
-               % results
+               % results 
                )
             ; 
     }
@@ -86,7 +91,7 @@ struct omp_driver : htts2::driver
 
 int main(int argc, char** argv)
 {
-    omp_driver<> d(argc, argv);
+    qthreads_driver d(argc, argv);
 
     d.run();
 
