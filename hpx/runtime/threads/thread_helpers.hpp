@@ -372,7 +372,7 @@ namespace hpx { namespace threads
     HPX_API_EXPORT void free_thread_exit_callbacks(thread_id_type const& id,
         error_code& ec = throws);
 
-#if HPX_THREAD_MAINTAIN_THREAD_DATA
+#if HPX_THREAD_MAINTAIN_LOCAL_STORAGE
     ///////////////////////////////////////////////////////////////////////////
     HPX_API_EXPORT std::size_t get_thread_data(thread_id_type const& id,
         error_code& ec = throws);

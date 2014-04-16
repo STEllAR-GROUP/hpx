@@ -212,7 +212,7 @@ namespace hpx
         threads::interrupt_thread(id.id_, flag);
     }
 
-#if HPX_THREAD_MAINTAIN_THREAD_DATA
+#if HPX_THREAD_MAINTAIN_LOCAL_STORAGE
     std::size_t thread::get_thread_data() const
     {
         return threads::get_thread_data(native_handle());

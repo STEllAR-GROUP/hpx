@@ -367,8 +367,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 /// By default, always enable storing the thread data.
-#if !defined(HPX_THREAD_MAINTAIN_THREAD_DATA)
-#  define HPX_THREAD_MAINTAIN_THREAD_DATA 1
+#if !defined(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
+#  define HPX_THREAD_MAINTAIN_LOCAL_STORAGE 1
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

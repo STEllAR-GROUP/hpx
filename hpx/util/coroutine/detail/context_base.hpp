@@ -115,7 +115,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
         m_phase(0),
 #endif
-#if HPX_THREAD_MAINTAIN_THREAD_DATA
+#if HPX_THREAD_MAINTAIN_LOCAL_STORAGE
         m_thread_data(0),
 #endif
         m_type_info(),
@@ -176,7 +176,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
       m_phase = 0;
 #endif
-#if HPX_THREAD_MAINTAIN_THREAD_DATA
+#if HPX_THREAD_MAINTAIN_LOCAL_STORAGE
       delete_tss_storage(m_thread_data);
 #endif
     }
@@ -455,7 +455,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       delete_tss_storage(m_thread_data);
     }
 
-#if HPX_THREAD_MAINTAIN_THREAD_DATA
+#if HPX_THREAD_MAINTAIN_LOCAL_STORAGE
     std::size_t get_thread_data() const
     {
         if (!m_thread_data)
@@ -538,7 +538,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
       HPX_ASSERT(m_phase == 0);
 #endif
-#if HPX_THREAD_MAINTAIN_THREAD_DATA
+#if HPX_THREAD_MAINTAIN_LOCAL_STORAGE
       HPX_ASSERT(m_thread_data == 0);
 #endif
 #if BOOST_VERSION <= 104200 || BOOST_VERSION >= 104600
@@ -612,7 +612,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
     std::size_t m_phase;
 #endif
-#if HPX_THREAD_MAINTAIN_THREAD_DATA
+#if HPX_THREAD_MAINTAIN_LOCAL_STORAGE
     mutable detail::tss_storage* m_thread_data;
 #endif
 

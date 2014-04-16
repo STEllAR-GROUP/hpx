@@ -205,7 +205,7 @@ namespace hpx { namespace threads
         return app->get_thread_manager().get_interruption_requested(id, ec);
     }
 
-#if HPX_THREAD_MAINTAIN_THREAD_DATA
+#if HPX_THREAD_MAINTAIN_LOCAL_STORAGE
     ///////////////////////////////////////////////////////////////////////////
     std::size_t get_thread_data(thread_id_type const& id, error_code& ec)
     {

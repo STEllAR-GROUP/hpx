@@ -445,7 +445,7 @@ namespace hpx { namespace threads
             thrd->interruption_point();      // notify thread
     }
 
-#if HPX_THREAD_MAINTAIN_THREAD_DATA
+#if HPX_THREAD_MAINTAIN_LOCAL_STORAGE
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     std::size_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::

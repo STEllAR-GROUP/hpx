@@ -597,7 +597,7 @@ namespace hpx { namespace threads
         virtual thread_state_enum operator()() = 0;
         virtual thread_id_type get_thread_id() const = 0;
         virtual std::size_t get_thread_phase() const = 0;
-#if HPX_THREAD_MAINTAIN_THREAD_DATA
+#if HPX_THREAD_MAINTAIN_LOCAL_STORAGE
         virtual std::size_t get_thread_data() const = 0;
         virtual std::size_t set_thread_data(std::size_t data) = 0;
 #endif
@@ -756,7 +756,7 @@ namespace hpx { namespace threads
 #endif
         }
 
-#if HPX_THREAD_MAINTAIN_THREAD_DATA
+#if HPX_THREAD_MAINTAIN_LOCAL_STORAGE
         std::size_t get_thread_data() const
         {
             return coroutine_.get_thread_data();
@@ -856,7 +856,7 @@ namespace hpx { namespace threads
 #endif
         }
 
-#if HPX_THREAD_MAINTAIN_THREAD_DATA
+#if HPX_THREAD_MAINTAIN_LOCAL_STORAGE
         std::size_t get_thread_data() const
         {
             return coroutine_.get_thread_data();
