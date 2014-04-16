@@ -598,23 +598,27 @@
 #  define HPX_STD_BIND                ::hpx::util::bind
 #  define HPX_STD_PROTECT(f)          ::hpx::util::protect(f)
 #  define HPX_STD_REF(r)              ::boost::ref(r)
+#  define HPX_STD_CREF(r)             ::boost::cref(r)
 #else
 #  if !defined(HPX_HAVE_CXX11_STD_BIND)
 #    if defined(HPX_PHOENIX_BIND)
 #      define HPX_STD_PLACEHOLDERS    ::boost::phoenix::placeholders
 #      define HPX_STD_BIND            ::boost::phoenix::bind
 #      define HPX_STD_REF(r)          ::boost::phoenix::ref(r)
+#      define HPX_STD_CREF(r)         ::boost::phoenix::cref(r)
 #      define HPX_STD_PROTECT(f)      ::boost::phoenix::lambda[f]
 #    else
 #      define HPX_STD_PLACEHOLDERS
 #      define HPX_STD_BIND            ::boost::bind
 #      define HPX_STD_REF(r)          ::boost::ref(r)
+#      define HPX_STD_CREF(r)         ::boost::cref(r)
 #      define HPX_STD_PROTECT(f)      ::hpx::util::protect(f)
 #    endif
 #  else
 #    define HPX_STD_PLACEHOLDERS      ::std::placeholders
 #    define HPX_STD_BIND              ::std::bind
 #    define HPX_STD_REF(r)            ::std::ref(r)
+#    define HPX_STD_CREF(r)           ::std::cref(r)
 #    define HPX_STD_PROTECT(f)        ::hpx::util::protect(f)
 #  endif
 #endif
