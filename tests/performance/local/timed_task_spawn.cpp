@@ -9,8 +9,8 @@
 // FIXME: Calling the tasks "workers" overloads the term worker-thread (which 
 // refers to OS-threads).
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/config.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
