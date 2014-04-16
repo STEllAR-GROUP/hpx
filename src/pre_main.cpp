@@ -63,8 +63,15 @@ create_barrier(std::size_t num_localities, char const* symname)
     lcos::barrier b;
     b.create(find_here(), num_localities);
 
-    agas::register_name_sync(symname, b.get_gid());
+    // register an unmanaged gid to avoid id-splitting during startup
+    agas::register_name_sync(symname, b.get_gid().get_gid());
     return b;
+}
+
+inline void delete_barrier(lcos::barrier& b, char const* symname)
+{
+    agas::unregister_name_sync(symname);
+    b.free();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -256,7 +263,7 @@ bool pre_main(runtime_mode mode)
 
             // Tear down the startup barrier.
             if (agas_client.is_bootstrap())
-                agas::unregister_name_sync(startup_barrier_name);
+                delete_barrier(startup_barrier, startup_barrier_name);
         }
     }
 
