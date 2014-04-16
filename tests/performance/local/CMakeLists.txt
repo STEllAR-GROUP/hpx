@@ -153,7 +153,7 @@ if(OPENMP_FOUND)
   set_target_properties(openmp_homogeneous_timed_task_spawn_exe PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
 endif()
 
-add_hpx_pseudo_target(tests.performance.htts_v2)
+add_hpx_pseudo_target(tests.performance.local.htts_v2)
 add_subdirectory(htts_v2)
-add_hpx_pseudo_dependencies(tests.performance tests.performance.htts_v2)
+add_hpx_pseudo_dependencies(tests.performance tests.performance.local.htts_v2)
 

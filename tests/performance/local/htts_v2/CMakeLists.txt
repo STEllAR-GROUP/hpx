@@ -58,14 +58,14 @@ foreach(benchmark ${benchmarks})
                      FOLDER "Benchmarks/HTTS v2/${benchmark}")
 
   # add a custom target for this example
-  add_hpx_pseudo_target(tests.performance.htts_v2.${benchmark})
+  add_hpx_pseudo_target(tests.performance.local.htts_v2.${benchmark})
 
   # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.performance.htts_v2
-                              tests.performance.htts_v2.${benchmark})
+  add_hpx_pseudo_dependencies(tests.performance.local.htts_v2
+                              tests.performance.local.htts_v2.${benchmark})
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.performance.htts_v2.${benchmark}
+  add_hpx_pseudo_dependencies(tests.performance.local.htts_v2.${benchmark}
                               ${benchmark}_exe)
 endforeach()
 
