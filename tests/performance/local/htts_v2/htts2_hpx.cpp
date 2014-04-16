@@ -23,7 +23,7 @@ struct hpx_driver : htts2::driver
 {
     hpx_driver(int argc, char** argv)
       : htts2::driver(argc, argv)
-      , count_(0)
+//      , count_(0)
     {}
 
     void run()
@@ -200,8 +200,7 @@ struct hpx_driver : htts2::driver
                 << "OS-threads (Independent Variable),"
                 << "Tasks per OS-thread (Control Variable) [tasks/OS-threads],"
                 << "Payload Duration (Control Variable) [nanoseconds],"
-                << "Total Walltime [nanoseconds],"
-                << "Warmup Walltime [nanoseconds]"
+                << "Total Walltime [nanoseconds]"
                 << "\n";
 
         std::cout

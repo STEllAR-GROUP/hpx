@@ -50,8 +50,6 @@ struct omp_driver : htts2::driver
                     #pragma omp task untied
                     htts2::payload<BaseClock>(this->payload_duration_ /* = p */);
 
-            results.warmup_walltime_ = t.elapsed();
-
             #pragma omp taskwait
 
             // w_M [nanoseconds]
