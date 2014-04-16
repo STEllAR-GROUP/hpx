@@ -20,7 +20,7 @@ else()
 endif()
 
 set(benchmarks
-    hpx_homogeneous_timed_task_spawn
+    timed_task_spawn 
     hpx_homogeneous_timed_task_spawn_executors
     hpx_heterogeneous_timed_task_spawn
 
@@ -83,7 +83,7 @@ if(SWARM_FOUND)
                    "${SWARM_LIBRARY}")
 endif()
 
-set(hpx_homogeneous_timed_task_spawn_executors_FLAGS DEPENDENCIES iostreams_component)
+set(timed_task_spawn_executors_FLAGS DEPENDENCIES iostreams_component)
 set(hpx_heterogeneous_timed_task_spawn_FLAGS DEPENDENCIES iostreams_component)
 
 set(delay_baseline_FLAGS NOLIBS
@@ -152,3 +152,8 @@ if(OPENMP_FOUND)
   set_target_properties(openmp_homogeneous_timed_task_spawn_exe PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
   set_target_properties(openmp_homogeneous_timed_task_spawn_exe PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
 endif()
+
+add_hpx_pseudo_target(tests.performance.htts_v2)
+add_subdirectory(htts_v2)
+add_hpx_pseudo_dependencies(tests.performance tests.performance.htts_v2)
+
