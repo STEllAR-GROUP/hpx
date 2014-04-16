@@ -202,7 +202,34 @@ hpx::threads::thread_state_enum invoke_worker_timed_suspension(
 ///////////////////////////////////////////////////////////////////////////////
 typedef void (*stage_worker_function)(boost::uint64_t, bool);
 
-void stage_worker_static_balanced(
+void stage_worker_static_balanced_stackless(
+    boost::uint64_t target_thread
+  , bool suspend
+    )
+{
+    if (suspend)
+        hpx::threads::register_thread_plain(
+            &invoke_worker_timed_suspension
+          , "invoke_worker_timed_suspension"
+          , hpx::threads::pending
+          , false
+          , hpx::threads::thread_priority_normal
+          , target_thread
+          , hpx::threads::thread_stacksize_nostack
+            );
+    else
+        hpx::threads::register_thread_plain(
+            &invoke_worker_timed_no_suspension
+          , "invoke_worker_timed_no_suspension"
+          , hpx::threads::pending
+          , false
+          , hpx::threads::thread_priority_normal
+          , target_thread
+          , hpx::threads::thread_stacksize_nostack
+            );
+}
+
+void stage_worker_static_balanced_stackbased(
     boost::uint64_t target_thread
   , bool suspend
     )
@@ -331,8 +358,10 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         stage_worker_function stage_worker;
 
-        if ("static-balanced" == distribution)
-            stage_worker = &stage_worker_static_balanced; 
+        if ("static-balanced-stackless" == distribution)
+            stage_worker = &stage_worker_static_balanced_stackless; 
+        else if ("static-balanced-stackbased" == distribution)
+            stage_worker = &stage_worker_static_balanced_stackbased; 
         else if ("static-imbalanced" == distribution)
             stage_worker = &stage_worker_static_imbalanced; 
         else if ("round-robin" == distribution)
@@ -426,7 +455,7 @@ int hpx_main(
         // performance counter reset (which is called just before the staging
         // function).
         boost::uint64_t const num_thread = hpx::get_worker_thread_num();
-    
+ 
         for (boost::uint64_t i = 0; i < os_thread_count; ++i)
         {
             if (num_thread == i) continue;
@@ -491,7 +520,7 @@ int main(
           "\"weak\")")
 
         ( "distribution"
-        , value<std::string>(&distribution)->default_value("static-balanced")
+        , value<std::string>(&distribution)->default_value("static-balanced-stackbased")
         , "type of distribution to perform (valid options are "
           "\"static-balanced\", \"static-imbalanced\" or \"round-robin\")")
 
