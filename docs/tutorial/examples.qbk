@@ -466,12 +466,6 @@ as component actions:
 
 [managed_accumulator_methods]
 
-Before we can define the action types for these methods, we first need to
-associate an action code (an arbitrary, unique integral value) with each method
-that we are going to expose as an action:
-
-[managed_accumulator_action_codes]
-
 Here are the action types. These types wrap the methods we're exposing. The
 wrapping technique is very similar to the one used in the __fibonacci_example__
 and the __hello_world_example__:
