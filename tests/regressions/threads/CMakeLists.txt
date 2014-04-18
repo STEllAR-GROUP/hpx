@@ -9,11 +9,14 @@ set(tests
     resume_priority
     thread_data_1111
     thread_pool_executor_1112
-    thread_pool_executor_1114
     thread_rescheduling
     thread_suspend_pending
     thread_suspend_duration
    )
+
+if(HPX_LOCAL_SCHEDULER)
+  set(tests ${tests} thread_pool_executor_1114)
+endif(HPX_LOCAL_SCHEDULER)
 
 set(block_os_threads_1036_PARAMETERS THREADS_PER_LOCALITY 4)
 set(thread_pool_executor_1112_PARAMETERS THREADS_PER_LOCALITY 4)
