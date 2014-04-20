@@ -62,14 +62,14 @@ namespace examples { namespace server
         /// Reset the value to 0.
         void reset()
         {
-            // Atomically set value_ to 0.
+            // set value_ to 0.
             value_= 0;
         }
 
         /// Add the given number to the accumulator.
         void add(argument_type arg)
         {
-            // Atomically add value_ to arg, and store the result in value_.
+            // add value_ to arg, and store the result in value_.
             value_ += arg;
         }
 
