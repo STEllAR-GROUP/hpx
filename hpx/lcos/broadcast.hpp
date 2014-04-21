@@ -58,9 +58,20 @@ namespace hpx { namespace lcos {
         template <typename Action, int N>
         struct make_broadcast_action_impl;
 
+        template <typename Action, int N>
+        struct make_broadcast_apply_action_impl;
+
         template <typename Action>
         struct make_broadcast_action
           : make_broadcast_action_impl<
+                Action
+              , util::tuple_size<typename Action::arguments_type>::value
+            >
+        {};
+
+        template <typename Action>
+        struct make_broadcast_apply_action
+          : make_broadcast_apply_action_impl<
                 Action
               , util::tuple_size<typename Action::arguments_type>::value
             >
@@ -112,7 +123,9 @@ namespace hpx { namespace lcos {
     }
 }}
 
-#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
+#if 0
+// FIXME
+//#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/lcos/preprocessed/broadcast.hpp>
 #else
 
@@ -141,6 +154,69 @@ namespace hpx { namespace lcos {
 #endif
 
 #endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION(...)                  \
+    HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION_(__VA_ARGS__)             \
+/**/
+#define HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION_(...)                 \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION_,                     \
+            HPX_UTIL_PP_NARG(__VA_ARGS__)                                     \
+    )(__VA_ARGS__))                                                           \
+/**/
+
+#define HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION_1(Action)             \
+    HPX_REGISTER_APPLY_ACTION_DECLARATION(                                    \
+        ::hpx::lcos::detail::make_broadcast_apply_action<Action>::type        \
+      , BOOST_PP_CAT(broadcast_apply_, Action)                                \
+    )                                                                         \
+    HPX_REGISTER_APPLY_COLOCATED_DECLARATION(                                 \
+        ::hpx::lcos::detail::make_broadcast_apply_action<Action>::type        \
+      , BOOST_PP_CAT(apply_colocated_broadcast_, Action)                      \
+    )                                                                         \
+/**/
+#define HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION_2(Action, Name)       \
+    HPX_REGISTER_ACTION_DECLARATION(                                          \
+        ::hpx::lcos::detail::make_broadcast_action<Action>::type              \
+      , BOOST_PP_CAT(broadcast_apply_, Name)                                  \
+    )                                                                         \
+    HPX_REGISTER_APPLY_COLOCATED_DECLARATION(                                 \
+        ::hpx::lcos::detail::make_broadcast_apply_action<Action>::type        \
+      , BOOST_PP_CAT(apply_colocated_broadcast_, Name)                        \
+    )                                                                         \
+/**/
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_BROADCAST_APPLY_ACTION(...)                              \
+    HPX_REGISTER_BROADCAST_APPLY_ACTION_(__VA_ARGS__)                         \
+/**/
+#define HPX_REGISTER_BROADCAST_APPLY_ACTION_(...)                             \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_REGISTER_BROADCAST_APPLY_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)   \
+    )(__VA_ARGS__))                                                           \
+/**/
+
+#define HPX_REGISTER_BROADCAST_APPLY_ACTION_1(Action)                         \
+    HPX_REGISTER_PLAIN_ACTION(                                                \
+        ::hpx::lcos::detail::make_broadcast_apply_action<Action>::type        \
+      , BOOST_PP_CAT(broadcast_apply_, Action)                                \
+    )                                                                         \
+    HPX_REGISTER_APPLY_COLOCATED(                                             \
+        ::hpx::lcos::detail::make_broadcast_apply_action<Action>::type        \
+      , BOOST_PP_CAT(apply_colocated_broadcast_, Action)                      \
+    )                                                                         \
+/**/
+#define HPX_REGISTER_BROADCAST_APPLY_ACTION_2(Action, Name)                   \
+    HPX_REGISTER_PLAIN_ACTION(                                                \
+        ::hpx::lcos::detail::make_broadcast_apply_action<Action>::type        \
+      , BOOST_PP_CAT(broadcast_apply_, Name)                                  \
+    )                                                                         \
+    HPX_REGISTER_APPLY_COLOCATED(                                             \
+        ::hpx::lcos::detail::make_broadcast_apply_action<Action>::type        \
+      , BOOST_PP_CAT(apply_colocated_broadcast_, Name)                        \
+    )                                                                         \
+/**/
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_BROADCAST_ACTION_DECLARATION(...)                        \
@@ -535,6 +611,59 @@ namespace hpx { namespace lcos {
                 then(&return_result_type<action_result>).get();
         }
 
+        template <
+            typename Action
+          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
+        >
+        void
+        BOOST_PP_CAT(broadcast_apply_impl, N)(
+            Action const & act
+          , std::vector<hpx::id_type> const & ids
+          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)
+        )
+        {
+            if(ids.empty()) return;
+
+            const std::size_t fan_out = 16;
+
+            for(std::size_t i = 0; i != std::min(ids.size(), fan_out); ++i)
+            {
+                hpx::apply(
+                    act
+                  , ids[i]
+                  BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
+                );
+            }
+            
+            if(ids.size() > fan_out)
+            {
+                std::size_t applied = fan_out;
+                std::vector<hpx::id_type>::const_iterator it = ids.begin() + fan_out;
+                
+                typedef
+                    typename detail::make_broadcast_apply_action<
+                        Action
+                    >::type
+                    broadcast_impl_action;
+                while(it != ids.end())
+                {
+                    std::size_t next_fan = std::min(fan_out, ids.size() - applied);
+
+                    std::vector<hpx::id_type> ids_next(it, it + fan_out);
+                    
+                    hpx::apply_colocated<broadcast_impl_action>(
+                        ids_next[0]
+                      , act
+                      , std::move(ids_next)
+                      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
+                    );
+
+                    applied += next_fan;
+                    it += next_fan;
+                }
+            }
+        }
+
         ///////////////////////////////////////////////////////////////////////
         template <
             typename Action
@@ -580,6 +709,47 @@ namespace hpx { namespace lcos {
                           , _
                         )
                       , typename boost::is_same<void, action_result>::type
+                    >
+                    broadcast_invoker_type;
+
+            typedef
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
+                type;
+        };
+        
+        template <
+            typename Action
+          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
+        >
+        struct BOOST_PP_CAT(broadcast_apply_invoker, N)
+        {
+            static void
+            call(
+                Action const & act
+              , std::vector<hpx::id_type> const & ids
+              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)
+            )
+            {
+                return
+                    BOOST_PP_CAT(broadcast_apply_impl, N)(
+                        act
+                      , ids
+                      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
+                    );
+            }
+        };
+
+        template <typename Action>
+        struct make_broadcast_apply_action_impl<Action, N>
+        {
+            typedef BOOST_PP_CAT(broadcast_apply_invoker, N)<
+                        Action
+                      BOOST_PP_COMMA_IF(N)
+                        BOOST_PP_ENUM(
+                            N
+                          , HPX_LCOS_BROADCAST_EXTRACT_ACTION_ARGUMENTS
+                          , _
+                        )
                     >
                     broadcast_invoker_type;
 
@@ -640,6 +810,48 @@ namespace hpx { namespace lcos {
                 ids
               BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
             );
+    }
+
+    template <
+        typename Action
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
+    >
+    void
+    broadcast_apply(
+        std::vector<hpx::id_type> const & ids
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
+    {
+        typedef
+            typename detail::make_broadcast_apply_action<Action>::type
+            broadcast_impl_action;
+
+        hpx::apply_colocated<broadcast_impl_action>(
+                ids[0]
+              , Action()
+              , ids
+              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
+            );
+    }
+
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
+    >
+    void
+    broadcast_apply(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > /* act */
+      , std::vector<hpx::id_type> const & ids
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
+    {
+        broadcast_apply<Derived>(
+            ids
+          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
+        );
     }
 
     template <

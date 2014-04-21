@@ -8,6 +8,7 @@ if(HPX_HAVE_CXX11_LAMBDAS)
   #    DEPENDENCIES iostreams_component
   #                 mini_ghost_component
   #                 distributing_factory_component)
+  add_definitions(-DHPX_LIMIT=10)
 
   # add mini_ghost executable
   add_hpx_executable(mini_ghost

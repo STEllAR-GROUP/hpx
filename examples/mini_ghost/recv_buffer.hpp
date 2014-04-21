@@ -71,46 +71,34 @@ namespace mini_ghost {
             }
         }
 
-        hpx::future<void> operator()(grid<value_type> & g, std::size_t step)
+        void operator()(grid<value_type> & g, std::size_t step)
         {
-            if(valid_)
+            hpx::util::high_resolution_timer timer;
+            buffer_type buffer = get_buffer(step).get();
+            double elapsed = timer.elapsed();
+            profiling::data().time_wait(elapsed);
+            switch(Zone)
             {
-                double time_now = hpx::util::high_resolution_timer::now();
-                return get_buffer(step).then(
-                    [&g, time_now](hpx::future<buffer_type> buffer_future)
-                    {
-                        hpx::util::high_resolution_timer timer(time_now);
-                        double elapsed = timer.elapsed();
-                        profiling::data().time_wait(elapsed);
-                        switch(Zone)
-                        {
-                            case EAST:
-                                profiling::data().time_wait_x(elapsed);
-                                break;
-                            case WEST:
-                                profiling::data().time_wait_x(elapsed);
-                                break;
-                            case NORTH:
-                                profiling::data().time_wait_y(elapsed);
-                                break;
-                            case SOUTH:
-                                profiling::data().time_wait_y(elapsed);
-                                break;
-                            case FRONT:
-                                profiling::data().time_wait_z(elapsed);
-                                break;
-                            case BACK:
-                                profiling::data().time_wait_z(elapsed);
-                                break;
-                        }
-                        unpack_buffer<Zone>::call(g, buffer_future.get());
-                    }
-                );
+                case EAST:
+                    profiling::data().time_wait_x(elapsed);
+                    break;
+                case WEST:
+                    profiling::data().time_wait_x(elapsed);
+                    break;
+                case NORTH:
+                    profiling::data().time_wait_y(elapsed);
+                    break;
+                case SOUTH:
+                    profiling::data().time_wait_y(elapsed);
+                    break;
+                case FRONT:
+                    profiling::data().time_wait_z(elapsed);
+                    break;
+                case BACK:
+                    profiling::data().time_wait_z(elapsed);
+                    break;
             }
-            else
-            {
-                return hpx::make_ready_future();
-            }
+            unpack_buffer<Zone>::call(g, buffer);
         }
 
         void set_buffer(buffer_type buffer, std::size_t step)

@@ -7,6 +7,7 @@
 #define HPX_EXAMPLES_MINI_GHOST_GLOBAL_SUM_HPP
 
 #include <hpx/include/local_lcos.hpp>
+#include <hpx/lcos/broadcast.hpp>
 
 namespace mini_ghost {
     template <typename T>
@@ -41,16 +42,21 @@ namespace mini_ghost {
             return *this;
         }
         template<typename Action>
-        hpx::future<T> add(Action action, std::vector<hpx::id_type> ids,
-            std::size_t which, T val)
+        hpx::future<T> add(Action action, std::vector<hpx::id_type> const & ids,
+            std::size_t which, T val, std::size_t id, std::size_t idx)
         {
             hpx::future<void> f = gate_.get_future(ids.size(), &generation_);
             HPX_ASSERT(value_ == 0);
 
-            for(hpx::id_type const & id : ids)
+            hpx::lcos::broadcast_apply<Action>(ids, generation_, which, val, id, idx);
+            
+            /*
+            for(hpx::id_type const & id_ : ids)
             {
-                hpx::apply(action, id, generation_, which, val);
+                hpx::apply(action, id_, generation_, which, val, id);
             }
+            */
+            
 
             return f.then(
                 hpx::launch::sync,
