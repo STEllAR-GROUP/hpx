@@ -79,13 +79,15 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         void insert(void const* key,
             boost::shared_ptr<tss_cleanup_function> const& func, void* tss_data)
         {
-            data_.insert(std::make_pair(key, tss_data_node(func, tss_data)));
+            tss_data_node node(func, tss_data);
+            data_[key] = std::move(node);
         }
 
         void insert(void const* key, void* tss_data)
         {
             boost::shared_ptr<tss_cleanup_function> func;
-            data_.insert(std::make_pair(key, tss_data_node(func, tss_data)));
+            tss_data_node node(func, tss_data);
+            data_[key] = std::move(node);
         }
 
         void erase(void const* key, bool cleanup_existing)
