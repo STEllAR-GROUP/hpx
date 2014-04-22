@@ -69,9 +69,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Properly handle all preprocessing limits
 #if !defined(HPX_LIMIT)
-#  define HPX_LIMIT 4
-#elif (HPX_LIMIT < 4)
-#  error "HPX_LIMIT is too low, it must be at least 4"
+#  define HPX_LIMIT 5
+#elif (HPX_LIMIT < 5)
+#  error "HPX_LIMIT is too low, it must be at least 5"
 #elif (HPX_LIMIT > HPX_MAX_LIMIT) && \
       !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  define HPX_USE_PREPROCESSOR_LIMIT_EXPANSION
