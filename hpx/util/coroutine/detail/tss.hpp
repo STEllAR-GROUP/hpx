@@ -13,6 +13,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/coroutine/exception.hpp>
+#include <hpx/util/move.hpp>
 
 #include <boost/shared_ptr.hpp>
 
@@ -34,6 +35,8 @@ namespace hpx { namespace util { namespace coroutines
         private:
             boost::shared_ptr<tss_cleanup_function> func_;
             void* value_;
+
+            HPX_MOVABLE_BUT_NOT_COPYABLE(tss_data_node)
 
         public:
             tss_data_node(void* val)
