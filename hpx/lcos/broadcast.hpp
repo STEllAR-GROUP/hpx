@@ -165,18 +165,11 @@ namespace hpx { namespace lcos {
 /**/
 
 #define HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION_1(Action)             \
-    HPX_REGISTER_APPLY_ACTION_DECLARATION(                                    \
-        ::hpx::lcos::detail::make_broadcast_apply_action<Action>::type        \
-      , BOOST_PP_CAT(broadcast_apply_, Action)                                \
-    )                                                                         \
-    HPX_REGISTER_APPLY_COLOCATED_DECLARATION(                                 \
-        ::hpx::lcos::detail::make_broadcast_apply_action<Action>::type        \
-      , BOOST_PP_CAT(apply_colocated_broadcast_, Action)                      \
-    )                                                                         \
+    HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION_2(Action, Action)         \
 /**/
 #define HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION_2(Action, Name)       \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
-        ::hpx::lcos::detail::make_broadcast_action<Action>::type              \
+        ::hpx::lcos::detail::make_broadcast_apply_action<Action>::type        \
       , BOOST_PP_CAT(broadcast_apply_, Name)                                  \
     )                                                                         \
     HPX_REGISTER_APPLY_COLOCATED_DECLARATION(                                 \
@@ -196,14 +189,7 @@ namespace hpx { namespace lcos {
 /**/
 
 #define HPX_REGISTER_BROADCAST_APPLY_ACTION_1(Action)                         \
-    HPX_REGISTER_PLAIN_ACTION(                                                \
-        ::hpx::lcos::detail::make_broadcast_apply_action<Action>::type        \
-      , BOOST_PP_CAT(broadcast_apply_, Action)                                \
-    )                                                                         \
-    HPX_REGISTER_APPLY_COLOCATED(                                             \
-        ::hpx::lcos::detail::make_broadcast_apply_action<Action>::type        \
-      , BOOST_PP_CAT(apply_colocated_broadcast_, Action)                      \
-    )                                                                         \
+    HPX_REGISTER_BROADCAST_APPLY_ACTION_2(Action, Action)                     \
 /**/
 #define HPX_REGISTER_BROADCAST_APPLY_ACTION_2(Action, Name)                   \
     HPX_REGISTER_PLAIN_ACTION(                                                \
@@ -228,14 +214,7 @@ namespace hpx { namespace lcos {
 /**/
 
 #define HPX_REGISTER_BROADCAST_ACTION_DECLARATION_1(Action)                   \
-    HPX_REGISTER_ACTION_DECLARATION(                                          \
-        ::hpx::lcos::detail::make_broadcast_action<Action>::type              \
-      , BOOST_PP_CAT(broadcast_, Action)                                      \
-    )                                                                         \
-    HPX_REGISTER_ASYNC_COLOCATED_DECLARATION(                                 \
-        ::hpx::lcos::detail::make_broadcast_action<Action>::type              \
-      , BOOST_PP_CAT(async_colocated_broadcast_, Action)                      \
-    )                                                                         \
+    HPX_REGISTER_BROADCAST_ACTION_DECLARATION_2(Action, Action)               \
 /**/
 #define HPX_REGISTER_BROADCAST_ACTION_DECLARATION_2(Action, Name)             \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
@@ -259,14 +238,7 @@ namespace hpx { namespace lcos {
 /**/
 
 #define HPX_REGISTER_BROADCAST_ACTION_1(Action)                               \
-    HPX_REGISTER_PLAIN_ACTION(                                                \
-        ::hpx::lcos::detail::make_broadcast_action<Action>::type              \
-      , BOOST_PP_CAT(broadcast_, Action)                                      \
-    )                                                                         \
-    HPX_REGISTER_ASYNC_COLOCATED(                                             \
-        ::hpx::lcos::detail::make_broadcast_action<Action>::type              \
-      , BOOST_PP_CAT(async_colocated_broadcast_, Action)                      \
-    )                                                                         \
+    HPX_REGISTER_BROADCAST_ACTION_2(Action, Action)                           \
 /**/
 #define HPX_REGISTER_BROADCAST_ACTION_2(Action, Name)                         \
     HPX_REGISTER_PLAIN_ACTION(                                                \
@@ -291,18 +263,7 @@ namespace hpx { namespace lcos {
 /**/
 
 #define HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION_1(Action)        \
-    HPX_REGISTER_ACTION_DECLARATION(                                          \
-        ::hpx::lcos::detail::make_broadcast_action<                           \
-            ::hpx::lcos::detail::broadcast_with_index<Action>                 \
-        >::type                                                               \
-      , BOOST_PP_CAT(broadcast_with_index_, Action)                           \
-    )                                                                         \
-    HPX_REGISTER_ASYNC_COLOCATED_DECLARATION(                                 \
-        ::hpx::lcos::detail::make_broadcast_action<                           \
-            ::hpx::lcos::detail::broadcast_with_index<Action>                 \
-        >::type                                                               \
-      , BOOST_PP_CAT(async_colocated_broadcast_with_index_, Action)           \
-    )                                                                         \
+    HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION_2(Action, Action)    \
 /**/
 #define HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION_2(Action, Name)  \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
@@ -331,18 +292,7 @@ namespace hpx { namespace lcos {
 /**/
 
 #define HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_1(Action)                    \
-    HPX_REGISTER_PLAIN_ACTION(                                                \
-        ::hpx::lcos::detail::make_broadcast_action<                           \
-            ::hpx::lcos::detail::broadcast_with_index<Action>                 \
-        >::type                                                               \
-      , BOOST_PP_CAT(broadcast_, Action)                                      \
-    )                                                                         \
-    HPX_REGISTER_ASYNC_COLOCATED(                                             \
-        ::hpx::lcos::detail::make_broadcast_action<                           \
-            ::hpx::lcos::detail::broadcast_with_index<Action>                 \
-        >::type                                                               \
-      , BOOST_PP_CAT(async_colocated_broadcast_with_index_, Action)           \
-    )                                                                         \
+    HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_2(Action, Action)                \
 /**/
 #define HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_2(Action, Name)              \
     HPX_REGISTER_PLAIN_ACTION(                                                \
