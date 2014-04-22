@@ -626,7 +626,7 @@ namespace hpx { namespace lcos {
 
             const std::size_t fan_out = 16;
 
-            for(std::size_t i = 0; i != std::min(ids.size(), fan_out); ++i)
+            for(std::size_t i = 0; i != (std::min)(ids.size(), fan_out); ++i)
             {
                 hpx::apply(
                     act
@@ -634,12 +634,12 @@ namespace hpx { namespace lcos {
                   BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
                 );
             }
-            
+
             if(ids.size() > fan_out)
             {
                 std::size_t applied = fan_out;
                 std::vector<hpx::id_type>::const_iterator it = ids.begin() + fan_out;
-                
+
                 typedef
                     typename detail::make_broadcast_apply_action<
                         Action
@@ -647,10 +647,10 @@ namespace hpx { namespace lcos {
                     broadcast_impl_action;
                 while(it != ids.end())
                 {
-                    std::size_t next_fan = std::min(fan_out, ids.size() - applied);
+                    std::size_t next_fan = (std::min)(fan_out, ids.size() - applied);
 
                     std::vector<hpx::id_type> ids_next(it, it + fan_out);
-                    
+
                     hpx::apply_colocated<broadcast_impl_action>(
                         ids_next[0]
                       , act
@@ -716,7 +716,7 @@ namespace hpx { namespace lcos {
                 typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
-        
+
         template <
             typename Action
           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
