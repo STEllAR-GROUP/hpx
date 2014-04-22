@@ -123,9 +123,7 @@ namespace hpx { namespace lcos {
     }
 }}
 
-#if 0
-// FIXME
-//#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
+#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/lcos/preprocessed/broadcast.hpp>
 #else
 

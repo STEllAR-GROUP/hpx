@@ -230,6 +230,51 @@ namespace hpx { namespace lcos {
             return hpx::when_all(broadcast_futures).
                 then(&return_result_type<action_result>).get();
         }
+        template <
+            typename Action
+           
+        >
+        void
+        broadcast_apply_impl0(
+            Action const & act
+          , std::vector<hpx::id_type> const & ids
+           
+        )
+        {
+            if(ids.empty()) return;
+            const std::size_t fan_out = 16;
+            for(std::size_t i = 0; i != (std::min)(ids.size(), fan_out); ++i)
+            {
+                hpx::apply(
+                    act
+                  , ids[i]
+                   
+                );
+            }
+            if(ids.size() > fan_out)
+            {
+                std::size_t applied = fan_out;
+                std::vector<hpx::id_type>::const_iterator it = ids.begin() + fan_out;
+                typedef
+                    typename detail::make_broadcast_apply_action<
+                        Action
+                    >::type
+                    broadcast_impl_action;
+                while(it != ids.end())
+                {
+                    std::size_t next_fan = (std::min)(fan_out, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fan_out);
+                    hpx::apply_colocated<broadcast_impl_action>(
+                        ids_next[0]
+                      , act
+                      , std::move(ids_next)
+                       
+                    );
+                    applied += next_fan;
+                    it += next_fan;
+                }
+            }
+        }
         
         template <
             typename Action
@@ -269,6 +314,40 @@ namespace hpx { namespace lcos {
                       
                         
                       , typename boost::is_same<void, action_result>::type
+                    >
+                    broadcast_invoker_type;
+            typedef
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
+                type;
+        };
+        template <
+            typename Action
+           
+        >
+        struct broadcast_apply_invoker0
+        {
+            static void
+            call(
+                Action const & act
+              , std::vector<hpx::id_type> const & ids
+               
+            )
+            {
+                return
+                    broadcast_apply_impl0(
+                        act
+                      , ids
+                       
+                    );
+            }
+        };
+        template <typename Action>
+        struct make_broadcast_apply_action_impl<Action, 0>
+        {
+            typedef broadcast_apply_invoker0<
+                        Action
+                      
+                        
                     >
                     broadcast_invoker_type;
             typedef
@@ -325,6 +404,45 @@ namespace hpx { namespace lcos {
                 ids
                
             );
+    }
+    template <
+        typename Action
+       
+    >
+    void
+    broadcast_apply(
+        std::vector<hpx::id_type> const & ids
+       )
+    {
+        typedef
+            typename detail::make_broadcast_apply_action<Action>::type
+            broadcast_impl_action;
+        hpx::apply_colocated<broadcast_impl_action>(
+                ids[0]
+              , Action()
+              , ids
+               
+            );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+       
+    >
+    void
+    broadcast_apply(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+       )
+    {
+        broadcast_apply<Derived>(
+            ids
+           
+        );
     }
     template <
         typename Action
@@ -586,6 +704,51 @@ namespace hpx { namespace lcos {
             }
             return hpx::when_all(broadcast_futures).
                 then(&return_result_type<action_result>).get();
+        }
+        template <
+            typename Action
+          , typename A0
+        >
+        void
+        broadcast_apply_impl1(
+            Action const & act
+          , std::vector<hpx::id_type> const & ids
+          , A0 const & a0
+        )
+        {
+            if(ids.empty()) return;
+            const std::size_t fan_out = 16;
+            for(std::size_t i = 0; i != (std::min)(ids.size(), fan_out); ++i)
+            {
+                hpx::apply(
+                    act
+                  , ids[i]
+                  , a0
+                );
+            }
+            if(ids.size() > fan_out)
+            {
+                std::size_t applied = fan_out;
+                std::vector<hpx::id_type>::const_iterator it = ids.begin() + fan_out;
+                typedef
+                    typename detail::make_broadcast_apply_action<
+                        Action
+                    >::type
+                    broadcast_impl_action;
+                while(it != ids.end())
+                {
+                    std::size_t next_fan = (std::min)(fan_out, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fan_out);
+                    hpx::apply_colocated<broadcast_impl_action>(
+                        ids_next[0]
+                      , act
+                      , std::move(ids_next)
+                      , a0
+                    );
+                    applied += next_fan;
+                    it += next_fan;
+                }
+            }
         }
         
         template <
@@ -632,6 +795,40 @@ namespace hpx { namespace lcos {
                 typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
+        template <
+            typename Action
+          , typename A0
+        >
+        struct broadcast_apply_invoker1
+        {
+            static void
+            call(
+                Action const & act
+              , std::vector<hpx::id_type> const & ids
+              , A0 const & a0
+            )
+            {
+                return
+                    broadcast_apply_impl1(
+                        act
+                      , ids
+                      , a0
+                    );
+            }
+        };
+        template <typename Action>
+        struct make_broadcast_apply_action_impl<Action, 1>
+        {
+            typedef broadcast_apply_invoker1<
+                        Action
+                      ,
+                        typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 0 >::type
+                    >
+                    broadcast_invoker_type;
+            typedef
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
+                type;
+        };
     }
     
     template <
@@ -682,6 +879,45 @@ namespace hpx { namespace lcos {
                 ids
               , a0
             );
+    }
+    template <
+        typename Action
+      , typename A0
+    >
+    void
+    broadcast_apply(
+        std::vector<hpx::id_type> const & ids
+      , A0 const & a0)
+    {
+        typedef
+            typename detail::make_broadcast_apply_action<Action>::type
+            broadcast_impl_action;
+        hpx::apply_colocated<broadcast_impl_action>(
+                ids[0]
+              , Action()
+              , ids
+              , a0
+            );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      , typename A0
+    >
+    void
+    broadcast_apply(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0)
+    {
+        broadcast_apply<Derived>(
+            ids
+          , a0
+        );
     }
     template <
         typename Action
@@ -943,6 +1179,51 @@ namespace hpx { namespace lcos {
             }
             return hpx::when_all(broadcast_futures).
                 then(&return_result_type<action_result>).get();
+        }
+        template <
+            typename Action
+          , typename A0 , typename A1
+        >
+        void
+        broadcast_apply_impl2(
+            Action const & act
+          , std::vector<hpx::id_type> const & ids
+          , A0 const & a0 , A1 const & a1
+        )
+        {
+            if(ids.empty()) return;
+            const std::size_t fan_out = 16;
+            for(std::size_t i = 0; i != (std::min)(ids.size(), fan_out); ++i)
+            {
+                hpx::apply(
+                    act
+                  , ids[i]
+                  , a0 , a1
+                );
+            }
+            if(ids.size() > fan_out)
+            {
+                std::size_t applied = fan_out;
+                std::vector<hpx::id_type>::const_iterator it = ids.begin() + fan_out;
+                typedef
+                    typename detail::make_broadcast_apply_action<
+                        Action
+                    >::type
+                    broadcast_impl_action;
+                while(it != ids.end())
+                {
+                    std::size_t next_fan = (std::min)(fan_out, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fan_out);
+                    hpx::apply_colocated<broadcast_impl_action>(
+                        ids_next[0]
+                      , act
+                      , std::move(ids_next)
+                      , a0 , a1
+                    );
+                    applied += next_fan;
+                    it += next_fan;
+                }
+            }
         }
         
         template <
@@ -989,6 +1270,40 @@ namespace hpx { namespace lcos {
                 typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
+        template <
+            typename Action
+          , typename A0 , typename A1
+        >
+        struct broadcast_apply_invoker2
+        {
+            static void
+            call(
+                Action const & act
+              , std::vector<hpx::id_type> const & ids
+              , A0 const & a0 , A1 const & a1
+            )
+            {
+                return
+                    broadcast_apply_impl2(
+                        act
+                      , ids
+                      , a0 , a1
+                    );
+            }
+        };
+        template <typename Action>
+        struct make_broadcast_apply_action_impl<Action, 2>
+        {
+            typedef broadcast_apply_invoker2<
+                        Action
+                      ,
+                        typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 0 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 1 >::type
+                    >
+                    broadcast_invoker_type;
+            typedef
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
+                type;
+        };
     }
     
     template <
@@ -1039,6 +1354,45 @@ namespace hpx { namespace lcos {
                 ids
               , a0 , a1
             );
+    }
+    template <
+        typename Action
+      , typename A0 , typename A1
+    >
+    void
+    broadcast_apply(
+        std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1)
+    {
+        typedef
+            typename detail::make_broadcast_apply_action<Action>::type
+            broadcast_impl_action;
+        hpx::apply_colocated<broadcast_impl_action>(
+                ids[0]
+              , Action()
+              , ids
+              , a0 , a1
+            );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      , typename A0 , typename A1
+    >
+    void
+    broadcast_apply(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1)
+    {
+        broadcast_apply<Derived>(
+            ids
+          , a0 , a1
+        );
     }
     template <
         typename Action
@@ -1300,6 +1654,51 @@ namespace hpx { namespace lcos {
             }
             return hpx::when_all(broadcast_futures).
                 then(&return_result_type<action_result>).get();
+        }
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2
+        >
+        void
+        broadcast_apply_impl3(
+            Action const & act
+          , std::vector<hpx::id_type> const & ids
+          , A0 const & a0 , A1 const & a1 , A2 const & a2
+        )
+        {
+            if(ids.empty()) return;
+            const std::size_t fan_out = 16;
+            for(std::size_t i = 0; i != (std::min)(ids.size(), fan_out); ++i)
+            {
+                hpx::apply(
+                    act
+                  , ids[i]
+                  , a0 , a1 , a2
+                );
+            }
+            if(ids.size() > fan_out)
+            {
+                std::size_t applied = fan_out;
+                std::vector<hpx::id_type>::const_iterator it = ids.begin() + fan_out;
+                typedef
+                    typename detail::make_broadcast_apply_action<
+                        Action
+                    >::type
+                    broadcast_impl_action;
+                while(it != ids.end())
+                {
+                    std::size_t next_fan = (std::min)(fan_out, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fan_out);
+                    hpx::apply_colocated<broadcast_impl_action>(
+                        ids_next[0]
+                      , act
+                      , std::move(ids_next)
+                      , a0 , a1 , a2
+                    );
+                    applied += next_fan;
+                    it += next_fan;
+                }
+            }
         }
         
         template <
@@ -1346,6 +1745,40 @@ namespace hpx { namespace lcos {
                 typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2
+        >
+        struct broadcast_apply_invoker3
+        {
+            static void
+            call(
+                Action const & act
+              , std::vector<hpx::id_type> const & ids
+              , A0 const & a0 , A1 const & a1 , A2 const & a2
+            )
+            {
+                return
+                    broadcast_apply_impl3(
+                        act
+                      , ids
+                      , a0 , a1 , a2
+                    );
+            }
+        };
+        template <typename Action>
+        struct make_broadcast_apply_action_impl<Action, 3>
+        {
+            typedef broadcast_apply_invoker3<
+                        Action
+                      ,
+                        typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 0 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 1 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 2 >::type
+                    >
+                    broadcast_invoker_type;
+            typedef
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
+                type;
+        };
     }
     
     template <
@@ -1396,6 +1829,45 @@ namespace hpx { namespace lcos {
                 ids
               , a0 , a1 , a2
             );
+    }
+    template <
+        typename Action
+      , typename A0 , typename A1 , typename A2
+    >
+    void
+    broadcast_apply(
+        std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2)
+    {
+        typedef
+            typename detail::make_broadcast_apply_action<Action>::type
+            broadcast_impl_action;
+        hpx::apply_colocated<broadcast_impl_action>(
+                ids[0]
+              , Action()
+              , ids
+              , a0 , a1 , a2
+            );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      , typename A0 , typename A1 , typename A2
+    >
+    void
+    broadcast_apply(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2)
+    {
+        broadcast_apply<Derived>(
+            ids
+          , a0 , a1 , a2
+        );
     }
     template <
         typename Action
@@ -1657,6 +2129,51 @@ namespace hpx { namespace lcos {
             }
             return hpx::when_all(broadcast_futures).
                 then(&return_result_type<action_result>).get();
+        }
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2 , typename A3
+        >
+        void
+        broadcast_apply_impl4(
+            Action const & act
+          , std::vector<hpx::id_type> const & ids
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3
+        )
+        {
+            if(ids.empty()) return;
+            const std::size_t fan_out = 16;
+            for(std::size_t i = 0; i != (std::min)(ids.size(), fan_out); ++i)
+            {
+                hpx::apply(
+                    act
+                  , ids[i]
+                  , a0 , a1 , a2 , a3
+                );
+            }
+            if(ids.size() > fan_out)
+            {
+                std::size_t applied = fan_out;
+                std::vector<hpx::id_type>::const_iterator it = ids.begin() + fan_out;
+                typedef
+                    typename detail::make_broadcast_apply_action<
+                        Action
+                    >::type
+                    broadcast_impl_action;
+                while(it != ids.end())
+                {
+                    std::size_t next_fan = (std::min)(fan_out, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fan_out);
+                    hpx::apply_colocated<broadcast_impl_action>(
+                        ids_next[0]
+                      , act
+                      , std::move(ids_next)
+                      , a0 , a1 , a2 , a3
+                    );
+                    applied += next_fan;
+                    it += next_fan;
+                }
+            }
         }
         
         template <
@@ -1703,6 +2220,40 @@ namespace hpx { namespace lcos {
                 typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2 , typename A3
+        >
+        struct broadcast_apply_invoker4
+        {
+            static void
+            call(
+                Action const & act
+              , std::vector<hpx::id_type> const & ids
+              , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3
+            )
+            {
+                return
+                    broadcast_apply_impl4(
+                        act
+                      , ids
+                      , a0 , a1 , a2 , a3
+                    );
+            }
+        };
+        template <typename Action>
+        struct make_broadcast_apply_action_impl<Action, 4>
+        {
+            typedef broadcast_apply_invoker4<
+                        Action
+                      ,
+                        typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 0 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 1 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 2 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 3 >::type
+                    >
+                    broadcast_invoker_type;
+            typedef
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
+                type;
+        };
     }
     
     template <
@@ -1753,6 +2304,45 @@ namespace hpx { namespace lcos {
                 ids
               , a0 , a1 , a2 , a3
             );
+    }
+    template <
+        typename Action
+      , typename A0 , typename A1 , typename A2 , typename A3
+    >
+    void
+    broadcast_apply(
+        std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3)
+    {
+        typedef
+            typename detail::make_broadcast_apply_action<Action>::type
+            broadcast_impl_action;
+        hpx::apply_colocated<broadcast_impl_action>(
+                ids[0]
+              , Action()
+              , ids
+              , a0 , a1 , a2 , a3
+            );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      , typename A0 , typename A1 , typename A2 , typename A3
+    >
+    void
+    broadcast_apply(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3)
+    {
+        broadcast_apply<Derived>(
+            ids
+          , a0 , a1 , a2 , a3
+        );
     }
     template <
         typename Action
@@ -2014,6 +2604,51 @@ namespace hpx { namespace lcos {
             }
             return hpx::when_all(broadcast_futures).
                 then(&return_result_type<action_result>).get();
+        }
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
+        >
+        void
+        broadcast_apply_impl5(
+            Action const & act
+          , std::vector<hpx::id_type> const & ids
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4
+        )
+        {
+            if(ids.empty()) return;
+            const std::size_t fan_out = 16;
+            for(std::size_t i = 0; i != (std::min)(ids.size(), fan_out); ++i)
+            {
+                hpx::apply(
+                    act
+                  , ids[i]
+                  , a0 , a1 , a2 , a3 , a4
+                );
+            }
+            if(ids.size() > fan_out)
+            {
+                std::size_t applied = fan_out;
+                std::vector<hpx::id_type>::const_iterator it = ids.begin() + fan_out;
+                typedef
+                    typename detail::make_broadcast_apply_action<
+                        Action
+                    >::type
+                    broadcast_impl_action;
+                while(it != ids.end())
+                {
+                    std::size_t next_fan = (std::min)(fan_out, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fan_out);
+                    hpx::apply_colocated<broadcast_impl_action>(
+                        ids_next[0]
+                      , act
+                      , std::move(ids_next)
+                      , a0 , a1 , a2 , a3 , a4
+                    );
+                    applied += next_fan;
+                    it += next_fan;
+                }
+            }
         }
         
         template <
@@ -2060,6 +2695,40 @@ namespace hpx { namespace lcos {
                 typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
+        >
+        struct broadcast_apply_invoker5
+        {
+            static void
+            call(
+                Action const & act
+              , std::vector<hpx::id_type> const & ids
+              , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4
+            )
+            {
+                return
+                    broadcast_apply_impl5(
+                        act
+                      , ids
+                      , a0 , a1 , a2 , a3 , a4
+                    );
+            }
+        };
+        template <typename Action>
+        struct make_broadcast_apply_action_impl<Action, 5>
+        {
+            typedef broadcast_apply_invoker5<
+                        Action
+                      ,
+                        typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 0 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 1 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 2 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 3 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 4 >::type
+                    >
+                    broadcast_invoker_type;
+            typedef
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
+                type;
+        };
     }
     
     template <
@@ -2110,6 +2779,45 @@ namespace hpx { namespace lcos {
                 ids
               , a0 , a1 , a2 , a3 , a4
             );
+    }
+    template <
+        typename Action
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
+    >
+    void
+    broadcast_apply(
+        std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4)
+    {
+        typedef
+            typename detail::make_broadcast_apply_action<Action>::type
+            broadcast_impl_action;
+        hpx::apply_colocated<broadcast_impl_action>(
+                ids[0]
+              , Action()
+              , ids
+              , a0 , a1 , a2 , a3 , a4
+            );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
+    >
+    void
+    broadcast_apply(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4)
+    {
+        broadcast_apply<Derived>(
+            ids
+          , a0 , a1 , a2 , a3 , a4
+        );
     }
     template <
         typename Action
@@ -2371,6 +3079,51 @@ namespace hpx { namespace lcos {
             }
             return hpx::when_all(broadcast_futures).
                 then(&return_result_type<action_result>).get();
+        }
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
+        >
+        void
+        broadcast_apply_impl6(
+            Action const & act
+          , std::vector<hpx::id_type> const & ids
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5
+        )
+        {
+            if(ids.empty()) return;
+            const std::size_t fan_out = 16;
+            for(std::size_t i = 0; i != (std::min)(ids.size(), fan_out); ++i)
+            {
+                hpx::apply(
+                    act
+                  , ids[i]
+                  , a0 , a1 , a2 , a3 , a4 , a5
+                );
+            }
+            if(ids.size() > fan_out)
+            {
+                std::size_t applied = fan_out;
+                std::vector<hpx::id_type>::const_iterator it = ids.begin() + fan_out;
+                typedef
+                    typename detail::make_broadcast_apply_action<
+                        Action
+                    >::type
+                    broadcast_impl_action;
+                while(it != ids.end())
+                {
+                    std::size_t next_fan = (std::min)(fan_out, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fan_out);
+                    hpx::apply_colocated<broadcast_impl_action>(
+                        ids_next[0]
+                      , act
+                      , std::move(ids_next)
+                      , a0 , a1 , a2 , a3 , a4 , a5
+                    );
+                    applied += next_fan;
+                    it += next_fan;
+                }
+            }
         }
         
         template <
@@ -2417,6 +3170,40 @@ namespace hpx { namespace lcos {
                 typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
+        >
+        struct broadcast_apply_invoker6
+        {
+            static void
+            call(
+                Action const & act
+              , std::vector<hpx::id_type> const & ids
+              , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5
+            )
+            {
+                return
+                    broadcast_apply_impl6(
+                        act
+                      , ids
+                      , a0 , a1 , a2 , a3 , a4 , a5
+                    );
+            }
+        };
+        template <typename Action>
+        struct make_broadcast_apply_action_impl<Action, 6>
+        {
+            typedef broadcast_apply_invoker6<
+                        Action
+                      ,
+                        typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 0 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 1 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 2 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 3 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 4 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 5 >::type
+                    >
+                    broadcast_invoker_type;
+            typedef
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
+                type;
+        };
     }
     
     template <
@@ -2467,6 +3254,45 @@ namespace hpx { namespace lcos {
                 ids
               , a0 , a1 , a2 , a3 , a4 , a5
             );
+    }
+    template <
+        typename Action
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
+    >
+    void
+    broadcast_apply(
+        std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5)
+    {
+        typedef
+            typename detail::make_broadcast_apply_action<Action>::type
+            broadcast_impl_action;
+        hpx::apply_colocated<broadcast_impl_action>(
+                ids[0]
+              , Action()
+              , ids
+              , a0 , a1 , a2 , a3 , a4 , a5
+            );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
+    >
+    void
+    broadcast_apply(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5)
+    {
+        broadcast_apply<Derived>(
+            ids
+          , a0 , a1 , a2 , a3 , a4 , a5
+        );
     }
     template <
         typename Action
@@ -2728,6 +3554,51 @@ namespace hpx { namespace lcos {
             }
             return hpx::when_all(broadcast_futures).
                 then(&return_result_type<action_result>).get();
+        }
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
+        >
+        void
+        broadcast_apply_impl7(
+            Action const & act
+          , std::vector<hpx::id_type> const & ids
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6
+        )
+        {
+            if(ids.empty()) return;
+            const std::size_t fan_out = 16;
+            for(std::size_t i = 0; i != (std::min)(ids.size(), fan_out); ++i)
+            {
+                hpx::apply(
+                    act
+                  , ids[i]
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6
+                );
+            }
+            if(ids.size() > fan_out)
+            {
+                std::size_t applied = fan_out;
+                std::vector<hpx::id_type>::const_iterator it = ids.begin() + fan_out;
+                typedef
+                    typename detail::make_broadcast_apply_action<
+                        Action
+                    >::type
+                    broadcast_impl_action;
+                while(it != ids.end())
+                {
+                    std::size_t next_fan = (std::min)(fan_out, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fan_out);
+                    hpx::apply_colocated<broadcast_impl_action>(
+                        ids_next[0]
+                      , act
+                      , std::move(ids_next)
+                      , a0 , a1 , a2 , a3 , a4 , a5 , a6
+                    );
+                    applied += next_fan;
+                    it += next_fan;
+                }
+            }
         }
         
         template <
@@ -2774,6 +3645,40 @@ namespace hpx { namespace lcos {
                 typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
+        >
+        struct broadcast_apply_invoker7
+        {
+            static void
+            call(
+                Action const & act
+              , std::vector<hpx::id_type> const & ids
+              , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6
+            )
+            {
+                return
+                    broadcast_apply_impl7(
+                        act
+                      , ids
+                      , a0 , a1 , a2 , a3 , a4 , a5 , a6
+                    );
+            }
+        };
+        template <typename Action>
+        struct make_broadcast_apply_action_impl<Action, 7>
+        {
+            typedef broadcast_apply_invoker7<
+                        Action
+                      ,
+                        typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 0 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 1 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 2 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 3 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 4 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 5 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 6 >::type
+                    >
+                    broadcast_invoker_type;
+            typedef
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
+                type;
+        };
     }
     
     template <
@@ -2824,6 +3729,45 @@ namespace hpx { namespace lcos {
                 ids
               , a0 , a1 , a2 , a3 , a4 , a5 , a6
             );
+    }
+    template <
+        typename Action
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
+    >
+    void
+    broadcast_apply(
+        std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6)
+    {
+        typedef
+            typename detail::make_broadcast_apply_action<Action>::type
+            broadcast_impl_action;
+        hpx::apply_colocated<broadcast_impl_action>(
+                ids[0]
+              , Action()
+              , ids
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6
+            );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
+    >
+    void
+    broadcast_apply(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6)
+    {
+        broadcast_apply<Derived>(
+            ids
+          , a0 , a1 , a2 , a3 , a4 , a5 , a6
+        );
     }
     template <
         typename Action
@@ -3085,6 +4029,51 @@ namespace hpx { namespace lcos {
             }
             return hpx::when_all(broadcast_futures).
                 then(&return_result_type<action_result>).get();
+        }
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
+        >
+        void
+        broadcast_apply_impl8(
+            Action const & act
+          , std::vector<hpx::id_type> const & ids
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7
+        )
+        {
+            if(ids.empty()) return;
+            const std::size_t fan_out = 16;
+            for(std::size_t i = 0; i != (std::min)(ids.size(), fan_out); ++i)
+            {
+                hpx::apply(
+                    act
+                  , ids[i]
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
+                );
+            }
+            if(ids.size() > fan_out)
+            {
+                std::size_t applied = fan_out;
+                std::vector<hpx::id_type>::const_iterator it = ids.begin() + fan_out;
+                typedef
+                    typename detail::make_broadcast_apply_action<
+                        Action
+                    >::type
+                    broadcast_impl_action;
+                while(it != ids.end())
+                {
+                    std::size_t next_fan = (std::min)(fan_out, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fan_out);
+                    hpx::apply_colocated<broadcast_impl_action>(
+                        ids_next[0]
+                      , act
+                      , std::move(ids_next)
+                      , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
+                    );
+                    applied += next_fan;
+                    it += next_fan;
+                }
+            }
         }
         
         template <
@@ -3131,6 +4120,40 @@ namespace hpx { namespace lcos {
                 typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
+        >
+        struct broadcast_apply_invoker8
+        {
+            static void
+            call(
+                Action const & act
+              , std::vector<hpx::id_type> const & ids
+              , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7
+            )
+            {
+                return
+                    broadcast_apply_impl8(
+                        act
+                      , ids
+                      , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
+                    );
+            }
+        };
+        template <typename Action>
+        struct make_broadcast_apply_action_impl<Action, 8>
+        {
+            typedef broadcast_apply_invoker8<
+                        Action
+                      ,
+                        typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 0 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 1 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 2 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 3 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 4 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 5 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 6 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 7 >::type
+                    >
+                    broadcast_invoker_type;
+            typedef
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
+                type;
+        };
     }
     
     template <
@@ -3181,6 +4204,45 @@ namespace hpx { namespace lcos {
                 ids
               , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
             );
+    }
+    template <
+        typename Action
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
+    >
+    void
+    broadcast_apply(
+        std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7)
+    {
+        typedef
+            typename detail::make_broadcast_apply_action<Action>::type
+            broadcast_impl_action;
+        hpx::apply_colocated<broadcast_impl_action>(
+                ids[0]
+              , Action()
+              , ids
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
+            );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
+    >
+    void
+    broadcast_apply(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7)
+    {
+        broadcast_apply<Derived>(
+            ids
+          , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
+        );
     }
     template <
         typename Action
@@ -3442,6 +4504,51 @@ namespace hpx { namespace lcos {
             }
             return hpx::when_all(broadcast_futures).
                 then(&return_result_type<action_result>).get();
+        }
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
+        >
+        void
+        broadcast_apply_impl9(
+            Action const & act
+          , std::vector<hpx::id_type> const & ids
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8
+        )
+        {
+            if(ids.empty()) return;
+            const std::size_t fan_out = 16;
+            for(std::size_t i = 0; i != (std::min)(ids.size(), fan_out); ++i)
+            {
+                hpx::apply(
+                    act
+                  , ids[i]
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
+                );
+            }
+            if(ids.size() > fan_out)
+            {
+                std::size_t applied = fan_out;
+                std::vector<hpx::id_type>::const_iterator it = ids.begin() + fan_out;
+                typedef
+                    typename detail::make_broadcast_apply_action<
+                        Action
+                    >::type
+                    broadcast_impl_action;
+                while(it != ids.end())
+                {
+                    std::size_t next_fan = (std::min)(fan_out, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fan_out);
+                    hpx::apply_colocated<broadcast_impl_action>(
+                        ids_next[0]
+                      , act
+                      , std::move(ids_next)
+                      , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
+                    );
+                    applied += next_fan;
+                    it += next_fan;
+                }
+            }
         }
         
         template <
@@ -3488,6 +4595,40 @@ namespace hpx { namespace lcos {
                 typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
+        >
+        struct broadcast_apply_invoker9
+        {
+            static void
+            call(
+                Action const & act
+              , std::vector<hpx::id_type> const & ids
+              , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8
+            )
+            {
+                return
+                    broadcast_apply_impl9(
+                        act
+                      , ids
+                      , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
+                    );
+            }
+        };
+        template <typename Action>
+        struct make_broadcast_apply_action_impl<Action, 9>
+        {
+            typedef broadcast_apply_invoker9<
+                        Action
+                      ,
+                        typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 0 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 1 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 2 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 3 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 4 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 5 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 6 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 7 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 8 >::type
+                    >
+                    broadcast_invoker_type;
+            typedef
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
+                type;
+        };
     }
     
     template <
@@ -3538,6 +4679,45 @@ namespace hpx { namespace lcos {
                 ids
               , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
             );
+    }
+    template <
+        typename Action
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
+    >
+    void
+    broadcast_apply(
+        std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8)
+    {
+        typedef
+            typename detail::make_broadcast_apply_action<Action>::type
+            broadcast_impl_action;
+        hpx::apply_colocated<broadcast_impl_action>(
+                ids[0]
+              , Action()
+              , ids
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
+            );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
+    >
+    void
+    broadcast_apply(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8)
+    {
+        broadcast_apply<Derived>(
+            ids
+          , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
+        );
     }
     template <
         typename Action
@@ -3800,6 +4980,51 @@ namespace hpx { namespace lcos {
             return hpx::when_all(broadcast_futures).
                 then(&return_result_type<action_result>).get();
         }
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
+        >
+        void
+        broadcast_apply_impl10(
+            Action const & act
+          , std::vector<hpx::id_type> const & ids
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9
+        )
+        {
+            if(ids.empty()) return;
+            const std::size_t fan_out = 16;
+            for(std::size_t i = 0; i != (std::min)(ids.size(), fan_out); ++i)
+            {
+                hpx::apply(
+                    act
+                  , ids[i]
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
+                );
+            }
+            if(ids.size() > fan_out)
+            {
+                std::size_t applied = fan_out;
+                std::vector<hpx::id_type>::const_iterator it = ids.begin() + fan_out;
+                typedef
+                    typename detail::make_broadcast_apply_action<
+                        Action
+                    >::type
+                    broadcast_impl_action;
+                while(it != ids.end())
+                {
+                    std::size_t next_fan = (std::min)(fan_out, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fan_out);
+                    hpx::apply_colocated<broadcast_impl_action>(
+                        ids_next[0]
+                      , act
+                      , std::move(ids_next)
+                      , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
+                    );
+                    applied += next_fan;
+                    it += next_fan;
+                }
+            }
+        }
         
         template <
             typename Action
@@ -3839,6 +5064,40 @@ namespace hpx { namespace lcos {
                       ,
                         typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 0 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 1 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 2 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 3 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 4 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 5 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 6 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 7 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 8 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 9 >::type
                       , typename boost::is_same<void, action_result>::type
+                    >
+                    broadcast_invoker_type;
+            typedef
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
+                type;
+        };
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
+        >
+        struct broadcast_apply_invoker10
+        {
+            static void
+            call(
+                Action const & act
+              , std::vector<hpx::id_type> const & ids
+              , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9
+            )
+            {
+                return
+                    broadcast_apply_impl10(
+                        act
+                      , ids
+                      , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
+                    );
+            }
+        };
+        template <typename Action>
+        struct make_broadcast_apply_action_impl<Action, 10>
+        {
+            typedef broadcast_apply_invoker10<
+                        Action
+                      ,
+                        typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 0 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 1 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 2 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 3 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 4 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 5 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 6 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 7 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 8 >::type , typename boost::fusion::result_of::value_at_c< typename Action::arguments_type, 9 >::type
                     >
                     broadcast_invoker_type;
             typedef
@@ -3895,6 +5154,45 @@ namespace hpx { namespace lcos {
                 ids
               , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
             );
+    }
+    template <
+        typename Action
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
+    >
+    void
+    broadcast_apply(
+        std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9)
+    {
+        typedef
+            typename detail::make_broadcast_apply_action<Action>::type
+            broadcast_impl_action;
+        hpx::apply_colocated<broadcast_impl_action>(
+                ids[0]
+              , Action()
+              , ids
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
+            );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
+    >
+    void
+    broadcast_apply(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9)
+    {
+        broadcast_apply<Derived>(
+            ids
+          , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
+        );
     }
     template <
         typename Action
