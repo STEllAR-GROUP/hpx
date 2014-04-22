@@ -39,6 +39,7 @@ if((040500 EQUAL ${gcc_version}) OR (040500 LESS ${gcc_version}) OR ("${CMAKE_CX
   set(tests
       ${tests}
       broadcast
+      broadcast_apply
       fold
       for_each
       reduce
@@ -52,6 +53,7 @@ set(async_continue_PARAMETERS LOCALITIES 2)
 set(async_remote_PARAMETERS LOCALITIES 2)
 
 set(broadcast_PARAMETERS LOCALITIES 2)
+set(broadcast_apply_PARAMETERS LOCALITIES 2)
 
 set(dataflow_FLAGS DEPENDENCIES dataflow_component)
 set(dataflow_PARAMETERS THREADS_PER_LOCALITY 4)
