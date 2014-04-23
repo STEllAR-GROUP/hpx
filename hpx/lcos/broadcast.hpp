@@ -286,7 +286,7 @@ namespace hpx { namespace lcos
         >::type                                                               \
       , BOOST_PP_CAT(broadcast_apply_with_index_, Name)                       \
     )                                                                         \
-    HPX_REGISTER_ASYNC_COLOCATED(                                             \
+    HPX_REGISTER_APPLY_COLOCATED(                                             \
         ::hpx::lcos::detail::make_broadcast_apply_action<                     \
             ::hpx::lcos::detail::broadcast_with_index<Action>                 \
         >::type                                                               \

@@ -49,8 +49,8 @@ int hpx_main()
         hpx::lcos::broadcast_apply<f2_action>(localities, 0);
     }
     {
-        hpx::lcos::broadcast_with_index<f1_idx_action>(localities);
-        hpx::lcos::broadcast_with_index<f2_idx_action>(localities, 0);
+        hpx::lcos::broadcast_apply_with_index<f1_idx_action>(localities);
+        hpx::lcos::broadcast_apply_with_index<f2_idx_action>(localities, 0);
     }
     return hpx::finalize();
 }
