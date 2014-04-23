@@ -26,8 +26,8 @@ namespace hpx { namespace lcos
     ///                  (or function object) is expected to return the result
     ///                  of the reduction operation performed on its arguments.
     /// \param argN      [in] Any number of arbitrary arguments (passed by
-    ///                  value, by const reference or by rvalue reference)
-    ///                  which will be forwarded to the action invocation.
+    ///                  by const reference) which will be forwarded to the
+    ///                  action invocation.
     ///
     /// \returns         This function returns a future representing the result
     ///                  of the overall reduction operation.
@@ -59,8 +59,8 @@ namespace hpx { namespace lcos
     ///                  (or function object) is expected to return the result
     ///                  of the reduction operation performed on its arguments.
     /// \param argN      [in] Any number of arbitrary arguments (passed by
-    ///                  value, by const reference or by rvalue reference)
-    ///                  which will be forwarded to the action invocation.
+    ///                  by const reference) which will be forwarded to the
+    ///                  action invocation.
     ///
     /// \returns         This function returns a future representing the result
     ///                  of the overall reduction operation.
@@ -86,6 +86,7 @@ namespace hpx { namespace lcos
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/calculate_fanout.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 
 #include <vector>
@@ -96,6 +97,10 @@ namespace hpx { namespace lcos
 #include <boost/preprocessor/repetition/enum_trailing_params.hpp>
 #include <boost/preprocessor/repetition/enum_trailing_binary_params.hpp>
 #include <boost/preprocessor/cat.hpp>
+
+#if !defined(HPX_REDUCE_FANOUT)
+#define HPX_REDUCE_FANOUT 16
+#endif
 
 namespace hpx { namespace lcos
 {
@@ -381,59 +386,57 @@ namespace hpx { namespace lcos
 
             if(ids.empty()) return result_type();
 
-            std::vector<hpx::future<result_type> > reduce_futures;
-            reduce_futures.reserve(3);
+            std::size_t const local_fanout = HPX_REDUCE_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
 
-            id_type id_first = ids[0];
-            if(ids.size() > 1)
+            std::vector<hpx::future<result_type> > reduce_futures;
+            reduce_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                reduce_invoke(
+                    act
+                  , reduce_futures
+                  , ids[i]
+                  BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
+                  , global_idx + i
+                );
+            }
+
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
 
                 typedef
                     typename detail::make_reduce_action<Action>::
                         template reduce_invoker<ReduceOp>::type
                     reduce_impl_action;
 
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
-                    reduce_futures.push_back(
-                        hpx::async_colocated<reduce_impl_action>(
-                            ids_first[0]
-                          , act
-                          , std::move(ids_first)
-                          , reduce_op
-                          BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
-                          , global_idx + 1
-                        )
-                    );
-                }
+                    HPX_ASSERT(ids.size() >= applied);
 
-                if(!ids_second.empty())
-                {
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+
+                    hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
                         hpx::async_colocated<reduce_impl_action>(
-                            ids_second[0]
+                            id
                           , act
-                          , std::move(ids_second)
+                          , std::move(ids_next)
                           , reduce_op
                           BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
-                          , global_idx + half
+                          , global_idx + applied
                         )
                     );
+
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
-
-            reduce_invoke(
-                act
-              , reduce_futures
-              , id_first
-              BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
-              , global_idx
-            );
 
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).

@@ -4,6 +4,133 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file broadcast.hpp
+
+#if defined(DOXYGEN)
+namespace hpx { namespace lcos
+{
+    /// \brief Perform a distributed broadcast operation
+    ///
+    /// The function hpx::lcos::broadcast performs a distributed broadcast
+    /// operation resulting in action invocations on a given set
+    /// of global identifiers. The action can be either a plain action (in
+    /// which case the global identifiers have to refer to localities) or a
+    /// component action (in which case the global identifiers have to refer
+    /// to instances of a component type which exposes the action.
+    ///
+    /// The given action is invoked asynchronously on all given identifiers,
+    /// and the arguments ArgN are passed along to those invocations.
+    ///
+    /// \param ids       [in] A list of global identifiers identifying the
+    ///                  target objects for which the given action will be
+    ///                  invoked.
+    /// \param argN      [in] Any number of arbitrary arguments (passed by
+    ///                  by const reference) which will be forwarded to the
+    ///                  action invocation.
+    ///
+    /// \returns         This function returns a future representing the result
+    ///                  of the overall reduction operation.
+    ///
+    /// \note            If decltype(Action(...)) is void, then the result of
+    ///                  this function is future<void>.
+    ///
+    template <typename Action, typename ArgN, ...>
+    hpx::future<std::vector<decltype(Action(hpx::id_type, ArgN, ...))> >
+    broadcast(
+        std::vector<hpx::id_type> const & ids
+      , ArgN argN, ...);
+
+    /// \brief Perform an asynchronous (fire&forget) distributed broadcast operation
+    ///
+    /// The function hpx::lcos::broadcast_apply performs an asynchronous
+    /// (fire&forget) distributed broadcast operation resulting in action
+    /// invocations on a given set of global identifiers. The action can be
+    /// either a plain action (in which case the global identifiers have to
+    /// refer to localities) or a component action (in which case the global
+    /// identifiers have to refer to instances of a component type which
+    /// exposes the action.
+    ///
+    /// The given action is invoked asynchronously on all given identifiers,
+    /// and the arguments ArgN are passed along to those invocations.
+    ///
+    /// \param ids       [in] A list of global identifiers identifying the
+    ///                  target objects for which the given action will be
+    ///                  invoked.
+    /// \param argN      [in] Any number of arbitrary arguments (passed by
+    ///                  by const reference) which will be forwarded to the
+    ///                  action invocation.
+    ///
+    template <typename Action, typename ArgN, ...>
+    void
+    broadcast_apply(
+        std::vector<hpx::id_type> const & ids
+      , ArgN argN, ...);
+
+    /// \brief Perform a distributed broadcast operation
+    ///
+    /// The function hpx::lcos::broadcast_with_index performs a distributed broadcast
+    /// operation resulting in action invocations on a given set
+    /// of global identifiers. The action can be either a plain action (in
+    /// which case the global identifiers have to refer to localities) or a
+    /// component action (in which case the global identifiers have to refer
+    /// to instances of a component type which exposes the action.
+    ///
+    /// The given action is invoked asynchronously on all given identifiers,
+    /// and the arguments ArgN are passed along to those invocations.
+    ///
+    /// The function passes the index of the global identifier in the given
+    /// list of identifiers as the last argument to the action.
+    ///
+    /// \param ids       [in] A list of global identifiers identifying the
+    ///                  target objects for which the given action will be
+    ///                  invoked.
+    /// \param argN      [in] Any number of arbitrary arguments (passed by
+    ///                  by const reference) which will be forwarded to the
+    ///                  action invocation.
+    ///
+    /// \returns         This function returns a future representing the result
+    ///                  of the overall reduction operation.
+    ///
+    /// \note            If decltype(Action(...)) is void, then the result of
+    ///                  this function is future<void>.
+    ///
+    template <typename Action, typename ArgN, ...>
+    hpx::future<std::vector<decltype(Action(hpx::id_type, ArgN, ..., std::size_t))> >
+    broadcast_with_index(
+        std::vector<hpx::id_type> const & ids
+      , ArgN argN, ...);
+
+    /// \brief Perform an asynchronous (fire&forget) distributed broadcast operation
+    ///
+    /// The function hpx::lcos::broadcast_apply_with_index performs an asynchronous
+    /// (fire&forget) distributed broadcast operation resulting in action
+    /// invocations on a given set of global identifiers. The action can be
+    /// either a plain action (in which case the global identifiers have to
+    /// refer to localities) or a component action (in which case the global
+    /// identifiers have to refer to instances of a component type which
+    /// exposes the action.
+    ///
+    /// The given action is invoked asynchronously on all given identifiers,
+    /// and the arguments ArgN are passed along to those invocations.
+    ///
+    /// The function passes the index of the global identifier in the given
+    /// list of identifiers as the last argument to the action.
+    ///
+    /// \param ids       [in] A list of global identifiers identifying the
+    ///                  target objects for which the given action will be
+    ///                  invoked.
+    /// \param argN      [in] Any number of arbitrary arguments (passed by
+    ///                  by const reference) which will be forwarded to the
+    ///                  action invocation.
+    ///
+    template <typename Action, typename ArgN, ...>
+    void
+    broadcast_apply_with_index(
+        std::vector<hpx::id_type> const & ids
+      , ArgN argN, ...);
+}}
+#else
+
 #if !BOOST_PP_IS_ITERATING
 
 #ifndef HPX_LCOS_BROADCAST_HPP
@@ -16,6 +143,7 @@
 #include <hpx/runtime/applier/apply_colocated.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/util/calculate_fanout.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 
 #include <vector>
@@ -136,22 +264,6 @@ namespace hpx { namespace lcos
             }
 
             return std::move(res);
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        inline std::size_t
-        calculate_fanout(std::size_t size, std::size_t local_fanout)
-        {
-            if (size <= local_fanout)
-                return size;
-
-            std::size_t fanout = 1;
-            size -= local_fanout;
-            while (fanout < size)
-            {
-                fanout *= local_fanout;
-            }
-            return fanout;
         }
     }
 }}
@@ -550,24 +662,28 @@ namespace hpx { namespace lcos
         {
             if(ids.empty()) return;// hpx::lcos::make_ready_future();
 
+            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
+
             std::vector<hpx::future<void> > broadcast_futures;
-            broadcast_futures.reserve(3);
-
-            broadcast_invoke(
-                act
-              , broadcast_futures
-              , ids[0]
-              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-              , global_idx
-            );
-
-            if(ids.size() > 1)
+            broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                broadcast_invoke(
+                    act
+                  , broadcast_futures
+                  , ids[i]
+                  BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
+                  , global_idx + i
+                );
+            }
+
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
 
                 typedef
                     typename detail::make_broadcast_action<
@@ -575,34 +691,27 @@ namespace hpx { namespace lcos
                     >::type
                     broadcast_impl_action;
 
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
-                    hpx::id_type id(ids_first[0]);
-                    broadcast_futures.push_back(
-                        hpx::async_colocated<broadcast_impl_action>(
-                            id
-                          , act
-                          , std::move(ids_first)
-                          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-                          , global_idx + 1
-                          , boost::integral_constant<bool, true>::type()
-                        )
-                    );
-                }
+                    HPX_ASSERT(ids.size() >= applied);
 
-                if(!ids_second.empty())
-                {
-                    hpx::id_type id(ids_second[0]);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+
+                    hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
                             id
                           , act
-                          , std::move(ids_second)
+                          , std::move(ids_next)
                           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-                          , global_idx + half
+                          , global_idx + applied
                           , boost::integral_constant<bool, true>::type()
                         )
                     );
+
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
 
@@ -634,13 +743,11 @@ namespace hpx { namespace lcos
             //if(ids.empty()) return hpx::lcos::make_ready_future(result_type());
             if(ids.empty()) return result_type();
 
-            std::vector<hpx::future<result_type> > broadcast_futures;
-            broadcast_futures.reserve(3);
-
             std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
             std::size_t local_size = (std::min)(ids.size(), local_fanout);
-            std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
 
+            std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
             for(std::size_t i = 0; i != local_size; ++i)
             {
@@ -694,6 +801,7 @@ namespace hpx { namespace lcos
                 then(&return_result_type<action_result>).get();
         }
 
+        ///////////////////////////////////////////////////////////////////////
         template <
             typename Action
           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
@@ -733,7 +841,7 @@ namespace hpx { namespace lcos
                     >::type
                     broadcast_impl_action;
 
-                std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+                std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
                 while(it != ids.end())
                 {
                     HPX_ASSERT(ids.size() >= applied);
@@ -1031,3 +1139,4 @@ namespace hpx { namespace lcos
 }}
 
 #endif
+#endif // DOXYGEN

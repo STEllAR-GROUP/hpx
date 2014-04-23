@@ -142,54 +142,49 @@ namespace hpx { namespace lcos
         )
         {
             if(ids.empty()) return;
+            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
             std::vector<hpx::future<void> > broadcast_futures;
-            broadcast_futures.reserve(3);
-            broadcast_invoke(
-                act
-              , broadcast_futures
-              , ids[0]
-               
-              , global_idx
-            );
-            if(ids.size() > 1)
+            broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                broadcast_invoke(
+                    act
+                  , broadcast_futures
+                  , ids[i]
+                   
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_broadcast_action<
                         Action
                     >::type
                     broadcast_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
-                    hpx::id_type id(ids_first[0]);
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
                             id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                            
-                          , global_idx + 1
+                          , global_idx + applied
                           , boost::integral_constant<bool, true>::type()
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    hpx::id_type id(ids_second[0]);
-                    broadcast_futures.push_back(
-                        hpx::async_colocated<broadcast_impl_action>(
-                            id
-                          , act
-                          , std::move(ids_second)
-                           
-                          , global_idx + half
-                          , boost::integral_constant<bool, true>::type()
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
             
@@ -217,11 +212,10 @@ namespace hpx { namespace lcos
                 result_type;
             
             if(ids.empty()) return result_type();
-            std::vector<hpx::future<result_type> > broadcast_futures;
-            broadcast_futures.reserve(3);
             std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
             std::size_t local_size = (std::min)(ids.size(), local_fanout);
-            std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
+            std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
             for(std::size_t i = 0; i != local_size; ++i)
             {
@@ -267,6 +261,7 @@ namespace hpx { namespace lcos
             return hpx::when_all(broadcast_futures).
                 then(&return_result_type<action_result>).get();
         }
+        
         template <
             typename Action
            
@@ -301,7 +296,7 @@ namespace hpx { namespace lcos
                         Action
                     >::type
                     broadcast_impl_action;
-                std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+                std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
                 while(it != ids.end())
                 {
                     HPX_ASSERT(ids.size() >= applied);
@@ -703,54 +698,49 @@ namespace hpx { namespace lcos
         )
         {
             if(ids.empty()) return;
+            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
             std::vector<hpx::future<void> > broadcast_futures;
-            broadcast_futures.reserve(3);
-            broadcast_invoke(
-                act
-              , broadcast_futures
-              , ids[0]
-              , a0
-              , global_idx
-            );
-            if(ids.size() > 1)
+            broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                broadcast_invoke(
+                    act
+                  , broadcast_futures
+                  , ids[i]
+                  , a0
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_broadcast_action<
                         Action
                     >::type
                     broadcast_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
-                    hpx::id_type id(ids_first[0]);
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
                             id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , a0
-                          , global_idx + 1
+                          , global_idx + applied
                           , boost::integral_constant<bool, true>::type()
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    hpx::id_type id(ids_second[0]);
-                    broadcast_futures.push_back(
-                        hpx::async_colocated<broadcast_impl_action>(
-                            id
-                          , act
-                          , std::move(ids_second)
-                          , a0
-                          , global_idx + half
-                          , boost::integral_constant<bool, true>::type()
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
             
@@ -778,11 +768,10 @@ namespace hpx { namespace lcos
                 result_type;
             
             if(ids.empty()) return result_type();
-            std::vector<hpx::future<result_type> > broadcast_futures;
-            broadcast_futures.reserve(3);
             std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
             std::size_t local_size = (std::min)(ids.size(), local_fanout);
-            std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
+            std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
             for(std::size_t i = 0; i != local_size; ++i)
             {
@@ -828,6 +817,7 @@ namespace hpx { namespace lcos
             return hpx::when_all(broadcast_futures).
                 then(&return_result_type<action_result>).get();
         }
+        
         template <
             typename Action
           , typename A0
@@ -862,7 +852,7 @@ namespace hpx { namespace lcos
                         Action
                     >::type
                     broadcast_impl_action;
-                std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+                std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
                 while(it != ids.end())
                 {
                     HPX_ASSERT(ids.size() >= applied);
@@ -1264,54 +1254,49 @@ namespace hpx { namespace lcos
         )
         {
             if(ids.empty()) return;
+            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
             std::vector<hpx::future<void> > broadcast_futures;
-            broadcast_futures.reserve(3);
-            broadcast_invoke(
-                act
-              , broadcast_futures
-              , ids[0]
-              , a0 , a1
-              , global_idx
-            );
-            if(ids.size() > 1)
+            broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                broadcast_invoke(
+                    act
+                  , broadcast_futures
+                  , ids[i]
+                  , a0 , a1
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_broadcast_action<
                         Action
                     >::type
                     broadcast_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
-                    hpx::id_type id(ids_first[0]);
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
                             id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , a0 , a1
-                          , global_idx + 1
+                          , global_idx + applied
                           , boost::integral_constant<bool, true>::type()
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    hpx::id_type id(ids_second[0]);
-                    broadcast_futures.push_back(
-                        hpx::async_colocated<broadcast_impl_action>(
-                            id
-                          , act
-                          , std::move(ids_second)
-                          , a0 , a1
-                          , global_idx + half
-                          , boost::integral_constant<bool, true>::type()
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
             
@@ -1339,11 +1324,10 @@ namespace hpx { namespace lcos
                 result_type;
             
             if(ids.empty()) return result_type();
-            std::vector<hpx::future<result_type> > broadcast_futures;
-            broadcast_futures.reserve(3);
             std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
             std::size_t local_size = (std::min)(ids.size(), local_fanout);
-            std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
+            std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
             for(std::size_t i = 0; i != local_size; ++i)
             {
@@ -1389,6 +1373,7 @@ namespace hpx { namespace lcos
             return hpx::when_all(broadcast_futures).
                 then(&return_result_type<action_result>).get();
         }
+        
         template <
             typename Action
           , typename A0 , typename A1
@@ -1423,7 +1408,7 @@ namespace hpx { namespace lcos
                         Action
                     >::type
                     broadcast_impl_action;
-                std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+                std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
                 while(it != ids.end())
                 {
                     HPX_ASSERT(ids.size() >= applied);
@@ -1825,54 +1810,49 @@ namespace hpx { namespace lcos
         )
         {
             if(ids.empty()) return;
+            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
             std::vector<hpx::future<void> > broadcast_futures;
-            broadcast_futures.reserve(3);
-            broadcast_invoke(
-                act
-              , broadcast_futures
-              , ids[0]
-              , a0 , a1 , a2
-              , global_idx
-            );
-            if(ids.size() > 1)
+            broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                broadcast_invoke(
+                    act
+                  , broadcast_futures
+                  , ids[i]
+                  , a0 , a1 , a2
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_broadcast_action<
                         Action
                     >::type
                     broadcast_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
-                    hpx::id_type id(ids_first[0]);
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
                             id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , a0 , a1 , a2
-                          , global_idx + 1
+                          , global_idx + applied
                           , boost::integral_constant<bool, true>::type()
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    hpx::id_type id(ids_second[0]);
-                    broadcast_futures.push_back(
-                        hpx::async_colocated<broadcast_impl_action>(
-                            id
-                          , act
-                          , std::move(ids_second)
-                          , a0 , a1 , a2
-                          , global_idx + half
-                          , boost::integral_constant<bool, true>::type()
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
             
@@ -1900,11 +1880,10 @@ namespace hpx { namespace lcos
                 result_type;
             
             if(ids.empty()) return result_type();
-            std::vector<hpx::future<result_type> > broadcast_futures;
-            broadcast_futures.reserve(3);
             std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
             std::size_t local_size = (std::min)(ids.size(), local_fanout);
-            std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
+            std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
             for(std::size_t i = 0; i != local_size; ++i)
             {
@@ -1950,6 +1929,7 @@ namespace hpx { namespace lcos
             return hpx::when_all(broadcast_futures).
                 then(&return_result_type<action_result>).get();
         }
+        
         template <
             typename Action
           , typename A0 , typename A1 , typename A2
@@ -1984,7 +1964,7 @@ namespace hpx { namespace lcos
                         Action
                     >::type
                     broadcast_impl_action;
-                std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+                std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
                 while(it != ids.end())
                 {
                     HPX_ASSERT(ids.size() >= applied);
@@ -2386,54 +2366,49 @@ namespace hpx { namespace lcos
         )
         {
             if(ids.empty()) return;
+            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
             std::vector<hpx::future<void> > broadcast_futures;
-            broadcast_futures.reserve(3);
-            broadcast_invoke(
-                act
-              , broadcast_futures
-              , ids[0]
-              , a0 , a1 , a2 , a3
-              , global_idx
-            );
-            if(ids.size() > 1)
+            broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                broadcast_invoke(
+                    act
+                  , broadcast_futures
+                  , ids[i]
+                  , a0 , a1 , a2 , a3
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_broadcast_action<
                         Action
                     >::type
                     broadcast_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
-                    hpx::id_type id(ids_first[0]);
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
                             id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , a0 , a1 , a2 , a3
-                          , global_idx + 1
+                          , global_idx + applied
                           , boost::integral_constant<bool, true>::type()
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    hpx::id_type id(ids_second[0]);
-                    broadcast_futures.push_back(
-                        hpx::async_colocated<broadcast_impl_action>(
-                            id
-                          , act
-                          , std::move(ids_second)
-                          , a0 , a1 , a2 , a3
-                          , global_idx + half
-                          , boost::integral_constant<bool, true>::type()
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
             
@@ -2461,11 +2436,10 @@ namespace hpx { namespace lcos
                 result_type;
             
             if(ids.empty()) return result_type();
-            std::vector<hpx::future<result_type> > broadcast_futures;
-            broadcast_futures.reserve(3);
             std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
             std::size_t local_size = (std::min)(ids.size(), local_fanout);
-            std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
+            std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
             for(std::size_t i = 0; i != local_size; ++i)
             {
@@ -2511,6 +2485,7 @@ namespace hpx { namespace lcos
             return hpx::when_all(broadcast_futures).
                 then(&return_result_type<action_result>).get();
         }
+        
         template <
             typename Action
           , typename A0 , typename A1 , typename A2 , typename A3
@@ -2545,7 +2520,7 @@ namespace hpx { namespace lcos
                         Action
                     >::type
                     broadcast_impl_action;
-                std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+                std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
                 while(it != ids.end())
                 {
                     HPX_ASSERT(ids.size() >= applied);
@@ -2947,54 +2922,49 @@ namespace hpx { namespace lcos
         )
         {
             if(ids.empty()) return;
+            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
             std::vector<hpx::future<void> > broadcast_futures;
-            broadcast_futures.reserve(3);
-            broadcast_invoke(
-                act
-              , broadcast_futures
-              , ids[0]
-              , a0 , a1 , a2 , a3 , a4
-              , global_idx
-            );
-            if(ids.size() > 1)
+            broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                broadcast_invoke(
+                    act
+                  , broadcast_futures
+                  , ids[i]
+                  , a0 , a1 , a2 , a3 , a4
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_broadcast_action<
                         Action
                     >::type
                     broadcast_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
-                    hpx::id_type id(ids_first[0]);
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
                             id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , a0 , a1 , a2 , a3 , a4
-                          , global_idx + 1
+                          , global_idx + applied
                           , boost::integral_constant<bool, true>::type()
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    hpx::id_type id(ids_second[0]);
-                    broadcast_futures.push_back(
-                        hpx::async_colocated<broadcast_impl_action>(
-                            id
-                          , act
-                          , std::move(ids_second)
-                          , a0 , a1 , a2 , a3 , a4
-                          , global_idx + half
-                          , boost::integral_constant<bool, true>::type()
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
             
@@ -3022,11 +2992,10 @@ namespace hpx { namespace lcos
                 result_type;
             
             if(ids.empty()) return result_type();
-            std::vector<hpx::future<result_type> > broadcast_futures;
-            broadcast_futures.reserve(3);
             std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
             std::size_t local_size = (std::min)(ids.size(), local_fanout);
-            std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
+            std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
             for(std::size_t i = 0; i != local_size; ++i)
             {
@@ -3072,6 +3041,7 @@ namespace hpx { namespace lcos
             return hpx::when_all(broadcast_futures).
                 then(&return_result_type<action_result>).get();
         }
+        
         template <
             typename Action
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
@@ -3106,7 +3076,7 @@ namespace hpx { namespace lcos
                         Action
                     >::type
                     broadcast_impl_action;
-                std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+                std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
                 while(it != ids.end())
                 {
                     HPX_ASSERT(ids.size() >= applied);
@@ -3508,54 +3478,49 @@ namespace hpx { namespace lcos
         )
         {
             if(ids.empty()) return;
+            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
             std::vector<hpx::future<void> > broadcast_futures;
-            broadcast_futures.reserve(3);
-            broadcast_invoke(
-                act
-              , broadcast_futures
-              , ids[0]
-              , a0 , a1 , a2 , a3 , a4 , a5
-              , global_idx
-            );
-            if(ids.size() > 1)
+            broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                broadcast_invoke(
+                    act
+                  , broadcast_futures
+                  , ids[i]
+                  , a0 , a1 , a2 , a3 , a4 , a5
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_broadcast_action<
                         Action
                     >::type
                     broadcast_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
-                    hpx::id_type id(ids_first[0]);
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
                             id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , a0 , a1 , a2 , a3 , a4 , a5
-                          , global_idx + 1
+                          , global_idx + applied
                           , boost::integral_constant<bool, true>::type()
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    hpx::id_type id(ids_second[0]);
-                    broadcast_futures.push_back(
-                        hpx::async_colocated<broadcast_impl_action>(
-                            id
-                          , act
-                          , std::move(ids_second)
-                          , a0 , a1 , a2 , a3 , a4 , a5
-                          , global_idx + half
-                          , boost::integral_constant<bool, true>::type()
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
             
@@ -3583,11 +3548,10 @@ namespace hpx { namespace lcos
                 result_type;
             
             if(ids.empty()) return result_type();
-            std::vector<hpx::future<result_type> > broadcast_futures;
-            broadcast_futures.reserve(3);
             std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
             std::size_t local_size = (std::min)(ids.size(), local_fanout);
-            std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
+            std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
             for(std::size_t i = 0; i != local_size; ++i)
             {
@@ -3633,6 +3597,7 @@ namespace hpx { namespace lcos
             return hpx::when_all(broadcast_futures).
                 then(&return_result_type<action_result>).get();
         }
+        
         template <
             typename Action
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
@@ -3667,7 +3632,7 @@ namespace hpx { namespace lcos
                         Action
                     >::type
                     broadcast_impl_action;
-                std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+                std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
                 while(it != ids.end())
                 {
                     HPX_ASSERT(ids.size() >= applied);
@@ -4069,54 +4034,49 @@ namespace hpx { namespace lcos
         )
         {
             if(ids.empty()) return;
+            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
             std::vector<hpx::future<void> > broadcast_futures;
-            broadcast_futures.reserve(3);
-            broadcast_invoke(
-                act
-              , broadcast_futures
-              , ids[0]
-              , a0 , a1 , a2 , a3 , a4 , a5 , a6
-              , global_idx
-            );
-            if(ids.size() > 1)
+            broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                broadcast_invoke(
+                    act
+                  , broadcast_futures
+                  , ids[i]
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_broadcast_action<
                         Action
                     >::type
                     broadcast_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
-                    hpx::id_type id(ids_first[0]);
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
                             id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6
-                          , global_idx + 1
+                          , global_idx + applied
                           , boost::integral_constant<bool, true>::type()
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    hpx::id_type id(ids_second[0]);
-                    broadcast_futures.push_back(
-                        hpx::async_colocated<broadcast_impl_action>(
-                            id
-                          , act
-                          , std::move(ids_second)
-                          , a0 , a1 , a2 , a3 , a4 , a5 , a6
-                          , global_idx + half
-                          , boost::integral_constant<bool, true>::type()
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
             
@@ -4144,11 +4104,10 @@ namespace hpx { namespace lcos
                 result_type;
             
             if(ids.empty()) return result_type();
-            std::vector<hpx::future<result_type> > broadcast_futures;
-            broadcast_futures.reserve(3);
             std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
             std::size_t local_size = (std::min)(ids.size(), local_fanout);
-            std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
+            std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
             for(std::size_t i = 0; i != local_size; ++i)
             {
@@ -4194,6 +4153,7 @@ namespace hpx { namespace lcos
             return hpx::when_all(broadcast_futures).
                 then(&return_result_type<action_result>).get();
         }
+        
         template <
             typename Action
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
@@ -4228,7 +4188,7 @@ namespace hpx { namespace lcos
                         Action
                     >::type
                     broadcast_impl_action;
-                std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+                std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
                 while(it != ids.end())
                 {
                     HPX_ASSERT(ids.size() >= applied);
@@ -4630,54 +4590,49 @@ namespace hpx { namespace lcos
         )
         {
             if(ids.empty()) return;
+            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
             std::vector<hpx::future<void> > broadcast_futures;
-            broadcast_futures.reserve(3);
-            broadcast_invoke(
-                act
-              , broadcast_futures
-              , ids[0]
-              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
-              , global_idx
-            );
-            if(ids.size() > 1)
+            broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                broadcast_invoke(
+                    act
+                  , broadcast_futures
+                  , ids[i]
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_broadcast_action<
                         Action
                     >::type
                     broadcast_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
-                    hpx::id_type id(ids_first[0]);
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
                             id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
-                          , global_idx + 1
+                          , global_idx + applied
                           , boost::integral_constant<bool, true>::type()
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    hpx::id_type id(ids_second[0]);
-                    broadcast_futures.push_back(
-                        hpx::async_colocated<broadcast_impl_action>(
-                            id
-                          , act
-                          , std::move(ids_second)
-                          , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
-                          , global_idx + half
-                          , boost::integral_constant<bool, true>::type()
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
             
@@ -4705,11 +4660,10 @@ namespace hpx { namespace lcos
                 result_type;
             
             if(ids.empty()) return result_type();
-            std::vector<hpx::future<result_type> > broadcast_futures;
-            broadcast_futures.reserve(3);
             std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
             std::size_t local_size = (std::min)(ids.size(), local_fanout);
-            std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
+            std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
             for(std::size_t i = 0; i != local_size; ++i)
             {
@@ -4755,6 +4709,7 @@ namespace hpx { namespace lcos
             return hpx::when_all(broadcast_futures).
                 then(&return_result_type<action_result>).get();
         }
+        
         template <
             typename Action
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
@@ -4789,7 +4744,7 @@ namespace hpx { namespace lcos
                         Action
                     >::type
                     broadcast_impl_action;
-                std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+                std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
                 while(it != ids.end())
                 {
                     HPX_ASSERT(ids.size() >= applied);
@@ -5191,54 +5146,49 @@ namespace hpx { namespace lcos
         )
         {
             if(ids.empty()) return;
+            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
             std::vector<hpx::future<void> > broadcast_futures;
-            broadcast_futures.reserve(3);
-            broadcast_invoke(
-                act
-              , broadcast_futures
-              , ids[0]
-              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
-              , global_idx
-            );
-            if(ids.size() > 1)
+            broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                broadcast_invoke(
+                    act
+                  , broadcast_futures
+                  , ids[i]
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_broadcast_action<
                         Action
                     >::type
                     broadcast_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
-                    hpx::id_type id(ids_first[0]);
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
                             id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
-                          , global_idx + 1
+                          , global_idx + applied
                           , boost::integral_constant<bool, true>::type()
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    hpx::id_type id(ids_second[0]);
-                    broadcast_futures.push_back(
-                        hpx::async_colocated<broadcast_impl_action>(
-                            id
-                          , act
-                          , std::move(ids_second)
-                          , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
-                          , global_idx + half
-                          , boost::integral_constant<bool, true>::type()
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
             
@@ -5266,11 +5216,10 @@ namespace hpx { namespace lcos
                 result_type;
             
             if(ids.empty()) return result_type();
-            std::vector<hpx::future<result_type> > broadcast_futures;
-            broadcast_futures.reserve(3);
             std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
             std::size_t local_size = (std::min)(ids.size(), local_fanout);
-            std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
+            std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
             for(std::size_t i = 0; i != local_size; ++i)
             {
@@ -5316,6 +5265,7 @@ namespace hpx { namespace lcos
             return hpx::when_all(broadcast_futures).
                 then(&return_result_type<action_result>).get();
         }
+        
         template <
             typename Action
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
@@ -5350,7 +5300,7 @@ namespace hpx { namespace lcos
                         Action
                     >::type
                     broadcast_impl_action;
-                std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+                std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
                 while(it != ids.end())
                 {
                     HPX_ASSERT(ids.size() >= applied);
@@ -5752,54 +5702,49 @@ namespace hpx { namespace lcos
         )
         {
             if(ids.empty()) return;
+            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
             std::vector<hpx::future<void> > broadcast_futures;
-            broadcast_futures.reserve(3);
-            broadcast_invoke(
-                act
-              , broadcast_futures
-              , ids[0]
-              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
-              , global_idx
-            );
-            if(ids.size() > 1)
+            broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                broadcast_invoke(
+                    act
+                  , broadcast_futures
+                  , ids[i]
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_broadcast_action<
                         Action
                     >::type
                     broadcast_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
-                    hpx::id_type id(ids_first[0]);
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
                             id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
-                          , global_idx + 1
+                          , global_idx + applied
                           , boost::integral_constant<bool, true>::type()
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    hpx::id_type id(ids_second[0]);
-                    broadcast_futures.push_back(
-                        hpx::async_colocated<broadcast_impl_action>(
-                            id
-                          , act
-                          , std::move(ids_second)
-                          , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
-                          , global_idx + half
-                          , boost::integral_constant<bool, true>::type()
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
             
@@ -5827,11 +5772,10 @@ namespace hpx { namespace lcos
                 result_type;
             
             if(ids.empty()) return result_type();
-            std::vector<hpx::future<result_type> > broadcast_futures;
-            broadcast_futures.reserve(3);
             std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
             std::size_t local_size = (std::min)(ids.size(), local_fanout);
-            std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
+            std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
             for(std::size_t i = 0; i != local_size; ++i)
             {
@@ -5877,6 +5821,7 @@ namespace hpx { namespace lcos
             return hpx::when_all(broadcast_futures).
                 then(&return_result_type<action_result>).get();
         }
+        
         template <
             typename Action
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
@@ -5911,7 +5856,7 @@ namespace hpx { namespace lcos
                         Action
                     >::type
                     broadcast_impl_action;
-                std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+                std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
                 while(it != ids.end())
                 {
                     HPX_ASSERT(ids.size() >= applied);
