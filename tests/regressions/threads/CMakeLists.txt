@@ -14,9 +14,9 @@ set(tests
     thread_suspend_duration
    )
 
-if(HPX_LOCAL_SCHEDULER)
+if(HPX_LOCAL_SCHEDULER OR HPX_ALL_SCHEDULERS)
   set(tests ${tests} thread_pool_executor_1114)
-endif(HPX_LOCAL_SCHEDULER)
+endif()
 
 set(block_os_threads_1036_PARAMETERS THREADS_PER_LOCALITY 4)
 set(thread_pool_executor_1112_PARAMETERS THREADS_PER_LOCALITY 4)
