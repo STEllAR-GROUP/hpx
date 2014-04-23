@@ -39,6 +39,10 @@ namespace hpx { namespace util { namespace coroutines
             HPX_MOVABLE_BUT_NOT_COPYABLE(tss_data_node)
 
         public:
+            tss_data_node()
+              : value_(0)
+            {}
+
             tss_data_node(void* val)
               : func_(),
                 value_(val)

@@ -8,9 +8,11 @@
 // Do not edit manually.
 
 
-namespace hpx { namespace lcos {
+namespace hpx { namespace lcos
+{
     namespace detail
     {
+        
         template <
             typename Action
           , typename Futures
@@ -90,6 +92,41 @@ namespace hpx { namespace lcos {
                 ).then(std::forward<Cont>(cont))
             );
         }
+        
+        template <
+            typename Action
+           
+        >
+        void
+        broadcast_invoke_apply(Action act
+          , hpx::id_type const& id
+           
+          , std::size_t)
+        {
+            hpx::apply(
+                act
+              , id
+               
+            );
+        }
+        template <
+            typename Action
+           
+        >
+        void
+        broadcast_invoke_apply(broadcast_with_index<Action>
+          , hpx::id_type const& id
+           
+          , std::size_t global_idx)
+        {
+            hpx::apply(
+                Action()
+              , id
+               
+              , global_idx
+            );
+        }
+        
         template <
             typename Action
            
@@ -128,9 +165,10 @@ namespace hpx { namespace lcos {
                     broadcast_impl_action;
                 if(!ids_first.empty())
                 {
+                    hpx::id_type id(ids_first[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
-                            ids_first[0]
+                            id
                           , act
                           , std::move(ids_first)
                            
@@ -141,9 +179,10 @@ namespace hpx { namespace lcos {
                 }
                 if(!ids_second.empty())
                 {
+                    hpx::id_type id(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
-                            ids_second[0]
+                            id
                           , act
                           , std::move(ids_second)
                            
@@ -180,51 +219,49 @@ namespace hpx { namespace lcos {
             if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_invoke(
-                act
-              , broadcast_futures
-              , &wrap_into_vector<action_result>
-              , ids[0]
-               
-              , global_idx
-            );
-            if(ids.size() > 1)
+            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+            broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                broadcast_invoke(
+                    act
+                  , broadcast_futures
+                  , &wrap_into_vector<action_result>
+                  , ids[i]
+                   
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_broadcast_action<
                         Action
                     >::type
                     broadcast_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
-                            ids_first[0]
+                            id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                            
-                          , global_idx + 1
+                          , global_idx + applied
                           , boost::integral_constant<bool, false>::type()
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    broadcast_futures.push_back(
-                        hpx::async_colocated<broadcast_impl_action>(
-                            ids_second[0]
-                          , act
-                          , std::move(ids_second)
-                           
-                          , global_idx + half
-                          , boost::integral_constant<bool, false>::type()
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
             return hpx::when_all(broadcast_futures).
@@ -239,36 +276,44 @@ namespace hpx { namespace lcos {
             Action const & act
           , std::vector<hpx::id_type> const & ids
            
+          , std::size_t global_idx
         )
         {
             if(ids.empty()) return;
-            const std::size_t fan_out = 16;
-            for(std::size_t i = 0; i != (std::min)(ids.size(), fan_out); ++i)
+            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                hpx::apply(
+                broadcast_invoke_apply(
                     act
                   , ids[i]
                    
+                  , global_idx + i
                 );
             }
-            if(ids.size() > fan_out)
+            if(ids.size() > local_fanout)
             {
-                std::size_t applied = fan_out;
-                std::vector<hpx::id_type>::const_iterator it = ids.begin() + fan_out;
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_broadcast_apply_action<
                         Action
                     >::type
                     broadcast_impl_action;
+                std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
                 while(it != ids.end())
                 {
-                    std::size_t next_fan = (std::min)(fan_out, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + fan_out);
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     hpx::apply_colocated<broadcast_impl_action>(
-                        ids_next[0]
+                        id
                       , act
                       , std::move(ids_next)
                        
+                      , global_idx + applied
                     );
                     applied += next_fan;
                     it += next_fan;
@@ -320,6 +365,7 @@ namespace hpx { namespace lcos {
                 typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
+        
         template <
             typename Action
            
@@ -331,6 +377,7 @@ namespace hpx { namespace lcos {
                 Action const & act
               , std::vector<hpx::id_type> const & ids
                
+              , std::size_t global_idx
             )
             {
                 return
@@ -338,6 +385,7 @@ namespace hpx { namespace lcos {
                         act
                       , ids
                        
+                      , global_idx
                     );
             }
         };
@@ -405,6 +453,7 @@ namespace hpx { namespace lcos {
                
             );
     }
+    
     template <
         typename Action
        
@@ -422,6 +471,7 @@ namespace hpx { namespace lcos {
               , Action()
               , ids
                
+              , 0
             );
     }
     template <
@@ -444,6 +494,7 @@ namespace hpx { namespace lcos {
            
         );
     }
+    
     template <
         typename Action
        
@@ -482,10 +533,47 @@ namespace hpx { namespace lcos {
                
             );
     }
+    
+    template <
+        typename Action
+       
+    >
+    void
+    broadcast_apply_with_index(
+        std::vector<hpx::id_type> const & ids
+       )
+    {
+        broadcast_apply<detail::broadcast_with_index<Action> >(
+            ids
+           
+        );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+       
+    >
+    void
+    broadcast_apply_with_index(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+       )
+    {
+        broadcast_apply<detail::broadcast_with_index<Derived> >(
+            ids
+           
+        );
+    }
 }}
-namespace hpx { namespace lcos {
+namespace hpx { namespace lcos
+{
     namespace detail
     {
+        
         template <
             typename Action
           , typename Futures
@@ -565,6 +653,41 @@ namespace hpx { namespace lcos {
                 ).then(std::forward<Cont>(cont))
             );
         }
+        
+        template <
+            typename Action
+          , typename A0
+        >
+        void
+        broadcast_invoke_apply(Action act
+          , hpx::id_type const& id
+          , A0 const & a0
+          , std::size_t)
+        {
+            hpx::apply(
+                act
+              , id
+              , a0
+            );
+        }
+        template <
+            typename Action
+          , typename A0
+        >
+        void
+        broadcast_invoke_apply(broadcast_with_index<Action>
+          , hpx::id_type const& id
+          , A0 const & a0
+          , std::size_t global_idx)
+        {
+            hpx::apply(
+                Action()
+              , id
+              , a0
+              , global_idx
+            );
+        }
+        
         template <
             typename Action
           , typename A0
@@ -603,9 +726,10 @@ namespace hpx { namespace lcos {
                     broadcast_impl_action;
                 if(!ids_first.empty())
                 {
+                    hpx::id_type id(ids_first[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
-                            ids_first[0]
+                            id
                           , act
                           , std::move(ids_first)
                           , a0
@@ -616,9 +740,10 @@ namespace hpx { namespace lcos {
                 }
                 if(!ids_second.empty())
                 {
+                    hpx::id_type id(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
-                            ids_second[0]
+                            id
                           , act
                           , std::move(ids_second)
                           , a0
@@ -655,51 +780,49 @@ namespace hpx { namespace lcos {
             if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_invoke(
-                act
-              , broadcast_futures
-              , &wrap_into_vector<action_result>
-              , ids[0]
-              , a0
-              , global_idx
-            );
-            if(ids.size() > 1)
+            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+            broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                broadcast_invoke(
+                    act
+                  , broadcast_futures
+                  , &wrap_into_vector<action_result>
+                  , ids[i]
+                  , a0
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_broadcast_action<
                         Action
                     >::type
                     broadcast_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
-                            ids_first[0]
+                            id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , a0
-                          , global_idx + 1
+                          , global_idx + applied
                           , boost::integral_constant<bool, false>::type()
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    broadcast_futures.push_back(
-                        hpx::async_colocated<broadcast_impl_action>(
-                            ids_second[0]
-                          , act
-                          , std::move(ids_second)
-                          , a0
-                          , global_idx + half
-                          , boost::integral_constant<bool, false>::type()
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
             return hpx::when_all(broadcast_futures).
@@ -714,36 +837,44 @@ namespace hpx { namespace lcos {
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , A0 const & a0
+          , std::size_t global_idx
         )
         {
             if(ids.empty()) return;
-            const std::size_t fan_out = 16;
-            for(std::size_t i = 0; i != (std::min)(ids.size(), fan_out); ++i)
+            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                hpx::apply(
+                broadcast_invoke_apply(
                     act
                   , ids[i]
                   , a0
+                  , global_idx + i
                 );
             }
-            if(ids.size() > fan_out)
+            if(ids.size() > local_fanout)
             {
-                std::size_t applied = fan_out;
-                std::vector<hpx::id_type>::const_iterator it = ids.begin() + fan_out;
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_broadcast_apply_action<
                         Action
                     >::type
                     broadcast_impl_action;
+                std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
                 while(it != ids.end())
                 {
-                    std::size_t next_fan = (std::min)(fan_out, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + fan_out);
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     hpx::apply_colocated<broadcast_impl_action>(
-                        ids_next[0]
+                        id
                       , act
                       , std::move(ids_next)
                       , a0
+                      , global_idx + applied
                     );
                     applied += next_fan;
                     it += next_fan;
@@ -795,6 +926,7 @@ namespace hpx { namespace lcos {
                 typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
+        
         template <
             typename Action
           , typename A0
@@ -806,6 +938,7 @@ namespace hpx { namespace lcos {
                 Action const & act
               , std::vector<hpx::id_type> const & ids
               , A0 const & a0
+              , std::size_t global_idx
             )
             {
                 return
@@ -813,6 +946,7 @@ namespace hpx { namespace lcos {
                         act
                       , ids
                       , a0
+                      , global_idx
                     );
             }
         };
@@ -880,6 +1014,7 @@ namespace hpx { namespace lcos {
               , a0
             );
     }
+    
     template <
         typename Action
       , typename A0
@@ -897,6 +1032,7 @@ namespace hpx { namespace lcos {
               , Action()
               , ids
               , a0
+              , 0
             );
     }
     template <
@@ -919,6 +1055,7 @@ namespace hpx { namespace lcos {
           , a0
         );
     }
+    
     template <
         typename Action
       , typename A0
@@ -957,10 +1094,47 @@ namespace hpx { namespace lcos {
               , a0
             );
     }
+    
+    template <
+        typename Action
+      , typename A0
+    >
+    void
+    broadcast_apply_with_index(
+        std::vector<hpx::id_type> const & ids
+      , A0 const & a0)
+    {
+        broadcast_apply<detail::broadcast_with_index<Action> >(
+            ids
+          , a0
+        );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      , typename A0
+    >
+    void
+    broadcast_apply_with_index(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0)
+    {
+        broadcast_apply<detail::broadcast_with_index<Derived> >(
+            ids
+          , a0
+        );
+    }
 }}
-namespace hpx { namespace lcos {
+namespace hpx { namespace lcos
+{
     namespace detail
     {
+        
         template <
             typename Action
           , typename Futures
@@ -1040,6 +1214,41 @@ namespace hpx { namespace lcos {
                 ).then(std::forward<Cont>(cont))
             );
         }
+        
+        template <
+            typename Action
+          , typename A0 , typename A1
+        >
+        void
+        broadcast_invoke_apply(Action act
+          , hpx::id_type const& id
+          , A0 const & a0 , A1 const & a1
+          , std::size_t)
+        {
+            hpx::apply(
+                act
+              , id
+              , a0 , a1
+            );
+        }
+        template <
+            typename Action
+          , typename A0 , typename A1
+        >
+        void
+        broadcast_invoke_apply(broadcast_with_index<Action>
+          , hpx::id_type const& id
+          , A0 const & a0 , A1 const & a1
+          , std::size_t global_idx)
+        {
+            hpx::apply(
+                Action()
+              , id
+              , a0 , a1
+              , global_idx
+            );
+        }
+        
         template <
             typename Action
           , typename A0 , typename A1
@@ -1078,9 +1287,10 @@ namespace hpx { namespace lcos {
                     broadcast_impl_action;
                 if(!ids_first.empty())
                 {
+                    hpx::id_type id(ids_first[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
-                            ids_first[0]
+                            id
                           , act
                           , std::move(ids_first)
                           , a0 , a1
@@ -1091,9 +1301,10 @@ namespace hpx { namespace lcos {
                 }
                 if(!ids_second.empty())
                 {
+                    hpx::id_type id(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
-                            ids_second[0]
+                            id
                           , act
                           , std::move(ids_second)
                           , a0 , a1
@@ -1130,51 +1341,49 @@ namespace hpx { namespace lcos {
             if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_invoke(
-                act
-              , broadcast_futures
-              , &wrap_into_vector<action_result>
-              , ids[0]
-              , a0 , a1
-              , global_idx
-            );
-            if(ids.size() > 1)
+            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+            broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                broadcast_invoke(
+                    act
+                  , broadcast_futures
+                  , &wrap_into_vector<action_result>
+                  , ids[i]
+                  , a0 , a1
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_broadcast_action<
                         Action
                     >::type
                     broadcast_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
-                            ids_first[0]
+                            id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , a0 , a1
-                          , global_idx + 1
+                          , global_idx + applied
                           , boost::integral_constant<bool, false>::type()
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    broadcast_futures.push_back(
-                        hpx::async_colocated<broadcast_impl_action>(
-                            ids_second[0]
-                          , act
-                          , std::move(ids_second)
-                          , a0 , a1
-                          , global_idx + half
-                          , boost::integral_constant<bool, false>::type()
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
             return hpx::when_all(broadcast_futures).
@@ -1189,36 +1398,44 @@ namespace hpx { namespace lcos {
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , A0 const & a0 , A1 const & a1
+          , std::size_t global_idx
         )
         {
             if(ids.empty()) return;
-            const std::size_t fan_out = 16;
-            for(std::size_t i = 0; i != (std::min)(ids.size(), fan_out); ++i)
+            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                hpx::apply(
+                broadcast_invoke_apply(
                     act
                   , ids[i]
                   , a0 , a1
+                  , global_idx + i
                 );
             }
-            if(ids.size() > fan_out)
+            if(ids.size() > local_fanout)
             {
-                std::size_t applied = fan_out;
-                std::vector<hpx::id_type>::const_iterator it = ids.begin() + fan_out;
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_broadcast_apply_action<
                         Action
                     >::type
                     broadcast_impl_action;
+                std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
                 while(it != ids.end())
                 {
-                    std::size_t next_fan = (std::min)(fan_out, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + fan_out);
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     hpx::apply_colocated<broadcast_impl_action>(
-                        ids_next[0]
+                        id
                       , act
                       , std::move(ids_next)
                       , a0 , a1
+                      , global_idx + applied
                     );
                     applied += next_fan;
                     it += next_fan;
@@ -1270,6 +1487,7 @@ namespace hpx { namespace lcos {
                 typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
+        
         template <
             typename Action
           , typename A0 , typename A1
@@ -1281,6 +1499,7 @@ namespace hpx { namespace lcos {
                 Action const & act
               , std::vector<hpx::id_type> const & ids
               , A0 const & a0 , A1 const & a1
+              , std::size_t global_idx
             )
             {
                 return
@@ -1288,6 +1507,7 @@ namespace hpx { namespace lcos {
                         act
                       , ids
                       , a0 , a1
+                      , global_idx
                     );
             }
         };
@@ -1355,6 +1575,7 @@ namespace hpx { namespace lcos {
               , a0 , a1
             );
     }
+    
     template <
         typename Action
       , typename A0 , typename A1
@@ -1372,6 +1593,7 @@ namespace hpx { namespace lcos {
               , Action()
               , ids
               , a0 , a1
+              , 0
             );
     }
     template <
@@ -1394,6 +1616,7 @@ namespace hpx { namespace lcos {
           , a0 , a1
         );
     }
+    
     template <
         typename Action
       , typename A0 , typename A1
@@ -1432,10 +1655,47 @@ namespace hpx { namespace lcos {
               , a0 , a1
             );
     }
+    
+    template <
+        typename Action
+      , typename A0 , typename A1
+    >
+    void
+    broadcast_apply_with_index(
+        std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1)
+    {
+        broadcast_apply<detail::broadcast_with_index<Action> >(
+            ids
+          , a0 , a1
+        );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      , typename A0 , typename A1
+    >
+    void
+    broadcast_apply_with_index(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1)
+    {
+        broadcast_apply<detail::broadcast_with_index<Derived> >(
+            ids
+          , a0 , a1
+        );
+    }
 }}
-namespace hpx { namespace lcos {
+namespace hpx { namespace lcos
+{
     namespace detail
     {
+        
         template <
             typename Action
           , typename Futures
@@ -1515,6 +1775,41 @@ namespace hpx { namespace lcos {
                 ).then(std::forward<Cont>(cont))
             );
         }
+        
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2
+        >
+        void
+        broadcast_invoke_apply(Action act
+          , hpx::id_type const& id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2
+          , std::size_t)
+        {
+            hpx::apply(
+                act
+              , id
+              , a0 , a1 , a2
+            );
+        }
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2
+        >
+        void
+        broadcast_invoke_apply(broadcast_with_index<Action>
+          , hpx::id_type const& id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2
+          , std::size_t global_idx)
+        {
+            hpx::apply(
+                Action()
+              , id
+              , a0 , a1 , a2
+              , global_idx
+            );
+        }
+        
         template <
             typename Action
           , typename A0 , typename A1 , typename A2
@@ -1553,9 +1848,10 @@ namespace hpx { namespace lcos {
                     broadcast_impl_action;
                 if(!ids_first.empty())
                 {
+                    hpx::id_type id(ids_first[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
-                            ids_first[0]
+                            id
                           , act
                           , std::move(ids_first)
                           , a0 , a1 , a2
@@ -1566,9 +1862,10 @@ namespace hpx { namespace lcos {
                 }
                 if(!ids_second.empty())
                 {
+                    hpx::id_type id(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
-                            ids_second[0]
+                            id
                           , act
                           , std::move(ids_second)
                           , a0 , a1 , a2
@@ -1605,51 +1902,49 @@ namespace hpx { namespace lcos {
             if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_invoke(
-                act
-              , broadcast_futures
-              , &wrap_into_vector<action_result>
-              , ids[0]
-              , a0 , a1 , a2
-              , global_idx
-            );
-            if(ids.size() > 1)
+            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+            broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                broadcast_invoke(
+                    act
+                  , broadcast_futures
+                  , &wrap_into_vector<action_result>
+                  , ids[i]
+                  , a0 , a1 , a2
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_broadcast_action<
                         Action
                     >::type
                     broadcast_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
-                            ids_first[0]
+                            id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , a0 , a1 , a2
-                          , global_idx + 1
+                          , global_idx + applied
                           , boost::integral_constant<bool, false>::type()
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    broadcast_futures.push_back(
-                        hpx::async_colocated<broadcast_impl_action>(
-                            ids_second[0]
-                          , act
-                          , std::move(ids_second)
-                          , a0 , a1 , a2
-                          , global_idx + half
-                          , boost::integral_constant<bool, false>::type()
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
             return hpx::when_all(broadcast_futures).
@@ -1664,36 +1959,44 @@ namespace hpx { namespace lcos {
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , A0 const & a0 , A1 const & a1 , A2 const & a2
+          , std::size_t global_idx
         )
         {
             if(ids.empty()) return;
-            const std::size_t fan_out = 16;
-            for(std::size_t i = 0; i != (std::min)(ids.size(), fan_out); ++i)
+            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                hpx::apply(
+                broadcast_invoke_apply(
                     act
                   , ids[i]
                   , a0 , a1 , a2
+                  , global_idx + i
                 );
             }
-            if(ids.size() > fan_out)
+            if(ids.size() > local_fanout)
             {
-                std::size_t applied = fan_out;
-                std::vector<hpx::id_type>::const_iterator it = ids.begin() + fan_out;
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_broadcast_apply_action<
                         Action
                     >::type
                     broadcast_impl_action;
+                std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
                 while(it != ids.end())
                 {
-                    std::size_t next_fan = (std::min)(fan_out, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + fan_out);
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     hpx::apply_colocated<broadcast_impl_action>(
-                        ids_next[0]
+                        id
                       , act
                       , std::move(ids_next)
                       , a0 , a1 , a2
+                      , global_idx + applied
                     );
                     applied += next_fan;
                     it += next_fan;
@@ -1745,6 +2048,7 @@ namespace hpx { namespace lcos {
                 typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
+        
         template <
             typename Action
           , typename A0 , typename A1 , typename A2
@@ -1756,6 +2060,7 @@ namespace hpx { namespace lcos {
                 Action const & act
               , std::vector<hpx::id_type> const & ids
               , A0 const & a0 , A1 const & a1 , A2 const & a2
+              , std::size_t global_idx
             )
             {
                 return
@@ -1763,6 +2068,7 @@ namespace hpx { namespace lcos {
                         act
                       , ids
                       , a0 , a1 , a2
+                      , global_idx
                     );
             }
         };
@@ -1830,6 +2136,7 @@ namespace hpx { namespace lcos {
               , a0 , a1 , a2
             );
     }
+    
     template <
         typename Action
       , typename A0 , typename A1 , typename A2
@@ -1847,6 +2154,7 @@ namespace hpx { namespace lcos {
               , Action()
               , ids
               , a0 , a1 , a2
+              , 0
             );
     }
     template <
@@ -1869,6 +2177,7 @@ namespace hpx { namespace lcos {
           , a0 , a1 , a2
         );
     }
+    
     template <
         typename Action
       , typename A0 , typename A1 , typename A2
@@ -1907,10 +2216,47 @@ namespace hpx { namespace lcos {
               , a0 , a1 , a2
             );
     }
+    
+    template <
+        typename Action
+      , typename A0 , typename A1 , typename A2
+    >
+    void
+    broadcast_apply_with_index(
+        std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2)
+    {
+        broadcast_apply<detail::broadcast_with_index<Action> >(
+            ids
+          , a0 , a1 , a2
+        );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      , typename A0 , typename A1 , typename A2
+    >
+    void
+    broadcast_apply_with_index(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2)
+    {
+        broadcast_apply<detail::broadcast_with_index<Derived> >(
+            ids
+          , a0 , a1 , a2
+        );
+    }
 }}
-namespace hpx { namespace lcos {
+namespace hpx { namespace lcos
+{
     namespace detail
     {
+        
         template <
             typename Action
           , typename Futures
@@ -1990,6 +2336,41 @@ namespace hpx { namespace lcos {
                 ).then(std::forward<Cont>(cont))
             );
         }
+        
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2 , typename A3
+        >
+        void
+        broadcast_invoke_apply(Action act
+          , hpx::id_type const& id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3
+          , std::size_t)
+        {
+            hpx::apply(
+                act
+              , id
+              , a0 , a1 , a2 , a3
+            );
+        }
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2 , typename A3
+        >
+        void
+        broadcast_invoke_apply(broadcast_with_index<Action>
+          , hpx::id_type const& id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3
+          , std::size_t global_idx)
+        {
+            hpx::apply(
+                Action()
+              , id
+              , a0 , a1 , a2 , a3
+              , global_idx
+            );
+        }
+        
         template <
             typename Action
           , typename A0 , typename A1 , typename A2 , typename A3
@@ -2028,9 +2409,10 @@ namespace hpx { namespace lcos {
                     broadcast_impl_action;
                 if(!ids_first.empty())
                 {
+                    hpx::id_type id(ids_first[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
-                            ids_first[0]
+                            id
                           , act
                           , std::move(ids_first)
                           , a0 , a1 , a2 , a3
@@ -2041,9 +2423,10 @@ namespace hpx { namespace lcos {
                 }
                 if(!ids_second.empty())
                 {
+                    hpx::id_type id(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
-                            ids_second[0]
+                            id
                           , act
                           , std::move(ids_second)
                           , a0 , a1 , a2 , a3
@@ -2080,51 +2463,49 @@ namespace hpx { namespace lcos {
             if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_invoke(
-                act
-              , broadcast_futures
-              , &wrap_into_vector<action_result>
-              , ids[0]
-              , a0 , a1 , a2 , a3
-              , global_idx
-            );
-            if(ids.size() > 1)
+            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+            broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                broadcast_invoke(
+                    act
+                  , broadcast_futures
+                  , &wrap_into_vector<action_result>
+                  , ids[i]
+                  , a0 , a1 , a2 , a3
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_broadcast_action<
                         Action
                     >::type
                     broadcast_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
-                            ids_first[0]
+                            id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , a0 , a1 , a2 , a3
-                          , global_idx + 1
+                          , global_idx + applied
                           , boost::integral_constant<bool, false>::type()
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    broadcast_futures.push_back(
-                        hpx::async_colocated<broadcast_impl_action>(
-                            ids_second[0]
-                          , act
-                          , std::move(ids_second)
-                          , a0 , a1 , a2 , a3
-                          , global_idx + half
-                          , boost::integral_constant<bool, false>::type()
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
             return hpx::when_all(broadcast_futures).
@@ -2139,36 +2520,44 @@ namespace hpx { namespace lcos {
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3
+          , std::size_t global_idx
         )
         {
             if(ids.empty()) return;
-            const std::size_t fan_out = 16;
-            for(std::size_t i = 0; i != (std::min)(ids.size(), fan_out); ++i)
+            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                hpx::apply(
+                broadcast_invoke_apply(
                     act
                   , ids[i]
                   , a0 , a1 , a2 , a3
+                  , global_idx + i
                 );
             }
-            if(ids.size() > fan_out)
+            if(ids.size() > local_fanout)
             {
-                std::size_t applied = fan_out;
-                std::vector<hpx::id_type>::const_iterator it = ids.begin() + fan_out;
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_broadcast_apply_action<
                         Action
                     >::type
                     broadcast_impl_action;
+                std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
                 while(it != ids.end())
                 {
-                    std::size_t next_fan = (std::min)(fan_out, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + fan_out);
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     hpx::apply_colocated<broadcast_impl_action>(
-                        ids_next[0]
+                        id
                       , act
                       , std::move(ids_next)
                       , a0 , a1 , a2 , a3
+                      , global_idx + applied
                     );
                     applied += next_fan;
                     it += next_fan;
@@ -2220,6 +2609,7 @@ namespace hpx { namespace lcos {
                 typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
+        
         template <
             typename Action
           , typename A0 , typename A1 , typename A2 , typename A3
@@ -2231,6 +2621,7 @@ namespace hpx { namespace lcos {
                 Action const & act
               , std::vector<hpx::id_type> const & ids
               , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3
+              , std::size_t global_idx
             )
             {
                 return
@@ -2238,6 +2629,7 @@ namespace hpx { namespace lcos {
                         act
                       , ids
                       , a0 , a1 , a2 , a3
+                      , global_idx
                     );
             }
         };
@@ -2305,6 +2697,7 @@ namespace hpx { namespace lcos {
               , a0 , a1 , a2 , a3
             );
     }
+    
     template <
         typename Action
       , typename A0 , typename A1 , typename A2 , typename A3
@@ -2322,6 +2715,7 @@ namespace hpx { namespace lcos {
               , Action()
               , ids
               , a0 , a1 , a2 , a3
+              , 0
             );
     }
     template <
@@ -2344,6 +2738,7 @@ namespace hpx { namespace lcos {
           , a0 , a1 , a2 , a3
         );
     }
+    
     template <
         typename Action
       , typename A0 , typename A1 , typename A2 , typename A3
@@ -2382,10 +2777,47 @@ namespace hpx { namespace lcos {
               , a0 , a1 , a2 , a3
             );
     }
+    
+    template <
+        typename Action
+      , typename A0 , typename A1 , typename A2 , typename A3
+    >
+    void
+    broadcast_apply_with_index(
+        std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3)
+    {
+        broadcast_apply<detail::broadcast_with_index<Action> >(
+            ids
+          , a0 , a1 , a2 , a3
+        );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      , typename A0 , typename A1 , typename A2 , typename A3
+    >
+    void
+    broadcast_apply_with_index(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3)
+    {
+        broadcast_apply<detail::broadcast_with_index<Derived> >(
+            ids
+          , a0 , a1 , a2 , a3
+        );
+    }
 }}
-namespace hpx { namespace lcos {
+namespace hpx { namespace lcos
+{
     namespace detail
     {
+        
         template <
             typename Action
           , typename Futures
@@ -2465,6 +2897,41 @@ namespace hpx { namespace lcos {
                 ).then(std::forward<Cont>(cont))
             );
         }
+        
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
+        >
+        void
+        broadcast_invoke_apply(Action act
+          , hpx::id_type const& id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4
+          , std::size_t)
+        {
+            hpx::apply(
+                act
+              , id
+              , a0 , a1 , a2 , a3 , a4
+            );
+        }
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
+        >
+        void
+        broadcast_invoke_apply(broadcast_with_index<Action>
+          , hpx::id_type const& id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4
+          , std::size_t global_idx)
+        {
+            hpx::apply(
+                Action()
+              , id
+              , a0 , a1 , a2 , a3 , a4
+              , global_idx
+            );
+        }
+        
         template <
             typename Action
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
@@ -2503,9 +2970,10 @@ namespace hpx { namespace lcos {
                     broadcast_impl_action;
                 if(!ids_first.empty())
                 {
+                    hpx::id_type id(ids_first[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
-                            ids_first[0]
+                            id
                           , act
                           , std::move(ids_first)
                           , a0 , a1 , a2 , a3 , a4
@@ -2516,9 +2984,10 @@ namespace hpx { namespace lcos {
                 }
                 if(!ids_second.empty())
                 {
+                    hpx::id_type id(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
-                            ids_second[0]
+                            id
                           , act
                           , std::move(ids_second)
                           , a0 , a1 , a2 , a3 , a4
@@ -2555,51 +3024,49 @@ namespace hpx { namespace lcos {
             if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_invoke(
-                act
-              , broadcast_futures
-              , &wrap_into_vector<action_result>
-              , ids[0]
-              , a0 , a1 , a2 , a3 , a4
-              , global_idx
-            );
-            if(ids.size() > 1)
+            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
+            broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                broadcast_invoke(
+                    act
+                  , broadcast_futures
+                  , &wrap_into_vector<action_result>
+                  , ids[i]
+                  , a0 , a1 , a2 , a3 , a4
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_broadcast_action<
                         Action
                     >::type
                     broadcast_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
                         hpx::async_colocated<broadcast_impl_action>(
-                            ids_first[0]
+                            id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , a0 , a1 , a2 , a3 , a4
-                          , global_idx + 1
+                          , global_idx + applied
                           , boost::integral_constant<bool, false>::type()
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    broadcast_futures.push_back(
-                        hpx::async_colocated<broadcast_impl_action>(
-                            ids_second[0]
-                          , act
-                          , std::move(ids_second)
-                          , a0 , a1 , a2 , a3 , a4
-                          , global_idx + half
-                          , boost::integral_constant<bool, false>::type()
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
             return hpx::when_all(broadcast_futures).
@@ -2614,36 +3081,44 @@ namespace hpx { namespace lcos {
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4
+          , std::size_t global_idx
         )
         {
             if(ids.empty()) return;
-            const std::size_t fan_out = 16;
-            for(std::size_t i = 0; i != (std::min)(ids.size(), fan_out); ++i)
+            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                hpx::apply(
+                broadcast_invoke_apply(
                     act
                   , ids[i]
                   , a0 , a1 , a2 , a3 , a4
+                  , global_idx + i
                 );
             }
-            if(ids.size() > fan_out)
+            if(ids.size() > local_fanout)
             {
-                std::size_t applied = fan_out;
-                std::vector<hpx::id_type>::const_iterator it = ids.begin() + fan_out;
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_broadcast_apply_action<
                         Action
                     >::type
                     broadcast_impl_action;
+                std::size_t fanout = calculate_fanout(ids.size(), local_fanout);
                 while(it != ids.end())
                 {
-                    std::size_t next_fan = (std::min)(fan_out, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + fan_out);
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     hpx::apply_colocated<broadcast_impl_action>(
-                        ids_next[0]
+                        id
                       , act
                       , std::move(ids_next)
                       , a0 , a1 , a2 , a3 , a4
+                      , global_idx + applied
                     );
                     applied += next_fan;
                     it += next_fan;
@@ -2695,6 +3170,7 @@ namespace hpx { namespace lcos {
                 typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
+        
         template <
             typename Action
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
@@ -2706,6 +3182,7 @@ namespace hpx { namespace lcos {
                 Action const & act
               , std::vector<hpx::id_type> const & ids
               , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4
+              , std::size_t global_idx
             )
             {
                 return
@@ -2713,6 +3190,7 @@ namespace hpx { namespace lcos {
                         act
                       , ids
                       , a0 , a1 , a2 , a3 , a4
+                      , global_idx
                     );
             }
         };
@@ -2780,6 +3258,7 @@ namespace hpx { namespace lcos {
               , a0 , a1 , a2 , a3 , a4
             );
     }
+    
     template <
         typename Action
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
@@ -2797,6 +3276,7 @@ namespace hpx { namespace lcos {
               , Action()
               , ids
               , a0 , a1 , a2 , a3 , a4
+              , 0
             );
     }
     template <
@@ -2819,6 +3299,7 @@ namespace hpx { namespace lcos {
           , a0 , a1 , a2 , a3 , a4
         );
     }
+    
     template <
         typename Action
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
@@ -2856,5 +3337,40 @@ namespace hpx { namespace lcos {
                 ids
               , a0 , a1 , a2 , a3 , a4
             );
+    }
+    
+    template <
+        typename Action
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
+    >
+    void
+    broadcast_apply_with_index(
+        std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4)
+    {
+        broadcast_apply<detail::broadcast_with_index<Action> >(
+            ids
+          , a0 , a1 , a2 , a3 , a4
+        );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
+    >
+    void
+    broadcast_apply_with_index(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4)
+    {
+        broadcast_apply<detail::broadcast_with_index<Derived> >(
+            ids
+          , a0 , a1 , a2 , a3 , a4
+        );
     }
 }}
