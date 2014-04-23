@@ -14,7 +14,7 @@ usage()
     echo "Options:"
     echo "  -d    Directory where Boost should be built."
     echo "  -v    Version of Boost to build (format: X.YY.Z)"
-    echo "  -n    Don't download Boost (expects tarball named boost_X.YY.Z.tar.bz2 in the -d directory)"
+    echo "  -n    Don't download Boost (expects tarball named boost_X.YY.Z.tar.bz2 in the -d directory) [default: 1.55.0]"
     echo "  -x    Libraries to exclude (format: exclude0,exclude1...) [default: mpi,graph_parallel,python]"
     echo "  -t    Number of threads to use while building [default: number of processors]" 
     echo "  -c    Compiler [default: automatically detected]" 
@@ -23,10 +23,10 @@ usage()
 DIRECTORY=
 
 # Dot version, e.g. X.YY.Z
-DOT_VERSION=
+DOT_VERSION=1.55.0
 
 # Underscore version, e.g. X_YY_Z
-US_VERSION=
+US_VERSION=1_55_0
 
 DOWNLOAD=1
 
@@ -95,7 +95,7 @@ while getopts "hnt:d:v:c:x:" OPTION; do case $OPTION in
 esac; done
 
 if ! [[ $DIRECTORY ]]; then
-    echo "ERROR: no version specified"; echo
+    echo "ERROR: no directory specified"; echo
     usage
     exit 1
 fi
