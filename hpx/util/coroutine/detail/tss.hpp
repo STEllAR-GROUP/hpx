@@ -36,8 +36,6 @@ namespace hpx { namespace util { namespace coroutines
             boost::shared_ptr<tss_cleanup_function> func_;
             void* value_;
 
-            HPX_MOVABLE_BUT_NOT_COPYABLE(tss_data_node)
-
         public:
             tss_data_node()
               : value_(0)
@@ -107,12 +105,30 @@ namespace hpx { namespace util { namespace coroutines
                 return value_;
             }
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40500
             // this is helping gcc 4.4
             void set_data(boost::shared_ptr<tss_cleanup_function> f, void* val)
             {
                 func_ = f;
                 value_ = val;
             }
+
+            tss_data_node(tss_data_node const& rhs)
+                : func_(rhs.func_),
+                value_(0)
+            {
+                HPX_ASSERT(rhs.value_ == 0);
+            }
+
+            tss_data_node& operator=(tss_data_node const& rhs)
+            {
+                HPX_ASSERT(rhs.value_ == 0);
+                func_ = rhs.func_;
+                value_ = 0;
+            }
+#else
+            HPX_MOVABLE_BUT_NOT_COPYABLE(tss_data_node)
+#endif
         };
 
         ///////////////////////////////////////////////////////////////////////
