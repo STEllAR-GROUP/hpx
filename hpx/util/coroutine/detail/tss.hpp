@@ -106,6 +106,13 @@ namespace hpx { namespace util { namespace coroutines
             {
                 return value_;
             }
+
+            // this is helping gcc 4.4
+            void set_data(boost::shared_ptr<tss_cleanup_function> f, void* val)
+            {
+                func_ = f;
+                value_ = val;
+            }
         };
 
         ///////////////////////////////////////////////////////////////////////
