@@ -63,7 +63,6 @@ namespace mini_ghost {
         
         // Find all others ...
         std::size_t r = p.rank % p.nranks;
-        std::size_t resolved = 0;
         for(std::size_t i = 0; i != p.nranks; ++i)
         {
             name = base_name;
