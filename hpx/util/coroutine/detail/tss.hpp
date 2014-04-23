@@ -122,9 +122,13 @@ namespace hpx { namespace util { namespace coroutines
 
             tss_data_node& operator=(tss_data_node const& rhs)
             {
-                HPX_ASSERT(rhs.value_ == 0);
-                func_ = rhs.func_;
-                value_ = 0;
+                if (this != &rhs)
+                {
+                    HPX_ASSERT(rhs.value_ == 0);
+                    func_ = rhs.func_;
+                    value_ = 0;
+                }
+                return *this;
             }
 #else
             HPX_MOVABLE_BUT_NOT_COPYABLE(tss_data_node)
