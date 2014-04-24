@@ -10,13 +10,13 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/atomic.hpp>
 #include <boost/array.hpp>
+#include <boost/random.hpp>
 
 #include <algorithm>
 #include <iostream>
 #include <vector>
 #include <memory>
 #include <cstdio>
-#include <random>
 
 //
 // This is a test program which reads and writes chunks of memory to storage
@@ -387,8 +387,8 @@ void barrier_wait()
 // Test speed of write/put
 void test_write(
     uint64_t rank, uint64_t nranks, uint64_t num_transfer_slots,
-    std::mt19937& gen, std::uniform_int_distribution<>& random_rank,
-    std::uniform_int_distribution<>& random_slot,
+    boost::random::mt19937& gen, boost::random::uniform_int_distribution<>& random_rank,
+    boost::random::uniform_int_distribution<>& random_slot,
     test_options &options
     )
 {
@@ -546,8 +546,8 @@ static void transfer_data(general_buffer_type recv,
 // Test speed of read/get
 void test_read(
     uint64_t rank, uint64_t nranks, uint64_t num_transfer_slots,
-    std::mt19937& gen, std::uniform_int_distribution<>& random_rank,
-    std::uniform_int_distribution<>& random_slot,
+    boost::random::mt19937& gen, boost::random::uniform_int_distribution<>& random_rank,
+    boost::random::uniform_int_distribution<>& random_slot,
     test_options &options
     )
 {
@@ -764,14 +764,14 @@ int hpx_main(boost::program_options::variables_map& vm)
         std::cout << "num ranks " << nranks << ", num_transfer_slots " << num_transfer_slots << " on rank " << rank << std::endl;
     );
     //
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> random_rank(0, (int)nranks - 1);
-    std::uniform_int_distribution<> random_slot(0, (int)num_transfer_slots - 1);
+    boost::random::mt19937 gen;
+    boost::random::uniform_int_distribution<> random_rank(0, (int)nranks - 1);
+    boost::random::uniform_int_distribution<> random_slot(0, (int)num_transfer_slots - 1);
     //
-    ActiveFutures.resize(nranks);
+    ActiveFutures.reserve(nranks);
     for(uint64_t i = 0; i < nranks; i++) {
         FuturesWaiting[i].store(0);
+        ActiveFutures.push_back(std::vector<hpx::future<int>>());
     }
 
     test_write(rank, nranks, num_transfer_slots, gen, random_rank, random_slot, options);
