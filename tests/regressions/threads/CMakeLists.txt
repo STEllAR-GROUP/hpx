@@ -7,12 +7,15 @@
 set(tests
     block_os_threads_1036
     resume_priority
-    thread_data_1111
     thread_pool_executor_1112
     thread_rescheduling
     thread_suspend_pending
     thread_suspend_duration
    )
+
+if(HPX_THREAD_MAINTAIN_THREAD_DATA)
+  set(tests ${tests} thread_data_1111)
+endif()
 
 if(HPX_LOCAL_SCHEDULER OR HPX_ALL_SCHEDULERS)
   set(tests ${tests} thread_pool_executor_1114)

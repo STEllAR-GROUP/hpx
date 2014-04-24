@@ -642,17 +642,10 @@ else()
   hpx_add_config_define(HPX_THREAD_MAINTAIN_STEALING_COUNTS 0)
 endif()
 
-if(${GCC_VERSION} GREATER 040407)
-  hpx_option(HPX_THREAD_MAINTAIN_THREAD_DATA BOOL
-    "Enable thread local storage for all HPX threads (default: ON)"
-    ON ADVANCED)
-else()
-  # Explicitly disabling hpx threads specific data storage for gcc < 4.4.7 as
-  # std::map seems to fail at missing std::pair move semantics
-  hpx_option(HPX_THREAD_MAINTAIN_THREAD_DATA BOOL
-    "Enable thread local storage for all HPX threads (default: OFF)"
-    OFF ADVANCED)
-endif()
+hpx_option(HPX_THREAD_MAINTAIN_THREAD_DATA BOOL
+  "Enable thread local storage for all HPX threads (default: ON)"
+  ON ADVANCED)
+
 if(HPX_THREAD_MAINTAIN_THREAD_DATA)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_THREAD_DATA 1)
 else()
