@@ -774,12 +774,12 @@ namespace hpx
         if (env && !env->empty())
             return *env;
 
-        return std::string();
+        return "<unknown>";
     }
 
     std::string get_error_env(boost::exception_ptr const& e)
     {
-        if (!e) return std::string();
+        if (!e) return "<unknown>";
 
         try {
             boost::rethrow_exception(e);
@@ -788,7 +788,7 @@ namespace hpx
             return get_error_env(be);
         }
         catch (...) {
-            return std::string();
+            return "<unknown>";
         }
     }
 
@@ -816,12 +816,12 @@ namespace hpx
         if (s)
             return *s;
 
-        return std::string();
+        return "<unknown>";
     }
 
     std::string get_error_file_name(boost::exception_ptr const& e)
     {
-        if (!e) return std::string();
+        if (!e) return "<unknown>";
 
         try {
             boost::rethrow_exception(e);
@@ -830,7 +830,7 @@ namespace hpx
             return get_error_file_name(be);
         }
         catch (...) {
-            return std::string();
+            return "<unknown>";
         }
     }
 
