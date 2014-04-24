@@ -24,7 +24,8 @@ bool register_name_sync(
     )
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
-    return agas_.register_name(name, naming::detail::get_stripped_gid(gid));
+    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
+    return agas_.register_name(name, gid_);
 }
 
 bool register_name_sync(
@@ -94,8 +95,9 @@ bool resolve_name_sync(
     )
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
+    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
 
-    if (agas_.resolve_name(name, naming::detail::get_stripped_gid(gid), ec) && !ec)
+    if (agas_.resolve_name(name, gid_, ec) && !ec)
         return true;
 
     return false;
@@ -250,8 +252,8 @@ bool is_local_address_cached(
   , error_code& ec
     )
 {
-    return naming::get_agas_client().is_local_address_cached(
-        naming::detail::get_stripped_gid(gid), ec);
+    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
+    return naming::get_agas_client().is_local_address_cached(gid_, ec);
 }
 
 bool is_local_address_cached(
@@ -260,8 +262,8 @@ bool is_local_address_cached(
   , error_code& ec
     )
 {
-    return naming::get_agas_client().is_local_address_cached(
-        naming::detail::get_stripped_gid(gid), addr, ec);
+    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
+    return naming::get_agas_client().is_local_address_cached(gid_, addr, ec);
 }
 
 bool is_local_lva_encoded_address(
@@ -296,8 +298,8 @@ hpx::future<bool> bind(
     )
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
-    return agas_.bind_async(naming::detail::get_stripped_gid(gid),
-        addr, locality_id);
+    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
+    return agas_.bind_async(gid_, addr, locality_id);
 }
 
 bool bind_sync(
@@ -308,8 +310,8 @@ bool bind_sync(
     )
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
-    return agas_.bind_async(naming::detail::get_stripped_gid(gid),
-        addr, locality_id).get(ec);
+    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
+    return agas_.bind_async(gid_, addr, locality_id).get(ec);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -411,7 +413,8 @@ void decref(
   )
 {
     naming::resolver_client& resolver = naming::get_agas_client();
-    resolver.decref(naming::detail::get_stripped_gid(gid), credits, ec);
+    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
+    resolver.decref(gid_, credits, ec);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
