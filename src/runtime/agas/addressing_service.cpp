@@ -2764,8 +2764,11 @@ void addressing_service::send_refcnt_requests_sync(
             {
                 HPX_THROWS_IF(ec, rep.get_status(),
                     "addressing_service::send_refcnt_requests_sync",
-                    "could not decrement reference count (reported error: " +
-                    hpx::get_error_what(ec));
+                    "could not decrement reference count (reported error" +
+                    hpx::get_error_what(ec) + ", " +
+                    hpx::get_error_file_name(ec) + "(" +
+                    boost::lexical_cast<std::string>(
+                        hpx::get_error_line_number(ec)) + "))");
                 return;
             }
         }
