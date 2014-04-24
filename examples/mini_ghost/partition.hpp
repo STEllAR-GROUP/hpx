@@ -181,7 +181,7 @@ namespace mini_ghost {
             if(nz_ % nz_block_) ++num_z_blocks;
 
             std::array<grid<hpx::shared_future<void> >, 2> calc_futures;
-            
+
             calc_futures[src_].resize(num_x_blocks, num_y_blocks, num_z_blocks);
             calc_futures[dst_].resize(num_x_blocks, num_y_blocks, num_z_blocks);
 
@@ -310,13 +310,13 @@ namespace mini_ghost {
                               , std::size_t src
                             )
                             {
-                                return flux_accumulate(src);
+                                return this->flux_accumulate(src);
                             }
                           , hpx::util::placeholders::_1
                           , src_
                         )
                     );
-                
+
                 std::vector<hpx::shared_future<void> > dependencies;
                 dependencies.reserve(NUM_NEIGHBORS + 2);
 
@@ -531,7 +531,7 @@ namespace mini_ghost {
                     }
                 );
                 */
-                
+
                 sum_future[dst_] = sum_grid(ids, io_mutex, step, dst_, flux_out_future[dst_], calc_futures[dst_].data_);
 
                 // Send boundaries ...
