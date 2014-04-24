@@ -318,7 +318,8 @@ std::vector<response> primary_namespace::bulk_service(
     BOOST_FOREACH(request const& req, reqs)
     {
         r.push_back(service(req, ec));
-        if (ec) break;      // on error: for now stop iterating
+        if (ec)
+            break;      // on error: for now stop iterating
     }
 
     return r;

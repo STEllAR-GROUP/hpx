@@ -1216,7 +1216,8 @@ bool addressing_service::is_local_lva_encoded_address(
     )
 {
     // NOTE: This should still be migration safe.
-    return msb == get_local_locality().get_msb();
+    return naming::detail::strip_internal_bits_from_gid(msb) ==
+        get_local_locality().get_msb();
 }
 
 bool addressing_service::resolve_locally_known_addresses(
