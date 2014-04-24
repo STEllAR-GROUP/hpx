@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -26,6 +26,22 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/atomic.hpp>
+#include <boost/unordered_set.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
+namespace boost
+{
+    template <>
+    struct hash<hpx::threads::thread_id_type>
+    {
+        std::size_t operator()(hpx::threads::thread_id_type const& v) const
+        {
+            return hasher_(reinterpret_cast<std::size_t>(v.get()));
+        }
+
+        boost::hash<std::size_t> hasher_;
+    };
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
@@ -96,9 +112,7 @@ namespace hpx { namespace threads { namespace policies
         };
 
         // this is the type of a map holding all threads (except depleted ones)
-        typedef std::map<
-            thread_data_base*, thread_id_type, std::less<thread_data_base*>
-        > thread_map_type;
+        typedef boost::unordered_set<thread_id_type> thread_map_type;
 
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
         typedef
@@ -239,7 +253,7 @@ namespace hpx { namespace threads { namespace policies
 
                 // add the new entry to the map of all threads
                 std::pair<thread_map_type::iterator, bool> p =
-                    thread_map_.insert(thread_map_type::value_type(thrd.get(), thrd));
+                    thread_map_.insert(thrd);
 
                 if (HPX_UNLIKELY(!p.second)) {
                     HPX_THROW_EXCEPTION(hpx::out_of_memory,
@@ -445,7 +459,7 @@ namespace hpx { namespace threads { namespace policies
                     // this thread has to be in this map
                     HPX_ASSERT(it != thread_map_.end());
 
-                    recycle_thread((*it).second);
+                    recycle_thread(*it);
 
                     thread_map_.erase(it);
                     --terminated_items_count_;
@@ -681,7 +695,7 @@ namespace hpx { namespace threads { namespace policies
 
                     // add a new entry in the map for this thread
                     std::pair<thread_map_type::iterator, bool> p =
-                        thread_map_.insert(thread_map_type::value_type(thrd.get(), thrd));
+                        thread_map_.insert(thrd);
 
                     if (HPX_UNLIKELY(!p.second)) {
                         HPX_THROWS_IF(ec, hpx::out_of_memory,
@@ -864,7 +878,7 @@ namespace hpx { namespace threads { namespace policies
             for (thread_map_type::const_iterator it = thread_map_.begin();
                  it != end; ++it)
             {
-                if ((*it).second->get_state() == state)
+                if ((*it)->get_state() == state)
                     ++num_threads;
             }
             return num_threads;
@@ -878,11 +892,11 @@ namespace hpx { namespace threads { namespace policies
             for (thread_map_type::iterator it = thread_map_.begin();
                  it != end; ++it)
             {
-                if ((*it).second->get_state() == suspended)
+                if ((*it)->get_state() == suspended)
                 {
-                    (*it).second->set_state_ex(wait_abort);
-                    (*it).second->set_state(pending);
-                    schedule_thread((*it).second.get());
+                    (*it)->set_state_ex(wait_abort);
+                    (*it)->set_state(pending);
+                    schedule_thread((*it).get());
                 }
             }
         }
