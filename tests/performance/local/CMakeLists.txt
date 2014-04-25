@@ -87,10 +87,13 @@ set(timed_task_spawn_executors_FLAGS DEPENDENCIES iostreams_component)
 set(hpx_heterogeneous_timed_task_spawn_FLAGS DEPENDENCIES iostreams_component)
 
 set(delay_baseline_FLAGS NOLIBS
-    DEPENDENCIES ${boost_library_dependencies})
+    DEPENDENCIES ${boost_library_dependencies} "${BOOST_DATE_TIME_LIBRARY}")
 
 set(delay_baseline_threaded_FLAGS NOLIBS
-    DEPENDENCIES ${boost_library_dependencies} "${BOOST_THREAD_LIBRARY}")
+    DEPENDENCIES
+        ${boost_library_dependencies}
+        "${BOOST_THREAD_LIBRARY}"
+        "${BOOST_DATE_TIME_LIBRARY}")
 
 set(print_heterogeneous_payloads_FLAGS NOLIBS
     DEPENDENCIES ${boost_library_dependencies})

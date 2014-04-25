@@ -31,9 +31,10 @@
 
 #define HPX_NO_VERSION_CHECK
 
+#include <hpx/config.hpp>
+
 #include "worker_timed.hpp"
 
-#include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 

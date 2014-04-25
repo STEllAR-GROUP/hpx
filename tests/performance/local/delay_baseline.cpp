@@ -5,6 +5,8 @@
 
 #define HPX_NO_VERSION_CHECK        // avoid linker errors
 
+#include <hpx/config.hpp>
+
 #include "worker_timed.hpp"
 
 #include <hpx/util/high_resolution_timer.hpp>
