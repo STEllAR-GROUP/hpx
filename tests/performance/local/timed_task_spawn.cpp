@@ -6,18 +6,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// FIXME: Calling the tasks "workers" overloads the term worker-thread (which 
+// FIXME: Calling the tasks "workers" overloads the term worker-thread (which
 // refers to OS-threads).
 
-#include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/runtime.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/lcos/local/barrier.hpp>
-#include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/agas/addressing_service.hpp>
-#include <hpx/util/activate_counters.hpp>
+#include <hpx/hpx.hpp>
 
 #include <stdexcept>
 
@@ -63,7 +56,7 @@ boost::uint64_t delay = 0;
 bool header = true;
 std::string scaling("weak");
 std::string distribution("static-balanced");
-  
+
 boost::uint64_t suspend_step = 0;
 boost::uint64_t no_suspend_step = 1;
 
@@ -84,7 +77,7 @@ void print_results(
   , double walltime
   , double warmup_estimate
   , std::vector<std::string> const& counter_shortnames
-  , boost::shared_ptr<hpx::util::activate_counters> ac 
+  , boost::shared_ptr<hpx::util::activate_counters> ac
     )
 {
     std::vector<hpx::performance_counters::counter_value> counter_values;
@@ -126,13 +119,13 @@ void print_results(
             if (!ac->unit_of_measure(i).empty())
                 cout << " [" << ac->unit_of_measure(i) << "]";
 
-            cout << "\n";            
+            cout << "\n";
         }
     }
 
     cout << ( boost::format("%lu %lu %lu %lu %.14g %.14g")
-            % delay 
-            % tasks 
+            % delay
+            % tasks
             % suspended_tasks
             % cores
             % walltime
@@ -140,7 +133,7 @@ void print_results(
             );
 
     if (ac)
-    {   
+    {
         for (boost::uint64_t i = 0; i < counter_shortnames.size(); ++i)
             cout << ( boost::format(" %.14g")
                     % counter_values[i].get_value<double>());
@@ -359,13 +352,13 @@ int hpx_main(
         stage_worker_function stage_worker;
 
         if ("static-balanced-stackless" == distribution)
-            stage_worker = &stage_worker_static_balanced_stackless; 
+            stage_worker = &stage_worker_static_balanced_stackless;
         else if ("static-balanced-stackbased" == distribution)
-            stage_worker = &stage_worker_static_balanced_stackbased; 
+            stage_worker = &stage_worker_static_balanced_stackbased;
         else if ("static-imbalanced" == distribution)
-            stage_worker = &stage_worker_static_imbalanced; 
+            stage_worker = &stage_worker_static_imbalanced;
         else if ("round-robin" == distribution)
-            stage_worker = &stage_worker_round_robin; 
+            stage_worker = &stage_worker_round_robin;
         else
             throw std::invalid_argument(
                 "invalid distribution type specified (valid options are "
@@ -396,9 +389,9 @@ int hpx_main(
         }
         else if ("weak" == scaling)
         {
-            tasks_per_feeder = tasks; 
+            tasks_per_feeder = tasks;
             total_tasks      = tasks * os_thread_count;
-            suspended_tasks_per_feeder = suspended_tasks; 
+            suspended_tasks_per_feeder = suspended_tasks;
             total_suspended_tasks      = suspended_tasks * os_thread_count;
         }
         else
@@ -455,11 +448,11 @@ int hpx_main(
         // performance counter reset (which is called just before the staging
         // function).
         boost::uint64_t const num_thread = hpx::get_worker_thread_num();
- 
+
         for (boost::uint64_t i = 0; i < os_thread_count; ++i)
         {
             if (num_thread == i) continue;
-    
+
             register_work(boost::bind(&stage_workers
                                     , i
                                     , tasks_per_feeder
@@ -477,7 +470,7 @@ int hpx_main(
         double warmup_estimate = t.elapsed();
 
         // Schedule a low-priority thread; when it is executed, it checks to
-        // make sure all the tasks (which are normal priority) have been 
+        // make sure all the tasks (which are normal priority) have been
         // executed, and then it
         hpx::lcos::local::barrier finished(2);
 

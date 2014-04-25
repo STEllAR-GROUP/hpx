@@ -17,6 +17,7 @@
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/unwrapped.hpp>
 #include <hpx/util/serialize_buffer.hpp>
+#include <hpx/util/activate_counters.hpp>
 
 #endif
 

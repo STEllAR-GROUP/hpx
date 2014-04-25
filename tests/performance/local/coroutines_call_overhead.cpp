@@ -6,9 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/util.hpp>
-#include <hpx/util/coroutine/coroutine.hpp>
-#include <hpx/util/activate_counters.hpp>
+#include <hpx/hpx.hpp>
 
 #include <boost/format.hpp>
 #include <boost/random.hpp>
@@ -22,14 +20,14 @@ char const* benchmark_name = "Context Switching Overhead - HPX";
 using namespace boost::program_options;
 using namespace hpx::threads;
 
-using hpx::util::coroutines::coroutine;
+using hpx::threads::coroutine_type;
 using std::cout;
 
 ///////////////////////////////////////////////////////////////////////////////
 boost::uint64_t payload    = 0;
 boost::uint64_t contexts   = 1000;
 boost::uint64_t iterations = 100000;
-boost::uint64_t seed       = 0; 
+boost::uint64_t seed       = 0;
 bool header = true;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -47,7 +45,7 @@ std::string format_build_date(std::string timestamp)
 void print_results(
     double w_M
 //  , std::vector<std::string> const& counter_shortnames
-//  , boost::shared_ptr<hpx::util::activate_counters> ac 
+//  , boost::shared_ptr<hpx::util::activate_counters> ac
     )
 {
 //    std::vector<hpx::performance_counters::counter_value> counter_values;
@@ -88,7 +86,7 @@ void print_results(
             if (!ac->unit_of_measure(i).empty())
                 cout << " [" << ac->unit_of_measure(i) << "]";
 
-            cout << "\n";            
+            cout << "\n";
         }
 */
     }
@@ -96,7 +94,7 @@ void print_results(
     boost::uint64_t const os_thread_count = hpx::get_os_thread_count();
 
     double w_T = iterations*payload*os_thread_count*1e-6;
-    double E = w_T/w_M;       
+    double E = w_T/w_M;
     double O = w_M-w_T;
 
 /*
@@ -109,8 +107,8 @@ void print_results(
 
     cout << ( boost::format("%lu %lu %lu %lu %lu %.14g")
             % payload
-            % os_thread_count 
-            % contexts 
+            % os_thread_count
+            % contexts
             % iterations
             % seed
             % (((O/(2*iterations*os_thread_count))*1e9))
@@ -119,7 +117,7 @@ void print_results(
 
 /*
     if (ac)
-    {   
+    {
         for (boost::uint64_t i = 0; i < counter_shortnames.size(); ++i)
             cout << ( boost::format(" %.14g")
                     % counter_values[i].get_value<double>());
@@ -213,7 +211,7 @@ int hpx_main(
         {
             if (num_thread == i) continue;
 
-            futures.push_back(hpx::async(&perform_2n_iterations)); 
+            futures.push_back(hpx::async(&perform_2n_iterations));
         }
 
         double total_elapsed = perform_2n_iterations();
@@ -271,7 +269,7 @@ int main(
 
         ( "contexts"
         , value<boost::uint64_t>(&contexts)->default_value(100000)
-        , "number of contexts use") 
+        , "number of contexts use")
 
         ( "iterations"
         , value<boost::uint64_t>(&iterations)->default_value(100000)
