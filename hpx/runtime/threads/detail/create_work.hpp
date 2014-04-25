@@ -56,9 +56,11 @@ namespace hpx { namespace threads { namespace detail
 #endif
             << ")";
 
+        thread_self* self = get_self_ptr();
+
 #if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
         if (0 == data.parent_id) {
-            thread_self* self = get_self_ptr();
+
             if (self)
             {
                 data.parent_id = threads::get_self_id().get();
@@ -73,7 +75,6 @@ namespace hpx { namespace threads { namespace detail
             data.scheduler_base = scheduler;
 
         // Pass critical priority from parent to child.
-        thread_self* self = get_self_ptr();
         if (self)
         {
             if (thread_priority_critical == threads::get_self_id()->get_priority())
