@@ -81,7 +81,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
             use_io_pool_ = false;
         }
 
-        ibv_device **device_list_ = 0;
+        device_list_ = 0;
         int num_devices = 0;
         device_list_ = ibv_get_device_list(&num_devices);
         for(int i = 0; i < num_devices; ++i)
@@ -105,6 +105,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
             ibv_close_device(ctx);
         }
         ibv_free_device_list(device_list_);
+
     }
 
     bool connection_handler::do_run()

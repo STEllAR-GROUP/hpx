@@ -49,6 +49,7 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/runtime/components/copy_component.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/components/migrate_component.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/naming/unmanaged.hpp"
+    "${hpx_SOURCE_DIR}/hpx/lcos/broadcast.hpp"
     "${hpx_SOURCE_DIR}/hpx/lcos/fold.hpp"
     "${hpx_SOURCE_DIR}/hpx/lcos/reduce.hpp"
     "${hpx_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp")
@@ -180,17 +181,17 @@ set_source_files_properties(${documentation_files}
 if(MSVC)
   add_custom_target(git_docs
     COMMAND "${CMAKE_COMMAND}"
-      -DHPX_BUILD_TYPE="${CMAKE_BUILD_TYPE}"
-      -DHPX_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
-      -DHPX_VERSION="${HPX_VERSION}"
+    -DHPX_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+      -DHPX_SOURCE_DIR:PATH=${CMAKE_SOURCE_DIR}
+      -DHPX_VERSION:STRING=${HPX_VERSION}
       -DHPX_DOCUMENTATION_FILES=\"${documentation_dependencies}\"
       -P "${CMAKE_SOURCE_DIR}/cmake/HPX_UpdateGitDocs.cmake"
     VERBATIM)
 else()
   add_custom_target(git_docs
     COMMAND "${CMAKE_COMMAND}"
-      -DHPX_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
-      -DHPX_VERSION="${HPX_VERSION}"
+    -DHPX_SOURCE_DIR:PATH=${CMAKE_SOURCE_DIR}
+    -DHPX_VERSION:STRING=${HPX_VERSION}
       -DHPX_DOCUMENTATION_FILES=\"${documentation_dependencies}\"
       -P "${CMAKE_SOURCE_DIR}/cmake/HPX_UpdateGitDocs.cmake"
     VERBATIM)

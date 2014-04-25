@@ -14,6 +14,7 @@
 #include <examples/mini_ghost/recv_buffer.hpp>
 
 #include <hpx/include/components.hpp>
+#include <hpx/lcos/broadcast.hpp>
 
 #include <boost/random.hpp>
 
@@ -34,7 +35,7 @@ namespace mini_ghost {
 
         void run(std::size_t num_spikes, std::size_t num_tsteps);
 
-        void set_global_sum(std::size_t generation, std::size_t which, Real value, std::size_t idx);
+        void set_global_sum(std::size_t generation, std::size_t which, Real value, std::size_t idx, std::size_t id);
         HPX_DEFINE_COMPONENT_ACTION_TPL(stepper<Real>, set_global_sum, set_global_sum_action);
 
         void set_north_zone(buffer_type buffer, std::size_t step, std::size_t var);
@@ -82,5 +83,15 @@ namespace mini_ghost {
         hpx::future<void> init_future_;
     };
 }
+
+HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION(
+    mini_ghost::stepper<float>::set_global_sum_action
+  , mini_ghost_stepper_float_set_global_sum_action
+)
+
+HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION(
+    mini_ghost::stepper<double>::set_global_sum_action
+  , mini_ghost_stepper_double_set_global_sum_action
+)
 
 #endif

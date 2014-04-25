@@ -25,20 +25,6 @@ namespace mini_ghost
     {
         struct profiling_data
         {
-            /*
-            std::vector<std::size_t> num_copy_;
-            void num_copy(std::size_t value)
-            {
-                num_copy_[hpx::get_worker_thread_num()] += value;
-            }
-            std::size_t num_copy() const
-            {
-                std::size_t res = 0;
-                for(auto v : num_copy_) { res += v; }
-                return res;
-            }
-
-            */
             std::vector<std::size_t> num_adds_;
             void num_adds(std::size_t value)
             {
@@ -63,205 +49,6 @@ namespace mini_ghost
                 return res;
             }
 
-
-            /*
-            std::vector<std::size_t> num_sends_;
-            void num_sends(std::size_t value)
-            {
-                num_sends_[hpx::get_worker_thread_num()] += value;
-            }
-            std::size_t num_sends() const
-            {
-                std::size_t res = 0;
-                for(auto v : num_sends_) { res += v; }
-                return res;
-            }
-
-            std::vector<std::size_t> send_count_;
-            void send_count(std::size_t value)
-            {
-                send_count_[hpx::get_worker_thread_num()] += value;
-            }
-            std::size_t send_count() const
-            {
-                std::size_t res = 0;
-                for(auto v : send_count_) { res += v; }
-                return res;
-            }
-
-            std::vector<std::size_t> send_count_max_;
-            void send_count_max(std::size_t value)
-            {
-                send_count_max_[hpx::get_worker_thread_num()] += value;
-            }
-            std::size_t send_count_max() const
-            {
-                std::size_t res = 0;
-                for(auto v : send_count_max_) { res += v; }
-                return res;
-            }
-
-            std::vector<std::size_t> send_count_min_;
-            void send_count_min(std::size_t value)
-            {
-                send_count_min_[hpx::get_worker_thread_num()] += value;
-            }
-            std::size_t send_count_min() const
-            {
-                std::size_t res = 0;
-                for(auto v : send_count_min_) { res += v; }
-                return res;
-            }
-
-
-            std::vector<std::size_t> num_recvs_;
-            void num_recvs(std::size_t value)
-            {
-                num_recvs_[hpx::get_worker_thread_num()] += value;
-            }
-            std::size_t num_recvs() const
-            {
-                std::size_t res = 0;
-                for(auto v : num_recvs_) { res += v; }
-                return res;
-            }
-
-            std::vector<std::size_t> recv_count_;
-            void recv_count(std::size_t value)
-            {
-                recv_count_[hpx::get_worker_thread_num()] += value;
-            }
-            std::size_t recv_count() const
-            {
-                std::size_t res = 0;
-                for(auto v : recv_count_) { res += v; }
-                return res;
-            }
-
-            std::vector<std::size_t> recv_count_max_;
-            void recv_count_max(std::size_t value)
-            {
-                recv_count_max_[hpx::get_worker_thread_num()] += value;
-            }
-            std::size_t recv_count_max() const
-            {
-                std::size_t res = 0;
-                for(auto v : recv_count_max_) { res += v; }
-                return res;
-            }
-
-            std::vector<std::size_t> recv_count_min_;
-            void recv_count_min(std::size_t value)
-            {
-                recv_count_min_[hpx::get_worker_thread_num()] += value;
-            }
-            std::size_t recv_count_min() const
-            {
-                std::size_t res = 0;
-                for(auto v : recv_count_min_) { res += v; }
-                return res;
-            }
-
-
-            std::vector<std::size_t> num_bcasts_;
-            void num_bcasts(std::size_t value)
-            {
-                num_bcasts_[hpx::get_worker_thread_num()] += value;
-            }
-            std::size_t num_bcasts() const
-            {
-                std::size_t res = 0;
-                for(auto v : num_bcasts_) { res += v; }
-                return res;
-            }
-
-            std::vector<std::size_t> bcast_count_;
-            void bcast_count(std::size_t value)
-            {
-                bcast_count_[hpx::get_worker_thread_num()] += value;
-            }
-            std::size_t bcast_count() const
-            {
-                std::size_t res = 0;
-                for(auto v : bcast_count_) { res += v; }
-                return res;
-            }
-
-            std::vector<std::size_t> bcast_count_max_;
-            void bcast_count_max(std::size_t value)
-            {
-                bcast_count_max_[hpx::get_worker_thread_num()] += value;
-            }
-            std::size_t bcast_count_max() const
-            {
-                std::size_t res = 0;
-                for(auto v : bcast_count_max_) { res += v; }
-                return res;
-            }
-
-            std::vector<std::size_t> bcast_count_min_;
-            void bcast_count_min(std::size_t value)
-            {
-                bcast_count_min_[hpx::get_worker_thread_num()] += value;
-            }
-            std::size_t bcast_count_min() const
-            {
-                std::size_t res = 0;
-                for(auto v : bcast_count_min_) { res += v; }
-                return res;
-            }
-
-
-            std::vector<std::size_t> num_allreduces_;
-            void num_allreduces(std::size_t value)
-            {
-                num_allreduces_[hpx::get_worker_thread_num()] += value;
-            }
-            std::size_t num_allreduces() const
-            {
-                std::size_t res = 0;
-                for(auto v : num_allreduces_) { res += v; }
-                return res;
-            }
-
-            std::vector<std::size_t> allreduce_count_;
-            void allreduce_count(std::size_t value)
-            {
-                allreduce_count_[hpx::get_worker_thread_num()] += value;
-            }
-            std::size_t allreduce_count() const
-            {
-                std::size_t res = 0;
-                for(auto v : allreduce_count_) { res += v; }
-                return res;
-            }
-
-            std::vector<std::size_t> allreduce_count_max_;
-            void allreduce_count_max(std::size_t value)
-            {
-                allreduce_count_max_[hpx::get_worker_thread_num()] += value;
-            }
-            std::size_t allreduce_count_max() const
-            {
-                std::size_t res = 0;
-                for(auto v : allreduce_count_max_) { res += v; }
-                return res;
-            }
-
-            std::vector<std::size_t> allreduce_count_min_;
-            void allreduce_count_min(std::size_t value)
-            {
-                allreduce_count_min_[hpx::get_worker_thread_num()] += value;
-            }
-            std::size_t allreduce_count_min() const
-            {
-                std::size_t res = 0;
-                for(auto v : allreduce_count_min_) { res += v; }
-                return res;
-            }
-
-            */
-
             std::vector<std::size_t> num_sumgrid_;
             void num_sumgrid(std::size_t value)
             {
@@ -273,7 +60,6 @@ namespace mini_ghost
                 for(auto v : num_sumgrid_) { res += v; }
                 return res;
             }
-
 
             std::vector<double> time_init_;
             void time_init(double value)
@@ -296,18 +82,6 @@ namespace mini_ghost
             {
                 double res = 0;
                 for(auto v : time_hpx_) { res += v; }
-                return res;
-            }
-
-            std::vector<double> time_copy_;
-            void time_copy(double value)
-            {
-                time_copy_[hpx::get_worker_thread_num()] += value;
-            }
-            double time_copy() const
-            {
-                double res = 0;
-                for(auto v : time_copy_) { res += v; }
                 return res;
             }
 
@@ -644,7 +418,6 @@ namespace mini_ghost
 
               , time_init_(hpx::get_os_thread_count(), 0.0)
               , time_hpx_(hpx::get_os_thread_count(), 0.0)
-              , time_copy_(hpx::get_os_thread_count(), 0.0)
               , time_pack_(hpx::get_os_thread_count(), 0.0)
               , time_recv_(hpx::get_os_thread_count(), 0.0)
               , time_send_(hpx::get_os_thread_count(), 0.0)
@@ -680,36 +453,12 @@ namespace mini_ghost
             template <typename Archive>
             void serialize(Archive & ar, unsigned)
             {
-                /*
-                ar & num_copy_;
-                */
                 ar & num_adds_;
                 ar & num_divides_;
-
-                /*
-                ar & num_sends_;
-                ar & send_count_;
-                ar & send_count_max_;
-                ar & send_count_min_;
-                ar & num_recvs_;
-                ar & recv_count_;
-                ar & recv_count_max_;
-                ar & recv_count_min_;
-                ar & num_bcasts_;
-                ar & bcast_count_;
-                ar & bcast_count_max_;
-                ar & bcast_count_min_;
-                ar & num_allreduces_;
-                ar & allreduce_count_;
-                ar & allreduce_count_max_;
-                ar & allreduce_count_min_;
-                */
 
                 ar & num_sumgrid_;
 
                 ar & time_init_;
-                ar & time_hpx_;
-                ar & time_copy_;
                 ar & time_pack_;
                 ar & time_recv_;
                 ar & time_send_;
@@ -957,10 +706,13 @@ namespace mini_ghost
                 << "Comp_time_mean: " << mean(time_stencil) << "\n"
                 << "Comp_time_variance: " << std::sqrt(variance(time_stencil)) << "\n"
             ;
-            double gflops_total  = double(p.num_tsteps) * double(gnum_adds + gnum_divides) / (max)(time_wall) / giga;
-            double flops_total   = double(p.num_tsteps) * double(gnum_adds + gnum_divides);
-            double flops_sums    = double(p.num_tsteps) * double(gnum_adds);
-            double flops_divides = double(p.num_tsteps) * double(gnum_divides);
+
+            std::cout << hpx::get_os_thread_count() << " Total_time: " << (max)(time_wall) << "\n";
+
+            double gflops_total  = double(gnum_adds + gnum_divides) / (max)(time_wall) / giga;
+            double flops_total   = double(gnum_adds + gnum_divides);
+            double flops_sums    = double(gnum_adds);
+            double flops_divides = double(gnum_divides);
             os
                 << "GFLOPS_Total: "   << gflops_total  << "\n"
                 << "FLOPS_Total: "    << flops_total   << "\n"

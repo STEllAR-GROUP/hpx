@@ -24,7 +24,8 @@ bool register_name_sync(
     )
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
-    return agas_.register_name(name, gid);
+    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
+    return agas_.register_name(name, gid_);
 }
 
 bool register_name_sync(
@@ -94,8 +95,9 @@ bool resolve_name_sync(
     )
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
+    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
 
-    if (agas_.resolve_name(name, gid, ec) && !ec)
+    if (agas_.resolve_name(name, gid_, ec) && !ec)
         return true;
 
     return false;
@@ -212,7 +214,7 @@ boost::uint32_t get_num_overall_threads_sync(
 // {
 //     return naming::get_agas_client().is_local_address(gid, ec);
 // }
-// 
+//
 // bool is_local_address(
 //     naming::gid_type const& gid
 //   , naming::address& addr
@@ -221,12 +223,12 @@ boost::uint32_t get_num_overall_threads_sync(
 // {
 //     return naming::get_agas_client().is_local_address(gid, addr, ec);
 // }
-// 
+//
 // inline naming::gid_type const& convert_to_gid(naming::id_type const& id)
 // {
 //     return id.get_gid();
 // }
-// 
+//
 // bool is_local_address(
 //     std::vector<naming::id_type> const& ids
 //   , std::vector<naming::address>& addrs
@@ -235,12 +237,12 @@ boost::uint32_t get_num_overall_threads_sync(
 //     )
 // {
 //     std::size_t count = ids.size();
-// 
+//
 //     std::vector<naming::gid_type> gids;
 //     gids.reserve(count);
-// 
+//
 //     std::transform(ids.begin(), ids.end(), std::back_inserter(gids), convert_to_gid);
-// 
+//
 //     addrs.resize(count);
 //     return naming::get_agas_client().is_local_address(gids.data(), addrs.data(), count, locals, ec);
 // }
@@ -250,7 +252,8 @@ bool is_local_address_cached(
   , error_code& ec
     )
 {
-    return naming::get_agas_client().is_local_address_cached(gid, ec);
+    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
+    return naming::get_agas_client().is_local_address_cached(gid_, ec);
 }
 
 bool is_local_address_cached(
@@ -259,7 +262,8 @@ bool is_local_address_cached(
   , error_code& ec
     )
 {
-    return naming::get_agas_client().is_local_address_cached(gid, addr, ec);
+    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
+    return naming::get_agas_client().is_local_address_cached(gid_, addr, ec);
 }
 
 bool is_local_lva_encoded_address(
@@ -288,24 +292,26 @@ naming::address resolve_sync(
 }
 
 hpx::future<bool> bind(
-    naming::gid_type const& id
+    naming::gid_type const& gid
   , naming::address const& addr
   , boost::uint32_t locality_id
     )
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
-    return agas_.bind_async(id, addr, locality_id);
+    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
+    return agas_.bind_async(gid_, addr, locality_id);
 }
 
 bool bind_sync(
-    naming::gid_type const& id
+    naming::gid_type const& gid
   , naming::address const& addr
   , boost::uint32_t locality_id
   , error_code& ec
     )
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
-    return agas_.bind_async(id, addr, locality_id).get(ec);
+    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
+    return agas_.bind_async(gid_, addr, locality_id).get(ec);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -407,7 +413,8 @@ void decref(
   )
 {
     naming::resolver_client& resolver = naming::get_agas_client();
-    resolver.decref(gid, credits, ec);
+    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
+    resolver.decref(gid_, credits, ec);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -420,12 +427,13 @@ hpx::future<boost::int64_t> incref_async(
     HPX_ASSERT(!naming::detail::is_locked(gid));
 
     naming::resolver_client& resolver = naming::get_agas_client();
+    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
 
     if (keep_alive_)
-        return resolver.incref_async(gid, credits, keep_alive_);
+        return resolver.incref_async(gid_, credits, keep_alive_);
 
     naming::id_type keep_alive = naming::id_type(gid, id_type::unmanaged);
-    return resolver.incref_async(gid, credits, keep_alive);
+    return resolver.incref_async(gid_, credits, keep_alive);
 }
 
 boost::int64_t incref(
@@ -438,12 +446,13 @@ boost::int64_t incref(
     HPX_ASSERT(!naming::detail::is_locked(gid));
 
     naming::resolver_client& resolver = naming::get_agas_client();
+    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
 
     if (keep_alive_)
-        return resolver.incref_async(gid, credits, keep_alive_).get();
+        return resolver.incref_async(gid_, credits, keep_alive_).get();
 
     naming::id_type keep_alive = naming::id_type(gid, id_type::unmanaged);
-    return resolver.incref_async(gid, credits, keep_alive).get();
+    return resolver.incref_async(gid_, credits, keep_alive).get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -317,8 +317,9 @@ std::vector<response> primary_namespace::bulk_service(
 
     BOOST_FOREACH(request const& req, reqs)
     {
-        error_code ign;
-        r.push_back(service(req, ign));
+        r.push_back(service(req, ec));
+        if (ec)
+            break;      // on error: for now stop iterating
     }
 
     return r;

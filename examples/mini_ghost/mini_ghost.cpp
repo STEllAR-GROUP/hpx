@@ -45,6 +45,12 @@ int hpx_main(boost::program_options::variables_map& vm)
     hpx::id_type    here = hpx::find_here();
     std::string     name = hpx::get_locality_name();
     p.rank = hpx::naming::get_locality_id_from_id(here);
+
+    if(p.rank == 0)
+    {
+        std::cout << "mini ghost started up in " << hpx::util::high_resolution_timer::now() - init_start << " seconds.\n";
+    }
+
     p.nranks = hpx::get_num_localities().get();
 
     profiling_data_sem.reset(new hpx::lcos::local::counting_semaphore(p.nranks));
@@ -57,9 +63,8 @@ int hpx_main(boost::program_options::variables_map& vm)
         stepper(hpx::get_ptr<stepper_type>(stepper_id).get());
 
     stepper->init(p);
-
+    mini_ghost::barrier_wait();
     stepper->run(p.num_spikes, p.num_tsteps);
-
     mini_ghost::barrier_wait();
     if (p.rank==0)
     {

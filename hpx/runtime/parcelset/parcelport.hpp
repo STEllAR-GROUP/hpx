@@ -62,6 +62,9 @@ namespace hpx { namespace parcelset
         /// Construct the parcelport on the given locality.
         parcelport(util::runtime_configuration const& ini, std::string const& type);
 
+        /// Virtual destructor
+        virtual ~parcelport() {}
+
         /// Start the parcelport I/O thread pool.
         ///
         /// \param blocking [in] If blocking is set to \a true the routine will

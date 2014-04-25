@@ -144,6 +144,12 @@ unmanaged                             "" "header\.hpx\.runtime\.naming\.unmanage
 # hpx/runtime/get_ptr.hpp
 get_ptr                               "" "hpx\.get_ptr.*"
 
+# hpx/lcos/broadcast.hpp
+broadcast                             "" "header\.hpx\.lcos\.broadcast.*"
+broadcast_with_index                  "" "header\.hpx\.lcos\.broadcast.*"
+broadcast_apply                       "" "header\.hpx\.lcos\.broadcast.*"
+broadcast_apply_with_index            "" "header\.hpx\.lcos\.broadcast.*"
+
 # hpx/lcos/reduce.hpp
 reduce                                "" "header\.hpx\.lcos\.reduce.*"
 reduce_with_index                     "" "header\.hpx\.lcos\.reduce.*"

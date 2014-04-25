@@ -1216,7 +1216,8 @@ bool addressing_service::is_local_lva_encoded_address(
     )
 {
     // NOTE: This should still be migration safe.
-    return msb == get_local_locality().get_msb();
+    return naming::detail::strip_internal_bits_from_gid(msb) ==
+        get_local_locality().get_msb();
 }
 
 bool addressing_service::resolve_locally_known_addresses(
@@ -2764,8 +2765,11 @@ void addressing_service::send_refcnt_requests_sync(
             {
                 HPX_THROWS_IF(ec, rep.get_status(),
                     "addressing_service::send_refcnt_requests_sync",
-                    "could not decrement reference count (reported error: " +
-                    hpx::get_error_what(ec));
+                    "could not decrement reference count (reported error" +
+                    hpx::get_error_what(ec) + ", " +
+                    hpx::get_error_file_name(ec) + "(" +
+                    boost::lexical_cast<std::string>(
+                        hpx::get_error_line_number(ec)) + "))");
                 return;
             }
         }

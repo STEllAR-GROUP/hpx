@@ -31,14 +31,16 @@ file(REMOVE_RECURSE "${CMAKE_BINARY_DIR}/gh-pages/docs/html/hpx")
 
 # copy all documentation files to target branch
 file(
-  COPY "${hpx_SOURCE_DIR}/docs/html"
+    COPY "${HPX_SOURCE_DIR}/docs/html"
   DESTINATION "${CMAKE_BINARY_DIR}/gh-pages/docs")
 
 if(HPX_BUILD_TYPE)
-  set(doc_dir "${CMAKE_BINARY_DIR}/${HPX_BUILD_TYPE}/../share/hpx-${HPX_VERSION}")
+  set(doc_dir ${CMAKE_BINARY_DIR}/${HPX_BUILD_TYPE}/../share/hpx-${HPX_VERSION})
 else()
-  set(doc_dir "${CMAKE_BINARY_DIR}/../share/hpx-${HPX_VERSION}")
+  set(doc_dir ${CMAKE_BINARY_DIR}/../share/hpx-${HPX_VERSION})
 endif()
+
+string(REPLACE "\"" "" doc_dir "${doc_dir}")
 
 # disable copying source files for now, this needs to be fixed...
 file(
@@ -49,6 +51,7 @@ file(
 if(HPX_DOCUMENTATION_FILES)
   string(REPLACE " " ";" HPX_DOCUMENTATION_FILES_LIST "${HPX_DOCUMENTATION_FILES}")
   foreach(file ${HPX_DOCUMENTATION_FILES_LIST})
+    string(REPLACE "\"" "" file ${file})
     file(COPY "${file}"
       DESTINATION "${CMAKE_BINARY_DIR}/gh-pages/docs/html/code")
   endforeach()
@@ -77,7 +80,7 @@ if(NOT "${git_diff_index_result}" EQUAL "0")
   if(NOT "${git_commit_result}" EQUAL "0")
     message(FATAL_ERROR "Commiting to the GitHub pages branch failed.")
   endif()
-  
+
   # push everything up to github
   execute_process(
     COMMAND "${GIT_EXECUTABLE}" push

@@ -164,6 +164,7 @@ namespace hpx { namespace components
 
         void free()
         {
+            gid_ = future_type();
         }
 
         ///////////////////////////////////////////////////////////////////////

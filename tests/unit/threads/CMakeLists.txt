@@ -13,8 +13,11 @@ set(tests
     thread_mf
     thread_stacksize
     thread_suspension_executor
-    tss
    )
+
+if(HPX_THREAD_MAINTAIN_THREAD_DATA)
+  set(tests ${tests} tss)
+endif()
 
 set(lockfree_fifo_FLAGS NOLIBS DEPENDENCIES ${BOOST_FOUND_LIBRARIES})
 

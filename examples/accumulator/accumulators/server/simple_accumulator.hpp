@@ -12,8 +12,6 @@
 #include <hpx/runtime/components/server/locking_hook.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 
-#include <boost/atomic.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace examples { namespace server
 {
@@ -58,14 +56,14 @@ namespace examples { namespace server
         /// Reset the components value to 0.
         void reset()
         {
-            // Atomically set value_ to 0.
+            //  set value_ to 0.
             value_ = 0;
         }
 
         /// Add the given number to the accumulator.
         void add(argument_type arg)
         {
-            // Atomically add value_ to arg, and store the result in value_.
+            //  add value_ to arg, and store the result in value_.
             value_ += arg;
         }
 

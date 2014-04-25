@@ -70,54 +70,50 @@ namespace hpx { namespace lcos
                 typename reduce_result<Action>::type
                 result_type;
             if(ids.empty()) return result_type();
+            std::size_t const local_fanout = HPX_REDUCE_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
             std::vector<hpx::future<result_type> > reduce_futures;
-            reduce_futures.reserve(3);
-            id_type id_first = ids[0];
-            if(ids.size() > 1)
+            reduce_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                reduce_invoke(
+                    act
+                  , reduce_futures
+                  , ids[i]
+                  
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_reduce_action<Action>::
                         template reduce_invoker<ReduceOp>::type
                     reduce_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
                         hpx::async_colocated<reduce_impl_action>(
-                            ids_first[0]
+                            id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , reduce_op
                           
-                          , global_idx + 1
+                          , global_idx + applied
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    reduce_futures.push_back(
-                        hpx::async_colocated<reduce_impl_action>(
-                            ids_second[0]
-                          , act
-                          , std::move(ids_second)
-                          , reduce_op
-                          
-                          , global_idx + half
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
-            reduce_invoke(
-                act
-              , reduce_futures
-              , id_first
-              
-              , global_idx
-            );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 get();
@@ -337,54 +333,50 @@ namespace hpx { namespace lcos
                 typename reduce_result<Action>::type
                 result_type;
             if(ids.empty()) return result_type();
+            std::size_t const local_fanout = HPX_REDUCE_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
             std::vector<hpx::future<result_type> > reduce_futures;
-            reduce_futures.reserve(3);
-            id_type id_first = ids[0];
-            if(ids.size() > 1)
+            reduce_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                reduce_invoke(
+                    act
+                  , reduce_futures
+                  , ids[i]
+                  , a0
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_reduce_action<Action>::
                         template reduce_invoker<ReduceOp>::type
                     reduce_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
                         hpx::async_colocated<reduce_impl_action>(
-                            ids_first[0]
+                            id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , reduce_op
                           , a0
-                          , global_idx + 1
+                          , global_idx + applied
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    reduce_futures.push_back(
-                        hpx::async_colocated<reduce_impl_action>(
-                            ids_second[0]
-                          , act
-                          , std::move(ids_second)
-                          , reduce_op
-                          , a0
-                          , global_idx + half
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
-            reduce_invoke(
-                act
-              , reduce_futures
-              , id_first
-              , a0
-              , global_idx
-            );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 get();
@@ -604,54 +596,50 @@ namespace hpx { namespace lcos
                 typename reduce_result<Action>::type
                 result_type;
             if(ids.empty()) return result_type();
+            std::size_t const local_fanout = HPX_REDUCE_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
             std::vector<hpx::future<result_type> > reduce_futures;
-            reduce_futures.reserve(3);
-            id_type id_first = ids[0];
-            if(ids.size() > 1)
+            reduce_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                reduce_invoke(
+                    act
+                  , reduce_futures
+                  , ids[i]
+                  , a0 , a1
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_reduce_action<Action>::
                         template reduce_invoker<ReduceOp>::type
                     reduce_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
                         hpx::async_colocated<reduce_impl_action>(
-                            ids_first[0]
+                            id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , reduce_op
                           , a0 , a1
-                          , global_idx + 1
+                          , global_idx + applied
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    reduce_futures.push_back(
-                        hpx::async_colocated<reduce_impl_action>(
-                            ids_second[0]
-                          , act
-                          , std::move(ids_second)
-                          , reduce_op
-                          , a0 , a1
-                          , global_idx + half
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
-            reduce_invoke(
-                act
-              , reduce_futures
-              , id_first
-              , a0 , a1
-              , global_idx
-            );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 get();
@@ -871,54 +859,50 @@ namespace hpx { namespace lcos
                 typename reduce_result<Action>::type
                 result_type;
             if(ids.empty()) return result_type();
+            std::size_t const local_fanout = HPX_REDUCE_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
             std::vector<hpx::future<result_type> > reduce_futures;
-            reduce_futures.reserve(3);
-            id_type id_first = ids[0];
-            if(ids.size() > 1)
+            reduce_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                reduce_invoke(
+                    act
+                  , reduce_futures
+                  , ids[i]
+                  , a0 , a1 , a2
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_reduce_action<Action>::
                         template reduce_invoker<ReduceOp>::type
                     reduce_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
                         hpx::async_colocated<reduce_impl_action>(
-                            ids_first[0]
+                            id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , reduce_op
                           , a0 , a1 , a2
-                          , global_idx + 1
+                          , global_idx + applied
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    reduce_futures.push_back(
-                        hpx::async_colocated<reduce_impl_action>(
-                            ids_second[0]
-                          , act
-                          , std::move(ids_second)
-                          , reduce_op
-                          , a0 , a1 , a2
-                          , global_idx + half
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
-            reduce_invoke(
-                act
-              , reduce_futures
-              , id_first
-              , a0 , a1 , a2
-              , global_idx
-            );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 get();
@@ -1138,54 +1122,50 @@ namespace hpx { namespace lcos
                 typename reduce_result<Action>::type
                 result_type;
             if(ids.empty()) return result_type();
+            std::size_t const local_fanout = HPX_REDUCE_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
             std::vector<hpx::future<result_type> > reduce_futures;
-            reduce_futures.reserve(3);
-            id_type id_first = ids[0];
-            if(ids.size() > 1)
+            reduce_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                reduce_invoke(
+                    act
+                  , reduce_futures
+                  , ids[i]
+                  , a0 , a1 , a2 , a3
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_reduce_action<Action>::
                         template reduce_invoker<ReduceOp>::type
                     reduce_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
                         hpx::async_colocated<reduce_impl_action>(
-                            ids_first[0]
+                            id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , reduce_op
                           , a0 , a1 , a2 , a3
-                          , global_idx + 1
+                          , global_idx + applied
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    reduce_futures.push_back(
-                        hpx::async_colocated<reduce_impl_action>(
-                            ids_second[0]
-                          , act
-                          , std::move(ids_second)
-                          , reduce_op
-                          , a0 , a1 , a2 , a3
-                          , global_idx + half
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
-            reduce_invoke(
-                act
-              , reduce_futures
-              , id_first
-              , a0 , a1 , a2 , a3
-              , global_idx
-            );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 get();
@@ -1405,54 +1385,50 @@ namespace hpx { namespace lcos
                 typename reduce_result<Action>::type
                 result_type;
             if(ids.empty()) return result_type();
+            std::size_t const local_fanout = HPX_REDUCE_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
             std::vector<hpx::future<result_type> > reduce_futures;
-            reduce_futures.reserve(3);
-            id_type id_first = ids[0];
-            if(ids.size() > 1)
+            reduce_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                reduce_invoke(
+                    act
+                  , reduce_futures
+                  , ids[i]
+                  , a0 , a1 , a2 , a3 , a4
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_reduce_action<Action>::
                         template reduce_invoker<ReduceOp>::type
                     reduce_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
                         hpx::async_colocated<reduce_impl_action>(
-                            ids_first[0]
+                            id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , reduce_op
                           , a0 , a1 , a2 , a3 , a4
-                          , global_idx + 1
+                          , global_idx + applied
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    reduce_futures.push_back(
-                        hpx::async_colocated<reduce_impl_action>(
-                            ids_second[0]
-                          , act
-                          , std::move(ids_second)
-                          , reduce_op
-                          , a0 , a1 , a2 , a3 , a4
-                          , global_idx + half
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
-            reduce_invoke(
-                act
-              , reduce_futures
-              , id_first
-              , a0 , a1 , a2 , a3 , a4
-              , global_idx
-            );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 get();
@@ -1672,54 +1648,50 @@ namespace hpx { namespace lcos
                 typename reduce_result<Action>::type
                 result_type;
             if(ids.empty()) return result_type();
+            std::size_t const local_fanout = HPX_REDUCE_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
             std::vector<hpx::future<result_type> > reduce_futures;
-            reduce_futures.reserve(3);
-            id_type id_first = ids[0];
-            if(ids.size() > 1)
+            reduce_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                reduce_invoke(
+                    act
+                  , reduce_futures
+                  , ids[i]
+                  , a0 , a1 , a2 , a3 , a4 , a5
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_reduce_action<Action>::
                         template reduce_invoker<ReduceOp>::type
                     reduce_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
                         hpx::async_colocated<reduce_impl_action>(
-                            ids_first[0]
+                            id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , reduce_op
                           , a0 , a1 , a2 , a3 , a4 , a5
-                          , global_idx + 1
+                          , global_idx + applied
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    reduce_futures.push_back(
-                        hpx::async_colocated<reduce_impl_action>(
-                            ids_second[0]
-                          , act
-                          , std::move(ids_second)
-                          , reduce_op
-                          , a0 , a1 , a2 , a3 , a4 , a5
-                          , global_idx + half
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
-            reduce_invoke(
-                act
-              , reduce_futures
-              , id_first
-              , a0 , a1 , a2 , a3 , a4 , a5
-              , global_idx
-            );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 get();
@@ -1939,54 +1911,50 @@ namespace hpx { namespace lcos
                 typename reduce_result<Action>::type
                 result_type;
             if(ids.empty()) return result_type();
+            std::size_t const local_fanout = HPX_REDUCE_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
             std::vector<hpx::future<result_type> > reduce_futures;
-            reduce_futures.reserve(3);
-            id_type id_first = ids[0];
-            if(ids.size() > 1)
+            reduce_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                reduce_invoke(
+                    act
+                  , reduce_futures
+                  , ids[i]
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_reduce_action<Action>::
                         template reduce_invoker<ReduceOp>::type
                     reduce_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
                         hpx::async_colocated<reduce_impl_action>(
-                            ids_first[0]
+                            id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , reduce_op
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6
-                          , global_idx + 1
+                          , global_idx + applied
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    reduce_futures.push_back(
-                        hpx::async_colocated<reduce_impl_action>(
-                            ids_second[0]
-                          , act
-                          , std::move(ids_second)
-                          , reduce_op
-                          , a0 , a1 , a2 , a3 , a4 , a5 , a6
-                          , global_idx + half
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
-            reduce_invoke(
-                act
-              , reduce_futures
-              , id_first
-              , a0 , a1 , a2 , a3 , a4 , a5 , a6
-              , global_idx
-            );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 get();
@@ -2206,54 +2174,50 @@ namespace hpx { namespace lcos
                 typename reduce_result<Action>::type
                 result_type;
             if(ids.empty()) return result_type();
+            std::size_t const local_fanout = HPX_REDUCE_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
             std::vector<hpx::future<result_type> > reduce_futures;
-            reduce_futures.reserve(3);
-            id_type id_first = ids[0];
-            if(ids.size() > 1)
+            reduce_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                reduce_invoke(
+                    act
+                  , reduce_futures
+                  , ids[i]
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_reduce_action<Action>::
                         template reduce_invoker<ReduceOp>::type
                     reduce_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
                         hpx::async_colocated<reduce_impl_action>(
-                            ids_first[0]
+                            id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , reduce_op
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
-                          , global_idx + 1
+                          , global_idx + applied
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    reduce_futures.push_back(
-                        hpx::async_colocated<reduce_impl_action>(
-                            ids_second[0]
-                          , act
-                          , std::move(ids_second)
-                          , reduce_op
-                          , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
-                          , global_idx + half
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
-            reduce_invoke(
-                act
-              , reduce_futures
-              , id_first
-              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
-              , global_idx
-            );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 get();
@@ -2473,54 +2437,50 @@ namespace hpx { namespace lcos
                 typename reduce_result<Action>::type
                 result_type;
             if(ids.empty()) return result_type();
+            std::size_t const local_fanout = HPX_REDUCE_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
             std::vector<hpx::future<result_type> > reduce_futures;
-            reduce_futures.reserve(3);
-            id_type id_first = ids[0];
-            if(ids.size() > 1)
+            reduce_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                reduce_invoke(
+                    act
+                  , reduce_futures
+                  , ids[i]
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_reduce_action<Action>::
                         template reduce_invoker<ReduceOp>::type
                     reduce_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
                         hpx::async_colocated<reduce_impl_action>(
-                            ids_first[0]
+                            id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , reduce_op
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
-                          , global_idx + 1
+                          , global_idx + applied
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    reduce_futures.push_back(
-                        hpx::async_colocated<reduce_impl_action>(
-                            ids_second[0]
-                          , act
-                          , std::move(ids_second)
-                          , reduce_op
-                          , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
-                          , global_idx + half
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
-            reduce_invoke(
-                act
-              , reduce_futures
-              , id_first
-              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
-              , global_idx
-            );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 get();
@@ -2740,54 +2700,50 @@ namespace hpx { namespace lcos
                 typename reduce_result<Action>::type
                 result_type;
             if(ids.empty()) return result_type();
+            std::size_t const local_fanout = HPX_REDUCE_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
             std::vector<hpx::future<result_type> > reduce_futures;
-            reduce_futures.reserve(3);
-            id_type id_first = ids[0];
-            if(ids.size() > 1)
+            reduce_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                reduce_invoke(
+                    act
+                  , reduce_futures
+                  , ids[i]
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_reduce_action<Action>::
                         template reduce_invoker<ReduceOp>::type
                     reduce_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
                         hpx::async_colocated<reduce_impl_action>(
-                            ids_first[0]
+                            id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , reduce_op
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
-                          , global_idx + 1
+                          , global_idx + applied
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    reduce_futures.push_back(
-                        hpx::async_colocated<reduce_impl_action>(
-                            ids_second[0]
-                          , act
-                          , std::move(ids_second)
-                          , reduce_op
-                          , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
-                          , global_idx + half
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
-            reduce_invoke(
-                act
-              , reduce_futures
-              , id_first
-              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
-              , global_idx
-            );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 get();
@@ -3007,54 +2963,50 @@ namespace hpx { namespace lcos
                 typename reduce_result<Action>::type
                 result_type;
             if(ids.empty()) return result_type();
+            std::size_t const local_fanout = HPX_REDUCE_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
             std::vector<hpx::future<result_type> > reduce_futures;
-            reduce_futures.reserve(3);
-            id_type id_first = ids[0];
-            if(ids.size() > 1)
+            reduce_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                reduce_invoke(
+                    act
+                  , reduce_futures
+                  , ids[i]
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_reduce_action<Action>::
                         template reduce_invoker<ReduceOp>::type
                     reduce_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
                         hpx::async_colocated<reduce_impl_action>(
-                            ids_first[0]
+                            id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , reduce_op
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10
-                          , global_idx + 1
+                          , global_idx + applied
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    reduce_futures.push_back(
-                        hpx::async_colocated<reduce_impl_action>(
-                            ids_second[0]
-                          , act
-                          , std::move(ids_second)
-                          , reduce_op
-                          , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10
-                          , global_idx + half
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
-            reduce_invoke(
-                act
-              , reduce_futures
-              , id_first
-              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10
-              , global_idx
-            );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 get();
@@ -3274,54 +3226,50 @@ namespace hpx { namespace lcos
                 typename reduce_result<Action>::type
                 result_type;
             if(ids.empty()) return result_type();
+            std::size_t const local_fanout = HPX_REDUCE_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
             std::vector<hpx::future<result_type> > reduce_futures;
-            reduce_futures.reserve(3);
-            id_type id_first = ids[0];
-            if(ids.size() > 1)
+            reduce_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                reduce_invoke(
+                    act
+                  , reduce_futures
+                  , ids[i]
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_reduce_action<Action>::
                         template reduce_invoker<ReduceOp>::type
                     reduce_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
                         hpx::async_colocated<reduce_impl_action>(
-                            ids_first[0]
+                            id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , reduce_op
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11
-                          , global_idx + 1
+                          , global_idx + applied
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    reduce_futures.push_back(
-                        hpx::async_colocated<reduce_impl_action>(
-                            ids_second[0]
-                          , act
-                          , std::move(ids_second)
-                          , reduce_op
-                          , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11
-                          , global_idx + half
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
-            reduce_invoke(
-                act
-              , reduce_futures
-              , id_first
-              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11
-              , global_idx
-            );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 get();
@@ -3541,54 +3489,50 @@ namespace hpx { namespace lcos
                 typename reduce_result<Action>::type
                 result_type;
             if(ids.empty()) return result_type();
+            std::size_t const local_fanout = HPX_REDUCE_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
             std::vector<hpx::future<result_type> > reduce_futures;
-            reduce_futures.reserve(3);
-            id_type id_first = ids[0];
-            if(ids.size() > 1)
+            reduce_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                reduce_invoke(
+                    act
+                  , reduce_futures
+                  , ids[i]
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_reduce_action<Action>::
                         template reduce_invoker<ReduceOp>::type
                     reduce_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
                         hpx::async_colocated<reduce_impl_action>(
-                            ids_first[0]
+                            id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , reduce_op
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12
-                          , global_idx + 1
+                          , global_idx + applied
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    reduce_futures.push_back(
-                        hpx::async_colocated<reduce_impl_action>(
-                            ids_second[0]
-                          , act
-                          , std::move(ids_second)
-                          , reduce_op
-                          , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12
-                          , global_idx + half
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
-            reduce_invoke(
-                act
-              , reduce_futures
-              , id_first
-              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12
-              , global_idx
-            );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 get();
@@ -3808,54 +3752,50 @@ namespace hpx { namespace lcos
                 typename reduce_result<Action>::type
                 result_type;
             if(ids.empty()) return result_type();
+            std::size_t const local_fanout = HPX_REDUCE_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
             std::vector<hpx::future<result_type> > reduce_futures;
-            reduce_futures.reserve(3);
-            id_type id_first = ids[0];
-            if(ids.size() > 1)
+            reduce_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                reduce_invoke(
+                    act
+                  , reduce_futures
+                  , ids[i]
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_reduce_action<Action>::
                         template reduce_invoker<ReduceOp>::type
                     reduce_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
                         hpx::async_colocated<reduce_impl_action>(
-                            ids_first[0]
+                            id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , reduce_op
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13
-                          , global_idx + 1
+                          , global_idx + applied
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    reduce_futures.push_back(
-                        hpx::async_colocated<reduce_impl_action>(
-                            ids_second[0]
-                          , act
-                          , std::move(ids_second)
-                          , reduce_op
-                          , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13
-                          , global_idx + half
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
-            reduce_invoke(
-                act
-              , reduce_futures
-              , id_first
-              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13
-              , global_idx
-            );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 get();
@@ -4075,54 +4015,50 @@ namespace hpx { namespace lcos
                 typename reduce_result<Action>::type
                 result_type;
             if(ids.empty()) return result_type();
+            std::size_t const local_fanout = HPX_REDUCE_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
             std::vector<hpx::future<result_type> > reduce_futures;
-            reduce_futures.reserve(3);
-            id_type id_first = ids[0];
-            if(ids.size() > 1)
+            reduce_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
             {
-                std::size_t half = (ids.size() / 2) + 1;
-                std::vector<hpx::id_type>
-                    ids_first(ids.begin() + 1, ids.begin() + half);
-                std::vector<hpx::id_type>
-                    ids_second(ids.begin() + half, ids.end());
+                reduce_invoke(
+                    act
+                  , reduce_futures
+                  , ids[i]
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14
+                  , global_idx + i
+                );
+            }
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
                 typedef
                     typename detail::make_reduce_action<Action>::
                         template reduce_invoker<ReduceOp>::type
                     reduce_impl_action;
-                if(!ids_first.empty())
+                while(it != ids.end())
                 {
+                    HPX_ASSERT(ids.size() >= applied);
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
                         hpx::async_colocated<reduce_impl_action>(
-                            ids_first[0]
+                            id
                           , act
-                          , std::move(ids_first)
+                          , std::move(ids_next)
                           , reduce_op
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14
-                          , global_idx + 1
+                          , global_idx + applied
                         )
                     );
-                }
-                if(!ids_second.empty())
-                {
-                    reduce_futures.push_back(
-                        hpx::async_colocated<reduce_impl_action>(
-                            ids_second[0]
-                          , act
-                          , std::move(ids_second)
-                          , reduce_op
-                          , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14
-                          , global_idx + half
-                        )
-                    );
+                    applied += next_fan;
+                    it += next_fan;
                 }
             }
-            reduce_invoke(
-                act
-              , reduce_futures
-              , id_first
-              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14
-              , global_idx
-            );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 get();

@@ -45,12 +45,9 @@ namespace mini_ghost {
 
         void operator()(grid<value_type> const & g, std::size_t step, std::size_t var)
         {
-            if(dest_)
-            {
-                buffer_type buffer;
-                pack_buffer<Zone>::call(g, buffer);
-                hpx::apply(Action(), dest_, buffer, step, var);
-            }
+            buffer_type buffer;
+            pack_buffer<Zone>::call(g, buffer);
+            hpx::apply(Action(), dest_, buffer, step, var);
         }
 
         hpx::id_type dest_;

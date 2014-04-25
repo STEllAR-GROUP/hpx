@@ -331,32 +331,29 @@ response symbol_namespace::resolve(
     // parameters
     std::string key = req.get_name();
 
-    naming::gid_type key_gid;
+    mutex_type::scoped_lock l(mutex_);
+
+    gid_table_type::iterator it = gids_.find(key)
+                           , end = gids_.end();
+
+    if (it == end)
     {
-        mutex_type::scoped_lock l(mutex_);
-
-        gid_table_type::iterator it = gids_.find(key)
-                               , end = gids_.end();
-
-        if (it == end)
-        {
-            LAGAS_(info) << (boost::format(
-                "symbol_namespace::resolve, key(%1%), response(no_success)")
-                % key);
-
-            if (&ec != &throws)
-                ec = make_success_code();
-
-            return response(symbol_ns_resolve
-                          , naming::invalid_gid
-                          , no_success);
-        }
+        LAGAS_(info) << (boost::format(
+            "symbol_namespace::resolve, key(%1%), response(no_success)")
+            % key);
 
         if (&ec != &throws)
             ec = make_success_code();
-        key_gid = it->second;
+
+        return response(symbol_ns_resolve
+                      , naming::invalid_gid
+                      , no_success);
     }
-    naming::gid_type gid = naming::detail::split_gid_if_needed(key_gid);
+
+    if (&ec != &throws)
+        ec = make_success_code();
+
+    naming::gid_type gid = naming::detail::split_gid_if_needed(it->second);
 
     LAGAS_(info) << (boost::format(
         "symbol_namespace::resolve, key(%1%), gid(%2%)")

@@ -23,6 +23,16 @@ typedef hpx::components::managed_component<
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(stepper_double_type, stepper_double);
 
+HPX_REGISTER_BROADCAST_APPLY_ACTION(
+    mini_ghost::stepper<float>::set_global_sum_action
+  , mini_ghost_stepper_float_set_global_sum_action
+)
+
+HPX_REGISTER_BROADCAST_APPLY_ACTION(
+    mini_ghost::stepper<double>::set_global_sum_action
+  , mini_ghost_stepper_double_set_global_sum_action
+)
+
 namespace mini_ghost {
 
     template <typename Real>
@@ -40,20 +50,37 @@ namespace mini_ghost {
         const std::string base_name = "/mini_ghost/stepper/";
         std::string name = base_name;
         name += boost::lexical_cast<std::string>(p.rank);
-        hpx::agas::register_name(name, this->get_gid());
-        stepper_ids.resize(p.nranks);
 
+        std::vector<std::size_t> id_map(p.nranks);
+        stepper_ids.resize(p.nranks);
+        stepper_ids[0] = this->get_gid();
+        stepper_ids[0].make_unmanaged();
+        
+        hpx::agas::register_name_sync(
+            name
+          , hpx::naming::detail::strip_credits_from_gid(stepper_ids[0].get_gid())
+        );
+        
         // Find all others ...
-        stepper_ids[p.rank] = this->get_gid();
-        for(std::size_t rank = 0; rank != p.nranks; ++rank)
+        std::size_t r = p.rank % p.nranks;
+        for(std::size_t i = 0; i != p.nranks; ++i)
         {
             name = base_name;
-            name += boost::lexical_cast<std::string>(rank);
-            while(!stepper_ids[rank])
+            name += boost::lexical_cast<std::string>(r);
+            std::size_t k = 0;
+
+            while(!stepper_ids[i])
             {
-                stepper_ids[rank] = hpx::agas::resolve_name_sync(name);
+                if(hpx::agas::resolve_name_sync(name, stepper_ids[i]))
+                    break;
+                hpx::lcos::local::spinlock::yield(k);
+                ++k;
             }
+            id_map[r] = i;
+            r = (r + 1) % p.nranks;
         }
+
+        rank = p.rank;
 
         // Set position in 3D processor grid
         std::size_t myrank_xy = p.rank % (p.npx*p.npy);
@@ -94,6 +121,7 @@ namespace mini_ghost {
                     var
                   , p
                   , stepper_ids
+                  , id_map
                   , my_px
                   , my_py
                   , my_pz
@@ -194,11 +222,11 @@ namespace mini_ghost {
     }
 
     template <typename Real>
-    void stepper<Real>::set_global_sum(std::size_t generation, std::size_t which, Real value, std::size_t idx)
+    void stepper<Real>::set_global_sum(std::size_t generation, std::size_t which, Real value, std::size_t idx, std::size_t id)
     {
         init_future_.wait();
         HPX_ASSERT(which < stepper_ids.size());
-        partitions_[idx].sum_allreduce(generation, which, value);
+        partitions_[idx].sum_allreduce(id, generation, which, value);
     }
 
     template struct stepper<float>;

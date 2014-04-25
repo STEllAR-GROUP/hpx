@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -62,7 +62,7 @@ namespace detail
         typename Map::const_iterator end = tm.end();
         for (typename Map::const_iterator it = tm.begin(); it != end; ++it)
         {
-            threads::thread_data_base const* thrd = (*it).first;
+            threads::thread_data_base const* thrd = (*it).get();
             threads::thread_state state = thrd->get_state();
             threads::thread_state marked_state = thrd->get_marked_state();
 
@@ -86,7 +86,7 @@ namespace detail
                     LTM_(error) << "queue(" << num_thread << "): " //-V128
                                 << get_thread_state_name(state)
                                 << "(" << std::hex << std::setw(8)
-                                    << std::setfill('0') << (*it).first
+                                    << std::setfill('0') << (*it).get()
                                 << "." << std::hex << std::setw(2)
                                     << std::setfill('0') << thrd->get_thread_phase()
                                 << "/" << std::hex << std::setw(8)
@@ -104,7 +104,7 @@ namespace detail
                                 << "queue(" << num_thread << "): "
                                 << get_thread_state_name(state)
                                 << "(" << std::hex << std::setw(8)
-                                    << std::setfill('0') << (*it).first
+                                    << std::setfill('0') << (*it).get()
                                 << "." << std::hex << std::setw(2)
                                     << std::setfill('0') << thrd->get_thread_phase()
                                 << "/" << std::hex << std::setw(8)

@@ -24,6 +24,7 @@ namespace mini_ghost {
     template <>
     struct stencils<STENCIL_NONE>
     {
+        static const std::size_t num_adds = 0;
         template <typename Real>
         static void call(grid<Real> & dst, grid<Real> const & src,
             range_type x_range, range_type y_range, range_type z_range)
@@ -39,19 +40,19 @@ namespace mini_ghost {
                     }
                 }
             }
-            profiling::data().time_stencil(timer.elapsed());
         }
     };
 
     template <>
     struct stencils<STENCIL_2D5PT>
     {
+        static const std::size_t num_adds = 4;
         template <typename Real>
         static void call(grid<Real> & dst, grid<Real> const & src,
             range_type x_range, range_type y_range, range_type z_range)
         {
-            hpx::util::high_resolution_timer timer;
             Real const divisor = Real(1.0)/Real(5.0);
+            std::size_t i = 0;
             for(std::size_t z = z_range.first; z != z_range.second; ++z)
             {
                 for(std::size_t y = y_range.first; y != y_range.second; ++y)
@@ -66,27 +67,21 @@ namespace mini_ghost {
                               + src(x+1, y, z)
                               + src(x, y+1, z)
                             ) * divisor;
+                        ++i;
                     }
                 }
             }
-            std::size_t num_pts = 1;
-            num_pts *= x_range.second - x_range.first;
-            num_pts *= y_range.second - y_range.first;
-            num_pts *= z_range.second - z_range.first;
-            profiling::data().num_adds(4*num_pts);
-            profiling::data().num_divides(num_pts);
-            profiling::data().time_stencil(timer.elapsed());
         }
     };
 
     template <>
     struct stencils<STENCIL_2D9PT>
     {
+        static const std::size_t num_adds = 7;
         template <typename Real>
         static void call(grid<Real> & dst, grid<Real> const & src,
             range_type x_range, range_type y_range, range_type z_range)
         {
-            hpx::util::high_resolution_timer timer;
             Real const divisor = Real(1.0)/Real(5.0);
             for(std::size_t z = z_range.first; z != z_range.second; ++z)
             {
@@ -109,24 +104,17 @@ namespace mini_ghost {
                     }
                 }
             }
-            std::size_t num_pts = 1;
-            num_pts *= x_range.second - x_range.first;
-            num_pts *= y_range.second - y_range.first;
-            num_pts *= z_range.second - z_range.first;
-            profiling::data().num_adds(8*num_pts);
-            profiling::data().num_divides(num_pts);
-            profiling::data().time_stencil(timer.elapsed());
         }
     };
 
     template <>
     struct stencils<STENCIL_3D7PT>
     {
+        static const std::size_t num_adds = 6;
         template <typename Real>
         static void call(grid<Real> & dst, grid<Real> const & src,
             range_type x_range, range_type y_range, range_type z_range)
         {
-            hpx::util::high_resolution_timer timer;
             Real const divisor = Real(1.0)/Real(5.0);
             for(std::size_t z = z_range.first; z != z_range.second; ++z)
             {
@@ -148,19 +136,13 @@ namespace mini_ghost {
                     }
                 }
             }
-            std::size_t num_pts = 1;
-            num_pts *= x_range.second - x_range.first;
-            num_pts *= y_range.second - y_range.first;
-            num_pts *= z_range.second - z_range.first;
-            profiling::data().num_adds(6*num_pts);
-            profiling::data().num_divides(num_pts);
-            profiling::data().time_stencil(timer.elapsed());
         }
     };
 
     template <>
     struct stencils<STENCIL_3D27PT>
     {
+        static const std::size_t num_adds = 26;
         template <typename Real>
         static void call(grid<Real> & dst, grid<Real> const & src,
             range_type x_range, range_type y_range, range_type z_range)
@@ -207,13 +189,6 @@ namespace mini_ghost {
                     }
                 }
             }
-            std::size_t num_pts = 1;
-            num_pts *= x_range.second - x_range.first;
-            num_pts *= y_range.second - y_range.first;
-            num_pts *= z_range.second - z_range.first;
-            profiling::data().num_adds(26*num_pts);
-            profiling::data().num_divides(num_pts);
-            profiling::data().time_stencil(timer.elapsed());
         }
     };
 }
