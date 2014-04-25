@@ -14,7 +14,9 @@ if(OPENMP_DISABLE)
   set(OpenMP_CXX_FLAGS ""
       CACHE STRING "OpenMP flags for ${language}.")
 else()
-  if(NOT OPENMP_SEARCHED)
+  # Explicitly disabling OpenMP for clang based compilers for now as it fails
+  # to detect it correctly
+  if(NOT OPENMP_SEARCHED AND NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set(flag_candidates
         # GCC 
         "-fopenmp"
