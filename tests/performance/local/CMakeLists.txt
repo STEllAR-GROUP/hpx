@@ -20,7 +20,7 @@ else()
 endif()
 
 set(benchmarks
-    timed_task_spawn 
+    timed_task_spawn
     hpx_homogeneous_timed_task_spawn_executors
     hpx_heterogeneous_timed_task_spawn
 
@@ -83,7 +83,7 @@ if(SWARM_FOUND)
                    "${SWARM_LIBRARY}")
 endif()
 
-set(timed_task_spawn_executors_FLAGS DEPENDENCIES iostreams_component)
+set(hpx_homogeneous_timed_task_spawn_executors_FLAGS DEPENDENCIES iostreams_component)
 set(hpx_heterogeneous_timed_task_spawn_FLAGS DEPENDENCIES iostreams_component)
 
 set(delay_baseline_FLAGS NOLIBS
@@ -98,7 +98,7 @@ set(delay_baseline_threaded_FLAGS NOLIBS
 set(print_heterogeneous_payloads_FLAGS NOLIBS
     DEPENDENCIES ${boost_library_dependencies})
 
-set(benchmarks ${benchmarks}    
+set(benchmarks ${benchmarks}
     boost_tls_overhead
     native_tls_overhead
     hpx_tls_overhead
