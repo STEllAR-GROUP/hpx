@@ -19,6 +19,14 @@ inline std::size_t idx(std::size_t i, std::size_t size)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Our operator:
+//   f(t+1, i) = (f(t, i-1) + f(t, i) + f(t, i+1)) / 3
+inline double heat(double a, double b, double c)
+{
+    return (a + b + c) / 3.;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
     using hpx::lcos::local::dataflow;
@@ -39,7 +47,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     // Our operator:
     //   f(t+1, i) = (f(t, i-1) + f(t, i) + f(t, i+1)) / 3
-    auto Op = unwrapped([](double a, double b, double c) { return (a + b + c) / 3.; });
+    auto Op = unwrapped(heat);
 
     for (std::size_t t = 0; t != nt; ++t)
     {

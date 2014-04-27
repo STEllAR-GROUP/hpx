@@ -55,6 +55,29 @@ inline std::size_t idx(std::size_t i, std::size_t size)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Our operator:
+//   f(t+1, i) = (f(t, i-1) + f(t, i) + f(t, i+1)) / 3
+inline double heat(double a, double b, double c)
+{
+    return (a + b + c) / 3.;
+}
+
+cell heat_part(cell const& left, cell const& middle, cell const& right)
+{
+    std::size_t size = middle.size();
+    cell next(size);
+
+    next[0] = heat(left[size-1], middle[0], middle[1]);
+
+    for (std::size_t i = 1; i != size-1; ++i)
+        next[i] = heat(middle[i-1], middle[i], middle[i+1]);
+
+    next[size-1] = heat(middle[size-2], middle[size-1], right[0]);
+
+    return next;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
     using hpx::lcos::local::dataflow;
@@ -74,25 +97,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     for (std::size_t i = 0; i != np; ++i)
         U[0][i] = hpx::make_ready_future(cell(nx, double(i)));
 
-    // Our operator:
-    //   f(t+1, i) = (f(t, i-1) + f(t, i) + f(t, i+1)) / 3
-    auto Op = [](double a, double b, double c) { return (a + b + c) / 3.; };
-
-    auto PartOp = unwrapped(
-        [&Op](cell const& left, cell const& middle, cell const& right) -> cell
-        {
-            std::size_t size = middle.size();
-            cell next(size);
-
-            next[0] = Op(left[size-1], middle[0], middle[1]);
-
-            for (std::size_t i = 1; i != size-1; ++i)
-                next[i] = Op(middle[i-1], middle[i], middle[i+1]);
-
-            next[size-1] = Op(middle[size-2], middle[size-1], right[0]);
-
-            return next;
-        });
+    auto Op = unwrapped(heat_part);
 
     for (std::size_t t = 0; t != nt; ++t)
     {
@@ -100,7 +105,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         space& next = U[(t + 1) % 2];
 
         for (std::size_t i = 0; i != np; ++i)
-            next[i] = dataflow(PartOp, current[idx(i-1, np)], current[i], current[idx(i+1, np)]);
+            next[i] = dataflow(Op, current[idx(i-1, np)], current[i], current[idx(i+1, np)]);
     }
 
     // Print the solution at time-step 'nt'.

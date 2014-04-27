@@ -19,6 +19,14 @@ inline std::size_t idx(std::size_t i, std::size_t size)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Our operator:
+//   f(t+1, i) = (f(t, i-1) + f(t, i) + f(t, i+1)) / 3
+inline double heat(double a, double b, double c)
+{
+    return (a + b + c) / 3.;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
     boost::uint64_t nt = vm["nt"].as<boost::uint64_t>();   // Number of steps.
@@ -34,17 +42,13 @@ int hpx_main(boost::program_options::variables_map& vm)
     for (std::size_t i = 0; i != nx; ++i)
         U[0][i] = double(i);
 
-    // Our operator:
-    //   f(t+1, i) = (f(t, i-1) + f(t, i) + f(t, i+1)) / 3
-    auto Op = [](double a, double b, double c) { return (a + b + c) / 3.; };
-
     for (std::size_t t = 0; t != nt; ++t)
     {
         space const& current = U[t % 2];
         space& next = U[(t + 1) % 2];
 
         for (std::size_t i = 0; i != nx; ++i)
-            next[i] = Op(current[idx(i-1, nx)], current[i], current[idx(i+1, nx)]);
+            next[i] = heat(current[idx(i-1, nx)], current[i], current[idx(i+1, nx)]);
     }
 
     // Print the solution at time-step 'nt'.
