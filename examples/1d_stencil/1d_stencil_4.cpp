@@ -45,8 +45,8 @@ std::ostream& operator<<(std::ostream& os, cell const& c)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef std::vector<cell> space;        // data for one time step
-typedef std::vector<space> spacetime;   // all of stored time steps
+typedef std::vector<hpx::shared_future<cell> > space; // data for one time step
+typedef std::vector<space> spacetime;               // all of stored time steps
 
 ///////////////////////////////////////////////////////////////////////////////
 inline std::size_t idx(std::size_t i, std::size_t size)
@@ -57,6 +57,9 @@ inline std::size_t idx(std::size_t i, std::size_t size)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
+    using hpx::lcos::local::dataflow;
+    using hpx::util::unwrapped;
+
     boost::uint64_t nt = vm["nt"].as<boost::uint64_t>();   // Number of steps.
     boost::uint64_t nx = vm["nx"].as<boost::uint64_t>();   // Number of grid points.
     boost::uint64_t np = vm["np"].as<boost::uint64_t>();   // Number of partitions.
@@ -64,18 +67,19 @@ int hpx_main(boost::program_options::variables_map& vm)
     // U[t][i] is the state of position i at time t.
     spacetime U(2);
     for (space& s: U)
-        s.reserve(np);
+        s.resize(np);
 
     // Initial conditions:
     //   f(0, i) = i
     for (std::size_t i = 0; i != np; ++i)
-        U[0][i] = cell(nx, double(i));
+        U[0][i] = hpx::make_ready_future(cell(nx, double(i)));
 
     // Our operator:
     //   f(t+1, i) = (f(t, i-1) + f(t, i) + f(t, i+1)) / 3
     auto Op = [](double a, double b, double c) { return (a + b + c) / 3.; };
 
-    auto PartOp = [&Op](cell const& left, cell const& middle, cell const& right) -> cell
+    auto PartOp = unwrapped(
+        [&Op](cell const& left, cell const& middle, cell const& right) -> cell
         {
             std::size_t size = middle.size();
             cell next(size);
@@ -88,7 +92,7 @@ int hpx_main(boost::program_options::variables_map& vm)
             next[size-1] = Op(middle[size-2], middle[size-1], right[0]);
 
             return next;
-        };
+        });
 
     for (std::size_t t = 0; t != nt; ++t)
     {
@@ -96,13 +100,14 @@ int hpx_main(boost::program_options::variables_map& vm)
         space& next = U[(t + 1) % 2];
 
         for (std::size_t i = 0; i != np; ++i)
-            next[i] = PartOp(current[idx(i-1, np)], current[i], current[idx(i+1, np)]);
+            next[i] = dataflow(PartOp, current[idx(i-1, np)], current[i], current[idx(i+1, np)]);
     }
 
     // Print the solution at time-step 'nt'.
-    space const& solution = U[nt % 2];
+    space solution = hpx::when_all(U[nt % 2]).get();
+
     for (std::size_t i = 0; i != np; ++i)
-        std::cout << "U[" << i << "] = " << solution[i] << std::endl;
+        std::cout << "U[" << i << "] = " << solution[i].get() << std::endl;
 
     return hpx::finalize();
 }

@@ -6,7 +6,8 @@
 set(example_programs
     1d_stencil_1
     1d_stencil_2
-    1d_stencil_3)
+    1d_stencil_3
+    1d_stencil_4)
 
 foreach(example_program ${example_programs})
 
