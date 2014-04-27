@@ -7,6 +7,7 @@
 
 set(subdirs
     1d_hydro
+    1d_stencil
     accumulator
     allgather
     async_io
