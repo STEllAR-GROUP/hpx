@@ -81,7 +81,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
             next[0] = Op(left[size-1], middle[0], middle[1]);
 
-            for (std::size_t i = 1; i != size-2; ++i)
+            for (std::size_t i = 1; i != size-1; ++i)
                 next[i] = Op(middle[i-1], middle[i], middle[i+1]);
 
             next[size-1] = Op(middle[size-2], middle[size-1], right[0]);
@@ -94,13 +94,13 @@ int hpx_main(boost::program_options::variables_map& vm)
         space& current = U[t % 2];
         space& next = U[(t + 1) % 2];
 
-        for (std::size_t i = 0; i != nx; ++i)
-            next[i] = PartOp(current[idx(i-1, nx)], current[i], current[idx(i+1, nx)]);
+        for (std::size_t i = 0; i != np; ++i)
+            next[i] = PartOp(current[idx(i-1, np)], current[i], current[idx(i+1, np)]);
     }
 
     // Print the solution at time-step 'nt'.
     space const& solution = U[nt % 2];
-    for (std::size_t i = 0; i != nx; ++i)
+    for (std::size_t i = 0; i != np; ++i)
         std::cout << "U[" << i << "] = " << solution[i] << std::endl;
 
     return hpx::finalize();
