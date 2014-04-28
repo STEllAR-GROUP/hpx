@@ -8,6 +8,21 @@
 
 #include "htts2.hpp"
 
+#if defined(BOOST_NO_CXX11_DELETED_FUNCTIONS)
+#define HPX_MOVABLE_BUT_NOT_COPYABLE(TYPE)                                    \
+    private:                                                                  \
+        TYPE(TYPE const &);                                                   \
+        TYPE& operator=(TYPE const &);                                        \
+/**/
+#else
+#define HPX_MOVABLE_BUT_NOT_COPYABLE(TYPE)                                    \
+    public:                                                                   \
+        TYPE(TYPE const &) = delete;                                          \
+        TYPE& operator=(TYPE const &) = delete;                               \
+    private:                                                                  \
+/**/
+#endif
+
 template <typename BaseClock = boost::chrono::steady_clock>
 struct payload_precision_tracker : htts2::clocksource<BaseClock>
 {
@@ -117,8 +132,6 @@ struct payload_precision_driver : htts2::driver
           , amortized_overhead_(amortized_overhead)
           , overhead_uncertainty_(overhead_uncertainty)
         {}
-
-        results_type(results_type const&) = default;
 
         double average_precision_;
         double precision_uncertainty_;
