@@ -62,9 +62,9 @@ struct clocksource
     }
 };
 
-// Performs approximately 'expected_' nanoseconds of artifical work.
+// Performs approximately 'expected_' nanoseconds of artificial work.
 // Returns: nanoseconds of work performed.
-template <typename BaseClock = boost::chrono::steady_clock>
+template <typename BaseClock>
 typename clocksource<BaseClock>::rep
 payload(typename clocksource<BaseClock>::rep expected)
 {
