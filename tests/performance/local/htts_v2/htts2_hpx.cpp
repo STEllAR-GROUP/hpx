@@ -6,14 +6,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
-
-#include "htts2.hpp"
-
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/lcos/local/barrier.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+
+#include "htts2.hpp"
 
 #include <boost/assign/std/vector.hpp> 
 #include <boost/lexical_cast.hpp>
@@ -186,7 +184,7 @@ struct hpx_driver : htts2::driver
         finished.wait();
 
         // w_M [nanoseconds]
-        results = t.elapsed();
+        results = static_cast<double>(t.elapsed());
 
         return results;
 

@@ -36,26 +36,28 @@ struct clocksource
 
     static_assert(base_clock::is_steady == true,
         "base_clock is not steady");
+#if !defined(BOOST_MSVC)
     static_assert(boost::mpl::or_<
             std::ratio_equal<period, std::nano>,
             boost::ratio_equal<period, boost::nano>
         >::value == true,
         "base_clock does not use a nanosecond period");
+#endif
 
     // Returns: current time in nanoseconds.
-    static rep now() 
+    static rep now()
     {
         duration d = base_clock::now().time_since_epoch();
         rep t = d.count();
         BOOST_ASSERT(t >= 0);
-        return t; 
+        return t;
     }
 
     // Returns: uncertainty of the base_clock in nanoseconds.
-    static double clock_uncertainty() 
+    static double clock_uncertainty()
     {
         // For steady clocks, we use instrument uncertainty, ie:
-        //   instrument_uncertainty = instrument_least_count/2 
+        //   instrument_uncertainty = instrument_least_count/2
         return 1.0/2.0;
     }
 };
@@ -68,7 +70,7 @@ payload(typename clocksource<BaseClock>::rep expected)
 {
     typedef typename clocksource<BaseClock>::rep rep;
 
-    rep const start = clocksource<BaseClock>::now(); 
+    rep const start = clocksource<BaseClock>::now();
 
     while (true)
     {
@@ -88,7 +90,7 @@ struct timer : clocksource<BaseClock>
 
     void restart()
     {
-        start_ = this->now(); 
+        start_ = this->now();
     }
 
     // Returns: elapsed time in nanoseconds.
@@ -97,7 +99,7 @@ struct timer : clocksource<BaseClock>
         return this->now() - start_;
     }
 
-    // Returns: uncertainty of elapsed time. 
+    // Returns: uncertainty of elapsed time.
     double elapsed_uncertainty() const
     {
         return this->clock_uncertainty();

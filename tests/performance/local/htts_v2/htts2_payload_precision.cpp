@@ -13,9 +13,9 @@ struct payload_precision_tracker : htts2::clocksource<BaseClock>
 {
     typedef typename htts2::clocksource<BaseClock>::rep rep;
 
-    // 'expected' is the expected payload in nanosecond 
+    // 'expected' is the expected payload in nanosecond
     payload_precision_tracker(rep expected)
-      : expected_(expected) 
+      : expected_(expected)
       , mean_lost_(0.0)
       , stdev_lost_(0.0)
       , samples_(0)
@@ -45,10 +45,11 @@ struct payload_precision_tracker : htts2::clocksource<BaseClock>
         return samples_;
     }
 
-    // Performs approximately 'expected_' nanoseconds of artifical work.
+    // Performs approximately 'expected_' nanoseconds of artificial work.
     void operator()()
     {
-        double const measured = htts2::payload<BaseClock>(expected_);
+        double const measured =
+            static_cast<double>(htts2::payload<BaseClock>(expected_));
 
         double const lost = double(measured - expected_);
 
@@ -58,8 +59,8 @@ struct payload_precision_tracker : htts2::clocksource<BaseClock>
   private:
     void update_lost(double lost)
     {
-        // Based on Boost.Accumulators. 
-        //   mean_n = (mean_{n-1}*(n-1) + x_n) / n 
+        // Based on Boost.Accumulators.
+        //   mean_n = (mean_{n-1}*(n-1) + x_n) / n
         //   sigma_n ~= sqrt(((n-1)/n)*(sigma_{n-1}^2) + (1/n)*(x_n-mean_n)^2)
 
         ++samples_;
@@ -82,7 +83,7 @@ template <typename BaseClock = boost::chrono::steady_clock>
 struct payload_precision_driver : htts2::driver
 {
     payload_precision_driver(int argc, char** argv)
-      : htts2::driver(argc, argv) 
+      : htts2::driver(argc, argv)
     {}
 
     void run() const
@@ -104,7 +105,7 @@ struct payload_precision_driver : htts2::driver
           , amortized_overhead_(0.0)
           , overhead_uncertainty_(0.0)
         {}
-        
+
         results_type(
             double average_precision,       // nanoseconds
             double precision_uncertainty,   // nanoseconds
@@ -131,17 +132,18 @@ struct payload_precision_driver : htts2::driver
 
         payload_precision_tracker<BaseClock>
             p(this->payload_duration_ /* = p */);
-        
+
         htts2::timer<BaseClock> t;
 
         for (boost::uint64_t i = 0; i < this->tasks_ /* = m */; ++i)
             p();
 
         // w_M [nanoseconds]
-        double measured_walltime = t.elapsed();
+        double measured_walltime = static_cast<double>(t.elapsed());
 
         // w_T [nanoseconds]
-        double theoretical_walltime = this->tasks_ * this->payload_duration_;
+        double theoretical_walltime =
+            static_cast<double>(this->tasks_ * this->payload_duration_);
 
         // Overhead = Measured Walltime - Theoretical Walltime
         double overhead = measured_walltime - theoretical_walltime;
@@ -177,15 +179,15 @@ struct payload_precision_driver : htts2::driver
 
         std::cout
             << ( boost::format("%lu,%lu,%lu,%.14g,%.14g,%.14g,%.14g\n")
-               % this->osthreads_ 
-               % this->tasks_ 
-               % this->payload_duration_ 
-               % results.average_precision_ 
-               % results.precision_uncertainty_ 
-               % results.amortized_overhead_ 
+               % this->osthreads_
+               % this->tasks_
+               % this->payload_duration_
+               % results.average_precision_
+               % results.precision_uncertainty_
+               % results.amortized_overhead_
                % results.overhead_uncertainty_
                )
-            ; 
+            ;
     }
 };
 

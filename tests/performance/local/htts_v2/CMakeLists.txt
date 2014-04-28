@@ -14,13 +14,17 @@
 if(MSVC)
   set(boost_library_dependencies)
 else()
-  set(boost_library_dependencies ${BOOST_PROGRAM_OPTIONS_LIBRARY} ${BOOST_SYSTEM_LIBRARY} ${BOOST_DATE_TIME_LIBRARY} ${BOOST_CHRONO_LIBRARY})
+  set(boost_library_dependencies
+      ${BOOST_PROGRAM_OPTIONS_LIBRARY}
+      ${BOOST_SYSTEM_LIBRARY}
+      ${BOOST_DATE_TIME_LIBRARY}
+      ${BOOST_CHRONO_LIBRARY})
 endif()
 
 set(benchmarks
     htts2_payload_precision
 #    htts2_payload_baseline
-    htts2_hpx 
+    htts2_hpx
    )
 
 set(htts2_payload_precision_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies})
@@ -34,7 +38,6 @@ if(QTHREADS_FOUND)
   include_directories(${QTHREADS_INCLUDE_DIR})
 
   set(benchmarks ${benchmarks} htts2_qthreads)
-
   set(htts2_qthreads_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies} ${QTHREADS_LIBRARY})
 endif()
 
@@ -42,7 +45,6 @@ if(TBB_FOUND)
   include_directories(${TBB_INCLUDE_DIR})
 
   set(benchmarks ${benchmarks} htts2_tbb)
-
   set(htts2_tbb_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies} ${TBB_LIBRARY})
 endif()
 

@@ -15,9 +15,9 @@ namespace htts2
 
 driver::driver(int argc, char** argv)
   : osthreads_(1)
-  , tasks_(5e6)
+  , tasks_(500000)
   , payload_duration_(5000)
-  , io_(csv_with_headers) 
+  , io_(csv_with_headers)
 {
     boost::program_options::variables_map vm;
 
@@ -35,7 +35,7 @@ driver::driver(int argc, char** argv)
 
         ( "tasks"
         , boost::program_options::value<boost::uint64_t>
-                (&tasks_)->default_value(5e5)
+                (&tasks_)->default_value(500000)
         , "number of tasks per OS-thread to invoke")
 
         ( "payload"
@@ -61,7 +61,7 @@ driver::driver(int argc, char** argv)
     }
 
     if (vm.count("no-header"))
-        io_ = csv_without_headers; 
+        io_ = csv_without_headers;
 }
 
 }
