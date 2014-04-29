@@ -28,7 +28,8 @@
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 
-namespace hpx { namespace detail {
+namespace hpx { namespace detail
+{
     template <typename Tuple>
     struct async_colocated_bound_tuple;
 
@@ -57,33 +58,33 @@ namespace hpx { namespace detail {
 }}
 
 #define HPX_REGISTER_ASYNC_COLOCATED_DECLARATION(Action, Name)                \
-HPX_UTIL_REGISTER_FUNCTION_DECLARATION(                                       \
-    void (hpx::naming::id_type, hpx::agas::response)                          \
-  , (hpx::util::functional::detail::async_continuation_impl<                  \
-        hpx::util::detail::bound_action<                                      \
-            Action                                                            \
-          , hpx::detail::async_colocated_bound_tuple<                         \
-                Action ::arguments_type                                       \
-            >::type                                                           \
-        >                                                                     \
-    >)                                                                        \
-  , Name                                                                      \
-);                                                                            \
+    HPX_UTIL_REGISTER_FUNCTION_DECLARATION(                                   \
+        void (hpx::naming::id_type, hpx::agas::response)                      \
+      , (hpx::util::functional::detail::async_continuation_impl<              \
+            hpx::util::detail::bound_action<                                  \
+                Action                                                        \
+              , hpx::detail::async_colocated_bound_tuple<                     \
+                    Action ::arguments_type                                   \
+                >::type                                                       \
+            >                                                                 \
+        >)                                                                    \
+      , Name                                                                  \
+    );                                                                        \
 /**/
 
 #define HPX_REGISTER_ASYNC_COLOCATED(Action, Name)                            \
-HPX_UTIL_REGISTER_FUNCTION(                                                   \
-    void (hpx::naming::id_type, hpx::agas::response)                          \
-  , (hpx::util::functional::detail::apply_continuation_impl<                  \
-        hpx::util::detail::bound_action<                                      \
-            Action                                                            \
-          , hpx::detail::apply_colocated_bound_tuple<                         \
-                Action ::arguments_type                                       \
-            >::type                                                           \
-        >                                                                     \
-    >)                                                                        \
-  , Name                                                                      \
-);                                                                            \
+    HPX_UTIL_REGISTER_FUNCTION(                                               \
+        void (hpx::naming::id_type, hpx::agas::response)                      \
+      , (hpx::util::functional::detail::apply_continuation_impl<              \
+            hpx::util::detail::bound_action<                                  \
+                Action                                                        \
+              , hpx::detail::apply_colocated_bound_tuple<                     \
+                    Action ::arguments_type                                   \
+                >::type                                                       \
+            >                                                                 \
+        >)                                                                    \
+      , Name                                                                  \
+    );                                                                        \
 /**/
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
@@ -147,7 +148,7 @@ namespace hpx
             service_target, req
           , util::functional::async_continuation(
                 util::bind<Action>(
-                    util::bind(util::functional::extract_locality(), _2)
+                    util::bind(util::functional::extract_locality(gid), _2)
                   BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg))
                 ));
     }
