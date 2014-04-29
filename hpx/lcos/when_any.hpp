@@ -89,9 +89,8 @@ namespace hpx { namespace lcos
                             typename lcos::detail::shared_state_ptr_for<Future>::type
                             shared_state_ptr;
 
-                        using lcos::detail::future_access;
                         shared_state_ptr const& shared_state =
-                            future_access::get_shared_state(lazy_values_[i]);
+                            lcos::detail::get_shared_state(lazy_values_[i]);
 
                         shared_state->set_on_completed(util::bind(
                             &when_any_swapped::on_future_ready,

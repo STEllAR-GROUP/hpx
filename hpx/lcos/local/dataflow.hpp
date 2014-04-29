@@ -56,7 +56,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         {
             future = Future();
         }
-        
+
         template <typename Future>
         BOOST_FORCEINLINE
         void operator()(boost::reference_wrapper<Future>& future) const
@@ -140,7 +140,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 boost::fusion::for_each(futures_, reset_dataflow_future());
 
                 this->set_data(util::unused_type());
-            } catch(...) {
+            }
+            catch(...) {
                 this->set_exception(boost::current_exception());
             }
         }
@@ -192,7 +193,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                     = &dataflow_frame::await_range;
 
                 typedef
-                    typename lcos::detail::future_traits<
+                    typename traits::future_traits<
                         future_type
                     >::type
                     future_result_type;
@@ -200,7 +201,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 boost::intrusive_ptr<
                     lcos::detail::future_data<future_result_type>
                 > next_future_data
-                    = lcos::detail::future_access::get_shared_state(*next);
+                    = lcos::detail::get_shared_state(*next);
 
                 boost::intrusive_ptr<dataflow_frame> this_(this);
                 next_future_data->set_on_completed(
@@ -227,7 +228,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             typedef
                 typename boost::fusion::result_of::next<Iter>::type
                 next_type;
-            
+
             await_range(
                 boost::begin(boost::unwrap_ref(boost::fusion::deref(iter)))
               , boost::end(boost::unwrap_ref(boost::fusion::deref(iter)))
@@ -266,7 +267,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                     = &dataflow_frame::await_next;
 
                 typedef
-                    typename lcos::detail::future_traits<
+                    typename traits::future_traits<
                         future_type
                     >::type
                     future_result_type;
@@ -274,7 +275,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 boost::intrusive_ptr<
                     lcos::detail::future_data<future_result_type>
                 > next_future_data
-                    = lcos::detail::future_access::get_shared_state(f_);
+                    = lcos::detail::get_shared_state(f_);
 
                 boost::intrusive_ptr<dataflow_frame> this_(this);
                 next_future_data->set_on_completed(
@@ -413,9 +414,8 @@ namespace hpx { namespace lcos { namespace local
             ));
         p->await();
 
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
 
     template <typename Func, BOOST_PP_ENUM_PARAMS(N, typename F)>
@@ -455,9 +455,8 @@ namespace hpx { namespace lcos { namespace local
             ));
         p->await();
 
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
 
     template <typename Func, BOOST_PP_ENUM_PARAMS(N, typename F)>
@@ -493,9 +492,8 @@ namespace hpx { namespace lcos { namespace local
             ));
         p->await();
 
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
 }}}
 

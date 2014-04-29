@@ -134,9 +134,10 @@ namespace hpx { namespace lcos { namespace local
                 return lcos::future<Result>();
             }
 
-            using lcos::detail::future_access;
             future_obtained_ = true;
-            return future_access::create<future<Result> >(task_);
+
+            using traits::future_access;
+            return future_access<future<Result> >::create(task_);
         }
 
         template <typename T>
@@ -293,9 +294,10 @@ namespace hpx { namespace lcos { namespace local
                 return lcos::future<void>();
             }
 
-            using lcos::detail::future_access;
             future_obtained_ = true;
-            return future_access::create<future<void> >(task_);
+
+            using traits::future_access;
+            return future_access<future<void> >::create(task_);
         }
 
         void set_value()

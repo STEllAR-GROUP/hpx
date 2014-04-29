@@ -42,10 +42,10 @@ namespace hpx { namespace lcos { namespace detail
         void operator()(Source& src, Destination& dest) const
         {
             typedef typename boost::is_void<
-                typename lcos::detail::future_traits<Future>::type
+                typename traits::future_traits<Future>::type
             >::type is_void;
 
-            apply(future_access::create<Future>(src), dest, is_void());
+            apply(traits::future_access<Future>::create(src), dest, is_void());
         }
     };
 
@@ -101,7 +101,7 @@ namespace hpx { namespace lcos { namespace detail
 
             // take by value, as the future may go away immediately
             inner_shared_state_ptr inner_state =
-                future_access::get_shared_state(func(std::move(future)));
+                lcos::detail::get_shared_state(func(std::move(future)));
 
             if (inner_state.get() == 0)
             {
@@ -188,7 +188,7 @@ namespace hpx { namespace lcos { namespace detail
 
         void run_impl(typename shared_state_ptr_for<Future>::type const& f)
         {
-            Future future = detail::future_access::create<Future>(f);
+            Future future = traits::future_access<Future>::create(f);
             invoke_continuation(f_, future, *this);
         }
 
@@ -222,7 +222,7 @@ namespace hpx { namespace lcos { namespace detail
         {
             reset_id r(*this);
 
-            Future future = detail::future_access::create<Future>(f);
+            Future future = traits::future_access<Future>::create(f);
             invoke_continuation(f_, future, *this);
             return threads::terminated;
         }
@@ -361,7 +361,7 @@ namespace hpx { namespace lcos { namespace detail
                 cb = &continuation::async;
 
             shared_state_ptr const& state =
-                future_access::get_shared_state(future);
+                lcos::detail::get_shared_state(future);
             state->set_on_completed(util::bind(cb, std::move(this_), state));
         }
 
@@ -378,7 +378,7 @@ namespace hpx { namespace lcos { namespace detail
                 &continuation::async;
 
             shared_state_ptr const& state =
-                future_access::get_shared_state(future);
+                lcos::detail::get_shared_state(future);
             state->set_on_completed(util::bind(cb, std::move(this_), state, boost::ref(sched)));
         }
 
@@ -448,7 +448,7 @@ namespace hpx { namespace lcos { namespace detail
         void attach(Future& future)
         {
             typedef
-                typename shared_state_ptr_for<Future>::type 
+                typename shared_state_ptr_for<Future>::type
                 shared_state_ptr;
 
             // Bind an on_completed handler to this future which will wait for
@@ -458,7 +458,7 @@ namespace hpx { namespace lcos { namespace detail
                 &void_continuation::on_ready<Future>;
 
             shared_state_ptr const& state =
-                future_access::get_shared_state(future);
+                lcos::detail::get_shared_state(future);
             state->set_on_completed(util::bind(ready, std::move(this_), state));
         }
     };

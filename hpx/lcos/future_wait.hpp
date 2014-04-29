@@ -108,7 +108,7 @@ namespace hpx { namespace lcos
             void on_future_ready(std::size_t i, threads::thread_id_type const& id)
             {
                 on_future_ready_(i, id,
-                    boost::is_void<typename future_traits<Future>::type>());
+                    boost::is_void<typename traits::future_traits<Future>::type>());
             }
 
         public:
@@ -157,8 +157,6 @@ namespace hpx { namespace lcos
 
             result_type operator()()
             {
-                using lcos::detail::future_access;
-
                 ready_count_.store(0);
 
                 // set callback functions to executed when future is ready
@@ -170,7 +168,7 @@ namespace hpx { namespace lcos
                         typename lcos::detail::shared_state_ptr_for<Future>::type
                         shared_state_ptr;
                     shared_state_ptr current =
-                        future_access::get_shared_state(lazy_values_[i]);
+                        lcos::detail::get_shared_state(lazy_values_[i]);
 
                     current->set_on_completed(
                         util::bind(&when_each::on_future_ready, this, i, id));
@@ -206,7 +204,7 @@ namespace hpx { namespace lcos
     /// expected value directly (without wrapping it into a tuple).
     template <typename Future, typename F>
     inline typename boost::enable_if_c<
-        !boost::is_void<typename detail::future_traits<Future>::type>::value
+        !boost::is_void<typename traits::future_traits<Future>::type>::value
       , std::size_t
     >::type
     wait(Future && f1, F && f)
@@ -217,7 +215,7 @@ namespace hpx { namespace lcos
 
     template <typename Future, typename F>
     inline typename boost::enable_if_c<
-        boost::is_void<typename detail::future_traits<Future>::type>::value
+        boost::is_void<typename traits::future_traits<Future>::type>::value
       , std::size_t
     >::type
     wait(Future && f1, F && f)

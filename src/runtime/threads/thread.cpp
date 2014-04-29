@@ -304,8 +304,8 @@ namespace hpx
             return lcos::future<void>();
         }
 
-        using lcos::detail::future_access;
-        return future_access::create<lcos::future<void> >(std::move(base));
+        using traits::future_access;
+        return future_access<lcos::future<void> >::create(std::move(base));
     }
 
     ///////////////////////////////////////////////////////////////////////////

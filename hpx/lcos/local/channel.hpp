@@ -142,9 +142,9 @@ struct channel
     hpx::future<T> get_future()
     {
         HPX_ASSERT(data_);
-        
-        using lcos::detail::future_access;
-        return future_access::create<hpx::future<T> >(data_);
+
+        using traits::future_access;
+        return future_access<hpx::future<T> >::create(data_);
     }
 
     T get(hpx::error_code& ec = hpx::throws) const
@@ -182,9 +182,9 @@ struct channel
     then(F && f)
     {
         HPX_ASSERT(data_);
-        
-        using lcos::detail::future_access;
-        return future_access::create<hpx::future<T> >(data_).then
+
+        using traits::future_access;
+        return future_access<hpx::future<T> >::create(data_).then
             (std::forward<F>(f));
     }
 
@@ -267,9 +267,9 @@ struct channel<void>
     hpx::future<void> get_future()
     {
         HPX_ASSERT(data_);
-        
-        using lcos::detail::future_access;
-        return future_access::create<hpx::future<void> >(data_);
+
+        using traits::future_access;
+        return future_access<hpx::future<void> >::create(data_);
     }
 
     void get(hpx::error_code& ec = hpx::throws) const
@@ -297,9 +297,9 @@ struct channel<void>
     then(F && f)
     {
         HPX_ASSERT(data_);
-        
-        using lcos::detail::future_access;
-        return future_access::create<hpx::future<void> >(data_).then
+
+        using traits::future_access;
+        return future_access<hpx::future<void> >::create(data_).then
             (std::forward<completed_callback_type>(f));
     }
 

@@ -228,9 +228,10 @@ namespace hpx { namespace lcos { namespace local
                 return lcos::future<Result>();
             }
 
-            using lcos::detail::future_access;
             future_obtained_ = true;
-            return future_access::create<future<Result> >(task_);
+
+            using traits::future_access;
+            return future_access<future<Result> >::create(task_);
         }
 
         bool valid() const BOOST_NOEXCEPT
