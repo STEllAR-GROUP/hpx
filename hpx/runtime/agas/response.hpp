@@ -193,7 +193,6 @@ struct HPX_EXPORT response
   private:
     friend class boost::serialization::access;
 
-
     void save(
         hpx::util::portable_binary_oarchive& ar
       , const unsigned int
