@@ -9,21 +9,9 @@ include(HPX_Include)
 
 hpx_include(ParseArguments)
 
-macro(hpx_make_python_list input output)
-  set(${output} "[")
-  foreach(element ${${input}})
-    set(${output} "${${output}}${element},")
-  endforeach()
-  set(${output} "${${output}}]")
-endmacro()
-
 macro(add_hpx_test category name)
-  hpx_parse_arguments(${name} "EXECUTABLE;TIMEOUT;LOCALITIES;THREADS_PER_LOCALITY;ARGS"
+  hpx_parse_arguments(${name} "EXECUTABLE;LOCALITIES;THREADS_PER_LOCALITY;ARGS"
                               "FAILURE_EXPECTED" ${ARGN})
-
-  if(NOT ${name}_TIMEOUT)
-    set(${name}_TIMEOUT 600)
-  endif()
 
   if(NOT ${name}_LOCALITIES)
     set(${name}_LOCALITIES 1)
@@ -37,10 +25,10 @@ macro(add_hpx_test category name)
     set(${name}_EXECUTABLE ${name})
   endif()
 
-  set(expected "True")
+  set(expected "0")
 
   if(${name}_FAILURE_EXPECTED)
-    set(expected "False")
+    set(expected "1")
   endif()
 
   set(args)
@@ -48,25 +36,41 @@ macro(add_hpx_test category name)
   foreach(arg ${${name}_ARGS})
     set(args ${args} "'${arg}'")
   endforeach()
+  set(args ${args} "-v" "--" ${args})
 
-  hpx_make_python_list(args ${name}_ARGS)
+  set(cmd "${PYTHON_EXECUTABLE}"
+          "${CMAKE_BINARY_DIR}/bin/hpxrun.py"
+          "$<TARGET_FILE:${${name}_EXECUTABLE}_test_exe>"
+          "-e" "${expected}"
+          "-l" "${${name}_LOCALITIES}"
+          "-t" "${${name}_THREADS_PER_LOCALITY}")
 
-  set(test_input "'$<TARGET_FILE:${${name}_EXECUTABLE}_test_exe>'"
-                 ${${name}_TIMEOUT}
-                 ${expected}
-                 ${${name}_LOCALITIES}
-                 ${${name}_THREADS_PER_LOCALITY}
-                 ${${name}_ARGS})
-
-  hpx_make_python_list(test_input test_output)
-
-  set(test_output "  ${test_output},\n")
-
-  add_test(
-    NAME "${category}.${name}"
-    COMMAND "${CMAKE_SOURCE_DIR}/python/scripts/hpx_run_test.py"
-            --log-stdout
-            "[${test_output}]")
+  if("${${name}_LOCALITIES}" STREQUAL "1")
+    add_test(
+      NAME "${category}.${name}"
+      COMMAND ${cmd} ${args})
+    else()
+      if(HPX_HAVE_PARCELPORT_IBVERBS)
+        add_test(
+          NAME "${category}.distributed.ibverbs.${name}"
+          COMMAND ${cmd} "-p" "ibverbs" ${args})
+      endif()
+      if(HPX_HAVE_PARCELPORT_IPC)
+        add_test(
+          NAME "${category}.distributed.ipc.${name}"
+          COMMAND ${cmd} "-p" "ipc" ${args})
+      endif()
+      if(HPX_HAVE_PARCELPORT_MPI)
+        add_test(
+          NAME "${category}.distributed.mpi.${name}"
+          COMMAND ${cmd} "-p" "mpi" "-r" "mpi" ${args})
+      endif()
+      if(HPX_HAVE_PARCELPORT_TCP)
+        add_test(
+          NAME "${category}.distributed.tcp.${name}"
+          COMMAND ${cmd} "-p" "tcp" ${args})
+      endif()
+    endif()
 endmacro()
 
 macro(add_hpx_unit_test category name)

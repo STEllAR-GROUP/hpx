@@ -1,0 +1,264 @@
+#! /usr/bin/env python
+#
+# Copyright (c) 2014 Thomas Heller
+#
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+# This script is a simple startup script to start 1 or multiple HPX localities.
+# It supports various startup wrappers for distributed runs.
+#
+# Usage:
+#  hpxrun.py hpx-application [Options] [Additional options]
+#
+# Available options are:
+#   -l Number of localities to start
+#   -t Number of threads per locality
+#   -p Parcelport to use
+#   -r Which runwrapper to use
+#   -e Expected return codes of all invoked processes
+#   -v verbose output
+#   -- delimiter for additional arguments
+
+import sys, os, string, atexit
+
+from optparse import OptionParser
+
+from subprocess import Popen, PIPE
+
+# Our global list of processes we started
+procs = []
+
+# Run with no run wrapper
+# This is just starting "localities" processes on the local node
+def run_none(cmd, localities, verbose):
+    for locality in range(localities):
+        exec_cmd = cmd + " --hpx:node=" + str(locality)
+        if verbose:
+            print "Executing command: " + exec_cmd
+        proc = Popen(exec_cmd, shell=True, stdout=PIPE, stderr=PIPE)
+        procs.append(proc)
+
+# Run with mpiexec
+# This is executing mpiexec with the "-np" option set to the number of localities
+def run_mpi(cmd, localities, verbose):
+    mpiexec = "@MPIEXEC@"
+    if mpiexec == "":
+        msg = "mpiexec not available on this platform."
+        msg += "Please rerun CMake with HPX_HAVE_PARCELPORT_MPI=True."
+        print >> sys.stderr, msg
+        sys.exit(1)
+    exec_cmd = "@MPIEXEC@ -np " + str(localities) + " " + cmd
+    if verbose:
+        print "Executing command: " + exec_cmd
+    proc = Popen(exec_cmd, shell=True, stdout=PIPE, stderr=PIPE)
+    procs.append(proc)
+
+# Run with srun
+# This is executing srun with the "-n" option set to the number of localities
+def run_srun(cmd, localities, verbose):
+    exec_cmd = "srun -n " + str(localities) + " " + cmd
+    if verbose:
+        print "Executing command: " + exec_cmd
+    proc = Popen(exec_cmd, shell=True, stdout=PIPE, stderr=PIPE)
+    procs.append(proc)
+
+# Select the appropriate run function based on runwrapper
+def run(cmd, runwrapper, localities, verbose):
+    if runwrapper == "none":
+        run_none(cmd, localities, verbose)
+    if runwrapper == "mpi":
+        run_mpi(cmd, localities, verbose)
+    if runwrapper == "srun":
+        run_srun(cmd, localities, verbose)
+
+# Output of our started process. We seperate the stdout and stderr for better
+# post analysis. If verbose is set, the number of the process will be shown as
+# well
+def output(proc, which, verbose):
+    (stdout, stderr) = proc.communicate()
+    if stdout:
+        if verbose:
+            print "STDOUT of process " + str(which) + ":"
+        print stdout
+        if verbose:
+            print "STDOUT of process " + str(which) + " end\n"
+    if stderr:
+        if verbose:
+            print >> sys.stderr, "STDERR of process " + str(which) + ":"
+        print >> sys.stderr, stderr
+        if verbose:
+            print >> sys.stderr, "STDERR of process " + str(which) + " end\n"
+
+# Building the command line. This function concatenates the different options
+def build_cmd(options, args):
+    cmd = args[0]
+    args.pop(0)
+
+    # Selecting the parcelport for hpx via hpx ini confifuration
+    select_parcelport = (lambda pp:
+        " -Ihpx.parcel.ibverbs.enable=1" if pp == "ibverbs"
+        else " -Ihpx.parcel.ipc.enable=1" if pp == "ipc"
+        else " -Ihpx.parcel.mpi.enable=1 -Ihpx.parcel.bootstrap=mpi" if pp == "mpi"
+        else " -Ihpx.parcel.tcp.enable=1" if pp == "tcp"
+        else "")
+    cmd += select_parcelport(options.parcelport)
+
+    # set number of threads
+    cmd += " --hpx:threads=" + str(options.threads)
+    # set number of localities
+    cmd += " --hpx:localities=" + str(options.localities)
+
+    # Append the remaining args
+    for arg in args:
+        cmd += " " + arg
+
+    return cmd
+
+def check_options(parser, options, args):
+    if 0 == len(args):
+        print >> sys.stderr, "Error: You need to specify at least the application to start\n"
+        parser.print_help()
+        sys.exit(1)
+
+    if not os.path.exists(args[0]):
+        print >> sys.stderr, "Executable " + args[0] + " does not exist"
+        sys.exit(1)
+
+    if options.localities < 1:
+        print >> sys.stderr, "Can not start less than one locality"
+        sys.exit(1)
+
+    if options.threads < 1:
+        print >> sys.stderr, "Can not start less than one thread per locality"
+        sys.exit(1)
+
+    check_valid_parcelport = (lambda x:
+            x == "ibverbs" or x == "ipc" or x == "mpi" or x == "tcp");
+    if not check_valid_parcelport(options.parcelport):
+        print >> sys.stderr, "Error: Parcelport option not valid\n"
+        parser.print_help()
+        sys.exit(1)
+
+    check_valid_runwrapper = (lambda x:
+            x == "none" or x == "mpi" or x == "srun");
+    if not check_valid_runwrapper(options.runwrapper):
+        print >> sys.stderr, "Error: Runwrapper option not valid\n"
+        parser.print_help()
+        sys.exit(1)
+    
+# Kill all our started processes when we exit
+def set_exit_handler(func):
+    if os.name == "nt":
+        try:
+            import win32api
+            win32api.SetConsoleCtrlHandler(func, True)
+        except ImportError:
+            version = ".".join(map(str, sys.version_info[:2]))
+            raise Exception("pywin32 not installed for Python " + version)
+    else:
+        import signal
+        signal.signal(signal.SIGTERM, func)
+
+def kill_subprocesses(sig = 0, func = None):
+    if procs:
+        print "Unexpected script termination. Killing remaining processes."
+    which = 0
+    for proc in procs:
+        proc.kill()
+        output(proc, which, True)
+        which = which + 1
+
+if __name__ == "__main__":
+
+    sys.exitfunc = kill_subprocesses
+    set_exit_handler(kill_subprocesses)
+
+    help_message = "Usage %proc hpx-application [Options] [-- Additional options]\n"
+    help_message = help_message + "\n"
+    help_message = help_message + "This script is a simple startup script to start"
+    help_message = help_message + "one or multiple HPX localities. It supports"
+    help_message = help_message + "various startup wrappers for distributed runs"
+
+    parser = OptionParser(usage = help_message)
+
+    default_env = (lambda env, default:
+        os.environ[env] if env in os.environ else default)
+
+    parser.add_option("-l", "--localities"
+      , action="store", type="int"
+      , dest="localities", default=default_env('HPXRUN_LOCALITIES', "1")
+      , help="Number of localities to run (environment variable "
+              "HPXRUN_LOCALITIES")
+
+    parser.add_option("-t", "--threads"
+      , action="store", type="int"
+      , dest="threads", default=default_env('HPXRUN_THREADS', "1")
+      , help="Number of threads per locality (environment variable "
+             "HPXRUN_THREADS)")
+
+    parser.add_option("-p", "--parcelport"
+      , action="store", type="string"
+      , dest="parcelport", default=default_env('HPXRUN_PARCELPORT', "tcp")
+      , help="Which parcelport to use (Options are: ibverbs, ipc, mpi, tcp) "
+             "(environment variable HPXRUN_PARCELPORT")
+
+    parser.add_option("-r", "--runwrapper"
+      , action="store", type="string"
+      , dest="runwrapper", default=default_env('HPXRUN_RUNWRAPPER', "none")
+      , help="Which runwrapper to use (Options are: none, mpi, srun) "
+             "(environment variable HPXRUN_ (environment variable"
+             "HPXRUN_RUNWRAPPER)")
+    
+    parser.add_option("-e", "--expected"
+      , action="store", type="int"
+      , dest="expected", default=default_env('HPXRUN_EXPECTED', "0")
+      , help="Expected return codes of all invoked processes "
+             "(environment variable HPXRUN_EXPECTED)")
+
+    parser.add_option("-v", "--verbose"
+      , action="store_true"
+      , dest="verbose", default=False
+            if default_env('HPXRUN_VERBOSE', "0") == "0" else True
+      , help="Verbose output (environment variable HPXRUN_VERBOSE)")
+
+    (options, args) = parser.parse_args()
+
+    check_options(parser, options, args)
+    if 'HPXRUN_ARGS' in os.environ:
+        args += os.environ['HPXRUN_ARGS'].split()
+
+    cmd = build_cmd(options, args)
+
+    if options.verbose:
+        print "Base command is '" + cmd + "'"
+
+    run(cmd, options.runwrapper, options.localities, options.verbose)
+
+    failed = False
+    which = 0
+    while procs:
+        # Pop the first process and wait for completion
+        ret = procs[0].wait()
+        proc = procs.pop(0)
+        output(proc, which, options.verbose)
+
+        if ret != options.expected:
+            # If the process failed, we kill the rest
+            kill_which = which + 1
+            while procs:
+                kill_proc = procs.pop(0)
+                kill_proc.kill()
+                output(kill_proc, kill_which, options.verbose)
+                failed = True
+
+            # Output which process failed
+            msg = "Process " + str(which) + " failed with an unexpected error "
+            msg += "code of " + str(ret) + " (expected " + str(options.expected)
+            msg += ")" 
+            print msg
+        which = which + 1
+
+    if failed:
+        sys.exit(1)
+

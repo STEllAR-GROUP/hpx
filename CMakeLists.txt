@@ -1607,7 +1607,15 @@ endif()
 add_plugin_modules()
 
 ###############################################################################
-hpx_option(HPX_BUILD_TESTS BOOL "Build HPX tests (default: ON)" ON ADVANCED)
+
+find_package(PythonInterp)
+
+if(NOT PYTHONINTERP_FOUND)
+    hpx_warn("hpx.tests" "Tests have been disabled because python was not found")
+    hpx_option(HPX_BUILD_TESTS BOOL "Build HPX tests (default: OFF)" OFF ADVANCED)
+else()
+    hpx_option(HPX_BUILD_TESTS BOOL "Build HPX tests (default: ON)" ON ADVANCED)
+endif()
 
 if(HPX_BUILD_TESTS)
   hpx_option(HPX_BUILD_TESTS_BENCHMARKS BOOL "Build HPX benchmark tests (default: ON)" ON ADVANCED)
@@ -1620,7 +1628,7 @@ if(HPX_BUILD_TESTS)
   include(CTest)
 
   add_custom_command(TARGET tests POST_BUILD
-    COMMAND ctest --output-on-failure)
+    COMMAND ctest --output-on-failure --timeout 100)
 
   include_directories(tests)
   add_subdirectory(tests)
@@ -1671,6 +1679,11 @@ endforeach()
 
 configure_file("${hpx_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
                "${CMAKE_BINARY_DIR}/hpx/config/defines.hpp"
+               @ONLY)
+
+# Configure hpxrun.py
+configure_file("${hpx_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
+               "${CMAKE_BINARY_DIR}/bin/hpxrun.py"
                @ONLY)
 
 ################################################################################
