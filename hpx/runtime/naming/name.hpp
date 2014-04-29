@@ -850,6 +850,11 @@ namespace hpx { namespace traits
       : boost::mpl::identity<naming::id_type>
     {};
 
+    template <>
+    struct promise_remote_result<naming::id_type>
+      : boost::mpl::identity<naming::gid_type>
+    {};
+
     // we need to specialize this template to allow for automatic conversion of
     // the vector<naming::gid_type> to a vector<naming::id_type>
     template <>
@@ -872,6 +877,11 @@ namespace hpx { namespace traits
     template <>
     struct promise_local_result<std::vector<naming::gid_type> >
       : boost::mpl::identity<std::vector<naming::id_type> >
+    {};
+
+    template <>
+    struct promise_remote_result<std::vector<naming::id_type> >
+      : boost::mpl::identity<std::vector<naming::gid_type> >
     {};
 }}
 
