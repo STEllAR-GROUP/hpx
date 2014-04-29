@@ -55,13 +55,14 @@ inline std::size_t idx(std::size_t i, std::size_t size)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Our operator:
-//   f(t+1, i) = (f(t, i-1) + f(t, i) + f(t, i+1)) / 3
+// Our operator: f(t+1, i) = (f(t, i-1) + f(t, i) + f(t, i+1)) / 3
 inline double heat(double a, double b, double c)
 {
     return (a + b + c) / 3.;
 }
 
+// The partitioned operator, it invokes the heat operator above on all elements
+// of a partition.
 cell heat_part(cell const& left, cell const& middle, cell const& right)
 {
     std::size_t size = middle.size();
