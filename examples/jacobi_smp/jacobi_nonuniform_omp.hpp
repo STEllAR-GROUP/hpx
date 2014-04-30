@@ -30,7 +30,7 @@ namespace jacobi_smp {
         for(std::size_t i = 0; i < iterations; ++i)
         {
 #pragma omp parallel for schedule(JACOBI_SMP_OMP_SCHEDULE)
-            for(std::size_t row = 0; row < b.size();  ++row)
+            for(int row = 0; row < int(b.size());  ++row)
             {
                 jacobi_kernel_nonuniform(
                           A

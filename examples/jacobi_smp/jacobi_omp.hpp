@@ -28,7 +28,7 @@ namespace jacobi_smp {
         for(std::size_t i = 0; i < iterations; ++i)
         {
 #pragma omp parallel for schedule(JACOBI_SMP_OMP_SCHEDULE)
-            for(std::size_t y = 1; y < n-1; ++y)
+            for(int y = 1; y < int(n-1); ++y)
             {
                       double * dst = &(*grid_new)[y * n];
                 const double * src = &(*grid_new)[y * n];
