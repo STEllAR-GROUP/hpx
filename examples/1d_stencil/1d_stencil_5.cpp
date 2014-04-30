@@ -181,7 +181,7 @@ cell heat_part(cell const& left, cell const& middle, cell const& right)
     using hpx::util::unwrapped;
 
     return dataflow(unwrapped(
-        [left, middle, right](cell_data const& l, cell_data const& m, cell_data const& r)
+        [middle](cell_data const& l, cell_data const& m, cell_data const& r)
         {
             // the new cell_data will be allocated on the same locality as 'middle'
             return cell(middle.get_gid(), heat_part_data(l, m, r));
