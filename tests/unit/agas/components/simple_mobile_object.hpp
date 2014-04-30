@@ -18,17 +18,12 @@ namespace hpx { namespace test
 
 struct simple_mobile_object
   : components::client_base<
-        simple_mobile_object
-      , components::stub_base<server::simple_mobile_object>
+        simple_mobile_object, server::simple_mobile_object
     >
 {
     typedef components::client_base<
-        simple_mobile_object
-      , components::stub_base<server::simple_mobile_object>
+        simple_mobile_object, server::simple_mobile_object
     > base_type;
-
-  private:
-    using base_type::create;
 
   public:
     typedef server::simple_mobile_object server_type;
@@ -38,7 +33,7 @@ struct simple_mobile_object
         naming::id_type const& locality
         )
     {
-        this->base_type::create(locality);
+        gid_ = stub_type::create_async(locality);
     }
 
     boost::uint64_t get_lva()

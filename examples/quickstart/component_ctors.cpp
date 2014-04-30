@@ -42,8 +42,12 @@ typedef message_server::print_action print_action;
 HPX_REGISTER_ACTION_DECLARATION(print_action);
 HPX_REGISTER_ACTION(print_action);
 
-struct message : client_base<message, stub_base<message_server> >
+struct message : client_base<message, message_server>
 {
+    typedef client_base<message, message_server> base_type;
+
+    message(hpx::future<hpx::id_type> && id) : base_type(std::move(id)) {}
+
     void print() { async<print_action>(this->get_gid()).get(); }
 };
 
