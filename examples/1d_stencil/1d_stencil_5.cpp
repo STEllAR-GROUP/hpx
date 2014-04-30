@@ -1,5 +1,4 @@
 //  Copyright (c) 2014 Hartmut Kaiser
-//  Copyright (c) 2014 Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -66,6 +65,9 @@ std::ostream& operator<<(std::ostream& os, cell_data const& c)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// This is the server side representation of the data. We expose this as a HPX
+// component which allows for it to be created and accessed remotely through
+// a global address (hpx::id_type).
 struct cell_server : hpx::components::simple_component_base<cell_server>
 {
     // construct new instances
@@ -85,12 +87,30 @@ struct cell_server : hpx::components::simple_component_base<cell_server>
         return data_;
     }
 
-    HPX_DEFINE_COMPONENT_CONST_ACTION(cell_server, get_data, get_data_action);
+    // Every member function which has to be invoked remotely needs to be
+    // wrapped into a component action. The macro below defines a new type
+    // 'get_data_action' which represents the (possibly remote) member function
+    // cell::get_data().
+    HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(cell_server, get_data, get_data_action);
 
 private:
     cell_data data_;
 };
 
+// The macros below are necessary to generate the code required for exposing
+// our cell type remotely.
+//
+// HPX_REGISTER_MINIMAL_COMPONENT_FACTORY() exposes the component creation
+// through hpx::new_<>().
+typedef hpx::components::simple_component<cell_server> server_type;
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server_type, cell_server);
+
+// HPX_REGISTER_ACTION() exposes the component member function for remote
+// invocation.
+typedef cell_server::get_data_action get_data_action;
+HPX_REGISTER_ACTION(get_data_action);
+
+///////////////////////////////////////////////////////////////////////////////
 // This is a client side helper class allowing to hide some of the tedious
 // boilerplate.
 struct cell : hpx::components::client_base<cell, cell_server>
@@ -99,38 +119,37 @@ struct cell : hpx::components::client_base<cell, cell_server>
 
     cell() {}
 
-    // create new component on locality 'where' and initialize the held data
+    // Create new component on locality 'where' and initialize the held data
     cell(hpx::id_type where, std::size_t size, double initial_value)
       : base_type(hpx::new_<cell_server>(where, size, initial_value))
     {}
 
+    // Create a new component on the locality co-located to the id 'where'. The
+    // new instance will be initialized from the given cell_data.
     cell(hpx::id_type where, cell_data && data)
       : base_type(hpx::new_colocated<cell_server>(where, std::move(data)))
     {}
 
-    // attach future representing (possibly remote) cell
+    // Attach a future representing a (possibly remote) cell.
     cell(hpx::future<hpx::id_type> && id)
       : base_type(std::move(id))
     {}
 
+    // Unwrap a future<cell> (a cell already holds a future to the id of the
+    // referenced object, thus unwrapping accesses this inner future).
     cell(hpx::future<cell> && c)
       : base_type(std::move(c))
     {}
 
-    // Invoke the (remote) member function which gives us access to the data
+    ///////////////////////////////////////////////////////////////////////////
+    // Invoke the (remote) member function which gives us access to the data.
+    // This is a pure helper function hiding the async.
     hpx::future<cell_data> get_data() const
     {
         cell_server::get_data_action act;
         return hpx::async(act, get_gid());
     }
 };
-
-typedef hpx::components::simple_component<cell_server> server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server_type, cell_server);
-
-typedef cell_server::get_data_action get_data_action;
-HPX_REGISTER_ACTION_DECLARATION(get_data_action);
-HPX_REGISTER_ACTION(get_data_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef std::vector<cell> space;            // data for one time step
@@ -182,6 +201,10 @@ cell heat_part(cell const& left, cell const& middle, cell const& right)
         left.get_data(), middle.get_data(), right.get_data());
 }
 
+// Global functions can be exposed as actions as well. That allows to invoke
+// those remotely. The macro HPX_PLAIN_ACTION() defines a new action type
+// 'heat_part_action' which wraps the global function heat_part(). It can be
+// used to call that function on a given locality.
 HPX_PLAIN_ACTION(heat_part, heat_part_action);
 
 ///////////////////////////////////////////////////////////////////////////////
