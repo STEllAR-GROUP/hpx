@@ -155,7 +155,7 @@ def set_exit_handler(func):
             win32api.SetConsoleCtrlHandler(func, True)
         except ImportError:
             version = ".".join(map(str, sys.version_info[:2]))
-            raise Exception("pywin32 not installed for Python " + version)
+#            raise Exception("pywin32 not installed for Python " + version)
     else:
         import signal
         signal.signal(signal.SIGTERM, func)
