@@ -1,7 +1,20 @@
 //  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014 Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+// This is the second in a series of examples demonstrating the development of
+// a fully distributed solver for a simple 1D heat distribution problem.
+//
+// This example shows how futurization can be applied to the code from example
+// one. While this nicely parallelizes the code (note: without changing the
+// overall structure of the algorithm), the achieved performance is bad (a lot
+// slower than example one). This is caused by the large amount of overheads
+// introduced by wrapping each and every grid point into its own future object.
+// The amount of work performed by each of the created HPX threads (one thread
+// for every grid point and time step) is too small compared to the imposed
+// overheads.
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
@@ -12,8 +25,8 @@ double dt = 1.;     // time step
 double dx = 1.;     // grid spacing
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::shared_future<double> cell;
-typedef std::vector<cell> space;
+typedef hpx::shared_future<double> subgrid;
+typedef std::vector<subgrid> space;
 typedef std::vector<space> spacetime;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -63,7 +76,7 @@ int hpx_main(boost::program_options::variables_map& vm)
             next[i] = dataflow(Op, current[idx(i-1, nx)], current[i], current[idx(i+1, nx)]);
     }
 
-    // Now the asynchronous computation is running; the above for loop does not
+    // Now the asynchronous computation is running; the above for-loop does not
     // wait on anything. There is no implicit waiting at the end of each timestep;
     // the computation of each U[t][i] will begin when as soon as its dependencies
     // are ready and hardware is available.

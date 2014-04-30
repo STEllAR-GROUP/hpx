@@ -3,6 +3,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// This is the first in a series of examples demonstrating the development of a
+// fully distributed solver for a simple 1D heat distribution problem.
+//
+// This example provides a serial base line implementation. No parallelization
+// is performed.
+
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
@@ -12,8 +18,8 @@ double dt = 1.;     // time step
 double dx = 1.;     // grid spacing
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef double cell;
-typedef std::vector<cell> space;
+typedef double subgrid;
+typedef std::vector<subgrid> space;
 typedef std::vector<space> spacetime;
 
 ///////////////////////////////////////////////////////////////////////////////

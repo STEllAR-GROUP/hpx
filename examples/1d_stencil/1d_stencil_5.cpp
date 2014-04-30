@@ -3,6 +3,18 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// This is the fifth in a series of examples demonstrating the development of a
+// fully distributed solver for a simple 1D heat distribution problem.
+//
+// This example builds on example four. It adds the possibility to distribute
+// both - the locality of the partitions and the locality of where the
+// heat_part code is executed. The overall code however still runs on one
+// locality only (it is always using hpx::find_here() as the target locality).
+//
+// This example adds all the boilerplate needed for enabling distributed
+// operation. Instead of calling (local) functions we invoke the corresponding
+// actions.
+
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
@@ -14,17 +26,17 @@ double dt = 1.;     // time step
 double dx = 1.;     // grid spacing
 
 ///////////////////////////////////////////////////////////////////////////////
-struct cell_data
+struct subgrid_data
 {
-    cell_data()
+    subgrid_data()
       : size_(0)
     {}
 
-    cell_data(std::size_t size)
+    subgrid_data(std::size_t size)
       : data_(new double [size]), size_(size)
     {}
 
-    cell_data(std::size_t size, double initial_value)
+    subgrid_data(std::size_t size, double initial_value)
       : data_(new double [size]), size_(size)
     {
         double base_value = double(initial_value * size);
@@ -51,7 +63,7 @@ private:
     std::size_t size_;
 };
 
-std::ostream& operator<<(std::ostream& os, cell_data const& c)
+std::ostream& operator<<(std::ostream& os, subgrid_data const& c)
 {
     os << "{";
     for (std::size_t i = 0; i != c.size(); ++i)
@@ -68,21 +80,21 @@ std::ostream& operator<<(std::ostream& os, cell_data const& c)
 // This is the server side representation of the data. We expose this as a HPX
 // component which allows for it to be created and accessed remotely through
 // a global address (hpx::id_type).
-struct cell_server : hpx::components::simple_component_base<cell_server>
+struct subgrid_server : hpx::components::simple_component_base<subgrid_server>
 {
     // construct new instances
-    cell_server() {}
+    subgrid_server() {}
 
-    cell_server(cell_data const& data)
+    subgrid_server(subgrid_data const& data)
       : data_(data)
     {}
 
-    cell_server(std::size_t size, double initial_value)
+    subgrid_server(std::size_t size, double initial_value)
       : data_(size, initial_value)
     {}
 
     // access data
-    cell_data get_data() const
+    subgrid_data get_data() const
     {
         return data_;
     }
@@ -90,69 +102,69 @@ struct cell_server : hpx::components::simple_component_base<cell_server>
     // Every member function which has to be invoked remotely needs to be
     // wrapped into a component action. The macro below defines a new type
     // 'get_data_action' which represents the (possibly remote) member function
-    // cell::get_data().
-    HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(cell_server, get_data, get_data_action);
+    // subgrid::get_data().
+    HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(subgrid_server, get_data, get_data_action);
 
 private:
-    cell_data data_;
+    subgrid_data data_;
 };
 
 // The macros below are necessary to generate the code required for exposing
-// our cell type remotely.
+// our subgrid type remotely.
 //
 // HPX_REGISTER_MINIMAL_COMPONENT_FACTORY() exposes the component creation
 // through hpx::new_<>().
-typedef hpx::components::simple_component<cell_server> server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server_type, cell_server);
+typedef hpx::components::simple_component<subgrid_server> server_type;
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server_type, subgrid_server);
 
 // HPX_REGISTER_ACTION() exposes the component member function for remote
 // invocation.
-typedef cell_server::get_data_action get_data_action;
+typedef subgrid_server::get_data_action get_data_action;
 HPX_REGISTER_ACTION(get_data_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 // This is a client side helper class allowing to hide some of the tedious
 // boilerplate.
-struct cell : hpx::components::client_base<cell, cell_server>
+struct subgrid : hpx::components::client_base<subgrid, subgrid_server>
 {
-    typedef hpx::components::client_base<cell, cell_server> base_type;
+    typedef hpx::components::client_base<subgrid, subgrid_server> base_type;
 
-    cell() {}
+    subgrid() {}
 
     // Create new component on locality 'where' and initialize the held data
-    cell(hpx::id_type where, std::size_t size, double initial_value)
-      : base_type(hpx::new_<cell_server>(where, size, initial_value))
+    subgrid(hpx::id_type where, std::size_t size, double initial_value)
+      : base_type(hpx::new_<subgrid_server>(where, size, initial_value))
     {}
 
     // Create a new component on the locality co-located to the id 'where'. The
-    // new instance will be initialized from the given cell_data.
-    cell(hpx::id_type where, cell_data && data)
-      : base_type(hpx::new_colocated<cell_server>(where, std::move(data)))
+    // new instance will be initialized from the given subgrid_data.
+    subgrid(hpx::id_type where, subgrid_data && data)
+      : base_type(hpx::new_colocated<subgrid_server>(where, std::move(data)))
     {}
 
-    // Attach a future representing a (possibly remote) cell.
-    cell(hpx::future<hpx::id_type> && id)
+    // Attach a future representing a (possibly remote) subgrid.
+    subgrid(hpx::future<hpx::id_type> && id)
       : base_type(std::move(id))
     {}
 
-    // Unwrap a future<cell> (a cell already holds a future to the id of the
+    // Unwrap a future<subgrid> (a subgrid already holds a future to the id of the
     // referenced object, thus unwrapping accesses this inner future).
-    cell(hpx::future<cell> && c)
+    subgrid(hpx::future<subgrid> && c)
       : base_type(std::move(c))
     {}
 
     ///////////////////////////////////////////////////////////////////////////
     // Invoke the (remote) member function which gives us access to the data.
     // This is a pure helper function hiding the async.
-    hpx::future<cell_data> get_data() const
+    hpx::future<subgrid_data> get_data() const
     {
-        cell_server::get_data_action act;
+        subgrid_server::get_data_action act;
         return hpx::async(act, get_gid());
     }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef std::vector<cell> space;            // data for one time step
+typedef std::vector<subgrid> space;            // data for one time step
 typedef std::vector<space> spacetime;       // all of stored time steps
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -170,11 +182,11 @@ inline double heat(double left, double middle, double right)
 
 // The partitioned operator, it invokes the heat operator above on all elements
 // of a partition.
-cell_data heat_part_data(
-    cell_data const& left, cell_data const& middle, cell_data const& right)
+subgrid_data heat_part_data(
+    subgrid_data const& left, subgrid_data const& middle, subgrid_data const& right)
 {
     std::size_t size = middle.size();
-    cell_data next(size);
+    subgrid_data next(size);
 
     next[0] = heat(left[size-1], middle[0], middle[1]);
 
@@ -187,16 +199,16 @@ cell_data heat_part_data(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-cell heat_part(cell const& left, cell const& middle, cell const& right)
+subgrid heat_part(subgrid const& left, subgrid const& middle, subgrid const& right)
 {
     using hpx::lcos::local::dataflow;
     using hpx::util::unwrapped;
 
     return dataflow(unwrapped(
-        [middle](cell_data const& l, cell_data const& m, cell_data const& r)
+        [middle](subgrid_data const& l, subgrid_data const& m, subgrid_data const& r)
         {
-            // the new cell_data will be allocated on the same locality as 'middle'
-            return cell(middle.get_gid(), heat_part_data(l, m, r));
+            // the new subgrid_data will be allocated on the same locality as 'middle'
+            return subgrid(middle.get_gid(), heat_part_data(l, m, r));
         }),
         left.get_data(), middle.get_data(), right.get_data());
 }
@@ -225,7 +237,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     // Initial conditions:
     //   f(0, i) = i
     for (std::size_t i = 0; i != np; ++i)
-        U[0][i] = cell(hpx::find_here(), nx, double(i));
+        U[0][i] = subgrid(hpx::find_here(), nx, double(i));
 
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
