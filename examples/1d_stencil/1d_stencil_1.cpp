@@ -8,9 +8,9 @@
 #include <hpx/hpx.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-double k = 0.5;
-double dt = 1.;
-double dx = 1.;
+double k = 0.5;     // heat transfer coefficient
+double dt = 1.;     // time step
+double dx = 1.;     // grid spacing
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef double cell;
@@ -27,7 +27,7 @@ inline std::size_t idx(std::size_t i, std::size_t size)
 // Our operator:
 inline double heat(double left, double middle, double right)
 {
-    return middle + (k*dt/dx*dx)*(left - 2*middle + right);
+    return middle + (k*dt/dx*dx) * (left - 2*middle + right);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

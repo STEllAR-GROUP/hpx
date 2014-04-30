@@ -10,9 +10,9 @@
 #include <boost/shared_array.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-double k = 0.5;
-double dt = 1.;
-double dx = 1.;
+double k = 0.5;     // heat transfer coefficient
+double dt = 1.;     // time step
+double dx = 1.;     // grid spacing
 
 ///////////////////////////////////////////////////////////////////////////////
 struct cell_data
@@ -39,20 +39,13 @@ struct cell_data
     std::size_t size() const { return size_; }
 
 private:
-    // serialization support
+    // Serialization support: even if all of the code below runs on one
+    // locality only, we need to provide an (empty) implementation for the
+    // serialization as all arguments passed to actions have to support this.
     friend boost::serialization::access;
 
     template <typename Archive>
-    void save(Archive& ar, const unsigned int version) const
-    {
-    }
-
-    template <typename Archive>
-    void load(Archive& ar, const unsigned int version)
-    {
-    }
-
-    BOOST_SERIALIZATION_SPLIT_MEMBER()
+    void serialize(Archive& ar, const unsigned int version) const {}
 
 private:
     boost::shared_array<double> data_;
@@ -153,7 +146,7 @@ inline std::size_t idx(std::size_t i, std::size_t size)
 // Our operator:
 inline double heat(double left, double middle, double right)
 {
-    return middle + (k*dt/dx*dx)*(left - 2*middle + right);
+    return middle + (k*dt/dx*dx) * (left - 2*middle + right);
 }
 
 // The partitioned operator, it invokes the heat operator above on all elements
