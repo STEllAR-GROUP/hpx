@@ -58,8 +58,9 @@ namespace jacobi
                 //, stencil_iterators(g.rows.size())
             {
                 stencil_iterators.reserve(ny);
-                hpx::components::distributing_factory factory;
-                factory.create(hpx::find_here());
+
+                hpx::components::distributing_factory factory =
+                    hpx::components::distributing_factory::create(hpx::find_here());
 
                 // make get the type of the solver component
                 hpx::components::component_type

@@ -44,9 +44,7 @@ struct test_client : client_base<test_client, stub_base<test_server> >
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    test_client t;
-
-    t.create(find_here());
+    test_client t = test_client::create(find_here());
     HPX_TEST_NEQ(hpx::naming::invalid_id, t.get_gid());
 
     t.check_gid();

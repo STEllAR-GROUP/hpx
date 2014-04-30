@@ -51,8 +51,7 @@ struct test_client
 ///////////////////////////////////////////////////////////////////////////////
 void test(hpx::id_type there)
 {
-    test_client t1;
-    t1.create(there);
+    test_client t1 = test_client::create(there);
     HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_gid());
 
     // the new object should live on the source locality

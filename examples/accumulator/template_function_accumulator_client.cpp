@@ -28,8 +28,8 @@ int hpx_main()
 {
     {
         // Create an accumulator component on this locality.
-        examples::template_function_accumulator accu;
-        accu.create(hpx::find_here());
+        examples::template_function_accumulator accu =
+            examples::template_function_accumulator::create(hpx::find_here());
 
         // Print out the available commands.
         std::cout << help << std::endl << "> ";

@@ -62,8 +62,7 @@ struct test_client
 bool test_copy_component(hpx::id_type id)
 {
     // create component on given locality
-    test_client t1;
-    t1.create(id);
+    test_client t1 = test_client::create(id);
     HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_gid());
 
     try {
@@ -87,8 +86,7 @@ bool test_copy_component(hpx::id_type id)
 bool test_copy_component_here(hpx::id_type id)
 {
     // create component on given locality
-    test_client t1;
-    t1.create(id);
+    test_client t1 = test_client::create(id);
     HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_gid());
 
     try {
@@ -112,8 +110,7 @@ bool test_copy_component_here(hpx::id_type id)
 bool test_copy_component_there(hpx::id_type id)
 {
     // create component on given locality
-    test_client t1;
-    t1.create(hpx::find_here());
+    test_client t1 = test_client::create(hpx::find_here());
     HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_gid());
 
     try {

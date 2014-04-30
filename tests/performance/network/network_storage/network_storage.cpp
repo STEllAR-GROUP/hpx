@@ -270,7 +270,7 @@ namespace Storage {
         uint32_t address, uint64_t length, std::size_t remote_buffer)
     {
         // we must allocate a temporary buffer to copy from storage into
-        // we can't use the remote buffer supplied because it is a handle to memory on 
+        // we can't use the remote buffer supplied because it is a handle to memory on
         // the (possibly) remote node. We allocate here using a NULL deleter so the array will
         // not be released by the shared_pointer
         std::allocator<char> local_allocator;
@@ -367,12 +367,12 @@ int reduce(hpx::future<std::vector<hpx::future<int>>> futvec)
 // Create a new barrier and register its gid with the given symbolic name.
 hpx::lcos::barrier create_barrier(std::size_t num_localities, char const* symname)
 {
-    hpx::lcos::barrier b;
     DEBUG_OUTPUT(2,
         std::cout << "Creating barrier based on N localities "
                   << num_localities << std::endl;
     );
-    b.create(hpx::find_here(), num_localities);
+
+    hpx::lcos::barrier b = hpx::lcos::barrier::create(hpx::find_here(), num_localities);
     hpx::agas::register_name_sync(symname, b.get_gid());
     return b;
 }
@@ -837,7 +837,7 @@ int main(int argc, char* argv[])
           "When set, all ranks send to all others, when off, only rank 0 send to the others.\n")
         ;
 
-    // if the user does not set parceltype on the command line, 
+    // if the user does not set parceltype on the command line,
     // we use a default of unknowm so we don't mistake plots
     desc_commandline.add_options()
         ( "parceltype",
