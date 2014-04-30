@@ -190,7 +190,7 @@ namespace hpx { namespace components
         // A future to a client_base can be unwrapped to represent the
         // client_base directly as a client_base holds another future to the
         // id of the referenced object.
-        explicit client_base(future<Derived> && d)
+        client_base(future<Derived> && d)
           : gid_(d.unwrap())
         {}
 
@@ -216,20 +216,30 @@ namespace hpx { namespace components
             gid_ = std::move(gid);
             return *this;
         }
+        client_base& operator=(future<naming::id_type> && gid)
+        {
+            gid_ = gid.share();
+            return *this;
+        }
+
+        client_base& operator=(future<Derived> && d)
+        {
+            gid_ = d.unwrap();
+            return *this;
+        }
 
         client_base& operator=(client_base const & rhs)
         {
-            if (this != &rhs)
-                gid_ = rhs.gid_;
+            gid_ = rhs.gid_;
             return *this;
         }
         client_base& operator=(client_base && rhs)
         {
-            if (this != &rhs)
-                gid_ = std::move(rhs.gid_);
+            gid_ = std::move(rhs.gid_);
             return *this;
         }
 
+        // check whether the embedded future is valid
         operator typename util::safe_bool<client_base>::result_type() const
         {
             return util::safe_bool<client_base>()(gid_.valid());
@@ -243,7 +253,7 @@ namespace hpx { namespace components
             return Derived(stub_type::create_async(targetgid));
         }
 
-        static Derived& create_colocated(naming::id_type const& id)
+        static Derived create_colocated(naming::id_type const& id)
         {
             return Derived(stub_type::create_colocated_async(id));
         }
