@@ -25,12 +25,13 @@ namespace jacobi_smp {
 
         boost::shared_ptr<vector_type> dst(new vector_type(b));
         boost::shared_ptr<vector_type> src(new vector_type(b));
-        
+
         hpx::util::high_resolution_timer t;
         for(std::size_t i = 0; i < iterations; ++i)
         {
+            // MSVC is unhappy if the OMP loop variable is unsigned
 #pragma omp parallel for schedule(JACOBI_SMP_OMP_SCHEDULE)
-            for(std::size_t row = 0; row < b.size();  ++row)
+            for(boost::int64_t row = 0; row < boost::int64_t(b.size());  ++row)
             {
                 jacobi_kernel_nonuniform(
                           A
@@ -45,7 +46,7 @@ namespace jacobi_smp {
 
         double time_elapsed = t.elapsed();
         std::cout << dst->size() << " "
-            << ((double(dst->size() * iterations)/1e6)/time_elapsed) << " MLUPS/s\n" 
+            << ((double(dst->size() * iterations)/1e6)/time_elapsed) << " MLUPS/s\n"
             << std::flush;
     }
 }

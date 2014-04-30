@@ -27,8 +27,9 @@ namespace jacobi_smp {
         hpx::util::high_resolution_timer t;
         for(std::size_t i = 0; i < iterations; ++i)
         {
+            // MSVC is unhappy if the OMP loop variable is unsigned
 #pragma omp parallel for schedule(JACOBI_SMP_OMP_SCHEDULE)
-            for(std::size_t y = 1; y < n-1; ++y)
+            for(boost::int64_t y = 1; y < boost::int64_t(n-1); ++y)
             {
                       double * dst = &(*grid_new)[y * n];
                 const double * src = &(*grid_new)[y * n];
