@@ -15,8 +15,14 @@
 namespace jacobi
 {
     struct solver
-        : hpx::components::client_base<solver, hpx::components::stub_base<server::solver> >
+        : hpx::components::client_base<solver, server::solver>
     {
+        typedef hpx::components::client_base<solver, server::solver> base_type;
+
+        solver(hpx::future<hpx::id_type> && id)
+          : base_type(std::move(id))
+        {}
+
         solver(grid const & g, std::size_t nx, std::size_t line_block)
         {
             // make get the type of the solver component
@@ -38,7 +44,6 @@ namespace jacobi
         {
             hpx::async<server::solver::run_action>(this->get_gid(), max_iterations).get();
         }
-
     };
 }
 

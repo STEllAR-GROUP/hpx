@@ -30,6 +30,10 @@ HPX_REGISTER_ACTION(check_ptr_action);
 struct test_client
   : hpx::components::client_base<test_client, test_server>
 {
+    typedef client_base<test_client, stub_base<test_server> > base_type;
+
+    test_client(hpx::future<hpx::id_type>&& id) : base_type(std::move(id)) {}
+
     std::size_t check_ptr() { return check_ptr_action()(this->get_gid()); }
 };
 
@@ -57,7 +61,7 @@ bool test_get_ptr1(hpx::id_type id)
 
 bool test_get_ptr2(hpx::id_type id)
 {
-    test_client t - test_client::create(id);
+    test_client t = test_client::create(id);
     HPX_TEST_NEQ(hpx::naming::invalid_id, t.get_gid());
 
     hpx::future<boost::shared_ptr<test_server> > f =

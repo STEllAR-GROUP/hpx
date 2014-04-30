@@ -34,8 +34,8 @@ namespace examples
 
         /// Create a client side representation for the existing
         /// \a server::simple_accumulator instance with the given GID.
-        simple_accumulator(hpx::shared_future<hpx::naming::id_type> const& gid)
-          : base_type(gid)
+        simple_accumulator(hpx::future<hpx::naming::id_type> && gid)
+          : base_type(std::move(gid))
         {}
 
         ///////////////////////////////////////////////////////////////////////

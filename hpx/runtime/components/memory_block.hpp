@@ -44,6 +44,10 @@ namespace hpx { namespace components
           : base_type(gid)
         {}
 
+        memory_block(hpx::future<naming::id_type> && gid)
+          : base_type(std::move(gid))
+        {}
+
         ///////////////////////////////////////////////////////////////////////
         /// Create a new instance of a memory_block component on the locality as
         /// given by the parameter \a targetgid

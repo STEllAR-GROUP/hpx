@@ -43,9 +43,7 @@ struct hello_world : client_base<hello_world, stub_base<hello_world_server> >
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    hello_world hw;
-
-    hw.create(find_here());
+    hello_world hw = hello_world::create(find_here());
 
     hw.print();
 

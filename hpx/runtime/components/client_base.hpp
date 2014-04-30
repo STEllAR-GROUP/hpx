@@ -342,6 +342,7 @@ namespace hpx { namespace components
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
 
+    protected:
         future_type gid_;
     };
 }}
