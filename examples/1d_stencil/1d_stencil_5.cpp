@@ -10,6 +10,11 @@
 #include <boost/shared_array.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
+double k = 0.5;
+double dt = 1.;
+double dx = 1.;
+
+///////////////////////////////////////////////////////////////////////////////
 struct cell_data
 {
     cell_data()
@@ -146,10 +151,9 @@ inline std::size_t idx(std::size_t i, std::size_t size)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Our operator:
-//   f(t+1, i) = (f(t, i-1) + f(t, i) + f(t, i+1)) / 3
-inline double heat(double a, double b, double c)
+inline double heat(double left, double middle, double right)
 {
-    return (a + b + c) / 3.;
+    return middle + (k*dt/dx*dx)*(left - 2*middle + right);
 }
 
 // The partitioned operator, it invokes the heat operator above on all elements
@@ -241,6 +245,12 @@ int main(int argc, char* argv[])
          "Number of time steps")
         ("np", value<boost::uint64_t>()->default_value(10),
          "Number of partitions")
+        ("k", value<double>(&k)->default_value(0.5),
+         "Heat transfer coefficient (default: 0.5)")
+        ("dt", value<double>(&dt)->default_value(1.0),
+         "Timestep unit (default: 1.0[s])")
+        ("dx", value<double>(&dx)->default_value(1.0),
+         "Local x dimension")
     ;
 
     // Initialize and run HPX
