@@ -64,6 +64,7 @@ struct vector_t_client:
   typedef hpx::components::client_base<vector_t_client, vector_t_server>
     base_type;
 
+  vector_t_client() {}
   vector_t_client(hpx::future<hpx::id_type> && id) : base_type(std::move(id)) {}
 
   boost::shared_ptr<vector_t> get_ptr() const
@@ -159,6 +160,7 @@ struct matrix_t_client:
   typedef hpx::components::client_base<matrix_t_client, matrix_t_server>
     base_type;
 
+  matrix_t_client() {}
   matrix_t_client(hpx::future<hpx::id_type> && id) : base_type(std::move(id)) {}
 
   boost::shared_ptr<matrix_t> get_ptr() const
