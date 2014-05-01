@@ -86,8 +86,7 @@ hpx::id_type matrix_t_server::gemv_process(bool trans, double alpha,
   const
 {
   auto fx = hpx::async(vector_t_server::get_data_action(), x);
-  vector_t_client y;
-  y.create(hpx::find_here(), data->NI);
+  vector_t_client y = vector_t_client::create(hpx::find_here(), data->NI);
   ::gemv(trans, alpha, *data, *fx.get(), 0.0, *y.get_ptr());
   return y.get_gid();
 }
