@@ -106,7 +106,7 @@ namespace hpx { namespace components { namespace stubs
 
         template <typename Component>
         static naming::id_type create_component_colocated(
-            naming::id_type const& id)
+            naming::id_type const& gid)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the future

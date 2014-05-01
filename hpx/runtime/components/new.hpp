@@ -82,7 +82,7 @@ namespace hpx { namespace components
     >::type
     new_colocated(id_type const& id)
     {
-        return components::stub_base<Component>::create_colocated_async(locality);
+        return components::stub_base<Component>::create_colocated_async(id);
     }
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
