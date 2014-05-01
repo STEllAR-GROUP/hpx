@@ -36,7 +36,7 @@ def run_none(cmd, localities, verbose):
         exec_cmd = cmd + " --hpx:node=" + str(locality)
         if verbose:
             print "Executing command: " + exec_cmd
-        proc = Popen(exec_cmd, shell=True, stdout=PIPE, stderr=PIPE)
+        proc = Popen(exec_cmd, shell=True)
         procs.append(proc)
 
 # Run with mpiexec
@@ -51,7 +51,7 @@ def run_mpi(cmd, localities, verbose):
     exec_cmd = "@MPIEXEC@ -np " + str(localities) + " " + cmd
     if verbose:
         print "Executing command: " + exec_cmd
-    proc = Popen(exec_cmd, shell=True, stdout=PIPE, stderr=PIPE)
+    proc = Popen(exec_cmd, shell=True)
     procs.append(proc)
 
 # Run with srun
@@ -60,7 +60,7 @@ def run_srun(cmd, localities, verbose):
     exec_cmd = "srun -n " + str(localities) + " " + cmd
     if verbose:
         print "Executing command: " + exec_cmd
-    proc = Popen(exec_cmd, shell=True, stdout=PIPE, stderr=PIPE)
+    proc = Popen(exec_cmd, shell=True)
     procs.append(proc)
 
 # Select the appropriate run function based on runwrapper
@@ -166,7 +166,7 @@ def kill_subprocesses(sig = 0, func = None):
     which = 0
     for proc in procs:
         proc.kill()
-        output(proc, which, True)
+        #output(proc, which, True)
         which = which + 1
 
 if __name__ == "__main__":
@@ -239,9 +239,10 @@ if __name__ == "__main__":
     which = 0
     while procs:
         # Pop the first process and wait for completion
-        ret = procs[0].wait()
+        procs[0].wait()
+        ret = procs[0].returncode
         proc = procs.pop(0)
-        output(proc, which, options.verbose)
+        #output(proc, which, options.verbose)
 
         if ret != options.expected:
             # If the process failed, we kill the rest
@@ -249,7 +250,7 @@ if __name__ == "__main__":
             while procs:
                 kill_proc = procs.pop(0)
                 kill_proc.kill()
-                output(kill_proc, kill_which, options.verbose)
+                #output(kill_proc, kill_which, options.verbose)
                 failed = True
 
             # Output which process failed
