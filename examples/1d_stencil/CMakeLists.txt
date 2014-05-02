@@ -9,7 +9,8 @@ set(example_programs
     1d_stencil_2
     1d_stencil_3
     1d_stencil_4
-    1d_stencil_5)
+    1d_stencil_5
+    1d_stencil_6)
 
 foreach(example_program ${example_programs})
 

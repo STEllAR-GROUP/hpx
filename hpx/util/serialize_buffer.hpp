@@ -58,22 +58,9 @@ namespace hpx { namespace util
           , alloc_(alloc)
         {}
 
-        serialize_buffer (T const* data, std::size_t size,
-                allocator_type const& alloc = allocator_type())
-          : data_()
-          , size_(size)
-          , alloc_(alloc)
-        {
-            // create from const data implies 'copy' mode
-            using util::placeholders::_1;
-            data_.reset(alloc_.allocate(size),
-                util::bind(&serialize_buffer::deleter<allocator_type>,
-                    _1, alloc_, size_));
-            if (size != 0)
-                std::copy(data, data + size, data_.get());
-        }
-
-        serialize_buffer (T* data, std::size_t size, init_mode mode,
+        // The default mode is 'copy' which is consistent with the constructor
+        // taking a T const * below.
+        serialize_buffer (T* data, std::size_t size, init_mode mode = copy,
                 allocator_type const& alloc = allocator_type())
           : data_()
           , size_(size)
@@ -114,22 +101,6 @@ namespace hpx { namespace util
                     _1, dealloc, size_));
         }
 
-        // same set of constructors, but in addition taking a deleter
-        template <typename Deleter>
-        serialize_buffer (T const* data, std::size_t size,
-                Deleter const& deleter,
-                allocator_type const& alloc = allocator_type())
-          : data_()
-          , size_(size)
-          , alloc_(alloc)
-        {
-            // create from const data implies 'copy' mode
-            using util::placeholders::_1;
-            data_.reset(alloc_.allocate(size), deleter);
-            if (size != 0)
-                std::copy(data, data + size, data_.get());
-        }
-
         template <typename Deleter>
         serialize_buffer (T* data, std::size_t size, init_mode mode,
                 Deleter const& deleter,
@@ -139,14 +110,12 @@ namespace hpx { namespace util
           , alloc_(alloc)
         {
             if (mode == copy) {
-                using util::placeholders::_1;
                 data_.reset(alloc_.allocate(size), deleter);
                 if (size != 0)
                     std::copy(data, data + size, data_.get());
             }
             else {
                 // reference or take ownership, behavior is defined by deleter
-                using util::placeholders::_1;
                 data_ = boost::shared_array<T>(data, deleter);
             }
         }
@@ -161,12 +130,71 @@ namespace hpx { namespace util
           , alloc_(alloc)
         {
             // if 2 allocators are specified we assume mode 'take'
-            using util::placeholders::_1;
             data_ = boost::shared_array<T>(data, deleter);
         }
 
+        // same set of constructors, but taking const data
+        serialize_buffer (T const* data, std::size_t size,
+                allocator_type const& alloc = allocator_type())
+          : data_()
+          , size_(size)
+          , alloc_(alloc)
+        {
+            // create from const data implies 'copy' mode
+            using util::placeholders::_1;
+            data_.reset(alloc_.allocate(size),
+                util::bind(&serialize_buffer::deleter<allocator_type>,
+                    _1, alloc_, size_));
+            if (size != 0)
+                std::copy(data, data + size, data_.get());
+        }
+
+        template <typename Deleter>
+        serialize_buffer (T const* data, std::size_t size,
+                Deleter const& deleter,
+                allocator_type const& alloc = allocator_type())
+          : data_()
+          , size_(size)
+          , alloc_(alloc)
+        {
+            // create from const data implies 'copy' mode
+            data_.reset(alloc_.allocate(size), deleter);
+            if (size != 0)
+                std::copy(data, data + size, data_.get());
+        }
+
+        serialize_buffer (T const* data, std::size_t size,
+                init_mode mode, allocator_type const& alloc = allocator_type())
+          : data_()
+          , size_(size)
+          , alloc_(alloc)
+        {
+            if (mode == copy) {
+                data_.reset(alloc_.allocate(size),
+                    util::bind(&serialize_buffer::deleter<allocator_type>,
+                        _1, alloc_, size_));
+                if (size != 0)
+                    std::copy(data, data + size, data_.get());
+            }
+            else if (mode == reference) {
+                data_ = boost::shared_array<T>(
+                    const_cast<double*>(data),
+                    &serialize_buffer::no_deleter);
+            }
+            else {
+                // can't take ownership of const buffer
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "serialize_buffer::serialize_buffer",
+                    "can't take ownership of const data");
+            }
+        }
+
+        // accessors enabling data access
         T* data() { return data_.get(); }
         T const* data() const { return data_.get(); }
+
+        T& operator[](std::size_t idx) { return data_[idx]; }
+        T operator[](std::size_t idx) const { return data_[idx]; }
 
         boost::shared_array<T> data_array() const { return data_; }
 
@@ -285,16 +313,9 @@ namespace hpx { namespace util
           : size_(0)
         {}
 
-        serialize_buffer (T const* data, std::size_t size)
-          : data_(), size_(size)
-        {
-            // create from const data implies 'copy' mode
-            data_.reset(new T[size]);
-            if (size != 0)
-                std::copy(data, data + size, data_.get());
-        }
-
-        serialize_buffer (T* data, std::size_t size, init_mode mode)
+        // The default mode is 'copy' which is consistent with the constructor
+        // taking a T const * below.
+        serialize_buffer (T* data, std::size_t size, init_mode mode = copy)
           : data_(), size_(size)
         {
             if (mode == copy) {
@@ -310,18 +331,6 @@ namespace hpx { namespace util
                 // take ownership
                 data_ = boost::shared_array<T>(data);
             }
-        }
-
-        // same set of constructors, but in addition taking a deleter
-        template <typename Deleter>
-        serialize_buffer (T const* data, std::size_t size,
-                Deleter const& deleter)
-          : data_(), size_(size)
-        {
-            // create from const data implies 'copy' mode
-            data_.reset(new T[size], deleter);
-            if (size != 0)
-                std::copy(data, data + size, data_.get());
         }
 
         template <typename Deleter>
@@ -340,8 +349,46 @@ namespace hpx { namespace util
             }
         }
 
+        // same set of constructors, but taking const data
+        serialize_buffer (T const* data, std::size_t size,
+                init_mode mode = copy)
+          : data_(), size_(size)
+        {
+            if (mode == copy) {
+                data_.reset(new T[size]);
+                if (size != 0)
+                    std::copy(data, data + size, data_.get());
+            }
+            else if (mode == reference) {
+                data_ = boost::shared_array<T>(
+                    const_cast<double*>(data),
+                    &serialize_buffer::no_deleter);
+            }
+            else {
+                // can't take ownership of const buffer
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "serialize_buffer::serialize_buffer",
+                    "can't take ownership of const data");
+            }
+        }
+
+        template <typename Deleter>
+        serialize_buffer (T const* data, std::size_t size,
+                Deleter const& deleter)
+          : data_(), size_(size)
+        {
+            // create from const data implies 'copy' mode
+            data_.reset(new T[size], deleter);
+            if (size != 0)
+                std::copy(data, data + size, data_.get());
+        }
+
+        // accessors enabling data access
         T* data() { return data_.get(); }
         T const* data() const { return data_.get(); }
+
+        T& operator[](std::size_t idx) { return data_[idx]; }
+        T operator[](std::size_t idx) const { return data_[idx]; }
 
         boost::shared_array<T> data_array() const { return data_; }
 
