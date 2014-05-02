@@ -35,8 +35,8 @@ init(hpx::components::server::distributing_factory::iterator_range_type const& r
 // all localities that support that component type.
 void test_allgather(std::size_t np)
 {
-    hpx::components::distributing_factory factory;
-    factory.create(hpx::find_here());
+    hpx::components::distributing_factory factory =
+        hpx::components::distributing_factory::create(hpx::find_here());
 
     // Get the component type for our point component.
     hpx::components::component_type block_type =
@@ -93,8 +93,8 @@ void test_allgather(std::size_t np)
 
 void test_allgather_and_gate(std::size_t np)
 {
-    hpx::components::distributing_factory factory;
-    factory.create(hpx::find_here());
+    hpx::components::distributing_factory factory =
+        hpx::components::distributing_factory::create(hpx::find_here());
 
     // Get the component type for our point component.
     hpx::components::component_type block_type =

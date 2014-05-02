@@ -44,6 +44,28 @@ namespace hpx { namespace components
     template <typename Component, typename ArgN, ...>
     hpx::future<hpx::id_type>
     new_(hpx::id_type const& locality, Arg0 argN, ...);
+
+    /// \brief Create a new instance of the given Component type on the
+    ///        co-located with the specified object.
+    ///
+    /// This function creates a new instance of the given Component type
+    /// on the specified locality the given object is currently located on
+    /// and returns a future object for the global address which can be used
+    /// to reference the new component instance.
+    ///
+    /// \param id        [in] The global address of an object defining the
+    ///                  locality where the new instance should be created on.
+    /// \param argN      [in] Any number of arbitrary arguments (passed by
+    ///                  value, by const reference or by rvalue reference)
+    ///                  which will be forwarded to the constructor of
+    ///                  the created component instance.
+    ///
+    /// \returns The function returns an \a hpx::future object instance
+    ///          which can be used to retrieve the global address of the
+    ///          newly created component.
+    template <typename Component, typename ArgN, ...>
+    hpx::future<hpx::id_type>
+    new_colocated(hpx::id_type const& id, Arg0 argN, ...);
 #else
     template <typename Component>
     inline typename boost::enable_if<
@@ -52,6 +74,15 @@ namespace hpx { namespace components
     new_(id_type const& locality)
     {
         return components::stub_base<Component>::create_async(locality);
+    }
+
+    template <typename Component>
+    inline typename boost::enable_if<
+        traits::is_component<Component>, lcos::future<naming::id_type>
+    >::type
+    new_colocated(id_type const& id)
+    {
+        return components::stub_base<Component>::create_colocated_async(id);
     }
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
@@ -82,6 +113,7 @@ namespace hpx { namespace components
 namespace hpx
 {
     using hpx::components::new_;
+    using hpx::components::new_colocated;
 }
 
 #endif // HPX_NEW_OCT_10_2012_1256PM
@@ -97,6 +129,16 @@ namespace hpx
     new_(id_type const& locality, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         return components::stub_base<Component>::create_async(locality,
+            HPX_ENUM_FORWARD_ARGS(N , Arg, arg));
+    }
+
+    template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    inline typename boost::enable_if<
+        traits::is_component<Component>, lcos::future<naming::id_type>
+    >::type
+    new_colocated(id_type const& id, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+    {
+        return components::stub_base<Component>::create_colocated_async(id,
             HPX_ENUM_FORWARD_ARGS(N , Arg, arg));
     }
 

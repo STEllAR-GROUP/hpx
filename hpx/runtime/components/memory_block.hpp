@@ -44,11 +44,16 @@ namespace hpx { namespace components
           : base_type(gid)
         {}
 
+        memory_block(hpx::future<naming::id_type> && gid)
+          : base_type(std::move(gid))
+        {}
+
         ///////////////////////////////////////////////////////////////////////
         /// Create a new instance of a memory_block component on the locality as
         /// given by the parameter \a targetgid
         template <typename T, typename Config>
-        memory_block& create(naming::id_type const& targetgid, std::size_t count,
+        static memory_block create(naming::id_type const& targetgid,
+            std::size_t count,
             hpx::actions::manage_object_action<T, Config> const& act)
         {
             return base_type::create(targetgid, count, act);
@@ -58,7 +63,8 @@ namespace hpx { namespace components
         /// given by the parameter \a targetgid.
         /// Allocates count * sizeof(T1) bytes of memory
         template <typename T0, typename T1, typename Config>
-        memory_block& create(naming::id_type const& targetgid, std::size_t count,
+        static memory_block create(naming::id_type const& targetgid,
+            std::size_t count,
             hpx::actions::manage_object_action<T1, Config> const& act)
         {
             return create(targetgid, sizeof(T0) * count, act);
@@ -69,26 +75,28 @@ namespace hpx { namespace components
         /// Allocates count * sizeof(T) bytes of memory and automatically creates
         /// an instance of hpx::actions::manage_object_action<T>
         template <typename T>
-        memory_block& create(naming::id_type const& targetgid, std::size_t count)
+        static memory_block create(naming::id_type const& targetgid,
+            std::size_t count)
         {
             hpx::actions::manage_object_action<T> const act;
             return create(targetgid, sizeof(T) * count, act);
         }
 
         template <typename T0, typename T1>
-        memory_block& create(naming::id_type const& targetgid, std::size_t count)
+        static memory_block create(naming::id_type const& targetgid,
+            std::size_t count)
         {
             hpx::actions::manage_object_action<T1> const act;
             return create(targetgid, sizeof(T0) * count, act);
         }
 
         template <typename T0, typename T1, typename Config>
-        memory_block& create(naming::id_type const& targetgid, std::size_t count)
+        static memory_block create(naming::id_type const& targetgid,
+            std::size_t count)
         {
             hpx::actions::manage_object_action<T1, Config> const act;
             return create(targetgid, sizeof(T0) * count, act);
         }
-
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component

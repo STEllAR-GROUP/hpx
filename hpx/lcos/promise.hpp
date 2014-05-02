@@ -580,9 +580,10 @@ namespace hpx { namespace lcos
                 return lcos::future<Result>();
             }
 
-            using lcos::detail::future_access;
             future_obtained_ = true;
-            return future_access::create<future<Result> >(impl_->get());
+
+            using traits::future_access;
+            return future_access<future<Result> >::create(impl_->get());
         }
 
         ///
@@ -683,9 +684,10 @@ namespace hpx { namespace lcos
                 return lcos::future<void>();
             }
 
-            using lcos::detail::future_access;
             future_obtained_ = true;
-            return future_access::create<future<void> >(impl_->get());
+
+            using traits::future_access;
+            return future_access<future<void> >::create(impl_->get());
         }
 
         void set_value()

@@ -11,6 +11,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/traits.hpp>
+#include <hpx/traits/promise_remote_result.hpp>
+#include <hpx/traits/promise_local_result.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/lcos/future.hpp>
@@ -74,11 +76,9 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<
-                    Action
-                >::result_type
-            >::type
+            typename hpx::actions::extract_action<
+                Action
+            >::result_type
         continuation_result_type;
 
         lcos::promise<result_type> p;

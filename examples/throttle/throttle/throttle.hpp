@@ -28,8 +28,8 @@ namespace throttle
           : base_type(stubs::throttle::create(hpx::find_here()))
         {}
 
-        throttle(hpx::naming::id_type gid)
-          : base_type(gid)
+        throttle(hpx::future<hpx::naming::id_type> && gid)
+          : base_type(std::move(gid))
         {}
 
         ~throttle()

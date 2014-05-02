@@ -19,7 +19,7 @@ namespace hpx { namespace lcos
             typename lcos::detail::shared_state_ptr_for<T0>::type>
             result_type;
         result_type lazy_values_(
-            lcos::detail::future_access::get_shared_state(f0));
+            lcos::detail::get_shared_state(f0));
         if (n == 0)
         {
             return;
@@ -48,7 +48,7 @@ namespace hpx { namespace lcos
             typename lcos::detail::shared_state_ptr_for<T0>::type , typename lcos::detail::shared_state_ptr_for<T1>::type>
             result_type;
         result_type lazy_values_(
-            lcos::detail::future_access::get_shared_state(f0) , lcos::detail::future_access::get_shared_state(f1));
+            lcos::detail::get_shared_state(f0) , lcos::detail::get_shared_state(f1));
         if (n == 0)
         {
             return;
@@ -77,7 +77,7 @@ namespace hpx { namespace lcos
             typename lcos::detail::shared_state_ptr_for<T0>::type , typename lcos::detail::shared_state_ptr_for<T1>::type , typename lcos::detail::shared_state_ptr_for<T2>::type>
             result_type;
         result_type lazy_values_(
-            lcos::detail::future_access::get_shared_state(f0) , lcos::detail::future_access::get_shared_state(f1) , lcos::detail::future_access::get_shared_state(f2));
+            lcos::detail::get_shared_state(f0) , lcos::detail::get_shared_state(f1) , lcos::detail::get_shared_state(f2));
         if (n == 0)
         {
             return;
@@ -106,7 +106,7 @@ namespace hpx { namespace lcos
             typename lcos::detail::shared_state_ptr_for<T0>::type , typename lcos::detail::shared_state_ptr_for<T1>::type , typename lcos::detail::shared_state_ptr_for<T2>::type , typename lcos::detail::shared_state_ptr_for<T3>::type>
             result_type;
         result_type lazy_values_(
-            lcos::detail::future_access::get_shared_state(f0) , lcos::detail::future_access::get_shared_state(f1) , lcos::detail::future_access::get_shared_state(f2) , lcos::detail::future_access::get_shared_state(f3));
+            lcos::detail::get_shared_state(f0) , lcos::detail::get_shared_state(f1) , lcos::detail::get_shared_state(f2) , lcos::detail::get_shared_state(f3));
         if (n == 0)
         {
             return;
@@ -135,7 +135,7 @@ namespace hpx { namespace lcos
             typename lcos::detail::shared_state_ptr_for<T0>::type , typename lcos::detail::shared_state_ptr_for<T1>::type , typename lcos::detail::shared_state_ptr_for<T2>::type , typename lcos::detail::shared_state_ptr_for<T3>::type , typename lcos::detail::shared_state_ptr_for<T4>::type>
             result_type;
         result_type lazy_values_(
-            lcos::detail::future_access::get_shared_state(f0) , lcos::detail::future_access::get_shared_state(f1) , lcos::detail::future_access::get_shared_state(f2) , lcos::detail::future_access::get_shared_state(f3) , lcos::detail::future_access::get_shared_state(f4));
+            lcos::detail::get_shared_state(f0) , lcos::detail::get_shared_state(f1) , lcos::detail::get_shared_state(f2) , lcos::detail::get_shared_state(f3) , lcos::detail::get_shared_state(f4));
         if (n == 0)
         {
             return;
@@ -164,7 +164,7 @@ namespace hpx { namespace lcos
             typename lcos::detail::shared_state_ptr_for<T0>::type , typename lcos::detail::shared_state_ptr_for<T1>::type , typename lcos::detail::shared_state_ptr_for<T2>::type , typename lcos::detail::shared_state_ptr_for<T3>::type , typename lcos::detail::shared_state_ptr_for<T4>::type , typename lcos::detail::shared_state_ptr_for<T5>::type>
             result_type;
         result_type lazy_values_(
-            lcos::detail::future_access::get_shared_state(f0) , lcos::detail::future_access::get_shared_state(f1) , lcos::detail::future_access::get_shared_state(f2) , lcos::detail::future_access::get_shared_state(f3) , lcos::detail::future_access::get_shared_state(f4) , lcos::detail::future_access::get_shared_state(f5));
+            lcos::detail::get_shared_state(f0) , lcos::detail::get_shared_state(f1) , lcos::detail::get_shared_state(f2) , lcos::detail::get_shared_state(f3) , lcos::detail::get_shared_state(f4) , lcos::detail::get_shared_state(f5));
         if (n == 0)
         {
             return;
@@ -193,7 +193,7 @@ namespace hpx { namespace lcos
             typename lcos::detail::shared_state_ptr_for<T0>::type , typename lcos::detail::shared_state_ptr_for<T1>::type , typename lcos::detail::shared_state_ptr_for<T2>::type , typename lcos::detail::shared_state_ptr_for<T3>::type , typename lcos::detail::shared_state_ptr_for<T4>::type , typename lcos::detail::shared_state_ptr_for<T5>::type , typename lcos::detail::shared_state_ptr_for<T6>::type>
             result_type;
         result_type lazy_values_(
-            lcos::detail::future_access::get_shared_state(f0) , lcos::detail::future_access::get_shared_state(f1) , lcos::detail::future_access::get_shared_state(f2) , lcos::detail::future_access::get_shared_state(f3) , lcos::detail::future_access::get_shared_state(f4) , lcos::detail::future_access::get_shared_state(f5) , lcos::detail::future_access::get_shared_state(f6));
+            lcos::detail::get_shared_state(f0) , lcos::detail::get_shared_state(f1) , lcos::detail::get_shared_state(f2) , lcos::detail::get_shared_state(f3) , lcos::detail::get_shared_state(f4) , lcos::detail::get_shared_state(f5) , lcos::detail::get_shared_state(f6));
         if (n == 0)
         {
             return;
@@ -222,7 +222,7 @@ namespace hpx { namespace lcos
             typename lcos::detail::shared_state_ptr_for<T0>::type , typename lcos::detail::shared_state_ptr_for<T1>::type , typename lcos::detail::shared_state_ptr_for<T2>::type , typename lcos::detail::shared_state_ptr_for<T3>::type , typename lcos::detail::shared_state_ptr_for<T4>::type , typename lcos::detail::shared_state_ptr_for<T5>::type , typename lcos::detail::shared_state_ptr_for<T6>::type , typename lcos::detail::shared_state_ptr_for<T7>::type>
             result_type;
         result_type lazy_values_(
-            lcos::detail::future_access::get_shared_state(f0) , lcos::detail::future_access::get_shared_state(f1) , lcos::detail::future_access::get_shared_state(f2) , lcos::detail::future_access::get_shared_state(f3) , lcos::detail::future_access::get_shared_state(f4) , lcos::detail::future_access::get_shared_state(f5) , lcos::detail::future_access::get_shared_state(f6) , lcos::detail::future_access::get_shared_state(f7));
+            lcos::detail::get_shared_state(f0) , lcos::detail::get_shared_state(f1) , lcos::detail::get_shared_state(f2) , lcos::detail::get_shared_state(f3) , lcos::detail::get_shared_state(f4) , lcos::detail::get_shared_state(f5) , lcos::detail::get_shared_state(f6) , lcos::detail::get_shared_state(f7));
         if (n == 0)
         {
             return;

@@ -30,11 +30,9 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<
-                    Action
-                >::result_type
-            >::type
+            typename hpx::actions::extract_action<
+                Action
+            >::result_type
         continuation_result_type;
         lcos::promise<result_type> p;
         apply<Action>(
@@ -89,11 +87,9 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<
-                    Action
-                >::result_type
-            >::type
+            typename hpx::actions::extract_action<
+                Action
+            >::result_type
         continuation_result_type;
         lcos::promise<result_type> p;
         apply<Action>(
@@ -148,11 +144,9 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<
-                    Action
-                >::result_type
-            >::type
+            typename hpx::actions::extract_action<
+                Action
+            >::result_type
         continuation_result_type;
         lcos::promise<result_type> p;
         apply<Action>(
@@ -207,11 +201,9 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<
-                    Action
-                >::result_type
-            >::type
+            typename hpx::actions::extract_action<
+                Action
+            >::result_type
         continuation_result_type;
         lcos::promise<result_type> p;
         apply<Action>(
@@ -266,11 +258,9 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<
-                    Action
-                >::result_type
-            >::type
+            typename hpx::actions::extract_action<
+                Action
+            >::result_type
         continuation_result_type;
         lcos::promise<result_type> p;
         apply<Action>(
@@ -325,11 +315,9 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<
-                    Action
-                >::result_type
-            >::type
+            typename hpx::actions::extract_action<
+                Action
+            >::result_type
         continuation_result_type;
         lcos::promise<result_type> p;
         apply<Action>(
@@ -384,11 +372,9 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<
-                    Action
-                >::result_type
-            >::type
+            typename hpx::actions::extract_action<
+                Action
+            >::result_type
         continuation_result_type;
         lcos::promise<result_type> p;
         apply<Action>(
@@ -443,11 +429,9 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<
-                    Action
-                >::result_type
-            >::type
+            typename hpx::actions::extract_action<
+                Action
+            >::result_type
         continuation_result_type;
         lcos::promise<result_type> p;
         apply<Action>(
@@ -502,11 +486,9 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<
-                    Action
-                >::result_type
-            >::type
+            typename hpx::actions::extract_action<
+                Action
+            >::result_type
         continuation_result_type;
         lcos::promise<result_type> p;
         apply<Action>(
@@ -561,11 +543,9 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<
-                    Action
-                >::result_type
-            >::type
+            typename hpx::actions::extract_action<
+                Action
+            >::result_type
         continuation_result_type;
         lcos::promise<result_type> p;
         apply<Action>(
@@ -620,11 +600,9 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<
-                    Action
-                >::result_type
-            >::type
+            typename hpx::actions::extract_action<
+                Action
+            >::result_type
         continuation_result_type;
         lcos::promise<result_type> p;
         apply<Action>(

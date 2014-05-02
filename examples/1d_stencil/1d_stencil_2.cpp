@@ -4,12 +4,29 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// This is the second in a series of examples demonstrating the development of
+// a fully distributed solver for a simple 1D heat distribution problem.
+//
+// This example shows how futurization can be applied to the code from example
+// one. While this nicely parallelizes the code (note: without changing the
+// overall structure of the algorithm), the achieved performance is bad (a lot
+// slower than example one). This is caused by the large amount of overheads
+// introduced by wrapping each and every grid point into its own future object.
+// The amount of work performed by each of the created HPX threads (one thread
+// for every grid point and time step) is too small compared to the imposed
+// overheads.
+
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::shared_future<double> cell;
-typedef std::vector<cell> space;
+double k = 0.5;     // heat transfer coefficient
+double dt = 1.;     // time step
+double dx = 1.;     // grid spacing
+
+///////////////////////////////////////////////////////////////////////////////
+typedef hpx::shared_future<double> subgrid;
+typedef std::vector<subgrid> space;
 typedef std::vector<space> spacetime;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -20,10 +37,9 @@ inline std::size_t idx(std::size_t i, std::size_t size)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Our operator:
-//   f(t+1, i) = (f(t, i-1) + f(t, i) + f(t, i+1)) / 3
-inline double heat(double a, double b, double c)
+inline double heat(double left, double middle, double right)
 {
-    return (a + b + c) / 3.;
+    return middle + (k*dt/dx*dx) * (left - 2*middle + right);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -60,7 +76,7 @@ int hpx_main(boost::program_options::variables_map& vm)
             next[i] = dataflow(Op, current[idx(i-1, nx)], current[i], current[idx(i+1, nx)]);
     }
 
-    // Now the asynchronous computation is running; the above for loop does not
+    // Now the asynchronous computation is running; the above for-loop does not
     // wait on anything. There is no implicit waiting at the end of each timestep;
     // the computation of each U[t][i] will begin when as soon as its dependencies
     // are ready and hardware is available.
@@ -85,6 +101,12 @@ int main(int argc, char* argv[])
          "Local x dimension")
         ("nt", value<boost::uint64_t>()->default_value(45),
          "Number of time steps")
+        ("k", value<double>(&k)->default_value(0.5),
+         "Heat transfer coefficient (default: 0.5)")
+        ("dt", value<double>(&dt)->default_value(1.0),
+         "Timestep unit (default: 1.0[s])")
+        ("dx", value<double>(&dx)->default_value(1.0),
+         "Local x dimension")
     ;
 
     // Initialize and run HPX

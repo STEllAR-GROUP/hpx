@@ -22,8 +22,8 @@ namespace nqueen
     public:
         board()
         {}
-        board(hpx::naming::id_type gid)
-            : base_type(gid)
+        board(hpx::future<hpx::naming::id_type> && gid)
+            : base_type(std::move(gid))
         {}
 
         void init_board(std::size_t size ){

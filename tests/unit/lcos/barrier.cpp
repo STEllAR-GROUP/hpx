@@ -57,14 +57,13 @@ int hpx_main(variables_map& vm)
     for (std::size_t i = 0; i < iterations; ++i)
     {
         // create a barrier waiting on 'count' threads
-        barrier b;
-        b.create(prefix, pxthreads + 1);
+        barrier b = barrier::create(prefix, pxthreads + 1);
 
         boost::atomic<std::size_t> c(0);
 
         for (std::size_t j = 0; j < pxthreads; ++j)
         {
-            register_work(boost::bind(&barrier_test, 
+            register_work(boost::bind(&barrier_test,
                 b.get_gid(), boost::ref(c)));
         }
 

@@ -10,7 +10,7 @@
 
 #include <tests/regressions/actions/components/stubs/action_move_semantics.hpp>
 
-namespace hpx { namespace test 
+namespace hpx { namespace test
 {
     struct action_move_semantics
       : components::client_base<action_move_semantics, stubs::action_move_semantics>
@@ -20,8 +20,8 @@ namespace hpx { namespace test
         > base_type;
 
         action_move_semantics() {}
-        action_move_semantics(naming::id_type id)
-          : base_type(id)
+        action_move_semantics(hpx::future<naming::id_type> && id)
+          : base_type(std::move(id))
         {}
     };
 }}

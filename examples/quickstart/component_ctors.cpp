@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2012 Bryce Adelstein-Lelbach 
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Copyright (c) 2012 Bryce Adelstein-Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -24,13 +24,13 @@ using hpx::flush;
 
 struct message_server : managed_component_base<message_server>
 {
-    std::string msg; 
+    std::string msg;
 
     message_server() : msg("uninitialized\n") {}
 
     message_server(std::string const& msg_) : msg(msg_) {}
 
-    void print() const { cout << msg << flush; } 
+    void print() const { cout << msg << flush; }
 
     HPX_DEFINE_COMPONENT_CONST_ACTION(message_server, print, print_action);
 };
@@ -42,21 +42,23 @@ typedef message_server::print_action print_action;
 HPX_REGISTER_ACTION_DECLARATION(print_action);
 HPX_REGISTER_ACTION(print_action);
 
-struct message : client_base<message, stub_base<message_server> >
+struct message : client_base<message, message_server>
 {
-    void print() { async<print_action>(this->get_gid()).get(); } 
+    typedef client_base<message, message_server> base_type;
+
+    message(hpx::future<hpx::id_type> && id) : base_type(std::move(id)) {}
+
+    void print() { async<print_action>(this->get_gid()).get(); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    message ms;
-
     std::string msg = "hello world\n";
-    ms.create(hpx::find_here(), msg);
+    message ms = message::create(hpx::find_here(), msg);
 
     ms.print();
 
-    return 0; 
+    return 0;
 }
 

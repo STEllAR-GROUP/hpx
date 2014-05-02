@@ -46,9 +46,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
     template <typename Func, typename F0>
     BOOST_FORCEINLINE
@@ -85,9 +84,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
     template <typename Func, typename F0>
     BOOST_FORCEINLINE
@@ -120,9 +118,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -163,9 +160,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
     template <typename Func, typename F0 , typename F1>
     BOOST_FORCEINLINE
@@ -202,9 +198,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
     template <typename Func, typename F0 , typename F1>
     BOOST_FORCEINLINE
@@ -237,9 +232,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -280,9 +274,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2>
     BOOST_FORCEINLINE
@@ -319,9 +312,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2>
     BOOST_FORCEINLINE
@@ -354,9 +346,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -397,9 +388,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3>
     BOOST_FORCEINLINE
@@ -436,9 +426,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3>
     BOOST_FORCEINLINE
@@ -471,9 +460,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -514,9 +502,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4>
     BOOST_FORCEINLINE
@@ -553,9 +540,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4>
     BOOST_FORCEINLINE
@@ -588,9 +574,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -631,9 +616,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5>
     BOOST_FORCEINLINE
@@ -670,9 +654,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5>
     BOOST_FORCEINLINE
@@ -705,9 +688,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -748,9 +730,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6>
     BOOST_FORCEINLINE
@@ -787,9 +768,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6>
     BOOST_FORCEINLINE
@@ -822,9 +802,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -865,9 +844,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7>
     BOOST_FORCEINLINE
@@ -904,9 +882,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7>
     BOOST_FORCEINLINE
@@ -939,9 +916,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -982,9 +958,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8>
     BOOST_FORCEINLINE
@@ -1021,9 +996,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8>
     BOOST_FORCEINLINE
@@ -1056,9 +1030,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -1099,9 +1072,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9>
     BOOST_FORCEINLINE
@@ -1138,9 +1110,8 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9>
     BOOST_FORCEINLINE
@@ -1173,8 +1144,7 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ))
             ));
         p->await();
-        using lcos::detail::future_access;
-        return future_access::create<typename frame_type::type>(
-            std::move(p));
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
 }}}

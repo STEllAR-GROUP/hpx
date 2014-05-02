@@ -35,17 +35,19 @@ typedef hello_world_server::print_action print_action;
 HPX_REGISTER_ACTION_DECLARATION(print_action);
 HPX_REGISTER_ACTION(print_action);
 
-struct hello_world : client_base<hello_world, stub_base<hello_world_server> >
+struct hello_world : client_base<hello_world, hello_world_server>
 {
+    typedef client_base<hello_world, hello_world_server> base_type;
+
+    hello_world(hpx::future<hpx::id_type> && id) : base_type(std::move(id)) {}
+
     void print() { async<print_action>(this->get_gid()).get(); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    hello_world hw;
-
-    hw.create(find_here());
+    hello_world hw = hello_world::create(find_here());
 
     hw.print();
 

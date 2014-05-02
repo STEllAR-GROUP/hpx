@@ -38,7 +38,7 @@ namespace hpx
           , req
           , util::functional::apply_continuation(
                 util::bind<Action>(
-                    util::bind(util::functional::extract_locality(), _2)
+                    util::bind(util::functional::extract_locality(gid), _2)
                    )
                 ));
     }
@@ -96,7 +96,7 @@ namespace hpx
           , req
           , util::functional::apply_continuation(
                 util::bind<Action>(
-                    util::bind(util::functional::extract_locality(), _2)
+                    util::bind(util::functional::extract_locality(gid), _2)
                   , std::forward<Arg0>( arg0 ))
                 ));
     }
@@ -154,7 +154,7 @@ namespace hpx
           , req
           , util::functional::apply_continuation(
                 util::bind<Action>(
-                    util::bind(util::functional::extract_locality(), _2)
+                    util::bind(util::functional::extract_locality(gid), _2)
                   , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ))
                 ));
     }
@@ -212,7 +212,7 @@ namespace hpx
           , req
           , util::functional::apply_continuation(
                 util::bind<Action>(
-                    util::bind(util::functional::extract_locality(), _2)
+                    util::bind(util::functional::extract_locality(gid), _2)
                   , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ))
                 ));
     }
@@ -270,7 +270,7 @@ namespace hpx
           , req
           , util::functional::apply_continuation(
                 util::bind<Action>(
-                    util::bind(util::functional::extract_locality(), _2)
+                    util::bind(util::functional::extract_locality(gid), _2)
                   , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ))
                 ));
     }
@@ -328,7 +328,7 @@ namespace hpx
           , req
           , util::functional::apply_continuation(
                 util::bind<Action>(
-                    util::bind(util::functional::extract_locality(), _2)
+                    util::bind(util::functional::extract_locality(gid), _2)
                   , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ))
                 ));
     }

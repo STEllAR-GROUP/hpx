@@ -164,8 +164,7 @@ namespace hpx { namespace lcos
             BOOST_FORCEINLINE result_type
             operator()(Future const& f) const
             {
-                using lcos::detail::future_access;
-                return future_access::get_shared_state(f);
+                return lcos::detail::get_shared_state(f);
             }
         };
     }
@@ -322,7 +321,7 @@ namespace hpx
     typename lcos::detail::shared_state_ptr_for<BOOST_PP_CAT(T, N)>::type     \
     /**/
 #define HPX_WAIT_N_GET_SHARED_STATE(Z, N, D)                                  \
-    lcos::detail::future_access::get_shared_state(BOOST_PP_CAT(f, N))         \
+    lcos::detail::get_shared_state(BOOST_PP_CAT(f, N))                        \
     /**/
 
 namespace hpx { namespace lcos

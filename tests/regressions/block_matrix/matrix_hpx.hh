@@ -59,9 +59,14 @@ struct vector_t_server:
 };
 
 struct vector_t_client:
-  hpx::components::client_base<vector_t_client,
-                               hpx::components::stub_base<vector_t_server>>
+  hpx::components::client_base<vector_t_client, vector_t_server>
 {
+  typedef hpx::components::client_base<vector_t_client, vector_t_server>
+    base_type;
+
+  vector_t_client() {}
+  vector_t_client(hpx::future<hpx::id_type> && id) : base_type(std::move(id)) {}
+
   boost::shared_ptr<vector_t> get_ptr() const
   {
     return hpx::get_ptr<vector_t_server>(get_gid()).get()->data;
@@ -150,9 +155,14 @@ struct matrix_t_server:
 };
 
 struct matrix_t_client:
-  hpx::components::client_base<matrix_t_client,
-                               hpx::components::stub_base<matrix_t_server>>
+  hpx::components::client_base<matrix_t_client, matrix_t_server>
 {
+  typedef hpx::components::client_base<matrix_t_client, matrix_t_server>
+    base_type;
+
+  matrix_t_client() {}
+  matrix_t_client(hpx::future<hpx::id_type> && id) : base_type(std::move(id)) {}
+
   boost::shared_ptr<matrix_t> get_ptr() const
   {
     return hpx::get_ptr<matrix_t_server>(get_gid()).get()->data;

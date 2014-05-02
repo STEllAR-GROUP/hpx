@@ -44,33 +44,33 @@ namespace hpx { namespace detail
 }}
 
 #define HPX_REGISTER_APPLY_COLOCATED_DECLARATION(Action, Name)                \
-HPX_UTIL_REGISTER_FUNCTION_DECLARATION(                                       \
-    void (hpx::naming::id_type, hpx::agas::response)                          \
-  , (hpx::util::functional::detail::apply_continuation_impl<                  \
-        hpx::util::detail::bound_action<                                      \
-            Action                                                            \
-          , hpx::detail::apply_colocated_bound_tuple<                         \
-                Action ::arguments_type                                       \
-            >::type                                                           \
-        >                                                                     \
-    >)                                                                        \
-  , Name                                                                      \
-);                                                                            \
+    HPX_UTIL_REGISTER_FUNCTION_DECLARATION(                                   \
+        void (hpx::naming::id_type, hpx::agas::response)                      \
+      , (hpx::util::functional::detail::apply_continuation_impl<              \
+            hpx::util::detail::bound_action<                                  \
+                Action                                                        \
+              , hpx::detail::apply_colocated_bound_tuple<                     \
+                    Action ::arguments_type                                   \
+                >::type                                                       \
+            >                                                                 \
+        >)                                                                    \
+      , Name                                                                  \
+    );                                                                        \
 /**/
 
 #define HPX_REGISTER_APPLY_COLOCATED(action, name)                            \
-HPX_UTIL_REGISTER_FUNCTION(                                                   \
-    void (hpx::naming::id_type, hpx::agas::response)                          \
-  , (hpx::util::functional::detail::apply_continuation_impl<                  \
-        hpx::util::detail::bound_action<                                      \
-            action                                                            \
-          , hpx::detail::apply_colocated_bound_tuple<                         \
-                action::arguments_type                                        \
-            >::type                                                           \
-        >                                                                     \
-    >)                                                                        \
-  , name                                                                      \
-);                                                                            \
+    HPX_UTIL_REGISTER_FUNCTION(                                               \
+        void (hpx::naming::id_type, hpx::agas::response)                      \
+      , (hpx::util::functional::detail::apply_continuation_impl<              \
+            hpx::util::detail::bound_action<                                  \
+                action                                                        \
+              , hpx::detail::apply_colocated_bound_tuple<                     \
+                    action::arguments_type                                    \
+                >::type                                                       \
+            >                                                                 \
+        >)                                                                    \
+      , name                                                                  \
+    );                                                                        \
 /**/
 
 #endif

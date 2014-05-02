@@ -33,7 +33,7 @@ namespace mini_ghost {
         if(0 == rank) {
             uint64_t nranks = hpx::get_num_localities().get();
             hpx::lcos::barrier & b = get_barrier();
-            b.create(hpx::find_here(), nranks);
+            b = hpx::lcos::barrier::create(hpx::find_here(), nranks);
             hpx::naming::id_type id = b.get_gid();
             id.make_unmanaged();
             hpx::agas::register_name_sync(HPX_EXAMPLES_MINI_GHOST_BARRIER, hpx::naming::detail::strip_credits_from_gid(id.get_gid()));

@@ -10,10 +10,9 @@
 int hpx_main(boost::program_options::variables_map&)
 {
     {
-        examples::hello_world client;
-
         // Create a single instance of the component on this locality.
-        client.create(hpx::find_here());
+        examples::hello_world client =
+            examples::hello_world::create(hpx::find_here());
 
         // Invoke the components action, which will print "Hello World!".
         client.invoke();
