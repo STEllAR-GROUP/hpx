@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// This is the forth in a series of examples demonstrating the development of a
+// This is the fourth in a series of examples demonstrating the development of a
 // fully distributed solver for a simple 1D heat distribution problem.
 //
 // This example builds on example three. It futurizes the code from that
