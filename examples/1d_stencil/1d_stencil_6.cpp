@@ -123,7 +123,10 @@ struct subgrid_server : hpx::components::simple_component_base<subgrid_server>
       : data_(size, initial_value)
     {}
 
-    // access data
+    // Access data. The parameter specifies what part of the data should be
+    // accessed. As long as the result is used locally, no data is copied,
+    // however as soon as the result is requested from another locality only
+    // the minimally required amount of data will go over the wire.
     subgrid_data get_data(subgrid_type t) const
     {
         switch (t)
@@ -141,7 +144,6 @@ struct subgrid_server : hpx::components::simple_component_base<subgrid_server>
             HPX_ASSERT(false);
             break;
         }
-
         return data_;
     }
 
@@ -210,8 +212,8 @@ struct subgrid : hpx::components::client_base<subgrid, subgrid_server>
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef std::vector<subgrid> space;            // data for one time step
-typedef std::vector<space> spacetime;       // all of stored time steps
+typedef std::vector<subgrid> space;             // data for one time step
+typedef std::vector<space> spacetime;           // all of stored time steps
 
 ///////////////////////////////////////////////////////////////////////////////
 inline std::size_t idx(std::size_t i, std::size_t size)
@@ -219,7 +221,7 @@ inline std::size_t idx(std::size_t i, std::size_t size)
     return (boost::int64_t(i) < 0) ? (i + size) % size : i % size;
 }
 
-inline std::size_t locidx(std::size_t np, std::size_t nl, std::size_t i)
+inline std::size_t locidx(std::size_t i, std::size_t np, std::size_t nl)
 {
     return i / (np/nl);
 }
@@ -255,17 +257,20 @@ subgrid heat_part(subgrid const& left, subgrid const& middle, subgrid const& rig
     using hpx::lcos::local::dataflow;
     using hpx::util::unwrapped;
 
-    return dataflow(unwrapped(
-        [left, middle, right](
-            subgrid_data const& l, subgrid_data const& m, subgrid_data const& r
-        )
-        {
-            // the new subgrid_data will be allocated on the same locality as 'middle'
-            return subgrid(middle.get_gid(), heat_part_data(l, m, r));
-        }),
+    return dataflow(
+        unwrapped(
+            [left, middle, right](subgrid_data const& l, subgrid_data const& m,
+                subgrid_data const& r)
+            {
+                // The new subgrid_data will be allocated on the same locality
+                // as 'middle'.
+                return subgrid(middle.get_gid(), heat_part_data(l, m, r));
+            }
+        ),
         left.get_data(subgrid_server::left_subgrid),
         middle.get_data(subgrid_server::middle_subgrid),
-        right.get_data(subgrid_server::right_subgrid));
+        right.get_data(subgrid_server::right_subgrid)
+    );
 }
 
 // Global functions can be exposed as actions as well. That allows to invoke
@@ -305,7 +310,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     // Initial conditions:
     //   f(0, i) = i
     for (std::size_t i = 0; i != np; ++i)
-        U[0][i] = subgrid(localities[locidx(np, nl, i)], nx, double(i));
+        U[0][i] = subgrid(localities[locidx(i, np, nl)], nx, double(i));
 
     for (std::size_t t = 0; t != nt; ++t)
     {
@@ -315,7 +320,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         for (std::size_t i = 0; i != np; ++i)
         {
             // we execute the action on the locality of the middle partition
-            auto Op = hpx::util::bind(heat_part_action(), localities[locidx(np, nl, i)], _1, _2, _3);
+            auto Op = hpx::util::bind(heat_part_action(), localities[locidx(i, np, nl)], _1, _2, _3);
             next[i] = dataflow(Op, current[idx(i-1, np)], current[i], current[idx(i+1, np)]);
         }
     }
