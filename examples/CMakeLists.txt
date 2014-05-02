@@ -7,7 +7,6 @@
 
 set(subdirs
     1d_hydro
-    1d_stencil
     accumulator
     allgather
     async_io
@@ -33,8 +32,9 @@ set(subdirs
 
 if(HPX_HAVE_CXX11_LAMBDAS)
   set(subdirs ${subdirs}
-      tuplespace
+      1d_stencil
       diskperf
+      tuplespace
       )
 endif()
 
