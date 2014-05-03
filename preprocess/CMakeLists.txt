@@ -24,7 +24,8 @@ set(function_argument_limit_preprocessing_files
   "hpx/util/deferred_call.hpp"
   "hpx/util/invoke.hpp"
   "hpx/util/invoke_fused.hpp"
-  "hpx/util/unwrapped.hpp")
+  "hpx/util/unwrapped.hpp"
+  "hpx/lcos/invoke_when_ready.hpp")
 foreach(file ${function_argument_limit_preprocessing_files})
   hpx_partial_preprocess_header(${file} LIMIT HPX_LIMIT)
 endforeach()
@@ -51,9 +52,9 @@ set(action_argument_limit_preprocessing_files
   "hpx/lcos/async_colocated.hpp"
   "hpx/lcos/async_colocated_fwd.hpp"
   "hpx/lcos/broadcast.hpp"
-  "hpx/lcos/reduce.hpp"
   "hpx/lcos/packaged_action_constructors.hpp"
   "hpx/lcos/packaged_action_constructors_direct.hpp"
+  "hpx/lcos/reduce.hpp"
   "hpx/lcos/local/dataflow.hpp"
   "hpx/lcos/local/packaged_task.hpp"
   "hpx/runtime/actions/component_action_implementations.hpp"
