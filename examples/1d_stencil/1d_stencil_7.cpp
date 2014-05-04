@@ -3,10 +3,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// This is the sixth in a series of examples demonstrating the development of a
-// fully distributed solver for a simple 1D heat distribution problem.
+// This is the seventh in a series of examples demonstrating the development
+// of a fully distributed solver for a simple 1D heat distribution problem.
 //
-// This example builds on example five.
+// This example builds on example six.
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
@@ -19,25 +19,25 @@ double dt = 1.;     // time step
 double dx = 1.;     // grid spacing
 
 ///////////////////////////////////////////////////////////////////////////////
-struct subgrid_data
+struct partition_data
 {
 private:
     typedef hpx::util::serialize_buffer<double> buffer_type;
 
 public:
-    subgrid_data()
+    partition_data()
       : size_(0)
     {}
 
-    // Create a new (uninitialized) subgrid of the given size.
-    subgrid_data(std::size_t size)
+    // Create a new (uninitialized) partition of the given size.
+    partition_data(std::size_t size)
       : data_(new double [size], size, buffer_type::take),
         size_(size),
         min_index_(0)
     {}
 
-    // Create a new (initialized) subgrid of the given size.
-    subgrid_data(std::size_t size, double initial_value)
+    // Create a new (initialized) partition of the given size.
+    partition_data(std::size_t size, double initial_value)
       : data_(new double [size], size, buffer_type::take),
         size_(size),
         min_index_(0)
@@ -47,10 +47,10 @@ public:
             data_[i] = base_value + double(i);
     }
 
-    // Create a subgrid which acts as a proxy to a part of the embedded array.
+    // Create a partition which acts as a proxy to a part of the embedded array.
     // The proxy is assumed to refer to either the left or the right boundary
     // element.
-    subgrid_data(subgrid_data const& base, std::size_t min_index)
+    partition_data(partition_data const& base, std::size_t min_index)
       : data_(base.data_.data()+min_index, 1, buffer_type::reference),
         size_(base.size()),
         min_index_(min_index)
@@ -88,7 +88,7 @@ private:
     std::size_t min_index_;
 };
 
-std::ostream& operator<<(std::ostream& os, subgrid_data const& c)
+std::ostream& operator<<(std::ostream& os, partition_data const& c)
 {
     os << "{";
     for (std::size_t i = 0; i != c.size(); ++i)
@@ -105,21 +105,21 @@ std::ostream& operator<<(std::ostream& os, subgrid_data const& c)
 // This is the server side representation of the data. We expose this as a HPX
 // component which allows for it to be created and accessed remotely through
 // a global address (hpx::id_type).
-struct subgrid_server : hpx::components::simple_component_base<subgrid_server>
+struct partition_server : hpx::components::simple_component_base<partition_server>
 {
-    enum subgrid_type
+    enum partition_type
     {
-        left_subgrid, middle_subgrid, right_subgrid
+        left_partition, middle_partition, right_partition
     };
 
     // construct new instances
-    subgrid_server() {}
+    partition_server() {}
 
-    subgrid_server(subgrid_data const& data)
+    partition_server(partition_data const& data)
       : data_(data)
     {}
 
-    subgrid_server(std::size_t size, double initial_value)
+    partition_server(std::size_t size, double initial_value)
       : data_(size, initial_value)
     {}
 
@@ -127,18 +127,18 @@ struct subgrid_server : hpx::components::simple_component_base<subgrid_server>
     // accessed. As long as the result is used locally, no data is copied,
     // however as soon as the result is requested from another locality only
     // the minimally required amount of data will go over the wire.
-    subgrid_data get_data(subgrid_type t) const
+    partition_data get_data(partition_type t) const
     {
         switch (t)
         {
-        case left_subgrid:
-            return subgrid_data(data_, data_.size()-1);
+        case left_partition:
+            return partition_data(data_, data_.size()-1);
 
-        case middle_subgrid:
+        case middle_partition:
             break;
 
-        case right_subgrid:
-            return subgrid_data(data_, 0);
+        case right_partition:
+            return partition_data(data_, 0);
 
         default:
             HPX_ASSERT(false);
@@ -150,70 +150,69 @@ struct subgrid_server : hpx::components::simple_component_base<subgrid_server>
     // Every member function which has to be invoked remotely needs to be
     // wrapped into a component action. The macro below defines a new type
     // 'get_data_action' which represents the (possibly remote) member function
-    // subgrid::get_data().
-    HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(subgrid_server, get_data, get_data_action);
+    // partition::get_data().
+    HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(partition_server, get_data, get_data_action);
 
 private:
-    subgrid_data data_;
+    partition_data data_;
 };
 
 // The macros below are necessary to generate the code required for exposing
-// our subgrid type remotely.
+// our partition type remotely.
 //
 // HPX_REGISTER_MINIMAL_COMPONENT_FACTORY() exposes the component creation
 // through hpx::new_<>().
-typedef hpx::components::simple_component<subgrid_server> server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server_type, subgrid_server);
+typedef hpx::components::simple_component<partition_server> partition_server_type;
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(partition_server_type, partition_server);
 
 // HPX_REGISTER_ACTION() exposes the component member function for remote
 // invocation.
-typedef subgrid_server::get_data_action get_data_action;
+typedef partition_server::get_data_action get_data_action;
 HPX_REGISTER_ACTION(get_data_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 // This is a client side helper class allowing to hide some of the tedious
 // boilerplate.
-struct subgrid : hpx::components::client_base<subgrid, subgrid_server>
+struct partition : hpx::components::client_base<partition, partition_server>
 {
-    typedef hpx::components::client_base<subgrid, subgrid_server> base_type;
+    typedef hpx::components::client_base<partition, partition_server> base_type;
 
-    subgrid() {}
+    partition() {}
 
     // Create new component on locality 'where' and initialize the held data
-    subgrid(hpx::id_type where, std::size_t size, double initial_value)
-      : base_type(hpx::new_<subgrid_server>(where, size, initial_value))
+    partition(hpx::id_type where, std::size_t size, double initial_value)
+      : base_type(hpx::new_<partition_server>(where, size, initial_value))
     {}
 
     // Create a new component on the locality co-located to the id 'where'. The
-    // new instance will be initialized from the given subgrid_data.
-    subgrid(hpx::id_type where, subgrid_data const& data)
-      : base_type(hpx::new_colocated<subgrid_server>(where, data))
+    // new instance will be initialized from the given partition_data.
+    partition(hpx::id_type where, partition_data const& data)
+      : base_type(hpx::new_colocated<partition_server>(where, data))
     {}
 
-    // Attach a future representing a (possibly remote) subgrid.
-    subgrid(hpx::future<hpx::id_type> && id)
+    // Attach a future representing a (possibly remote) partition.
+    partition(hpx::future<hpx::id_type> && id)
       : base_type(std::move(id))
     {}
 
-    // Unwrap a future<subgrid> (a subgrid already holds a future to the id of the
+    // Unwrap a future<partition> (a partition already holds a future to the id of the
     // referenced object, thus unwrapping accesses this inner future).
-    subgrid(hpx::future<subgrid> && c)
+    partition(hpx::future<partition> && c)
       : base_type(std::move(c))
     {}
 
     ///////////////////////////////////////////////////////////////////////////
     // Invoke the (remote) member function which gives us access to the data.
     // This is a pure helper function hiding the async.
-    hpx::future<subgrid_data> get_data(subgrid_server::subgrid_type t) const
+    hpx::future<partition_data> get_data(partition_server::partition_type t) const
     {
-        subgrid_server::get_data_action act;
+        partition_server::get_data_action act;
         return hpx::async(act, get_gid(), t);
     }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef std::vector<subgrid> space;             // data for one time step
-typedef std::vector<space> spacetime;           // all of stored time steps
+typedef std::vector<partition> space;             // data for one time step
 
 ///////////////////////////////////////////////////////////////////////////////
 inline std::size_t idx(std::size_t i, std::size_t size)
@@ -234,22 +233,23 @@ inline double heat(double left, double middle, double right)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-subgrid heat_part(subgrid const& left, subgrid const& middle, subgrid const& right)
+partition heat_part(partition const& left, partition const& middle,
+    partition const& right)
 {
     using hpx::lcos::local::dataflow;
     using hpx::util::unwrapped;
 
-    hpx::shared_future<subgrid_data> middle_data =
-        middle.get_data(subgrid_server::middle_subgrid);
+    hpx::shared_future<partition_data> middle_data =
+        middle.get_data(partition_server::middle_partition);
 
-    hpx::future<subgrid_data> next_middle = middle_data.then(
+    hpx::future<partition_data> next_middle = middle_data.then(
         unwrapped(
-            [middle](subgrid_data const& m)
+            [middle](partition_data const& m)
             {
                 // All local operations are performed once the middle data of
                 // the previous time step becomes available.
                 std::size_t size = m.size();
-                subgrid_data next(size);
+                partition_data next(size);
                 for (std::size_t i = 1; i != size-1; ++i)
                     next[i] = heat(m[i-1], m[i], m[i+1]);
                 return next;
@@ -259,8 +259,8 @@ subgrid heat_part(subgrid const& left, subgrid const& middle, subgrid const& rig
 
     return dataflow(
         unwrapped(
-            [left, middle, right](subgrid_data next, subgrid_data const& l,
-                subgrid_data const& m, subgrid_data const& r)
+            [left, middle, right](partition_data next, partition_data const& l,
+                partition_data const& m, partition_data const& r)
             {
                 // Calculate the missing boundary elements once the
                 // corresponding data has become available.
@@ -268,15 +268,15 @@ subgrid heat_part(subgrid const& left, subgrid const& middle, subgrid const& rig
                 next[0] = heat(l[size-1], m[0], m[1]);
                 next[size-1] = heat(m[size-2], m[size-1], r[0]);
 
-                // The new subgrid_data will be allocated on the same locality
+                // The new partition_data will be allocated on the same locality
                 // as 'middle'.
-                return subgrid(middle.get_gid(), next);
+                return partition(middle.get_gid(), next);
             }
         ),
         std::move(next_middle),
-        left.get_data(subgrid_server::left_subgrid),
+        left.get_data(partition_server::left_partition),
         middle_data,
-        right.get_data(subgrid_server::right_subgrid)
+        right.get_data(partition_server::right_partition)
     );
 }
 
@@ -310,15 +310,16 @@ int hpx_main(boost::program_options::variables_map& vm)
     }
 
     // U[t][i] is the state of position i at time t.
-    spacetime U(2);
+    std::vector<space> U(2);
     for (space& s: U)
         s.resize(np);
 
     // Initial conditions:
     //   f(0, i) = i
     for (std::size_t i = 0; i != np; ++i)
-        U[0][i] = subgrid(localities[locidx(i, np, nl)], nx, double(i));
+        U[0][i] = partition(localities[locidx(i, np, nl)], nx, double(i));
 
+    heat_part_action act;
     for (std::size_t t = 0; t != nt; ++t)
     {
         space& current = U[t % 2];
@@ -327,7 +328,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         for (std::size_t i = 0; i != np; ++i)
         {
             // we execute the action on the locality of the middle partition
-            auto Op = hpx::util::bind(heat_part_action(), localities[locidx(i, np, nl)], _1, _2, _3);
+            auto Op = hpx::util::bind(act, localities[locidx(i, np, nl)], _1, _2, _3);
             next[i] = dataflow(Op, current[idx(i-1, np)], current[i], current[idx(i+1, np)]);
         }
     }
@@ -337,7 +338,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     for (std::size_t i = 0; i != np; ++i)
     {
         std::cout << "U[" << i << "] = "
-                  << solution[i].get_data(subgrid_server::middle_subgrid).get()
+                  << solution[i].get_data(partition_server::middle_partition).get()
                   << std::endl;
     }
 

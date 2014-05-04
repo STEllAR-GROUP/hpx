@@ -7,7 +7,7 @@
 // fully distributed solver for a simple 1D heat distribution problem.
 //
 // This example takes the code from example one and introduces a partitioning
-// of the 1D grid into groups of grid subgrids which are handled at the same time.
+// of the 1D grid into groups of grid partitions which are handled at the same time.
 // The purpose is to be able to control the amount of work performed. The
 // example is still fully serial, no parallelization is performed.
 
@@ -20,13 +20,13 @@ double dt = 1.;     // time step
 double dx = 1.;     // grid spacing
 
 ///////////////////////////////////////////////////////////////////////////////
-struct subgrid
+struct partition
 {
-    subgrid(std::size_t size)
+    partition(std::size_t size)
       : data_(size)
     {}
 
-    subgrid(std::size_t size, double initial_value)
+    partition(std::size_t size, double initial_value)
       : data_(size)
     {
         double base_value = double(initial_value * size);
@@ -43,7 +43,7 @@ private:
     std::vector<double> data_;
 };
 
-std::ostream& operator<<(std::ostream& os, subgrid const& c)
+std::ostream& operator<<(std::ostream& os, partition const& c)
 {
     os << "{";
     for (std::size_t i = 0; i != c.size(); ++i)
@@ -57,8 +57,7 @@ std::ostream& operator<<(std::ostream& os, subgrid const& c)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef std::vector<subgrid> space;        // data for one time step
-typedef std::vector<space> spacetime;   // all of stored time steps
+typedef std::vector<partition> space;        // data for one time step
 
 ///////////////////////////////////////////////////////////////////////////////
 inline std::size_t idx(std::size_t i, std::size_t size)
@@ -73,10 +72,11 @@ inline double heat(double left, double middle, double right)
     return middle + (k*dt/dx*dx) * (left - 2*middle + right);
 }
 
-subgrid heat_part(subgrid const& left, subgrid const& middle, subgrid const& right)
+partition heat_part(partition const& left, partition const& middle,
+    partition const& right)
 {
     std::size_t size = middle.size();
-    subgrid next(size);
+    partition next(size);
 
     next[0] = heat(left[size-1], middle[0], middle[1]);
 
@@ -96,14 +96,14 @@ int hpx_main(boost::program_options::variables_map& vm)
     boost::uint64_t np = vm["np"].as<boost::uint64_t>();   // Number of partitions.
 
     // U[t][i] is the state of position i at time t.
-    spacetime U(2);
+    std::vector<space> U(2);
     for (space& s: U)
         s.reserve(np);
 
     // Initial conditions:
     //   f(0, i) = i
     for (std::size_t i = 0; i != np; ++i)
-        U[0][i] = subgrid(nx, double(i));
+        U[0][i] = partition(nx, double(i));
 
     for (std::size_t t = 0; t != nt; ++t)
     {

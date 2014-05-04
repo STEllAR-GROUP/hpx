@@ -25,9 +25,8 @@ double dt = 1.;     // time step
 double dx = 1.;     // grid spacing
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::shared_future<double> subgrid;
-typedef std::vector<subgrid> space;
-typedef std::vector<space> spacetime;
+typedef hpx::shared_future<double> partition;
+typedef std::vector<partition> space;
 
 ///////////////////////////////////////////////////////////////////////////////
 inline std::size_t idx(std::size_t i, std::size_t size)
@@ -52,7 +51,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     boost::uint64_t nx = vm["nx"].as<boost::uint64_t>();   // Number of grid points.
 
     // U[t][i] is the state of position i at time t.
-    spacetime U(2);
+    std::vector<space> U(2);
     for (space& s : U)
         s.resize(nx);
 

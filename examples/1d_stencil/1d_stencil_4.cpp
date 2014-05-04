@@ -22,13 +22,13 @@ double dt = 1.;     // time step
 double dx = 1.;     // grid spacing
 
 ///////////////////////////////////////////////////////////////////////////////
-struct subgrid
+struct partition
 {
-    subgrid(std::size_t size)
+    partition(std::size_t size)
       : data_(size)
     {}
 
-    subgrid(std::size_t size, double initial_value)
+    partition(std::size_t size, double initial_value)
       : data_(size)
     {
         double base_value = double(initial_value * size);
@@ -45,7 +45,7 @@ private:
     std::vector<double> data_;
 };
 
-std::ostream& operator<<(std::ostream& os, subgrid const& c)
+std::ostream& operator<<(std::ostream& os, partition const& c)
 {
     os << "{";
     for (std::size_t i = 0; i != c.size(); ++i)
@@ -59,8 +59,7 @@ std::ostream& operator<<(std::ostream& os, subgrid const& c)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef std::vector<hpx::shared_future<subgrid> > space; // data for one time step
-typedef std::vector<space> spacetime;               // all of stored time steps
+typedef std::vector<hpx::shared_future<partition> > space; // data for one time step
 
 ///////////////////////////////////////////////////////////////////////////////
 inline std::size_t idx(std::size_t i, std::size_t size)
@@ -77,10 +76,11 @@ inline double heat(double left, double middle, double right)
 
 // The partitioned operator, it invokes the heat operator above on all elements
 // of a partition.
-subgrid heat_part(subgrid const& left, subgrid const& middle, subgrid const& right)
+partition heat_part(partition const& left, partition const& middle,
+    partition const& right)
 {
     std::size_t size = middle.size();
-    subgrid next(size);
+    partition next(size);
 
     next[0] = heat(left[size-1], middle[0], middle[1]);
 
@@ -103,14 +103,14 @@ int hpx_main(boost::program_options::variables_map& vm)
     boost::uint64_t np = vm["np"].as<boost::uint64_t>();   // Number of partitions.
 
     // U[t][i] is the state of position i at time t.
-    spacetime U(2);
+    std::vector<space> U(2);
     for (space& s: U)
         s.resize(np);
 
     // Initial conditions:
     //   f(0, i) = i
     for (std::size_t i = 0; i != np; ++i)
-        U[0][i] = hpx::make_ready_future(subgrid(nx, double(i)));
+        U[0][i] = hpx::make_ready_future(partition(nx, double(i)));
 
     auto Op = unwrapped(heat_part);
 
