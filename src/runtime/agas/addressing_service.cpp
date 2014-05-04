@@ -2866,7 +2866,7 @@ namespace hpx
         if (0 == basename)
         {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "hpx::find_all_ids_from_basename",
+                "hpx::find_ids_from_basename",
                 "no basename specified");
         }
 
@@ -2880,13 +2880,30 @@ namespace hpx
         return results;
     }
 
+    hpx::future<hpx::id_type> find_id_from_basename(char const* basename,
+        std::size_t sequence_nr)
+    {
+        if (0 == basename)
+        {
+            HPX_THROW_EXCEPTION(bad_parameter,
+                "hpx::find_id_from_basename",
+                "no basename specified");
+        }
+
+        if (sequence_nr == ~0U)
+            sequence_nr = naming::get_locality_id_from_id(find_here());
+
+        std::string name = detail::name_from_basename(basename, sequence_nr);
+        return agas::on_symbol_namespace_event(name, agas::symbol_ns_bind, true);
+    }
+
     hpx::future<bool> register_id_with_basename(char const* basename,
         hpx::id_type id, std::size_t sequence_nr)
     {
         if (0 == basename)
         {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "hpx::find_all_ids_from_basename",
+                "hpx::register_id_with_basename",
                 "no basename specified");
         }
 
@@ -2903,7 +2920,7 @@ namespace hpx
         if (0 == basename)
         {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "hpx::find_all_ids_from_basename",
+                "hpx::unregister_id_with_basename",
                 "no basename specified");
         }
 

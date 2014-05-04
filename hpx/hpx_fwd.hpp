@@ -1035,7 +1035,7 @@ namespace hpx
     /// \brief Return all registered ids from all localities from the given
     ///        base name.
     ///
-    /// This function locates all ids which where registered with the given
+    /// This function locates all ids which were registered with the given
     /// base name. It returns a list of futures representing those ids.
     ///
     /// \param base_name    [in] The base name for which to retrieve the
@@ -1054,7 +1054,7 @@ namespace hpx
 
     /// \brief Return registered ids from the given base name and sequence numbers.
     ///
-    /// This function locates the ids which where registered with the given
+    /// This function locates the ids which were registered with the given
     /// base name and the given sequence numbers. It returns a list of futures
     /// representing those ids.
     ///
@@ -1073,6 +1073,27 @@ namespace hpx
         find_ids_from_basename(char const* base_name,
             std::vector<std::size_t> const& ids);
 
+    /// \brief Return registered id from the given base name and sequence number.
+    ///
+    /// This function locates the id which was registered with the given
+    /// base name and the given sequence number. It returns a future
+    /// representing those id.
+    ///
+    /// \param base_name    [in] The base name for which to retrieve the
+    ///                     registered ids.
+    /// \param id          [in] The sequence number of the registered id.
+    ///
+    /// \returns A representing the id which was registered using the given
+    ///          base name and sequence numbers.
+    ///
+    /// \note   The returned future may become ready after the function
+    ///         returns if the corresponding id is not yet registered while
+    ///         the function is executed.
+    ///
+    HPX_API_EXPORT hpx::future<hpx::id_type>
+        find_id_from_basename(char const* base_name,
+            std::size_t sequence_nr = ~0U);
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Register the given id using the given base name.
     ///
@@ -1085,7 +1106,8 @@ namespace hpx
     ///                     registration of the id. This number has to be
     ///                     unique system wide for each registration using the
     ///                     same base name. The default is the current locality
-    ///                     identifier.
+    ///                     identifier. Also, the sequence numbers have to be
+    ///                     consecutive starting from zero.
     ///
     /// \returns A future representing the result of the registration operation
     ///          itself.
