@@ -2054,6 +2054,43 @@ lcos::future<naming::id_type> addressing_service::resolve_name_async(
         name, req, action_priority_);
 } // }}}
 
+namespace detail
+{
+    hpx::future<hpx::id_type> on_register_event(hpx::future<bool> f,
+        lcos::promise<hpx::id_type> p)
+    {
+        if (!f.get())
+        {
+            HPX_THROW_EXCEPTION(bad_request,
+                "hpx::agas::detail::on_register_event",
+                "request 'symbol_ns_on_event' failed");
+            return hpx::future<hpx::id_type>();
+        }
+        return p.get_future();
+    }
+}
+
+future<hpx::id_type> addressing_service::on_symbol_namespace_event(
+    std::string const& name, namespace_action_code evt,
+    bool call_for_past_events)
+{
+    if (evt != symbol_ns_bind)
+    {
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "addressing_service::on_symbol_namespace_event",
+            "invalid event type");
+        return hpx::future<hpx::id_type>();
+    }
+
+    lcos::promise<naming::id_type> p;
+    request req(symbol_ns_on_event, name, evt, call_for_past_events, p.get_gid());
+    hpx::future<bool> f = stubs::symbol_namespace::service_async<bool>(
+        name, req, action_priority_);
+
+    using util::placeholders::_1;
+    return f.then(util::bind(&detail::on_register_event, _1, std::move(p)));
+}
+
 }}
 
 #if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
@@ -2781,3 +2818,54 @@ void addressing_service::send_refcnt_requests_sync(
 
 }}
 
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx
+{
+    ///////////////////////////////////////////////////////////////////////////
+    std::vector<hpx::future<hpx::id_type> >
+        find_ids_from_basename(char const* name_prefix, std::size_t num_ids)
+    {
+        std::vector<hpx::future<hpx::id_type> > results;
+        for(std::size_t i = 0; i != num_ids; ++i)
+        {
+            std::string name(name_prefix);
+            if (name.back() != '/')
+                name += '/';
+            name += boost::lexical_cast<std::string>(i);
+
+            using util::placeholders::_2;
+
+            results.push_back(agas::on_symbol_namespace_event(
+                name, agas::symbol_ns_bind, true));
+        }
+        return results;
+    }
+
+    hpx::future<bool> register_id_with_basename(char const* name_prefix,
+        hpx::id_type id, boost::uint32_t locality_id)
+    {
+        if (locality_id == naming::invalid_locality_id)
+            locality_id = naming::get_locality_id_from_id(find_here());
+
+        std::string name(name_prefix);
+        if (name.back() != '/')
+            name += '/';
+        name += boost::lexical_cast<std::string>(locality_id);
+
+        return agas::register_name(name, id);
+    }
+
+    hpx::future<hpx::id_type> unregister_id_with_basename(
+        char const* name_prefix, hpx::id_type id, boost::uint32_t locality_id)
+    {
+        if (locality_id == naming::invalid_locality_id)
+            locality_id = naming::get_locality_id_from_id(find_here());
+
+        std::string name(name_prefix);
+        if (name.back() != '/')
+            name += '/';
+        name += boost::lexical_cast<std::string>(locality_id);
+
+        return agas::unregister_name(name);
+    }
+}

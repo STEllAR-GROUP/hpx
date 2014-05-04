@@ -1032,6 +1032,22 @@ namespace hpx
         error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \brief Register the given id with the given name prefix and return
+    ///        all registered ids from other localities.
+    HPX_API_EXPORT std::vector<hpx::future<hpx::id_type> >
+        find_ids_from_basename(char const* name_prefix, std::size_t num_ids);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Register the given id using the given name prefix.
+    HPX_API_EXPORT hpx::future<bool> register_id_with_basename(
+        char const* name_prefix, hpx::id_type id,
+        boost::uint32_t locality_id = ~0U);  // = naming::invalid_locality_id
+
+    HPX_API_EXPORT hpx::future<hpx::id_type> unregister_id_with_basename(
+        char const* name_prefix, hpx::id_type id,
+        boost::uint32_t locality_id = ~0U);  // = naming::invalid_locality_id
+
+    ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of localities which are currently registered
     ///        for the running application.
     ///

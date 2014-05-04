@@ -61,7 +61,8 @@ enum namespace_action_code
     symbol_ns_resolve                       = BOOST_BINARY_U(0010011),
     symbol_ns_unbind                        = BOOST_BINARY_U(0010100),
     symbol_ns_iterate_names                 = BOOST_BINARY_U(0010101),
-    symbol_ns_statistics_counter            = BOOST_BINARY_U(0010110)
+    symbol_ns_on_event                      = BOOST_BINARY_U(0010110),
+    symbol_ns_statistics_counter            = BOOST_BINARY_U(0010111)
 };
 
 namespace detail
@@ -377,6 +378,11 @@ namespace detail
           , counter_target_count
           , symbol_ns_iterate_names
           , symbol_ns_statistics_counter }
+      , {   "count/on_symbol_namespace_event"
+          , ""
+          , counter_target_count
+          , symbol_ns_on_event
+          , symbol_ns_statistics_counter }
       // counters exposing API timings
       , {   "time/bind"
           , "ns"
@@ -397,6 +403,11 @@ namespace detail
           , "ns"
           , counter_target_time
           , symbol_ns_iterate_names
+          , symbol_ns_statistics_counter }
+      , {   "time/on_symbol_namespace_event"
+          , "ns"
+          , counter_target_time
+          , symbol_ns_on_event
           , symbol_ns_statistics_counter }
     };
     static std::size_t const num_symbol_namespace_services =

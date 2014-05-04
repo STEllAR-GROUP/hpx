@@ -856,7 +856,7 @@ public:
 //         naming::address addr;
 //         return is_local_address(id, addr, ec);
 //     }
-// 
+//
 //     bool is_local_address(
 //         naming::gid_type const& id
 //       , naming::address& addr
@@ -1433,6 +1433,30 @@ public:
     {
         return resolve_name_async(name).get(ec);
     }
+
+    /// \brief Install a listener for a given symbol namespace event.
+    ///
+    /// This function installs a listener for a given symbol namespace event.
+    /// It returns a future which becomes ready as a result of the listener
+    /// being triggered.
+    ///
+    /// \param name       [in] The global name (string) for which the given
+    ///                   event should be triggered.
+    /// \param evt        [in] The event for which a listener should be
+    ///                   installed.
+    /// \param call_for_past_events   [in, optional] Trigger the listener even
+    ///                   if the given event has already happened in the past.
+    ///                   The default for this parameter is \a false.
+    ///
+    /// \returns  A future instance encapsulating the global id which is
+    ///           causing the registered listener to be triggered.
+    ///
+    /// \note    The only event type which is currently supported is
+    ///          \a symbol_ns_bind, i.e. the listener is triggered whenever a
+    ///          global id is registered with the given name.
+    ///
+    future<hpx::id_type> on_symbol_namespace_event(std::string const& name,
+        namespace_action_code evt, bool call_for_past_events = false);
 
     /// \warning This function is for internal use only. It is dangerous and
     ///          may break your code if you use it.
