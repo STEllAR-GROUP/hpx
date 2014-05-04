@@ -46,9 +46,9 @@ struct test_client
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main()
+void test_find_all_ids_from_basename()
 {
-    char const* basename = "/find_ids_from_prefix_test/";
+    char const* basename = "/find_all_ids_from_prefix_test/";
 
     test_client t1 = test_client::create(hpx::find_here());
     hpx::id_type client_id = t1.get_gid();
@@ -62,7 +62,7 @@ int hpx_main()
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
     std::vector<hpx::future<hpx::id_type> > all_ids =
-        hpx::find_ids_from_basename(basename, localities.size());
+        hpx::find_all_ids_from_basename(basename, localities.size());
     HPX_TEST_EQ(all_ids.size(), localities.size());
 
     // retrieve all component ids
@@ -84,6 +84,62 @@ int hpx_main()
         HPX_TEST(component_localities.find(id) != component_localities.end());
     }
 
+    HPX_TEST(hpx::unregister_id_with_basename(basename).get());
+}
+
+void test_find_ids_from_basename()
+{
+    char const* basename = "/find_ids_from_prefix_test/";
+
+    test_client t1 = test_client::create(hpx::find_here());
+    hpx::id_type client_id = t1.get_gid();
+
+    HPX_TEST_NEQ(hpx::naming::invalid_id, client_id);
+
+    // register our component with AGAS
+    HPX_TEST((hpx::register_id_with_basename(basename, client_id).get()));
+
+    // wait for all localities to register their component
+    std::vector<hpx::id_type> localities = hpx::find_remote_localities();
+
+    std::vector<std::size_t> sequence_nrs;
+    sequence_nrs.reserve(localities.size());
+    BOOST_FOREACH(hpx::id_type locality, localities)
+    {
+        sequence_nrs.push_back(hpx::naming::get_locality_id_from_id(locality));
+    }
+
+    std::vector<hpx::future<hpx::id_type> > ids =
+        hpx::find_ids_from_basename(basename, sequence_nrs);
+    HPX_TEST_EQ(ids.size(), sequence_nrs.size());
+
+    // retrieve all component ids
+    std::set<hpx::id_type> component_localities;
+    BOOST_FOREACH(hpx::future<hpx::id_type>& f, ids)
+    {
+        hpx::id_type id = f.get();
+
+        hpx::id_type locality = test_client(id).call();
+        std::pair<std::set<hpx::id_type>::iterator, bool> p =
+            component_localities.insert(locality);
+
+        HPX_TEST(p.second);     // every id should be unique
+    }
+    HPX_TEST_EQ(component_localities.size(), localities.size());
+
+    // make sure that components are on all localities
+    BOOST_FOREACH(hpx::id_type const& id, localities)
+    {
+        HPX_TEST(component_localities.find(id) != component_localities.end());
+    }
+
+    HPX_TEST(hpx::unregister_id_with_basename(basename).get());
+}
+
+int hpx_main()
+{
+    test_find_ids_from_basename();
+    test_find_all_ids_from_basename();
     return hpx::finalize();
 }
 

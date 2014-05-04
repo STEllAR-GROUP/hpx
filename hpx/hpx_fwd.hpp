@@ -1032,20 +1032,86 @@ namespace hpx
         error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief Register the given id with the given name prefix and return
-    ///        all registered ids from other localities.
+    /// \brief Return all registered ids from all localities from the given
+    ///        base name.
+    ///
+    /// This function locates all ids which where registered with the given
+    /// base name. It returns a list of futures representing those ids.
+    ///
+    /// \param base_name    [in] The base name for which to retrieve the
+    ///                     registered ids.
+    /// \param num_ids      [in] The number of registered ids to expect.
+    ///
+    /// \returns A list of futures representing the ids which were registered
+    ///          using the given base name.
+    ///
+    /// \note   The returned futures may become ready after the function
+    ///         returns if the corresponding id is not yet registered while
+    ///         the function is executed.
+    ///
     HPX_API_EXPORT std::vector<hpx::future<hpx::id_type> >
-        find_ids_from_basename(char const* name_prefix, std::size_t num_ids);
+        find_all_ids_from_basename(char const* base_name, std::size_t num_ids);
+
+    /// \brief Return registered ids from the given base name and sequence numbers.
+    ///
+    /// This function locates the ids which where registered with the given
+    /// base name and the given sequence numbers. It returns a list of futures
+    /// representing those ids.
+    ///
+    /// \param base_name    [in] The base name for which to retrieve the
+    ///                     registered ids.
+    /// \param ids          [in] The sequence numbers of the registered ids.
+    ///
+    /// \returns A list of futures representing the ids which were registered
+    ///          using the given base name and sequence numbers.
+    ///
+    /// \note   The returned futures may become ready after the function
+    ///         returns if the corresponding id is not yet registered while
+    ///         the function is executed.
+    ///
+    HPX_API_EXPORT std::vector<hpx::future<hpx::id_type> >
+        find_ids_from_basename(char const* base_name,
+            std::vector<std::size_t> const& ids);
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief Register the given id using the given name prefix.
+    /// \brief Register the given id using the given base name.
+    ///
+    /// The function registers the given ids using the provided base name.
+    ///
+    /// \param base_name    [in] The base name for which to retrieve the
+    ///                     registered ids.
+    /// \param id           [in] The id to register using the given base name.
+    /// \param sequence_nr  [in, optional] The sequential number to use for the
+    ///                     registration of the id. This number has to be
+    ///                     unique system wide for each registration using the
+    ///                     same base name. The default is the current locality
+    ///                     identifier.
+    ///
+    /// \returns A future representing the result of the registration operation
+    ///          itself.
+    ///
+    /// \note    The operation will fail if the given sequence number is not
+    ///          unique.
+    ///
     HPX_API_EXPORT hpx::future<bool> register_id_with_basename(
-        char const* name_prefix, hpx::id_type id,
-        boost::uint32_t locality_id = ~0U);  // = naming::invalid_locality_id
+        char const* base_name, hpx::id_type id, std::size_t sequence_nr = ~0U);
 
+    /// \brief Unregister the given id using the given base name.
+    ///
+    /// The function unregisters the given ids using the provided base name.
+    ///
+    /// \param base_name    [in] The base name for which to retrieve the
+    ///                     registered ids.
+    /// \param sequence_nr  [in, optional] The sequential number to use for the
+    ///                     un-registration. This number has to be the same
+    ///                     as has been used with \a register_id_with_basename
+    ///                     before.
+    ///
+    /// \returns A future representing the result of the un-registration
+    ///          operation itself.
+    ///
     HPX_API_EXPORT hpx::future<hpx::id_type> unregister_id_with_basename(
-        char const* name_prefix, hpx::id_type id,
-        boost::uint32_t locality_id = ~0U);  // = naming::invalid_locality_id
+        char const* base_name, std::size_t sequence_nr = ~0U);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of localities which are currently registered

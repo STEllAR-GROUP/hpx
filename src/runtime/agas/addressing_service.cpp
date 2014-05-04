@@ -2821,51 +2821,96 @@ void addressing_service::send_refcnt_requests_sync(
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
+    namespace detail
+    {
+        inline std::string name_from_basename(char const* basename, std::size_t idx)
+        {
+            std::string name;
+
+            if (basename[0] != '/')
+                name += '/';
+            name += basename;
+            if (name.back() != '/')
+                name += '/';
+            name += boost::lexical_cast<std::string>(idx);
+
+            return name;
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     std::vector<hpx::future<hpx::id_type> >
-        find_ids_from_basename(char const* name_prefix, std::size_t num_ids)
+        find_all_ids_from_basename(char const* basename, std::size_t num_ids)
     {
+        if (0 == basename)
+        {
+            HPX_THROW_EXCEPTION(bad_parameter,
+                "hpx::find_all_ids_from_basename",
+                "no basename specified");
+        }
+
         std::vector<hpx::future<hpx::id_type> > results;
         for(std::size_t i = 0; i != num_ids; ++i)
         {
-            std::string name(name_prefix);
-            if (name.back() != '/')
-                name += '/';
-            name += boost::lexical_cast<std::string>(i);
-
-            using util::placeholders::_2;
-
+            std::string name = detail::name_from_basename(basename, i);
             results.push_back(agas::on_symbol_namespace_event(
                 name, agas::symbol_ns_bind, true));
         }
         return results;
     }
 
-    hpx::future<bool> register_id_with_basename(char const* name_prefix,
-        hpx::id_type id, boost::uint32_t locality_id)
+    std::vector<hpx::future<hpx::id_type> >
+        find_ids_from_basename(char const* basename,
+            std::vector<std::size_t> const& ids)
     {
-        if (locality_id == naming::invalid_locality_id)
-            locality_id = naming::get_locality_id_from_id(find_here());
+        if (0 == basename)
+        {
+            HPX_THROW_EXCEPTION(bad_parameter,
+                "hpx::find_all_ids_from_basename",
+                "no basename specified");
+        }
 
-        std::string name(name_prefix);
-        if (name.back() != '/')
-            name += '/';
-        name += boost::lexical_cast<std::string>(locality_id);
+        std::vector<hpx::future<hpx::id_type> > results;
+        BOOST_FOREACH(std::size_t i, ids)
+        {
+            std::string name = detail::name_from_basename(basename, i);
+            results.push_back(agas::on_symbol_namespace_event(
+                name, agas::symbol_ns_bind, true));
+        }
+        return results;
+    }
 
+    hpx::future<bool> register_id_with_basename(char const* basename,
+        hpx::id_type id, std::size_t sequence_nr)
+    {
+        if (0 == basename)
+        {
+            HPX_THROW_EXCEPTION(bad_parameter,
+                "hpx::find_all_ids_from_basename",
+                "no basename specified");
+        }
+
+        if (sequence_nr == ~0U)
+            sequence_nr = naming::get_locality_id_from_id(find_here());
+
+        std::string name = detail::name_from_basename(basename, sequence_nr);
         return agas::register_name(name, id);
     }
 
     hpx::future<hpx::id_type> unregister_id_with_basename(
-        char const* name_prefix, hpx::id_type id, boost::uint32_t locality_id)
+        char const* basename, std::size_t sequence_nr)
     {
-        if (locality_id == naming::invalid_locality_id)
-            locality_id = naming::get_locality_id_from_id(find_here());
+        if (0 == basename)
+        {
+            HPX_THROW_EXCEPTION(bad_parameter,
+                "hpx::find_all_ids_from_basename",
+                "no basename specified");
+        }
 
-        std::string name(name_prefix);
-        if (name.back() != '/')
-            name += '/';
-        name += boost::lexical_cast<std::string>(locality_id);
+        if (sequence_nr == ~0U)
+            sequence_nr = naming::get_locality_id_from_id(find_here());
 
+        std::string name = detail::name_from_basename(basename, sequence_nr);
         return agas::unregister_name(name);
     }
 }
