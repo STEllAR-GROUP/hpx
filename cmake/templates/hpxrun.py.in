@@ -26,14 +26,19 @@ import traceback
 
 from optparse import OptionParser
 
-from subprocess import Popen, CREATE_NEW_PROCESS_GROUP
+import subprocess
+from subprocess import Popen
 
 # Our global list of processes we started
 procs = []
 def subproc(cmd):
     kwargs = {}
     if sys.platform == 'win32':
-        kwargs['creationflags'] = CREATE_NEW_PROCESS_GROUP
+        # For some reason or another ... this seems to be non existent sometimes
+        try:
+            kwargs['creationflags'] = subprocess.CREATE_NEW_PROCESS_GROUP
+        except:
+            pass
     proc = Popen(cmd, **kwargs)
     procs.append(proc)
 
