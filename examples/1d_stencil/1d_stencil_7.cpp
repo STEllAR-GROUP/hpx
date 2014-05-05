@@ -18,6 +18,16 @@ double k = 0.5;     // heat transfer coefficient
 double dt = 1.;     // time step
 double dx = 1.;     // grid spacing
 
+inline std::size_t idx(std::size_t i, std::size_t size)
+{
+    return (boost::int64_t(i) < 0) ? (i + size) % size : i % size;
+}
+
+inline std::size_t locidx(std::size_t i, std::size_t np, std::size_t nl)
+{
+    return i / (np/nl);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 struct partition_data
 {
@@ -105,7 +115,8 @@ std::ostream& operator<<(std::ostream& os, partition_data const& c)
 // This is the server side representation of the data. We expose this as a HPX
 // component which allows for it to be created and accessed remotely through
 // a global address (hpx::id_type).
-struct partition_server : hpx::components::simple_component_base<partition_server>
+struct partition_server
+  : hpx::components::simple_component_base<partition_server>
 {
     enum partition_type
     {
@@ -195,8 +206,8 @@ struct partition : hpx::components::client_base<partition, partition_server>
       : base_type(std::move(id))
     {}
 
-    // Unwrap a future<partition> (a partition already holds a future to the id of the
-    // referenced object, thus unwrapping accesses this inner future).
+    // Unwrap a future<partition> (a partition already holds a future to the
+    // id of the referenced object, thus unwrapping accesses this inner future).
     partition(hpx::future<partition> && c)
       : base_type(std::move(c))
     {}
@@ -212,82 +223,81 @@ struct partition : hpx::components::client_base<partition, partition_server>
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef std::vector<partition> space;             // data for one time step
-
-///////////////////////////////////////////////////////////////////////////////
-inline std::size_t idx(std::size_t i, std::size_t size)
+struct stepper
 {
-    return (boost::int64_t(i) < 0) ? (i + size) % size : i % size;
-}
+    // Our data for one time step
+    typedef std::vector<partition> space;
 
-inline std::size_t locidx(std::size_t i, std::size_t np, std::size_t nl)
-{
-    return i / (np/nl);
-}
+    // Our operator
+    static double heat(double left, double middle, double right)
+    {
+        return middle + (k*dt/dx*dx) * (left - 2*middle + right);
+    }
 
-///////////////////////////////////////////////////////////////////////////////
-// Our operator:
-inline double heat(double left, double middle, double right)
-{
-    return middle + (k*dt/dx*dx) * (left - 2*middle + right);
-}
+    // The partitioned operator, it invokes the heat operator above on all elements
+    // of a partition.
+    static partition heat_part(partition const& left,
+        partition const& middle, partition const& right)
+    {
+        using hpx::lcos::local::dataflow;
+        using hpx::util::unwrapped;
 
-///////////////////////////////////////////////////////////////////////////////
-partition heat_part(partition const& left, partition const& middle,
-    partition const& right)
-{
-    using hpx::lcos::local::dataflow;
-    using hpx::util::unwrapped;
+        hpx::shared_future<partition_data> middle_data =
+            middle.get_data(partition_server::middle_partition);
 
-    hpx::shared_future<partition_data> middle_data =
-        middle.get_data(partition_server::middle_partition);
+        hpx::future<partition_data> next_middle = middle_data.then(
+            unwrapped(
+                [middle](partition_data const& m)
+                {
+                    // All local operations are performed once the middle data of
+                    // the previous time step becomes available.
+                    std::size_t size = m.size();
+                    partition_data next(size);
+                    for (std::size_t i = 1; i != size-1; ++i)
+                        next[i] = heat(m[i-1], m[i], m[i+1]);
+                    return next;
+                }
+            )
+        );
 
-    hpx::future<partition_data> next_middle = middle_data.then(
-        unwrapped(
-            [middle](partition_data const& m)
-            {
-                // All local operations are performed once the middle data of
-                // the previous time step becomes available.
-                std::size_t size = m.size();
-                partition_data next(size);
-                for (std::size_t i = 1; i != size-1; ++i)
-                    next[i] = heat(m[i-1], m[i], m[i+1]);
-                return next;
-            }
-        )
-    );
+        return dataflow(
+            unwrapped(
+                [left, middle, right](partition_data next, partition_data const& l,
+                    partition_data const& m, partition_data const& r)
+                {
+                    // Calculate the missing boundary elements once the
+                    // corresponding data has become available.
+                    std::size_t size = m.size();
+                    next[0] = heat(l[size-1], m[0], m[1]);
+                    next[size-1] = heat(m[size-2], m[size-1], r[0]);
 
-    return dataflow(
-        unwrapped(
-            [left, middle, right](partition_data next, partition_data const& l,
-                partition_data const& m, partition_data const& r)
-            {
-                // Calculate the missing boundary elements once the
-                // corresponding data has become available.
-                std::size_t size = m.size();
-                next[0] = heat(l[size-1], m[0], m[1]);
-                next[size-1] = heat(m[size-2], m[size-1], r[0]);
+                    // The new partition_data will be allocated on the same locality
+                    // as 'middle'.
+                    return partition(middle.get_gid(), next);
+                }
+            ),
+            std::move(next_middle),
+            left.get_data(partition_server::left_partition),
+            middle_data,
+            right.get_data(partition_server::right_partition)
+        );
+    }
 
-                // The new partition_data will be allocated on the same locality
-                // as 'middle'.
-                return partition(middle.get_gid(), next);
-            }
-        ),
-        std::move(next_middle),
-        left.get_data(partition_server::left_partition),
-        middle_data,
-        right.get_data(partition_server::right_partition)
-    );
-}
+    // do all the work on 'np' partitions, 'nx' data points each, for 'nt'
+    // time steps
+    space do_work(std::size_t np, std::size_t nx, std::size_t nt);
+};
 
 // Global functions can be exposed as actions as well. That allows to invoke
 // those remotely. The macro HPX_PLAIN_ACTION() defines a new action type
 // 'heat_part_action' which wraps the global function heat_part(). It can be
 // used to call that function on a given locality.
-HPX_PLAIN_ACTION(heat_part, heat_part_action);
+HPX_PLAIN_ACTION(stepper::heat_part, heat_part_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map& vm)
+// do all the work on 'np' partitions, 'nx' data points each, for 'nt'
+// time steps
+stepper::space stepper::do_work(std::size_t np, std::size_t nx, std::size_t nt)
 {
     using hpx::lcos::local::dataflow;
     using hpx::util::unwrapped;
@@ -295,27 +305,15 @@ int hpx_main(boost::program_options::variables_map& vm)
     using hpx::util::placeholders::_2;
     using hpx::util::placeholders::_3;
 
-    boost::uint64_t nt = vm["nt"].as<boost::uint64_t>();   // Number of steps.
-    boost::uint64_t nx = vm["nx"].as<boost::uint64_t>();   // Number of grid points.
-    boost::uint64_t np = vm["np"].as<boost::uint64_t>();   // Number of partitions.
-
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
     std::size_t nl = localities.size();                    // Number of localities
-
-    if (np < nl)
-    {
-        std::cout << "The number of partitions should not be smaller than "
-                     "the number of localities" << std::endl;
-        return hpx::finalize();
-    }
 
     // U[t][i] is the state of position i at time t.
     std::vector<space> U(2);
     for (space& s: U)
         s.resize(np);
 
-    // Initial conditions:
-    //   f(0, i) = i
+    // Initial conditions: f(0, i) = i
     for (std::size_t i = 0; i != np; ++i)
         U[0][i] = partition(localities[locidx(i, np, nl)], nx, double(i));
 
@@ -333,8 +331,34 @@ int hpx_main(boost::program_options::variables_map& vm)
         }
     }
 
+    // Return the solution at time-step 'nt'.
+    return U[nt % 2];
+}
+
+///////////////////////////////////////////////////////////////////////////////
+int hpx_main(boost::program_options::variables_map& vm)
+{
+    boost::uint64_t np = vm["np"].as<boost::uint64_t>();   // Number of partitions.
+    boost::uint64_t nx = vm["nx"].as<boost::uint64_t>();   // Number of grid points.
+    boost::uint64_t nt = vm["nt"].as<boost::uint64_t>();   // Number of steps.
+
+    std::vector<hpx::id_type> localities = hpx::find_all_localities();
+    std::size_t nl = localities.size();                    // Number of localities
+
+    if (np < nl)
+    {
+        std::cout << "The number of partitions should not be smaller than "
+                     "the number of localities" << std::endl;
+        return hpx::finalize();
+    }
+
+    // Create the stepper object
+    stepper step;
+
+    // Execute nt time steps on nx grid points and print the final solution.
+    stepper::space solution = step.do_work(np, nx, nt);
+
     // Print the solution at time-step 'nt'.
-    space const& solution = U[nt % 2];
     for (std::size_t i = 0; i != np; ++i)
     {
         std::cout << "U[" << i << "] = "

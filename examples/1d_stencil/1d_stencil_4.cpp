@@ -21,7 +21,13 @@ double k = 0.5;     // heat transfer coefficient
 double dt = 1.;     // time step
 double dx = 1.;     // grid spacing
 
+inline std::size_t idx(std::size_t i, std::size_t size)
+{
+    return (boost::int64_t(i) < 0) ? (i + size) % size : i % size;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
+// Our partition data type
 struct partition
 {
     partition(std::size_t size)
@@ -59,73 +65,83 @@ std::ostream& operator<<(std::ostream& os, partition const& c)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef std::vector<hpx::shared_future<partition> > space; // data for one time step
-
-///////////////////////////////////////////////////////////////////////////////
-inline std::size_t idx(std::size_t i, std::size_t size)
+struct stepper
 {
-    return (boost::int64_t(i) < 0) ? (i + size) % size : i % size;
-}
+    // Our data for one time step
+    typedef std::vector<hpx::shared_future<partition> > space;
 
-///////////////////////////////////////////////////////////////////////////////
-// Our operator
-inline double heat(double left, double middle, double right)
-{
-    return middle + (k*dt/dx*dx) * (left - 2*middle + right);
-}
+    // Our operator
+    static double heat(double left, double middle, double right)
+    {
+        return middle + (k*dt/dx*dx) * (left - 2*middle + right);
+    }
 
-// The partitioned operator, it invokes the heat operator above on all elements
-// of a partition.
-partition heat_part(partition const& left, partition const& middle,
-    partition const& right)
-{
-    std::size_t size = middle.size();
-    partition next(size);
+    // The partitioned operator, it invokes the heat operator above on all
+    // elements of a partition.
+    static partition heat_part(partition const& left, partition const& middle,
+        partition const& right)
+    {
+        std::size_t size = middle.size();
+        partition next(size);
 
-    next[0] = heat(left[size-1], middle[0], middle[1]);
+        next[0] = heat(left[size-1], middle[0], middle[1]);
 
-    for (std::size_t i = 1; i != size-1; ++i)
-        next[i] = heat(middle[i-1], middle[i], middle[i+1]);
+        for (std::size_t i = 1; i != size-1; ++i)
+            next[i] = heat(middle[i-1], middle[i], middle[i+1]);
 
-    next[size-1] = heat(middle[size-2], middle[size-1], right[0]);
+        next[size-1] = heat(middle[size-2], middle[size-1], right[0]);
 
-    return next;
-}
+        return next;
+    }
+
+    // do all the work on 'np' partitions, 'nx' data points each, for 'nt'
+    // time steps
+    hpx::future<space> do_work(std::size_t np, std::size_t nx, std::size_t nt)
+    {
+        using hpx::lcos::local::dataflow;
+        using hpx::util::unwrapped;
+
+        // U[t][i] is the state of position i at time t.
+        std::vector<space> U(2);
+        for (space& s: U)
+            s.resize(np);
+
+        // Initial conditions: f(0, i) = i
+        for (std::size_t i = 0; i != np; ++i)
+            U[0][i] = hpx::make_ready_future(partition(nx, double(i)));
+
+        auto Op = unwrapped(&stepper::heat_part);
+
+        // Actual time step loop
+        for (std::size_t t = 0; t != nt; ++t)
+        {
+            space& current = U[t % 2];
+            space& next = U[(t + 1) % 2];
+
+            for (std::size_t i = 0; i != np; ++i)
+                next[i] = dataflow(Op, current[idx(i-1, np)], current[i], current[idx(i+1, np)]);
+        }
+
+        // Return the solution at time-step 'nt'.
+        return hpx::when_all(U[nt % 2]);
+    }
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    using hpx::lcos::local::dataflow;
-    using hpx::util::unwrapped;
-
-    boost::uint64_t nt = vm["nt"].as<boost::uint64_t>();   // Number of steps.
-    boost::uint64_t nx = vm["nx"].as<boost::uint64_t>();   // Number of grid points.
     boost::uint64_t np = vm["np"].as<boost::uint64_t>();   // Number of partitions.
+    boost::uint64_t nx = vm["nx"].as<boost::uint64_t>();   // Number of grid points.
+    boost::uint64_t nt = vm["nt"].as<boost::uint64_t>();   // Number of steps.
 
-    // U[t][i] is the state of position i at time t.
-    std::vector<space> U(2);
-    for (space& s: U)
-        s.resize(np);
+    // Create the stepper object
+    stepper step;
 
-    // Initial conditions:
-    //   f(0, i) = i
-    for (std::size_t i = 0; i != np; ++i)
-        U[0][i] = hpx::make_ready_future(partition(nx, double(i)));
+    // Execute nt time steps on nx grid points and print the final solution.
+    hpx::future<stepper::space> result = step.do_work(np, nx, nt);
 
-    auto Op = unwrapped(heat_part);
-
-    for (std::size_t t = 0; t != nt; ++t)
-    {
-        space& current = U[t % 2];
-        space& next = U[(t + 1) % 2];
-
-        for (std::size_t i = 0; i != np; ++i)
-            next[i] = dataflow(Op, current[idx(i-1, np)], current[i], current[idx(i+1, np)]);
-    }
-
-    // Print the solution at time-step 'nt'.
-    space solution = hpx::when_all(U[nt % 2]).get();
-
+    // Print the final solution
+    stepper::space solution = result.get();
     for (std::size_t i = 0; i != np; ++i)
         std::cout << "U[" << i << "] = " << solution[i].get() << std::endl;
 
