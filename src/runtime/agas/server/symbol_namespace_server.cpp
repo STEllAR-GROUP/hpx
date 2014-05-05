@@ -76,6 +76,15 @@ response symbol_namespace::service(
                 counter_data_.increment_iterate_names_count();
                 return iterate(req, ec);
             }
+        case symbol_ns_on_event:
+            {
+                update_time_on_exit update(
+                    counter_data_
+                  , counter_data_.on_event_.time_
+                );
+                counter_data_.increment_on_event_count();
+                return on_event(req, ec);
+            }
         case symbol_ns_statistics_counter:
             return statistics_counter(req, ec);
 
@@ -313,6 +322,52 @@ response symbol_namespace::bind(
         return response();
     }
 
+    // handle registered events
+    typedef on_event_data_map_type::iterator iterator;
+    std::pair<std::string, namespace_action_code> evtkey(key, symbol_ns_bind);
+    std::pair<iterator, iterator> p = on_event_data_.equal_range(evtkey);
+
+    if (p.first != p.second)
+    {
+        std::vector<hpx::id_type> lcos;
+
+        iterator it = p.first;
+        while (it != p.second)
+        {
+            lcos.push_back((*it).second);
+            ++it;
+        }
+
+        on_event_data_.erase(p.first, p.second);
+
+        // notify all LCOS which were registered with this name
+        BOOST_FOREACH(hpx::id_type const& id, lcos)
+        {
+            // re-locate the entry in the GID table for each LCO anew, as we
+            // need to unlock the mutex protecting the table for each iteration
+            // below
+            gid_table_type::iterator it = gids_.find(key);
+            if (it == gids_.end())
+            {
+                l.unlock();
+
+                HPX_THROWS_IF(ec, invalid_status
+                  , "symbol_namespace::bind"
+                  , "unable to re-locate the entry in the GID table");
+                return response();
+            }
+
+            // split the credit as the receiving end will expect to keep the
+            // object alive
+            naming::gid_type new_gid = naming::detail::split_gid_if_needed(
+                it->second);
+
+            // trigger the lco
+            util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+            set_lco_value(id, new_gid);
+        }
+    }
+
     LAGAS_(info) << (boost::format(
         "symbol_namespace::bind, key(%1%), gid(%2%)")
         % key % gid);
@@ -424,6 +479,75 @@ response symbol_namespace::iterate(
         ec = make_success_code();
 
     return response(symbol_ns_iterate_names);
+} // }}}
+
+response symbol_namespace::on_event(
+    request const& req
+  , error_code& ec
+    )
+{ // {{{ on_event implementation
+    std::string name = req.get_name();
+    namespace_action_code evt = req.get_on_event_event();
+    bool call_for_past_events = req.get_on_event_call_for_past_event();
+    hpx::id_type lco = req.get_on_event_result_lco();
+
+    if (evt != symbol_ns_bind)
+    {
+        HPX_THROWS_IF(ec, bad_parameter,
+            "addressing_service::on_symbol_namespace_event",
+            "invalid event type");
+        return response(symbol_ns_on_event, no_success);
+    }
+
+    mutex_type::scoped_lock l(mutex_);
+
+    bool handled = false;
+    if (call_for_past_events)
+    {
+        gid_table_type::iterator it = gids_.find(name);
+        if (it != gids_.end())
+        {
+            // split the credit as the receiving end will expect to keep the
+            // object alive
+            naming::gid_type new_gid = naming::detail::split_gid_if_needed(
+                it->second);
+
+            // trigger the lco
+            l.unlock();
+            handled = true;
+
+            // trigger LCO as name is already bound to an id
+            set_lco_value(lco, new_gid);
+        }
+    }
+
+    if (!handled)
+    {
+        std::pair<std::string, namespace_action_code> key(name, evt);
+        on_event_data_map_type::iterator it = on_event_data_.insert(
+            on_event_data_map_type::value_type(std::move(key), lco));
+
+        l.unlock();
+
+        if (it == on_event_data_.end())
+        {
+            LAGAS_(info) << (boost::format(
+                "symbol_namespace::on_event, name(%1%), response(no_success)")
+                % name);
+
+            if (&ec != &throws)
+                ec = make_success_code();
+
+            return response(symbol_ns_on_event, no_success);
+        }
+    }
+
+    LAGAS_(info) << "symbol_namespace::on_event";
+
+    if (&ec != &throws)
+        ec = make_success_code();
+
+    return response(symbol_ns_on_event);
 } // }}}
 
 response symbol_namespace::statistics_counter(
@@ -565,13 +689,20 @@ boost::int64_t symbol_namespace::counter_data::get_iterate_names_count(bool rese
     return util::get_and_reset_value(iterate_names_.count_, reset);
 }
 
+boost::int64_t symbol_namespace::counter_data::get_on_event_count(bool reset)
+{
+    mutex_type::scoped_lock l(mtx_);
+    return util::get_and_reset_value(on_event_.count_, reset);
+}
+
 boost::int64_t symbol_namespace::counter_data::get_overall_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(bind_.count_, reset) +
         util::get_and_reset_value(resolve_.count_, reset) +
         util::get_and_reset_value(unbind_.count_, reset) +
-        util::get_and_reset_value(iterate_names_.count_, reset);
+        util::get_and_reset_value(iterate_names_.count_, reset) +
+        util::get_and_reset_value(on_event_.count_, reset);
 }
 
 // access execution time counters
@@ -599,13 +730,20 @@ boost::int64_t symbol_namespace::counter_data::get_iterate_names_time(bool reset
     return util::get_and_reset_value(iterate_names_.time_, reset);
 }
 
+boost::int64_t symbol_namespace::counter_data::get_on_event_time(bool reset)
+{
+    mutex_type::scoped_lock l(mtx_);
+    return util::get_and_reset_value(on_event_.time_, reset);
+}
+
 boost::int64_t symbol_namespace::counter_data::get_overall_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(bind_.time_, reset) +
         util::get_and_reset_value(resolve_.time_, reset) +
         util::get_and_reset_value(unbind_.time_, reset) +
-        util::get_and_reset_value(iterate_names_.time_, reset);
+        util::get_and_reset_value(iterate_names_.time_, reset) +
+        util::get_and_reset_value(on_event_.time_, reset);
 }
 
 // increment counter values
@@ -631,6 +769,12 @@ void symbol_namespace::counter_data::increment_iterate_names_count()
 {
     mutex_type::scoped_lock l(mtx_);
     ++iterate_names_.count_;
+}
+
+void symbol_namespace::counter_data::increment_on_event_count()
+{
+    mutex_type::scoped_lock l(mtx_);
+    ++on_event_.count_;
 }
 
 }}}

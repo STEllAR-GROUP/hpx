@@ -141,6 +141,7 @@ response component_namespace::service(
         case symbol_ns_resolve:
         case symbol_ns_unbind:
         case symbol_ns_iterate_names:
+        case symbol_ns_on_event:
         {
             LAGAS_(warning) <<
                 "component_namespace::service, redirecting request to "

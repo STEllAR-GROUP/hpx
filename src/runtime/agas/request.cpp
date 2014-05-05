@@ -61,6 +61,7 @@ namespace hpx { namespace agas
           , subtype_iterate_types_function  = 0xb
           , subtype_void                    = 0xc
           , subtype_parcel                  = 0xd
+          , subtype_name_evt_id             = 0xe
           // update HPX_AGAS_REQUEST_SUBTYPES above if you add more entries
         };
 
@@ -157,6 +158,14 @@ namespace hpx { namespace agas
             // primary_ns_route
           , util::tuple<
                 parcelset::parcel
+            >
+            // 0xe
+            // symbol_ns_on_event
+          , util::tuple<
+                std::string
+              , namespace_action_code
+              , bool
+              , hpx::id_type
             >
         > data_type;
 
@@ -371,6 +380,19 @@ namespace hpx { namespace agas
         // TODO: verification of namespace_action_code
     }
 
+    request::request(
+        namespace_action_code type_
+      , std::string const& name
+      , namespace_action_code evt
+      , bool call_for_past_events
+      , hpx::id_type result_lco
+        )
+      : mc(type_)
+      , data(new request_data(util::make_tuple(name, evt, call_for_past_events, result_lco)))
+    {
+        HPX_ASSERT(type_ == symbol_ns_on_event);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // copy constructor
     request::request(
@@ -390,6 +412,7 @@ namespace hpx { namespace agas
         return *this;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     gva request::get_gva(
         error_code& ec
         ) const
@@ -566,6 +589,9 @@ namespace hpx { namespace agas
             case request_data::subtype_name_gid:
                 return data->get_data<request_data::subtype_name_gid, 0>(ec);
 
+            case request_data::subtype_name_evt_id:
+                return data->get_data<request_data::subtype_name_evt_id, 0>(ec);
+
             default: {
                 HPX_THROWS_IF(ec, bad_parameter,
                     "request::get_name",
@@ -596,6 +622,28 @@ namespace hpx { namespace agas
         return data->get_data<request_data::subtype_locality_count, 3>(ec);
     }
 
+    namespace_action_code request::get_on_event_event(
+        error_code& ec
+        ) const
+    {
+        return data->get_data<request_data::subtype_name_evt_id, 1>(ec);
+    }
+
+    bool request::get_on_event_call_for_past_event(
+        error_code& ec
+        ) const
+    {
+        return data->get_data<request_data::subtype_name_evt_id, 2>(ec);
+    }
+
+    hpx::id_type request::get_on_event_result_lco(
+        error_code& ec
+        ) const
+    {
+        return data->get_data<request_data::subtype_name_evt_id, 3>(ec);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     struct save_visitor : boost::static_visitor<void>
     {
       private:

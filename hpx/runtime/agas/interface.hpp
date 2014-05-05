@@ -269,16 +269,6 @@ HPX_API_EXPORT void decref(
   , error_code& ec = throws
   );
 
-HPX_API_EXPORT void add_incref_request(
-    boost::int64_t credit
-  , naming::id_type const& keep_alive
-    );
-HPX_API_EXPORT bool add_remote_incref_request(
-    boost::int64_t credit
-  , naming::gid_type const& gid
-  , boost::uint32_t remote_locality
-    );
-
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT hpx::future<boost::int64_t> incref_async(
     naming::gid_type const& gid
@@ -301,6 +291,10 @@ HPX_API_EXPORT naming::id_type get_colocation_id_sync(
     naming::id_type const& id
   , error_code& ec = throws);
 
+///////////////////////////////////////////////////////////////////////////////
+HPX_API_EXPORT hpx::future<hpx::id_type> on_symbol_namespace_event(
+    std::string const& name, agas::namespace_action_code evt,
+    bool call_for_past_events);
 }}
 
 #endif // HPX_A55506A4_4AC7_4FD0_AB0D_ED0D1368FCC5
