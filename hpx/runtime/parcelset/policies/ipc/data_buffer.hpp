@@ -379,7 +379,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
 
         void clear()
         {
-            data_->clear();
+            if(data_)
+                data_->clear();
         }
 
         char const & operator[](std::size_t i) const

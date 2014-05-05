@@ -221,7 +221,7 @@ namespace hpx { namespace parcelset {
 
 
     template <typename Parcelport, typename Connection, typename Buffer>
-    void decode_parcels(Parcelport & parcelport, Connection connection,
+    void decode_parcels(Parcelport & parcelport, Connection & connection,
         boost::shared_ptr<Buffer> buffer)
     {
         typedef typename Buffer::transmission_chunk_type transmission_chunk_type;
@@ -275,9 +275,9 @@ namespace hpx { namespace parcelset {
         }
         bool first_message = false;
 #if defined(HPX_HAVE_SECURITY)
-        if(connection->first_message_)
+        if(connection.first_message_)
         {
-            connection->first_message_ = false;
+            connection.first_message_ = false;
             first_message = true;
         }
 #endif

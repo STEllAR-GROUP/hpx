@@ -258,7 +258,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                     = &receiver::handle_write_ack<Handler>;
 
                 // decode the received parcels.
-                decode_parcels(parcelport_, shared_from_this(), buffer_);
+                decode_parcels(parcelport_, *this, buffer_);
 
                 ack_ = true;
                 boost::asio::async_write(socket_,
