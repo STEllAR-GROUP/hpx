@@ -50,7 +50,7 @@ namespace hpx { namespace util
             static type call(Future& future, /*is_void=*/boost::mpl::false_)
             {
                 return future.get();
-            }
+          }
 
             template <typename Future>
             static type call(Future& future, /*is_void=*/boost::mpl::true_)
