@@ -370,7 +370,7 @@ void stepper_server::do_work(std::size_t nt)
 //     heat_part_action act;
 //     for (std::size_t t = 0; t != nt; ++t)
 //     {
-//         space& current = U[t % 2];
+//         space const& current = U[t % 2];
 //         space& next = U[(t + 1) % 2];
 //
 //         for (std::size_t i = 0; i != np; ++i)
