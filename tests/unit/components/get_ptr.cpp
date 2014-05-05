@@ -30,7 +30,7 @@ HPX_REGISTER_ACTION(check_ptr_action);
 struct test_client
   : hpx::components::client_base<test_client, test_server>
 {
-    typedef client_base<test_client, test_server> base_type;
+    typedef hpx::components::client_base<test_client, test_server> base_type;
 
     test_client(hpx::future<hpx::id_type>&& id) : base_type(std::move(id)) {}
 
