@@ -26,14 +26,14 @@ import traceback
 
 from optparse import OptionParser
 
-from subprocess import Popen, PIPE
+from subprocess import Popen, CREATE_NEW_PROCESS_GROUP
 
 # Our global list of processes we started
 procs = []
 def subproc(cmd):
     kwargs = {}
     if sys.platform == 'win32':
-        kwargs['creationflags'] = subprocess.CREATE_NEW_PROCESS_GROUP
+        kwargs['creationflags'] = CREATE_NEW_PROCESS_GROUP
     proc = Popen(cmd, **kwargs)
     procs.append(proc)
 
