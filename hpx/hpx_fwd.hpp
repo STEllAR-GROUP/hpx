@@ -1045,9 +1045,10 @@ namespace hpx
     /// \returns A list of futures representing the ids which were registered
     ///          using the given base name.
     ///
-    /// \note   The returned futures may become ready after the function
-    ///         returns if the corresponding id is not yet registered while
-    ///         the function is executed.
+    /// \note   The future will become ready even if the event (for instance,
+    ///         binding the name to an id) has already happened in the past.
+    ///         This is important in order to reliably retrieve ids from a
+    ///         name, even if the name was already registered.
     ///
     HPX_API_EXPORT std::vector<hpx::future<hpx::id_type> >
         find_all_ids_from_basename(char const* base_name, std::size_t num_ids);
@@ -1065,9 +1066,10 @@ namespace hpx
     /// \returns A list of futures representing the ids which were registered
     ///          using the given base name and sequence numbers.
     ///
-    /// \note   The returned futures may become ready after the function
-    ///         returns if the corresponding id is not yet registered while
-    ///         the function is executed.
+    /// \note   The future will become ready even if the event (for instance,
+    ///         binding the name to an id) has already happened in the past.
+    ///         This is important in order to reliably retrieve ids from a
+    ///         name, even if the name was already registered.
     ///
     HPX_API_EXPORT std::vector<hpx::future<hpx::id_type> >
         find_ids_from_basename(char const* base_name,
@@ -1081,14 +1083,15 @@ namespace hpx
     ///
     /// \param base_name    [in] The base name for which to retrieve the
     ///                     registered ids.
-    /// \param id          [in] The sequence number of the registered id.
+    /// \param id           [in] The sequence number of the registered id.
     ///
     /// \returns A representing the id which was registered using the given
     ///          base name and sequence numbers.
     ///
-    /// \note   The returned future may become ready after the function
-    ///         returns if the corresponding id is not yet registered while
-    ///         the function is executed.
+    /// \note   The future will become ready even if the event (for instance,
+    ///         binding the name to an id) has already happened in the past.
+    ///         This is important in order to reliably retrieve ids from a
+    ///         name, even if the name was already registered.
     ///
     HPX_API_EXPORT hpx::future<hpx::id_type>
         find_id_from_basename(char const* base_name,
