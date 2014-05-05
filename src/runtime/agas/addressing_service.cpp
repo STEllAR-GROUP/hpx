@@ -2830,7 +2830,7 @@ namespace hpx
             if (basename[0] != '/')
                 name += '/';
             name += basename;
-            if (name.back() != '/')
+            if (name[name.size()-1] != '/')
                 name += '/';
             name += boost::lexical_cast<std::string>(idx);
 
