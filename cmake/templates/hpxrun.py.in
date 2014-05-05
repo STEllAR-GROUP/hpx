@@ -151,7 +151,10 @@ def check_options(parser, options, args):
 # Send a SIGTERM/SIGBRAK to proc and wait for it to terminate.
 def term(proc):
     if sys.platform == 'win32':
-        proc.send_signal(signal.CTRL_BREAK_EVENT)
+        try:
+            proc.send_signal(signal.CTRL_BREAK_EVENT)
+        except:
+            proc.terminate()
     else:
         proc.terminate()
     proc.wait()
@@ -235,7 +238,7 @@ if __name__ == '__main__':
         ret = procs[0].returncode
         if ret != options.expected:
             # Output which process failed
-            msg = 'Process ' + str(which) + ' failed with an unexpected error '
+            msg = 'Process 0 failed with an unexpected error '
             msg += 'code of ' + str(ret) + ' (expected ' + str(options.expected)
             msg += ')' 
         sys.exit(ret)
