@@ -64,7 +64,7 @@ struct stepper
         // Actual time step loop
         for (std::size_t t = 0; t != nt; ++t)
         {
-            space& current = U[t % 2];
+            space const& current = U[t % 2];
             space& next = U[(t + 1) % 2];
 
             // WHEN U[t][i-1], U[t][i], and U[t][i+1] have been computed, THEN we
