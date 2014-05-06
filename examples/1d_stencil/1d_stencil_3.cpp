@@ -28,7 +28,7 @@ inline std::size_t idx(std::size_t i, std::size_t size)
 // Our partition data type
 struct partition
 {
-    partition(std::size_t size)
+    partition(std::size_t size = 0)
       : data_(size)
     {}
 
@@ -99,7 +99,7 @@ struct stepper
         // U[t][i] is the state of position i at time t.
         std::vector<space> U(2);
         for (space& s: U)
-            s.reserve(np);
+            s.resize(np);
 
         // Initial conditions: f(0, i) = i
         for (std::size_t i = 0; i != np; ++i)
