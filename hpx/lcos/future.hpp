@@ -219,23 +219,20 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Archive, typename Future>
     void serialize_future_save(Archive& ar, Future& f)
     {
+        typedef typename traits::future_traits<Future>::type value_type;
+
         HPX_ASSERT(!f.valid() || f.is_ready());
-        
+
         int state = future_state::invalid;
         if (f.has_value())
         {
             state = future_state::has_value;
-            ar << state << f.get();
+            value_type value = f.get();
+            ar << state << value;
         } else if (f.has_exception()) {
             state = future_state::has_exception;
-            ar << state; //! fix me: use get_exception
-            try
-            {
-                f.get();
-            } catch (...) {
-                boost::exception_ptr exception = boost::current_exception();
-                ar << exception;
-            }
+            boost::exception_ptr exception = f.get_exception_ptr();
+            ar << state << exception;
         } else {
             state = future_state::invalid;
             ar << state;
@@ -477,21 +474,21 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         // Returns: true if the shared state is ready, false if it isn't.
-        bool is_ready() const
+        bool is_ready() const BOOST_NOEXCEPT
         {
             return shared_state_ != 0 && shared_state_->is_ready();
         }
 
         // Returns: true if the shared state is ready and stores a value,
         //          false if it isn't.
-        bool has_value() const
+        bool has_value() const BOOST_NOEXCEPT
         {
             return shared_state_ != 0 && shared_state_->has_value();
         }
 
         // Returns: true if the shared state is ready and stores an exception,
         //          false if it isn't.
-        bool has_exception() const
+        bool has_exception() const BOOST_NOEXCEPT
         {
             return shared_state_ != 0 && shared_state_->has_exception();
         }
@@ -503,6 +500,27 @@ namespace hpx { namespace lcos { namespace detail
                 return future_status::uninitialized;
 
             return shared_state_->get_status();
+        }
+
+        // Effects:
+        //   - Blocks until the future is ready.
+        // Returns: The stored exception_ptr if has_exception(), a null
+        //          pointer otherwise.
+        boost::exception_ptr get_exception_ptr() const
+        {
+            if (!shared_state_)
+            {
+                HPX_THROW_EXCEPTION(no_state,
+                    "future_base<R>::get_exception_ptr",
+                    "this future has no valid shared state");
+            }
+
+            typedef typename shared_state_type::data_type data_type;
+            error_code ec(lightweight);
+            data_type& data = this->shared_state_->get_result(ec);
+            if (!ec) return boost::exception_ptr();
+
+            return data.get_error();
         }
 
         // Notes: The three functions differ only by input parameters.
@@ -904,6 +922,7 @@ namespace hpx { namespace lcos
             // no error has been reported, return the result
             return detail::future_value<R>::get(data.move_value());
         }
+        using base_type::get_exception_ptr;
 
         using base_type::valid;
         using base_type::is_ready;
@@ -1120,6 +1139,7 @@ namespace hpx { namespace lcos
             // no error has been reported, return the result
             return detail::future_value<R>::get(data.get_value());
         }
+        using base_type::get_exception_ptr;
 
         using base_type::valid;
         using base_type::is_ready;

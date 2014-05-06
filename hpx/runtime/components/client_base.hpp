@@ -107,9 +107,15 @@ namespace hpx { namespace traits
 
             future_type f;
             future_access<future_type>::load(ar, f);
-
-            // fix-me: handle invalid and exception
-            client = Derived(hpx::make_ready_future(f.get()));
+            
+            future<naming::id_type> id;
+            if (f.has_value())
+            {
+                id = hpx::make_ready_future(f.get());
+            } else if (f.has_exception()) {
+                id = hpx::make_error_future<naming::id_type>(f.get_exception_ptr());
+            }
+            client = Derived(std::move(id));
             ar >> client;
         }
 
