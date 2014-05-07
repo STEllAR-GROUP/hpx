@@ -19,6 +19,12 @@ void increment(boost::int32_t i)
     result_cv.notify_one();
 }
 
+void increment_with_future(hpx::shared_future<boost::int32_t> fi)
+{
+    accumulator += fi.get();
+    result_cv.notify_one();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 struct increment_function_object
 {
@@ -64,6 +70,19 @@ int hpx_main()
     }
 
     {
+        hpx::promise<boost::int32_t> p;
+        hpx::shared_future<boost::int32_t> f = p.get_future();
+
+        using hpx::util::placeholders::_1;
+
+        hpx::apply(&increment_with_future, f);
+        hpx::apply(hpx::util::bind(&increment_with_future, f));
+        hpx::apply(hpx::util::bind(&increment_with_future, _1), f);
+
+        p.set_value(1);
+    }
+
+    {
         using hpx::util::placeholders::_1;
 
         hpx::apply(increment, 1);
@@ -89,7 +108,6 @@ int hpx_main()
         using hpx::util::placeholders::_2;
 
         hpx::apply(obj, 1);
-
         hpx::apply(hpx::util::bind(obj, 1));
         hpx::apply(hpx::util::bind(obj, _1), 1);
     }
@@ -100,7 +118,6 @@ int hpx_main()
         using hpx::util::placeholders::_2;
 
         hpx::apply(increment_lambda, 1);
-
         hpx::apply(hpx::util::bind(increment_lambda, 1));
         hpx::apply(hpx::util::bind(increment_lambda, _1), 1);
     }
@@ -110,14 +127,14 @@ int hpx_main()
     hpx::lcos::local::no_mutex::scoped_lock l(result_mutex);
 #   if !defined(BOOST_NO_CXX11_LAMBDAS) && !defined(BOOST_NO_CXX11_AUTO_DECLARATIONS)
     result_cv.wait_for(result_mutex, boost::chrono::seconds(1),
+        hpx::util::bind(std::equal_to<boost::int32_t>(), boost::ref(accumulator), 18));
+
+    HPX_TEST_EQ(accumulator.load(), 18);
+#   else
+    result_cv.wait_for(result_mutex, boost::chrono::seconds(1),
         hpx::util::bind(std::equal_to<boost::int32_t>(), boost::ref(accumulator), 15));
 
     HPX_TEST_EQ(accumulator.load(), 15);
-#   else
-    result_cv.wait_for(result_mutex, boost::chrono::seconds(1),
-        hpx::util::bind(std::equal_to<boost::int32_t>(), boost::ref(accumulator), 12));
-
-    HPX_TEST_EQ(accumulator.load(), 12);
 #   endif
 
     return hpx::finalize();

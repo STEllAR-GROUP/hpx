@@ -16,6 +16,12 @@ boost::int32_t increment(boost::int32_t i)
 }
 HPX_PLAIN_ACTION(increment);  // defines increment_action
 
+boost::int32_t increment_with_future(hpx::shared_future<boost::int32_t> fi)
+{
+    return fi.get() + 1;
+}
+HPX_PLAIN_ACTION(increment_with_future);
+
 ///////////////////////////////////////////////////////////////////////////////
 boost::int32_t mult2(boost::int32_t i)
 {
@@ -29,22 +35,41 @@ int hpx_main()
     using hpx::make_continuation;
 
     increment_action inc;
+    increment_with_future_action inc_f;
     mult2_action mult;
 
     // test locally, fully equivalent to plain hpx::async
     {
-        hpx::future<int> f = hpx::async_continue(
+        hpx::future<int> f1 = hpx::async_continue(
             inc, hpx::find_here(), 42, make_continuation());
-        HPX_TEST_EQ(f.get(), 43);
+        HPX_TEST_EQ(f1.get(), 43);
+        
+        hpx::promise<boost::int32_t> p;
+        hpx::shared_future<boost::int32_t> f = p.get_future();
+
+        hpx::future<int> f2 = hpx::async_continue(
+            inc_f, hpx::find_here(), f, make_continuation());
+
+        p.set_value(42);
+        HPX_TEST_EQ(f2.get(), 43);
     }
 
     // test remotely, if possible, fully equivalent to plain hpx::async
     std::vector<hpx::id_type> localities = hpx::find_remote_localities();
     if (!localities.empty())
     {
-        hpx::future<int> f = hpx::async_continue(
+        hpx::future<int> f1 = hpx::async_continue(
             inc, localities[0], 42, make_continuation());
-        HPX_TEST_EQ(f.get(), 43);
+        HPX_TEST_EQ(f1.get(), 43);
+        
+        hpx::promise<boost::int32_t> p;
+        hpx::shared_future<boost::int32_t> f = p.get_future();
+        
+        hpx::future<int> f2 = hpx::async_continue(
+            inc_f, localities[0], f, make_continuation());
+
+        p.set_value(42);
+        HPX_TEST_EQ(f2.get(), 43);
     }
 
     // test chaining locally

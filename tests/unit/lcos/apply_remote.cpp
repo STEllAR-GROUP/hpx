@@ -33,6 +33,13 @@ void increment(hpx::id_type const& there, boost::int32_t i)
 }
 HPX_PLAIN_ACTION(increment);
 
+void increment_with_future(hpx::id_type const& there, hpx::shared_future<boost::int32_t> fi)
+{
+    accumulator += fi.get();
+    hpx::apply(receive_result_action(), there, accumulator.load());
+}
+HPX_PLAIN_ACTION(increment_with_future);
+
 ///////////////////////////////////////////////////////////////////////////////
 struct increment_server
   : hpx::components::managed_component_base<increment_server>
@@ -75,6 +82,20 @@ int hpx_main()
     }
 
     {
+        increment_with_future_action inc;
+        hpx::promise<boost::int32_t> p;
+        hpx::shared_future<boost::int32_t> f = p.get_future();
+
+        using hpx::util::placeholders::_1;
+
+        hpx::apply(inc, there, here, f);
+        hpx::apply(hpx::util::bind(inc, there, here, f));
+        hpx::apply(hpx::util::bind(inc, there, here, _1), f);
+
+        p.set_value(1);
+    }
+
+    {
         hpx::future<hpx::id_type> inc_f =
             hpx::components::new_<increment_server>(there);
         hpx::id_type inc = inc_f.get();
@@ -102,9 +123,9 @@ int hpx_main()
 
     hpx::util::spinlock::scoped_lock l(result_mutex);
     result_cv.wait_for(result_mutex, boost::chrono::seconds(1),
-        hpx::util::bind(std::equal_to<boost::int32_t>(), boost::ref(final_result), 10));
+        hpx::util::bind(std::equal_to<boost::int32_t>(), boost::ref(final_result), 13));
 
-    HPX_TEST_EQ(final_result, 10);
+    HPX_TEST_EQ(final_result, 13);
 
     return hpx::finalize();
 }
