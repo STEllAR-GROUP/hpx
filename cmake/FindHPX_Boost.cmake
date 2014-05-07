@@ -5,6 +5,9 @@
 
 include(HPX_Utils)
 
+set(BOOST_USE_SYSTEM ON CACHE BOOL
+  "Set to true to search for a system install of Boost (default ON).")
+
 ################################################################################
 # backwards compatibility
 if(BOOST_LIB_DIR AND NOT BOOST_LIBRARY_DIR)

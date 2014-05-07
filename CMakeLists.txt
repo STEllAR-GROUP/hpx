@@ -1007,7 +1007,7 @@ if(MSVC)
   set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -d2Zi+")
 
   # VS2013 and above know how to do link time constant data segment folding
-  # VS2013 update 2 and above know how to remove debug information for 
+  # VS2013 update 2 and above know how to remove debug information for
   # non-referenced functions and data (-Zc:inline)
   if(MSVC12)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Zc:inline")
@@ -1249,11 +1249,13 @@ else()
   endif()
 
   if(APPLE)
-    hpx_option(HPX_STDLIB_IS_LIBCPP BOOL "Adds -stdlib=libc++ to the linker command by default" OFF ADVANCED)
+    hpx_option(HPX_STDLIB_IS_LIBCPP BOOL "Adds -stdlib=libc++ to the linker command by default" ON ADVANCED)
     if(HPX_STDLIB_IS_LIBCPP)
       hpx_use_flag_if_available(-stdlib=libc++ LANGUAGES CXX)
     endif()
     hpx_use_flag_if_available(-ftemplate-depth=256 LANGUAGES CXX)
+    set(CMAKE_OSX_ARCHITECTURES "x86_64" CACHE
+      STRING "Forced OS X architectures to 64 bit" FORCE)
   endif()
 
   ##############################################################################

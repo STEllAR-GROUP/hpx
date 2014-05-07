@@ -38,9 +38,9 @@ macro(get_boost_version)
     endif()
 
     # Locate include directory
-    find_path(BOOST_VERSION_HPP boost/version.hpp PATHS "${BOOST_INCLUDE_DIR}" NO_DEFAULT_PATH)
+    find_path(BOOST_INCLUDE_ROOT boost/version.hpp PATHS "${BOOST_INCLUDE_DIR}" NO_DEFAULT_PATH)
 
-    if(${BOOST_VERSION_HPP} STREQUAL BOOST_VERSION_HPP-NOTFOUND)
+    if(${BOOST_INCLUDE_ROOT} STREQUAL BOOST_INCLUDE_ROOT-NOTFOUND)
       set(boost_possible_suffixes
         "boost-1_56" "boost-1_55" "boost-1_54" "boost-1_53" "boost-1_52"
         "boost-1_51" "boost-1_49" "boost-1_48" "boost-1_47" "boost-1_46"
@@ -53,26 +53,26 @@ macro(get_boost_version)
         hpx_warn("boost.version" "Could not locate Boost include directory in ${BOOST_INCLUDE_DIR}. Now searching versioned include directory.")
       endif()
 
-      find_path(BOOST_VERSION_HPP boost/version.hpp
+      find_path(BOOST_INCLUDE_ROOT boost/version.hpp
           PATHS "${BOOST_INCLUDE_DIR}"
           PATH_SUFFIXES ${boost_possible_suffixes}
           NO_DEFAULT_PATH)
 
-      if(NOT ${BOOST_VERSION_HPP} STREQUAL BOOST_VERSION_HPP-NOTFOUND)
-        set(BOOST_INCLUDE_DIR "${BOOST_VERSION_HPP}")
+      if(NOT ${BOOST_INCLUDE_ROOT} STREQUAL BOOST_INCLUDE_ROOT-NOTFOUND)
+        set(BOOST_INCLUDE_DIR "${BOOST_INCLUDE_ROOT}")
       endif()
     endif()
 
-    if(${BOOST_VERSION_HPP} STREQUAL BOOST_VERSION_HPP-NOTFOUND)
+    if(${BOOST_INCLUDE_ROOT} STREQUAL BOOST_INCLUDE_ROOT-NOTFOUND)
       if(NOT BOOST_INCLUDE_DIR)
         hpx_warn("boost.version" "Could not locate Boost include directory. Now searching the system.")
       else()
         hpx_warn("boost.version" "Could not locate Boost include directory in ${BOOST_INCLUDE_DIR}. Now searching the system.")
       endif()
 
-      find_path(BOOST_VERSION_HPP boost/version.hpp)
+      find_path(BOOST_INCLUDE_ROOT boost/version.hpp)
 
-      if(${BOOST_VERSION_HPP} STREQUAL BOOST_VERSION_HPP-NOTFOUND)
+      if(NOT BOOST_INCLUDE_ROOT)
         if(NOT BOOST_INCLUDE_DIR)
           hpx_error("boost.version" "Failed to locate Boost include directory in the default path. Try setting BOOST_ROOT to your Boost installation directory.")
         else()
@@ -84,15 +84,17 @@ macro(get_boost_version)
   # System Boost installation (deb, rpm, etc)
   else()
     # Locate include directory
-    find_path(BOOST_VERSION_HPP boost/version.hpp)
+    find_path(BOOST_INCLUDE_ROOT boost/version.hpp)
 
-    if(${BOOST_VERSION_HPP} STREQUAL BOOST_VERSION_HPP-NOTFOUND)
+    if(${BOOST_INCLUDE_ROOT} STREQUAL BOOST_INCLUDE_ROOT-NOTFOUND)
       hpx_error("boost.version" "Failed to locate Boost include directory in the default path. Try setting BOOST_ROOT to your Boost installation directory.")
     endif()
 
   endif()
 
-  set(BOOST_VERSION_HPP "${BOOST_VERSION_HPP}/boost/version.hpp")
+  set(BOOST_VERSION_HPP "${BOOST_INCLUDE_ROOT}/boost/version.hpp")
+  set(BOOST_INCLUDE_DIR "${BOOST_INCLUDE_ROOT}")
+  get_filename_component(BOOST_ROOT "${BOOST_INCLUDE_ROOT}/.." ABSOLUTE)
   hpx_info("boost.version" "Using ${BOOST_VERSION_HPP} as Boost version.hpp header.")
 
   # Get Boost version
@@ -141,14 +143,12 @@ macro(get_boost_version)
 
   set(BOOST_VERSION_FOUND ON CACHE INTERNAL "Boost version was found.")
 
-  set(BOOST_USE_SYSTEM "${BOOST_USE_SYSTEM}" CACHE BOOL
-    "Set to true to search for a system install of Boost (default ON)." FORCE)
   set(BOOST_ROOT "${BOOST_ROOT}" CACHE PATH
     "The Boost source tree to use (default: BOOST_ROOT or BOOST environmental variable)." FORCE)
   set(BOOST_LIBRARY_DIR "${BOOST_LIBRARY_DIR}" CACHE PATH
     "Path to Boost shared libraries (default: \${BOOST_ROOT}/stage/lib)." FORCE)
   set(BOOST_INCLUDE_DIR "${BOOST_INCLUDE_DIR}" CACHE PATH
-    "Include path for Boost (default: \${BOOST_ROOT})." FORCE)
+    "Include path for Boost (default: \${BOOST_ROOT}/include)." FORCE)
   mark_as_advanced(FORCE BOOST_USE_SYSTEM BOOST_USE_SYSTEM BOOST_LIBRARY_DIR BOOST_INCLUDE_DIR)
 
   endif()
@@ -157,4 +157,3 @@ endmacro()
 get_boost_version()
 
 ################################################################################
-
