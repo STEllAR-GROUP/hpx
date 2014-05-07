@@ -355,6 +355,20 @@ namespace hpx { namespace util
         }
     };
 
+    template <typename Tuple>
+    struct tuple_decay
+    {};
+    
+#   define HPX_TUPLE_DECAY_ELEM(Z, N, D)                                      \
+    typename decay<BOOST_PP_CAT(T, N)>::type                                  \
+    /**/
+    template <BOOST_PP_ENUM_PARAMS(N, typename T)>
+    struct tuple_decay<tuple<BOOST_PP_ENUM_PARAMS(N, T)> >
+    {
+        typedef tuple<BOOST_PP_ENUM(N, HPX_TUPLE_DECAY_ELEM, _)> type;
+    };    
+#undef HPX_TUPLE_DECAY_ELEM
+
     // 20.4.2.6, element access
 
     // template <size_t I, class... Types>
