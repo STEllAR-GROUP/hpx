@@ -116,6 +116,9 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #if HPX_THREAD_MAINTAIN_LOCAL_STORAGE
         return new tss_storage;
 #else
+        boost::throw_exception(std::runtime_error(
+            "thread local storage has been disabled at configuration time, "
+            "please specify HPX_THREAD_MAINTAIN_LOCAL_STORAGE=ON to cmake"));
         return 0;
 #endif
     }
@@ -148,6 +151,9 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
         return node->get_data<std::size_t>();
 #else
+        boost::throw_exception(std::runtime_error(
+            "thread local storage has been disabled at configuration time, "
+            "please specify HPX_THREAD_MAINTAIN_LOCAL_STORAGE=ON to cmake"));
         return 0;
 #endif
     }
@@ -181,6 +187,9 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
         return prev_val;
 #else
+        boost::throw_exception(std::runtime_error(
+            "thread local storage has been disabled at configuration time, "
+            "please specify HPX_THREAD_MAINTAIN_LOCAL_STORAGE=ON to cmake"));
         return 0;
 #endif
     }
@@ -202,6 +211,9 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
         return tss_map->find(key);
 #else
+        boost::throw_exception(std::runtime_error(
+            "thread local storage has been disabled at configuration time, "
+            "please specify HPX_THREAD_MAINTAIN_LOCAL_STORAGE=ON to cmake"));
         return 0;
 #endif
     }
