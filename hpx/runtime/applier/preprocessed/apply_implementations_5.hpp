@@ -20,7 +20,7 @@ namespace hpx
         {
             
             
-            lcos::invoke_when_ready(
+            lcos::local::detail::invoke_when_ready(
                 detail::put_parcel<Action>(id, std::move(addr), priority),
                 std::forward<Arg0>( arg0 ));
             return false; 
@@ -121,7 +121,7 @@ namespace hpx
         {
             
             
-            lcos::invoke_when_ready(
+            lcos::local::detail::invoke_when_ready(
                 detail::put_parcel<Action>(id, std::move(addr), priority,
                     actions::continuation_type(c)),
                 std::forward<Arg0>( arg0 ));
@@ -291,7 +291,7 @@ namespace hpx
         {
             
             
-            lcos::invoke_when_ready(
+            lcos::local::detail::invoke_when_ready(
                 detail::put_parcel<Action>(id, std::move(addr), priority),
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
             return false; 
@@ -392,7 +392,7 @@ namespace hpx
         {
             
             
-            lcos::invoke_when_ready(
+            lcos::local::detail::invoke_when_ready(
                 detail::put_parcel<Action>(id, std::move(addr), priority,
                     actions::continuation_type(c)),
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
@@ -562,7 +562,7 @@ namespace hpx
         {
             
             
-            lcos::invoke_when_ready(
+            lcos::local::detail::invoke_when_ready(
                 detail::put_parcel<Action>(id, std::move(addr), priority),
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
             return false; 
@@ -663,7 +663,7 @@ namespace hpx
         {
             
             
-            lcos::invoke_when_ready(
+            lcos::local::detail::invoke_when_ready(
                 detail::put_parcel<Action>(id, std::move(addr), priority,
                     actions::continuation_type(c)),
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
@@ -833,7 +833,7 @@ namespace hpx
         {
             
             
-            lcos::invoke_when_ready(
+            lcos::local::detail::invoke_when_ready(
                 detail::put_parcel<Action>(id, std::move(addr), priority),
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
             return false; 
@@ -934,7 +934,7 @@ namespace hpx
         {
             
             
-            lcos::invoke_when_ready(
+            lcos::local::detail::invoke_when_ready(
                 detail::put_parcel<Action>(id, std::move(addr), priority,
                     actions::continuation_type(c)),
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
@@ -1104,7 +1104,7 @@ namespace hpx
         {
             
             
-            lcos::invoke_when_ready(
+            lcos::local::detail::invoke_when_ready(
                 detail::put_parcel<Action>(id, std::move(addr), priority),
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
             return false; 
@@ -1205,7 +1205,7 @@ namespace hpx
         {
             
             
-            lcos::invoke_when_ready(
+            lcos::local::detail::invoke_when_ready(
                 detail::put_parcel<Action>(id, std::move(addr), priority,
                     actions::continuation_type(c)),
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));

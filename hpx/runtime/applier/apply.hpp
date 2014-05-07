@@ -10,7 +10,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 
-#include <hpx/lcos/invoke_when_ready.hpp>
+#include <hpx/lcos/local/detail/invoke_when_ready.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
@@ -137,7 +137,7 @@ namespace hpx
         {
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            lcos::invoke_when_ready(
+            lcos::local::detail::invoke_when_ready(
                 detail::put_parcel<Action>(id, std::move(addr), priority));
             return false;     // destinations are remote
         }
@@ -343,7 +343,7 @@ namespace hpx
         {
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            lcos::invoke_when_ready(
+            lcos::local::detail::invoke_when_ready(
                 detail::put_parcel<Action>(id, std::move(addr), priority,
                     actions::continuation_type(c)));
             return false;     // destinations are remote

@@ -25,7 +25,7 @@ set(function_argument_limit_preprocessing_files
   "hpx/util/invoke.hpp"
   "hpx/util/invoke_fused.hpp"
   "hpx/util/unwrapped.hpp"
-  "hpx/lcos/invoke_when_ready.hpp")
+  "hpx/lcos/local/detail/invoke_when_ready.hpp")
 foreach(file ${function_argument_limit_preprocessing_files})
   hpx_partial_preprocess_header(${file} LIMIT HPX_LIMIT)
 endforeach()

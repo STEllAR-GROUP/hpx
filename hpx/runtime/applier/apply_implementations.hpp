@@ -8,7 +8,7 @@
 #if !defined(HPX_APPLIER_APPLY_IMPLEMENTATIONS_JUN_09_2008_0434PM)
 #define HPX_APPLIER_APPLY_IMPLEMENTATIONS_JUN_09_2008_0434PM
 
-#include <hpx/lcos/invoke_when_ready.hpp>
+#include <hpx/lcos/local/detail/invoke_when_ready.hpp>
 #include <hpx/util/move.hpp>
 
 #include <boost/preprocessor/cat.hpp>
@@ -59,7 +59,7 @@ namespace hpx
         {
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            lcos::invoke_when_ready(
+            lcos::local::detail::invoke_when_ready(
                 detail::put_parcel<Action>(id, std::move(addr), priority),
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
             return false;     // destinations are remote
@@ -276,7 +276,7 @@ namespace hpx
         {
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            lcos::invoke_when_ready(
+            lcos::local::detail::invoke_when_ready(
                 detail::put_parcel<Action>(id, std::move(addr), priority,
                     actions::continuation_type(c)),
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
