@@ -35,7 +35,10 @@ namespace hpx { namespace detail
             util::tuple<
                 hpx::util::detail::bound<
                     hpx::util::functional::extract_locality
-                  , hpx::util::tuple<hpx::util::detail::placeholder<2ul> >
+                  , hpx::util::tuple<
+                        hpx::util::detail::placeholder<2ul>
+                      , hpx::id_type
+                    >
                 >
               , BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(HPX_TUPLE_LIMIT), T)
             >

@@ -82,7 +82,7 @@ namespace hpx
             service_target, req
           , util::functional::apply_continuation(
                 util::bind<Action>(
-                    util::bind(util::functional::extract_locality(gid), _2)
+                    util::bind(util::functional::extract_locality(), _2, gid)
                   BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg))
                 ));
     }

@@ -37,7 +37,7 @@ namespace hpx
             service_target, req
           , util::functional::async_continuation(
                 util::bind<Action>(
-                    util::bind(util::functional::extract_locality(gid), _2)
+                    util::bind(util::functional::extract_locality(), _2, gid)
                    )
                 ));
     }
@@ -91,7 +91,7 @@ namespace hpx
             service_target, req
           , util::functional::async_continuation(
                 util::bind<Action>(
-                    util::bind(util::functional::extract_locality(gid), _2)
+                    util::bind(util::functional::extract_locality(), _2, gid)
                   , std::forward<Arg0>( arg0 ))
                 ));
     }
@@ -145,7 +145,7 @@ namespace hpx
             service_target, req
           , util::functional::async_continuation(
                 util::bind<Action>(
-                    util::bind(util::functional::extract_locality(gid), _2)
+                    util::bind(util::functional::extract_locality(), _2, gid)
                   , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ))
                 ));
     }
@@ -199,7 +199,7 @@ namespace hpx
             service_target, req
           , util::functional::async_continuation(
                 util::bind<Action>(
-                    util::bind(util::functional::extract_locality(gid), _2)
+                    util::bind(util::functional::extract_locality(), _2, gid)
                   , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ))
                 ));
     }
@@ -253,7 +253,7 @@ namespace hpx
             service_target, req
           , util::functional::async_continuation(
                 util::bind<Action>(
-                    util::bind(util::functional::extract_locality(gid), _2)
+                    util::bind(util::functional::extract_locality(), _2, gid)
                   , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ))
                 ));
     }
@@ -307,7 +307,7 @@ namespace hpx
             service_target, req
           , util::functional::async_continuation(
                 util::bind<Action>(
-                    util::bind(util::functional::extract_locality(gid), _2)
+                    util::bind(util::functional::extract_locality(), _2, gid)
                   , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ))
                 ));
     }
@@ -361,7 +361,7 @@ namespace hpx
             service_target, req
           , util::functional::async_continuation(
                 util::bind<Action>(
-                    util::bind(util::functional::extract_locality(gid), _2)
+                    util::bind(util::functional::extract_locality(), _2, gid)
                   , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ))
                 ));
     }
@@ -415,7 +415,7 @@ namespace hpx
             service_target, req
           , util::functional::async_continuation(
                 util::bind<Action>(
-                    util::bind(util::functional::extract_locality(gid), _2)
+                    util::bind(util::functional::extract_locality(), _2, gid)
                   , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ))
                 ));
     }
@@ -469,7 +469,7 @@ namespace hpx
             service_target, req
           , util::functional::async_continuation(
                 util::bind<Action>(
-                    util::bind(util::functional::extract_locality(gid), _2)
+                    util::bind(util::functional::extract_locality(), _2, gid)
                   , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ))
                 ));
     }
@@ -523,7 +523,7 @@ namespace hpx
             service_target, req
           , util::functional::async_continuation(
                 util::bind<Action>(
-                    util::bind(util::functional::extract_locality(gid), _2)
+                    util::bind(util::functional::extract_locality(), _2, gid)
                   , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ))
                 ));
     }
@@ -577,7 +577,7 @@ namespace hpx
             service_target, req
           , util::functional::async_continuation(
                 util::bind<Action>(
-                    util::bind(util::functional::extract_locality(gid), _2)
+                    util::bind(util::functional::extract_locality(), _2, gid)
                   , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ))
                 ));
     }

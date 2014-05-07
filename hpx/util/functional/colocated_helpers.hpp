@@ -24,9 +24,8 @@ namespace hpx { namespace util { namespace functional
 
         extract_locality() {}
 
-        extract_locality(naming::id_type const& id) : id_(id) {}
-
-        naming::id_type operator()(agas::response const& rep) const
+        naming::id_type operator()(agas::response const& rep,
+            naming::id_type const& id) const
         {
             if (rep.get_status() != success)
             {
@@ -34,19 +33,11 @@ namespace hpx { namespace util { namespace functional
                     "extract_locality::operator()",
                     boost::str(boost::format(
                         "could not resolve colocated locality for id(%1%)"
-                    ) % id_));
+                    ) % id));
                 return naming::invalid_id;
             }
             return naming::get_id_from_locality_id(rep.get_locality_id());
         }
-
-        template <typename Archive>
-        void serialize(Archive& ar, unsigned int const version)
-        {
-            ar & id_;
-        }
-
-        naming::id_type id_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

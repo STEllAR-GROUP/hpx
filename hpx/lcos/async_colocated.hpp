@@ -49,7 +49,10 @@ namespace hpx { namespace detail
             util::tuple<
                 hpx::util::detail::bound<
                     hpx::util::functional::extract_locality
-                  , hpx::util::tuple<hpx::util::detail::placeholder<2ul> >
+                  , hpx::util::tuple<
+                        hpx::util::detail::placeholder<2ul>
+                      , hpx::id_type
+                    >
                 >
               , BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(HPX_TUPLE_LIMIT), T)
             >
@@ -148,7 +151,7 @@ namespace hpx
             service_target, req
           , util::functional::async_continuation(
                 util::bind<Action>(
-                    util::bind(util::functional::extract_locality(gid), _2)
+                    util::bind(util::functional::extract_locality(), _2, gid)
                   BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg))
                 ));
     }
