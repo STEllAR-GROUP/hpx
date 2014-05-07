@@ -43,6 +43,7 @@ namespace hpx { namespace lcos { namespace detail
 
     template <typename Future>
     struct shared_state_ptr_for
+      : shared_state_ptr<typename traits::future_traits<Future>::type>
     {};
 
     template <typename Future>
@@ -60,15 +61,12 @@ namespace hpx { namespace lcos { namespace detail
       : shared_state_ptr_for<Future>
     {};
 
-    template <typename R>
-    struct shared_state_ptr_for<future<R> >
-      : shared_state_ptr<R>
-    {};
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Archive, typename Future>
+    void serialize_future_load(Archive& ar, Future& f);
 
-    template <typename R>
-    struct shared_state_ptr_for<shared_future<R> >
-      : shared_state_ptr<R>
-    {};
+    template <typename Archive, typename Future>
+    void serialize_future_save(Archive& ar, Future& f);
 }}}
 
 namespace hpx { namespace traits
@@ -101,12 +99,23 @@ namespace hpx { namespace traits
             return future<R>(boost::intrusive_ptr<SharedState>(shared_state));
         }
 
-        template <typename T>
         BOOST_FORCEINLINE static
-        typename lcos::detail::shared_state_ptr<T>::type const&
-        get_shared_state(future<T> const& f)
+        typename lcos::detail::shared_state_ptr<R>::type const&
+        get_shared_state(future<R> const& f)
         {
             return f.shared_state_;
+        }
+
+        template <typename Archive>
+        static void load(Archive& ar, future<R>& f)
+        {
+            lcos::detail::serialize_future_load(ar, f);
+        }
+
+        template <typename Archive>
+        static void save(Archive& ar, future<R>& f)
+        {
+            lcos::detail::serialize_future_save(ar, f);
         }
     };
 
@@ -124,7 +133,7 @@ namespace hpx { namespace traits
         static shared_future<R>
         create(boost::intrusive_ptr<SharedState> && shared_state)
         {
-            return Future(std::move(shared_state));
+            return shared_future<R>(std::move(shared_state));
         }
 
         template <typename SharedState>
@@ -134,12 +143,23 @@ namespace hpx { namespace traits
             return shared_future<R>(boost::intrusive_ptr<SharedState>(shared_state));
         }
 
-        template <typename T>
         BOOST_FORCEINLINE static
-        typename lcos::detail::shared_state_ptr<T>::type const&
-        get_shared_state(shared_future<T> const& f)
+        typename lcos::detail::shared_state_ptr<R>::type const&
+        get_shared_state(shared_future<R> const& f)
         {
             return f.shared_state_;
+        }
+
+        template <typename Archive>
+        static void load(Archive& ar, shared_future<R>& f)
+        {
+            lcos::detail::serialize_future_load(ar, f);
+        }
+
+        template <typename Archive>
+        static void save(Archive& ar, shared_future<R> const& f)
+        {
+            lcos::detail::serialize_future_save(ar, f);
         }
     };
 }}
@@ -154,6 +174,72 @@ namespace hpx { namespace lcos { namespace detail
     get_shared_state(Future const& f)
     {
         return traits::future_access<Future>::get_shared_state(f);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    enum future_state
+    {
+        invalid = 0,
+        has_value = 1,
+        has_exception = 2
+    };
+
+    template <typename Archive, typename Future>
+    void serialize_future_load(Archive& ar, Future& f)
+    {
+        typedef typename traits::future_traits<Future>::type value_type;
+        typedef lcos::detail::future_data<value_type> shared_state;
+
+        int state = future_state::invalid;
+        ar >> state;
+        if (state == future_state::has_value)
+        {
+            value_type value;
+            ar >> value;
+
+            boost::intrusive_ptr<shared_state> p(new shared_state());
+            p->set_result(std::move(value));
+
+            f = traits::future_access<Future>::create(std::move(p));
+        } else if (state == future_state::has_exception) {
+            boost::exception_ptr exception;
+            ar >> exception;
+
+            boost::intrusive_ptr<shared_state> p(new shared_state());
+            p->set_exception(exception);
+
+            f = traits::future_access<Future>::create(std::move(p));
+        } else if (state == future_state::invalid) {
+            f = Future();
+        } else {
+            HPX_ASSERT(false);
+        }
+    }
+
+    template <typename Archive, typename Future>
+    void serialize_future_save(Archive& ar, Future& f)
+    {
+        HPX_ASSERT(!f.valid() || f.is_ready());
+        
+        int state = future_state::invalid;
+        if (f.has_value())
+        {
+            state = future_state::has_value;
+            ar << state << f.get();
+        } else if (f.has_exception()) {
+            state = future_state::has_exception;
+            ar << state; //! fix me: use get_exception
+            try
+            {
+                f.get();
+            } catch (...) {
+                boost::exception_ptr exception = boost::current_exception();
+                ar << exception;
+            }
+        } else {
+            state = future_state::invalid;
+            ar << state;
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
