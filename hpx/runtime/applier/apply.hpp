@@ -70,7 +70,7 @@ namespace hpx
 
             explicit put_parcel(naming::id_type const& id,
                 naming::address&& addr, threads::thread_priority priority,
-                actions::continuation_type cont = 0)
+                actions::continuation_type cont = actions::continuation_type())
               : id_(id)
               , addr_(std::move(addr))
               , priority_(priority)
