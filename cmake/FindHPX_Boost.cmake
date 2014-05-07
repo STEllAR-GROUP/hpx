@@ -26,8 +26,13 @@ macro(get_boost_compiler_version)
         ARGS ${CMAKE_CXX_COMPILER_ARG1} --version
         OUTPUT_VARIABLE BOOST_COMPILER_VERSION_NUMBER)
 
-      string(REGEX REPLACE "clang version ([0-9])\\.([0-9]) .*" "\\1\\2"
-        BOOST_COMPILER_VERSION_NUMBER ${BOOST_COMPILER_VERSION_NUMBER})
+      if(APPLE)
+        string(REGEX REPLACE "Apple LLVM version ([0-9])\\.([0-9]) .*" "\\1\\2"
+          BOOST_COMPILER_VERSION_NUMBER ${BOOST_COMPILER_VERSION_NUMBER})
+      else()
+        string(REGEX REPLACE "clang version ([0-9])\\.([0-9]) .*" "\\1\\2"
+          BOOST_COMPILER_VERSION_NUMBER ${BOOST_COMPILER_VERSION_NUMBER})
+      endif()
     elseif(NOT MSVC)
       exec_program(${CMAKE_CXX_COMPILER}
         ARGS ${CMAKE_CXX_COMPILER_ARG1} -dumpversion
@@ -256,4 +261,3 @@ endforeach()
 set(BOOST_FOUND_LIBRARIES ${BOOST_FOUND_LIBRARIES} CACHE STRING "Boost shared libraries found by CMake (default: none).")
 
 ################################################################################
-
