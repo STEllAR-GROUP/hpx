@@ -16,6 +16,12 @@ boost::int32_t increment(boost::int32_t i)
 }
 HPX_PLAIN_ACTION(increment);
 
+boost::int32_t increment_with_future(hpx::shared_future<boost::int32_t> fi)
+{
+    return fi.get() + 1;
+}
+HPX_PLAIN_ACTION(increment_with_future);
+
 ///////////////////////////////////////////////////////////////////////////////
 struct decrement_server
   : hpx::components::managed_component_base<decrement_server>
@@ -46,6 +52,20 @@ void test_remote_async(hpx::id_type const& target)
 
         hpx::future<boost::int32_t> f2 =
             hpx::async(hpx::launch::all, inc, target, 42);
+        HPX_TEST_EQ(f2.get(), 43);
+    }
+    
+    {
+        increment_with_future_action inc;
+        hpx::promise<boost::int32_t> p;
+        hpx::shared_future<boost::int32_t> f = p.get_future();
+
+        hpx::future<boost::int32_t> f1 = hpx::async(inc, target, f);
+        hpx::future<boost::int32_t> f2 =
+            hpx::async(hpx::launch::all, inc, target, f);
+
+        p.set_value(42);        
+        HPX_TEST_EQ(f1.get(), 43);
         HPX_TEST_EQ(f2.get(), 43);
     }
 

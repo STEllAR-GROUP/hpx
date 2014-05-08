@@ -8,6 +8,7 @@
 #if !defined(HPX_APPLIER_APPLY_IMPLEMENTATIONS_JUN_09_2008_0434PM)
 #define HPX_APPLIER_APPLY_IMPLEMENTATIONS_JUN_09_2008_0434PM
 
+#include <hpx/lcos/local/detail/invoke_when_ready.hpp>
 #include <hpx/util/move.hpp>
 
 #include <boost/preprocessor/cat.hpp>
@@ -53,19 +54,14 @@ namespace hpx
     {
         template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         inline bool
-        apply_r_p(naming::address& addr, naming::id_type const& id,
+        apply_r_p(naming::address&& addr, naming::id_type const& id,
             threads::thread_priority priority, HPX_ENUM_FWD_ARGS(N, Arg, arg))
         {
-            typedef typename hpx::actions::extract_action<Action>::type action_type;
-
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(priority,
-                    util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, Arg, arg))));
-
-            // Send the parcel through the parcel handler
-            hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
+            lcos::local::detail::invoke_when_ready(
+                detail::put_parcel<Action>(id, std::move(addr), priority),
+                HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
             return false;     // destinations are remote
         }
 
@@ -105,10 +101,10 @@ namespace hpx
 
         template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         inline bool
-        apply_r (naming::address& addr, naming::id_type const& gid,
+        apply_r (naming::address&& addr, naming::id_type const& gid,
             HPX_ENUM_FWD_ARGS(N, Arg, arg))
         {
-            return apply_r_p<Action>(addr, gid,
+            return apply_r_p<Action>(std::move(addr), gid,
                 actions::action_priority<Action>(),
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
@@ -177,8 +173,8 @@ namespace hpx
         }
 
         // apply remotely
-        return applier::detail::apply_r_p<Action>(addr, gid, priority,
-            HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+        return applier::detail::apply_r_p<Action>(std::move(addr), gid, 
+            priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
@@ -274,23 +270,17 @@ namespace hpx
     {
         template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         inline bool
-        apply_r_p(naming::address& addr, actions::continuation* c,
+        apply_r_p(naming::address&& addr, actions::continuation* c,
             naming::id_type const& id, threads::thread_priority priority,
             HPX_ENUM_FWD_ARGS(N, Arg, arg))
         {
-            typedef typename hpx::actions::extract_action<Action>::type action_type;
-
-            actions::continuation_type cont(c);
-
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(priority,
-                    util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, Arg, arg))), cont);
-
-            // Send the parcel through the parcel handler
-            hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
-            return false;     // destination is remote
+            lcos::local::detail::invoke_when_ready(
+                detail::put_parcel<Action>(id, std::move(addr), priority,
+                    actions::continuation_type(c)),
+                HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+            return false;     // destinations are remote
         }
 
         template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
@@ -355,8 +345,8 @@ namespace hpx
         }
 
         // apply remotely
-        return applier::detail::apply_r_p<Action>(addr, c, gid, priority,
-            HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+        return applier::detail::apply_r_p<Action>(std::move(addr), c, gid,
+            priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>

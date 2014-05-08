@@ -95,9 +95,37 @@ namespace hpx { namespace traits
     {
         BOOST_FORCEINLINE static
         typename lcos::detail::shared_state_ptr<naming::id_type>::type const&
-        get_shared_state(Derived const& f)
+        get_shared_state(Derived const& client)
         {
-            return f.share().shared_state_;
+            return client.share().shared_state_;
+        }
+
+        template <typename Archive>
+        static void load(Archive& ar, Derived& client)
+        {
+            typedef shared_future<naming::id_type> future_type;
+
+            future_type f;
+            future_access<future_type>::load(ar, f);
+            
+            future<naming::id_type> id;
+            if (f.has_value())
+            {
+                id = hpx::make_ready_future(f.get());
+            } else if (f.has_exception()) {
+                id = hpx::make_error_future<naming::id_type>(f.get_exception_ptr());
+            }
+            client = Derived(std::move(id));
+            ar >> client;
+        }
+
+        template <typename Archive>
+        static void save(Archive& ar, Derived const& client)
+        {
+            typedef shared_future<naming::id_type> future_type;
+
+            future_access<future_type>::save(ar, client.share());
+            ar << client;
         }
     };
 }}
@@ -225,10 +253,15 @@ namespace hpx { namespace components
             return *this;
         }
 
+        bool valid() const
+        {
+            return gid_.valid();
+        }
+
         // check whether the embedded future is valid
         operator typename util::safe_bool<client_base>::result_type() const
         {
-            return util::safe_bool<client_base>()(gid_.valid());
+            return util::safe_bool<client_base>()(valid());
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -312,19 +345,11 @@ namespace hpx { namespace components
 
         template <typename Archive>
         void load(Archive & ar, unsigned)
-        {
-            naming::id_type id;
-            ar & id;
-
-            gid_ = lcos::make_ready_future(id);
-        }
+        {}
 
         template <typename Archive>
         void save(Archive & ar, unsigned) const
-        {
-            naming::id_type id = gid_.get();
-            ar & id;
-        }
+        {}
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
 
