@@ -22,7 +22,7 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 #include <boost/mpl/bool.hpp>
-#include <boost/type_traits/is_base_and_derived.hpp>
+#include <boost/type_traits/is_base_of.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Client objects are equivalent to futures
@@ -35,28 +35,32 @@ namespace hpx { namespace components
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
+    template <typename T, typename Enable = void>
+    struct is_client
+      : boost::mpl::false_
+    {};
+
+    template <typename Derived>
+    struct is_client<Derived,
+        typename util::always_void<typename Derived::stub_argument_type>::type
+    > : boost::is_base_of<
+            components::client_base<
+                Derived, typename Derived::stub_argument_type
+            >,
+            Derived>
+    {};
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Derived>
     struct is_future<Derived,
-            typename boost::enable_if<
-                boost::is_base_and_derived<
-                    components::client_base<
-                        Derived, typename Derived::stub_argument_type
-                    >,
-                    Derived>
-            >::type>
+        typename boost::enable_if<is_client<Derived> >::type>
       : boost::mpl::true_
     {};
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Derived>
     struct future_traits<Derived,
-        typename boost::enable_if<
-                boost::is_base_and_derived<
-                    components::client_base<
-                        Derived, typename Derived::stub_argument_type
-                    >,
-                    Derived>
-            >::type>
+        typename boost::enable_if<is_client<Derived> >::type>
     {
         typedef naming::id_type type;
     };
@@ -64,13 +68,7 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename Derived>
     struct future_unwrap_getter<lcos::future<Derived>,
-        typename boost::enable_if<
-                boost::is_base_and_derived<
-                    components::client_base<
-                        Derived, typename Derived::stub_argument_type
-                    >,
-                    Derived>
-            >::type>
+        typename boost::enable_if<is_client<Derived> >::type>
     {
         BOOST_FORCEINLINE lcos::shared_future<naming::id_type>
         operator()(lcos::future<Derived> f) const
@@ -81,13 +79,7 @@ namespace hpx { namespace traits
 
     template <typename Derived>
     struct future_unwrap_getter<lcos::shared_future<Derived>,
-        typename boost::enable_if<
-                boost::is_base_and_derived<
-                    components::client_base<
-                        Derived, typename Derived::stub_argument_type
-                    >,
-                    Derived>
-            >::type>
+        typename boost::enable_if<is_client<Derived> >::type>
     {
         BOOST_FORCEINLINE lcos::shared_future<naming::id_type>
         operator()(lcos::shared_future<Derived> f) const
@@ -99,19 +91,41 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename Derived>
     struct future_access<Derived,
-        typename boost::enable_if<
-                boost::is_base_and_derived<
-                    components::client_base<
-                        Derived, typename Derived::stub_argument_type
-                    >,
-                    Derived>
-            >::type>
+        typename boost::enable_if<is_client<Derived> >::type>
     {
         BOOST_FORCEINLINE static
         typename lcos::detail::shared_state_ptr<naming::id_type>::type const&
-        get_shared_state(Derived const& f)
+        get_shared_state(Derived const& client)
         {
-            return f.share().shared_state_;
+            return client.share().shared_state_;
+        }
+
+        template <typename Archive>
+        static void load(Archive& ar, Derived& client)
+        {
+            typedef shared_future<naming::id_type> future_type;
+
+            future_type f;
+            future_access<future_type>::load(ar, f);
+            
+            future<naming::id_type> id;
+            if (f.has_value())
+            {
+                id = hpx::make_ready_future(f.get());
+            } else if (f.has_exception()) {
+                id = hpx::make_error_future<naming::id_type>(f.get_exception_ptr());
+            }
+            client = Derived(std::move(id));
+            ar >> client;
+        }
+
+        template <typename Archive>
+        static void save(Archive& ar, Derived const& client)
+        {
+            typedef shared_future<naming::id_type> future_type;
+
+            future_access<future_type>::save(ar, client.share());
+            ar << client;
         }
     };
 }}
@@ -239,10 +253,15 @@ namespace hpx { namespace components
             return *this;
         }
 
+        bool valid() const
+        {
+            return gid_.valid();
+        }
+
         // check whether the embedded future is valid
         operator typename util::safe_bool<client_base>::result_type() const
         {
-            return util::safe_bool<client_base>()(gid_.valid());
+            return util::safe_bool<client_base>()(valid());
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -326,19 +345,11 @@ namespace hpx { namespace components
 
         template <typename Archive>
         void load(Archive & ar, unsigned)
-        {
-            naming::id_type id;
-            ar & id;
-
-            gid_ = lcos::make_ready_future(id);
-        }
+        {}
 
         template <typename Archive>
         void save(Archive & ar, unsigned) const
-        {
-            naming::id_type id = gid_.get();
-            ar & id;
-        }
+        {}
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
 

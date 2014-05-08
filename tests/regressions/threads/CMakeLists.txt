@@ -13,7 +13,7 @@ set(tests
     thread_suspend_duration
    )
 
-if(HPX_THREAD_MAINTAIN_THREAD_DATA)
+if(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
   set(tests ${tests} thread_data_1111)
 endif()
 

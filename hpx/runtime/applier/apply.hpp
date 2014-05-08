@@ -10,6 +10,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 
+#include <hpx/lcos/local/detail/invoke_when_ready.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
@@ -61,24 +62,84 @@ namespace hpx
             }
             return addr;
         }
+        
+        template <typename Action>
+        struct put_parcel
+        {
+            typedef void result_type;
+
+            explicit put_parcel(naming::id_type const& id,
+                naming::address&& addr, threads::thread_priority priority,
+                actions::continuation_type cont = actions::continuation_type())
+              : id_(id)
+              , addr_(std::move(addr))
+              , priority_(priority)
+              , cont_(cont)
+            {}
+
+            template <typename Args>
+            result_type send_parcel(Args&& args)
+            {
+                typedef 
+                    typename hpx::actions::extract_action<Action>::type
+                    action_type;
+
+                actions::base_action* action =
+                    new hpx::actions::transfer_action<action_type>(priority_,
+                        std::forward<Args>(args));
+                if (!cont_)
+                {
+                    parcelset::parcel p(id_, complement_addr<action_type>(addr_),
+                        action);
+                
+                    // Send the parcel through the parcel handler
+                    hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
+                } else {
+                    parcelset::parcel p(id_, complement_addr<action_type>(addr_),
+                        action, cont_);
+                
+                    // Send the parcel through the parcel handler
+                    hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
+                }
+            }
+
+            result_type operator()()
+            {
+                return send_parcel(util::forward_as_tuple());
+            }
+
+#   define HPX_APPLIER_PUT_PARCEL(Z, N, D)                                     \
+            template <BOOST_PP_ENUM_PARAMS(N, typename A)>                     \
+            result_type operator()(HPX_ENUM_FWD_ARGS(N, A, a))                 \
+            {                                                                  \
+                return send_parcel(util::forward_as_tuple(                     \
+                    HPX_ENUM_FORWARD_ARGS(N, A, a)));                          \
+            }                                                                  \
+            /**/
+
+            BOOST_PP_REPEAT_FROM_TO(
+                1, HPX_FUNCTION_ARGUMENT_LIMIT
+              , HPX_APPLIER_PUT_PARCEL, _);
+            
+#   undef HPX_APPLIER_PUT_PARCEL
+            
+            naming::id_type id_;
+            naming::address addr_;
+            threads::thread_priority priority_;
+            actions::continuation_type cont_;
+        };
 
         // We know it is remote.
         template <typename Action>
         inline bool
-        apply_r_p(naming::address& addr, naming::id_type const& id,
+        apply_r_p(naming::address&& addr, naming::id_type const& id,
             threads::thread_priority priority)
         {
-            typedef typename hpx::actions::extract_action<Action>::type action_type_;
-
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p(id, complement_addr<action_type_>(addr),
-                new hpx::actions::transfer_action<action_type_>(priority,
-                    util::forward_as_tuple()));
-
-            // Send the parcel through the parcel handler
-            hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
-            return false;     // destination is remote
+            lcos::local::detail::invoke_when_ready(
+                detail::put_parcel<Action>(id, std::move(addr), priority));
+            return false;     // destinations are remote
         }
 
 #if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
@@ -196,7 +257,8 @@ namespace hpx
             return applier::detail::apply_l_p<Action>(gid, addr, priority);   // apply locally
 
         // apply remotely
-        return applier::detail::apply_r_p<Action>(addr, gid, priority);
+        return applier::detail::apply_r_p<Action>(std::move(addr), gid, 
+            priority);
     }
 
     template <typename Action>
@@ -276,22 +338,15 @@ namespace hpx
     {
         template <typename Action>
         inline bool
-        apply_r_p(naming::address& addr, actions::continuation* c,
+        apply_r_p(naming::address&& addr, actions::continuation* c,
             naming::id_type const& id, threads::thread_priority priority)
         {
-            typedef typename hpx::actions::extract_action<Action>::type action_type_;
-
-            actions::continuation_type cont(c);
-
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p(id, complement_addr<action_type_>(addr),
-                new hpx::actions::transfer_action<action_type_>(priority,
-                    util::forward_as_tuple()), cont);
-
-            // Send the parcel through the parcel handler
-            hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
-            return false;     // destination is remote
+            lcos::local::detail::invoke_when_ready(
+                detail::put_parcel<Action>(id, std::move(addr), priority,
+                    actions::continuation_type(c)));
+            return false;     // destinations are remote
         }
 
         template <typename Action>
@@ -372,7 +427,8 @@ namespace hpx
             return applier::detail::apply_l_p<Action>(c, gid, addr, priority);
 
         // apply remotely
-        return applier::detail::apply_r_p<Action>(addr, c, gid, priority);
+        return applier::detail::apply_r_p<Action>(std::move(addr), c, gid, 
+            priority);
     }
 
     template <typename Action>

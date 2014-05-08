@@ -72,7 +72,7 @@ namespace hpx { namespace util
             }
 
             template <typename Archive, typename Element>
-            static void serialize(Archive& ar, Element& e)
+            static void serialize(Archive& ar, Element&& e)
             {
                 typedef
                     typename boost::fusion::traits::is_sequence<Element>::type

@@ -16,6 +16,11 @@ boost::int32_t increment(boost::int32_t i)
     return i + 1;
 }
 
+boost::int32_t increment_with_future(hpx::shared_future<boost::int32_t> fi)
+{
+    return fi.get() + 1;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 struct mult2
 {
@@ -95,6 +100,19 @@ int hpx_main()
 
         hpx::future<void> f4 = hpx::async(hpx::launch::sync, &do_nothing, 42);
         f4.get();
+    }
+    
+    {
+        hpx::promise<boost::int32_t> p;
+        hpx::shared_future<boost::int32_t> f = p.get_future();
+
+        hpx::future<boost::int32_t> f1 = hpx::async(&increment_with_future, f);
+        hpx::future<boost::int32_t> f2 =
+            hpx::async(hpx::launch::all, &increment_with_future, f);
+
+        p.set_value(42);        
+        HPX_TEST_EQ(f1.get(), 43);
+        HPX_TEST_EQ(f2.get(), 43);
     }
 
     {
