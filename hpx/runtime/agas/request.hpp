@@ -23,7 +23,7 @@
 #include <boost/serialization/tracking.hpp>
 
 // The number of types that the request's variant can represent.
-#define HPX_AGAS_REQUEST_SUBTYPES 14
+#define HPX_AGAS_REQUEST_SUBTYPES 15
 
 namespace hpx { namespace agas
 {
@@ -126,6 +126,14 @@ struct HPX_EXPORT request
         namespace_action_code type_
         );
 
+    request(
+        namespace_action_code type_
+      , std::string const& name
+      , namespace_action_code evt
+      , bool call_for_past_events
+      , hpx::id_type result_lco
+        );
+
     ///////////////////////////////////////////////////////////////////////////
     // copy constructor
     request(
@@ -203,6 +211,18 @@ struct HPX_EXPORT request
         ) const;
 
     naming::gid_type get_suggested_prefix(
+        error_code& ec = throws
+        ) const;
+
+    namespace_action_code get_on_event_event(
+        error_code& ec = throws
+        ) const;
+
+    bool get_on_event_call_for_past_event(
+        error_code& ec = throws
+        ) const;
+
+    hpx::id_type get_on_event_result_lco(
         error_code& ec = throws
         ) const;
 

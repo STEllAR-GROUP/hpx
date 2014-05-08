@@ -37,7 +37,7 @@ namespace server
 // Base name used to register the component
 char const* const symbol_namespace_service_name = "symbol/";
 
-struct HPX_EXPORT symbol_namespace 
+struct HPX_EXPORT symbol_namespace
   : components::fixed_component_base<symbol_namespace>
 {
     // {{{ nested types
@@ -50,12 +50,17 @@ struct HPX_EXPORT symbol_namespace
     > iterate_names_function_type;
 
     typedef std::map<std::string, naming::gid_type> gid_table_type;
+
+    typedef std::multimap<
+        std::pair<std::string, namespace_action_code>, hpx::id_type
+    > on_event_data_map_type;
     // }}}
 
   private:
     mutex_type mutex_;
     gid_table_type gids_;
     std::string instance_name_;
+    on_event_data_map_type on_event_data_;
 
     struct update_time_on_exit;
 
@@ -84,12 +89,14 @@ struct HPX_EXPORT symbol_namespace
         boost::int64_t get_resolve_count(bool);
         boost::int64_t get_unbind_count(bool);
         boost::int64_t get_iterate_names_count(bool);
+        boost::int64_t get_on_event_count(bool);
         boost::int64_t get_overall_count(bool);
 
         boost::int64_t get_bind_time(bool);
         boost::int64_t get_resolve_time(bool);
         boost::int64_t get_unbind_time(bool);
         boost::int64_t get_iterate_names_time(bool);
+        boost::int64_t get_on_event_time(bool);
         boost::int64_t get_overall_time(bool);
 
         // increment counter values
@@ -97,6 +104,7 @@ struct HPX_EXPORT symbol_namespace
         void increment_resolve_count();
         void increment_unbind_count();
         void increment_iterate_names_count();
+        void increment_on_event_count();
 
     private:
         friend struct update_time_on_exit;
@@ -107,6 +115,7 @@ struct HPX_EXPORT symbol_namespace
         api_counter_data resolve_;            // symbol_ns_resolve
         api_counter_data unbind_;             // symbol_ns_unbind
         api_counter_data iterate_names_;      // symbol_ns_iterate_names
+        api_counter_data on_event_;           // symbol_ns_on_event
     };
     counter_data counter_data_;
 
@@ -197,6 +206,11 @@ struct HPX_EXPORT symbol_namespace
       , error_code& ec = throws
         );
 
+    response on_event(
+        request const& req
+      , error_code& ec = throws
+        );
+
     response statistics_counter(
         request const& req
       , error_code& ec = throws
@@ -213,6 +227,7 @@ struct HPX_EXPORT symbol_namespace
       , namespace_resolve            = symbol_ns_resolve
       , namespace_unbind             = symbol_ns_unbind
       , namespace_iterate_names      = symbol_ns_iterate_names
+      , namespace_on_event           = symbol_ns_on_event
       , namespace_statistics_counter = symbol_ns_statistics_counter
     }; // }}}
 

@@ -41,6 +41,10 @@ start_active_counters                 "" "hpx\.start_active_counters.*"
 reset_active_counters                 "" "hpx\.reset_active_counters.*"
 stop_active_counters                  "" "hpx\.stop_active_counters.*"
 evaluate_active_counters              "" "hpx\.evaluate_active_counters.*"
+find_all_ids_from_basename            "" "hpx\.find_all_ids_from_basename.*"
+find_ids_from_basename                "" "hpx\.find_ids_from_basename.*"
+register_id_with_basename             "" "hpx\.register_id_with_basename.*"
+unregister_id_with_basename           "" "hpx\.unregister_id_with_basename.*"
 
 # hpx/runtime/components/new.hpp
 new_                                  "" "hpx\.components\.new_.*"

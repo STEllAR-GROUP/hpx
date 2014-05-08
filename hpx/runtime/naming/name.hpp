@@ -841,7 +841,11 @@ namespace hpx { namespace traits
     {
         static naming::id_type call(naming::gid_type const& rhs)
         {
-            return naming::id_type(rhs, naming::id_type::managed);
+            bool has_credits = naming::detail::has_credits(rhs);
+            return naming::id_type(rhs,
+                has_credits ?
+                    naming::id_type::managed :
+                    naming::id_type::unmanaged);
         }
     };
 
@@ -868,7 +872,11 @@ namespace hpx { namespace traits
             result.reserve(rhs.size());
             BOOST_FOREACH(naming::gid_type const& r, rhs)
             {
-                result.push_back(naming::id_type(r, naming::id_type::managed));
+                bool has_credits = naming::detail::has_credits(r);
+                result.push_back(naming::id_type(r,
+                    has_credits ?
+                        naming::id_type::managed :
+                        naming::id_type::unmanaged));
             }
             return result;
         }

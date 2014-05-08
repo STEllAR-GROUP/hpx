@@ -95,7 +95,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                     buffer_->data_point_.time_;
 
                 // decode the received parcels.
-                decode_parcels(pp, shared_from_this(), buffer_);
+                decode_parcels(pp, *this, buffer_);
                 return true;
             }
             return false;

@@ -64,6 +64,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         void async_read(Handler handler)
         {
             buffer_ = get_buffer();
+            buffer_->clear();
 
             // Store the time of the begin of the read operation
             performance_counters::parcels::data_point& data = buffer_->data_point_;
@@ -105,8 +106,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
                           boost::tuple<Handler>)
                     = &receiver::handle_write_ack<Handler>;
 
+                buffer_->data_size_ = buffer_->data_.size();
+                buffer_->size_ = buffer_->data_.size();
+
                 // decode the received parcels.
-                decode_parcels(parcelport_, shared_from_this(), buffer_);
+                decode_parcels(parcelport_, *this, buffer_);
 
                 // acknowledge to have received the parcel
                 window_.async_write_ack(

@@ -452,7 +452,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       catch(...) {
         /**/;
       }
-#if HPX_THREAD_MAINTAIN_THREAD_DATA
+#if HPX_THREAD_MAINTAIN_LOCAL_STORAGE
       delete_tss_storage(m_thread_data);
 #endif
     }

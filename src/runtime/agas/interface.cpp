@@ -34,8 +34,7 @@ bool register_name_sync(
   , error_code& ec
     )
 {
-    naming::resolver_client& agas_ = naming::get_agas_client();
-    return agas_.register_name(name, id);
+    return register_name(name, id).get(ec);
 }
 
 lcos::future<bool> register_name(
@@ -468,6 +467,15 @@ naming::id_type get_colocation_id_sync(
   , error_code& ec)
 {
     return get_colocation_id(id).get(ec);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+hpx::future<hpx::id_type> on_symbol_namespace_event(
+    std::string const& name, agas::namespace_action_code evt,
+    bool call_for_past_events)
+{
+    naming::resolver_client& resolver = naming::get_agas_client();
+    return resolver.on_symbol_namespace_event(name, evt, call_for_past_events);
 }
 
 }}
