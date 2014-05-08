@@ -14,10 +14,12 @@
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
 #include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/move.hpp>
@@ -104,8 +106,14 @@ namespace hpx { namespace lcos { namespace local { namespace detail
     }
 
     template <typename F, typename Args>
-    struct when_ready : boost::enable_shared_from_this<when_ready<F, Args> >
+    struct when_ready
+      : lcos::detail::future_data<
+            typename util::invoke_fused_result_of<F&(Args)>::type
+        >
     {
+        typedef typename util::invoke_fused_result_of<F&(Args)>::type result_type;
+        typedef lcos::detail::future_data<result_type> base_type;
+
     private:
         static std::size_t const needed_count_ =
             boost::fusion::result_of::size<Args>::value;
@@ -126,7 +134,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         when_ready(when_ready const&);
 
     public:
-        typedef typename util::invoke_fused_result_of<F&(Args)>::type result_type;
+        typedef hpx::future<result_type> type;
 
         when_ready(F const& f, Args&& args)
           : f_(f)
@@ -140,12 +148,47 @@ namespace hpx { namespace lcos { namespace local { namespace detail
           , count_(0)
         {}
 
-        result_type operator()()
+        BOOST_FORCEINLINE
+        void invoke(boost::mpl::false_)
+        {
+            try
+            {
+                base_type::set_data(
+                    util::invoke_fused(f_, std::forward<Args>(args_)));
+            } catch (...) {
+                base_type::set_exception(boost::current_exception());
+            }
+        }
+
+        BOOST_FORCEINLINE
+        void invoke(boost::mpl::true_)
+        {
+            typedef typename util::invoke_fused_result_of<
+                typename util::decay<F>::type(Args)
+            >::type value_type;
+            try
+            {
+                util::invoke_fused(f_, std::forward<Args>(args_));
+                base_type::set_data(util::unused);
+            } catch (...) {
+                base_type::set_exception(boost::current_exception());
+            }
+        }
+
+        BOOST_FORCEINLINE
+        void invoke()
+        {
+            typedef typename boost::is_void<result_type>::type is_void;
+            invoke(is_void());
+        }
+
+        void apply()
         {
             // set callback functions to executed when future is ready
+            boost::intrusive_ptr<when_ready> this_(this);
             set_invoke_on_completed_callback(*this,
                 util::bind(
-                    &when_ready::on_future_ready, this->shared_from_this(),
+                    &when_ready::on_future_ready, this_,
                     threads::get_self_id()));
 
             // if all of the requested futures are already set, our
@@ -160,7 +203,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             // all futures should be ready
             HPX_ASSERT(count_.load(boost::memory_order_acquire) >= needed_count_);
 
-            return util::invoke_fused_r<result_type>(f_, std::move(args_));
+            invoke();
         }
 
         F f_;
@@ -174,8 +217,16 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         typename util::decay<F>::type(Args)
     >::type> invoke_fused_now(F&& f, Args&& args, boost::mpl::false_)
     {
-        return hpx::make_ready_future(
-            util::invoke_fused(f, std::forward<Args>(args)));
+        typedef typename util::invoke_fused_result_of<
+            typename util::decay<F>::type(Args)
+        >::type value_type;
+        try
+        {
+            return hpx::make_ready_future(
+                util::invoke_fused(f, std::forward<Args>(args)));
+        } catch (...) {
+            return hpx::make_error_future<value_type>(boost::current_exception());
+        }
     }
 
     template <typename F, typename Args>
@@ -183,8 +234,13 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         typename util::decay<F>::type(Args)
     >::type> invoke_fused_now(F&& f, Args&& args, boost::mpl::true_)
     {
-        util::invoke_fused(f, std::forward<Args>(args));
-        return hpx::make_ready_future();
+        try
+        {
+            util::invoke_fused(f, std::forward<Args>(args));
+            return hpx::make_ready_future();
+        } catch (...) {
+            return hpx::make_error_future<void>(boost::current_exception());
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -220,15 +276,16 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         typedef when_ready<
             typename util::decay<F>::type
           , typename util::tuple_decay<typename util::decay<Args>::type>::type
-        > invoker;
+        > invoker_type;
 
-        arguments_type lazy_args(std::forward<Args>(args));
-        lcos::local::futures_factory<typename invoker::result_type()> p(
-            util::bind(&invoker::operator(), boost::make_shared<invoker>(
-                std::forward<F>(f), std::move(lazy_args))));
+        boost::intrusive_ptr<invoker_type> p(new invoker_type(
+            std::forward<F>(f), std::forward<Args>(args)));
+        threads::register_thread_nullary(
+            util::deferred_call(&invoker_type::apply, p)
+          , "hpx::lcos::local::detail::invoke_when_ready");
 
-        p.apply();
-        return p.get_future();
+        using traits::future_access;
+        return future_access<typename invoker_type::type>::create(std::move(p));
     }
 
     ///////////////////////////////////////////////////////////////////////////
