@@ -224,47 +224,83 @@ struct partition : hpx::components::client_base<partition, partition_server>
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-// This is a client side helper class allowing to hide some of the tedious
-// boilerplate while referencing a remote space instance.
-//
-// Here we forward declare all functions only as we need to avoid cyclic
-// references between the stepper and the stepper_Server classes.
-//
-struct stepper_server;
-
-struct stepper : hpx::components::client_base<stepper, stepper_server>
-{
-    typedef hpx::components::client_base<stepper, stepper_server> base_type;
-
-    // construct new instances/wrap existing steppers from other localities
-    stepper() {}
-    stepper(hpx::future<hpx::id_type> && id)
-      : base_type(std::move(id))
-    {}
-    stepper(std::size_t np, std::size_t nl);
-
-    hpx::future<void> do_work(std::size_t nt);
-};
-
-///////////////////////////////////////////////////////////////////////////////
 // Data for one time step on one locality
 char const* stepper_basename = "/1d_stencil_8/stepper/";
 
 struct stepper_server : hpx::components::simple_component_base<stepper_server>
 {
+    // Our data for one time step
+    typedef std::vector<partition> space;
+
     stepper_server() {}
 
-    stepper_server(std::size_t np, std::size_t nl)
+    stepper_server(std::size_t nl)
       : left_(hpx::find_id_from_basename(stepper_basename, idx(hpx::get_locality_id()-1, nl))),
-        right_(hpx::find_id_from_basename(stepper_basename, idx(hpx::get_locality_id()+1, nl)))
-    {}
+        right_(hpx::find_id_from_basename(stepper_basename, idx(hpx::get_locality_id()+1, nl))),
+        U_(2)
+    {
+    }
 
-    void do_work(std::size_t nt);
+    // do all the work on 'np' local partitions, 'nx' data points each, for
+    // 'nt' time steps
+    space do_work(std::size_t local_np, std::size_t nx, std::size_t nt);
 
     HPX_DEFINE_COMPONENT_ACTION(stepper_server, do_work, do_work_action);
 
+    // receive the left-most partition from the right
+    void from_right(std::size_t t, partition p)
+    {
+        right_receive_buffer_.store_received(t, std::move(p));
+    }
+
+    // receive the right-most partition from the left
+    void from_left(std::size_t t, partition p)
+    {
+        left_receive_buffer_.store_received(t, std::move(p));
+    }
+
+    HPX_DEFINE_COMPONENT_ACTION(stepper_server, from_right, from_right_action);
+    HPX_DEFINE_COMPONENT_ACTION(stepper_server, from_left, from_left_action);
+
+protected:
+    // Our operator
+    static double heat(double left, double middle, double right)
+    {
+        return middle + (k*dt/dx*dx) * (left - 2*middle + right);
+    }
+
+    // The partitioned operator, it invokes the heat operator above on all
+    // elements of a partition.
+    static partition heat_part(partition const& left, partition const& middle,
+        partition const& right);
+
+    // Helper functions to receive the left and right boundary elements from
+    // the neighbors.
+    partition receive_left(std::size_t t)
+    {
+        return left_receive_buffer_.receive(t);
+    }
+    partition receive_right(std::size_t t)
+    {
+        return right_receive_buffer_.receive(t);
+    }
+
+    // Helper functions to send our left and right boundary elements to
+    // the neighbors.
+    void send_left(std::size_t t, partition p)
+    {
+        hpx::apply(from_right_action(), left_.get(), t, p);
+    }
+    void send_right(std::size_t t, partition p)
+    {
+        hpx::apply(from_left_action(), right_.get(), t, p);
+    }
+
 private:
-    stepper left_, right_;
+    hpx::shared_future<hpx::id_type> left_, right_;
+    std::vector<space> U_;
+    hpx::lcos::local::receive_buffer<partition> left_receive_buffer_;
+    hpx::lcos::local::receive_buffer<partition> right_receive_buffer_;
 };
 
 // The macros below are necessary to generate the code required for exposing
@@ -283,25 +319,33 @@ HPX_REGISTER_ACTION(do_work_action);
 ///////////////////////////////////////////////////////////////////////////////
 // This is a client side member function can now be implemented as the
 // stepper_server has been defined.
-stepper::stepper(std::size_t np, std::size_t nl)
-  : base_type(hpx::new_<stepper_server>(hpx::find_here(), np, nl))
-{}
-
-hpx::future<void> stepper::do_work(std::size_t nt)
+struct stepper : hpx::components::client_base<stepper, stepper_server>
 {
-    return hpx::async(do_work_action(), get_gid(), nt);
-}
+    typedef hpx::components::client_base<stepper, stepper_server> base_type;
+
+    // construct new instances/wrap existing steppers from other localities
+    stepper()
+      : base_type(hpx::new_<stepper_server>(hpx::find_here(), hpx::get_num_localities_sync()))
+    {
+        hpx::register_id_with_basename(stepper_basename, get_gid(), hpx::get_locality_id());
+    }
+
+    stepper(hpx::future<hpx::id_type> && id)
+      : base_type(std::move(id))
+    {}
+
+    hpx::future<stepper_server::space> do_work(
+        std::size_t local_np, std::size_t nx, std::size_t nt)
+    {
+        return hpx::async(do_work_action(), get_gid(), local_np, nx, nt);
+    }
+};
 
 ///////////////////////////////////////////////////////////////////////////////
-// Our operator:
-inline double heat(double left, double middle, double right)
-{
-    return middle + (k*dt/dx*dx) * (left - 2*middle + right);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-partition heat_part(partition const& left, partition const& middle,
-    partition const& right)
+// The partitioned operator, it invokes the heat operator above on all elements
+// of a partition.
+partition stepper_server::heat_part(partition const& left,
+    partition const& middle, partition const& right)
 {
     using hpx::lcos::local::dataflow;
     using hpx::util::unwrapped;
@@ -347,48 +391,47 @@ partition heat_part(partition const& left, partition const& middle,
     );
 }
 
-// Global functions can be exposed as actions as well. That allows to invoke
-// those remotely. The macro HPX_PLAIN_ACTION() defines a new action type
-// 'heat_part_action' which wraps the global function heat_part(). It can be
-// used to call that function on a given locality.
-HPX_PLAIN_ACTION(heat_part, heat_part_action);
-
 ///////////////////////////////////////////////////////////////////////////////
 // This is the implementation of the time step loop
-void stepper_server::do_work(std::size_t nt)
+stepper_server::space stepper_server::do_work(std::size_t local_np,
+    std::size_t nx, std::size_t nt)
 {
-//     // U[t][i] is the state of position i at time t.
-//     std::vector<space> U(2);
-//     for (space& s: U)
-//         s.resize(np);
-//
-//     // Initial conditions:
-//     //   f(0, i) = i
-//     for (std::size_t i = 0; i != np; ++i)
-//         U[0][i] = partition(localities[locidx(i, np, nl)], nx, double(i));
-//
-//     heat_part_action act;
-//     for (std::size_t t = 0; t != nt; ++t)
-//     {
-//         space const& current = U[t % 2];
-//         space& next = U[(t + 1) % 2];
-//
-//         for (std::size_t i = 0; i != np; ++i)
-//         {
-//             // we execute the action on the locality of the middle partition
-//             auto Op = hpx::util::bind(act, localities[locidx(i, np, nl)], _1, _2, _3);
-//             next[i] = dataflow(Op, current[idx(i-1, np)], current[i], current[idx(i+1, np)]);
-//         }
-//     }
-//
-//     // Print the solution at time-step 'nt'.
-//     space const& solution = U[nt % 2];
-//     for (std::size_t i = 0; i != np; ++i)
-//     {
-//         std::cout << "U[" << i << "] = "
-//                   << solution[i].get_data(partition_server::middle_partition).get()
-//                   << std::endl;
-//     }
+    using hpx::lcos::local::dataflow;
+    using hpx::util::unwrapped;
+
+    std::vector<hpx::id_type> localities = hpx::find_all_localities();
+    std::size_t nl = localities.size();                    // Number of localities
+
+    // U[t][i] is the state of position i at time t.
+    for (space& s: U_)
+        s.resize(local_np);
+
+    // Initial conditions: f(0, i) = i
+    hpx::id_type here = hpx::find_here();
+    for (std::size_t i = 0; i != local_np; ++i)
+        U_[0][i] = partition(here, nx, double(i));
+
+    auto Op = &stepper_server::heat_part;
+
+    for (std::size_t t = 0; t != nt; ++t)
+    {
+        space const& current = U_[t % 2];
+        space& next = U_[(t + 1) % 2];
+
+        next[0] = dataflow(Op, receive_left(t), current[0], current[1]);
+        send_right(t, next[0]);
+
+        for (std::size_t i = 1; i != local_np-1; ++i)
+        {
+            next[i] = dataflow(Op, current[i-1], current[i], current[i+1]);
+        }
+
+        next[local_np-1] = dataflow(Op, current[local_np-2], current[local_np-1], receive_right(t));
+        send_left(t, next[local_np-1]);
+    }
+
+    // Print the solution at time-step 'nt'.
+    return U_[nt % 2];
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -415,10 +458,10 @@ int hpx_main(boost::program_options::variables_map& vm)
     }
 
     // Create the local stepper instance, register it
-    stepper step(np/nl, nl);
+    stepper step;
 
     // perform all work and wait for it to finish
-    hpx::future<void> result = step.do_work(nt);
+    hpx::future<stepper_server::space> result = step.do_work(np/nl, nx, nt);
     result.wait();
 
     return hpx::finalize();
