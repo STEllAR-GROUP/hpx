@@ -18,7 +18,10 @@ if(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
 endif()
 
 if(HPX_LOCAL_SCHEDULER OR HPX_ALL_SCHEDULERS)
-  set(tests ${tests} thread_pool_executor_1114)
+  set(tests ${tests}
+    thread_pool_executor_1114
+    thread_pool_executor_1127
+    )
 endif()
 
 set(block_os_threads_1036_PARAMETERS THREADS_PER_LOCALITY 4)
