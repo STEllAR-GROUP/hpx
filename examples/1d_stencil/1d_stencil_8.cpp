@@ -369,6 +369,7 @@ partition stepper_server::heat_part(partition const& left,
     );
 
     return dataflow(
+        hpx::launch::async,
         unwrapped(
             [left, middle, right](partition_data next, partition_data const& l,
                 partition_data const& m, partition_data const& r)
@@ -418,15 +419,24 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
         space const& current = U_[t % 2];
         space& next = U_[(t + 1) % 2];
 
-        next[0] = dataflow(Op, receive_left(t), current[0], current[1]);
+        next[0] = dataflow(
+                hpx::launch::async, Op,
+                receive_left(t), current[0], current[1]
+            );
         send_right(t, next[0]);
 
         for (std::size_t i = 1; i != local_np-1; ++i)
         {
-            next[i] = dataflow(Op, current[i-1], current[i], current[i+1]);
+            next[i] = dataflow(
+                    hpx::launch::async, Op,
+                    current[i-1], current[i], current[i+1]
+                );
         }
 
-        next[local_np-1] = dataflow(Op, current[local_np-2], current[local_np-1], receive_right(t));
+        next[local_np-1] = dataflow(
+                hpx::launch::async, Op,
+                current[local_np-2], current[local_np-1], receive_right(t)
+            );
         send_left(t, next[local_np-1]);
     }
 

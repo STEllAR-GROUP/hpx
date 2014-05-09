@@ -31,11 +31,11 @@ inline std::size_t idx(std::size_t i, std::size_t size)
 struct partition
 {
     partition(std::size_t size)
-      : data_(size)
+      : data_(new double [size]), size_(size)
     {}
 
     partition(std::size_t size, double initial_value)
-      : data_(size)
+      : data_(new double [size]), size_(size)
     {
         double base_value = double(initial_value * size);
         for (std::size_t i = 0; i != size; ++i)
@@ -45,10 +45,11 @@ struct partition
     double& operator[](std::size_t idx) { return data_[idx]; }
     double operator[](std::size_t idx) const { return data_[idx]; }
 
-    std::size_t size() const { return data_.size(); }
+    std::size_t size() const { return size_; }
 
 private:
-    std::vector<double> data_;
+    boost::shared_array<double> data_;
+    std::size_t size_;
 };
 
 std::ostream& operator<<(std::ostream& os, partition const& c)
@@ -78,8 +79,8 @@ struct stepper
 
     // The partitioned operator, it invokes the heat operator above on all
     // elements of a partition.
-    static partition heat_part(partition const& left, partition const& middle,
-        partition const& right)
+    static partition heat_part(partition const& left,
+        partition const& middle, partition const& right)
     {
         std::size_t size = middle.size();
         partition next(size);
@@ -119,7 +120,12 @@ struct stepper
             space& next = U[(t + 1) % 2];
 
             for (std::size_t i = 0; i != np; ++i)
-                next[i] = dataflow(Op, current[idx(i-1, np)], current[i], current[idx(i+1, np)]);
+            {
+                next[i] = dataflow(
+                        hpx::launch::async, Op,
+                        current[idx(i-1, np)], current[i], current[idx(i+1, np)]
+                    );
+            }
         }
 
         // Return the solution at time-step 'nt'.
@@ -137,13 +143,27 @@ int hpx_main(boost::program_options::variables_map& vm)
     // Create the stepper object
     stepper step;
 
+    // Measure execution time.
+    hpx::util::high_resolution_timer t;
+
     // Execute nt time steps on nx grid points and print the final solution.
     hpx::future<stepper::space> result = step.do_work(np, nx, nt);
 
+    double elapsed = t.elapsed();
+
     // Print the final solution
     stepper::space solution = result.get();
-    for (std::size_t i = 0; i != np; ++i)
-        std::cout << "U[" << i << "] = " << solution[i].get() << std::endl;
+    if (vm.count("result"))
+    {
+        for (std::size_t i = 0; i != np; ++i)
+            std::cout << "U[" << i << "] = " << solution[i].get() << std::endl;
+    }
+    else
+    {
+        hpx::wait_all(solution);
+    }
+
+    std::cout << "Elapsed time: " << elapsed << " [s]" << std::endl;
 
     return hpx::finalize();
 }
@@ -154,6 +174,7 @@ int main(int argc, char* argv[])
 
     options_description desc_commandline;
     desc_commandline.add_options()
+        ("results,r", "print generated results (default: false)")
         ("nx", value<boost::uint64_t>()->default_value(10),
          "Local x dimension (of each partition)")
         ("nt", value<boost::uint64_t>()->default_value(45),

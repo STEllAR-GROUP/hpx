@@ -239,7 +239,6 @@ HPX_PLAIN_ACTION(stepper::heat_part, heat_part_action);
 stepper::space stepper::do_work(std::size_t np, std::size_t nx, std::size_t nt)
 {
     using hpx::lcos::local::dataflow;
-    using hpx::util::unwrapped;
 
     // U[t][i] is the state of position i at time t.
     std::vector<space> U(2);
@@ -262,7 +261,12 @@ stepper::space stepper::do_work(std::size_t np, std::size_t nx, std::size_t nt)
         space& next = U[(t + 1) % 2];
 
         for (std::size_t i = 0; i != np; ++i)
-            next[i] = dataflow(Op, current[idx(i-1, np)], current[i], current[idx(i+1, np)]);
+        {
+            next[i] = dataflow(
+                    hpx::launch::async, Op,
+                    current[idx(i-1, np)], current[i], current[idx(i+1, np)]
+                );
+        }
     }
 
     // Return the solution at time-step 'nt'.
@@ -279,12 +283,31 @@ int hpx_main(boost::program_options::variables_map& vm)
     // Create the stepper object
     stepper step;
 
+    // Measure execution time.
+    hpx::util::high_resolution_timer t;
+
     // Execute nt time steps on nx grid points and print the final solution.
     stepper::space solution = step.do_work(np, nx, nt);
 
-    // Print the solution at time-step 'nt'.
-    for (std::size_t i = 0; i != np; ++i)
-        std::cout << "U[" << i << "] = " << solution[i].get_data().get() << std::endl;
+    double elapsed = t.elapsed();
+
+    // Print the final solution
+    if (vm.count("result"))
+    {
+        for (std::size_t i = 0; i != np; ++i)
+        {
+            std::cout << "U[" << i << "] = "
+                      << solution[i].get_data().get()
+                      << std::endl;
+        }
+    }
+    else
+    {
+        for (std::size_t i = 0; i != np; ++i)
+            solution[i].get_data().wait();
+    }
+
+    std::cout << "Elapsed time: " << elapsed << " [s]" << std::endl;
 
     return hpx::finalize();
 }
@@ -295,6 +318,7 @@ int main(int argc, char* argv[])
 
     options_description desc_commandline;
     desc_commandline.add_options()
+        ("results,r", "print generated results (default: false)")
         ("nx", value<boost::uint64_t>()->default_value(10),
          "Local x dimension (of each partition)")
         ("nt", value<boost::uint64_t>()->default_value(45),
