@@ -122,7 +122,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 // reset futures
                 boost::fusion::for_each(futures_, reset_dataflow_future());
 
-                this->set_data(res);
+                this->set_data(std::move(res));
             }
             catch(...) {
                 this->set_exception(boost::current_exception());
