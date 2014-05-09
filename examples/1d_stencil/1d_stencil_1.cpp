@@ -73,12 +73,21 @@ int hpx_main(boost::program_options::variables_map& vm)
     // Create the stepper object
     stepper step;
 
+    // Measure execution time.
+    boost::uint64_t t = hpx::util::high_resolution_clock::now();
+
     // Execute nt time steps on nx grid points.
     stepper::space solution = step.do_work(nx, nt);
 
     // Print the final solution
-    for (std::size_t i = 0; i != nx; ++i)
-        std::cout << "U[" << i << "] = " << solution[i] << std::endl;
+    if (vm.count("result"))
+    {
+        for (std::size_t i = 0; i != nx; ++i)
+            std::cout << "U[" << i << "] = " << solution[i] << std::endl;
+    }
+
+    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+    std::cout << "Elapsed time: " << elapsed / 1e9 << " [s]" << std::endl;
 
     return hpx::finalize();
 }
@@ -89,6 +98,7 @@ int main(int argc, char* argv[])
 
     options_description desc_commandline;
     desc_commandline.add_options()
+        ("results,r", "print generated results (default: false)")
         ("nx", value<boost::uint64_t>()->default_value(100),
          "Local x dimension")
         ("nt", value<boost::uint64_t>()->default_value(45),

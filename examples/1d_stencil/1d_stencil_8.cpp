@@ -470,9 +470,15 @@ int hpx_main(boost::program_options::variables_map& vm)
     // Create the local stepper instance, register it
     stepper step;
 
+    // Measure execution time.
+    boost::uint64_t t = hpx::util::high_resolution_clock::now();
+
     // perform all work and wait for it to finish
     hpx::future<stepper_server::space> result = step.do_work(np/nl, nx, nt);
     result.wait();
+
+    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+    std::cout << "Elapsed time: " << elapsed / 1e9 << " [s]" << std::endl;
 
     return hpx::finalize();
 }
