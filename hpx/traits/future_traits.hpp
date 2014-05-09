@@ -8,6 +8,11 @@
 
 #include <hpx/traits.hpp>
 
+#include <boost/mpl/eval_if.hpp>
+#include <boost/mpl/identity.hpp>
+#include <boost/type_traits/add_lvalue_reference.hpp>
+#include <boost/type_traits/is_void.hpp>
+
 namespace hpx { namespace lcos
 {
     template <typename R> class future;
@@ -40,12 +45,18 @@ namespace hpx { namespace traits
     struct future_traits<lcos::future<R> >
     {
         typedef R type;
+        typedef R result_type;
     };
 
     template <typename R>
     struct future_traits<lcos::shared_future<R> >
     {
         typedef R type;
+        typedef typename boost::mpl::eval_if<
+            boost::is_void<R>
+          , boost::mpl::identity<R>
+          , boost::add_lvalue_reference<R const>
+        >::type result_type;
     };
 }}
 

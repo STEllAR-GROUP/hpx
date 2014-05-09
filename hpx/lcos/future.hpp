@@ -314,8 +314,6 @@ namespace hpx { namespace lcos { namespace detail
     struct future_value
       : future_data_result<T>
     {
-        typedef T const& const_lvref;
-
         template <typename U>
         BOOST_FORCEINLINE static
         U get(U && u)
@@ -333,8 +331,6 @@ namespace hpx { namespace lcos { namespace detail
     struct future_value<T&>
       : future_data_result<T&>
     {
-        typedef T& const_lvref;
-
         BOOST_FORCEINLINE static
         T& get(T& u)
         {
@@ -352,8 +348,6 @@ namespace hpx { namespace lcos { namespace detail
     struct future_value<void>
       : future_data_result<void>
     {
-        typedef void const_lvref;
-
         BOOST_FORCEINLINE static
         void get(util::unused_type)
         {}
@@ -886,7 +880,8 @@ namespace hpx { namespace lcos
         // Throws: the stored exception, if an exception was stored in the
         //         shared state.
         // Postcondition: valid() == false.
-        R get()
+        typename traits::future_traits<future>::result_type
+        get()
         {
             if (!this->shared_state_)
             {
@@ -903,7 +898,9 @@ namespace hpx { namespace lcos
             // no error has been reported, return the result
             return detail::future_value<R>::get(data.move_value());
         }
-        R get(error_code& ec)
+        
+        typename traits::future_traits<future>::result_type
+        get(error_code& ec)
         {
             if (!this->shared_state_)
             {
@@ -1107,7 +1104,8 @@ namespace hpx { namespace lcos
         // Throws: the stored exception, if an exception was stored in the
         //         shared state.
         // Postcondition: valid() == false.
-        typename detail::future_value<R>::const_lvref get() const
+        typename traits::future_traits<shared_future>::result_type
+        get() const
         {
             if (!this->shared_state_)
             {
@@ -1122,7 +1120,8 @@ namespace hpx { namespace lcos
             // no error has been reported, return the result
             return detail::future_value<R>::get(data.get_value());
         }
-        typename detail::future_value<R>::const_lvref get(error_code& ec) const
+        typename traits::future_traits<shared_future>::result_type
+        get(error_code& ec) const
         {
             if (!this->shared_state_)
             {

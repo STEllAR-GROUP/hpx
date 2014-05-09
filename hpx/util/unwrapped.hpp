@@ -44,9 +44,7 @@ namespace hpx { namespace util
             typedef typename traits::future_traits<T>::type value_type;
             typedef typename boost::is_void<value_type>::type is_void;
 
-            typedef typename boost::mpl::if_<
-                is_void, void, value_type
-            >::type type;
+            typedef typename traits::future_traits<T>::result_type type;
 
             template <typename Future>
             static type call(Future& future, /*is_void=*/boost::mpl::false_)
