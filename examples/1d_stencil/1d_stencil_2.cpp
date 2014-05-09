@@ -70,7 +70,12 @@ struct stepper
             // WHEN U[t][i-1], U[t][i], and U[t][i+1] have been computed, THEN we
             // can compute U[t+1][i]
             for (std::size_t i = 0; i != nx; ++i)
-                next[i] = dataflow(Op, current[idx(i-1, nx)], current[i], current[idx(i+1, nx)]);
+            {
+                next[i] = dataflow(
+                        hpx::launch::async, Op,
+                        current[idx(i-1, nx)], current[i], current[idx(i+1, nx)]
+                    );
+            }
         }
 
         // Now the asynchronous computation is running; the above for-loop does not
@@ -92,13 +97,27 @@ int hpx_main(boost::program_options::variables_map& vm)
     // Create the stepper object
     stepper step;
 
+    // Measure execution time.
+    hpx::util::high_resolution_timer t;
+
     // Execute nt time steps on nx grid points.
     hpx::future<stepper::space> result = step.do_work(nx, nt);
 
+    double elapsed = t.elapsed();
+
     // Print the final solution
     stepper::space solution = result.get();
-    for (std::size_t i = 0; i != nx; ++i)
-        std::cout << "U[" << i << "] = " << solution[i].get() << std::endl;
+    if (vm.count("result"))
+    {
+        for (std::size_t i = 0; i != nx; ++i)
+            std::cout << "U[" << i << "] = " << solution[i].get() << std::endl;
+    }
+    else
+    {
+        hpx::wait_all(solution);
+    }
+
+    std::cout << "Elapsed time: " << elapsed << " [s]" << std::endl;
 
     return hpx::finalize();
 }
@@ -109,6 +128,7 @@ int main(int argc, char* argv[])
 
     options_description desc_commandline;
     desc_commandline.add_options()
+        ("results,r", "print generated results (default: false)")
         ("nx", value<boost::uint64_t>()->default_value(100),
          "Local x dimension")
         ("nt", value<boost::uint64_t>()->default_value(45),
