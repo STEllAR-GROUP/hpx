@@ -144,12 +144,10 @@ int hpx_main(boost::program_options::variables_map& vm)
     stepper step;
 
     // Measure execution time.
-    hpx::util::high_resolution_timer t;
+    boost::uint64_t t = hpx::util::high_resolution_clock::now();
 
     // Execute nt time steps on nx grid points and print the final solution.
     hpx::future<stepper::space> result = step.do_work(np, nx, nt);
-
-    double elapsed = t.elapsed();
 
     // Print the final solution
     stepper::space solution = result.get();
@@ -163,7 +161,8 @@ int hpx_main(boost::program_options::variables_map& vm)
         hpx::wait_all(solution);
     }
 
-    std::cout << "Elapsed time: " << elapsed << " [s]" << std::endl;
+    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+    std::cout << "Elapsed time: " << elapsed / 1e9 << " [s]" << std::endl;
 
     return hpx::finalize();
 }
