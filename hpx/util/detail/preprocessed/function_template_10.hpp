@@ -207,7 +207,7 @@ namespace hpx { namespace util { namespace detail
             return detail::get_table<
                         Functor
                       , R()
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
         }
         BOOST_FORCEINLINE R operator()() const
         {
@@ -448,7 +448,7 @@ namespace hpx { namespace util { namespace detail
             return detail::get_table<
                         Functor
                       , R(A0)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
         }
         BOOST_FORCEINLINE R operator()(A0 a0) const
         {
@@ -689,7 +689,7 @@ namespace hpx { namespace util { namespace detail
             return detail::get_table<
                         Functor
                       , R(A0 , A1)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1) const
         {
@@ -930,7 +930,7 @@ namespace hpx { namespace util { namespace detail
             return detail::get_table<
                         Functor
                       , R(A0 , A1 , A2)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2) const
         {
@@ -1171,7 +1171,7 @@ namespace hpx { namespace util { namespace detail
             return detail::get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3) const
         {
@@ -1412,7 +1412,7 @@ namespace hpx { namespace util { namespace detail
             return detail::get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4) const
         {
@@ -1653,7 +1653,7 @@ namespace hpx { namespace util { namespace detail
             return detail::get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5) const
         {
@@ -1894,7 +1894,7 @@ namespace hpx { namespace util { namespace detail
             return detail::get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6) const
         {
@@ -2135,7 +2135,7 @@ namespace hpx { namespace util { namespace detail
             return detail::get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7) const
         {
@@ -2376,7 +2376,7 @@ namespace hpx { namespace util { namespace detail
             return detail::get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8) const
         {
@@ -2617,7 +2617,7 @@ namespace hpx { namespace util { namespace detail
             return detail::get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9) const
         {
@@ -2858,7 +2858,7 @@ namespace hpx { namespace util { namespace detail
             return detail::get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10) const
         {
@@ -3099,7 +3099,7 @@ namespace hpx { namespace util { namespace detail
             return detail::get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11) const
         {
@@ -3340,7 +3340,7 @@ namespace hpx { namespace util { namespace detail
             return detail::get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12) const
         {

@@ -78,11 +78,11 @@ namespace hpx { namespace util { namespace detail
         struct type;
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/util/detail/preprocessed/vtable.hpp>
+#  include <hpx/util/detail/preprocessed/vtable1.hpp>
 #else
 
 #if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/vtable_" HPX_LIMIT_STR ".hpp")
+#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/vtable1_" HPX_LIMIT_STR ".hpp")
 #endif
 
 #define BOOST_PP_ITERATION_PARAMS_1                                             \
@@ -187,6 +187,156 @@ namespace hpx { namespace util { namespace detail
 
 #endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <>
+    struct unique_vtable<true>
+    {
+        template <typename Functor>
+        struct type_base
+        {
+            enum { empty = false };
+
+            static std::type_info const& get_type()
+            {
+                return typeid(Functor);
+            }
+
+            static Functor & construct(void ** f)
+            {
+                new (f) Functor;
+                return *reinterpret_cast<Functor *>(f);
+            }
+
+            static Functor & get(void **f)
+            {
+                return *reinterpret_cast<Functor *>(f);
+            }
+
+            static Functor const & get(void *const*f)
+            {
+                return *reinterpret_cast<Functor const *>(f);
+            }
+
+            static void static_delete(void ** f)
+            {
+                reinterpret_cast<Functor*>(f)->~Functor();
+            }
+
+            static void destruct(void ** f)
+            {
+                reinterpret_cast<Functor*>(f)->~Functor();
+            }
+
+            static void clone(void *const* f, void ** dest) {}
+            static void copy(void *const* f, void ** dest) {}
+        };
+
+        template <typename Functor, typename Sig, typename IArchive, typename OArchive>
+        struct type;
+
+#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
+#  include <hpx/util/detail/preprocessed/vtable3.hpp>
+#else
+
+#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/vtable3_" HPX_LIMIT_STR ".hpp")
+#endif
+
+#define BOOST_PP_ITERATION_PARAMS_1                                             \
+    (                                                                           \
+        4                                                                       \
+      , (                                                                       \
+            0                                                                   \
+          , HPX_FUNCTION_ARGUMENT_LIMIT                                         \
+          , <hpx/util/detail/vtable.hpp>                                        \
+          , 3                                                                   \
+        )                                                                       \
+    )                                                                           \
+/**/
+#include BOOST_PP_ITERATE()
+
+#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(output: null)
+#endif
+
+#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
+
+    };
+
+    template <>
+    struct unique_vtable<false>
+    {
+        template <typename Functor>
+        struct type_base
+        {
+            enum { empty = false };
+
+            static std::type_info const & get_type()
+            {
+                return typeid(Functor);
+            }
+
+            static Functor & construct(void ** f)
+            {
+                *f = new Functor;
+                return **reinterpret_cast<Functor **>(f);
+            }
+
+            static Functor & get(void **f)
+            {
+                return **reinterpret_cast<Functor **>(f);
+            }
+
+            static Functor const & get(void *const*f)
+            {
+                return **reinterpret_cast<Functor *const *>(f);
+            }
+
+            static void static_delete(void ** f)
+            {
+                delete (*reinterpret_cast<Functor **>(f));
+            }
+
+            static void destruct(void ** f)
+            {
+                (*reinterpret_cast<Functor**>(f))->~Functor();
+            }
+
+            static void clone(void *const* f, void ** dest) {}
+            static void copy(void *const* f, void ** dest) {}
+        };
+
+        template <typename Functor, typename Sig, typename IArchive, typename OArchive>
+        struct type;
+
+#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
+#  include <hpx/util/detail/preprocessed/vtable4.hpp>
+#else
+
+#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/vtable4_" HPX_LIMIT_STR ".hpp")
+#endif
+
+#define BOOST_PP_ITERATION_PARAMS_1                                             \
+    (                                                                           \
+        4                                                                       \
+      , (                                                                       \
+            0                                                                   \
+          , HPX_FUNCTION_ARGUMENT_LIMIT                                         \
+          , <hpx/util/detail/vtable.hpp>                                        \
+          , 4                                                                   \
+        )                                                                       \
+    )                                                                           \
+/**/
+#include BOOST_PP_ITERATE()
+
+#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(output: null)
+#endif
+
+#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
+    };
 }}}
 
 #endif
@@ -211,8 +361,7 @@ namespace hpx { namespace util { namespace detail
             Functor
           , R(BOOST_PP_ENUM_PARAMS(N, A))
           , IArchive, OArchive
-        >
-            : type_base<Functor>
+        > : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(BOOST_PP_ENUM_PARAMS(N, A))
@@ -223,7 +372,7 @@ namespace hpx { namespace util { namespace detail
                     get_table<
                         Functor
                       , R(BOOST_PP_ENUM_PARAMS(N, A))
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
             }
 
             BOOST_FORCEINLINE static R
@@ -235,9 +384,7 @@ namespace hpx { namespace util { namespace detail
             }
         };
 
-#endif
-
-#if BOOST_PP_ITERATION_FLAGS() == 2
+#elif BOOST_PP_ITERATION_FLAGS() == 2
 
         template <
             typename Functor
@@ -249,8 +396,7 @@ namespace hpx { namespace util { namespace detail
             Functor
           , R(BOOST_PP_ENUM_PARAMS(N, A))
           , IArchive, OArchive
-        >
-            : type_base<Functor>
+        > : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(BOOST_PP_ENUM_PARAMS(N, A))
@@ -261,7 +407,77 @@ namespace hpx { namespace util { namespace detail
                     get_table<
                         Functor
                       , R(BOOST_PP_ENUM_PARAMS(N, A))
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
+            }
+
+            BOOST_FORCEINLINE static R
+            invoke(void ** f
+                BOOST_PP_ENUM_TRAILING(N, BOOST_UTIL_DETAIL_VTABLE_ADD_RVALUE_REF, A))
+            {
+                return util::invoke_r<R>((**reinterpret_cast<Functor**>(f))
+                    BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, A, a));
+            }
+        };
+
+#elif BOOST_PP_ITERATION_FLAGS() == 3
+
+        template <
+            typename Functor
+          , typename R
+          BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
+          , typename IArchive, typename OArchive
+        >
+        struct type<
+            Functor
+          , R(BOOST_PP_ENUM_PARAMS(N, A))
+          , IArchive, OArchive
+        > : type_base<Functor>
+        {
+            static vtable_ptr_base<
+                R(BOOST_PP_ENUM_PARAMS(N, A))
+              , IArchive, OArchive
+            > *get_ptr()
+            {
+                return
+                    get_table<
+                        Functor
+                      , R(BOOST_PP_ENUM_PARAMS(N, A))
+                    >::template get<true, IArchive, OArchive>();
+            }
+
+            BOOST_FORCEINLINE static R
+            invoke(void ** f
+                BOOST_PP_ENUM_TRAILING(N, BOOST_UTIL_DETAIL_VTABLE_ADD_RVALUE_REF, A))
+            {
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
+                    BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, A, a));
+            }
+        };
+
+#elif BOOST_PP_ITERATION_FLAGS() == 4
+
+        template <
+            typename Functor
+          , typename R
+          BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
+          , typename IArchive, typename OArchive
+        >
+        struct type<
+            Functor
+          , R(BOOST_PP_ENUM_PARAMS(N, A))
+          , IArchive, OArchive
+        > : type_base<Functor>
+        {
+            static vtable_ptr_base<
+                R(BOOST_PP_ENUM_PARAMS(N, A))
+              , IArchive, OArchive
+            > *get_ptr()
+            {
+                return
+                    get_table<
+                        Functor
+                      , R(BOOST_PP_ENUM_PARAMS(N, A))
+                    >::template get<true, IArchive, OArchive>();
             }
 
             BOOST_FORCEINLINE static R

@@ -18,8 +18,7 @@
             Functor
           , R()
           , IArchive, OArchive
-        >
-            : type_base<Functor>
+        > : type_base<Functor>
         {
             static vtable_ptr_base<
                 R()
@@ -30,7 +29,7 @@
                     get_table<
                         Functor
                       , R()
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
@@ -50,8 +49,7 @@
             Functor
           , R(A0)
           , IArchive, OArchive
-        >
-            : type_base<Functor>
+        > : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0)
@@ -62,7 +60,7 @@
                     get_table<
                         Functor
                       , R(A0)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
@@ -82,8 +80,7 @@
             Functor
           , R(A0 , A1)
           , IArchive, OArchive
-        >
-            : type_base<Functor>
+        > : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1)
@@ -94,7 +91,7 @@
                     get_table<
                         Functor
                       , R(A0 , A1)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
@@ -114,8 +111,7 @@
             Functor
           , R(A0 , A1 , A2)
           , IArchive, OArchive
-        >
-            : type_base<Functor>
+        > : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2)
@@ -126,7 +122,7 @@
                     get_table<
                         Functor
                       , R(A0 , A1 , A2)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
@@ -146,8 +142,7 @@
             Functor
           , R(A0 , A1 , A2 , A3)
           , IArchive, OArchive
-        >
-            : type_base<Functor>
+        > : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3)
@@ -158,7 +153,7 @@
                     get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
@@ -178,8 +173,7 @@
             Functor
           , R(A0 , A1 , A2 , A3 , A4)
           , IArchive, OArchive
-        >
-            : type_base<Functor>
+        > : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4)
@@ -190,7 +184,7 @@
                     get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
@@ -210,8 +204,7 @@
             Functor
           , R(A0 , A1 , A2 , A3 , A4 , A5)
           , IArchive, OArchive
-        >
-            : type_base<Functor>
+        > : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5)
@@ -222,7 +215,7 @@
                     get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
@@ -242,8 +235,7 @@
             Functor
           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
           , IArchive, OArchive
-        >
-            : type_base<Functor>
+        > : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
@@ -254,7 +246,7 @@
                     get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
@@ -274,8 +266,7 @@
             Functor
           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
           , IArchive, OArchive
-        >
-            : type_base<Functor>
+        > : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
@@ -286,7 +277,7 @@
                     get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
@@ -306,8 +297,7 @@
             Functor
           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
           , IArchive, OArchive
-        >
-            : type_base<Functor>
+        > : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
@@ -318,7 +308,7 @@
                     get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
@@ -338,8 +328,7 @@
             Functor
           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
           , IArchive, OArchive
-        >
-            : type_base<Functor>
+        > : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
@@ -350,7 +339,7 @@
                     get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
@@ -370,8 +359,7 @@
             Functor
           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
           , IArchive, OArchive
-        >
-            : type_base<Functor>
+        > : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
@@ -382,7 +370,7 @@
                     get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
@@ -402,8 +390,7 @@
             Functor
           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
           , IArchive, OArchive
-        >
-            : type_base<Functor>
+        > : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
@@ -414,7 +401,7 @@
                     get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
@@ -434,8 +421,7 @@
             Functor
           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
           , IArchive, OArchive
-        >
-            : type_base<Functor>
+        > : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
@@ -446,7 +432,7 @@
                     get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<false, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f

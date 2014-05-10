@@ -7,11 +7,12 @@
 #define HPX_UTIL_DETAIL_RESET_FUNCTION_OCT_22_2013_0854AM
 
 #include <hpx/config/function.hpp>
+#include <hpx/util/detail/function_template.hpp>
+#include <hpx/util/detail/unique_function.hpp>
 #include <utility>
 
 namespace hpx { namespace util { namespace detail
 {
-#if defined(HPX_UTIL_FUNCTION)
     template <typename Sig, typename IArchive, typename OArchive>
     inline void reset_function(hpx::util::function<Sig, IArchive, OArchive>& f)
     {
@@ -23,6 +24,14 @@ namespace hpx { namespace util { namespace detail
     {
         f.reset();
     }
+    
+    template <typename Sig, typename IArchive, typename OArchive>
+    inline void reset_function(hpx::util::detail::unique_function<Sig, IArchive, OArchive>& f)
+    {
+        f.reset();
+    }
+    
+#if defined(HPX_UTIL_FUNCTION)
 #elif !defined(HPX_HAVE_CXX11_STD_FUNCTION)
     template <typename Sig>
     inline void reset_function(boost::function<Sig>& f)

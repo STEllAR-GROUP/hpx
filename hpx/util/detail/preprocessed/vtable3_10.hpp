@@ -29,13 +29,13 @@
                     get_table<
                         Functor
                       , R()
-                    >::template get<false, IArchive, OArchive>();
+                    >::template get<true, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
                 )
             {
-                return util::invoke_r<R>((**reinterpret_cast<Functor**>(f))
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                      );
             }
         };
@@ -60,13 +60,13 @@
                     get_table<
                         Functor
                       , R(A0)
-                    >::template get<false, IArchive, OArchive>();
+                    >::template get<true, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
                 , A0 && a0)
             {
-                return util::invoke_r<R>((**reinterpret_cast<Functor**>(f))
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , std::forward<A0>( a0 ));
             }
         };
@@ -91,13 +91,13 @@
                     get_table<
                         Functor
                       , R(A0 , A1)
-                    >::template get<false, IArchive, OArchive>();
+                    >::template get<true, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
                 , A0 && a0 , A1 && a1)
             {
-                return util::invoke_r<R>((**reinterpret_cast<Functor**>(f))
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ));
             }
         };
@@ -122,13 +122,13 @@
                     get_table<
                         Functor
                       , R(A0 , A1 , A2)
-                    >::template get<false, IArchive, OArchive>();
+                    >::template get<true, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
                 , A0 && a0 , A1 && a1 , A2 && a2)
             {
-                return util::invoke_r<R>((**reinterpret_cast<Functor**>(f))
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ));
             }
         };
@@ -153,13 +153,13 @@
                     get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3)
-                    >::template get<false, IArchive, OArchive>();
+                    >::template get<true, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
                 , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3)
             {
-                return util::invoke_r<R>((**reinterpret_cast<Functor**>(f))
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ));
             }
         };
@@ -184,13 +184,13 @@
                     get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4)
-                    >::template get<false, IArchive, OArchive>();
+                    >::template get<true, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
                 , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4)
             {
-                return util::invoke_r<R>((**reinterpret_cast<Functor**>(f))
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ));
             }
         };
@@ -215,13 +215,13 @@
                     get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5)
-                    >::template get<false, IArchive, OArchive>();
+                    >::template get<true, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
                 , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5)
             {
-                return util::invoke_r<R>((**reinterpret_cast<Functor**>(f))
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ));
             }
         };
@@ -246,13 +246,13 @@
                     get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
-                    >::template get<false, IArchive, OArchive>();
+                    >::template get<true, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
                 , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6)
             {
-                return util::invoke_r<R>((**reinterpret_cast<Functor**>(f))
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ));
             }
         };
@@ -277,13 +277,13 @@
                     get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
-                    >::template get<false, IArchive, OArchive>();
+                    >::template get<true, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
                 , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7)
             {
-                return util::invoke_r<R>((**reinterpret_cast<Functor**>(f))
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ));
             }
         };
@@ -308,13 +308,13 @@
                     get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
-                    >::template get<false, IArchive, OArchive>();
+                    >::template get<true, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
                 , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8)
             {
-                return util::invoke_r<R>((**reinterpret_cast<Functor**>(f))
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 ));
             }
         };
@@ -339,13 +339,13 @@
                     get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
-                    >::template get<false, IArchive, OArchive>();
+                    >::template get<true, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
                 , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9)
             {
-                return util::invoke_r<R>((**reinterpret_cast<Functor**>(f))
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 ) , std::forward<A9>( a9 ));
             }
         };
@@ -370,13 +370,13 @@
                     get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
-                    >::template get<false, IArchive, OArchive>();
+                    >::template get<true, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
                 , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10)
             {
-                return util::invoke_r<R>((**reinterpret_cast<Functor**>(f))
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 ) , std::forward<A9>( a9 ) , std::forward<A10>( a10 ));
             }
         };
@@ -401,13 +401,13 @@
                     get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
-                    >::template get<false, IArchive, OArchive>();
+                    >::template get<true, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
                 , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11)
             {
-                return util::invoke_r<R>((**reinterpret_cast<Functor**>(f))
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 ) , std::forward<A9>( a9 ) , std::forward<A10>( a10 ) , std::forward<A11>( a11 ));
             }
         };
@@ -432,13 +432,13 @@
                     get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
-                    >::template get<false, IArchive, OArchive>();
+                    >::template get<true, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
                 , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11 , A12 && a12)
             {
-                return util::invoke_r<R>((**reinterpret_cast<Functor**>(f))
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 ) , std::forward<A9>( a9 ) , std::forward<A10>( a10 ) , std::forward<A11>( a11 ) , std::forward<A12>( a12 ));
             }
         };
