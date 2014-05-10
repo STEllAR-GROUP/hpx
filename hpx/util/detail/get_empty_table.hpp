@@ -54,8 +54,8 @@ namespace hpx { namespace util { namespace detail
 
 #define N BOOST_PP_ITERATION()
 
-namespace hpx { namespace util { namespace detail {
-
+namespace hpx { namespace util { namespace detail
+{
     template <
         typename R
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
@@ -75,16 +75,14 @@ namespace hpx { namespace util { namespace detail {
             typedef
                 empty_vtable<
                         R(BOOST_PP_ENUM_PARAMS(N, A))
-                      , IArchive
-                      , OArchive
+                      , IArchive, OArchive
                     >
                 vtable_type;
 
             typedef
                 vtable_ptr<
                     R(BOOST_PP_ENUM_PARAMS(N, A))
-                  , IArchive
-                  , OArchive
+                  , IArchive, OArchive
                   , vtable_type
                 >
                 vtable_ptr_type;

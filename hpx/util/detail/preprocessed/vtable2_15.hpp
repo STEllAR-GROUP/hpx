@@ -12,21 +12,18 @@
             typename Functor
           , typename R
           
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R()
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         >
             : type_base<Functor>
         {
             static vtable_ptr_base<
                 R()
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
@@ -47,21 +44,18 @@
             typename Functor
           , typename R
           , typename A0
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(A0)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         >
             : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0)
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
@@ -82,21 +76,18 @@
             typename Functor
           , typename R
           , typename A0 , typename A1
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(A0 , A1)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         >
             : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1)
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
@@ -117,21 +108,18 @@
             typename Functor
           , typename R
           , typename A0 , typename A1 , typename A2
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(A0 , A1 , A2)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         >
             : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2)
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
@@ -152,21 +140,18 @@
             typename Functor
           , typename R
           , typename A0 , typename A1 , typename A2 , typename A3
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(A0 , A1 , A2 , A3)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         >
             : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3)
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
@@ -187,21 +172,18 @@
             typename Functor
           , typename R
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(A0 , A1 , A2 , A3 , A4)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         >
             : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4)
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
@@ -222,21 +204,18 @@
             typename Functor
           , typename R
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(A0 , A1 , A2 , A3 , A4 , A5)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         >
             : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5)
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
@@ -257,21 +236,18 @@
             typename Functor
           , typename R
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         >
             : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
@@ -292,21 +268,18 @@
             typename Functor
           , typename R
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         >
             : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
@@ -327,21 +300,18 @@
             typename Functor
           , typename R
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         >
             : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
@@ -362,21 +332,18 @@
             typename Functor
           , typename R
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         >
             : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
@@ -397,21 +364,18 @@
             typename Functor
           , typename R
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         >
             : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
@@ -432,21 +396,18 @@
             typename Functor
           , typename R
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         >
             : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
@@ -467,21 +428,18 @@
             typename Functor
           , typename R
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         >
             : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
@@ -502,21 +460,18 @@
             typename Functor
           , typename R
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         >
             : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13)
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
@@ -537,21 +492,18 @@
             typename Functor
           , typename R
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         >
             : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14)
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
@@ -572,21 +524,18 @@
             typename Functor
           , typename R
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         >
             : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15)
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
@@ -607,21 +556,18 @@
             typename Functor
           , typename R
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         >
             : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16)
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
@@ -642,21 +588,18 @@
             typename Functor
           , typename R
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         >
             : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17)
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return

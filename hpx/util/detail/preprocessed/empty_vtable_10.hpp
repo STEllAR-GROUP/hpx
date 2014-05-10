@@ -13,21 +13,18 @@ namespace hpx { namespace util { namespace detail
     template <
         typename R
       
-      , typename IArchive
-      , typename OArchive
+      , typename IArchive, typename OArchive
     >
     struct empty_vtable<
         R()
-      , IArchive
-      , OArchive
+      , IArchive, OArchive
     >
         : empty_vtable_base
     {
         typedef R (*functor_type)();
         static vtable_ptr_base<
             R()
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         > *get_ptr() BOOST_NOEXCEPT
         {
             return
@@ -50,21 +47,18 @@ namespace hpx { namespace util { namespace detail
     template <
         typename R
       , typename A0
-      , typename IArchive
-      , typename OArchive
+      , typename IArchive, typename OArchive
     >
     struct empty_vtable<
         R(A0)
-      , IArchive
-      , OArchive
+      , IArchive, OArchive
     >
         : empty_vtable_base
     {
         typedef R (*functor_type)(A0);
         static vtable_ptr_base<
             R(A0)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         > *get_ptr() BOOST_NOEXCEPT
         {
             return
@@ -87,21 +81,18 @@ namespace hpx { namespace util { namespace detail
     template <
         typename R
       , typename A0 , typename A1
-      , typename IArchive
-      , typename OArchive
+      , typename IArchive, typename OArchive
     >
     struct empty_vtable<
         R(A0 , A1)
-      , IArchive
-      , OArchive
+      , IArchive, OArchive
     >
         : empty_vtable_base
     {
         typedef R (*functor_type)(A0 , A1);
         static vtable_ptr_base<
             R(A0 , A1)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         > *get_ptr() BOOST_NOEXCEPT
         {
             return
@@ -124,21 +115,18 @@ namespace hpx { namespace util { namespace detail
     template <
         typename R
       , typename A0 , typename A1 , typename A2
-      , typename IArchive
-      , typename OArchive
+      , typename IArchive, typename OArchive
     >
     struct empty_vtable<
         R(A0 , A1 , A2)
-      , IArchive
-      , OArchive
+      , IArchive, OArchive
     >
         : empty_vtable_base
     {
         typedef R (*functor_type)(A0 , A1 , A2);
         static vtable_ptr_base<
             R(A0 , A1 , A2)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         > *get_ptr() BOOST_NOEXCEPT
         {
             return
@@ -161,21 +149,18 @@ namespace hpx { namespace util { namespace detail
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3
-      , typename IArchive
-      , typename OArchive
+      , typename IArchive, typename OArchive
     >
     struct empty_vtable<
         R(A0 , A1 , A2 , A3)
-      , IArchive
-      , OArchive
+      , IArchive, OArchive
     >
         : empty_vtable_base
     {
         typedef R (*functor_type)(A0 , A1 , A2 , A3);
         static vtable_ptr_base<
             R(A0 , A1 , A2 , A3)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         > *get_ptr() BOOST_NOEXCEPT
         {
             return
@@ -198,21 +183,18 @@ namespace hpx { namespace util { namespace detail
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
-      , typename IArchive
-      , typename OArchive
+      , typename IArchive, typename OArchive
     >
     struct empty_vtable<
         R(A0 , A1 , A2 , A3 , A4)
-      , IArchive
-      , OArchive
+      , IArchive, OArchive
     >
         : empty_vtable_base
     {
         typedef R (*functor_type)(A0 , A1 , A2 , A3 , A4);
         static vtable_ptr_base<
             R(A0 , A1 , A2 , A3 , A4)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         > *get_ptr() BOOST_NOEXCEPT
         {
             return
@@ -235,21 +217,18 @@ namespace hpx { namespace util { namespace detail
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
-      , typename IArchive
-      , typename OArchive
+      , typename IArchive, typename OArchive
     >
     struct empty_vtable<
         R(A0 , A1 , A2 , A3 , A4 , A5)
-      , IArchive
-      , OArchive
+      , IArchive, OArchive
     >
         : empty_vtable_base
     {
         typedef R (*functor_type)(A0 , A1 , A2 , A3 , A4 , A5);
         static vtable_ptr_base<
             R(A0 , A1 , A2 , A3 , A4 , A5)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         > *get_ptr() BOOST_NOEXCEPT
         {
             return
@@ -272,21 +251,18 @@ namespace hpx { namespace util { namespace detail
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
-      , typename IArchive
-      , typename OArchive
+      , typename IArchive, typename OArchive
     >
     struct empty_vtable<
         R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
-      , IArchive
-      , OArchive
+      , IArchive, OArchive
     >
         : empty_vtable_base
     {
         typedef R (*functor_type)(A0 , A1 , A2 , A3 , A4 , A5 , A6);
         static vtable_ptr_base<
             R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         > *get_ptr() BOOST_NOEXCEPT
         {
             return
@@ -309,21 +285,18 @@ namespace hpx { namespace util { namespace detail
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
-      , typename IArchive
-      , typename OArchive
+      , typename IArchive, typename OArchive
     >
     struct empty_vtable<
         R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
-      , IArchive
-      , OArchive
+      , IArchive, OArchive
     >
         : empty_vtable_base
     {
         typedef R (*functor_type)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7);
         static vtable_ptr_base<
             R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         > *get_ptr() BOOST_NOEXCEPT
         {
             return
@@ -346,21 +319,18 @@ namespace hpx { namespace util { namespace detail
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
-      , typename IArchive
-      , typename OArchive
+      , typename IArchive, typename OArchive
     >
     struct empty_vtable<
         R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
-      , IArchive
-      , OArchive
+      , IArchive, OArchive
     >
         : empty_vtable_base
     {
         typedef R (*functor_type)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8);
         static vtable_ptr_base<
             R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         > *get_ptr() BOOST_NOEXCEPT
         {
             return
@@ -383,21 +353,18 @@ namespace hpx { namespace util { namespace detail
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
-      , typename IArchive
-      , typename OArchive
+      , typename IArchive, typename OArchive
     >
     struct empty_vtable<
         R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
-      , IArchive
-      , OArchive
+      , IArchive, OArchive
     >
         : empty_vtable_base
     {
         typedef R (*functor_type)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9);
         static vtable_ptr_base<
             R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         > *get_ptr() BOOST_NOEXCEPT
         {
             return
@@ -420,21 +387,18 @@ namespace hpx { namespace util { namespace detail
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10
-      , typename IArchive
-      , typename OArchive
+      , typename IArchive, typename OArchive
     >
     struct empty_vtable<
         R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
-      , IArchive
-      , OArchive
+      , IArchive, OArchive
     >
         : empty_vtable_base
     {
         typedef R (*functor_type)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10);
         static vtable_ptr_base<
             R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         > *get_ptr() BOOST_NOEXCEPT
         {
             return
@@ -457,21 +421,18 @@ namespace hpx { namespace util { namespace detail
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11
-      , typename IArchive
-      , typename OArchive
+      , typename IArchive, typename OArchive
     >
     struct empty_vtable<
         R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
-      , IArchive
-      , OArchive
+      , IArchive, OArchive
     >
         : empty_vtable_base
     {
         typedef R (*functor_type)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11);
         static vtable_ptr_base<
             R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         > *get_ptr() BOOST_NOEXCEPT
         {
             return
@@ -494,21 +455,18 @@ namespace hpx { namespace util { namespace detail
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12
-      , typename IArchive
-      , typename OArchive
+      , typename IArchive, typename OArchive
     >
     struct empty_vtable<
         R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
-      , IArchive
-      , OArchive
+      , IArchive, OArchive
     >
         : empty_vtable_base
     {
         typedef R (*functor_type)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12);
         static vtable_ptr_base<
             R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         > *get_ptr() BOOST_NOEXCEPT
         {
             return

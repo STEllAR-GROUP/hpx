@@ -42,9 +42,10 @@
 #include <hpx/util/coroutine/detail/coroutine_accessor.hpp>
 #include <hpx/util/coroutine/detail/context_base.hpp>
 #include <hpx/util/coroutine/detail/self.hpp>
+#include <hpx/util/decay.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/util/detail/reset_function.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 
 #include <cstddef>
@@ -447,7 +448,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     void reset()
     {
         this->reset_stack();
-        m_fun.clear();    // just reset the bound function
+        util::detail::reset_function(m_fun); // just reset the bound function
         target_ = naming::invalid_id;
         this->super_type::reset();
     }

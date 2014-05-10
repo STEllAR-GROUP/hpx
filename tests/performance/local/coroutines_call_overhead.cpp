@@ -138,8 +138,12 @@ struct kernel
     }
 
     bool operator!() const { return true; }
-    void clear() {}
 };
+
+namespace hpx { namespace util { namespace detail
+{
+    inline void reset_function(kernel& /*k*/) {}
+}}}
 
 double perform_2n_iterations()
 {
@@ -294,4 +298,3 @@ int main(
     // Initialize and run HPX.
     return hpx::init(cmdline, argc, argv);
 }
-

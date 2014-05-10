@@ -36,6 +36,7 @@
 #include <boost/scoped_ptr.hpp>
 
 #include <boost/utility/enable_if.hpp>
+#include <boost/type_traits/is_same.hpp>
 #include <boost/type_traits/is_pointer.hpp>
 #include <boost/type_traits/is_member_pointer.hpp>
 #include <boost/type_traits/remove_reference.hpp>
@@ -52,13 +53,6 @@ namespace hpx { namespace util
 {
     template <
         typename Sig
-      , typename IArchive = void
-      , typename OArchive = void
-    >
-    struct function_base;
-
-    template <
-        typename Sig
       , typename IArchive = portable_binary_iarchive
       , typename OArchive = portable_binary_oarchive
     >
@@ -71,6 +65,12 @@ namespace hpx { namespace util
 
     namespace detail
     {
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Sig
+          , typename IArchive = void, typename OArchive = void
+        >
+        struct function_base;
+
         ///////////////////////////////////////////////////////////////////////
         template <
             typename Functor
@@ -137,19 +137,11 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Sig
-      , typename IArchive
-      , typename OArchive
-    >
-    struct function : function_base<Sig, IArchive, OArchive>
+    template <typename Sig, typename IArchive, typename OArchive>
+    struct function : detail::function_base<Sig, IArchive, OArchive>
     {
-        typedef typename function_base<Sig, IArchive, OArchive>::result_type
-            result_type;
-
-        using function_base<Sig, IArchive, OArchive>::reset;
-
-        typedef function_base<Sig, IArchive, OArchive> base_type;
+        typedef detail::function_base<Sig, IArchive, OArchive> base_type;
+        typedef typename base_type::result_type result_type;
 
         function() BOOST_NOEXCEPT
           : base_type() {}
@@ -163,16 +155,15 @@ namespace hpx { namespace util
                   , typename util::decay<Functor>::type
                 >::type
             >::type * = 0
-        )
-            : base_type(std::forward<Functor>(f))
+        ) : base_type(std::forward<Functor>(f))
         {}
 
         function(function const & other)
-            : base_type(static_cast<base_type const &>(other))
+          : base_type(static_cast<base_type const &>(other))
         {}
 
         function(function && other) BOOST_NOEXCEPT
-            : base_type(std::move(static_cast<base_type &&>(other)))
+          : base_type(std::move(static_cast<base_type &&>(other)))
         {}
 
         function& operator=(function const & t)
@@ -186,8 +177,6 @@ namespace hpx { namespace util
             this->base_type::operator=(std::move(static_cast<base_type &&>(t)));
             return *this;
         }
-
-        void clear() BOOST_NOEXCEPT { reset(); }
 
     private:
         friend class boost::serialization::access;
@@ -241,17 +230,13 @@ namespace hpx { namespace util
         BOOST_SERIALIZATION_SPLIT_MEMBER()
     };
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Sig
-    >
-    struct function<Sig, void, void> : function_base<Sig, void, void>
+    template <typename Sig>
+    struct function<Sig, void, void>
+      : detail::function_base<Sig, void, void>
     {
-        typedef typename function_base<Sig, void, void>::result_type result_type;
+        typedef detail::function_base<Sig, void, void> base_type;
+        typedef typename base_type::result_type result_type;
 
-        using function_base<Sig, void, void>::reset;
-
-        typedef function_base<Sig, void, void> base_type;
         function() BOOST_NOEXCEPT
           : base_type() {}
 
@@ -264,16 +249,15 @@ namespace hpx { namespace util
                   , typename util::decay<Functor>::type
                 >::type
             >::type * = 0
-        )
-            : base_type(std::forward<Functor>(f))
+        ) : base_type(std::forward<Functor>(f))
         {}
 
         function(function const & other)
-            : base_type(static_cast<base_type const &>(other))
+          : base_type(static_cast<base_type const &>(other))
         {}
 
         function(function && other) BOOST_NOEXCEPT
-            : base_type(std::move(static_cast<base_type &&>(other)))
+          : base_type(std::move(static_cast<base_type &&>(other)))
         {}
 
         function& operator=(function const & t)
@@ -287,19 +271,15 @@ namespace hpx { namespace util
             this->base_type::operator=(std::move(static_cast<base_type &&>(t)));
             return *this;
         }
-
-        void clear() BOOST_NOEXCEPT { reset(); }
     };
 
-
-    template <
-        typename Sig
-    >
-    struct function_nonser : function_base<Sig, void, void>
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Sig>
+    struct function_nonser
+      : detail::function_base<Sig, void, void>
     {
-        using function_base<Sig, void, void>::reset;
-
-        typedef function_base<Sig, void, void> base_type;
+        typedef detail::function_base<Sig, void, void> base_type;
+        typedef typename base_type::result_type result_type;
 
         function_nonser() BOOST_NOEXCEPT
           : base_type() {}
@@ -313,16 +293,15 @@ namespace hpx { namespace util
                   , typename util::decay<Functor>::type
                 >::type
             >::type * = 0
-        )
-            : base_type(std::forward<Functor>(f))
+        ) : base_type(std::forward<Functor>(f))
         {}
 
         function_nonser(function_nonser const & other)
-            : base_type(static_cast<base_type const &>(other))
+          : base_type(static_cast<base_type const &>(other))
         {}
 
         function_nonser(function_nonser && other) BOOST_NOEXCEPT
-            : base_type(std::move(static_cast<base_type &&>(other)))
+          : base_type(std::move(static_cast<base_type &&>(other)))
         {}
 
         function_nonser& operator=(function_nonser const & t)
@@ -336,8 +315,6 @@ namespace hpx { namespace util
             this->base_type::operator=(std::move(static_cast<base_type &&>(t)));
             return *this;
         }
-
-        void clear() BOOST_NOEXCEPT { reset(); }
     };
 }}
 
@@ -373,23 +350,34 @@ namespace hpx { namespace util
 
 #define N BOOST_PP_ITERATION()
 
-namespace hpx { namespace util {
-
+namespace hpx { namespace util { namespace detail
+{
     template <
         typename R
       BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
-      , typename IArchive
-      , typename OArchive
+      , typename IArchive, typename OArchive
     >
     struct function_base<
         R(BOOST_PP_ENUM_PARAMS(N, A))
-      , IArchive
-      , OArchive
+      , IArchive, OArchive
     >
     {
+        typedef R result_type;
+
+        typedef
+            detail::vtable_ptr_virtbase<
+                IArchive, OArchive
+            > vtable_virtbase_type;
+
+        typedef
+            detail::vtable_ptr_base<
+                R(BOOST_PP_ENUM_PARAMS(N, A))
+              , IArchive, OArchive
+            > vtable_ptr_type;
+        
         function_base() BOOST_NOEXCEPT
-            : vptr(get_empty_table_ptr())
-            , object(0)
+          : vptr(get_empty_table_ptr())
+          , object(0)
         {}
 
         ~function_base()
@@ -400,21 +388,6 @@ namespace hpx { namespace util {
             }
         }
 
-        typedef R result_type;
-
-        typedef
-            detail::vtable_ptr_virtbase<
-                IArchive
-              , OArchive
-            > vtable_virtbase_type;
-
-        typedef
-            detail::vtable_ptr_base<
-                R(BOOST_PP_ENUM_PARAMS(N, A))
-              , IArchive
-              , OArchive
-            > vtable_ptr_type;
-
         template <typename Functor>
         explicit function_base(
             Functor && f
@@ -424,9 +397,8 @@ namespace hpx { namespace util {
                   , typename util::decay<Functor>::type
                 >::type
             >::type * /*dummy*/ = 0
-        )
-            : vptr(get_empty_table_ptr())
-            , object(0)
+        ) : vptr(get_empty_table_ptr())
+          , object(0)
         {
             if (!detail::is_empty_function(f))
             {
@@ -447,15 +419,15 @@ namespace hpx { namespace util {
         }
 
         function_base(function_base const & other)
-            : vptr(get_empty_table_ptr())
-            , object(0)
+          : vptr(get_empty_table_ptr())
+          , object(0)
         {
             assign(other);
         }
 
         function_base(function_base && other) BOOST_NOEXCEPT
-            : vptr(other.vptr)
-            , object(other.object)
+          : vptr(other.vptr)
+          , object(other.object)
         {
             other.vptr = get_empty_table_ptr();
             other.object = 0;
@@ -590,10 +562,7 @@ namespace hpx { namespace util {
         {
             return detail::get_empty_table<
                         R(BOOST_PP_ENUM_PARAMS(N, A))
-                    >::template get<
-                        IArchive
-                      , OArchive
-                    >();
+                    >::template get<IArchive, OArchive>();
         }
 
         template <typename Functor>
@@ -602,10 +571,7 @@ namespace hpx { namespace util {
             return detail::get_table<
                         Functor
                       , R(BOOST_PP_ENUM_PARAMS(N, A))
-                    >::template get<
-                        IArchive
-                      , OArchive
-                    >();
+                    >::template get<IArchive, OArchive>();
         }
 
         BOOST_FORCEINLINE R operator()(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)) const
@@ -657,8 +623,7 @@ namespace hpx { namespace util {
         vtable_ptr_type *vptr;
         mutable void *object;
     };
-}}
+}}}
 
 #undef N
 #endif
-

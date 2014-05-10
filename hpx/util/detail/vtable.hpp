@@ -21,8 +21,8 @@
 
 #include <typeinfo>
 
-namespace hpx { namespace util { namespace detail {
-
+namespace hpx { namespace util { namespace detail
+{
     template <>
     struct vtable<true>
     {
@@ -76,10 +76,6 @@ namespace hpx { namespace util { namespace detail {
 
         template <typename Functor, typename Sig, typename IArchive, typename OArchive>
         struct type;
-
-#       define BOOST_UTIL_DETAIL_VTABLE_ADD_RVALUE_REF(Z, N, D)                 \
-        BOOST_PP_CAT(D, N) && BOOST_PP_CAT(a, N)                                \
-        /**/
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/util/detail/preprocessed/vtable.hpp>
@@ -190,8 +186,6 @@ namespace hpx { namespace util { namespace detail {
 #endif
 
 #endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-
-#       undef BOOST_UTIL_DETAIL_VTABLE_ADD_RVALUE_REF
     };
 }}}
 
@@ -201,27 +195,28 @@ namespace hpx { namespace util { namespace detail {
 
 #define N BOOST_PP_ITERATION()
 
+#define BOOST_UTIL_DETAIL_VTABLE_ADD_RVALUE_REF(Z, N, D)                        \
+        BOOST_PP_CAT(D, N) && BOOST_PP_CAT(a, N)                                \
+        /**/
+
 #if BOOST_PP_ITERATION_FLAGS() == 1
 
         template <
             typename Functor
           , typename R
           BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(BOOST_PP_ENUM_PARAMS(N, A))
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         >
             : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(BOOST_PP_ENUM_PARAMS(N, A))
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
@@ -248,21 +243,18 @@ namespace hpx { namespace util { namespace detail {
             typename Functor
           , typename R
           BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(BOOST_PP_ENUM_PARAMS(N, A))
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         >
             : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(BOOST_PP_ENUM_PARAMS(N, A))
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
@@ -283,7 +275,7 @@ namespace hpx { namespace util { namespace detail {
 
 #endif
 
+#undef BOOST_UTIL_DETAIL_VTABLE_ADD_RVALUE_REF
 #undef N
 
 #endif
-

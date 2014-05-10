@@ -22,13 +22,10 @@
 #include <boost/mpl/int.hpp>
 #include <boost/mpl/assert.hpp>
 
-namespace hpx { namespace util { namespace detail {
-
+namespace hpx { namespace util { namespace detail
+{
     /////////////////////////////////////////////////////////////////////////////
-    template <
-        typename IArchive
-      , typename OArchive
-    >
+    template <typename IArchive, typename OArchive>
     struct vtable_ptr_virtbase
     {
         virtual ~vtable_ptr_virtbase() {}
@@ -39,6 +36,12 @@ namespace hpx { namespace util { namespace detail {
 
         virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
         virtual void load_object(void **, IArchive & ar, unsigned) = 0;
+    };
+
+    template <>
+    struct vtable_ptr_virtbase<void, void>
+    {
+        virtual bool empty() const = 0;
     };
 
     template <typename Function>
@@ -123,23 +126,15 @@ namespace hpx { namespace util { namespace detail {
 
 }}}
 
-namespace boost { namespace serialization {
-
-    template <
-        typename IArchive
-      , typename OArchive
-    >
+namespace boost { namespace serialization
+{
+    template <typename IArchive, typename OArchive>
     struct tracking_level<hpx::util::detail::vtable_ptr_virtbase<
         IArchive, OArchive
-    > >
-        : boost::mpl::int_<boost::serialization::track_never>
+    > > : boost::mpl::int_<boost::serialization::track_never>
     {};
 
 }}
-
-#define BOOST_UTIL_DETAIL_VTABLE_PTR_BASE_ADD_RVALUE_REF(Z, N, D)               \
-    BOOST_PP_CAT(D, N) &&                                                       \
-    /**/
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/util/detail/preprocessed/vtable_ptr_base.hpp>
@@ -167,53 +162,30 @@ namespace boost { namespace serialization {
 
 #endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
-#undef BOOST_UTIL_DETAIL_VTABLE_PTR_BASE_ADD_RVALUE_REF
-
 #endif
 
 #else
 
 #define N BOOST_PP_ITERATION()
 
-namespace hpx { namespace util { namespace detail {
+#define BOOST_UTIL_DETAIL_VTABLE_PTR_BASE_ADD_RVALUE_REF(Z, N, D)               \
+    BOOST_PP_CAT(D, N) &&                                                       \
+    /**/
 
+namespace hpx { namespace util { namespace detail
+{
     template <
         typename R
       BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
-      , typename IArchive
-      , typename OArchive
+      , typename IArchive, typename OArchive
     >
     struct vtable_ptr_base<
         R(BOOST_PP_ENUM_PARAMS(N, A))
-      , IArchive
-      , OArchive
+      , IArchive, OArchive
     >
         : vtable_ptr_virtbase<IArchive, OArchive>
     {
         virtual ~vtable_ptr_base() {}
-
-        std::type_info const& (*get_type)();
-        void (*static_delete)(void**);
-        void (*destruct)(void**);
-        void (*clone)(void * const*, void **);
-        void (*copy)(void * const*, void **);
-        R (*invoke)(void ** 
-            BOOST_PP_ENUM_TRAILING(N, BOOST_UTIL_DETAIL_VTABLE_PTR_BASE_ADD_RVALUE_REF, A));
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename R
-      BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
-    >
-    struct vtable_ptr_base<
-        R(BOOST_PP_ENUM_PARAMS(N, A))
-      , void
-      , void
-    >
-    {
-        virtual ~vtable_ptr_base() {}
-        virtual bool empty() const = 0;
 
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
@@ -230,16 +202,16 @@ namespace boost { namespace serialization {
     template <
         typename R
       BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
-      , typename IArchive
-      , typename OArchive
+      , typename IArchive, typename OArchive
     >
     struct tracking_level<hpx::util::detail::vtable_ptr_base<
         R(BOOST_PP_ENUM_PARAMS(N, A)), IArchive, OArchive
-    > >
-        : boost::mpl::int_<boost::serialization::track_never>
+    > > : boost::mpl::int_<boost::serialization::track_never>
     {};
 
 }}
 
+#undef BOOST_UTIL_DETAIL_VTABLE_PTR_BASE_ADD_RVALUE_REF
 #undef N
+
 #endif

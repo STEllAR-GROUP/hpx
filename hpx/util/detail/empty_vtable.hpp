@@ -68,10 +68,6 @@ namespace hpx { namespace util { namespace detail
     struct empty_vtable;
 }}}
 
-#define BOOST_UTIL_DETAIL_EMPTY_VTABLE_ADD_RVALUE_REF(Z, N, D)                  \
-    BOOST_PP_CAT(D, N) && /*BOOST_PP_CAT(a, N)*/                                \
-    /**/
-
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/util/detail/preprocessed/empty_vtable.hpp>
 #else
@@ -98,26 +94,26 @@ namespace hpx { namespace util { namespace detail
 
 #endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
-#undef BOOST_UTIL_DETAIL_EMPTY_VTABLE_ADD_RVALUE_REF
-
 #endif
 
 #else
 
 #define N BOOST_PP_ITERATION()
 
+#define BOOST_UTIL_DETAIL_EMPTY_VTABLE_ADD_RVALUE_REF(Z, N, D)                  \
+    BOOST_PP_CAT(D, N) && /*BOOST_PP_CAT(a, N)*/                                \
+    /**/
+
 namespace hpx { namespace util { namespace detail
 {
     template <
         typename R
       BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
-      , typename IArchive
-      , typename OArchive
+      , typename IArchive, typename OArchive
     >
     struct empty_vtable<
         R(BOOST_PP_ENUM_PARAMS(N, A))
-      , IArchive
-      , OArchive
+      , IArchive, OArchive
     >
         : empty_vtable_base
     {
@@ -125,8 +121,7 @@ namespace hpx { namespace util { namespace detail
 
         static vtable_ptr_base<
             R(BOOST_PP_ENUM_PARAMS(N, A))
-          , IArchive
-          , OArchive
+          , IArchive, OArchive
         > *get_ptr() BOOST_NOEXCEPT
         {
             return
@@ -146,7 +141,7 @@ namespace hpx { namespace util { namespace detail
     };
 }}}
 
+#undef BOOST_UTIL_DETAIL_EMPTY_VTABLE_ADD_RVALUE_REF
 #undef N
 
 #endif
-
