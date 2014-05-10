@@ -556,7 +556,7 @@ namespace hpx { namespace applier
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     HPX_API_EXPORT threads::thread_id_type register_thread_plain(
-        HPX_STD_FUNCTION<threads::thread_function_type> && func,
+        threads::thread_function_type && func,
         char const* description = 0,
         threads::thread_state_enum initial_state = threads::pending,
         bool run_now = true,
@@ -693,7 +693,7 @@ namespace hpx { namespace applier
     /// \throws invalid_status if the runtime system has not been started yet.
     ///
     HPX_API_EXPORT void register_work_plain(
-        HPX_STD_FUNCTION<threads::thread_function_type> && func,
+        threads::thread_function_type && func,
         char const* description = 0, naming::address::address_type lva = 0,
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
@@ -703,7 +703,7 @@ namespace hpx { namespace applier
 
 #if !defined(DOXYGEN)
     HPX_API_EXPORT void register_work_plain(
-        HPX_STD_FUNCTION<threads::thread_function_type> && func,
+        threads::thread_function_type && func,
         naming::id_type const& target, char const* description = 0,
         naming::address::address_type lva = 0,
         threads::thread_state_enum initial_state = threads::pending,

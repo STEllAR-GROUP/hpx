@@ -319,7 +319,7 @@ namespace hpx { namespace actions
         /// \note This \a get_thread_function will be invoked to retrieve the
         ///       thread function for an action which has to be invoked without
         ///       continuations.
-        virtual HPX_STD_FUNCTION<threads::thread_function_type>
+        virtual threads::thread_function_type
             get_thread_function(naming::address::address_type lva) = 0;
 
         /// The \a get_thread_function constructs a proper thread function for
@@ -337,7 +337,7 @@ namespace hpx { namespace actions
         /// \note This \a get_thread_function will be invoked to retrieve the
         ///       thread function for an action which has to be invoked with
         ///       continuations.
-        virtual HPX_STD_FUNCTION<threads::thread_function_type>
+        virtual threads::thread_function_type
             get_thread_function(continuation_type& cont,
                 naming::address::address_type lva) = 0;
 
@@ -580,7 +580,7 @@ namespace hpx { namespace actions
         /// \note This \a get_thread_function will be invoked to retrieve the
         ///       thread function for an action which has to be invoked without
         ///       continuations.
-        HPX_STD_FUNCTION<threads::thread_function_type>
+        threads::thread_function_type
         get_thread_function(naming::address::address_type lva)
         {
             return derived_type::construct_thread_function(lva,
@@ -602,7 +602,7 @@ namespace hpx { namespace actions
         /// \note This \a get_thread_function will be invoked to retrieve the
         ///       thread function for an action which has to be invoked with
         ///       continuations.
-        HPX_STD_FUNCTION<threads::thread_function_type>
+        threads::thread_function_type
         get_thread_function(continuation_type& cont,
             naming::address::address_type lva)
         {
@@ -919,7 +919,7 @@ namespace hpx { namespace actions
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Func, typename Arguments_>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         construct_continuation_thread_function_void(
             continuation_type cont, Func && func, Arguments_ && args)
         {
@@ -930,7 +930,7 @@ namespace hpx { namespace actions
         }
 
         template <typename Func, typename Arguments_>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         construct_continuation_thread_function(
             continuation_type cont, Func && func, Arguments_ && args)
         {

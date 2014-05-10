@@ -81,7 +81,7 @@ namespace hpx { namespace threads
             scheduler_base(scheduler_base_)
         {}
 
-        HPX_STD_FUNCTION<threads::thread_function_type> func;
+        threads::thread_function_type func;
 
 #if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
         naming::address::address_type lva;

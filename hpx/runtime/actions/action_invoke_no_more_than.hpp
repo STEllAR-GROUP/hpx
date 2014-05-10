@@ -72,7 +72,7 @@ namespace hpx { namespace actions { namespace detail
         // a semaphore into the call graph.
         static threads::thread_state_enum thread_function(
             threads::thread_state_ex_enum state,
-            HPX_STD_FUNCTION<threads::thread_function_type> f)
+            threads::thread_function_type f)
         {
             typedef typename construct_semaphore_type::semaphore_type
                 semaphore_type;
@@ -83,12 +83,12 @@ namespace hpx { namespace actions { namespace detail
         }
 
         template <typename F>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         call(naming::address::address_type lva, F && f, boost::mpl::false_)
         {
             typedef typename Action::component_type component_type;
             return util::bind(
-                &action_decorate_function::thread_function,
+                util::one_shot(&action_decorate_function::thread_function),
                 util::placeholders::_1,
                 component_type::decorate_action(lva, std::forward<F>(f))
             );
@@ -99,19 +99,19 @@ namespace hpx { namespace actions { namespace detail
         // the traits::action_schedule_thread<> below).
         static threads::thread_state_enum thread_function_future(
             threads::thread_state_ex_enum state,
-            HPX_STD_FUNCTION<threads::thread_function_type> f)
+            threads::thread_function_type f)
         {
             construct_semaphore_type::get_sem().wait();
             return f(state);
         }
 
         template <typename F>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         call(naming::address::address_type lva, F && f, boost::mpl::true_)
         {
             typedef typename Action::component_type component_type;
             return util::bind(
-                &action_decorate_function::thread_function_future,
+                util::one_shot(&action_decorate_function::thread_function_future),
                 util::placeholders::_1,
                 component_type::decorate_action(lva, std::forward<F>(f))
             );
@@ -119,7 +119,7 @@ namespace hpx { namespace actions { namespace detail
 
         ///////////////////////////////////////////////////////////////////////
         template <typename F>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         call(naming::address::address_type lva, F&& f)
         {
             typedef typename Action::result_type result_type;

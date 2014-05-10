@@ -140,11 +140,6 @@ struct kernel
     bool operator!() const { return true; }
 };
 
-namespace hpx { namespace util { namespace detail
-{
-    inline void reset_function(kernel& /*k*/) {}
-}}}
-
 double perform_2n_iterations()
 {
     std::vector<coroutine_type*> coroutines;

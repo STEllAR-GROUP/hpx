@@ -72,11 +72,12 @@ namespace hpx { namespace components
         /// sure that the object becomes pinned during the execution of an
         /// action.
         template <typename F>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         decorate_action(naming::address::address_type lva, F && f)
         {
             using util::placeholders::_1;
-            return util::bind(&migration_support::thread_function,
+            return util::bind(
+                util::one_shot(&migration_support::thread_function),
                 get_lva<this_component_type>::call(lva),
                 _1, base_type::decorate_action(lva, std::forward<F>(f)));
         }
@@ -101,7 +102,7 @@ namespace hpx { namespace components
         // no migration will happen while an operation is in flight.
         threads::thread_state_enum thread_function(
             threads::thread_state_ex_enum state,
-            HPX_STD_FUNCTION<threads::thread_function_type> const& f)
+            threads::thread_function_type f)
         {
             scoped_pinner sp(*this);
             return f(state);

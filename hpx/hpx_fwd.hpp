@@ -41,6 +41,7 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/detail/unique_function.hpp>
 #include <hpx/util/coroutine/detail/default_context_impl.hpp>
 #include <hpx/util/coroutine/detail/coroutine_impl.hpp>
 #include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
@@ -334,7 +335,8 @@ namespace hpx
 
         typedef threads::detail::tagged_thread_state<thread_state_ex_enum> thread_state_ex;
 
-        typedef thread_state_enum thread_function_type(thread_state_ex_enum);
+        typedef thread_state_enum thread_function_sig(thread_state_ex_enum);
+        typedef util::detail::unique_function<thread_function_sig> thread_function_type;
 
         /// \enum thread_stacksize
         enum thread_stacksize
@@ -358,7 +360,7 @@ namespace hpx
         }
         /// \ endcond
         typedef util::coroutines::coroutine<
-            thread_function_type, detail::coroutine_allocator> coroutine_type;
+            thread_function_sig, detail::coroutine_allocator> coroutine_type;
 
         typedef util::coroutines::detail::coroutine_self<coroutine_type>
             thread_self;

@@ -85,7 +85,7 @@ namespace hpx { namespace actions
         /// instantiate the \a base_result_action0 type. This is used by the \a
         /// applier in case no continuation has been supplied.
         template <typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         construct_thread_function(naming::address::address_type lva,
             Arguments && /*args*/)
         {
@@ -101,7 +101,7 @@ namespace hpx { namespace actions
         /// instantiate the \a base_result_action0 type. This is used by the \a
         /// applier in case a continuation has been supplied
         template <typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
@@ -275,7 +275,7 @@ namespace hpx { namespace actions
         /// instantiate the base_action0 type. This is used by the \a applier in
         /// case no continuation has been supplied.
         template <typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         construct_thread_function(naming::address::address_type lva,
             Arguments && /*args*/)
         {
@@ -291,7 +291,7 @@ namespace hpx { namespace actions
         /// instantiate the base_action0 type. This is used by the \a applier in
         /// case a continuation has been supplied
         template <typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {

@@ -24,11 +24,10 @@ struct plain_data
     /// This is the default hook implementation for decorate_action which
     /// does no hooking at all.
     template <typename F>
-    static HPX_STD_FUNCTION<hpx::threads::thread_function_type>
+    static hpx::threads::thread_function_type
     decorate_action(hpx::naming::address::address_type, F && f)
     {
-        return HPX_STD_FUNCTION<hpx::threads::thread_function_type>(
-            std::forward<F>(f));
+        return std::forward<F>(f);
     }
 
     /// This is the default hook implementation for schedule_thread which
@@ -97,7 +96,7 @@ public:
     ///
     /// This is used by in case no continuation has been supplied.
     template <typename Arguments>
-    static HPX_STD_FUNCTION<hpx::threads::thread_function_type>
+    static hpx::threads::thread_function_type
     construct_thread_function(hpx::naming::address::address_type lva,
         Arguments && /*args*/)
     {
@@ -110,7 +109,7 @@ public:
     ///
     /// This is used in case a continuation has been supplied
     template <typename Arguments>
-    static HPX_STD_FUNCTION<hpx::threads::thread_function_type>
+    static hpx::threads::thread_function_type
     construct_thread_function(hpx::actions::continuation_type& cont,
         hpx::naming::address::address_type lva, Arguments && args)
     {
@@ -180,7 +179,7 @@ public:
     ///
     /// This is used by in case no continuation has been supplied.
     template <typename Arguments>
-    static HPX_STD_FUNCTION<hpx::threads::thread_function_type>
+    static hpx::threads::thread_function_type
     construct_thread_function(hpx::naming::address::address_type lva,
         Arguments && args)
     {
@@ -195,7 +194,7 @@ public:
     ///
     /// This is used in case a continuation has been supplied
     template <typename Arguments>
-    static HPX_STD_FUNCTION<hpx::threads::thread_function_type>
+    static hpx::threads::thread_function_type
     construct_thread_function(hpx::actions::continuation_type& cont,
         hpx::naming::address::address_type lva, Arguments && args)
     {

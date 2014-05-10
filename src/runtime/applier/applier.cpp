@@ -126,7 +126,7 @@ namespace hpx { namespace applier
     }
 
     threads::thread_id_type register_thread_plain(
-        HPX_STD_FUNCTION<threads::thread_function_type> && func,
+        threads::thread_function_type && func,
         char const* desc, threads::thread_state_enum state, bool run_now,
         threads::thread_priority priority, std::size_t os_thread,
         threads::thread_stacksize stacksize, error_code& ec)
@@ -232,7 +232,7 @@ namespace hpx { namespace applier
     }
 
     void register_work_plain(
-        HPX_STD_FUNCTION<threads::thread_function_type> && func,
+        threads::thread_function_type && func,
         char const* desc, naming::address::address_type lva,
         threads::thread_state_enum state, threads::thread_priority priority,
         std::size_t os_thread, threads::thread_stacksize stacksize,
@@ -254,7 +254,7 @@ namespace hpx { namespace applier
     }
 
     void register_work_plain(
-        HPX_STD_FUNCTION<threads::thread_function_type> && func,
+        threads::thread_function_type && func,
         naming::id_type const& target,
         char const* desc, naming::address::address_type lva,
         threads::thread_state_enum state, threads::thread_priority priority,

@@ -233,8 +233,7 @@ namespace hpx { namespace util
     };
 
     template <typename Sig>
-    struct function<Sig, void, void>
-      : detail::function_base<Sig, void, void>
+    struct function<Sig, void, void> : detail::function_base<Sig, void, void>
     {
         typedef detail::function_base<Sig, void, void> base_type;
         typedef typename base_type::result_type result_type;
@@ -277,8 +276,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Sig>
-    struct function_nonser
-      : detail::function_base<Sig, void, void>
+    struct function_nonser : detail::function_base<Sig, void, void>
     {
         typedef detail::function_base<Sig, void, void> base_type;
         typedef typename base_type::result_type result_type;
