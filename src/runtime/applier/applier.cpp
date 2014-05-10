@@ -28,7 +28,7 @@ namespace hpx { namespace applier
 {
     ///////////////////////////////////////////////////////////////////////////
     static inline threads::thread_state_enum thread_function(
-        HPX_STD_FUNCTION<void(threads::thread_state_ex_enum)> const& func)
+        util::detail::unique_function<void(threads::thread_state_ex_enum)> func)
     {
         // execute the actual thread function
         func(threads::wait_signaled);
@@ -42,7 +42,7 @@ namespace hpx { namespace applier
     }
 
     static inline threads::thread_state_enum thread_function_nullary(
-        HPX_STD_FUNCTION<void()> const& func)
+        util::detail::unique_function<void()> func)
     {
         // execute the actual thread function
         func();
@@ -57,7 +57,7 @@ namespace hpx { namespace applier
 
     ///////////////////////////////////////////////////////////////////////////
     threads::thread_id_type register_thread_nullary(
-        HPX_STD_FUNCTION<void()> && func, char const* desc,
+        util::detail::unique_function<void()> && func, char const* desc,
         threads::thread_state_enum state, bool run_now,
         threads::thread_priority priority, std::size_t os_thread,
         threads::thread_stacksize stacksize, error_code& ec)
@@ -72,7 +72,7 @@ namespace hpx { namespace applier
         }
 
         threads::thread_init_data data(
-            HPX_STD_BIND(&thread_function_nullary, std::move(func)),
+            util::bind(util::one_shot(&thread_function_nullary), std::move(func)),
             desc ? desc : "<unknown>", 0, priority, os_thread,
             threads::get_stack_size(stacksize));
         return app->get_thread_manager().
@@ -80,7 +80,7 @@ namespace hpx { namespace applier
     }
 
     threads::thread_id_type register_thread(
-        HPX_STD_FUNCTION<void(threads::thread_state_ex_enum)> && func,
+        util::detail::unique_function<void(threads::thread_state_ex_enum)> && func,
         char const* desc, threads::thread_state_enum state, bool run_now,
         threads::thread_priority priority, std::size_t os_thread,
         threads::thread_stacksize stacksize, error_code& ec)
@@ -95,7 +95,7 @@ namespace hpx { namespace applier
         }
 
         threads::thread_init_data data(
-            HPX_STD_BIND(&thread_function, std::move(func)),
+            util::bind(util::one_shot(&thread_function), std::move(func)),
             desc ? desc : "<unknown>", 0, priority, os_thread,
             threads::get_stack_size(stacksize));
         return app->get_thread_manager().
@@ -103,7 +103,7 @@ namespace hpx { namespace applier
     }
 
     threads::thread_id_type register_non_suspendable_thread(
-        HPX_STD_FUNCTION<void(threads::thread_state_ex_enum)> && func,
+        util::detail::unique_function<void(threads::thread_state_ex_enum)> && func,
         char const* desc, threads::thread_state_enum state, bool run_now,
         threads::thread_priority priority, std::size_t os_thread,
         error_code& ec)
@@ -118,7 +118,7 @@ namespace hpx { namespace applier
         }
 
         threads::thread_init_data data(
-            HPX_STD_BIND(&thread_function, std::move(func)),
+            util::bind(util::one_shot(&thread_function), std::move(func)),
             desc ? desc : "<unknown>", 0, priority, os_thread,
             threads::get_stack_size(threads::thread_stacksize_nostack));
         return app->get_thread_manager().
@@ -166,7 +166,7 @@ namespace hpx { namespace applier
 
     ///////////////////////////////////////////////////////////////////////////
     void register_work_nullary(
-        HPX_STD_FUNCTION<void()> && func, char const* desc,
+        util::detail::unique_function<void()> && func, char const* desc,
         threads::thread_state_enum state, threads::thread_priority priority,
         std::size_t os_thread, threads::thread_stacksize stacksize,
         error_code& ec)
@@ -181,14 +181,14 @@ namespace hpx { namespace applier
         }
 
         threads::thread_init_data data(
-            HPX_STD_BIND(&thread_function_nullary, std::move(func)),
+            util::bind(util::one_shot(&thread_function_nullary), std::move(func)),
             desc ? desc : "<unknown>", 0, priority, os_thread,
             threads::get_stack_size(stacksize));
         app->get_thread_manager().register_work(data, state, ec);
     }
 
     void register_work(
-        HPX_STD_FUNCTION<void(threads::thread_state_ex_enum)> && func,
+        util::detail::unique_function<void(threads::thread_state_ex_enum)> && func,
         char const* desc, threads::thread_state_enum state,
         threads::thread_priority priority, std::size_t os_thread,
         threads::thread_stacksize stacksize, error_code& ec)
@@ -203,14 +203,14 @@ namespace hpx { namespace applier
         }
 
         threads::thread_init_data data(
-            HPX_STD_BIND(&thread_function, std::move(func)),
+            util::bind(util::one_shot(&thread_function), std::move(func)),
             desc ? desc : "<unknown>", 0, priority, os_thread,
             threads::get_stack_size(stacksize));
         app->get_thread_manager().register_work(data, state, ec);
     }
 
     void register_non_suspendable_work(
-        HPX_STD_FUNCTION<void(threads::thread_state_ex_enum)> && func,
+        util::detail::unique_function<void(threads::thread_state_ex_enum)> && func,
         char const* desc, threads::thread_state_enum state,
         threads::thread_priority priority, std::size_t os_thread,
         error_code& ec)
@@ -225,7 +225,7 @@ namespace hpx { namespace applier
         }
 
         threads::thread_init_data data(
-            HPX_STD_BIND(&thread_function, std::move(func)),
+            util::bind(util::one_shot(&thread_function), std::move(func)),
             desc ? desc : "<unknown>", 0, priority, os_thread,
             threads::get_stack_size(threads::thread_stacksize_nostack));
         app->get_thread_manager().register_work(data, state, ec);

@@ -44,7 +44,9 @@ struct hello_world_server
 #endif
 
         hpx::get_lva<hello_world_server>::call(lva)->sched_.add(
-            hpx::util::bind(&hello_world_server::func, std::move(data.func)),
+            hpx::util::bind(
+                hpx::util::one_shot(&hello_world_server::func),
+                std::move(data.func)),
             desc, initial_state);
     }
 
