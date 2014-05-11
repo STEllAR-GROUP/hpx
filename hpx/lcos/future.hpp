@@ -63,10 +63,25 @@ namespace hpx { namespace lcos { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Archive, typename Future>
-    void serialize_future_load(Archive& ar, Future& f);
+    typename boost::disable_if<
+        boost::is_void<typename traits::future_traits<Future>::type>
+    >::type serialize_future_load(Archive& ar, Future& f);
 
     template <typename Archive, typename Future>
-    void serialize_future_save(Archive& ar, Future& f);
+    typename boost::enable_if<
+        boost::is_void<typename traits::future_traits<Future>::type>
+    >::type serialize_future_load(Archive& ar, Future& f);
+
+    template <typename Archive, typename Future>
+    typename boost::disable_if<
+        boost::is_void<typename traits::future_traits<Future>::type>
+    >::type serialize_future_save(Archive& ar, Future const& f);
+
+    template <typename Archive, typename Future>
+    typename boost::enable_if<
+        boost::is_void<typename traits::future_traits<Future>::type>
+    >::type serialize_future_save(Archive& ar, Future const& f);
+
 }}}
 
 namespace hpx { namespace traits
@@ -113,7 +128,7 @@ namespace hpx { namespace traits
         }
 
         template <typename Archive>
-        static void save(Archive& ar, future<R>& f)
+        static void save(Archive& ar, future<R> const& f)
         {
             lcos::detail::serialize_future_save(ar, f);
         }
@@ -185,7 +200,9 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     template <typename Archive, typename Future>
-    void serialize_future_load(Archive& ar, Future& f)
+    typename boost::disable_if<
+        boost::is_void<typename traits::future_traits<Future>::type>
+    >::type serialize_future_load(Archive& ar, Future& f)
     {
         typedef typename traits::future_traits<Future>::type value_type;
         typedef lcos::detail::future_data<value_type> shared_state;
@@ -217,7 +234,39 @@ namespace hpx { namespace lcos { namespace detail
     }
 
     template <typename Archive, typename Future>
-    void serialize_future_save(Archive& ar, Future& f)
+    typename boost::enable_if<
+        boost::is_void<typename traits::future_traits<Future>::type>
+    >::type serialize_future_load(Archive& ar, Future& f)
+    {
+        typedef lcos::detail::future_data<void> shared_state;
+
+        int state = future_state::invalid;
+        ar >> state;
+        if (state == future_state::has_value)
+        {
+            boost::intrusive_ptr<shared_state> p(new shared_state());
+            p->set_result(util::unused);
+
+            f = traits::future_access<Future>::create(std::move(p));
+        } else if (state == future_state::has_exception) {
+            boost::exception_ptr exception;
+            ar >> exception;
+
+            boost::intrusive_ptr<shared_state> p(new shared_state());
+            p->set_exception(exception);
+
+            f = traits::future_access<Future>::create(std::move(p));
+        } else if (state == future_state::invalid) {
+            f = Future();
+        } else {
+            HPX_ASSERT(false);
+        }
+    }
+
+    template <typename Archive, typename Future>
+    typename boost::disable_if<
+        boost::is_void<typename traits::future_traits<Future>::type>
+    >::type serialize_future_save(Archive& ar, Future const& f)
     {
         typedef typename traits::future_traits<Future>::type value_type;
 
@@ -227,8 +276,29 @@ namespace hpx { namespace lcos { namespace detail
         if (f.has_value())
         {
             state = future_state::has_value;
-            value_type value = f.get();
+            value_type value = const_cast<Future&>(f).get();
             ar << state << value;
+        } else if (f.has_exception()) {
+            state = future_state::has_exception;
+            boost::exception_ptr exception = f.get_exception_ptr();
+            ar << state << exception;
+        } else {
+            state = future_state::invalid;
+            ar << state;
+        }
+    }
+
+    template <typename Archive, typename Future>
+    typename boost::enable_if<
+        boost::is_void<typename traits::future_traits<Future>::type>
+    >::type serialize_future_save(Archive& ar, Future const& f)
+    {
+        HPX_ASSERT(!f.valid() || f.is_ready());
+
+        int state = future_state::invalid;
+        if (f.has_value())
+        {
+            state = future_state::has_value;
         } else if (f.has_exception()) {
             state = future_state::has_exception;
             boost::exception_ptr exception = f.get_exception_ptr();
