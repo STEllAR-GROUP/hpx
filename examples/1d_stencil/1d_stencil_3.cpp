@@ -84,6 +84,8 @@ struct stepper
 
         next[0] = heat(left[size-1], middle[0], middle[1]);
 
+// Uncomment the following line to use OpenMP
+// #pragma omp parallel for
         for (std::size_t i = 1; i != size-1; ++i)
             next[i] = heat(middle[i-1], middle[i], middle[i+1]);
 
