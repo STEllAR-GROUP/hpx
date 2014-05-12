@@ -31,7 +31,7 @@ namespace hpx { namespace threads { namespace executors
             // Schedule the specified function for execution in this executor.
             // Depending on the subclass implementation, this may block in some
             // situations.
-            void add(HPX_STD_FUNCTION<void()> && f, char const* description,
+            void add(closure_type && f, char const* description,
                 threads::thread_state_enum initial_state, bool run_now,
                 threads::thread_stacksize stacksize, error_code& ec);
 
@@ -40,7 +40,7 @@ namespace hpx { namespace threads { namespace executors
 
         protected:
             static threads::thread_state_enum thread_function_nullary(
-                HPX_STD_FUNCTION<void()> const& func);
+                closure_type func);
 
         private:
             policies::scheduler_base* scheduler_base_;

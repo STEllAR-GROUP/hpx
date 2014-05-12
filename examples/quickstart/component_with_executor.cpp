@@ -11,7 +11,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define a base component which exposes the required interface
-struct hello_world_server 
+struct hello_world_server
   : hpx::components::managed_component_base<hello_world_server>
 {
     hello_world_server()
@@ -27,8 +27,7 @@ struct hello_world_server
 
     ///////////////////////////////////////////////////////////////////////////
     // wrap given function into a nullary function as expected by the executor
-    static void func(hpx::util::function_nonser<
-        hpx::threads::thread_function_type> const& f)
+    static void func(hpx::threads::thread_function_type f)
     {
         f(hpx::threads::wait_signaled);
     }
@@ -45,7 +44,9 @@ struct hello_world_server
 #endif
 
         hpx::get_lva<hello_world_server>::call(lva)->sched_.add(
-            hpx::util::bind(&hello_world_server::func, std::move(data.func)),
+            hpx::util::bind(
+                hpx::util::one_shot(&hello_world_server::func),
+                std::move(data.func)),
             desc, initial_state);
     }
 
@@ -88,4 +89,3 @@ int main()
 
     return 0;
 }
-

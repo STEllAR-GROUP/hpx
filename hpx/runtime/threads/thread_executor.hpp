@@ -8,8 +8,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/date_time_chrono.hpp>
-#include <hpx/util/function.hpp>
 #include <hpx/util/safe_bool.hpp>
+#include <hpx/util/detail/unique_function.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
@@ -76,6 +76,10 @@ namespace hpx { namespace threads
         class executor_base
         {
         public:
+            typedef
+                util::detail::unique_function<void(), void, void>
+                closure_type;
+
             executor_base() : count_(0) {}
             virtual ~executor_base() {}
 
@@ -84,7 +88,7 @@ namespace hpx { namespace threads
             // Schedule the specified function for execution in this executor.
             // Depending on the subclass implementation, this may block in some
             // situations.
-            virtual void add(HPX_STD_FUNCTION<void()> && f, char const* desc,
+            virtual void add(closure_type && f, char const* desc,
                 threads::thread_state_enum initial_state, bool run_now,
                 threads::thread_stacksize stacksize, error_code& ec) = 0;
 
@@ -118,7 +122,7 @@ namespace hpx { namespace threads
             // than time abs_time. This call never blocks, and may violate
             // bounds on the executor's queue size.
             virtual void add_at(boost::posix_time::ptime const& abs_time,
-                HPX_STD_FUNCTION<void()> && f, char const* desc,
+                closure_type && f, char const* desc,
                 threads::thread_stacksize stacksize, error_code& ec) = 0;
 
             // Schedule given function for execution in this executor no sooner
@@ -126,7 +130,7 @@ namespace hpx { namespace threads
             // violate bounds on the executor's queue size.
             virtual void add_after(
                 boost::posix_time::time_duration const& rel_time,
-                HPX_STD_FUNCTION<void()> && f, char const* desc,
+                closure_type && f, char const* desc,
                 threads::thread_stacksize stacksize, error_code& ec) = 0;
         };
     }
@@ -151,13 +155,15 @@ namespace hpx { namespace threads
         {}
 
     public:
+        typedef detail::executor_base::closure_type closure_type;
+
         // default constructor creates invalid (non-usable) executor
         executor() {}
 
         /// Schedule the specified function for execution in this executor.
         /// Depending on the subclass implementation, this may block in some
         /// situations.
-        void add(HPX_STD_FUNCTION<void()> f, char const* desc = "",
+        void add(closure_type f, char const* desc = "",
             threads::thread_state_enum initial_state = threads::pending,
             bool run_now = true,
             threads::thread_stacksize stacksize = threads::thread_stacksize_default,
@@ -219,7 +225,7 @@ namespace hpx { namespace threads
         /// Error conditions: If invoking closure throws an exception, the
         /// executor shall call terminate.
         void add_at(boost::posix_time::ptime const& abs_time,
-            HPX_STD_FUNCTION<void()> f, char const* desc = "",
+            closure_type f, char const* desc = "",
             threads::thread_stacksize stacksize = threads::thread_stacksize_default,
             error_code& ec = throws)
         {
@@ -229,7 +235,7 @@ namespace hpx { namespace threads
 
         template <typename Clock, typename Duration>
         void add_at(boost::chrono::time_point<Clock, Duration> const& abs_time,
-            HPX_STD_FUNCTION<void()> f, char const* desc = "",
+            closure_type f, char const* desc = "",
             threads::thread_stacksize stacksize = threads::thread_stacksize_default,
             error_code& ec = throws)
         {
@@ -248,7 +254,7 @@ namespace hpx { namespace threads
         /// executor shall call terminate.
         void add_after(
             boost::posix_time::time_duration const& rel_time,
-            HPX_STD_FUNCTION<void()> f, char const* desc = "",
+            closure_type f, char const* desc = "",
             threads::thread_stacksize stacksize = threads::thread_stacksize_default,
             error_code& ec = throws)
         {
@@ -258,7 +264,7 @@ namespace hpx { namespace threads
 
         template <typename Rep, typename Period>
         void add_after(boost::chrono::duration<Rep, Period> const& rel_time,
-            HPX_STD_FUNCTION<void()> f, char const* desc = "",
+            closure_type f, char const* desc = "",
             threads::thread_stacksize stacksize = threads::thread_stacksize_default,
             error_code& ec = throws)
         {

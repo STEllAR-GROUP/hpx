@@ -8,7 +8,8 @@
 // Do not edit manually.
 
 
-namespace hpx { namespace util { namespace detail {
+namespace hpx { namespace util { namespace detail
+{
     template <
         typename R
        
@@ -28,15 +29,13 @@ namespace hpx { namespace util { namespace detail {
             typedef
                 empty_vtable<
                         R()
-                      , IArchive
-                      , OArchive
+                      , IArchive, OArchive
                     >
                 vtable_type;
             typedef
                 vtable_ptr<
                     R()
-                  , IArchive
-                  , OArchive
+                  , IArchive, OArchive
                   , vtable_type
                 >
                 vtable_ptr_type;
@@ -45,7 +44,8 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
-namespace hpx { namespace util { namespace detail {
+namespace hpx { namespace util { namespace detail
+{
     template <
         typename R
       , typename A0
@@ -65,15 +65,13 @@ namespace hpx { namespace util { namespace detail {
             typedef
                 empty_vtable<
                         R(A0)
-                      , IArchive
-                      , OArchive
+                      , IArchive, OArchive
                     >
                 vtable_type;
             typedef
                 vtable_ptr<
                     R(A0)
-                  , IArchive
-                  , OArchive
+                  , IArchive, OArchive
                   , vtable_type
                 >
                 vtable_ptr_type;
@@ -82,7 +80,8 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
-namespace hpx { namespace util { namespace detail {
+namespace hpx { namespace util { namespace detail
+{
     template <
         typename R
       , typename A0 , typename A1
@@ -102,15 +101,13 @@ namespace hpx { namespace util { namespace detail {
             typedef
                 empty_vtable<
                         R(A0 , A1)
-                      , IArchive
-                      , OArchive
+                      , IArchive, OArchive
                     >
                 vtable_type;
             typedef
                 vtable_ptr<
                     R(A0 , A1)
-                  , IArchive
-                  , OArchive
+                  , IArchive, OArchive
                   , vtable_type
                 >
                 vtable_ptr_type;
@@ -119,7 +116,8 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
-namespace hpx { namespace util { namespace detail {
+namespace hpx { namespace util { namespace detail
+{
     template <
         typename R
       , typename A0 , typename A1 , typename A2
@@ -139,15 +137,13 @@ namespace hpx { namespace util { namespace detail {
             typedef
                 empty_vtable<
                         R(A0 , A1 , A2)
-                      , IArchive
-                      , OArchive
+                      , IArchive, OArchive
                     >
                 vtable_type;
             typedef
                 vtable_ptr<
                     R(A0 , A1 , A2)
-                  , IArchive
-                  , OArchive
+                  , IArchive, OArchive
                   , vtable_type
                 >
                 vtable_ptr_type;
@@ -156,7 +152,8 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
-namespace hpx { namespace util { namespace detail {
+namespace hpx { namespace util { namespace detail
+{
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3
@@ -176,15 +173,13 @@ namespace hpx { namespace util { namespace detail {
             typedef
                 empty_vtable<
                         R(A0 , A1 , A2 , A3)
-                      , IArchive
-                      , OArchive
+                      , IArchive, OArchive
                     >
                 vtable_type;
             typedef
                 vtable_ptr<
                     R(A0 , A1 , A2 , A3)
-                  , IArchive
-                  , OArchive
+                  , IArchive, OArchive
                   , vtable_type
                 >
                 vtable_ptr_type;
@@ -193,7 +188,8 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
-namespace hpx { namespace util { namespace detail {
+namespace hpx { namespace util { namespace detail
+{
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
@@ -213,15 +209,13 @@ namespace hpx { namespace util { namespace detail {
             typedef
                 empty_vtable<
                         R(A0 , A1 , A2 , A3 , A4)
-                      , IArchive
-                      , OArchive
+                      , IArchive, OArchive
                     >
                 vtable_type;
             typedef
                 vtable_ptr<
                     R(A0 , A1 , A2 , A3 , A4)
-                  , IArchive
-                  , OArchive
+                  , IArchive, OArchive
                   , vtable_type
                 >
                 vtable_ptr_type;
@@ -230,7 +224,8 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
-namespace hpx { namespace util { namespace detail {
+namespace hpx { namespace util { namespace detail
+{
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
@@ -250,15 +245,13 @@ namespace hpx { namespace util { namespace detail {
             typedef
                 empty_vtable<
                         R(A0 , A1 , A2 , A3 , A4 , A5)
-                      , IArchive
-                      , OArchive
+                      , IArchive, OArchive
                     >
                 vtable_type;
             typedef
                 vtable_ptr<
                     R(A0 , A1 , A2 , A3 , A4 , A5)
-                  , IArchive
-                  , OArchive
+                  , IArchive, OArchive
                   , vtable_type
                 >
                 vtable_ptr_type;
@@ -267,7 +260,8 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
-namespace hpx { namespace util { namespace detail {
+namespace hpx { namespace util { namespace detail
+{
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
@@ -287,15 +281,13 @@ namespace hpx { namespace util { namespace detail {
             typedef
                 empty_vtable<
                         R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
-                      , IArchive
-                      , OArchive
+                      , IArchive, OArchive
                     >
                 vtable_type;
             typedef
                 vtable_ptr<
                     R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
-                  , IArchive
-                  , OArchive
+                  , IArchive, OArchive
                   , vtable_type
                 >
                 vtable_ptr_type;
@@ -304,7 +296,8 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
-namespace hpx { namespace util { namespace detail {
+namespace hpx { namespace util { namespace detail
+{
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
@@ -324,15 +317,13 @@ namespace hpx { namespace util { namespace detail {
             typedef
                 empty_vtable<
                         R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
-                      , IArchive
-                      , OArchive
+                      , IArchive, OArchive
                     >
                 vtable_type;
             typedef
                 vtable_ptr<
                     R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
-                  , IArchive
-                  , OArchive
+                  , IArchive, OArchive
                   , vtable_type
                 >
                 vtable_ptr_type;
@@ -341,7 +332,8 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
-namespace hpx { namespace util { namespace detail {
+namespace hpx { namespace util { namespace detail
+{
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
@@ -361,15 +353,13 @@ namespace hpx { namespace util { namespace detail {
             typedef
                 empty_vtable<
                         R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
-                      , IArchive
-                      , OArchive
+                      , IArchive, OArchive
                     >
                 vtable_type;
             typedef
                 vtable_ptr<
                     R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
-                  , IArchive
-                  , OArchive
+                  , IArchive, OArchive
                   , vtable_type
                 >
                 vtable_ptr_type;
@@ -378,7 +368,8 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
-namespace hpx { namespace util { namespace detail {
+namespace hpx { namespace util { namespace detail
+{
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
@@ -398,15 +389,13 @@ namespace hpx { namespace util { namespace detail {
             typedef
                 empty_vtable<
                         R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
-                      , IArchive
-                      , OArchive
+                      , IArchive, OArchive
                     >
                 vtable_type;
             typedef
                 vtable_ptr<
                     R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
-                  , IArchive
-                  , OArchive
+                  , IArchive, OArchive
                   , vtable_type
                 >
                 vtable_ptr_type;
@@ -415,7 +404,8 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
-namespace hpx { namespace util { namespace detail {
+namespace hpx { namespace util { namespace detail
+{
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10
@@ -435,15 +425,13 @@ namespace hpx { namespace util { namespace detail {
             typedef
                 empty_vtable<
                         R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
-                      , IArchive
-                      , OArchive
+                      , IArchive, OArchive
                     >
                 vtable_type;
             typedef
                 vtable_ptr<
                     R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
-                  , IArchive
-                  , OArchive
+                  , IArchive, OArchive
                   , vtable_type
                 >
                 vtable_ptr_type;
@@ -452,7 +440,8 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
-namespace hpx { namespace util { namespace detail {
+namespace hpx { namespace util { namespace detail
+{
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11
@@ -472,15 +461,13 @@ namespace hpx { namespace util { namespace detail {
             typedef
                 empty_vtable<
                         R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
-                      , IArchive
-                      , OArchive
+                      , IArchive, OArchive
                     >
                 vtable_type;
             typedef
                 vtable_ptr<
                     R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
-                  , IArchive
-                  , OArchive
+                  , IArchive, OArchive
                   , vtable_type
                 >
                 vtable_ptr_type;
@@ -489,7 +476,8 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
-namespace hpx { namespace util { namespace detail {
+namespace hpx { namespace util { namespace detail
+{
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12
@@ -509,15 +497,13 @@ namespace hpx { namespace util { namespace detail {
             typedef
                 empty_vtable<
                         R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
-                      , IArchive
-                      , OArchive
+                      , IArchive, OArchive
                     >
                 vtable_type;
             typedef
                 vtable_ptr<
                     R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
-                  , IArchive
-                  , OArchive
+                  , IArchive, OArchive
                   , vtable_type
                 >
                 vtable_ptr_type;
@@ -526,7 +512,8 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
-namespace hpx { namespace util { namespace detail {
+namespace hpx { namespace util { namespace detail
+{
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13
@@ -546,15 +533,13 @@ namespace hpx { namespace util { namespace detail {
             typedef
                 empty_vtable<
                         R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13)
-                      , IArchive
-                      , OArchive
+                      , IArchive, OArchive
                     >
                 vtable_type;
             typedef
                 vtable_ptr<
                     R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13)
-                  , IArchive
-                  , OArchive
+                  , IArchive, OArchive
                   , vtable_type
                 >
                 vtable_ptr_type;
@@ -563,7 +548,8 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
-namespace hpx { namespace util { namespace detail {
+namespace hpx { namespace util { namespace detail
+{
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14
@@ -583,15 +569,13 @@ namespace hpx { namespace util { namespace detail {
             typedef
                 empty_vtable<
                         R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14)
-                      , IArchive
-                      , OArchive
+                      , IArchive, OArchive
                     >
                 vtable_type;
             typedef
                 vtable_ptr<
                     R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14)
-                  , IArchive
-                  , OArchive
+                  , IArchive, OArchive
                   , vtable_type
                 >
                 vtable_ptr_type;
@@ -600,7 +584,8 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
-namespace hpx { namespace util { namespace detail {
+namespace hpx { namespace util { namespace detail
+{
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15
@@ -620,15 +605,13 @@ namespace hpx { namespace util { namespace detail {
             typedef
                 empty_vtable<
                         R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15)
-                      , IArchive
-                      , OArchive
+                      , IArchive, OArchive
                     >
                 vtable_type;
             typedef
                 vtable_ptr<
                     R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15)
-                  , IArchive
-                  , OArchive
+                  , IArchive, OArchive
                   , vtable_type
                 >
                 vtable_ptr_type;
@@ -637,7 +620,8 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
-namespace hpx { namespace util { namespace detail {
+namespace hpx { namespace util { namespace detail
+{
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16
@@ -657,15 +641,13 @@ namespace hpx { namespace util { namespace detail {
             typedef
                 empty_vtable<
                         R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16)
-                      , IArchive
-                      , OArchive
+                      , IArchive, OArchive
                     >
                 vtable_type;
             typedef
                 vtable_ptr<
                     R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16)
-                  , IArchive
-                  , OArchive
+                  , IArchive, OArchive
                   , vtable_type
                 >
                 vtable_ptr_type;
@@ -674,7 +656,8 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
-namespace hpx { namespace util { namespace detail {
+namespace hpx { namespace util { namespace detail
+{
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17
@@ -694,15 +677,13 @@ namespace hpx { namespace util { namespace detail {
             typedef
                 empty_vtable<
                         R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17)
-                      , IArchive
-                      , OArchive
+                      , IArchive, OArchive
                     >
                 vtable_type;
             typedef
                 vtable_ptr<
                     R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17)
-                  , IArchive
-                  , OArchive
+                  , IArchive, OArchive
                   , vtable_type
                 >
                 vtable_ptr_type;
@@ -711,7 +692,8 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
-namespace hpx { namespace util { namespace detail {
+namespace hpx { namespace util { namespace detail
+{
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18
@@ -731,15 +713,13 @@ namespace hpx { namespace util { namespace detail {
             typedef
                 empty_vtable<
                         R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18)
-                      , IArchive
-                      , OArchive
+                      , IArchive, OArchive
                     >
                 vtable_type;
             typedef
                 vtable_ptr<
                     R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18)
-                  , IArchive
-                  , OArchive
+                  , IArchive, OArchive
                   , vtable_type
                 >
                 vtable_ptr_type;
@@ -748,7 +728,8 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
-namespace hpx { namespace util { namespace detail {
+namespace hpx { namespace util { namespace detail
+{
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19
@@ -768,15 +749,13 @@ namespace hpx { namespace util { namespace detail {
             typedef
                 empty_vtable<
                         R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19)
-                      , IArchive
-                      , OArchive
+                      , IArchive, OArchive
                     >
                 vtable_type;
             typedef
                 vtable_ptr<
                     R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19)
-                  , IArchive
-                  , OArchive
+                  , IArchive, OArchive
                   , vtable_type
                 >
                 vtable_ptr_type;
@@ -785,7 +764,8 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
-namespace hpx { namespace util { namespace detail {
+namespace hpx { namespace util { namespace detail
+{
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20
@@ -805,15 +785,13 @@ namespace hpx { namespace util { namespace detail {
             typedef
                 empty_vtable<
                         R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
-                      , IArchive
-                      , OArchive
+                      , IArchive, OArchive
                     >
                 vtable_type;
             typedef
                 vtable_ptr<
                     R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
-                  , IArchive
-                  , OArchive
+                  , IArchive, OArchive
                   , vtable_type
                 >
                 vtable_ptr_type;
@@ -822,7 +800,8 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
-namespace hpx { namespace util { namespace detail {
+namespace hpx { namespace util { namespace detail
+{
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21
@@ -842,15 +821,13 @@ namespace hpx { namespace util { namespace detail {
             typedef
                 empty_vtable<
                         R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
-                      , IArchive
-                      , OArchive
+                      , IArchive, OArchive
                     >
                 vtable_type;
             typedef
                 vtable_ptr<
                     R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
-                  , IArchive
-                  , OArchive
+                  , IArchive, OArchive
                   , vtable_type
                 >
                 vtable_ptr_type;
@@ -859,7 +836,8 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
-namespace hpx { namespace util { namespace detail {
+namespace hpx { namespace util { namespace detail
+{
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21 , typename A22
@@ -879,15 +857,13 @@ namespace hpx { namespace util { namespace detail {
             typedef
                 empty_vtable<
                         R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22)
-                      , IArchive
-                      , OArchive
+                      , IArchive, OArchive
                     >
                 vtable_type;
             typedef
                 vtable_ptr<
                     R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22)
-                  , IArchive
-                  , OArchive
+                  , IArchive, OArchive
                   , vtable_type
                 >
                 vtable_ptr_type;

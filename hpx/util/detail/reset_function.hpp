@@ -6,12 +6,11 @@
 #if !defined(HPX_UTIL_DETAIL_RESET_FUNCTION_OCT_22_2013_0854AM)
 #define HPX_UTIL_DETAIL_RESET_FUNCTION_OCT_22_2013_0854AM
 
-#include <hpx/config/function.hpp>
-#include <utility>
+#include <hpx/util/detail/function_template.hpp>
+#include <hpx/util/detail/unique_function.hpp>
 
 namespace hpx { namespace util { namespace detail
 {
-#if defined(HPX_UTIL_FUNCTION)
     template <typename Sig, typename IArchive, typename OArchive>
     inline void reset_function(hpx::util::function<Sig, IArchive, OArchive>& f)
     {
@@ -23,19 +22,18 @@ namespace hpx { namespace util { namespace detail
     {
         f.reset();
     }
-#elif !defined(HPX_HAVE_CXX11_STD_FUNCTION)
-    template <typename Sig>
-    inline void reset_function(boost::function<Sig>& f)
+    
+    template <typename Sig, typename IArchive, typename OArchive>
+    inline void reset_function(hpx::util::detail::unique_function<Sig, IArchive, OArchive>& f)
     {
-        f = std::move(boost::function<Sig>());
+        f.reset();
     }
-#else
-    template <typename Sig>
-    inline void reset_function(std::function<Sig>& f)
+
+    template <typename Function>
+    inline void reset_function(Function& f)
     {
-        f = std::move(std::function<Sig>());
+        f = Function();
     }
-#endif
 }}}
 
 #endif

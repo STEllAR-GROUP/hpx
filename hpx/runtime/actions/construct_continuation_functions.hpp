@@ -109,7 +109,7 @@
 
     template <typename Object, typename Arguments_
         BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename FArg)>
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(BOOST_PP_ENUM_PARAMS(N, FArg)), Component* obj,
@@ -124,7 +124,7 @@
 
     template <typename Object, typename Arguments_
         BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename FArg)>
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(BOOST_PP_ENUM_PARAMS(N, FArg)) const,
@@ -194,7 +194,7 @@
 
     template <typename Object, typename Arguments_
         BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename FArg)>
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(BOOST_PP_ENUM_PARAMS(N, FArg)), Component* obj,
@@ -209,7 +209,7 @@
 
     template <typename Object, typename Arguments_
         BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename FArg)>
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(BOOST_PP_ENUM_PARAMS(N, FArg)) const,

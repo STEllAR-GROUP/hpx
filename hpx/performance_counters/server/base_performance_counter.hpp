@@ -140,11 +140,10 @@ namespace hpx { namespace performance_counters { namespace server
         /// This is the default hook implementation for decorate_action which
         /// does no hooking at all.
         template <typename F>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         decorate_action(naming::address::address_type, F && f)
         {
-            return HPX_STD_FUNCTION<threads::thread_function_type>(
-                std::forward<F>(f));
+            return std::forward<F>(f);
         }
 
         /// This is the default hook implementation for schedule_thread which

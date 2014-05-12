@@ -14,6 +14,7 @@
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/executors/thread_pool_executors.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/lcos/local/barrier.hpp>
 
@@ -140,7 +141,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     template <typename Scheduler>
     threads::thread_state_enum
     thread_pool_executor<Scheduler>::thread_function_nullary(
-        HPX_STD_FUNCTION<void()> const& func)
+        closure_type func)
     {
         // execute the actual thread function
         func();
@@ -161,14 +162,14 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // situations.
     template <typename Scheduler>
     void thread_pool_executor<Scheduler>::add(
-        HPX_STD_FUNCTION<void()> && f,
+        closure_type && f,
         char const* desc, threads::thread_state_enum initial_state,
         bool run_now, threads::thread_stacksize stacksize, error_code& ec)
     {
         // create a new thread
         thread_init_data data(util::bind(
-            &thread_pool_executor::thread_function_nullary, this,
-            std::move(f)), desc);
+            util::one_shot(&thread_pool_executor::thread_function_nullary),
+            this, std::move(f)), desc);
         data.stacksize = threads::get_stack_size(stacksize);
 
         // update statistics
@@ -190,13 +191,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     template <typename Scheduler>
     void thread_pool_executor<Scheduler>::add_at(
         boost::posix_time::ptime const& abs_time,
-        HPX_STD_FUNCTION<void()> && f, char const* desc,
+        closure_type && f, char const* desc,
         threads::thread_stacksize stacksize, error_code& ec)
     {
         // create a new suspended thread
         thread_init_data data(util::bind(
-            &thread_pool_executor::thread_function_nullary, this,
-            std::move(f)), desc);
+            util::one_shot(&thread_pool_executor::thread_function_nullary),
+            this, std::move(f)), desc);
         data.stacksize = threads::get_stack_size(stacksize);
 
         thread_id_type id = threads::detail::create_thread(
@@ -224,13 +225,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     template <typename Scheduler>
     void thread_pool_executor<Scheduler>::add_after(
         boost::posix_time::time_duration const& rel_time,
-        HPX_STD_FUNCTION<void()> && f, char const* desc,
+        closure_type && f, char const* desc,
         threads::thread_stacksize stacksize, error_code& ec)
     {
         // create a new suspended thread
         thread_init_data data(util::bind(
-            &thread_pool_executor::thread_function_nullary, this,
-            std::move(f)), desc);
+            util::one_shot(&thread_pool_executor::thread_function_nullary),
+            this, std::move(f)), desc);
         data.stacksize = threads::get_stack_size(stacksize);
 
         thread_id_type id = threads::detail::create_thread(
@@ -370,8 +371,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         {
             register_thread_nullary(
                 util::bind(
-                    &thread_pool_executor::run, this,
-                    virt_core, thread_num
+                    util::one_shot(&thread_pool_executor::run),
+                    this, virt_core, thread_num
                 ),
                 "thread_pool_executor thread", threads::pending, true,
                 threads::thread_priority_normal, thread_num,

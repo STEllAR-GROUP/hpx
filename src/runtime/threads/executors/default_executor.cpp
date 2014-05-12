@@ -12,7 +12,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // Schedule the specified function for execution in this executor.
     // Depending on the subclass implementation, this may block in some
     // situations.
-    void default_executor::add(HPX_STD_FUNCTION<void()> && f,
+    void default_executor::add(closure_type && f,
         char const* desc, threads::thread_state_enum initial_state,
         bool run_now, threads::thread_stacksize stacksize, error_code& ec)
     {
@@ -26,7 +26,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // bounds on the executor's queue size.
     void default_executor::add_at(
         boost::posix_time::ptime const& abs_time,
-        HPX_STD_FUNCTION<void()> && f, char const* description,
+        closure_type && f, char const* description,
         threads::thread_stacksize stacksize, error_code& ec)
     {
         // create new thread
@@ -47,7 +47,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // violate bounds on the executor's queue size.
     void default_executor::add_after(
         boost::posix_time::time_duration const& rel_time,
-        HPX_STD_FUNCTION<void()> && f, char const* description,
+        closure_type && f, char const* description,
         threads::thread_stacksize stacksize, error_code& ec)
     {
         // create new thread

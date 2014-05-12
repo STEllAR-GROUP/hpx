@@ -13,6 +13,7 @@ set(function_argument_limit_preprocessing_files
   "hpx/util/detail/define_bind_action_function_operators.hpp"
   "hpx/util/detail/define_bind_function_operators.hpp"
   "hpx/util/detail/function_template.hpp"
+  "hpx/util/detail/unique_function.hpp"
   "hpx/util/detail/get_table.hpp"
   "hpx/util/detail/get_empty_table.hpp"
   "hpx/util/detail/vtable.hpp"

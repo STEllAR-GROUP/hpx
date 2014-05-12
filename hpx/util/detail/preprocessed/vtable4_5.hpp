@@ -12,34 +12,30 @@
             typename Functor
           , typename R
           
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R()
-          , IArchive
-          , OArchive
-        >
-            : type_base<Functor>
+          , IArchive, OArchive
+        > : type_base<Functor>
         {
             static vtable_ptr_base<
                 R()
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
                     get_table<
                         Functor
                       , R()
-                    >::template get<IArchive, OArchive>();
+                    >::template get<true, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
                 )
             {
-                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
+                return util::invoke_r<R>((**reinterpret_cast<Functor**>(f))
                      );
             }
         };
@@ -47,34 +43,30 @@
             typename Functor
           , typename R
           , typename A0
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(A0)
-          , IArchive
-          , OArchive
-        >
-            : type_base<Functor>
+          , IArchive, OArchive
+        > : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0)
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
                     get_table<
                         Functor
                       , R(A0)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<true, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
                 , A0 && a0)
             {
-                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
+                return util::invoke_r<R>((**reinterpret_cast<Functor**>(f))
                     , std::forward<A0>( a0 ));
             }
         };
@@ -82,34 +74,30 @@
             typename Functor
           , typename R
           , typename A0 , typename A1
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(A0 , A1)
-          , IArchive
-          , OArchive
-        >
-            : type_base<Functor>
+          , IArchive, OArchive
+        > : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1)
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
                     get_table<
                         Functor
                       , R(A0 , A1)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<true, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
                 , A0 && a0 , A1 && a1)
             {
-                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
+                return util::invoke_r<R>((**reinterpret_cast<Functor**>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ));
             }
         };
@@ -117,34 +105,30 @@
             typename Functor
           , typename R
           , typename A0 , typename A1 , typename A2
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(A0 , A1 , A2)
-          , IArchive
-          , OArchive
-        >
-            : type_base<Functor>
+          , IArchive, OArchive
+        > : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2)
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
                     get_table<
                         Functor
                       , R(A0 , A1 , A2)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<true, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
                 , A0 && a0 , A1 && a1 , A2 && a2)
             {
-                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
+                return util::invoke_r<R>((**reinterpret_cast<Functor**>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ));
             }
         };
@@ -152,34 +136,30 @@
             typename Functor
           , typename R
           , typename A0 , typename A1 , typename A2 , typename A3
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(A0 , A1 , A2 , A3)
-          , IArchive
-          , OArchive
-        >
-            : type_base<Functor>
+          , IArchive, OArchive
+        > : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3)
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
                     get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<true, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
                 , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3)
             {
-                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
+                return util::invoke_r<R>((**reinterpret_cast<Functor**>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ));
             }
         };
@@ -187,34 +167,30 @@
             typename Functor
           , typename R
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(A0 , A1 , A2 , A3 , A4)
-          , IArchive
-          , OArchive
-        >
-            : type_base<Functor>
+          , IArchive, OArchive
+        > : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4)
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
                     get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<true, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
                 , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4)
             {
-                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
+                return util::invoke_r<R>((**reinterpret_cast<Functor**>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ));
             }
         };
@@ -222,34 +198,30 @@
             typename Functor
           , typename R
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(A0 , A1 , A2 , A3 , A4 , A5)
-          , IArchive
-          , OArchive
-        >
-            : type_base<Functor>
+          , IArchive, OArchive
+        > : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5)
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
                     get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<true, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
                 , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5)
             {
-                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
+                return util::invoke_r<R>((**reinterpret_cast<Functor**>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ));
             }
         };
@@ -257,34 +229,30 @@
             typename Functor
           , typename R
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
-          , IArchive
-          , OArchive
-        >
-            : type_base<Functor>
+          , IArchive, OArchive
+        > : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
                     get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<true, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
                 , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6)
             {
-                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
+                return util::invoke_r<R>((**reinterpret_cast<Functor**>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ));
             }
         };
@@ -292,34 +260,30 @@
             typename Functor
           , typename R
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
-          , typename IArchive
-          , typename OArchive
+          , typename IArchive, typename OArchive
         >
         struct type<
             Functor
           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
-          , IArchive
-          , OArchive
-        >
-            : type_base<Functor>
+          , IArchive, OArchive
+        > : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
-              , IArchive
-              , OArchive
+              , IArchive, OArchive
             > *get_ptr()
             {
                 return
                     get_table<
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
-                    >::template get<IArchive, OArchive>();
+                    >::template get<true, IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
                 , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7)
             {
-                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
+                return util::invoke_r<R>((**reinterpret_cast<Functor**>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ));
             }
         };

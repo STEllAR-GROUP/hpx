@@ -69,8 +69,8 @@ static void
     v1();
     HPX_TEST(global_int == 5);
 
-    // clear() method
-    v1.clear();
+    // reset() method
+    v1.reset();
     HPX_TEST(v1.empty());
 
     // Assignment to an empty function
@@ -133,7 +133,7 @@ static void
     HPX_TEST(global_int == 3);
 
     // Construction from another function (that is empty)
-    v1.clear();
+    v1.reset();
     func_void_type v2(v1);
     HPX_TEST(v2 == 0);
 
@@ -154,7 +154,7 @@ static void
     v2();
     HPX_TEST(global_int == 5);
 
-    v2.clear();
+    v2.reset();
     HPX_TEST(v2.empty());
 
     // Assignment to an empty function from a free function
@@ -183,7 +183,7 @@ static void
     v1();
     HPX_TEST(global_int == 3);
     std::swap(v1, v2);
-    v1.clear();
+    v1.reset();
 
     // Assignment
     v2 = five;
@@ -241,8 +241,8 @@ static void
     v3();
     HPX_TEST(global_int == 5);
 
-    // clear() method
-    v3.clear();
+    // reset() method
+    v3.reset();
     HPX_TEST(!v3);
 
     // Assignment to an empty function
@@ -262,8 +262,8 @@ static void
     v3();
     HPX_TEST(global_int == 5);
 
-    // clear()
-    v3.clear();
+    // reset()
+    v3.reset();
     HPX_TEST(v3.empty());
 
     // Assignment to an empty function from a free function
@@ -301,8 +301,8 @@ static void
     v4();
     HPX_TEST(global_int == 5);
 
-    // clear() method
-    v4.clear();
+    // reset() method
+    v4.reset();
     HPX_TEST(v4.empty());
 
     // Assignment to an empty function
@@ -322,8 +322,8 @@ static void
     v4();
     HPX_TEST(global_int == 5);
 
-    // clear()
-    v4.clear();
+    // reset()
+    v4.reset();
     HPX_TEST(v4.empty());
 
     // Assignment to an empty function from a free function
@@ -361,8 +361,8 @@ static void
     v5();
     HPX_TEST(global_int == 5);
 
-    // clear() method
-    v5.clear();
+    // reset() method
+    v5.reset();
     HPX_TEST(v5.empty());
 
     // Assignment to an empty function
@@ -382,8 +382,8 @@ static void
     v5();
     HPX_TEST(global_int == 5);
 
-    // clear()
-    v5.clear();
+    // reset()
+    v5.reset();
     HPX_TEST(v5.empty());
 
     // Assignment to an empty function from a free function
@@ -421,8 +421,8 @@ static void
     v6();
     HPX_TEST(global_int == 5);
 
-    // clear() method
-    v6.clear();
+    // reset() method
+    v6.reset();
     HPX_TEST(v6.empty());
 
     // Assignment to an empty function
@@ -442,8 +442,8 @@ static void
     v6();
     HPX_TEST(global_int == 5);
 
-    // clear()
-    v6.clear();
+    // reset()
+    v6.reset();
     HPX_TEST(v6.empty());
 
     // Assignment to an empty function from a free function
@@ -506,7 +506,7 @@ static void
     i0 = &generate_three;
     HPX_TEST(i0() == 3);
     HPX_TEST(i0 != 0);
-    i0.clear();
+    i0.reset();
     HPX_TEST(!i0);
 
     // Test return values with compatible types
@@ -521,7 +521,7 @@ static void
     i1 = &generate_three;
     HPX_TEST(i1() == 3);
     HPX_TEST(i1 != 0);
-    i1.clear();
+    i1.reset();
     HPX_TEST(!i1);
 }
 

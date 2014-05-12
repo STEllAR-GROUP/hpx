@@ -59,7 +59,7 @@
     };
     template <typename Object, typename Arguments_
          >
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(), Component* obj,
@@ -73,7 +73,7 @@
     }
     template <typename Object, typename Arguments_
          >
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)() const,
@@ -137,7 +137,7 @@
     };
     template <typename Object, typename Arguments_
          >
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(), Component* obj,
@@ -151,7 +151,7 @@
     }
     template <typename Object, typename Arguments_
          >
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)() const,
@@ -214,7 +214,7 @@
     };
     template <typename Object, typename Arguments_
         , typename FArg0>
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(FArg0), Component* obj,
@@ -228,7 +228,7 @@
     }
     template <typename Object, typename Arguments_
         , typename FArg0>
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(FArg0) const,
@@ -292,7 +292,7 @@
     };
     template <typename Object, typename Arguments_
         , typename FArg0>
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(FArg0), Component* obj,
@@ -306,7 +306,7 @@
     }
     template <typename Object, typename Arguments_
         , typename FArg0>
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(FArg0) const,
@@ -369,7 +369,7 @@
     };
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1>
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(FArg0 , FArg1), Component* obj,
@@ -383,7 +383,7 @@
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1>
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(FArg0 , FArg1) const,
@@ -447,7 +447,7 @@
     };
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1>
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(FArg0 , FArg1), Component* obj,
@@ -461,7 +461,7 @@
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1>
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(FArg0 , FArg1) const,
@@ -524,7 +524,7 @@
     };
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2>
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(FArg0 , FArg1 , FArg2), Component* obj,
@@ -538,7 +538,7 @@
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2>
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(FArg0 , FArg1 , FArg2) const,
@@ -602,7 +602,7 @@
     };
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2>
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(FArg0 , FArg1 , FArg2), Component* obj,
@@ -616,7 +616,7 @@
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2>
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(FArg0 , FArg1 , FArg2) const,
@@ -679,7 +679,7 @@
     };
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3>
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3), Component* obj,
@@ -693,7 +693,7 @@
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3>
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3) const,
@@ -757,7 +757,7 @@
     };
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3>
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3), Component* obj,
@@ -771,7 +771,7 @@
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3>
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3) const,
@@ -834,7 +834,7 @@
     };
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4>
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4), Component* obj,
@@ -848,7 +848,7 @@
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4>
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4) const,
@@ -912,7 +912,7 @@
     };
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4>
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4), Component* obj,
@@ -926,7 +926,7 @@
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4>
-    static HPX_STD_FUNCTION<threads::thread_function_type>
+    static threads::thread_function_type
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4) const,

@@ -85,7 +85,7 @@ namespace hpx { namespace actions
         
         
         template <typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
@@ -98,7 +98,7 @@ namespace hpx { namespace actions
         
         
         template <typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
@@ -270,7 +270,7 @@ namespace hpx { namespace actions
         
         
         template <typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
@@ -285,7 +285,7 @@ namespace hpx { namespace actions
         
         
         template <typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
@@ -473,7 +473,7 @@ namespace hpx { namespace actions
         
         
         template <typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
@@ -486,7 +486,7 @@ namespace hpx { namespace actions
         
         
         template <typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
@@ -658,7 +658,7 @@ namespace hpx { namespace actions
         
         
         template <typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
@@ -673,7 +673,7 @@ namespace hpx { namespace actions
         
         
         template <typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
@@ -861,7 +861,7 @@ namespace hpx { namespace actions
         
         
         template <typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
@@ -874,7 +874,7 @@ namespace hpx { namespace actions
         
         
         template <typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
@@ -1046,7 +1046,7 @@ namespace hpx { namespace actions
         
         
         template <typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
@@ -1061,7 +1061,7 @@ namespace hpx { namespace actions
         
         
         template <typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
@@ -1249,7 +1249,7 @@ namespace hpx { namespace actions
         
         
         template <typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
@@ -1262,7 +1262,7 @@ namespace hpx { namespace actions
         
         
         template <typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
@@ -1434,7 +1434,7 @@ namespace hpx { namespace actions
         
         
         template <typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
@@ -1449,7 +1449,7 @@ namespace hpx { namespace actions
         
         
         template <typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
@@ -1637,7 +1637,7 @@ namespace hpx { namespace actions
         
         
         template <typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
@@ -1650,7 +1650,7 @@ namespace hpx { namespace actions
         
         
         template <typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
@@ -1822,7 +1822,7 @@ namespace hpx { namespace actions
         
         
         template <typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
@@ -1837,7 +1837,7 @@ namespace hpx { namespace actions
         
         
         template <typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {

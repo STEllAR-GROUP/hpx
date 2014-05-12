@@ -47,7 +47,7 @@ namespace detail
     struct construct_continuation_thread_function_voidN<Action, 0>
     {
         template <typename Func, typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         call(continuation_type cont, Func && func,
             Arguments && args)
         {
@@ -88,7 +88,7 @@ namespace detail
     struct construct_continuation_thread_functionN<Action, 0>
     {
         template <typename Func, typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         call(continuation_type cont, Func && func,
             Arguments && args)
         {
@@ -139,7 +139,7 @@ namespace detail
     struct construct_continuation_thread_function_voidN<Action, 1>
     {
         template <typename Func, typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         call(continuation_type cont, Func && func,
             Arguments && args)
         {
@@ -180,7 +180,7 @@ namespace detail
     struct construct_continuation_thread_functionN<Action, 1>
     {
         template <typename Func, typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         call(continuation_type cont, Func && func,
             Arguments && args)
         {
@@ -231,7 +231,7 @@ namespace detail
     struct construct_continuation_thread_function_voidN<Action, 2>
     {
         template <typename Func, typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         call(continuation_type cont, Func && func,
             Arguments && args)
         {
@@ -272,7 +272,7 @@ namespace detail
     struct construct_continuation_thread_functionN<Action, 2>
     {
         template <typename Func, typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         call(continuation_type cont, Func && func,
             Arguments && args)
         {
@@ -323,7 +323,7 @@ namespace detail
     struct construct_continuation_thread_function_voidN<Action, 3>
     {
         template <typename Func, typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         call(continuation_type cont, Func && func,
             Arguments && args)
         {
@@ -364,7 +364,7 @@ namespace detail
     struct construct_continuation_thread_functionN<Action, 3>
     {
         template <typename Func, typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         call(continuation_type cont, Func && func,
             Arguments && args)
         {
@@ -415,7 +415,7 @@ namespace detail
     struct construct_continuation_thread_function_voidN<Action, 4>
     {
         template <typename Func, typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         call(continuation_type cont, Func && func,
             Arguments && args)
         {
@@ -456,7 +456,7 @@ namespace detail
     struct construct_continuation_thread_functionN<Action, 4>
     {
         template <typename Func, typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         call(continuation_type cont, Func && func,
             Arguments && args)
         {
@@ -507,7 +507,7 @@ namespace detail
     struct construct_continuation_thread_function_voidN<Action, 5>
     {
         template <typename Func, typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         call(continuation_type cont, Func && func,
             Arguments && args)
         {
@@ -548,7 +548,7 @@ namespace detail
     struct construct_continuation_thread_functionN<Action, 5>
     {
         template <typename Func, typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         call(continuation_type cont, Func && func,
             Arguments && args)
         {
@@ -599,7 +599,7 @@ namespace detail
     struct construct_continuation_thread_function_voidN<Action, 6>
     {
         template <typename Func, typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         call(continuation_type cont, Func && func,
             Arguments && args)
         {
@@ -640,7 +640,7 @@ namespace detail
     struct construct_continuation_thread_functionN<Action, 6>
     {
         template <typename Func, typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         call(continuation_type cont, Func && func,
             Arguments && args)
         {
@@ -691,7 +691,7 @@ namespace detail
     struct construct_continuation_thread_function_voidN<Action, 7>
     {
         template <typename Func, typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         call(continuation_type cont, Func && func,
             Arguments && args)
         {
@@ -732,7 +732,7 @@ namespace detail
     struct construct_continuation_thread_functionN<Action, 7>
     {
         template <typename Func, typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         call(continuation_type cont, Func && func,
             Arguments && args)
         {
@@ -783,7 +783,7 @@ namespace detail
     struct construct_continuation_thread_function_voidN<Action, 8>
     {
         template <typename Func, typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         call(continuation_type cont, Func && func,
             Arguments && args)
         {
@@ -824,7 +824,7 @@ namespace detail
     struct construct_continuation_thread_functionN<Action, 8>
     {
         template <typename Func, typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         call(continuation_type cont, Func && func,
             Arguments && args)
         {
@@ -875,7 +875,7 @@ namespace detail
     struct construct_continuation_thread_function_voidN<Action, 9>
     {
         template <typename Func, typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         call(continuation_type cont, Func && func,
             Arguments && args)
         {
@@ -916,7 +916,7 @@ namespace detail
     struct construct_continuation_thread_functionN<Action, 9>
     {
         template <typename Func, typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         call(continuation_type cont, Func && func,
             Arguments && args)
         {
@@ -967,7 +967,7 @@ namespace detail
     struct construct_continuation_thread_function_voidN<Action, 10>
     {
         template <typename Func, typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         call(continuation_type cont, Func && func,
             Arguments && args)
         {
@@ -1008,7 +1008,7 @@ namespace detail
     struct construct_continuation_thread_functionN<Action, 10>
     {
         template <typename Func, typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
+        static threads::thread_function_type
         call(continuation_type cont, Func && func,
             Arguments && args)
         {
