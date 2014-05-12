@@ -107,12 +107,14 @@ namespace hpx { namespace traits
 
             future_type f;
             future_access<future_type>::load(ar, f);
-            
+
             future<naming::id_type> id;
             if (f.has_value())
             {
                 id = hpx::make_ready_future(f.get());
-            } else if (f.has_exception()) {
+            }
+            else if (f.has_exception())
+            {
                 id = hpx::make_error_future<naming::id_type>(f.get_exception_ptr());
             }
             client = Derived(std::move(id));
@@ -339,6 +341,25 @@ namespace hpx { namespace components
         {
             return gid_.is_ready();
         }
+
+//     protected:
+//         template <typename F>
+//         static typename lcos::detail::future_then_result<client_base, F>::cont_result
+//         on_ready(future_type fut, F && f)
+//         {
+//             return f(Derived(fut));
+//         }
+//
+//     public:
+//         template <typename F>
+//         typename lcos::detail::future_then_result<client_base, F>::type
+//         then(F && f)
+//         {
+//             typedef typename util::decay<F>::type func_type;
+//             return gid_.then(util::bind(
+//                 util::one_shot(&client_base::on_ready<func_type>),
+//                 std::forward<F>(f)));
+//         }
 
     private:
         friend class boost::serialization::access;

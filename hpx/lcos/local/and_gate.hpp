@@ -79,10 +79,16 @@ namespace hpx { namespace lcos { namespace local
 
     public:
         /// \brief get a future allowing to wait for the gate to fire
-        future<void> get_future(std::size_t count,
+        future<void> get_future(std::size_t count = ~0U,
             std::size_t* generation_value = 0, error_code& ec = hpx::throws)
         {
             typename mutex_type::scoped_lock l(mtx_);
+
+            // by default we use as many segments as specified during construction
+            if (count == ~0U)
+                count = received_segments_.size();
+            HPX_ASSERT(count != 0);
+
             init_locked(count, ec);
             if (!ec) {
                 HPX_ASSERT(generation_ != std::size_t(-1));
@@ -204,7 +210,7 @@ namespace hpx { namespace lcos { namespace local
                 manage_condition cond(*this, c);
 
                 future<void> f = cond.get_future(util::bind(
-                        &base_and_gate::test_condition, this, generation_value));
+                    &base_and_gate::test_condition, this, generation_value));
 
                 {
                     hpx::util::scoped_unlock<Lock> ul(l);
@@ -272,7 +278,8 @@ namespace hpx { namespace lcos { namespace local
         typedef base_and_gate<no_mutex> base_type;
 
     public:
-        and_gate()
+        and_gate(std::size_t count = 0)
+          : base_type(count)
         {
         }
 

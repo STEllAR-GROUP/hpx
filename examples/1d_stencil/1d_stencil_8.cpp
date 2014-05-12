@@ -10,6 +10,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/lcos/gather.hpp>
 
 #include <boost/shared_array.hpp>
 
@@ -17,6 +18,9 @@
 double k = 0.5;     // heat transfer coefficient
 double dt = 1.;     // time step
 double dx = 1.;     // grid spacing
+
+char const* stepper_basename = "/1d_stencil_8/stepper/";
+char const* gather_basename = "/1d_stencil_8/gather/";
 
 ///////////////////////////////////////////////////////////////////////////////
 struct partition_data
@@ -225,8 +229,6 @@ struct partition : hpx::components::client_base<partition, partition_server>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Data for one time step on one locality
-char const* stepper_basename = "/1d_stencil_8/stepper/";
-
 struct stepper_server : hpx::components::simple_component_base<stepper_server>
 {
     // Our data for one time step
@@ -412,15 +414,13 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
     for (std::size_t i = 0; i != local_np; ++i)
         U_[0][i] = partition(here, nx, double(i));
 
-    auto Op = &stepper_server::heat_part;
-
     for (std::size_t t = 0; t != nt; ++t)
     {
         space const& current = U_[t % 2];
         space& next = U_[(t + 1) % 2];
 
         next[0] = dataflow(
-                hpx::launch::async, Op,
+                hpx::launch::async, &stepper_server::heat_part,
                 receive_left(t), current[0], current[1]
             );
         send_right(t, next[0]);
@@ -428,13 +428,13 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
         for (std::size_t i = 1; i != local_np-1; ++i)
         {
             next[i] = dataflow(
-                    hpx::launch::async, Op,
+                    hpx::launch::async, &stepper_server::heat_part,
                     current[i-1], current[i], current[i+1]
                 );
         }
 
         next[local_np-1] = dataflow(
-                hpx::launch::async, Op,
+                hpx::launch::async, &stepper_server::heat_part,
                 current[local_np-2], current[local_np-1], receive_right(t)
             );
         send_left(t, next[local_np-1]);
@@ -444,14 +444,12 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
     return U_[nt % 2];
 }
 
+HPX_REGISTER_GATHER(stepper_server::space, stepper_server_space_gatherer);
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
     using hpx::lcos::local::dataflow;
-    using hpx::util::unwrapped;
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
-    using hpx::util::placeholders::_3;
 
     boost::uint64_t nt = vm["nt"].as<boost::uint64_t>();   // Number of steps.
     boost::uint64_t nx = vm["nx"].as<boost::uint64_t>();   // Number of grid points.
@@ -473,12 +471,44 @@ int hpx_main(boost::program_options::variables_map& vm)
     // Measure execution time.
     boost::uint64_t t = hpx::util::high_resolution_clock::now();
 
-    // perform all work and wait for it to finish
+    // Perform all work and wait for it to finish
     hpx::future<stepper_server::space> result = step.do_work(np/nl, nx, nt);
-    result.wait();
 
-    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
-    std::cout << "Elapsed time: " << elapsed / 1e9 << " [s]" << std::endl;
+    // Gather results from all localities
+    hpx::future<hpx::id_type> gather_id =
+        hpx::find_id_from_basename(gather_basename, 0);
+
+    if (0 == hpx::get_locality_id())
+    {
+        hpx::future<std::vector<stepper_server::space> > overall_result =
+            hpx::lcos::gather_here(gather_basename, std::move(result), nl);
+
+        if (vm.count("result"))
+        {
+            std::vector<stepper_server::space> solution = overall_result.get();
+            for (std::size_t i = 0; i != nl; ++i)
+            {
+                stepper_server::space const& s = solution[i];
+                for (std::size_t j = 0; j != np; ++j)
+                {
+                    std::cout << "U[" << i*np + j << "] = "
+                        << s[j].get_data(partition_server::middle_partition).get()
+                        << std::endl;
+                }
+            }
+        }
+        else
+        {
+            overall_result.wait();
+        }
+
+        boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+        std::cout << "Elapsed time: " << elapsed / 1e9 << " [s]" << std::endl;
+    }
+    else
+    {
+        hpx::lcos::gather_there(gather_basename, std::move(result)).wait();
+    }
 
     return hpx::finalize();
 }
