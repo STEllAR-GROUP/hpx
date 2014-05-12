@@ -55,6 +55,8 @@ struct stepper
             space const& current = U[t % 2];
             space& next = U[(t + 1) % 2];
 
+// Uncomment the following line to use OpenMP
+// #pragma omp parallel for
             for (std::size_t i = 0; i != nx; ++i)
                 next[i] = heat(current[idx(i-1, nx)], current[i], current[idx(i+1, nx)]);
         }
