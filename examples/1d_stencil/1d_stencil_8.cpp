@@ -533,6 +533,10 @@ int main(int argc, char* argv[])
          "Local x dimension")
     ;
 
-    // Initialize and run HPX
-    return hpx::init(desc_commandline, argc, argv);
+    // Initialize and run HPX, this example requires to run hpx_main on all
+    // localities
+    std::vector<std::string> cfg;
+    cfg.push_back("hpx.run_hpx_main!=1");
+
+    return hpx::init(desc_commandline, argc, argv, cfg);
 }
