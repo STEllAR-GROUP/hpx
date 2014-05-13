@@ -11,8 +11,28 @@
 // The purpose is to be able to control the amount of work performed. The
 // example is still fully serial, no parallelization is performed.
 
+// #define STENCIL3_USE_OMP 1
+
+#if !defined(STENCIL3_USE_OMP)
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#endif
+
+#include <boost/cstdint.hpp>
+#include <boost/program_options.hpp>
+#include <boost/chrono.hpp>
+
+#include <vector>
+#include <cstdlib>
+
+///////////////////////////////////////////////////////////////////////////////
+// Timer with nanosecond resolution
+inline boost::uint64_t now()
+{
+    boost::chrono::nanoseconds ns =
+        boost::chrono::steady_clock::now().time_since_epoch();
+    return static_cast<boost::uint64_t>(ns.count());
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 double k = 0.5;     // heat transfer coefficient
@@ -84,8 +104,9 @@ struct stepper
 
         next[0] = heat(left[size-1], middle[0], middle[1]);
 
-// Uncomment the following line to use OpenMP
-// #pragma omp parallel for
+#if defined(STENCIL3_USE_OMP)
+# pragma omp parallel for
+#endif
         for (std::size_t i = 1; i != size-1; ++i)
             next[i] = heat(middle[i-1], middle[i], middle[i+1]);
 
@@ -133,7 +154,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     stepper step;
 
     // Measure execution time.
-    boost::uint64_t t = hpx::util::high_resolution_clock::now();
+    boost::uint64_t t = now();
 
     // Execute nt time steps on nx grid points and print the final solution.
     stepper::space solution = step.do_work(np, nx, nt);
@@ -145,32 +166,44 @@ int hpx_main(boost::program_options::variables_map& vm)
             std::cout << "U[" << i << "] = " << solution[i] << std::endl;
     }
 
-    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+    boost::uint64_t elapsed = now() - t;
     std::cout << "Elapsed time: " << elapsed / 1e9 << " [s]" << std::endl;
 
+#if defined(STENCIL3_USE_OMP)
+    return 0;
+#else
     return hpx::finalize();
+#endif
 }
 
 int main(int argc, char* argv[])
 {
-    using namespace boost::program_options;
+    namespace po = boost::program_options;
 
-    options_description desc_commandline;
+    po::options_description desc_commandline;
     desc_commandline.add_options()
-        ("nx", value<boost::uint64_t>()->default_value(10),
+        ("nx", po::value<boost::uint64_t>()->default_value(10),
          "Local x dimension (of each partition)")
-        ("nt", value<boost::uint64_t>()->default_value(45),
+        ("nt", po::value<boost::uint64_t>()->default_value(45),
          "Number of time steps")
-        ("np", value<boost::uint64_t>()->default_value(10),
+        ("np", po::value<boost::uint64_t>()->default_value(10),
          "Number of partitions")
-        ("k", value<double>(&k)->default_value(0.5),
+        ("k", po::value<double>(&k)->default_value(0.5),
          "Heat transfer coefficient (default: 0.5)")
-        ("dt", value<double>(&dt)->default_value(1.0),
+        ("dt", po::value<double>(&dt)->default_value(1.0),
          "Timestep unit (default: 1.0[s])")
-        ("dx", value<double>(&dx)->default_value(1.0),
+        ("dx", po::value<double>(&dx)->default_value(1.0),
          "Local x dimension")
     ;
 
+#if defined(STENCIL3_USE_OMP)
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc_commandline), vm);
+    po::notify(vm);
+
+    return hpx_main(vm);
+#else
     // Initialize and run HPX
     return hpx::init(desc_commandline, argc, argv);
+#endif
 }
