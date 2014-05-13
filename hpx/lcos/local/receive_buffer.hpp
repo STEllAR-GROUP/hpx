@@ -42,11 +42,11 @@ namespace hpx { namespace lcos { namespace local
 
         ~receive_buffer()
         {
-            typedef typename buffer_map_type::value_type value_type;
-            for (value_type & v: buffer_map_)
+            iterator end = buffer_map_.end();
+            for (iterator it = buffer_map_.begin(); it != end; ++it)
             {
-                if (v.second.valid())
-                    v.second.get_future();
+                if ((*it).second.valid())
+                    (*it).second.get_future();
             }
         }
 
