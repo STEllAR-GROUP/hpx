@@ -8,24 +8,16 @@
 #if defined(DOXYGEN)
 namespace hpx { namespace lcos
 {
-    /// \brief Perform a distributed reduction operation
-    ///
-    /// The function hpx::lcos::reduce performs a distributed reduction
-    /// operation over results returned from action invocations on a given set
-    /// of global identifiers. The action can be either a plain action (in
-    /// which case the global identifiers have to refer to localities) or a
-    /// component action (in which case the global identifiers have to refer
-    /// to instances of a component type which exposes the action.
-    ///
-    /// \param
-    /// \returns
-    ///
-    ///
     template <typename T>
     hpx::future<std::vector<T> >
-    gather(
-        hpx::future<hpx::id_type> const& dest_id
-      , hpx::future<T> result);
+    gather_here(char const* basename, hpx::future<T> result,
+        std::size_t num_sites = ~0U, std::size_t this_site = ~0U);
+
+    template <typename T>
+    hpx::future<void>
+    gather_there(char const* basename, hpx::future<T> result,
+        std::size_t root_site = 0, std::size_t this_site = ~0U);
+}}
 #else
 
 #include <hpx/hpx_fwd.hpp>

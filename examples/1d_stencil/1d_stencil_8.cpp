@@ -440,7 +440,6 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
         send_left(t, next[local_np-1]);
     }
 
-    // Print the solution at time-step 'nt'.
     return U_[nt % 2];
 }
 
@@ -483,6 +482,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         hpx::future<std::vector<stepper_server::space> > overall_result =
             hpx::lcos::gather_here(gather_basename, std::move(result), nl);
 
+        // Print the solution at time-step 'nt'.
         if (vm.count("result"))
         {
             std::vector<stepper_server::space> solution = overall_result.get();
