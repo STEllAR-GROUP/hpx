@@ -17,7 +17,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 0
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -32,7 +34,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 0
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -50,7 +54,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 1
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -65,7 +71,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 1
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -83,7 +91,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 2
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -98,7 +108,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 2
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -116,7 +128,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 3
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -131,7 +145,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 3
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -149,7 +165,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 4
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -164,7 +182,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 4
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -182,7 +202,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 5
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -197,7 +219,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 5
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -215,7 +239,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 6
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -230,7 +256,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 6
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -248,7 +276,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 7
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -263,7 +293,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 7
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -281,7 +313,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 8
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -296,7 +330,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 8
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -314,7 +350,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 9
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -329,7 +367,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 9
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -347,7 +387,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 10
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -362,7 +404,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 10
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(

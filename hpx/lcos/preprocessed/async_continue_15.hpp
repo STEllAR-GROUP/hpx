@@ -18,7 +18,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 0
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -30,11 +32,14 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
+            typename util::detail::remote_result_of_async_continue<Action, F>::type
+        remote_result_type;
+        typedef
             typename hpx::actions::extract_action<
                 Action
             >::result_type
         continuation_result_type;
-        lcos::promise<result_type> p;
+        lcos::promise<result_type, remote_result_type> p;
         apply<Action>(
             new hpx::actions::typed_continuation<continuation_result_type>(
                 p.get_gid(), std::forward<F>(f))
@@ -50,7 +55,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 0
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -75,7 +82,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 1
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -87,11 +96,14 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
+            typename util::detail::remote_result_of_async_continue<Action, F>::type
+        remote_result_type;
+        typedef
             typename hpx::actions::extract_action<
                 Action
             >::result_type
         continuation_result_type;
-        lcos::promise<result_type> p;
+        lcos::promise<result_type, remote_result_type> p;
         apply<Action>(
             new hpx::actions::typed_continuation<continuation_result_type>(
                 p.get_gid(), std::forward<F>(f))
@@ -107,7 +119,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 1
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -132,7 +146,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 2
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -144,11 +160,14 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
+            typename util::detail::remote_result_of_async_continue<Action, F>::type
+        remote_result_type;
+        typedef
             typename hpx::actions::extract_action<
                 Action
             >::result_type
         continuation_result_type;
-        lcos::promise<result_type> p;
+        lcos::promise<result_type, remote_result_type> p;
         apply<Action>(
             new hpx::actions::typed_continuation<continuation_result_type>(
                 p.get_gid(), std::forward<F>(f))
@@ -164,7 +183,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 2
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -189,7 +210,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 3
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -201,11 +224,14 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
+            typename util::detail::remote_result_of_async_continue<Action, F>::type
+        remote_result_type;
+        typedef
             typename hpx::actions::extract_action<
                 Action
             >::result_type
         continuation_result_type;
-        lcos::promise<result_type> p;
+        lcos::promise<result_type, remote_result_type> p;
         apply<Action>(
             new hpx::actions::typed_continuation<continuation_result_type>(
                 p.get_gid(), std::forward<F>(f))
@@ -221,7 +247,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 3
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -246,7 +274,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 4
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -258,11 +288,14 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
+            typename util::detail::remote_result_of_async_continue<Action, F>::type
+        remote_result_type;
+        typedef
             typename hpx::actions::extract_action<
                 Action
             >::result_type
         continuation_result_type;
-        lcos::promise<result_type> p;
+        lcos::promise<result_type, remote_result_type> p;
         apply<Action>(
             new hpx::actions::typed_continuation<continuation_result_type>(
                 p.get_gid(), std::forward<F>(f))
@@ -278,7 +311,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 4
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -303,7 +338,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 5
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -315,11 +352,14 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
+            typename util::detail::remote_result_of_async_continue<Action, F>::type
+        remote_result_type;
+        typedef
             typename hpx::actions::extract_action<
                 Action
             >::result_type
         continuation_result_type;
-        lcos::promise<result_type> p;
+        lcos::promise<result_type, remote_result_type> p;
         apply<Action>(
             new hpx::actions::typed_continuation<continuation_result_type>(
                 p.get_gid(), std::forward<F>(f))
@@ -335,7 +375,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 5
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -360,7 +402,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 6
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -372,11 +416,14 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
+            typename util::detail::remote_result_of_async_continue<Action, F>::type
+        remote_result_type;
+        typedef
             typename hpx::actions::extract_action<
                 Action
             >::result_type
         continuation_result_type;
-        lcos::promise<result_type> p;
+        lcos::promise<result_type, remote_result_type> p;
         apply<Action>(
             new hpx::actions::typed_continuation<continuation_result_type>(
                 p.get_gid(), std::forward<F>(f))
@@ -392,7 +439,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 6
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -417,7 +466,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 7
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -429,11 +480,14 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
+            typename util::detail::remote_result_of_async_continue<Action, F>::type
+        remote_result_type;
+        typedef
             typename hpx::actions::extract_action<
                 Action
             >::result_type
         continuation_result_type;
-        lcos::promise<result_type> p;
+        lcos::promise<result_type, remote_result_type> p;
         apply<Action>(
             new hpx::actions::typed_continuation<continuation_result_type>(
                 p.get_gid(), std::forward<F>(f))
@@ -449,7 +503,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 7
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -474,7 +530,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 8
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -486,11 +544,14 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
+            typename util::detail::remote_result_of_async_continue<Action, F>::type
+        remote_result_type;
+        typedef
             typename hpx::actions::extract_action<
                 Action
             >::result_type
         continuation_result_type;
-        lcos::promise<result_type> p;
+        lcos::promise<result_type, remote_result_type> p;
         apply<Action>(
             new hpx::actions::typed_continuation<continuation_result_type>(
                 p.get_gid(), std::forward<F>(f))
@@ -506,7 +567,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 8
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -531,7 +594,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 9
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -543,11 +608,14 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
+            typename util::detail::remote_result_of_async_continue<Action, F>::type
+        remote_result_type;
+        typedef
             typename hpx::actions::extract_action<
                 Action
             >::result_type
         continuation_result_type;
-        lcos::promise<result_type> p;
+        lcos::promise<result_type, remote_result_type> p;
         apply<Action>(
             new hpx::actions::typed_continuation<continuation_result_type>(
                 p.get_gid(), std::forward<F>(f))
@@ -563,7 +631,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 9
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -588,7 +658,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 10
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -600,11 +672,14 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
+            typename util::detail::remote_result_of_async_continue<Action, F>::type
+        remote_result_type;
+        typedef
             typename hpx::actions::extract_action<
                 Action
             >::result_type
         continuation_result_type;
-        lcos::promise<result_type> p;
+        lcos::promise<result_type, remote_result_type> p;
         apply<Action>(
             new hpx::actions::typed_continuation<continuation_result_type>(
                 p.get_gid(), std::forward<F>(f))
@@ -620,7 +695,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 10
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -645,7 +722,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 11
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -657,11 +736,14 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
+            typename util::detail::remote_result_of_async_continue<Action, F>::type
+        remote_result_type;
+        typedef
             typename hpx::actions::extract_action<
                 Action
             >::result_type
         continuation_result_type;
-        lcos::promise<result_type> p;
+        lcos::promise<result_type, remote_result_type> p;
         apply<Action>(
             new hpx::actions::typed_continuation<continuation_result_type>(
                 p.get_gid(), std::forward<F>(f))
@@ -677,7 +759,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 11
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -702,7 +786,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 12
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -714,11 +800,14 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
+            typename util::detail::remote_result_of_async_continue<Action, F>::type
+        remote_result_type;
+        typedef
             typename hpx::actions::extract_action<
                 Action
             >::result_type
         continuation_result_type;
-        lcos::promise<result_type> p;
+        lcos::promise<result_type, remote_result_type> p;
         apply<Action>(
             new hpx::actions::typed_continuation<continuation_result_type>(
                 p.get_gid(), std::forward<F>(f))
@@ -734,7 +823,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 12
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -759,7 +850,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 13
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -771,11 +864,14 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
+            typename util::detail::remote_result_of_async_continue<Action, F>::type
+        remote_result_type;
+        typedef
             typename hpx::actions::extract_action<
                 Action
             >::result_type
         continuation_result_type;
-        lcos::promise<result_type> p;
+        lcos::promise<result_type, remote_result_type> p;
         apply<Action>(
             new hpx::actions::typed_continuation<continuation_result_type>(
                 p.get_gid(), std::forward<F>(f))
@@ -791,7 +887,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 13
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -816,7 +914,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 14
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -828,11 +928,14 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
+            typename util::detail::remote_result_of_async_continue<Action, F>::type
+        remote_result_type;
+        typedef
             typename hpx::actions::extract_action<
                 Action
             >::result_type
         continuation_result_type;
-        lcos::promise<result_type> p;
+        lcos::promise<result_type, remote_result_type> p;
         apply<Action>(
             new hpx::actions::typed_continuation<continuation_result_type>(
                 p.get_gid(), std::forward<F>(f))
@@ -848,7 +951,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 14
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -873,7 +978,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 15
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -885,11 +992,14 @@ namespace hpx
             typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
+            typename util::detail::remote_result_of_async_continue<Action, F>::type
+        remote_result_type;
+        typedef
             typename hpx::actions::extract_action<
                 Action
             >::result_type
         continuation_result_type;
-        lcos::promise<result_type> p;
+        lcos::promise<result_type, remote_result_type> p;
         apply<Action>(
             new hpx::actions::typed_continuation<continuation_result_type>(
                 p.get_gid(), std::forward<F>(f))
@@ -905,7 +1015,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 15
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(
