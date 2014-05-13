@@ -39,7 +39,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             shutdown_sem_.signal();
     }
 
-#if defined(BOOST_ASIO_HAS_MOVE)
+#if defined(BOOST_ASIO_HAS_MOVE) && BOOST_VERSION >= 105500
     // Schedule the specified function for execution in this executor.
     // Depending on the subclass implementation, this may block in some
     // situations.
@@ -109,7 +109,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     }
 #endif
 
-#if defined(BOOST_ASIO_HAS_MOVE)
+#if defined(BOOST_ASIO_HAS_MOVE) && BOOST_VERSION >= 105500
     static void delayed_add(
         boost::intrusive_ptr<service_executor> this_,
         service_executor::closure_type && f,
