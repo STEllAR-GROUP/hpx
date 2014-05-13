@@ -36,30 +36,6 @@ namespace hpx { namespace util
             )>::type
         >
     {};
-
-    namespace detail
-    {
-        ///////////////////////////////////////////////////////////////////////
-        // Beware: this is a workaround for the specifics of result type
-        // calculation for using actions as continuations.
-        template <typename Action, typename F, typename LocalResult =
-            typename traits::promise_local_result<
-                typename result_of_async_continue<Action, F>::type
-            >::type>
-        struct remote_result_of_async_continue
-          : boost::mpl::identity<LocalResult>
-        {};
-
-        template <typename Action, typename F>
-        struct remote_result_of_async_continue<Action, F, hpx::naming::id_type>
-          : boost::mpl::identity<hpx::naming::gid_type>
-        {};
-
-        template <typename Action, typename F>
-        struct remote_result_of_async_continue<Action, F, void>
-          : boost::mpl::identity<hpx::util::unused_type>
-        {};
-    }
 }}
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
@@ -95,7 +71,30 @@ namespace hpx { namespace util
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action
+    namespace detail
+    {
+        template <
+            typename Action
+          , typename RemoteResult
+          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
+          , typename F>
+        typename boost::enable_if_c<
+            util::tuple_size<typename Action::arguments_type>::value == N
+          , lcos::future<
+                typename traits::promise_local_result<
+                    typename util::result_of_async_continue<Action, F>::type
+                >::type
+            >
+        >::type
+        async_continue_r(
+            naming::id_type const& gid
+          BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)
+          , F && f);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <
+        typename Action
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
       , typename F>
     typename boost::enable_if_c<
