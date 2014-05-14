@@ -13,6 +13,7 @@
 #include <hpx/lcos/gather.hpp>
 
 #include <boost/shared_array.hpp>
+#include <boost/serialization/vector.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 double k = 0.5;     // heat transfer coefficient
