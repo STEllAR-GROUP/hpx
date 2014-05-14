@@ -24,16 +24,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename F>
     struct result_of_async_continue
         : actions::detail::remote_action_result<
             typename util::result_of<typename util::decay<F>::type(
                 naming::id_type,
-                typename traits::promise_local_result<
-                    typename hpx::actions::extract_action<
-                        Action
-                    >::remote_result_type
-                >::type
+                typename hpx::actions::extract_action<
+                    Action
+                >::remote_result_type
             )>::type
         >
     {};
@@ -72,13 +71,38 @@ namespace hpx { namespace util
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action
+    namespace detail
+    {
+        template <
+            typename Action
+          , typename RemoteResult
+          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
+          , typename F>
+        typename boost::enable_if_c<
+            util::tuple_size<typename Action::arguments_type>::value == N
+          , lcos::future<
+                typename traits::promise_local_result<
+                    typename util::result_of_async_continue<Action, F>::type
+                >::type
+            >
+        >::type
+        async_continue_r(
+            naming::id_type const& gid
+          BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)
+          , F && f);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <
+        typename Action
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == N
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -94,7 +118,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == N
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(

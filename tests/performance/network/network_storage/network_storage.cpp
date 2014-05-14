@@ -429,7 +429,7 @@ void test_write(
               send_rank = random_rank(gen);
             }
             else {
-              send_rank = i % nranks;
+              send_rank = static_cast<int>(i % nranks);
             }
             // get the pointer to the current packet send buffer
             char *buffer = &local_storage[i*options.transfer_size_B];
@@ -494,7 +494,7 @@ void test_write(
         }
         double movetime = movetimer.elapsed();
         //
-        int numwait = final_list.size();
+        int numwait = static_cast<int>(final_list.size());
         hpx::util::high_resolution_timer futuretimer;
         hpx::future<int> result = when_all(final_list).then(hpx::launch::sync, reduce);
         result.get();
@@ -591,7 +591,7 @@ void test_read(
               send_rank = random_rank(gen);
             }
             else {
-              send_rank = i % nranks;
+              send_rank = static_cast<int>(i % nranks);
             }
             // get the pointer to the current packet send buffer
             char *buffer = &local_storage[i*options.transfer_size_B];
@@ -663,7 +663,7 @@ void test_read(
         }
         double movetime = movetimer.elapsed();
         //
-        int numwait = final_list.size();
+        int numwait = static_cast<int>(final_list.size());
         hpx::util::high_resolution_timer futuretimer;
         hpx::future<int> result = when_all(final_list).then(hpx::launch::sync, reduce);
         result.get();
@@ -751,7 +751,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     options.threads           = hpx::get_os_thread_count();
     options.network           = vm["parceltype"].as<std::string>();
     options.all2all           = vm["all-to-all"].as<bool>();
-    options.distribution      = vm["distribution"].as<boost::uint64_t>();
+    options.distribution      = vm["distribution"].as<boost::uint64_t>() ? true : false;
 
     //
     if (options.global_storage_MB>0) {

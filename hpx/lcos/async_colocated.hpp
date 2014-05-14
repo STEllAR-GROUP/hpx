@@ -144,10 +144,13 @@ namespace hpx
             agas::stubs::primary_namespace::get_service_instance(gid.get_gid())
           , naming::id_type::unmanaged);
 
+        typedef
+            typename hpx::actions::extract_action<Action>::remote_result_type
+        remote_result_type;
         typedef agas::server::primary_namespace::service_action action_type;
 
         using util::placeholders::_2;
-        return async_continue<action_type>(
+        return detail::async_continue_r<action_type, remote_result_type>(
             service_target, req
           , util::functional::async_continuation(
                 util::bind<Action>(

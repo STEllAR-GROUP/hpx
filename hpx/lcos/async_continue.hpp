@@ -57,6 +57,49 @@
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        template <
+            typename Action
+          , typename RemoteResult
+          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
+          , typename F>
+        typename boost::enable_if_c<
+            util::tuple_size<typename Action::arguments_type>::value == N
+          , lcos::future<
+                typename traits::promise_local_result<
+                    typename util::result_of_async_continue<Action, F>::type
+                >::type
+            >
+        >::type
+        async_continue_r(
+            naming::id_type const& gid
+          BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)
+          , F && f)
+        {
+            typedef
+                typename traits::promise_local_result<
+                    typename util::result_of_async_continue<Action, F>::type
+                >::type
+            result_type;
+
+            typedef
+                typename hpx::actions::extract_action<
+                    Action
+                >::result_type
+            continuation_result_type;
+
+            lcos::promise<result_type, RemoteResult> p;
+            apply<Action>(
+                new hpx::actions::typed_continuation<continuation_result_type>(
+                    p.get_gid(), std::forward<F>(f))
+              , gid
+              BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+            return p.get_future();
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <
         typename Action
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
@@ -64,7 +107,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == N
       , lcos::future<
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         >
     >::type
     async_continue(
@@ -73,21 +118,15 @@ namespace hpx
       , F && f)
     {
         typedef
-            typename util::result_of_async_continue<Action, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Action, F>::type
+            >::type
         result_type;
-        typedef
-            typename hpx::actions::extract_action<
-                Action
-            >::result_type
-        continuation_result_type;
 
-        lcos::promise<result_type> p;
-        apply<Action>(
-            new hpx::actions::typed_continuation<continuation_result_type>(
-                p.get_gid(), std::forward<F>(f))
-          , gid
-          BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-        return p.get_future();
+        return detail::async_continue_r<Action, result_type>(
+            gid
+          BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg)
+          , std::forward<F>(f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -98,7 +137,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == N
       , lcos::future<
-            typename util::result_of_async_continue<Derived, F>::type
+            typename traits::promise_local_result<
+                typename util::result_of_async_continue<Derived, F>::type
+            >::type
         >
     >::type
     async_continue(

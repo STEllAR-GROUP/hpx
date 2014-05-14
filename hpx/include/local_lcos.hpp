@@ -23,6 +23,7 @@
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/lcos/local/and_gate.hpp>
 #include <hpx/lcos/local/trigger.hpp>
+#include <hpx/lcos/local/receive_buffer.hpp>
 
 #endif
 

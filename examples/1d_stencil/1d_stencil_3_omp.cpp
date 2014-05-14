@@ -10,9 +10,16 @@
 // of the 1D grid into groups of grid partitions which are handled at the same time.
 // The purpose is to be able to control the amount of work performed. The
 // example is still fully serial, no parallelization is performed.
+//
+// The only difference to 1d_stencil_3 is that this example uses OpenMP for
+// parallelizing the inner loop.
 
-#include <hpx/hpx_init.hpp>
-#include <hpx/hpx.hpp>
+#include <boost/cstdint.hpp>
+#include <boost/program_options.hpp>
+#include <boost/chrono.hpp>
+
+#include <vector>
+#include <cstdlib>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Timer with nanosecond resolution
@@ -93,7 +100,9 @@ struct stepper
 
         next[0] = heat(left[size-1], middle[0], middle[1]);
 
-        for (std::size_t i = 1; i != size-1; ++i)
+        // Visual Studio requires OMP loop variables to be signed :/
+        # pragma omp parallel for
+        for (boost::int64_t i = 1; i < boost::int64_t(size-1); ++i)
             next[i] = heat(middle[i-1], middle[i], middle[i+1]);
 
         next[size-1] = heat(middle[size-2], middle[size-1], right[0]);
@@ -155,7 +164,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     boost::uint64_t elapsed = now() - t;
     std::cout << "Elapsed time: " << elapsed / 1e9 << " [s]" << std::endl;
 
-    return hpx::finalize();
+    return 0;
 }
 
 int main(int argc, char* argv[])
@@ -178,6 +187,9 @@ int main(int argc, char* argv[])
          "Local x dimension")
     ;
 
-    // Initialize and run HPX
-    return hpx::init(desc_commandline, argc, argv);
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc_commandline), vm);
+    po::notify(vm);
+
+    return hpx_main(vm);
 }

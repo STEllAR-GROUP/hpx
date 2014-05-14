@@ -2057,7 +2057,7 @@ lcos::future<naming::id_type> addressing_service::resolve_name_async(
 namespace detail
 {
     hpx::future<hpx::id_type> on_register_event(hpx::future<bool> f,
-        lcos::promise<hpx::id_type> p)
+        lcos::promise<hpx::id_type, naming::gid_type> p)
     {
         if (!f.get())
         {
@@ -2082,7 +2082,7 @@ future<hpx::id_type> addressing_service::on_symbol_namespace_event(
         return hpx::future<hpx::id_type>();
     }
 
-    lcos::promise<naming::id_type> p;
+    lcos::promise<naming::id_type, naming::gid_type> p;
     request req(symbol_ns_on_event, name, evt, call_for_past_events, p.get_gid());
     hpx::future<bool> f = stubs::symbol_namespace::service_async<bool>(
         name, req, action_priority_);
