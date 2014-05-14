@@ -73,7 +73,7 @@ struct stepper
 
             // Visual Studio requires OMP loop variables to be signed :/
             # pragma omp parallel for
-            for (boost::int64_t i = 0; i != boost::int64_t(nx); ++i)
+            for (boost::int64_t i = 0; i < boost::int64_t(nx); ++i)
                 next[i] = heat(current[idx(i-1, nx)], current[i], current[idx(i+1, nx)]);
         }
 
