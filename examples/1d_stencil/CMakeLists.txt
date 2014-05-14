@@ -14,6 +14,12 @@ set(example_programs
     1d_stencil_7
     1d_stencil_8)
 
+if(OPENMP_FOUND)
+  set(example_programs ${example_programs}
+      1d_stencil_1_omp
+      1d_stencil_3_omp)
+endif()
+
 foreach(example_program ${example_programs})
 
   set(${example_program}_FLAGS DEPENDENCIES iostreams_component)
@@ -40,3 +46,15 @@ foreach(example_program ${example_programs})
                               ${example_program}_exe)
 endforeach()
 
+if(OPENMP_FOUND)
+  set_target_properties(1d_stencil_1_omp_exe
+    PROPERTIES COMPILE_FLAGS "${OpenMP_CXX_FLAGS}")
+  set_target_properties(1d_stencil_3_omp_exe
+    PROPERTIES COMPILE_FLAGS "${OpenMP_CXX_FLAGS}")
+  if(NOT MSVC)
+    set_target_properties(1d_stencil_1_omp_exe
+      PROPERTIES LINK_FLAGS "${OpenMP_CXX_FLAGS}")
+    set_target_properties(1d_stencil_3_omp_exe
+      PROPERTIES LINK_FLAGS "${OpenMP_CXX_FLAGS}")
+  endif()
+endif()

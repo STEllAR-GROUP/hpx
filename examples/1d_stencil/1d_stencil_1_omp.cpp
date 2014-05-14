@@ -8,9 +8,16 @@
 //
 // This example provides a serial base line implementation. No parallelization
 // is performed.
+//
+// The only difference to 1d_stencil_1 is that this example uses OpenMP for
+// parallelizing the inner loop.
 
-#include <hpx/hpx_init.hpp>
-#include <hpx/hpx.hpp>
+#include <boost/cstdint.hpp>
+#include <boost/program_options.hpp>
+#include <boost/chrono.hpp>
+
+#include <vector>
+#include <cstdlib>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Timer with nanosecond resolution
@@ -64,6 +71,7 @@ struct stepper
             space const& current = U[t % 2];
             space& next = U[(t + 1) % 2];
 
+            # pragma omp parallel for
             for (std::size_t i = 0; i != nx; ++i)
                 next[i] = heat(current[idx(i-1, nx)], current[i], current[idx(i+1, nx)]);
         }
@@ -98,7 +106,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     boost::uint64_t elapsed = now() - t;
     std::cout << "Elapsed time: " << elapsed / 1e9 << " [s]" << std::endl;
 
-    return hpx::finalize();
+    return 0;
 }
 
 int main(int argc, char* argv[])
@@ -120,6 +128,9 @@ int main(int argc, char* argv[])
          "Local x dimension")
     ;
 
-    // Initialize and run HPX
-    return hpx::init(desc_commandline, argc, argv);
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc_commandline), vm);
+    po::notify(vm);
+
+    return hpx_main(vm);
 }
