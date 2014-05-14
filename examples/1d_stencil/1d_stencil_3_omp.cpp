@@ -100,8 +100,9 @@ struct stepper
 
         next[0] = heat(left[size-1], middle[0], middle[1]);
 
+        // Visual Studio requires OMP loop variables to be signed :/
         # pragma omp parallel for
-        for (std::size_t i = 1; i != size-1; ++i)
+        for (boost::int64_t i = 1; i < boost::int64_t(size-1); ++i)
             next[i] = heat(middle[i-1], middle[i], middle[i+1]);
 
         next[size-1] = heat(middle[size-2], middle[size-1], right[0]);

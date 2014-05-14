@@ -71,8 +71,9 @@ struct stepper
             space const& current = U[t % 2];
             space& next = U[(t + 1) % 2];
 
+            // Visual Studio requires OMP loop variables to be signed :/
             # pragma omp parallel for
-            for (std::size_t i = 0; i != nx; ++i)
+            for (boost::int64_t i = 0; i != boost::int64_t(nx); ++i)
                 next[i] = heat(current[idx(i-1, nx)], current[i], current[idx(i+1, nx)]);
         }
 
