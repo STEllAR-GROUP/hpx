@@ -50,7 +50,7 @@ namespace hpx { namespace lcos { namespace local
             }
         }
 
-        T receive(std::size_t step)
+        hpx::future<T> receive(std::size_t step)
         {
             typename mutex_type::scoped_lock l(mtx_);
             return receive_locked(step);
@@ -78,7 +78,7 @@ namespace hpx { namespace lcos { namespace local
             iterator it_;
         };
 
-        T receive_locked(std::size_t step)
+        hpx::future<T> receive_locked(std::size_t step)
         {
             iterator it = get_buffer_entry(step);
             HPX_ASSERT(it != buffer_map_.end());
