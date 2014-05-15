@@ -1150,28 +1150,34 @@ namespace hpx
         if (&ec != &throws)
             ec = make_success_code();
 
-        if (hpx::find_here() == hpx::find_root_locality())
+        if (std::abs(localwait + 1.0) < 1e-16)
+            localwait = detail::get_option("hpx.finalize_wait_time", -1.0);
+        else
         {
-            if (std::abs(localwait + 1.0) < 1e-16)
-                localwait = detail::get_option("hpx.finalize_wait_time", -1.0);
-            else
-            {
-                hpx::util::high_resolution_timer t;
-                double start_time = t.elapsed();
-                double current = 0.0;
-                do {
-                    current = t.elapsed();
-                } while (current - start_time < localwait * 1e-6);
-            }
+            hpx::util::high_resolution_timer t;
+            double start_time = t.elapsed();
+            double current = 0.0;
+            do {
+                current = t.elapsed();
+            } while (current - start_time < localwait * 1e-6);
+        }
 
-            if (std::abs(shutdown_timeout + 1.0) < 1e-16)
-                shutdown_timeout = detail::get_option("hpx.shutdown_timeout", -1.0);
+        if (std::abs(shutdown_timeout + 1.0) < 1e-16)
+            shutdown_timeout = detail::get_option("hpx.shutdown_timeout", -1.0);
 
-            components::server::runtime_support* p =
-                reinterpret_cast<components::server::runtime_support*>(
-                      get_runtime().get_runtime_support_lva());
+        using components::server::runtime_support;
 
+        hpx::id_type root = hpx::find_root_locality();
+        if (hpx::find_here() == root)
+        {
+            runtime_support* p = get_runtime_support_ptr();
             p->shutdown_all(shutdown_timeout);
+        }
+        else
+        {
+            // tell main locality to start application exit, duplicate requests
+            // will be ignored
+            apply<runtime_support::shutdown_all_action>(root, shutdown_timeout);
         }
 
         util::apex_finalize();

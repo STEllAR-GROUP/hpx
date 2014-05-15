@@ -21,6 +21,7 @@
 #include <boost/preprocessor/comma_if.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 #include <boost/preprocessor/iterate.hpp>
+#include <boost/atomic.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/agas/gva.hpp>
@@ -406,6 +407,7 @@ namespace hpx { namespace components { namespace server
         bool stopped_;
         bool terminated_;
         bool dijkstra_color_;   // false: white, true: black
+        boost::atomic<bool> shutdown_all_invoked_;
 
         lcos::local::spinlock dijkstra_mtx_;
         lcos::local::condition_variable dijkstra_cond_;

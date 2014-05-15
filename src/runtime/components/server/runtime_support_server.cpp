@@ -245,7 +245,8 @@ namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     runtime_support::runtime_support()
-      : stopped_(false), terminated_(false), dijkstra_color_(false)
+      : stopped_(false), terminated_(false), dijkstra_color_(false),
+        shutdown_all_invoked_(false)
     {}
 
     ///////////////////////////////////////////////////////////////////////////
@@ -591,7 +592,7 @@ namespace hpx { namespace components { namespace server
 
         agas_client.start_shutdown();
 
-        // First wait for this locality to become passive. We do this by 
+        // First wait for this locality to become passive. We do this by
         // periodically checking the number of still running threads.
         //
         // Rule 0: When active, machine nr.i + 1 keeps the token; when passive,
@@ -656,7 +657,7 @@ namespace hpx { namespace components { namespace server
         boost::uint32_t initiating_locality_id,
         boost::uint32_t num_localities, bool dijkstra_token)
     {
-        // First wait for this locality to become passive. We do this by 
+        // First wait for this locality to become passive. We do this by
         // periodically checking the number of still running threads.
         //
         // Rule 0: When active, machine nr.i + 1 keeps the token; when passive,
@@ -762,6 +763,19 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     void runtime_support::shutdown_all(double timeout)
     {
+        if (find_here() != hpx::find_root_locality())
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "runtime_support::shutdown_all",
+                "shutdown_all shut be invoked on the troot locality only");
+            return;
+        }
+
+        // make sure shutdown_all is invoked only once
+        bool flag = false;
+        if (!shutdown_all_invoked_.compare_exchange_strong(flag, true))
+            return;
+
         applier::applier& appl = hpx::applier::get_applier();
         naming::resolver_client& agas_client = appl.get_agas_client();
 
@@ -935,6 +949,7 @@ namespace hpx { namespace components { namespace server
         mutex_type::scoped_lock l(mtx_);
         stopped_ = false;
         terminated_ = false;
+        shutdown_all_invoked_.store(false);
     }
 
     void runtime_support::wait()
