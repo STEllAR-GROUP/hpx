@@ -23,6 +23,9 @@
 #endif
 
 #if defined(BOOST_WINDOWS)
+#if !defined(WIN32)
+#  define WIN32
+#endif
 #include <winsock2.h>
 #include <windows.h>
 #endif
