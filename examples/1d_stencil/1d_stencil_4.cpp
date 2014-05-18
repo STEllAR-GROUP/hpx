@@ -28,13 +28,13 @@ inline std::size_t idx(std::size_t i, std::size_t size)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Our partition data type
-struct partition
+struct partition_data
 {
-    partition(std::size_t size)
+    partition_data(std::size_t size)
       : data_(new double [size]), size_(size)
     {}
 
-    partition(std::size_t size, double initial_value)
+    partition_data(std::size_t size, double initial_value)
       : data_(new double [size]), size_(size)
     {
         double base_value = double(initial_value * size);
@@ -52,7 +52,7 @@ private:
     std::size_t size_;
 };
 
-std::ostream& operator<<(std::ostream& os, partition const& c)
+std::ostream& operator<<(std::ostream& os, partition_data const& c)
 {
     os << "{";
     for (std::size_t i = 0; i != c.size(); ++i)
@@ -69,7 +69,8 @@ std::ostream& operator<<(std::ostream& os, partition const& c)
 struct stepper
 {
     // Our data for one time step
-    typedef std::vector<hpx::shared_future<partition> > space;
+    typedef hpx::shared_future<partition_data> partition;
+    typedef std::vector<partition> space;
 
     // Our operator
     static double heat(double left, double middle, double right)
@@ -79,11 +80,11 @@ struct stepper
 
     // The partitioned operator, it invokes the heat operator above on all
     // elements of a partition.
-    static partition heat_part(partition const& left,
-        partition const& middle, partition const& right)
+    static partition_data heat_part(partition_data const& left,
+        partition_data const& middle, partition_data const& right)
     {
         std::size_t size = middle.size();
-        partition next(size);
+        partition_data next(size);
 
         next[0] = heat(left[size-1], middle[0], middle[1]);
 
@@ -109,7 +110,7 @@ struct stepper
 
         // Initial conditions: f(0, i) = i
         for (std::size_t i = 0; i != np; ++i)
-            U[0][i] = hpx::make_ready_future(partition(nx, double(i)));
+            U[0][i] = hpx::make_ready_future(partition_data(nx, double(i)));
 
         auto Op = unwrapped(&stepper::heat_part);
 

@@ -26,11 +26,6 @@ double k = 0.5;     // heat transfer coefficient
 double dt = 1.;     // time step
 double dx = 1.;     // grid spacing
 
-inline std::size_t idx(std::size_t i, std::size_t size)
-{
-    return (boost::int64_t(i) < 0) ? (i + size) % size : i % size;
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 struct stepper
 {
@@ -64,8 +59,12 @@ struct stepper
             space const& current = U[t % 2];
             space& next = U[(t + 1) % 2];
 
-            for (std::size_t i = 0; i != nx; ++i)
-                next[i] = heat(current[idx(i-1, nx)], current[i], current[idx(i+1, nx)]);
+            next[0] = heat(current[nx-1], current[0], current[1]);
+
+            for (std::size_t i = 1; i != nx-1; ++i)
+                next[i] = heat(current[i-1], current[i], current[i+1]);
+
+            next[nx-1] = heat(current[nx-2], current[nx-1], current[0]);
         }
 
         // Return the solution at time-step 'nt'.
