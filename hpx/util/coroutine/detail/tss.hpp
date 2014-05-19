@@ -105,7 +105,7 @@ namespace hpx { namespace util { namespace coroutines
                 return value_;
             }
 
-#if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40500) || defined(__INTEL_COMPILER)
+#if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40500) || defined(BOOST_INTEL_LINUX)
             // this is helping gcc 4.4
             void set_data(boost::shared_ptr<tss_cleanup_function> f, void* val)
             {
