@@ -112,11 +112,6 @@ inline std::size_t idx(std::size_t i, std::size_t size)
     return (boost::int64_t(i) < 0) ? (i + size) % size : i % size;
 }
 
-inline std::size_t locidx(std::size_t i, std::size_t np, std::size_t nl)
-{
-    return i / (np/nl);
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 // This is the server side representation of the data. We expose this as a HPX
 // component which allows for it to be created and accessed remotely through
@@ -475,11 +470,9 @@ int hpx_main(boost::program_options::variables_map& vm)
     hpx::future<stepper_server::space> result = step.do_work(np/nl, nx, nt);
 
     // Gather results from all localities
-    hpx::future<hpx::id_type> gather_id =
-        hpx::find_id_from_basename(gather_basename, 0);
-
     if (0 == hpx::get_locality_id())
     {
+        boost::uint64_t elapsed = 0;
         hpx::future<std::vector<stepper_server::space> > overall_result =
             hpx::lcos::gather_here(gather_basename, std::move(result), nl);
 
@@ -487,6 +480,8 @@ int hpx_main(boost::program_options::variables_map& vm)
         if (vm.count("result"))
         {
             std::vector<stepper_server::space> solution = overall_result.get();
+            elapsed = hpx::util::high_resolution_clock::now() - t;
+
             for (std::size_t i = 0; i != nl; ++i)
             {
                 stepper_server::space const& s = solution[i];
@@ -501,9 +496,9 @@ int hpx_main(boost::program_options::variables_map& vm)
         else
         {
             overall_result.wait();
+            elapsed = hpx::util::high_resolution_clock::now() - t;
         }
 
-        boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
         std::cout << "Elapsed time: " << elapsed / 1e9 << " [s]" << std::endl;
     }
     else
