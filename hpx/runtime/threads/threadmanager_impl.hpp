@@ -519,7 +519,7 @@ namespace hpx { namespace threads
             return used_processing_units_;
         }
 
-        // Return the executor associated with th egiven thread
+        // Return the executor associated with the given thread
         executor get_executor(thread_id_type const& id, error_code& ec) const;
 
     private:
