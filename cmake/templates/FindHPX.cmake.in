@@ -36,7 +36,7 @@ set(HPX_GIT_COMMIT @HPX_GIT_COMMIT@
 
 if(NOT MSVC)
   set(HPX_RPATH @external_rpath@ CACHE PATH "Base RPATH for linking against HPX")
-  set(HPX_PIE ON CACHE BOOL "Compile executables as shared objects")
+  set(HPX_PIE @HPX_PIE@ CACHE BOOL "Compile executables as shared objects")
   mark_as_advanced(FORCE HPX_RPATH HPX_PIE)
 else()
   set(HPX_LINK_FLAG_TARGET_PROPERTIES "@hpx_link_flag_target_properties@"
