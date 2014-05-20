@@ -1981,7 +1981,7 @@ endforeach()
 # Make list unique
 list(REMOVE_DUPLICATES external_definitions)
 
-set(cmake_dir cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
+set(CMAKE_DIR "cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" CACHE STRING "directory (in share), where to put FindHPX cmake module")
 
 if(MSVC)
   set(output_dir "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
@@ -2002,12 +2002,12 @@ if(MSVC AND HPX_LINK_FLAG_TARGET_PROPERTIES)
 endif()
 
 configure_file("${hpx_SOURCE_DIR}/cmake/templates/FindHPX.cmake.in"
-               "${output_dir}/share/${cmake_dir}/Modules/FindHPX.cmake"
+               "${output_dir}/share/${CMAKE_DIR}/Modules/FindHPX.cmake"
                ESCAPE_QUOTES @ONLY)
 
 if(NOT HPX_NO_INSTALL)
-  install(FILES "${output_dir}/share/${cmake_dir}/Modules/FindHPX.cmake"
-          DESTINATION "share/${cmake_dir}/Modules")
+  install(FILES "${output_dir}/share/${CMAKE_DIR}/Modules/FindHPX.cmake"
+          DESTINATION "share/${CMAKE_DIR}/Modules")
 endif()
 
 if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
