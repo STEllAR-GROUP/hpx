@@ -206,7 +206,7 @@ struct object_semaphore
         }
     } // }}}
 
-#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
+#if defined(HPX_GCC44_WORKAROUND)
     typedef
         hpx::actions::action2<
             object_semaphore<ValueType>

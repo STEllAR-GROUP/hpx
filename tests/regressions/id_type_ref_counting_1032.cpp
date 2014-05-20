@@ -52,7 +52,7 @@ struct test_server1
 
     void test();
 
-#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
+#if defined(HPX_GCC44_WORKAROUND)
     typedef hpx::actions::action0<
         test_server1, &test_server1::test
     > test_action;
@@ -85,7 +85,7 @@ struct test_server2
             hpx::find_here(), this->get_gid()).get();
     }
 
-#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
+#if defined(HPX_GCC44_WORKAROUND)
     typedef hpx::actions::result_action0<
         test_server2, hpx::id_type, &test_server2::create_test_server1
     > create_test_server1_action;

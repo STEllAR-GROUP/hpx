@@ -23,7 +23,7 @@
 
 #include <boost/preprocessor/cat.hpp>
 
-#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
+#if defined(HPX_GCC44_WORKAROUND)
 
 // use a special version of action implementation for gcc 4.4 which has only
 // a partial implementation of decltype (i.e. __typeof__)

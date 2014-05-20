@@ -12,7 +12,7 @@
 #if !defined(BOOST_FORCEINLINE)
 #   if defined(_MSC_VER)
 #       define BOOST_FORCEINLINE __forceinline
-#   elif HPX_GCC_VERSION >= 40400
+#   elif !defined(HPX_GCC44_WORKAROUND)
 #       define BOOST_FORCEINLINE inline __attribute__ ((always_inline))
 #   else
 #       define BOOST_FORCEINLINE inline

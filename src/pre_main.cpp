@@ -17,7 +17,7 @@
 #include <hpx/lcos/detail/full_empty_entry.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 
-#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
+#if !defined(HPX_GCC44_WORKAROUND)
 #define HPX_USE_FAST_BOOTSTRAP_SYNCHRONIZATION
 #endif
 

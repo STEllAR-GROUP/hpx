@@ -100,7 +100,7 @@ namespace hpx { namespace lcos
         ///
         /// \param RemoteResult [in] The type of the result to be transferred
         ///               back to this LCO instance.
-#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
+#if defined(HPX_GCC44_WORKAROUND)
         typedef hpx::actions::direct_action1<
             base_lco_with_value, RemoteResult &&,
             &base_lco_with_value::set_value_nonvirt
@@ -112,7 +112,7 @@ namespace hpx { namespace lcos
 
         /// The \a get_value_action may be used to query the value this LCO
         /// instance exposes as its 'result' value.
-#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
+#if defined(HPX_GCC44_WORKAROUND)
         typedef hpx::actions::direct_result_action0<
             base_lco_with_value, Result,
             &base_lco_with_value::get_value_nonvirt

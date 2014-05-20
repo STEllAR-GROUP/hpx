@@ -32,7 +32,7 @@
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
-#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
+#if !defined(HPX_GCC44_WORKAROUND)
 #include <hpx/lcos/broadcast.hpp>
 #if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
 #include <hpx/lcos/reduce.hpp>
@@ -521,7 +521,7 @@ namespace hpx { namespace components { namespace server
     }
 }}}
 
-#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
+#if !defined(HPX_GCC44_WORKAROUND)
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::server::runtime_support::call_shutdown_functions_action
@@ -551,7 +551,7 @@ namespace hpx { namespace components { namespace server
     void invoke_shutdown_functions(
         std::vector<naming::id_type> const& prefixes, bool pre_shutdown)
     {
-#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
+#if !defined(HPX_GCC44_WORKAROUND)
         call_shutdown_functions_action act;
         lcos::broadcast(act, prefixes, pre_shutdown).get();
 #else

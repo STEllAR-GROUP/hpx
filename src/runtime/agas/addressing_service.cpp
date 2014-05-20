@@ -24,7 +24,7 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/lcos/wait_all.hpp>
-#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
+#if !defined(HPX_GCC44_WORKAROUND)
 #include <hpx/lcos/broadcast.hpp>
 #endif
 
@@ -2093,7 +2093,7 @@ future<hpx::id_type> addressing_service::on_symbol_namespace_event(
 
 }}
 
-#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
+#if !defined(HPX_GCC44_WORKAROUND)
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::agas::server::symbol_namespace::service_action
@@ -2130,7 +2130,7 @@ bool addressing_service::iterate_ids(
     try {
         request req(symbol_ns_iterate_names, f);
 
-#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
+#if !defined(HPX_GCC44_WORKAROUND)
         symbol_namespace_service_action act;
         lcos::broadcast(act, detail::find_all_symbol_namespace_services(), req).get(ec);
 #else

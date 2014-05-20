@@ -16,6 +16,7 @@
 #  endif
 
 #  undef HPX_CLANG_VERSION
+#  undef HPX_INTEL_VERSION
 
 #else
 
@@ -27,10 +28,28 @@
 
 #  define HPX_CLANG_VERSION (__clang_major__*10000 + __clang_minor__*100 + __clang_patchlevel__)
 
+#  undef HPX_INTEL_VERSION
+
 #else
 
 #  undef HPX_CLANG_VERSION
 
+#endif
+
+#if defined(__INTEL_COMPILER)
+
+# define HPX_INTEL_VERSION __INTEL_COMPILER
+
+#else
+
+#  undef HPX_INTEL_VERSION
+
+#endif
+
+#if !defined(HPX_CLANG_VERSION) && !defined(HPX_INTEL_VERSION)
+#  if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
+#    define HPX_GCC44_WORKAROUND
+#  endif
 #endif
 
 #endif
