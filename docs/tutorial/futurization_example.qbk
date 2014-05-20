@@ -1,0 +1,29 @@
+[/=============================================================================
+   Copyright (c) 2014 Adrian Serio 
+     
+   Distributed under the Boost Software License, Version 1.0. (See accompanying
+   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+=============================================================================/]
+
+[section:futurization_example Futurization Example]
+
+The following set of expamples were developed to demonstrate how a 
+serial program 
+can use the tecniques of futurization to exploit the parallism of an
+algorithm.  In this case, we implemented a 1D heat distribution problem.
+The first example is straight serial code.  In this code we instaniate
+ a vector which contains two vectors of doubles.  
+Each element in the vector of doubles represents a single grid
+point. To calculate the change in heat distibution, the temperature of 
+each grid point, along with its neighbors, are passed to the function heat.
+ In order to imporove readablility, references named current 
+and next are created which, depending on the timestep, point to the first
+and second vector of doubles. The first vector of doubles is initialized 
+with a simple 
+heat ramp. After calling the heat function with the data in the "current"
+vector, the results are placed into the "next" vector. 
+
+In example 2 the code is futureized.
+
+[/////////////////////////////////////////////////////////////////////////////]
+
