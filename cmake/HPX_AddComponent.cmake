@@ -258,7 +258,7 @@ macro(add_hpx_component name)
     if(${name}_INSTALL_SUFFIX)
       hpx_library_install("${name}_component" "${${name}_INSTALL_SUFFIX}")
     else()
-      hpx_library_install(${name}_component lib/hpx)
+      hpx_library_install(${name}_component ${LIB}/hpx)
     endif()
 
     foreach(target ${${name}_INI})

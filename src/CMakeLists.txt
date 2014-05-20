@@ -312,7 +312,7 @@ set_property(TARGET hpx_serialization APPEND
   "HPX_COROUTINE_EXPORTS")
 
 if(NOT HPX_NO_INSTALL)
-  hpx_library_install(hpx_serialization lib/hpx)
+  hpx_library_install(hpx_serialization ${LIB}/hpx)
 endif()
 
 ################################################################################
@@ -403,7 +403,7 @@ set_property(TARGET hpx APPEND
   "HPX_COROUTINE_EXPORTS") # Do we still need this?
 
 if(NOT HPX_NO_INSTALL)
-  hpx_library_install(hpx lib/hpx)
+  hpx_library_install(hpx ${LIB}/hpx)
 endif()
 
 ################################################################################
@@ -436,7 +436,7 @@ endif()
 set_property(TARGET hpx_init PROPERTY FOLDER "Core")
 
 if(NOT HPX_NO_INSTALL)
-  hpx_archive_install(hpx_init lib/hpx)
+  hpx_archive_install(hpx_init ${LIB}/hpx)
 endif()
 
 set(HPX_CONFIG_DEFINITIONS ${HPX_CONFIG_DEFINITIONS} PARENT_SCOPE)

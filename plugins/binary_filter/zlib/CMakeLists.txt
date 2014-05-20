@@ -38,7 +38,7 @@ macro(add_zlib_module)
     add_hpx_pseudo_dependencies(plugins.compression.zlib compress_zlib_lib)
 
     if(NOT HPX_NO_INSTALL)
-      hpx_library_install(compress_zlib_lib lib/hpx)
+      hpx_library_install(compress_zlib_lib ${LIB}/hpx)
     endif()
   endif()
 endmacro()

@@ -192,6 +192,9 @@ else()
     "64" ADVANCED)
 endif()
 
+if (NOT DEFINED LIB)
+  set(LIB "lib")
+endif(NOT DEFINED LIB)
 ###############################################################################
 if(UNIX)
   hpx_link_directories("${CMAKE_BINARY_DIR}/lib/hpx")
@@ -464,7 +467,7 @@ hpx_include(SetOutputPaths)
 # RPATH configuration
 ################################################################################
 if(NOT MSVC)
-  set(HPX_RPATH "${CMAKE_INSTALL_PREFIX}/lib/hpx:${CMAKE_BINARY_DIR}/lib/hpx"
+  set(HPX_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB}/hpx:${CMAKE_BINARY_DIR}/lib/hpx"
       CACHE STRING "Base RPATH for linking" FORCE)
 endif()
 
@@ -2027,14 +2030,14 @@ endif()
 if(NOT HPX_NO_INSTALL)
   if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
     install(FILES "${output_dir}/lib/pkgconfig/hpx_application.pc"
-            DESTINATION lib/pkgconfig)
+            DESTINATION ${LIB}/pkgconfig)
     install(FILES "${output_dir}/lib/pkgconfig/hpx_component.pc"
-            DESTINATION lib/pkgconfig)
+            DESTINATION ${LIB}/pkgconfig)
   else()
     install(FILES "${output_dir}/lib/pkgconfig/hpx_application_debug.pc"
-            DESTINATION lib/pkgconfig)
+            DESTINATION ${LIB}/pkgconfig)
     install(FILES "${output_dir}/lib/pkgconfig/hpx_component_debug.pc"
-            DESTINATION lib/pkgconfig)
+            DESTINATION ${LIB}/pkgconfig)
   endif()
 endif()
 
