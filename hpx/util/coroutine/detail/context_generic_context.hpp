@@ -160,6 +160,9 @@ namespace hpx { namespace util { namespace coroutines
 
             fcontext_context_impl()
               : cb_(0)
+#if BOOST_VERSION > 105500
+              , ctx_(0)
+#endif
             {}
 
             // Create a context that on restore invokes Functor on
@@ -167,33 +170,45 @@ namespace hpx { namespace util { namespace coroutines
             template <typename Functor>
             explicit fcontext_context_impl(Functor& cb, std::ptrdiff_t stack_size)
               : cb_(reinterpret_cast<intptr_t>(&cb))
+              , stack_size_(
+                    (stack_size == -1) ?
+                    alloc_.minimum_stacksize() : std::size_t(stack_size)
+                )
+              , stack_pointer_(alloc_.allocate(stack_size_))
             {
-                std::size_t stack_size_ = (stack_size == -1) ?
-                      alloc_.minimum_stacksize() : std::size_t(stack_size);
-
-                void* stack_pointer_ = alloc_.allocate(stack_size_);
                 void (*fn)(intptr_t) = &trampoline<Functor>;
 
+#if BOOST_VERSION < 105600
                 boost::context::fcontext_t* ctx =
                     boost::context::make_fcontext(stack_pointer_, stack_size_, fn);
 
                 std::swap(*ctx, ctx_);
+#else
+                ctx_ =
+                    boost::context::make_fcontext(stack_pointer_, stack_size_, fn);
+#endif
             }
 
             ~fcontext_context_impl()
             {
+#if BOOST_VERSION < 105600
                 if (ctx_.fc_stack.sp)
+#else
+                if (ctx_)
+#endif
                 {
-                    alloc_.deallocate(ctx_.fc_stack.sp, ctx_.fc_stack.size);
+                    alloc_.deallocate(stack_pointer_, stack_size_);
+#if BOOST_VERSION < 105600
                     ctx_.fc_stack.size = 0;
                     ctx_.fc_stack.sp = 0;
+#endif
                 }
             }
 
             // Return the size of the reserved stack address space.
             std::ptrdiff_t get_stacksize() const
             {
-                return ctx_.fc_stack.size;
+                return stack_size_;
             }
 
             // global functions to be called for each OS-thread after it started
@@ -207,7 +222,11 @@ namespace hpx { namespace util { namespace coroutines
             }
             void rebind_stack()
             {
+#if BOOST_VERSION < 105600
                 if (ctx_.fc_stack.sp)
+#else
+                if (ctx_)
+#endif
                     increment_stack_recycle_count();
             }
 
@@ -236,7 +255,11 @@ namespace hpx { namespace util { namespace coroutines
                 __splitstack_setcontext(to.alloc_.segments_ctx);
 #endif
                 // switch to other coroutine context
+#if BOOST_VERSION < 105600
                 boost::context::jump_fcontext(&from.ctx_, &to.ctx_, to.cb_, false);
+#else
+                boost::context::jump_fcontext(&from.ctx_, to.ctx_, to.cb_, false);
+#endif
 
 #if defined(HPX_GENERIC_CONTEXT_USE_SEGMENTED_STACKS)
                 __splitstack_setcontext(from.alloc_.segments_ctx);
@@ -244,9 +267,11 @@ namespace hpx { namespace util { namespace coroutines
             }
 
         private:
+            intptr_t cb_;
             boost::context::fcontext_t ctx_;
             stack_allocator alloc_;
-            intptr_t cb_;
+            std::size_t stack_size_;
+            void * stack_pointer_;
         };
 
         typedef fcontext_context_impl context_impl;
