@@ -125,9 +125,9 @@ if(${BOOST_MINOR_VERSION} GREATER 50)
   if(APPLE)
     set(use_generic_coroutine_context ON)
   endif()
-  #if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
-  #  set(use_generic_coroutine_context ON)
-  #endif()
+  if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ" AND ${BOOST_MINOR_VERSION} GREATER 55)
+    set(use_generic_coroutine_context ON)
+  endif()
 
   if (use_generic_coroutine_context)
     hpx_option(HPX_USE_GENERIC_COROUTINE_CONTEXT BOOL "Use Boost.Context as the underlying coroutines context switch implementation (default: ON)." ON ADVANCED)
@@ -1007,7 +1007,7 @@ if(MSVC)
   set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -d2Zi+")
 
   # VS2013 and above know how to do link time constant data segment folding
-  # VS2013 update 2 and above know how to remove debug information for 
+  # VS2013 update 2 and above know how to remove debug information for
   # non-referenced functions and data (-Zc:inline)
   if(MSVC12)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Zc:inline")
@@ -1241,7 +1241,6 @@ else()
     hpx_option(HPX_PIE BOOL "Compile executables as shared objects" ON ADVANCED)
   endif()
 
-
   # This is necessary to ensure that our executables are ELF DYN objects.
   if(HPX_PIE)
     hpx_use_flag_if_available(-rdynamic LANGUAGES CXX C Fortran)
@@ -1382,8 +1381,6 @@ else()
       # visibility is broken for gcc 4.7.x
       set(enable_visibility_hidden OFF)
     elseif("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
-      set(enable_visibility_hidden OFF)
-    elseif("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
       set(enable_visibility_hidden OFF)
     endif()
 
