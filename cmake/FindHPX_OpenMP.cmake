@@ -40,11 +40,16 @@ else()
 
     hpx_include(AddConfigTest)
 
+    set(cmake_root ${CMAKE_SOURCE_DIR})
+    if(HPX_EXTERNAL_CMAKE)
+      set(cmake_root ${HPX_ROOT})
+    endif()
+
     foreach(flag_candidate ${flag_candidates}) 
       hpx_info("find_package.openmp" "Trying flag ${flag_candidate}.")
 
       add_hpx_config_test("openmp" OPENMP_FOUND LANGUAGE CXX
-        SOURCE cmake/tests/openmp.cpp
+        SOURCE ${cmake_root}/cmake/tests/openmp.cpp
         FLAGS ${flag_candidate} FILE)
 
       if(OPENMP_FOUND)
