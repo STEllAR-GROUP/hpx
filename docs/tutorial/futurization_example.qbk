@@ -23,7 +23,30 @@ with a simple
 heat ramp. After calling the heat function with the data in the "current"
 vector, the results are placed into the "next" vector. 
 
-In example 2 the code is futureized.
+In example 2 the code is futureized.  To do this we re-define our
+our partion type as a shared_future [ADD TELETYPE] and create 
+the object "result" which is a future vector of shared futures. We
+then call result.get() and set its value equal to the solution vector.
+The future vector "result" is calculated by stringing the futrue results 
+of the function heat together so that each element calls heat 
+when the previous futures it depends on are ready. 
+In HPX 
+we have an LCO whch assists the programmer in this process.  Dataflow 
+allows us to... [INSERT DESC. OF DATAFLOW]
+Dataflow talkes [x] arguments which intruct the object on how to perform 
+the function call, the funcion to call, and the arguments for that function. 
+Because these arguments are futures, the dataflow object will only call
+the function when all of the futures are ready. 
+
+After the values of the futues in data flow are ready the values must 
+be prepared to be passed to the function heat. In order to do this we 
+use the HPX facility unwrapped.  In this example, unwrapped
+retrieves the value of the futuers passed to Op and passes thier
+values to the function heat.
+
+By setting up the algorithm this way, the program will be able to exexute
+as the dependecies are meet.  Unfortunaly, ...grai size....
+
 
 [/////////////////////////////////////////////////////////////////////////////]
 
