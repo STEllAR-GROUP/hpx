@@ -1762,15 +1762,22 @@ if(NOT HPX_NO_INSTALL)
 
   if(UNIX)
     file(GLOB scripts "${CMAKE_SOURCE_DIR}/python/scripts/*.py")
+    execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory
+      "${CMAKE_BINARY_DIR}/python/scripts" )
     foreach(script ${scripts})
       get_filename_component(script_name ${script} NAME)
       get_filename_component(script_name_we ${script} NAME_WE)
-      install(CODE
-        "set(bindir \"${CMAKE_INSTALL_PREFIX}/bin/\")
-         execute_process(
-           COMMAND \"\${CMAKE_COMMAND}\" -E create_symlink
-                   \"${script_name}\" \"${script_name_we}\"
-           WORKING_DIRECTORY \"\${bindir}\")")
+
+      #make copy, so that we have intact symlink in CMAKE_BINARY_DIR
+      execute_process(
+        COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${script}" "${script_name}"
+	WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
+
+      execute_process(
+        COMMAND "${CMAKE_COMMAND}" -E create_symlink "${script_name}" "${script_name_we}"
+	WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
+
+      install(FILES "${CMAKE_BINARY_DIR}/python/scripts/${script_name_we}" DESTINATION "bin")
     endforeach()
   endif()
 
@@ -1781,13 +1788,13 @@ if(NOT HPX_NO_INSTALL)
     FILES_MATCHING PATTERN "*.py"
     PATTERN ".git" EXCLUDE)
 
+  execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/python" )
+  #make symlink, so that we have intact hpx symlink in CMAKE_BINARY_DIR
+  execute_process(COMMAND "${CMAKE_COMMAND}" -E create_symlink "${CMAKE_SOURCE_DIR}/python/hpx"
+    "hpx-${HPX_VERSION}" WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python")
   # create a symlink in share pointing to the latest HPX installation
-  install(CODE
-    "set(sharedir \"${CMAKE_INSTALL_PREFIX}/share/\")
-     execute_process(
-     COMMAND \"\${CMAKE_COMMAND}\" -E create_symlink
-             \"hpx-${HPX_VERSION}\" \"hpx\"
-     WORKING_DIRECTORY \"\${sharedir}\")")
+  execute_process(COMMAND "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx" WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python")
+  install(DIRECTORY "${CMAKE_BINARY_DIR}/python/hpx" DESTINATION "share")
 
   install( # Install external dependencies
     DIRECTORY external/cache/boost
