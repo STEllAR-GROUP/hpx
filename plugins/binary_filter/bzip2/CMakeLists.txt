@@ -38,7 +38,7 @@ macro(add_bzip2_module)
     add_hpx_pseudo_dependencies(plugins.compression.bzip2 compress_bzip2_lib)
 
     if(NOT HPX_NO_INSTALL)
-      hpx_library_install(compress_bzip2_lib lib/hpx)
+      hpx_library_install(compress_bzip2_lib ${LIB}/hpx)
     endif()
   endif()
 endmacro()

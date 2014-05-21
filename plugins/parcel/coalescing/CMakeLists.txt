@@ -22,7 +22,7 @@ macro(add_coalescing_module)
   add_hpx_pseudo_dependencies(plugins.parcel.coalescing parcel_coalescing_lib)
 
   if(NOT HPX_NO_INSTALL)
-    hpx_library_install(parcel_coalescing_lib lib/hpx)
+    hpx_library_install(parcel_coalescing_lib ${LIB}/hpx)
   endif()
 endmacro()
 

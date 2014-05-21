@@ -30,7 +30,7 @@ macro(add_snappy_module)
     add_hpx_pseudo_dependencies(plugins.compression.snappy compress_snappy_lib)
 
     if(NOT HPX_NO_INSTALL)
-      hpx_library_install(compress_snappy_lib lib/hpx)
+      hpx_library_install(compress_snappy_lib ${LIB}/hpx)
     endif()
   endif()
 endmacro()
