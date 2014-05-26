@@ -32,11 +32,13 @@ of the function heat together so that each element calls heat
 when the previous futures it depends on are ready. 
 In HPX 
 we have an LCO whch assists the programmer in this process.  Dataflow 
-allows us to... [INSERT DESC. OF DATAFLOW]
+allows us to pass the results a set of futures to a specified function 
+when the futures are ready.
 Dataflow talkes [x] arguments which intruct the object on how to perform 
 the function call, the funcion to call, and the arguments for that function. 
-Because these arguments are futures, the dataflow object will only call
-the function when all of the futures are ready. 
+When called, dataflow immediatly returns a future to the result of the 
+specified function.  This allows users to string the dataflows together 
+and construnct an execution tree. 
 
 After the values of the futues in data flow are ready the values must 
 be prepared to be passed to the function heat. In order to do this we 
@@ -45,7 +47,20 @@ retrieves the value of the futuers passed to Op and passes thier
 values to the function heat.
 
 By setting up the algorithm this way, the program will be able to exexute
-as the dependecies are meet.  Unfortunaly, ...grai size....
+as the dependecies are meet.  Unfortunaly, this example runs 
+terribly slow. This increase in execution time is caused 
+by the increased overheads needed to create a future for each
+data point. Because the work done within each call to heat is very
+small the overhead of creating and schedualing each of the three
+futures is greater than that of the actual useful work! In order
+amatorize [SP] the oveerheads of our syncronization techniques,
+we need to be able to control the amount of work that with be
+done with each future.  We call this amout of work per overhead
+grain size.
+
+In example 3 we retun to our serial code to figure out how to 
+control the grain size of our program. The stratagy that we 
+employ is to create "partiions" of data points that [example 3]
 
 
 [/////////////////////////////////////////////////////////////////////////////]
