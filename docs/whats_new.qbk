@@ -24,7 +24,33 @@
 
 Here is a list of the important tickets we closed for this release.
 
-* [issue 1111] - hpx::threads::get_thread_data always returns zero
+* [issue 1137] - Improvements to create binary packages
+* [issue 1136] - HPX_GCC_VERSION not defined on all compilers
+* [issue 1136] - HPX_GCC_VERSION not defined on all compilers
+* [issue 1135] - Avoiding collision between winsock2.h and windows.h
+* [issue 1134] - Making sure, that hpx::finalize can be called from any locality
+* [issue 1133] - 1d stencil examples
+* [issue 1130] - Unique function
+* [issue 1128] - Action future args
+* [issue 1127] - Executor causes segmentation fault
+* [issue 1124] - Adding new API functions: `register_id_with_basename`,
+                 `unregister_id_with_basename`, `find_ids_from_basename`;
+                 adding test
+* [issue 1123] - Reduce nesting of try-catch construct in `encode_parcels`?
+* [issue 1122] - Client base fixes
+* [issue 1121] - Update `hpxrun.py.in`
+* [issue 1120] - HTTS2 tests compile errors on v110 (VS2012)
+* [issue 1119] - Remove references to boost::atomic in accumulator example
+* [issue 1118] - Only build test thread_pool_executor_1114_test if
+                 `HPX_LOCAL_SCHEDULER` is set
+* [issue 1117] - local_queue_executor linker error on vc110
+* [issue 1116] - Disabled performance counter should give runtime errors, not
+                 invalid data
+* [issue 1114] - Default constructed executor is not usable
+* [issue 1113] - Fast compilation of logging causes ABI incompatibilities
+                 between different `NDEBUG` values
+* [issue 1112] - Using thread_pool_executors causes segfault
+* [issue 1111] - `hpx::threads::get_thread_data` always returns zero
 * [issue 1110] - Remove unnecessary null pointer checks
 * [issue 1109] - More tests adjustments
 * [issue 1108] - Clarify build rules for "libboost_atomic-mt.so"?
@@ -57,6 +83,8 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1082] - Implement proper termination detection during shutdown
 * [issue 1081] - Implement thread_specific_ptr for hpx::threads
 * [issue 1070] - Complete quoting for parameters of some CMake commands
+* [issue 879]  - Hung test leads to cascading test failure; make tests should
+                 support the MPI parcelport
 
 [endsect]
 
