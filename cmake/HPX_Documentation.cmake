@@ -4,12 +4,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(HPX_DOCUMENTATION_LOADED TRUE)
-
-include(HPX_Include)
-
-hpx_include(Message)
-
 find_package(HPX_DocBook)
 find_package(HPX_BoostQuickBook)
 find_package(HPX_Doxygen)
@@ -269,7 +263,7 @@ else()
     endif()
   endmacro()
 
-  # XSL-FO -> PDF 
+  # XSL-FO -> PDF
   macro(hpx_xslfo_to_pdf name)
     hpx_parse_arguments(${name} "SOURCE;DEPENDENCIES;FOP_ARGS" "" ${ARGN})
 

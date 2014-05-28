@@ -3,13 +3,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(HPX_PREPROCESSING_LOADED TRUE)
-
-include(HPX_Include)
-
-hpx_include(Message)
-hpx_include(ListContains)
-
 find_package(HPX_BoostWave)
 
 if(BOOSTWAVE_FOUND)

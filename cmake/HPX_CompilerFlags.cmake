@@ -3,15 +3,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(HPX_COMPILERFLAGS_LOADED TRUE)
-
-include(HPX_Include)
-
-hpx_include(Message
-            GCCVersion
-            AddConfigTest
-            ParseArguments)
-
 macro(hpx_language_suffix var language)
   if(${language} STREQUAL "CXX")
     set(${var} .cpp)

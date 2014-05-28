@@ -4,13 +4,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(HPX_HANDLECOMPONENTDEPENDENCIES_LOADED TRUE)
-
-include(HPX_Include)
-
-hpx_include(IsTarget)
-hpx_include(Message)
-
 macro(hpx_handle_component_dependencies components)
   set(tmp "")
 

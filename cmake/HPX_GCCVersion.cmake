@@ -6,11 +6,6 @@
 set(HPX_GCCVERSION_LOADED TRUE)
 
 if(NOT MSVC)
-  include(HPX_Include)
-
-  hpx_include(Compile
-              GetIncludeDirectory)
-
   hpx_get_include_directory(include_dir)
 
   set(source_dir "")

@@ -3,12 +3,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(HPX_FINDFILE_LOADED TRUE)
-
-if(NOT HPX_UTILS_LOADED)
-  include(HPX_Utils)
-endif()
-
 macro(hpx_find_path name)
   if(${name}_DISABLE)
     hpx_info("find_path.${name}" "Path search disabled by user.")

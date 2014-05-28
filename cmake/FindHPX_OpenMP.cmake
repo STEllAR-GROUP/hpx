@@ -18,34 +18,32 @@ else()
   # to detect it correctly
   if(NOT OPENMP_SEARCHED AND NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set(flag_candidates
-        # GCC 
+        # GCC
         "-fopenmp"
         # MSVC
         "/openmp"
         # Intel (Windows)
-        "-Qopenmp" 
+        "-Qopenmp"
         # Intel (Unix)
-        "-openmp" 
+        "-openmp"
         # Empty, if compiler automatically accepts OpenMP
         " "
         # Sun
         "-xopenmp"
         # HP
         "+Oopenmp"
-        # IBM 
+        # IBM
         "-qsmp"
         # PGI
         "-mp"
         )
-
-    hpx_include(AddConfigTest)
 
     set(cmake_root ${CMAKE_SOURCE_DIR})
     if(HPX_EXTERNAL_CMAKE)
       set(cmake_root ${HPX_ROOT})
     endif()
 
-    foreach(flag_candidate ${flag_candidates}) 
+    foreach(flag_candidate ${flag_candidates})
       hpx_info("find_package.openmp" "Trying flag ${flag_candidate}.")
 
       add_hpx_config_test("openmp" OPENMP_FOUND LANGUAGE CXX

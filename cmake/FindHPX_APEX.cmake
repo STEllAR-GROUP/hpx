@@ -5,10 +5,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT HPX_FINDPACKAGE_LOADED)
-  include(HPX_FindPackage)
-endif()
-
 # This if statement is specific to APEX, and should not be copied into other
 # Find cmake scripts.
 if(NOT APEX_ROOT AND NOT $ENV{HOME_APEX} STREQUAL "")
@@ -22,7 +18,7 @@ endif()
 
 hpx_find_package(APEX
   LIBRARIES Apex
-  LIBRARY_PATHS lib 
+  LIBRARY_PATHS lib
   HEADERS apex.hpp
   HEADER_PATHS include)
 

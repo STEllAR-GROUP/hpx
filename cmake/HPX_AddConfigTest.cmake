@@ -5,13 +5,6 @@
 
 set(HPX_ADDCONFIGTEST_LOADED TRUE)
 
-include(HPX_Include)
-
-hpx_include(Message
-            Compile
-            GetIncludeDirectory
-            ParseArguments)
-
 macro(add_hpx_config_test name variable)
   hpx_parse_arguments(${name} "SOURCE;FLAGS;DEFINITIONS;LANGUAGE;ARGS;ROOT"
                               "FILE" ${ARGN})

@@ -5,18 +5,14 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT HPX_FINDPACKAGE_LOADED)
-  include(HPX_FindPackage)
-endif()
-
-if(GOOGLE_PERFTOOLS_FOUND)
-  hpx_find_package(TCMALLOC
+if(GooglePerftools_FOUND)
+  hpx_find_package(TCMalloc
     LIBRARIES tcmalloc libtcmalloc
     LIBRARY_PATHS lib64 lib
     HEADERS tcmalloc.h
     HEADER_PATHS include/google)
 else()
-  hpx_find_package(TCMALLOC
+  hpx_find_package(TCMalloc
     LIBRARIES tcmalloc_minimal libtcmalloc_minimal
     LIBRARY_PATHS lib64 lib
     HEADERS tcmalloc.h

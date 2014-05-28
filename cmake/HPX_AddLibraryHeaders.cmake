@@ -4,11 +4,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(HPX_ADDLIBRARYHEADERS_LOADED TRUE)
-
-hpx_include(Message
-            ParseArguments)
-
 macro(add_hpx_library_headers name globtype)
   if(MSVC)
     hpx_parse_arguments(HEADERS "EXCLUDE;GLOBS" "APPEND" ${ARGN})

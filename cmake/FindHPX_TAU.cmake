@@ -5,10 +5,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT HPX_FINDPACKAGE_LOADED)
-  include(HPX_FindPackage)
-endif()
-
 # This if statement is specific to TAU, and should not be copied into other
 # Find cmake scripts.
 if(NOT TAU_ROOT AND NOT $ENV{HOME_TAU} STREQUAL "")
@@ -19,7 +15,7 @@ endif()
 
 hpx_find_package(TAU
   LIBRARIES TAU  m
-  LIBRARY_PATHS x86_64/lib 
+  LIBRARY_PATHS x86_64/lib
   HEADERS TAU.h
   HEADER_PATHS include)
 

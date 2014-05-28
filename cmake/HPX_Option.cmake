@@ -5,24 +5,21 @@
 
 # FIXME: Use parse arg.
 
-set(HPX_OPTION_LOADED TRUE)
-
 macro(hpx_option option type description default)
 #  hpx_info("option.${option}" "type:${type}")
 #  hpx_info("option.${option}" "description:${description}")
 #  hpx_info("option.${option}" "default:${default}")
 
-  if(DEFINED ${option})
-    set(${option} "${${option}}" CACHE ${type} "${description}" FORCE)
-  else()
-    set(${option} "${default}" CACHE ${type} "${description}" FORCE)
+  if(NOT DEFINED ${option})
+    set(${option} ${default})
+    set(${option} ${default} CACHE ${type} "${description}" FORCE)
   endif()
 
   foreach(arg ${ARGN})
     if(arg STREQUAL "ADVANCED")
       mark_as_advanced(FORCE ${option})
     else()
-      hpx_error("option" "Unknown argument while calling hpx_option: ${arg} (only allowed value: 'ADVANCED')")
+      hpx_error("Unknown argument while calling hpx_option: ${arg} (only allowed value: 'ADVANCED')")
     endif()
   endforeach()
 endmacro()

@@ -3,10 +3,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT HPX_FINDPATH_LOADED)
-  include(HPX_FindPath)
-endif()
-
 if(BOOST_USE_SYSTEM)
   set(BOOSTBOOK_DTD_USE_SYSTEM ON)
   set(BOOSTBOOK_XSL_USE_SYSTEM ON)

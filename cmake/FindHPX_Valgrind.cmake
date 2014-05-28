@@ -6,9 +6,6 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(HPX_HAVE_VALGRIND)
-  if(NOT HPX_FINDPACKAGE_LOADED)
-    include(HPX_FindPackage)
-  endif()
 
   if(NOT VALGRIND_ROOT AND NOT $ENV{HOME_VALGRIND} STREQUAL "")
     set(VALGRIND_ROOT "$ENV{HOME_VALGRIND}")

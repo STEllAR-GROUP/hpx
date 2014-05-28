@@ -6,11 +6,6 @@
 # Abusive hacks that allow us to have installable targets that are not built
 # by default.
 
-set(HPX_INSTALL_LOADED TRUE)
-
-hpx_include(ParseArguments
-            TargetPaths)
-
 macro(hpx_symlink source destination)
   if(NOT HPX_NO_INSTALL)
     install(CODE

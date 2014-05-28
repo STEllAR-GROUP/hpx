@@ -5,10 +5,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT HPX_FINDPACKAGE_LOADED)
-  include(HPX_FindPackage)
-endif()
-
 if(NOT SDF_ROOT AND NOT $ENV{SDF_ROOT} STREQUAL "")
   set(SDF_ROOT "$ENV{SDF_ROOT}")
 endif()

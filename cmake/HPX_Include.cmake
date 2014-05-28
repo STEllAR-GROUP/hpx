@@ -5,10 +5,7 @@
 
 macro(hpx_include)
   foreach(listfile ${ARGV})
-    string(TOUPPER "HPX_${listfile}_LOADED" detector)
-    if(NOT ${detector})
-      include("HPX_${listfile}")
-    endif()
+    include("HPX_${listfile}")
   endforeach()
 endmacro()
 

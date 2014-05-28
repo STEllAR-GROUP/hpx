@@ -5,12 +5,6 @@
 
 # FIXME: Put into a common script with HPX_LinkDirectories.cmake
 
-set(HPX_INCLUDEDIRECTORIES_LOADED TRUE)
-
-if(NOT HPX_UTILS_LOADED)
-  include(HPX_Utils)
-endif()
-
 macro(hpx_include_directories)
   if(HPX_NO_INSTALL)
     # Don't use hpx_include_directories to avoid passing paths from the source
