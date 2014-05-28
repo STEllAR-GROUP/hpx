@@ -40,7 +40,9 @@ HPX_PLAIN_ACTION(add_profile);
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    mini_ghost::profiling::data().time_init(hpx::util::high_resolution_timer::now() - init_start);
+    mini_ghost::profiling::data().time_init(
+        hpx::util::high_resolution_timer::now() - init_start);
+
     hpx::util::high_resolution_timer timer_all;
     hpx::id_type    here = hpx::find_here();
     std::string     name = hpx::get_locality_name();
@@ -48,25 +50,29 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     if(p.rank == 0)
     {
-        std::cout << "mini ghost started up in " << hpx::util::high_resolution_timer::now() - init_start << " seconds.\n";
+        std::cout << "mini ghost started up in "
+                  << hpx::util::high_resolution_timer::now() - init_start
+                  << " seconds.\n";
     }
 
-    p.nranks = hpx::get_num_localities().get();
+    p.nranks = hpx::get_num_localities_sync();
 
     profiling_data_sem.reset(new hpx::lcos::local::counting_semaphore(p.nranks));
     p.setup(vm);
 
     hpx::id_type stepper_id
-        = hpx::components::new_<stepper_type>(hpx::find_here()).get();
+        = hpx::components::new_<stepper_type>(here).get();
 
     boost::shared_ptr<stepper_type>
         stepper(hpx::get_ptr<stepper_type>(stepper_id).get());
 
-    stepper->init(p);
+    stepper->init(p).get();
     mini_ghost::barrier_wait();
+
     stepper->run(p.num_spikes, p.num_tsteps);
     mini_ghost::barrier_wait();
-    if (p.rank==0)
+
+    if (stepper->get_rank() == 0)
     {
         add_profile(mini_ghost::profiling::data());
         if(p.report_perf)
@@ -80,7 +86,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     }
     else
     {
-        hpx::apply(add_profile_action(), hpx::find_root_locality(), mini_ghost::profiling::data());
+        hpx::apply(add_profile_action(), hpx::find_root_locality(),
+            mini_ghost::profiling::data());
         return 0;
     }
 }

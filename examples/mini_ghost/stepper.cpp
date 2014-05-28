@@ -44,101 +44,103 @@ namespace mini_ghost {
     {}
 
     template <typename Real>
-    void stepper<Real>::init(params<Real> & p)
+    hpx::future<void> stepper<Real>::init(params<Real> & p)
     {
         // register our own name
-        const std::string base_name = "/mini_ghost/stepper/";
-        std::string name = base_name;
-        name += boost::lexical_cast<std::string>(p.rank);
+        char const* base_name = "/mini_ghost/stepper/";
 
-        std::vector<std::size_t> id_map(p.nranks);
         stepper_ids.resize(p.nranks);
-        stepper_ids[0] = this->get_gid();
-        stepper_ids[0].make_unmanaged();
-        
-        hpx::agas::register_name_sync(
-            name
-          , hpx::naming::detail::strip_credits_from_gid(stepper_ids[0].get_gid())
-        );
-        
-        // Find all others ...
-        std::size_t r = p.rank % p.nranks;
-        for(std::size_t i = 0; i != p.nranks; ++i)
-        {
-            name = base_name;
-            name += boost::lexical_cast<std::string>(r);
-            std::size_t k = 0;
-
-            while(!stepper_ids[i])
-            {
-                if(hpx::agas::resolve_name_sync(name, stepper_ids[i]))
-                    break;
-                hpx::lcos::local::spinlock::yield(k);
-                ++k;
-            }
-            id_map[r] = i;
-            r = (r + 1) % p.nranks;
-        }
-
         rank = p.rank;
 
-        // Set position in 3D processor grid
-        std::size_t myrank_xy = p.rank % (p.npx*p.npy);
-        std::size_t remainder = myrank_xy % p.npx;
-        std::size_t my_py = myrank_xy / p.npx;
-        std::size_t my_px = 0;
-        if(remainder != 0)
-        {
-            my_px = remainder;
-        }
-        else
-        {
-            my_px = 0;
-        }
-        std::size_t my_pz = p.rank / (p.npx*p.npy);
+        hpx::register_id_with_basename(base_name, this->get_gid(), p.rank);
+        std::vector<hpx::future<hpx::id_type> > steppers =
+            hpx::find_all_ids_from_basename(base_name, p.nranks);
 
-        // Initialize grids and spikes
-        std::vector<hpx::future<void> > partition_init_futures;//
-        partition_init_futures.reserve(p.num_vars);
+//         // Find all others ...
+//         std::size_t r = p.rank % p.nranks;
+//         for(std::size_t i = 0; i != p.nranks; ++i)
+//         {
+//             name = base_name;
+//             name += boost::lexical_cast<std::string>(r);
+//             std::size_t k = 0;
+//
+//             while(!stepper_ids[i])
+//             {
+//                 if(hpx::agas::resolve_name_sync(name, stepper_ids[i]))
+//                     break;
+//                 hpx::lcos::local::spinlock::yield(k);
+//                 ++k;
+//             }
+//             id_map[r] = i;
+//             r = (r + 1) % p.nranks;
+//         }
 
-        auto random_lambda = [this]() -> Real { return random(gen); };
-        std::size_t num_sum_grid = 0;
-        partitions_.reserve(p.num_vars);
-        for(std::size_t var = 0; var != p.num_vars; ++var)
-        {
-            spikes_.push_back(
-                spikes<Real>(
-                    p
-                  , my_px
-                  , my_py
-                  , my_pz
-                  , random_lambda
-                )
-            );
-            partition_init_futures.push_back(hpx::future<void>());
-            partitions_.push_back(
-                partition_type(
-                    var
-                  , p
-                  , stepper_ids
-                  , id_map
-                  , my_px
-                  , my_py
-                  , my_pz
-                  , random_lambda
-                  , partition_init_futures[var]
-                )
-            );
-            if(partitions_.back().sum_grid()) ++num_sum_grid;
-        }
-        init_promise_.set_value();
-        hpx::wait_all(partition_init_futures);
-        //FIXME: setup performance captures...
+        return hpx::when_all(steppers).then(hpx::util::unwrapped2(
+            [this, &p](std::vector<hpx::id_type> && ids)
+            {
+                stepper_ids = std::move(ids);
 
-        if(p.rank == 0)
-        {
-            p.print_header(num_sum_grid);
-        }
+                std::vector<std::size_t> id_map(p.nranks);
+
+                // Set position in 3D processor grid
+                std::size_t myrank_xy = p.rank % (p.npx*p.npy);
+                std::size_t remainder = myrank_xy % p.npx;
+                std::size_t my_py = myrank_xy / p.npx;
+                std::size_t my_px = 0;
+                if(remainder != 0)
+                {
+                    my_px = remainder;
+                }
+                else
+                {
+                    my_px = 0;
+                }
+                std::size_t my_pz = p.rank / (p.npx*p.npy);
+
+                // Initialize grids and spikes
+                std::vector<hpx::future<void> > partition_init_futures;//
+                partition_init_futures.reserve(p.num_vars);
+
+                auto random_lambda = [this]() -> Real { return random(gen); };
+                std::size_t num_sum_grid = 0;
+                partitions_.reserve(p.num_vars);
+                for(std::size_t var = 0; var != p.num_vars; ++var)
+                {
+                    spikes_.push_back(
+                        spikes<Real>(
+                            p
+                            , my_px
+                            , my_py
+                            , my_pz
+                            , random_lambda
+                        )
+                    );
+                    partition_init_futures.push_back(hpx::future<void>());
+                    partitions_.push_back(
+                        partition_type(
+                            var
+                            , p
+                            , stepper_ids
+                            , id_map
+                            , my_px
+                            , my_py
+                            , my_pz
+                            , random_lambda
+                            , partition_init_futures[var]
+                        )
+                    );
+                    if(partitions_.back().sum_grid()) ++num_sum_grid;
+                }
+                init_promise_.set_value();
+                hpx::wait_all(partition_init_futures);
+                //FIXME: setup performance captures...
+
+                if(p.rank == 0)
+                {
+                    p.print_header(num_sum_grid);
+                }
+            }
+        ));
     }
 
     template <typename Real>
@@ -150,7 +152,7 @@ namespace mini_ghost {
 
         for(std::size_t spike = 0; spike != num_spikes; ++spike)
         {
-            std::vector<hpx::future<void>> run_futures;
+            std::vector<hpx::future<void> > run_futures;
             run_futures.reserve(partitions_.size());
             for(auto & partition : partitions_)
             {
@@ -164,13 +166,6 @@ namespace mini_ghost {
                           , num_tsteps
                           , boost::ref(io_mutex)
                         )
-                /*
-                        &partition_type::run
-                      , boost::ref(partition)
-                      , boost::ref(stepper_ids)
-                      , num_tsteps
-                      , boost::ref(io_mutex)
-                */
                     )
                 );
             }

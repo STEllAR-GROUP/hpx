@@ -31,7 +31,7 @@ namespace mini_ghost {
 
         stepper();
 
-        void init(params<Real> & p);
+        hpx::future<void> init(params<Real> & p);
 
         void run(std::size_t num_spikes, std::size_t num_tsteps);
 
@@ -55,6 +55,8 @@ namespace mini_ghost {
 
         void set_back_zone(buffer_type buffer, std::size_t step, std::size_t var);
         HPX_DEFINE_COMPONENT_ACTION_TPL(stepper<Real>, set_back_zone, set_back_zone_action);
+
+        std::size_t get_rank() const { return rank; }
 
     private:
         boost::random::mt19937 gen;
