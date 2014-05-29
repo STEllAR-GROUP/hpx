@@ -7,28 +7,41 @@
 #define HPX_STL_UTIL_PARTITIONER_MAY_27_2014_1040PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/stl/execution_policy.hpp>
+#include <hpx/stl/detail/algorithm_result.hpp>
 
-namespace hpx { namespace parallale { namespace util
+namespace hpx { namespace parallel { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
     struct static_partitioner_tag {};
     struct default_partitioner_tag {};
 
-    template <typename PartTag>
+    namespace detail
+    {
+        template <typename ExPolicy>
+        struct extract_partitioner
+        {
+            typedef default_partitioner_tag type;
+        };
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename ExPolicy,
+        typename PartTag = typename detail::extract_partitioner<ExPolicy>::type>
     struct partitioner;
 
-    template <>
-    struct partitioner<static_partitioner_tag>
+    template <typename ExPolicy>
+    struct partitioner<ExPolicy, static_partitioner_tag>
     {
-        template <typename FwdIter, typename Diff, typename F>
-        static FwdIter call(FwdIter first, Diff count, F && func,
+        template <typename FwdIter, typename F>
+        static FwdIter call(FwdIter first, std::size_t count, F && func,
             std::size_t chunk_size = 0)
         {
             // estimate a chunk size based on number of cores used
             if (chunk_size == 0)
             {
-                unsigned int const _HdConc = std::thread::hardware_concurrency();
-                chunk_size = (count + _HdConc - 1) / _HdConc;
+                std::size_t const cores = hpx::get_num_worker_threads();
+                chunk_size = (count + cores - 1) / cores;
             }
 
             // schedule every chunk on a separate thread
@@ -37,20 +50,74 @@ namespace hpx { namespace parallale { namespace util
 
             while (count > chunk_size)
             {
-                workitems.emplace_back(hpx::async(util::bind(func, first, chunk_size)));
+                workitems.emplace_back(hpx::async(
+                    hpx::util::bind(func, first, chunk_size)));
                 count -= chunk_size;
                 std::advance(first, chunk_size);
             }
 
             // execute last chunk directly
-            func(first, count);
-            std::advance(first, count);
+            if (count != 0)
+            {
+                func(first, count);
+                std::advance(first, count);
+            }
 
             // wait for all tasks to finish
             hpx::wait_all(workitems);
             return first;
         }
     };
+
+    template <>
+    struct partitioner<task_execution_policy, static_partitioner_tag>
+    {
+        template <typename FwdIter, typename F>
+        static hpx::future<FwdIter> call(FwdIter first, std::size_t count,
+            F && func, std::size_t chunk_size = 0)
+        {
+            // estimate a chunk size based on number of cores used
+            if (chunk_size == 0)
+            {
+                std::size_t const cores = hpx::get_num_worker_threads();
+                chunk_size = (count + cores - 1) / cores;
+            }
+
+            // schedule every chunk on a separate thread
+            std::vector<hpx::future<void> > workitems;
+            workitems.reserve(count / chunk_size + 1);
+
+            while (count > chunk_size)
+            {
+                workitems.emplace_back(hpx::async(
+                    hpx::util::bind(func, first, chunk_size)));
+                count -= chunk_size;
+                std::advance(first, chunk_size);
+            }
+
+            // add last chunk
+            if (count != 0)
+            {
+                workitems.emplace_back(hpx::async(
+                    hpx::util::bind(func, first, count)));
+                std::advance(first, count);
+            }
+
+            // wait for all tasks to finish
+            return hpx::when_all(workitems).then(
+                [first](hpx::future<void> f)
+                {
+                    f.get();        // rethrow any errors
+                    return first;
+                }
+            );
+        }
+    };
+
+    template <typename ExPolicy>
+    struct partitioner<ExPolicy, default_partitioner_tag>
+      : partitioner<ExPolicy, static_partitioner_tag>
+    {};
 }}}
 
 #endif

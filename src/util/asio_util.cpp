@@ -62,8 +62,8 @@ namespace hpx { namespace util
             if (util::get_endpoint(hostname, port, ep))
                 return ep;
         }
-        catch (boost::system::system_error const& e) {
-            errors.add(e);
+        catch (boost::system::system_error const&) {
+            errors.add(boost::current_exception());
         }
 
         // it's not an address, try to treat it as a host name

@@ -22,31 +22,55 @@
 namespace hpx { namespace parallel
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// The parallel_execution_policy is intended to specify the parallel
-    /// execution policy for algorithms. The specific scheduling strategy will
-    /// be chosen by the implementation depending on the algorithm being used.
+    /// The class parallel_execution_policy is an execution policy type used
+    /// as a unique type to disambiguate parallel algorithm overloading and
+    /// indicate that a parallel algorithm's execution may be parallelized.
     struct parallel_execution_policy {};
 
     /// Default parallel execution policy object.
     parallel_execution_policy const par;
 
-    /// The sequential_execution_policy is intend to specify the sequential
-    /// execution policy for algorithms.
+    /// The class sequential_execution_policy is an execution policy type used
+    /// as a unique type to disambiguate parallel algorithm overloading and
+    /// require that a parallel algorithm's execution may not be parallelized.
     struct sequential_execution_policy {};
 
     /// Default sequential execution policy object.
     sequential_execution_policy const seq;
 
-    /// The vector_execution_policy is intend to specify the vector execution
-    /// policy for algorithms.
+    /// The class vector_execution_policy is an execution policy type used as
+    /// a unique type to disambiguate parallel algorithm overloading and
+    /// indicate that a parallel algorithm's execution may be vectorized.
     struct vector_execution_policy {};
 
     /// Default vector execution policy object.
     vector_execution_policy const vec;
 
+    /// extension:
+    ///
+    /// The class task_execution_policy is an execution policy type used as
+    /// a unique type to disambiguate parallel algorithm overloading and
+    /// indicate that a parallel algorithm's execution may be parallelized. The
+    /// algorithm returns a future representing the result of the corresponding
+    /// algorithm when invoked with the parallel_execution_policy.
+    struct task_execution_policy {};
+
+    /// Default vector execution policy object.
+    task_execution_policy const task;
+
+
     ///////////////////////////////////////////////////////////////////////////
-    /// The is_execution_policy is intended to test if specified type is of
-    /// execution policy type.
+    ///
+    /// 1. The type is_execution_policy can be used to detect parallel
+    ///    execution policies for the purpose of excluding function signatures
+    ///    from otherwise ambiguous overload resolution participation.
+    /// 2. If T is the type of a standard or implementation-defined execution
+    ///    policy, is_execution_policy<T> shall be publicly derived from
+    ///    integral_constant<bool, true>, otherwise from
+    ///    integral_constant<bool, false>.
+    /// 3. The behavior of a program that adds specializations for
+    ///    is_execution_policy is undefined.
+    ///
     template <typename T>
     struct is_execution_policy
       : boost::mpl::false_
@@ -67,6 +91,12 @@ namespace hpx { namespace parallel
       : boost::mpl::true_
     {};
 
+    // extension
+    template <>
+    struct is_execution_policy<task_execution_policy>
+      : boost::mpl::true_
+    {};
+
     class execution_policy;
 
     template <>
@@ -74,56 +104,51 @@ namespace hpx { namespace parallel
       : boost::mpl::true_
     {};
 
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        template <typename ExPolicy, typename T>
-        struct enable_if_parallel
-          : public boost::enable_if<
-                boost::is_base_of<
-                    parallel_execution_policy, typename util::decay<ExPolicy>::type
-                >::value ||
-                boost::is_base_of<
-                    vector_execution_policy, typename util::decay<ExPolicy>::type
-                >::value
-              , T>
-        {};
+    // extension: detect whether give execution policy enables parallelization
+    template <typename T>
+    struct is_parallel_execution_policy
+      : boost::mpl::false_
+    {};
 
-        template <typename ExPolicy, typename T>
-        struct enable_if_policy
-          : public boost::enable_if<
-                boost::is_base_of<
-                    sequential_execution_policy, typename util::decay<ExPolicy>::type
-                >::value ||
-                boost::is_base_of<
-                    parallel_execution_policy, typename util::decay<ExPolicy>::type
-                >::value ||
-                boost::is_base_of<
-                    vector_execution_policy, typename util::decay<ExPolicy>::type
-                >::value ||
-                boost::is_base_of<
-                    execution_policy, typename util::decay<ExPolicy>::type
-                >::value
-              , T>
-        {};
-    }
+    template <>
+    struct is_parallel_execution_policy<parallel_execution_policy>
+      : boost::mpl::true_
+    {};
+
+    template <>
+    struct is_parallel_execution_policy<vector_execution_policy>
+      : boost::mpl::true_
+    {};
+
+    template <>
+    struct is_parallel_execution_policy<task_execution_policy>
+      : boost::mpl::true_
+    {};
 
     ///////////////////////////////////////////////////////////////////////////
-    /// The execution_policy is intended to specify the dynamic execution
-    /// policy for algorithms.
+    /// 1. The class execution_policy is a dynamic container for execution
+    ///    policy objects. execution_policy allows dynamic control over
+    ///    standard algorithm execution.
+    /// 2. Objects of type execution_policy shall be constructible and
+    ///    assignable from objects of type T for which
+    ///    is_execution_policy<T>::value is true.
     class execution_policy
     {
     private:
-        std::shared_ptr<void> inner_;
+        boost::shared_ptr<void> inner_;
         std::type_info const* type_;
 
     public:
-        /// Constructs a new execution_policy object.
+        /// Effects: Constructs an execution_policy object with a copy of
+        ///          exec's state
+        /// Requires: is_execution_policy<T>::value is true
         ///
         /// \param policy Specifies the inner execution policy
         template <typename ExPolicy>
         execution_policy(ExPolicy const& policy,
-                typename detail::enable_if_policy<ExPolicy, ExPolicy>::type* = 0)
+                typename boost::enable_if<
+                    is_execution_policy<ExPolicy>, ExPolicy
+                >::type* = 0)
           : inner_(boost::make_shared<ExPolicy>(policy)),
             type_(&typeid(ExPolicy))
         {
@@ -135,18 +160,22 @@ namespace hpx { namespace parallel
         /// Move constructs a new execution_policy object.
         ///
         /// \param policy Specifies the inner execution policy
-        execution_policy(execution_policy&& policy)
+        execution_policy(execution_policy && policy)
           : inner_(std::move(policy.inner_)),
             type_(policy.type_)
         {
             policy.type_ = 0;
         }
 
-        /// Assigns a new execution policy to the object.
+        /// Effects: Assigns a copy of exec’s state to *this
+        /// Returns: *this
+        /// Requires: is_execution_policy<T>::value is true
         ///
         /// \param policy Specifies the inner execution policy
         template <typename ExPolicy>
-        typename detail::enable_if_policy<ExPolicy, execution_policy>::type&
+        typename boost::enable_if<
+            is_execution_policy<ExPolicy>, execution_policy
+        >::type&
         operator=(ExPolicy const& policy)
         {
             BOOST_STATIC_ASSERT_MSG(
@@ -172,13 +201,16 @@ namespace hpx { namespace parallel
             return *this;
         }
 
-        /// Returns the type_info of the inner policy.
-        type_info const& type() const BOOST_NOEXCEPT
+        /// Returns: typeid(T), such that T is the type of the execution policy
+        ///          object contained by *this
+        std::type_info const& type() const BOOST_NOEXCEPT
         {
             return *type_;
         }
 
-        /// Returns the inner policy if type matches.
+        /// Returns: If target_type() == typeid(T), a pointer to the stored
+        ///          execution policy object; otherwise a null pointer
+        /// Requires: is_execution_policy<T>::value is true
         template <typename ExPolicy>
         ExPolicy* get() const BOOST_NOEXCEPT
         {

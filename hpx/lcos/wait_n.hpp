@@ -284,6 +284,35 @@ namespace hpx { namespace lcos
             return;
         //}
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    void wait_n(std::size_t n, hpx::future<T> && f, error_code& ec = throws)
+    {
+        if (n != 1)
+        {
+            HPX_THROWS_IF(ec, hpx::bad_parameter,
+                "hpx::lcos::wait_n",
+                "number of results to wait for is out of bounds");
+            return;
+        }
+
+        f.wait();
+    }
+
+    template <typename T>
+    void wait_n(std::size_t n, hpx::shared_future<T> && f, error_code& ec = throws)
+    {
+        if (n != 1)
+        {
+            HPX_THROWS_IF(ec, hpx::bad_parameter,
+                "hpx::lcos::wait_n",
+                "number of results to wait for is out of bounds");
+            return;
+        }
+
+        f.wait();
+    }
 }}
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)

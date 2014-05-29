@@ -3,19 +3,24 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_STL_PARALLEL_ALGORITHM_MAY_27_2014_0904PM)
-#define HPX_STL_PARALLEL_ALGORITHM_MAY_27_2014_0904PM
+#if !defined(HPX_STL_PARALLEL_ALGORITHM_RESULT_MAY_28_2014_0522PM)
+#define HPX_STL_PARALLEL_ALGORITHM_RESULT_MAY_28_2014_0522PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/stl/execution_policy.hpp>
+#include <hpx/stl/detail/algorithm_result.hpp>
 #include <hpx/stl/util/partitioner.hpp>
 #include <hpx/stl/util/loop.hpp>
+#include <hpx/exception_list.hpp>
+#include <hpx/util/void_guard.hpp>
+#include <hpx/util/decay.hpp>
 
 #include <algorithm>
 #include <iterator>
 
 #include <boost/static_assert.hpp>
 #include <boost/utility/declval.hpp>
+#include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 
 namespace hpx { namespace parallel
@@ -24,62 +29,65 @@ namespace hpx { namespace parallel
     // for_each_n
     namespace detail
     {
-        template <typename InIter, typename Diff, typename F, typename IterTag>
-        inline InIter for_each_n(sequential_execution_policy const &,
-            InIter first, Diff count, F && func, IterTag)
+        template <typename InIter, typename F, typename IterTag>
+        inline InIter
+        for_each_n(sequential_execution_policy const &, InIter first,
+            std::size_t count, F && func, IterTag)
         {
             try {
-                for (/**/; count != 0; --count, ++first)
-                    func(*first);
+                util::loop<InIter>::call(first, count, std::forward<F>(func));
+                return first;
             }
             catch(std::bad_alloc const& e) {
                 throw e;
             }
             catch (...) {
-                // throw exception_list
+                throw hpx::exception_list(boost::current_exception());
             }
-            return first;
         }
 
-        template <typename ExPolicy, typename InIter, typename Diff,
-            typename F, typename IterTag>
-        inline InIter for_each_n(ExPolicy const&, InIter first, Diff count,
-            F && func, IterTag)
+        template <typename ExPolicy, typename InIter, typename F,
+            typename IterTag>
+        inline typename detail::algorithm_result<
+            typename hpx::util::decay<ExPolicy>::type, InIter
+        >::type
+        for_each_n(ExPolicy const&, InIter first, std::size_t count, F && func, IterTag)
         {
-            typedef typename util::decay<ExPolicy>::type execution_policy_type;
+            typedef typename hpx::util::decay<ExPolicy>::type execution_policy_type;
             BOOST_STATIC_ASSERT_MSG(
                 is_execution_policy<execution_policy_type>::value,
                 "Given type is not a execution policy");
 
             if (count > 0)
             {
-                typedef std::iterator_traits<InIter>::reference reference;
-
                 return util::partitioner<execution_policy_type>::call(
                     first, count, [func](InIter part_begin, std::size_t count)
                     {
-                        util::loop<InIter>::call(
-                            part_begin, count, [&func](reference it)
-                            {
-                                func(it);
-                            });
+                        util::loop<InIter>::call(part_begin, count, func);
                     });
             }
-            return first;
+
+            return detail::algorithm_result<
+                execution_policy_type, InIter>::get(std::move(first));
         }
 
-        template <typename ExPolicy, typename InIter, typename Diff, typename F>
-        inline typename detail::enable_if_parallel<ExPolicy, InIter>::type
-        for_each_n(ExPolicy const&, InIter first, Diff count, F && func,
+        template <typename ExPolicy, typename InIter, typename F>
+        inline typename boost::enable_if<
+            is_parallel_execution_policy<ExPolicy>,
+            typename detail::algorithm_result<
+                typename hpx::util::decay<ExPolicy>::type, InIter
+            >::type
+         >::type
+        for_each_n(ExPolicy const&, InIter first, std::size_t count, F && func,
             std::input_iterator_tag category)
         {
             return detail::for_each_n(seq, first, count, std::forward<F>(func),
                 category);
         }
 
-        template <typename InIter, typename Diff, typename F, typename IterTag>
-        inline InIter For_each_n(execution_policy cosnt& policy, InIter first,
-            Diff count, F && func, IterTag category)
+        template <typename InIter, typename F, typename IterTag>
+        inline InIter for_each_n(execution_policy const& policy,
+            InIter first, std::size_t count, F && func, IterTag category)
         {
             std::type_info const& t = policy.type();
             if (t == typeid(parallel_execution_policy)) {
@@ -92,6 +100,12 @@ namespace hpx { namespace parallel
                     *policy.get<sequential_execution_policy>(),
                     first, count, std::forward<F>(func), category);
             }
+            else if (t == typeid(task_execution_policy)) {
+                // the dynamic case will never return a future
+                return detail::for_each_n(
+                    *policy.get<parallel_execution_policy>(),
+                    first, count, std::forward<F>(func), category);
+            }
 //             else if (t == typeid(vector_execution_policy)) {
 //                 return detail::for_each_n(
 //                     *policy.get<vector_execution_policy>(),
@@ -99,15 +113,20 @@ namespace hpx { namespace parallel
 //             }
             else {
                 HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                    "hpx::parallel::detail::for_each_n"
+                    "hpx::parallel::detail::for_each_n",
                     "Not supported execution policy");
             }
         }
     }
 
-    template <typename ExPolicy, typename InIter, typename Diff, typename F>
-    inline typename detail::enable_if_policy<ExPolicy, InIter>::type
-    for_each_n(ExPolicy && policy, InIter first, Diff count, F && func)
+    template <typename ExPolicy, typename InIter, typename F>
+    inline typename boost::enable_if<
+        is_execution_policy<typename hpx::util::decay<ExPolicy>::type>,
+        typename detail::algorithm_result<
+            typename hpx::util::decay<ExPolicy>::type, InIter
+        >::type
+    >::type
+    for_each_n(ExPolicy && policy, InIter first, std::size_t count, F && func)
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
             iterator_category;
@@ -117,8 +136,9 @@ namespace hpx { namespace parallel
             "Requires at least input iterator.");
 
         return detail::for_each_n(
-            std::forward<ExPolicy>(policy), first, count,
-            std::forward<F>(func), boost::declval<iterator_category>());
+            std::forward<ExPolicy>(policy),
+            first, count, std::forward<F>(func),
+            boost::declval<iterator_category>());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -136,24 +156,37 @@ namespace hpx { namespace parallel
                 throw e;
             }
             catch (...) {
-                // throw exception_list
+                throw hpx::exception_list(boost::current_exception());
             }
         }
 
         template <typename ExPolicy, typename InIter, typename F, typename IterTag>
-        inline void for_each(ExPolicy const& policy, InIter first, InIter last,
-            F && func, IterTag category)
+        inline typename detail::algorithm_result<
+            typename hpx::util::decay<ExPolicy>::type, void
+        >::type
+        for_each(ExPolicy const& policy, InIter first, InIter last, F && func,
+            IterTag category)
         {
-            detail::for_each_n(policy, first, std::distance(first, last),
-                std::forward<F>(func), category);
+            typedef typename detail::algorithm_result<
+                typename hpx::util::decay<ExPolicy>::type, void
+            >::type result_type;
+
+            return hpx::util::void_guard<result_type>(),
+                detail::for_each_n(policy, first, std::distance(first, last),
+                    std::forward<F>(func), category);
         }
 
         template <typename ExPolicy, typename InIter, typename F>
-        inline typename detail::enable_if_parallel<ExPolicy, void>::type
+        inline typename boost::enable_if<
+            is_parallel_execution_policy<typename hpx::util::decay<ExPolicy>::type>,
+            typename detail::algorithm_result<
+                typename hpx::util::decay<ExPolicy>::type, void
+            >::type
+        >::type
         for_each(ExPolicy const&, InIter first, InIter last, F && func,
             std::input_iterator_tag category)
         {
-            detail::for_each(seq, first, last, std::forward<F>(func), category);
+            return detail::for_each(seq, first, last, std::forward<F>(func), category);
         }
 
         template <typename InIter, typename F, typename IterTag>
@@ -162,11 +195,16 @@ namespace hpx { namespace parallel
         {
             std::type_info const& t = policy.type();
             if (t == typeid(parallel_execution_policy)) {
-                return detail::for_each(*policy.get<parallel_execution_policy>(),
+                detail::for_each(*policy.get<parallel_execution_policy>(),
                     first, last, std::forward<F>(func), category);
             }
             else if (t == typeid(sequential_execution_policy)) {
-                return detail::for_each(*policy.get<sequential_execution_policy>(),
+                detail::for_each(*policy.get<sequential_execution_policy>(),
+                    first, last, std::forward<F>(func), category);
+            }
+            else if (t == typeid(task_execution_policy)) {
+                // the dynamic case will never return a future
+                detail::for_each(*policy.get<parallel_execution_policy>(),
                     first, last, std::forward<F>(func), category);
             }
 //             else if (t == typeid(vector_execution_policy)) {
@@ -175,14 +213,19 @@ namespace hpx { namespace parallel
 //             }
             else {
                 HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                    "hpx::parallel::detail::for_each"
+                    "hpx::parallel::detail::for_each",
                     "Not supported execution policy");
             }
         }
     }
 
     template <typename ExPolicy, typename InIter, typename F>
-    inline typename detail::enable_if_policy<ExPolicy, void>::type
+    inline typename boost::enable_if<
+        is_execution_policy<typename hpx::util::decay<ExPolicy>::type>,
+        typename detail::algorithm_result<
+            typename hpx::util::decay<ExPolicy>::type, void
+        >::type
+    >::type
     for_each(ExPolicy && policy, InIter first, InIter last, F && func)
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
@@ -193,8 +236,9 @@ namespace hpx { namespace parallel
             "Requires at least input iterator.");
 
         return detail::for_each(
-            std::forward<ExPolicy>(policy), first, last,
-            std::forward<F>(func), boost::declval<iterator_category>());
+            std::forward<ExPolicy>(policy),
+            first, last, std::forward<F>(func),
+            boost::declval<iterator_category>());
     }
 }}
 

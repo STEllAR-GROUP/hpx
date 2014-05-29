@@ -98,8 +98,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
                         this,
                         boost::asio::placeholders::error, conn));
             }
-            catch (boost::system::system_error const& e) {
-                errors.add(e);   // store all errors
+            catch (boost::system::system_error const&) {
+                errors.add(boost::current_exception());
                 continue;
             }
         }

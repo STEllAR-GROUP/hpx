@@ -4,14 +4,14 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_STL_UTIL_LOOP_MAY_27_2014_1040PM)
-#define HPX_STL_UTIL_PARTITIONER_MAY_27_2014_1040PM
+#define HPX_STL_UTIL_LOOP_MAY_27_2014_1040PM
 
 #include <hpx/hpx_fwd.hpp>
 
 #include <iterator>
 #include <algorithm>
 
-namespace hpx { namespace parallale { namespace util
+namespace hpx { namespace parallel { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
     // Helper class to repeatedly call a function starting from a given
@@ -21,10 +21,11 @@ namespace hpx { namespace parallale { namespace util
     struct loop
     {
         template <typename Diff, typename F>
-        static Iter Loop(Iter it, Diff count, F && func)
+        static Iter call(Iter it, Diff count, F && func)
         {
             for (/**/; count != 0; --count, ++it)
                 func(*it);
+
             return it;
         }
     };
@@ -34,7 +35,7 @@ namespace hpx { namespace parallale { namespace util
     struct loop<Iter, std::random_access_iterator_tag>
     {
         template <typename Diff, typename F>
-        static Iter Loop(Iter it, Diff count, F && func)
+        static Iter call(Iter it, Diff count, F && func)
         {
             for (Diff i = 0; i != count; ++i)
                 func(it[i]);
