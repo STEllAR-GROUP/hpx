@@ -212,7 +212,7 @@ namespace hpx { namespace parallel
         ///          execution policy object; otherwise a null pointer
         /// Requires: is_execution_policy<T>::value is true
         template <typename ExPolicy>
-        ExPolicy* get() const BOOST_NOEXCEPT
+        ExPolicy* get() BOOST_NOEXCEPT
         {
             BOOST_STATIC_ASSERT_MSG(
                 !boost::is_same<ExPolicy, execution_policy>::value,
@@ -225,6 +225,22 @@ namespace hpx { namespace parallel
                 return 0;
 
             return static_cast<ExPolicy*>(inner_.get());
+        }
+
+        template <typename ExPolicy>
+        ExPolicy const* get() const BOOST_NOEXCEPT
+        {
+            BOOST_STATIC_ASSERT_MSG(
+                !boost::is_same<ExPolicy, execution_policy>::value,
+                "Incorrect execution policy parameter.");
+            BOOST_STATIC_ASSERT_MSG(
+                is_execution_policy<ExPolicy>::value,
+                "Execution policy type required.");
+
+            if (*type_ != typeid(_ExPolicy))
+                return 0;
+
+            return static_cast<ExPolicy const*>(inner_.get());
         }
     };
 }}

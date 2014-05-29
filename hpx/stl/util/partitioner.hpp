@@ -7,6 +7,9 @@
 #define HPX_STL_UTIL_PARTITIONER_MAY_27_2014_1040PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/async.hpp>
+#include <hpx/lcos/when_all.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/stl/execution_policy.hpp>
 #include <hpx/stl/detail/algorithm_result.hpp>
 

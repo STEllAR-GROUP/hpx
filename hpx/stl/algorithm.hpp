@@ -19,7 +19,6 @@
 #include <iterator>
 
 #include <boost/static_assert.hpp>
-#include <boost/utility/declval.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 
@@ -137,8 +136,7 @@ namespace hpx { namespace parallel
 
         return detail::for_each_n(
             std::forward<ExPolicy>(policy),
-            first, count, std::forward<F>(func),
-            boost::declval<iterator_category>());
+            first, count, std::forward<F>(func), iterator_category());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -237,8 +235,7 @@ namespace hpx { namespace parallel
 
         return detail::for_each(
             std::forward<ExPolicy>(policy),
-            first, last, std::forward<F>(func),
-            boost::declval<iterator_category>());
+            first, last, std::forward<F>(func), iterator_category());
     }
 }}
 

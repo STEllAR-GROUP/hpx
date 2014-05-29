@@ -78,8 +78,8 @@ namespace hpx { namespace util
             HPX_ASSERT(it != boost::asio::ip::tcp::resolver::iterator());
             return *it;
         }
-        catch (boost::system::system_error const& e) {
-            errors.add(e);
+        catch (boost::system::system_error const&) {
+            errors.add(boost::current_exception());
         }
 
         // report errors
