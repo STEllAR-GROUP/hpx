@@ -108,9 +108,19 @@ namespace hpx { namespace parallel { namespace util
 
             // wait for all tasks to finish
             return hpx::when_all(workitems).then(
-                [first](hpx::future<void> f)
+                [first](hpx::future<std::vector<hpx::future<void> > > r)
                 {
-                    f.get();        // rethrow any errors
+                    std::vector<hpx::future<void> > result = r.get();
+
+                    std::list<boost::exception_ptr> errors;
+                    for (hpx::future<void>& f: result)
+                    {
+                        if (f.has_exception())
+                            errors.push_back(f.get_exception_ptr());
+                    }
+                    if (!errors.empty())
+                        throw exception_list(std::move(errors));
+
                     return first;
                 }
             );

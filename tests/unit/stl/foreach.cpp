@@ -34,7 +34,7 @@ void test_foreach1(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_foreach1(hpx::parallel::task_execution_policy const&, IteratorTag)
+void test_foreach1(hpx::parallel::task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -65,13 +65,91 @@ void test_foreach1()
     test_foreach1(hpx::parallel::task, IteratorTag());
 }
 
-///////////////////////////////////////////////////////////////////////////////
-int hpx_main()
+void foreach1_test()
 {
     test_foreach1<std::random_access_iterator_tag>();
     test_foreach1<std::forward_iterator_tag>();
     test_foreach1<std::input_iterator_tag>();
+}
 
+///////////////////////////////////////////////////////////////////////////////
+template <typename ExPolicy, typename IteratorTag>
+void test_foreach1_exception(ExPolicy const& policy, IteratorTag)
+{
+    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10000);
+
+    bool caught_exception = false;
+    try {
+        hpx::parallel::for_each(policy,
+            iterator(boost::begin(c)), iterator(boost::end(c)),
+            [](std::size_t& v) {
+                throw std::runtime_error("test");
+            });
+
+        HPX_TEST(false);
+    }
+    catch(...) {
+        caught_exception = true;
+        boost::exception_ptr e = boost::current_exception();
+    }
+
+    HPX_TEST(caught_exception);
+}
+
+template <typename IteratorTag>
+void test_foreach1_exception(hpx::parallel::task_execution_policy, IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10000);
+
+    bool caught_exception = false;
+    try {
+        hpx::future<void> f =
+            hpx::parallel::for_each(hpx::parallel::task,
+                iterator(boost::begin(c)), iterator(boost::end(c)),
+                [](std::size_t& v) {
+                    throw std::runtime_error("test");
+                });
+        f.get();
+
+        HPX_TEST(false);
+    }
+    catch(...) {
+        caught_exception = true;
+        boost::exception_ptr e = boost::current_exception();
+    }
+
+    HPX_TEST(caught_exception);
+}
+
+template <typename IteratorTag>
+void test_foreach1_exception()
+{
+    test_foreach1_exception(hpx::parallel::seq, IteratorTag());
+    test_foreach1_exception(hpx::parallel::par, IteratorTag());
+    test_foreach1_exception(hpx::parallel::vec, IteratorTag());
+    test_foreach1_exception(hpx::parallel::task, IteratorTag());
+}
+
+void foreach1_exception_test()
+{
+    test_foreach1_exception<std::random_access_iterator_tag>();
+    test_foreach1_exception<std::forward_iterator_tag>();
+    test_foreach1_exception<std::input_iterator_tag>();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+int hpx_main()
+{
+    foreach1_test();
+    foreach1_exception_test();
     return hpx::finalize();
 }
 
