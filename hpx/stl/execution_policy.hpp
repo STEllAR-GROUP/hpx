@@ -60,6 +60,43 @@ namespace hpx { namespace parallel
 
 
     ///////////////////////////////////////////////////////////////////////////
+    class execution_policy;
+
+    namespace detail
+    {
+        template <typename T>
+        struct is_execution_policy
+          : boost::mpl::false_
+        {};
+
+        template <>
+        struct is_execution_policy<parallel_execution_policy>
+          : boost::mpl::true_
+        {};
+
+        template <>
+        struct is_execution_policy<vector_execution_policy>
+          : boost::mpl::true_
+        {};
+
+        template <>
+        struct is_execution_policy<sequential_execution_policy>
+          : boost::mpl::true_
+        {};
+
+        // extension
+        template <>
+        struct is_execution_policy<task_execution_policy>
+          : boost::mpl::true_
+        {};
+
+        template <>
+        struct is_execution_policy<execution_policy>
+          : boost::mpl::true_
+        {};
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     ///
     /// 1. The type is_execution_policy can be used to detect parallel
     ///    execution policies for the purpose of excluding function signatures
@@ -73,56 +110,37 @@ namespace hpx { namespace parallel
     ///
     template <typename T>
     struct is_execution_policy
-      : boost::mpl::false_
+      : detail::is_execution_policy<typename hpx::util::decay<T>::type>
     {};
 
-    template <>
-    struct is_execution_policy<parallel_execution_policy>
-      : boost::mpl::true_
-    {};
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        template <typename T>
+        struct is_parallel_execution_policy
+          : boost::mpl::false_
+        {};
 
-    template <>
-    struct is_execution_policy<vector_execution_policy>
-      : boost::mpl::true_
-    {};
+        template <>
+        struct is_parallel_execution_policy<parallel_execution_policy>
+          : boost::mpl::true_
+        {};
 
-    template <>
-    struct is_execution_policy<sequential_execution_policy>
-      : boost::mpl::true_
-    {};
+        template <>
+        struct is_parallel_execution_policy<vector_execution_policy>
+          : boost::mpl::true_
+        {};
 
-    // extension
-    template <>
-    struct is_execution_policy<task_execution_policy>
-      : boost::mpl::true_
-    {};
-
-    class execution_policy;
-
-    template <>
-    struct is_execution_policy<execution_policy>
-      : boost::mpl::true_
-    {};
+        template <>
+        struct is_parallel_execution_policy<task_execution_policy>
+          : boost::mpl::true_
+        {};
+    }
 
     // extension: detect whether give execution policy enables parallelization
     template <typename T>
     struct is_parallel_execution_policy
-      : boost::mpl::false_
-    {};
-
-    template <>
-    struct is_parallel_execution_policy<parallel_execution_policy>
-      : boost::mpl::true_
-    {};
-
-    template <>
-    struct is_parallel_execution_policy<vector_execution_policy>
-      : boost::mpl::true_
-    {};
-
-    template <>
-    struct is_parallel_execution_policy<task_execution_policy>
-      : boost::mpl::true_
+      : detail::is_parallel_execution_policy<typename hpx::util::decay<T>::type>
     {};
 
     ///////////////////////////////////////////////////////////////////////////

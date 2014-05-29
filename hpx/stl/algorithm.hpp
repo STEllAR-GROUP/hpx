@@ -28,14 +28,14 @@ namespace hpx { namespace parallel
     // for_each_n
     namespace detail
     {
-        template <typename InIter, typename F, typename IterTag>
-        inline InIter
-        for_each_n(sequential_execution_policy const &, InIter first,
+        template <typename ExPolicy, typename InIter, typename F, typename IterTag>
+        inline typename detail::algorithm_result<ExPolicy, InIter>::type
+        for_each_n_seq(ExPolicy const &, InIter first,
             std::size_t count, F && func, IterTag)
         {
             try {
                 util::loop<InIter>::call(first, count, std::forward<F>(func));
-                return first;
+                return detail::algorithm_result<ExPolicy, InIter>::get(first);
             }
             catch(std::bad_alloc const& e) {
                 throw e;
@@ -47,9 +47,7 @@ namespace hpx { namespace parallel
 
         template <typename ExPolicy, typename InIter, typename F,
             typename IterTag>
-        inline typename detail::algorithm_result<
-            typename hpx::util::decay<ExPolicy>::type, InIter
-        >::type
+        inline typename detail::algorithm_result<ExPolicy, InIter>::type
         for_each_n(ExPolicy const&, InIter first, std::size_t count, F && func, IterTag)
         {
             typedef typename hpx::util::decay<ExPolicy>::type execution_policy_type;
@@ -66,22 +64,19 @@ namespace hpx { namespace parallel
                     });
             }
 
-            return detail::algorithm_result<
-                execution_policy_type, InIter>::get(std::move(first));
+            return detail::algorithm_result<ExPolicy, InIter>::get(std::move(first));
         }
 
         template <typename ExPolicy, typename InIter, typename F>
         inline typename boost::enable_if<
             is_parallel_execution_policy<ExPolicy>,
-            typename detail::algorithm_result<
-                typename hpx::util::decay<ExPolicy>::type, InIter
-            >::type
+            typename detail::algorithm_result<ExPolicy, InIter>::type
          >::type
-        for_each_n(ExPolicy const&, InIter first, std::size_t count, F && func,
-            std::input_iterator_tag category)
+        for_each_n(ExPolicy const& policy, InIter first, std::size_t count,
+            F && func, std::input_iterator_tag category)
         {
-            return detail::for_each_n(seq, first, count, std::forward<F>(func),
-                category);
+            return detail::for_each_n_seq(policy, first, count,
+                std::forward<F>(func), category);
         }
 
         template <typename InIter, typename F, typename IterTag>
@@ -121,9 +116,7 @@ namespace hpx { namespace parallel
     template <typename ExPolicy, typename InIter, typename F>
     inline typename boost::enable_if<
         is_execution_policy<typename hpx::util::decay<ExPolicy>::type>,
-        typename detail::algorithm_result<
-            typename hpx::util::decay<ExPolicy>::type, InIter
-        >::type
+        typename detail::algorithm_result<ExPolicy, InIter>::type
     >::type
     for_each_n(ExPolicy && policy, InIter first, std::size_t count, F && func)
     {
@@ -143,12 +136,13 @@ namespace hpx { namespace parallel
     // for_each
     namespace detail
     {
-        template <typename InIter, typename F, typename IterTag>
-        inline void for_each(sequential_execution_policy const&,
-            InIter first, InIter last, F && func, IterTag)
+        template <typename ExPolicy, typename InIter, typename F, typename IterTag>
+        inline typename detail::algorithm_result<ExPolicy, void>::type
+        for_each_seq(ExPolicy const&, InIter first, InIter last, F && func, IterTag)
         {
             try {
                 std::for_each(first, last, std::forward<F>(func));
+                return detail::algorithm_result<ExPolicy, void>::get();
             }
             catch(std::bad_alloc const& e) {
                 throw e;
@@ -159,15 +153,13 @@ namespace hpx { namespace parallel
         }
 
         template <typename ExPolicy, typename InIter, typename F, typename IterTag>
-        inline typename detail::algorithm_result<
-            typename hpx::util::decay<ExPolicy>::type, void
-        >::type
+        typename detail::algorithm_result<ExPolicy, void>::type
         for_each(ExPolicy const& policy, InIter first, InIter last, F && func,
             IterTag category)
         {
-            typedef typename detail::algorithm_result<
-                typename hpx::util::decay<ExPolicy>::type, void
-            >::type result_type;
+            typedef
+                typename detail::algorithm_result<ExPolicy, void>::type
+            result_type;
 
             return hpx::util::void_guard<result_type>(),
                 detail::for_each_n(policy, first, std::distance(first, last),
@@ -176,15 +168,14 @@ namespace hpx { namespace parallel
 
         template <typename ExPolicy, typename InIter, typename F>
         inline typename boost::enable_if<
-            is_parallel_execution_policy<typename hpx::util::decay<ExPolicy>::type>,
-            typename detail::algorithm_result<
-                typename hpx::util::decay<ExPolicy>::type, void
-            >::type
+            is_parallel_execution_policy<ExPolicy>,
+            typename detail::algorithm_result<ExPolicy, void>::type
         >::type
-        for_each(ExPolicy const&, InIter first, InIter last, F && func,
+        for_each(ExPolicy const& policy, InIter first, InIter last, F && func,
             std::input_iterator_tag category)
         {
-            return detail::for_each(seq, first, last, std::forward<F>(func), category);
+            return detail::for_each_seq(policy, first, last,
+                std::forward<F>(func), category);
         }
 
         template <typename InIter, typename F, typename IterTag>
@@ -220,9 +211,7 @@ namespace hpx { namespace parallel
     template <typename ExPolicy, typename InIter, typename F>
     inline typename boost::enable_if<
         is_execution_policy<typename hpx::util::decay<ExPolicy>::type>,
-        typename detail::algorithm_result<
-            typename hpx::util::decay<ExPolicy>::type, void
-        >::type
+        typename detail::algorithm_result<ExPolicy, void>::type
     >::type
     for_each(ExPolicy && policy, InIter first, InIter last, F && func)
     {

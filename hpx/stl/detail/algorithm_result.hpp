@@ -14,7 +14,7 @@ namespace hpx { namespace parallel { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename T>
-    struct algorithm_result
+    struct algorithm_result_impl
     {
         typedef T type;         // The return type of the initiating function.
 
@@ -25,7 +25,7 @@ namespace hpx { namespace parallel { namespace detail
     };
 
     template <typename ExPolicy>
-    struct algorithm_result<ExPolicy, void>
+    struct algorithm_result_impl<ExPolicy, void>
     {
         typedef void type;      // The return type of the initiating function.
 
@@ -33,7 +33,7 @@ namespace hpx { namespace parallel { namespace detail
     };
 
     template <typename T>
-    struct algorithm_result<task_execution_policy, T>
+    struct algorithm_result_impl<task_execution_policy, T>
     {
         // The return type of the initiating function.
         typedef hpx::future<T> type;
@@ -45,7 +45,7 @@ namespace hpx { namespace parallel { namespace detail
     };
 
     template <>
-    struct algorithm_result<task_execution_policy, void>
+    struct algorithm_result_impl<task_execution_policy, void>
     {
         // The return type of the initiating function.
         typedef hpx::future<void> type;
@@ -55,6 +55,12 @@ namespace hpx { namespace parallel { namespace detail
             return hpx::make_ready_future();
         }
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename ExPolicy, typename T>
+    struct algorithm_result
+      : algorithm_result_impl<typename hpx::util::decay<ExPolicy>::type, T>
+    {};
 }}}
 
 #endif
