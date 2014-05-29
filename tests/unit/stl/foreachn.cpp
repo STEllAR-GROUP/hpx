@@ -12,7 +12,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_for_each(ExPolicy const& policy, IteratorTag)
+void test_for_each_n(ExPolicy const& policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -20,8 +20,8 @@ void test_for_each(ExPolicy const& policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10000);
-    hpx::parallel::for_each(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)),
+    hpx::parallel::for_each_n(policy,
+        iterator(boost::begin(c)), c.size(),
         [](std::size_t& v) {
             v = 42;
         });
@@ -34,7 +34,7 @@ void test_for_each(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_for_each(hpx::parallel::task_execution_policy, IteratorTag)
+void test_for_each_n(hpx::parallel::task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -42,8 +42,8 @@ void test_for_each(hpx::parallel::task_execution_policy, IteratorTag)
     std::vector<std::size_t> c(10000);
 
     hpx::future<void> f =
-        hpx::parallel::for_each(hpx::parallel::task,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
+        hpx::parallel::for_each_n(hpx::parallel::task,
+            iterator(boost::begin(c)), c.size(),
             [](std::size_t& v) {
                 v = 42;
             });
@@ -57,31 +57,31 @@ void test_for_each(hpx::parallel::task_execution_policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_for_each()
+void test_for_each_n()
 {
     using namespace hpx::parallel;
 
-    test_for_each(seq, IteratorTag());
-    test_for_each(par, IteratorTag());
-    test_for_each(vec, IteratorTag());
-    test_for_each(task, IteratorTag());
+    test_for_each_n(seq, IteratorTag());
+    test_for_each_n(par, IteratorTag());
+    test_for_each_n(vec, IteratorTag());
+    test_for_each_n(task, IteratorTag());
 
-    test_for_each(execution_policy(seq), IteratorTag());
-    test_for_each(execution_policy(par), IteratorTag());
-    test_for_each(execution_policy(vec), IteratorTag());
-    test_for_each(execution_policy(task), IteratorTag());
+    test_for_each_n(execution_policy(seq), IteratorTag());
+    test_for_each_n(execution_policy(par), IteratorTag());
+    test_for_each_n(execution_policy(vec), IteratorTag());
+    test_for_each_n(execution_policy(task), IteratorTag());
 }
 
-void for_each_test()
+void for_each_n_test()
 {
-    test_for_each<std::random_access_iterator_tag>();
-    test_for_each<std::forward_iterator_tag>();
-    test_for_each<std::input_iterator_tag>();
+    test_for_each_n<std::random_access_iterator_tag>();
+    test_for_each_n<std::forward_iterator_tag>();
+    test_for_each_n<std::input_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_for_each_exception(ExPolicy const& policy, IteratorTag)
+void test_for_each_n_exception(ExPolicy const& policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -92,8 +92,8 @@ void test_for_each_exception(ExPolicy const& policy, IteratorTag)
 
     bool caught_exception = false;
     try {
-        hpx::parallel::for_each(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
+        hpx::parallel::for_each_n(policy,
+            iterator(boost::begin(c)), c.size(),
             [](std::size_t& v) {
                 throw std::runtime_error("test");
             });
@@ -109,7 +109,7 @@ void test_for_each_exception(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_for_each_exception(hpx::parallel::task_execution_policy, IteratorTag)
+void test_for_each_n_exception(hpx::parallel::task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -119,8 +119,8 @@ void test_for_each_exception(hpx::parallel::task_execution_policy, IteratorTag)
     bool caught_exception = false;
     try {
         hpx::future<void> f =
-            hpx::parallel::for_each(hpx::parallel::task,
-                iterator(boost::begin(c)), iterator(boost::end(c)),
+            hpx::parallel::for_each_n(hpx::parallel::task,
+                iterator(boost::begin(c)), c.size(),
                 [](std::size_t& v) {
                     throw std::runtime_error("test");
                 });
@@ -137,33 +137,33 @@ void test_for_each_exception(hpx::parallel::task_execution_policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_for_each_exception()
+void test_for_each_n_exception()
 {
     using namespace hpx::parallel;
 
-    test_for_each_exception(seq, IteratorTag());
-    test_for_each_exception(par, IteratorTag());
-    test_for_each_exception(vec, IteratorTag());
-    test_for_each_exception(task, IteratorTag());
+    test_for_each_n_exception(seq, IteratorTag());
+    test_for_each_n_exception(par, IteratorTag());
+    test_for_each_n_exception(vec, IteratorTag());
+    test_for_each_n_exception(task, IteratorTag());
 
-    test_for_each_exception(execution_policy(seq), IteratorTag());
-    test_for_each_exception(execution_policy(par), IteratorTag());
-    test_for_each_exception(execution_policy(vec), IteratorTag());
-    test_for_each_exception(execution_policy(task), IteratorTag());
+    test_for_each_n_exception(execution_policy(seq), IteratorTag());
+    test_for_each_n_exception(execution_policy(par), IteratorTag());
+    test_for_each_n_exception(execution_policy(vec), IteratorTag());
+    test_for_each_n_exception(execution_policy(task), IteratorTag());
 }
 
-void for_each_exception_test()
+void for_each_n_exception_test()
 {
-    test_for_each_exception<std::random_access_iterator_tag>();
-    test_for_each_exception<std::forward_iterator_tag>();
-    test_for_each_exception<std::input_iterator_tag>();
+    test_for_each_n_exception<std::random_access_iterator_tag>();
+    test_for_each_n_exception<std::forward_iterator_tag>();
+    test_for_each_n_exception<std::input_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    for_each_test();
-    for_each_exception_test();
+    for_each_n_test();
+    for_each_n_exception_test();
     return hpx::finalize();
 }
 

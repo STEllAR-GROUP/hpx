@@ -5,6 +5,7 @@
 
 set(tests
     foreach
+    foreachn
    )
 
 foreach(test ${tests})

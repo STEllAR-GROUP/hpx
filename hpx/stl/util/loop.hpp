@@ -20,8 +20,8 @@ namespace hpx { namespace parallel { namespace util
         typename IterCat = typename std::iterator_traits<Iter>::iterator_category>
     struct loop
     {
-        template <typename Diff, typename F>
-        static Iter call(Iter it, Diff count, F && func)
+        template <typename F>
+        static Iter call(Iter it, std::size_t count, F && func)
         {
             for (/**/; count != 0; --count, ++it)
                 func(*it);
@@ -34,10 +34,10 @@ namespace hpx { namespace parallel { namespace util
     template <typename Iter>
     struct loop<Iter, std::random_access_iterator_tag>
     {
-        template <typename Diff, typename F>
-        static Iter call(Iter it, Diff count, F && func)
+        template <typename F>
+        static Iter call(Iter it, std::size_t count, F && func)
         {
-            for (Diff i = 0; i != count; ++i)
+            for (std::size_t i = 0; i != count; ++i)
                 func(it[i]);
 
             std::advance(it, count);

@@ -239,7 +239,7 @@ namespace hpx { namespace parallel
                 is_execution_policy<ExPolicy>::value,
                 "Execution policy type required.");
 
-            if (*type_ != typeid(_ExPolicy))
+            if (*type_ != typeid(ExPolicy))
                 return 0;
 
             return static_cast<ExPolicy*>(inner_.get());
@@ -255,7 +255,7 @@ namespace hpx { namespace parallel
                 is_execution_policy<ExPolicy>::value,
                 "Execution policy type required.");
 
-            if (*type_ != typeid(_ExPolicy))
+            if (*type_ != typeid(ExPolicy))
                 return 0;
 
             return static_cast<ExPolicy const*>(inner_.get());
