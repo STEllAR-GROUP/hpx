@@ -29,7 +29,7 @@ namespace hpx { namespace parallel
     namespace detail
     {
         template <typename ExPolicy, typename InIter, typename F, typename IterTag>
-        inline typename detail::algorithm_result<ExPolicy, InIter>::type
+        typename detail::algorithm_result<ExPolicy, InIter>::type
         for_each_n_seq(ExPolicy const&, InIter first,
             std::size_t count, F && f, IterTag)
         {
@@ -48,7 +48,7 @@ namespace hpx { namespace parallel
 
         template <typename ExPolicy, typename InIter, typename F,
             typename IterTag>
-        inline typename detail::algorithm_result<ExPolicy, InIter>::type
+        typename detail::algorithm_result<ExPolicy, InIter>::type
         for_each_n(ExPolicy const&, InIter first, std::size_t count, F && f, IterTag)
         {
             typedef typename hpx::util::decay<ExPolicy>::type execution_policy_type;
@@ -71,7 +71,7 @@ namespace hpx { namespace parallel
         }
 
         template <typename ExPolicy, typename InIter, typename F>
-        inline typename boost::enable_if<
+        typename boost::enable_if<
             is_parallel_execution_policy<ExPolicy>,
             typename detail::algorithm_result<ExPolicy, InIter>::type
         >::type
@@ -83,7 +83,15 @@ namespace hpx { namespace parallel
         }
 
         template <typename InIter, typename F, typename IterTag>
-        inline InIter for_each_n(execution_policy const& policy,
+        InIter for_each_n(sequential_execution_policy const& policy,
+            InIter first, std::size_t count, F && f, IterTag category)
+        {
+            return detail::for_each_n_seq(policy, first, count,
+                std::forward<F>(f), category);
+        }
+
+        template <typename InIter, typename F, typename IterTag>
+        InIter for_each_n(execution_policy const& policy,
             InIter first, std::size_t count, F && f, IterTag category)
         {
             switch (detail::which(policy))
@@ -118,7 +126,7 @@ namespace hpx { namespace parallel
     }
 
     template <typename ExPolicy, typename InIter, typename F>
-    inline typename boost::enable_if<
+    typename boost::enable_if<
         is_execution_policy<typename hpx::util::decay<ExPolicy>::type>,
         typename detail::algorithm_result<ExPolicy, InIter>::type
     >::type
@@ -141,7 +149,7 @@ namespace hpx { namespace parallel
     namespace detail
     {
         template <typename ExPolicy, typename InIter, typename F, typename IterTag>
-        inline typename detail::algorithm_result<ExPolicy, void>::type
+        typename detail::algorithm_result<ExPolicy, void>::type
         for_each_seq(ExPolicy const&, InIter first, InIter last, F && f, IterTag)
         {
             try {
@@ -171,7 +179,7 @@ namespace hpx { namespace parallel
         }
 
         template <typename ExPolicy, typename InIter, typename F>
-        inline typename boost::enable_if<
+        typename boost::enable_if<
             is_parallel_execution_policy<ExPolicy>,
             typename detail::algorithm_result<ExPolicy, void>::type
         >::type
@@ -183,7 +191,15 @@ namespace hpx { namespace parallel
         }
 
         template <typename InIter, typename F, typename IterTag>
-        inline void for_each(execution_policy const& policy,
+        void for_each(sequential_execution_policy const& policy,
+            InIter first, InIter last, F && f, IterTag category)
+        {
+            detail::for_each_seq(policy, first, last,
+                std::forward<F>(f), category);
+        }
+
+        template <typename InIter, typename F, typename IterTag>
+        void for_each(execution_policy const& policy,
             InIter first, InIter last, F && f, IterTag category)
         {
             switch (detail::which(policy))
@@ -222,7 +238,7 @@ namespace hpx { namespace parallel
     }
 
     template <typename ExPolicy, typename InIter, typename F>
-    inline typename boost::enable_if<
+    typename boost::enable_if<
         is_execution_policy<typename hpx::util::decay<ExPolicy>::type>,
         typename detail::algorithm_result<ExPolicy, void>::type
     >::type
