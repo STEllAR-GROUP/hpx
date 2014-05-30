@@ -99,31 +99,33 @@ namespace hpx { namespace parallel
         OutIter transform(execution_policy const& policy,
             InIter first, InIter last, OutIter dest, F && f, IterTag category)
         {
-            std::type_info const& t = policy.type();
-            if (t == typeid(parallel_execution_policy)) {
-                return detail::transform(
-                    *policy.get<parallel_execution_policy>(),
-                    first, last, dest, std::forward<F>(f), category);
-            }
-            else if (t == typeid(sequential_execution_policy)) {
+            switch (detail::which(policy))
+            {
+            case detail::execution_policy_enum::sequential:
                 return detail::transform(
                     *policy.get<sequential_execution_policy>(),
                     first, last, dest, std::forward<F>(f), category);
-            }
-            else if (t == typeid(task_execution_policy)) {
-                // the dynamic case will never return a future
-                return detail::transform(par,
+
+            case detail::execution_policy_enum::parallel:
+                return detail::transform(
+                    *policy.get<parallel_execution_policy>(),
                     first, last, dest, std::forward<F>(f), category);
-            }
-            else if (t == typeid(vector_execution_policy)) {
+
+            case detail::execution_policy_enum::vector:
                 return detail::transform(
                     *policy.get<vector_execution_policy>(),
                     first, last, dest, std::forward<F>(f), category);
-            }
-            else {
+
+            case detail::execution_policy_enum::task:
+                // the dynamic case will never return a future
+                return detail::transform(par,
+                    first, last, dest, std::forward<F>(f), category);
+
+            default:
                 HPX_THROW_EXCEPTION(hpx::bad_parameter,
                     "hpx::parallel::detail::transform",
                     "Not supported execution policy");
+                break;
             }
         }
     }
@@ -211,31 +213,33 @@ namespace hpx { namespace parallel
             InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest,
             F && f, IterTag category)
         {
-            std::type_info const& t = policy.type();
-            if (t == typeid(parallel_execution_policy)) {
-                return detail::transform_binary(
-                    *policy.get<parallel_execution_policy>(),
-                    first1, last1, first2, dest, std::forward<F>(f), category);
-            }
-            else if (t == typeid(sequential_execution_policy)) {
+            switch (detail::which(policy))
+            {
+            case detail::execution_policy_enum::sequential:
                 return detail::transform_binary_seq(
                     *policy.get<sequential_execution_policy>(),
                     first1, last1, first2, dest, std::forward<F>(f), category);
-            }
-            else if (t == typeid(task_execution_policy)) {
-                // the dynamic case will never return a future
-                return detail::transform_binary(par,
+
+            case detail::execution_policy_enum::parallel:
+                return detail::transform_binary(
+                    *policy.get<parallel_execution_policy>(),
                     first1, last1, first2, dest, std::forward<F>(f), category);
-            }
-            else if (t == typeid(vector_execution_policy)) {
+
+            case detail::execution_policy_enum::vector:
                 return detail::transform_binary(
                     *policy.get<vector_execution_policy>(),
                     first1, last1, first2, dest, std::forward<F>(f), category);
-            }
-            else {
+
+            case detail::execution_policy_enum::task:
+                // the dynamic case will never return a future
+                return detail::transform_binary(par,
+                    first1, last1, first2, dest, std::forward<F>(f), category);
+
+            default:
                 HPX_THROW_EXCEPTION(hpx::bad_parameter,
                     "hpx::parallel::detail::transform_binary",
                     "Not supported execution policy");
+                break;
             }
         }
     }
