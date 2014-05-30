@@ -19,7 +19,7 @@ void test_for_each(ExPolicy const& policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10000);
+    std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     hpx::parallel::for_each(policy,
@@ -31,7 +31,7 @@ void test_for_each(ExPolicy const& policy, IteratorTag)
     // verify values
     std::size_t count = 0;
     std::for_each(boost::begin(c), boost::end(c),
-        [](std::size_t v) {
+        [&count](std::size_t v) {
             HPX_TEST_EQ(v, std::size_t(42));
             ++count;
         });
@@ -44,7 +44,7 @@ void test_for_each(hpx::parallel::task_execution_policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10000);
+    std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     hpx::future<void> f =
@@ -58,7 +58,7 @@ void test_for_each(hpx::parallel::task_execution_policy, IteratorTag)
     // verify values
     std::size_t count = 0;
     std::for_each(boost::begin(c), boost::end(c),
-        [](std::size_t v) {
+        [&count](std::size_t v) {
             HPX_TEST_EQ(v, std::size_t(42));
             ++count;
         });
@@ -97,7 +97,7 @@ void test_for_each_exception(ExPolicy const& policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10000);
+    std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     bool caught_exception = false;
@@ -110,9 +110,12 @@ void test_for_each_exception(ExPolicy const& policy, IteratorTag)
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const&) {
+    catch(hpx::exception_list const& e) {
         caught_exception = true;
-        boost::exception_ptr e = boost::current_exception();
+
+        // The static partitioner uses the number of threads/cores for the
+        // number chunks to create.
+        HPX_TEST_EQ(e.size(), hpx::threads::hardware_concurrency());
     }
     catch(...) {
         HPX_TEST(false);
@@ -127,7 +130,7 @@ void test_for_each_exception(hpx::parallel::task_execution_policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10000);
+    std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     bool caught_exception = false;
@@ -142,9 +145,12 @@ void test_for_each_exception(hpx::parallel::task_execution_policy, IteratorTag)
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const&) {
+    catch(hpx::exception_list const& e) {
         caught_exception = true;
-        boost::exception_ptr e = boost::current_exception();
+
+        // The static partitioner uses the number of threads/cores for the
+        // number chunks to create.
+        HPX_TEST_EQ(e.size(), hpx::threads::hardware_concurrency());
     }
     catch(...) {
         HPX_TEST(false);
@@ -186,8 +192,13 @@ int hpx_main()
 
 int main(int argc, char* argv[])
 {
+    // By default this test should run on all available cores
+    std::vector<std::string> cfg;
+    cfg.push_back("hpx.os_threads=" +
+        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency()));
+
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
+    HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,
         "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();

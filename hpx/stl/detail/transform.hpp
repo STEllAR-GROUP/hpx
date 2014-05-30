@@ -177,14 +177,17 @@ namespace hpx { namespace parallel
             typedef boost::tuple<InIter1, InIter2, OutIter> iterator_tuple;
             typedef detail::zip_iterator<iterator_tuple> zip_iterator;
             typedef typename zip_iterator::reference reference;
+            typedef
+                typename detail::algorithm_result<ExPolicy, OutIter>::type
+            result_type;
 
-            return boost::get<2>(
+            return get_iter<2, result_type>(
                 for_each_n(policy,
                     detail::make_zip_iterator(boost::make_tuple(first1, first2, dest)),
                     std::distance(first1, last1),
                     [f](reference it) {
                         *boost::get<2>(it) =
-                            f(*boost::get<0>(it), *std::boost<1>(it));
+                            f(*boost::get<0>(it), *boost::get<1>(it));
                     },
                     category));
         }
@@ -255,7 +258,7 @@ namespace hpx { namespace parallel
                 typename std::iterator_traits<InIter2>::iterator_category>::value,
             "Required at least input iterator.");
 
-        detail::zip_iterator_category_helper<InIter, InIter2>::iterator_category category;
+        detail::zip_iterator_category_helper<InIter1, InIter2>::iterator_category category;
         return detail::transform_binary(policy, first1, last1, first2,
             dest, std::forward<F>(f), category);
     }
