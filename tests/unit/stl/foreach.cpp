@@ -110,9 +110,12 @@ void test_for_each_exception(ExPolicy const& policy, IteratorTag)
 
         HPX_TEST(false);
     }
-    catch(...) {
+    catch(hpx::exception_list const&) {
         caught_exception = true;
         boost::exception_ptr e = boost::current_exception();
+    }
+    catch(...) {
+        HPX_TEST(false);
     }
 
     HPX_TEST(caught_exception);
@@ -139,9 +142,12 @@ void test_for_each_exception(hpx::parallel::task_execution_policy, IteratorTag)
 
         HPX_TEST(false);
     }
-    catch(...) {
+    catch(hpx::exception_list const&) {
         caught_exception = true;
         boost::exception_ptr e = boost::current_exception();
+    }
+    catch(...) {
+        HPX_TEST(false);
     }
 
     HPX_TEST(caught_exception);

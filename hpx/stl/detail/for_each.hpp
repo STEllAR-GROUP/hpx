@@ -30,7 +30,7 @@ namespace hpx { namespace parallel
     {
         template <typename ExPolicy, typename InIter, typename F, typename IterTag>
         inline typename detail::algorithm_result<ExPolicy, InIter>::type
-        for_each_n_seq(ExPolicy const &, InIter first,
+        for_each_n_seq(ExPolicy const&, InIter first,
             std::size_t count, F && f, IterTag)
         {
             try {
@@ -59,9 +59,10 @@ namespace hpx { namespace parallel
             if (count > 0)
             {
                 return util::partitioner<execution_policy_type>::call(
-                    first, count, [f](InIter part_begin, std::size_t count)
+                    first, count,
+                    [f](InIter part_begin, std::size_t part_count)
                     {
-                        util::loop_n<IterTag>::call(part_begin, count, f);
+                        util::loop_n<IterTag>::call(part_begin, part_count, f);
                     });
             }
 
@@ -73,7 +74,7 @@ namespace hpx { namespace parallel
         inline typename boost::enable_if<
             is_parallel_execution_policy<ExPolicy>,
             typename detail::algorithm_result<ExPolicy, InIter>::type
-         >::type
+        >::type
         for_each_n(ExPolicy const& policy, InIter first, std::size_t count,
             F && f, std::input_iterator_tag category)
         {

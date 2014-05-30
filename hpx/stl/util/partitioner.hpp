@@ -59,24 +59,34 @@ namespace hpx { namespace parallel { namespace util
                 std::advance(first, chunk_size);
             }
 
+            std::list<boost::exception_ptr> errors;
+
             // execute last chunk directly
             if (count != 0)
             {
-                func(first, count);
+                try {
+                    func(first, count);
+                }
+                catch (std::bad_alloc const& e) {
+                    throw e;
+                }
+                catch (...) {
+                    errors.push_back(boost::current_exception());
+                }
                 std::advance(first, count);
             }
 
             // wait for all tasks to finish
             hpx::wait_all(workitems);
 
-            std::list<boost::exception_ptr> errors;
             for (hpx::future<void>& f: workitems)
             {
                 if (f.has_exception())
                     errors.push_back(f.get_exception_ptr());
             }
+
             if (!errors.empty())
-                throw exception_list(std::move(errors));
+                boost::throw_exception(exception_list(std::move(errors)));
 
             return first;
         }
@@ -128,8 +138,9 @@ namespace hpx { namespace parallel { namespace util
                         if (f.has_exception())
                             errors.push_back(f.get_exception_ptr());
                     }
+
                     if (!errors.empty())
-                        throw exception_list(std::move(errors));
+                        boost::throw_exception(exception_list(std::move(errors)));
 
                     return first;
                 }
