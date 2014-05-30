@@ -20,6 +20,8 @@ void test_for_each(ExPolicy const& policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10000);
+    std::iota(boost::begin(c), boost::end(c), std::rand());
+
     hpx::parallel::for_each(policy,
         iterator(boost::begin(c)), iterator(boost::end(c)),
         [](std::size_t& v) {
@@ -27,10 +29,13 @@ void test_for_each(ExPolicy const& policy, IteratorTag)
         });
 
     // verify values
+    std::size_t count = 0;
     std::for_each(boost::begin(c), boost::end(c),
         [](std::size_t v) {
             HPX_TEST_EQ(v, std::size_t(42));
+            ++count;
         });
+    HPX_TEST_EQ(count, c.size());
 }
 
 template <typename IteratorTag>
@@ -40,6 +45,7 @@ void test_for_each(hpx::parallel::task_execution_policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10000);
+    std::iota(boost::begin(c), boost::end(c), std::rand());
 
     hpx::future<void> f =
         hpx::parallel::for_each(hpx::parallel::task,
@@ -50,10 +56,13 @@ void test_for_each(hpx::parallel::task_execution_policy, IteratorTag)
     f.wait();
 
     // verify values
+    std::size_t count = 0;
     std::for_each(boost::begin(c), boost::end(c),
         [](std::size_t v) {
             HPX_TEST_EQ(v, std::size_t(42));
+            ++count;
         });
+    HPX_TEST_EQ(count, c.size());
 }
 
 template <typename IteratorTag>
@@ -89,6 +98,7 @@ void test_for_each_exception(ExPolicy const& policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10000);
+    std::iota(boost::begin(c), boost::end(c), std::rand());
 
     bool caught_exception = false;
     try {
@@ -115,6 +125,7 @@ void test_for_each_exception(hpx::parallel::task_execution_policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10000);
+    std::iota(boost::begin(c), boost::end(c), std::rand());
 
     bool caught_exception = false;
     try {

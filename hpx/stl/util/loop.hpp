@@ -13,14 +13,27 @@
 
 namespace hpx { namespace parallel { namespace util
 {
-    ///////////////////////////////////////////////////////////////////////////
     // Helper class to repeatedly call a function starting from a given
     // iterator position.
-    template <typename Iter,
-        typename IterCat = typename std::iterator_traits<Iter>::iterator_category>
+    template <typename IterCat>
     struct loop
     {
-        template <typename F>
+        template <typename Iter, typename F>
+        static Iter call(Iter it, Iter end, F && func)
+        {
+            for (/**/; it != end; ++it)
+                func(*it);
+
+            return it;
+        }
+    };
+
+    // Helper class to repeatedly call a function a given number of times
+    // starting from a given iterator position.
+    template <typename IterCat>
+    struct loop_n
+    {
+        template <typename Iter, typename F>
         static Iter call(Iter it, std::size_t count, F && func)
         {
             for (/**/; count != 0; --count, ++it)
@@ -31,10 +44,10 @@ namespace hpx { namespace parallel { namespace util
     };
 
     // specialization for random access iterators
-    template <typename Iter>
-    struct loop<Iter, std::random_access_iterator_tag>
+    template <>
+    struct loop_n<std::random_access_iterator_tag>
     {
-        template <typename F>
+        template <typename Iter, typename F>
         static Iter call(Iter it, std::size_t count, F && func)
         {
             for (std::size_t i = 0; i != count; ++i)

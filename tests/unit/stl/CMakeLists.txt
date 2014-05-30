@@ -6,6 +6,7 @@
 set(tests
     foreach
     foreachn
+    transform
    )
 
 foreach(test ${tests})
