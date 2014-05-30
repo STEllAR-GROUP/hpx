@@ -60,7 +60,21 @@ grain size.
 
 In example 3 we retun to our serial code to figure out how to 
 control the grain size of our program. The stratagy that we 
-employ is to create "partiions" of data points that [example 3]
+employ is to create "partiions" of data points. The user
+can define how many partitions are created and how many 
+datapoints are contained in each partition. This is accomplished 
+by creating the stuct partition and defineing space to now
+be a vector of partions.
+
+In example 4 we take advangate of the partion setup by redefining
+spacd to be a vector of shared_futures whaich represent partitions.
+In hpx_main we create a future vector of space named result which
+contains the final calculated data points and set it equal
+to the step member function do_work.  We pass the number 
+of partions, the number of grid points per partition, and 
+the number of steps that the program will simulate to this
+function, which sets up the execution tree.  It should be noted
+how strikingly similar example 4 is to example 2.
 
 
 [/////////////////////////////////////////////////////////////////////////////]
