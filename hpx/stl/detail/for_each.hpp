@@ -53,9 +53,6 @@ namespace hpx { namespace parallel
         for_each_n(ExPolicy const&, InIter first, std::size_t count, F && f, IterTag)
         {
             typedef typename hpx::util::decay<ExPolicy>::type execution_policy_type;
-            BOOST_STATIC_ASSERT_MSG(
-                is_execution_policy<execution_policy_type>::value,
-                "Given type is not a execution policy");
 
             if (count > 0)
             {
@@ -128,7 +125,7 @@ namespace hpx { namespace parallel
 
     template <typename ExPolicy, typename InIter, typename F>
     typename boost::enable_if<
-        is_execution_policy<typename hpx::util::decay<ExPolicy>::type>,
+        is_execution_policy<ExPolicy>,
         typename detail::algorithm_result<ExPolicy, InIter>::type
     >::type
     for_each_n(ExPolicy && policy, InIter first, std::size_t count, F && f)
@@ -242,7 +239,7 @@ namespace hpx { namespace parallel
 
     template <typename ExPolicy, typename InIter, typename F>
     typename boost::enable_if<
-        is_execution_policy<typename hpx::util::decay<ExPolicy>::type>,
+        is_execution_policy<ExPolicy>,
         typename detail::algorithm_result<ExPolicy, void>::type
     >::type
     for_each(ExPolicy && policy, InIter first, InIter last, F && f)
