@@ -36,7 +36,7 @@ namespace hpx { namespace parallel
                     std::transform(first, last, dest, std::forward<F>(f)));
             }
             catch(std::bad_alloc const& e) {
-                throw e;
+                boost::throw_exception(e);
             }
             catch (...) {
                 boost::throw_exception(
@@ -173,7 +173,7 @@ namespace hpx { namespace parallel
                         std::forward<F>(f)));
             }
             catch(std::bad_alloc const& e) {
-                throw e;
+                boost::throw_exception(e);
             }
             catch (...) {
                 boost::throw_exception(

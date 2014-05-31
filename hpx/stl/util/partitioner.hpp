@@ -68,7 +68,7 @@ namespace hpx { namespace parallel { namespace util
                     func(first, count);
                 }
                 catch (std::bad_alloc const& e) {
-                    throw e;
+                    boost::throw_exception(e);
                 }
                 catch (...) {
                     errors.push_back(boost::current_exception());

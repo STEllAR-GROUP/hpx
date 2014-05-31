@@ -36,7 +36,7 @@ namespace test
         {
             // The static partitioner uses the number of threads/cores for the
             // number chunks to create.
-            HPX_TEST_EQ(e.size(), hpx::threads::hardware_concurrency());
+            HPX_TEST_EQ(e.size(), hpx::get_num_worker_threads());
         }
     };
 
@@ -85,7 +85,7 @@ namespace test
             else {
                 // The static partitioner uses the number of threads/cores for
                 // the number chunks to create.
-                HPX_TEST_EQ(e.size(), hpx::threads::hardware_concurrency());
+                HPX_TEST_EQ(e.size(), hpx::get_num_worker_threads());
             }
         }
     };

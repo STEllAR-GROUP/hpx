@@ -34,12 +34,11 @@ namespace hpx { namespace parallel
             std::size_t count, F && f, IterTag)
         {
             try {
-                util::loop_n<IterTag>::call(first, count, std::forward<F>(f));
                 return detail::algorithm_result<ExPolicy, InIter>::get(
-                    std::move(first));
+                    util::loop_n<IterTag>::call(first, count, std::forward<F>(f)));
             }
             catch(std::bad_alloc const& e) {
-                throw e;
+                boost::throw_exception(e);
             }
             catch (...) {
                 boost::throw_exception(
@@ -159,7 +158,7 @@ namespace hpx { namespace parallel
                 return detail::algorithm_result<ExPolicy, void>::get();
             }
             catch(std::bad_alloc const& e) {
-                throw e;
+                boost::throw_exception(e);
             }
             catch (...) {
                 boost::throw_exception(

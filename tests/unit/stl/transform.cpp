@@ -23,7 +23,7 @@ void test_transform(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    hpx::parallel::transform(policy,
+    base_iterator outiter = hpx::parallel::transform(policy,
         iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
         [](std::size_t v) {
             return v + 1;
@@ -50,7 +50,7 @@ void test_transform(hpx::parallel::task_execution_policy, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    hpx::future<void> f =
+    hpx::future<base_iterator> f =
         hpx::parallel::transform(hpx::parallel::task,
             iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
             [](std::size_t& v) {
@@ -107,7 +107,7 @@ void test_transform_exception(ExPolicy const& policy, IteratorTag)
 
     bool caught_exception = false;
     try {
-        hpx::parallel::transform(policy,
+        base_iterator outiter = hpx::parallel::transform(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
             [](std::size_t v) {
                 throw std::runtime_error("test");
@@ -139,7 +139,7 @@ void test_transform_exception(hpx::parallel::task_execution_policy, IteratorTag)
 
     bool caught_exception = false;
     try {
-        hpx::future<void> f =
+        hpx::future<base_iterator> f =
             hpx::parallel::transform(hpx::parallel::task,
                 iterator(boost::begin(c)), iterator(boost::end(c)),
                 boost::begin(d),

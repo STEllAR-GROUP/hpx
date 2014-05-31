@@ -423,7 +423,7 @@ namespace hpx { namespace naming
         return gid_type(msb, gid.get_lsb());
     }
 
-    boost::uint32_t const invalid_locality_id = ~0U;
+    BOOST_CONSTEXPR_OR_CONST boost::uint32_t invalid_locality_id = ~0U;
 
     ///////////////////////////////////////////////////////////////////////////
     inline bool refers_to_virtual_memory(gid_type const& gid)

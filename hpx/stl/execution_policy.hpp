@@ -29,7 +29,7 @@ namespace hpx { namespace parallel
     struct parallel_execution_policy {};
 
     /// Default parallel execution policy object.
-    parallel_execution_policy const par;
+    BOOST_CONSTEXPR_OR_CONST parallel_execution_policy par;
 
     /// The class sequential_execution_policy is an execution policy type used
     /// as a unique type to disambiguate parallel algorithm overloading and
@@ -37,7 +37,7 @@ namespace hpx { namespace parallel
     struct sequential_execution_policy {};
 
     /// Default sequential execution policy object.
-    sequential_execution_policy const seq;
+    BOOST_CONSTEXPR_OR_CONST sequential_execution_policy seq;
 
     /// The class vector_execution_policy is an execution policy type used as
     /// a unique type to disambiguate parallel algorithm overloading and
@@ -45,7 +45,7 @@ namespace hpx { namespace parallel
     struct vector_execution_policy {};
 
     /// Default vector execution policy object.
-    vector_execution_policy const vec;
+    BOOST_CONSTEXPR_OR_CONST vector_execution_policy vec;
 
     /// extension:
     ///
@@ -57,7 +57,7 @@ namespace hpx { namespace parallel
     struct task_execution_policy {};
 
     /// Default vector execution policy object.
-    task_execution_policy const task;
+    BOOST_CONSTEXPR_OR_CONST task_execution_policy task;
 
 
     ///////////////////////////////////////////////////////////////////////////
@@ -276,7 +276,7 @@ namespace hpx { namespace parallel
         };
         BOOST_SCOPED_ENUM_END
 
-        int which(execution_policy const& policy)
+        inline int which(execution_policy const& policy)
         {
             std::type_info const& t = policy.type();
             if (t == typeid(parallel_execution_policy))

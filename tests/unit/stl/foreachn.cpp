@@ -22,11 +22,13 @@ void test_for_each_n(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    hpx::parallel::for_each_n(policy,
+    iterator result = hpx::parallel::for_each_n(policy,
         iterator(boost::begin(c)), c.size(),
         [](std::size_t& v) {
             v = 42;
         });
+    iterator end = iterator(boost::end(c));
+    HPX_TEST(result == end);
 
     // verify values
     std::size_t count = 0;
@@ -47,13 +49,13 @@ void test_for_each_n(hpx::parallel::task_execution_policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    hpx::future<void> f =
+    hpx::future<iterator> f =
         hpx::parallel::for_each_n(hpx::parallel::task,
             iterator(boost::begin(c)), c.size(),
             [](std::size_t& v) {
                 v = 42;
             });
-    f.wait();
+    HPX_TEST(f.get() == iterator(boost::end(c)));
 
     // verify values
     std::size_t count = 0;
@@ -102,7 +104,7 @@ void test_for_each_n_exception(ExPolicy const& policy, IteratorTag)
 
     bool caught_exception = false;
     try {
-        hpx::parallel::for_each_n(policy,
+        iterator result = hpx::parallel::for_each_n(policy,
             iterator(boost::begin(c)), c.size(),
             [](std::size_t& v) {
                 throw std::runtime_error("test");
@@ -132,13 +134,13 @@ void test_for_each_n_exception(hpx::parallel::task_execution_policy, IteratorTag
 
     bool caught_exception = false;
     try {
-        hpx::future<void> f =
+        hpx::future<iterator> f =
             hpx::parallel::for_each_n(hpx::parallel::task,
                 iterator(boost::begin(c)), c.size(),
                 [](std::size_t& v) {
                     throw std::runtime_error("test");
                 });
-        f.get();
+        f.get();    // rethrow exception
 
         HPX_TEST(false);
     }
