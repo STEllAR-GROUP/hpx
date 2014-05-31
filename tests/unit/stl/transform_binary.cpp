@@ -211,10 +211,107 @@ void transform_binary_exception_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename ExPolicy, typename IteratorTag>
+void test_transform_binary_bad_alloc(ExPolicy const& policy, IteratorTag)
+{
+    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c1(10007);
+    std::vector<std::size_t> c2(c1.size());
+    std::vector<std::size_t> d1(c1.size());
+    std::iota(boost::begin(c1), boost::end(c1), std::rand());
+    std::iota(boost::begin(c2), boost::end(c2), std::rand());
+
+    bool caught_bad_alloc = false;
+    try {
+        base_iterator outiter = hpx::parallel::transform(policy,
+            iterator(boost::begin(c1)), iterator(boost::end(c1)),
+            boost::begin(c2), boost::begin(d1),
+            [](std::size_t v1, std::size_t v2) {
+                throw std::bad_alloc();
+                return v1 + v2;
+            });
+
+        HPX_TEST(false);
+    }
+    catch(std::bad_alloc const&) {
+        caught_bad_alloc = true;
+    }
+    catch(...) {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_bad_alloc);
+}
+
+template <typename IteratorTag>
+void test_transform_binary_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c1(10007);
+    std::vector<std::size_t> c2(c1.size());
+    std::vector<std::size_t> d1(c1.size());
+    std::iota(boost::begin(c1), boost::end(c1), std::rand());
+    std::iota(boost::begin(c2), boost::end(c2), std::rand());
+
+    bool caught_bad_alloc = false;
+    try {
+        hpx::future<base_iterator> f =
+            hpx::parallel::transform(hpx::parallel::task,
+                iterator(boost::begin(c1)), iterator(boost::end(c1)),
+                boost::begin(c2), boost::begin(d1),
+                [](std::size_t v1, std::size_t v2) {
+                    throw std::bad_alloc();
+                    return v1 + v2;
+                });
+        f.get();
+
+        HPX_TEST(false);
+    }
+    catch(std::bad_alloc const&) {
+        caught_bad_alloc = true;
+    }
+    catch(...) {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_bad_alloc);
+}
+
+template <typename IteratorTag>
+void test_transform_binary_bad_alloc()
+{
+    using namespace hpx::parallel;
+
+    test_transform_binary_bad_alloc(seq, IteratorTag());
+    test_transform_binary_bad_alloc(par, IteratorTag());
+    test_transform_binary_bad_alloc(vec, IteratorTag());
+    test_transform_binary_bad_alloc(task, IteratorTag());
+
+    test_transform_binary_bad_alloc(execution_policy(seq), IteratorTag());
+    test_transform_binary_bad_alloc(execution_policy(par), IteratorTag());
+    test_transform_binary_bad_alloc(execution_policy(vec), IteratorTag());
+    test_transform_binary_bad_alloc(execution_policy(task), IteratorTag());
+}
+
+void transform_binary_bad_alloc_test()
+{
+    test_transform_binary_bad_alloc<std::random_access_iterator_tag>();
+    test_transform_binary_bad_alloc<std::forward_iterator_tag>();
+    test_transform_binary_bad_alloc<std::input_iterator_tag>();
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
     transform_binary_test();
     transform_binary_exception_test();
+    transform_binary_bad_alloc_test();
     return hpx::finalize();
 }
 

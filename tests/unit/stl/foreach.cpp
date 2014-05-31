@@ -179,10 +179,97 @@ void for_each_exception_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename ExPolicy, typename IteratorTag>
+void test_for_each_bad_alloc(ExPolicy const& policy, IteratorTag)
+{
+    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::iota(boost::begin(c), boost::end(c), std::rand());
+
+    bool caught_exception = false;
+    try {
+        hpx::parallel::for_each(policy,
+            iterator(boost::begin(c)), iterator(boost::end(c)),
+            [](std::size_t& v) {
+                throw std::bad_alloc();
+            });
+
+        HPX_TEST(false);
+    }
+    catch(std::bad_alloc const&) {
+        caught_exception = true;
+    }
+    catch(...) {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
+template <typename IteratorTag>
+void test_for_each_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::iota(boost::begin(c), boost::end(c), std::rand());
+
+    bool caught_exception = false;
+    try {
+        hpx::future<void> f =
+            hpx::parallel::for_each(hpx::parallel::task,
+                iterator(boost::begin(c)), iterator(boost::end(c)),
+                [](std::size_t& v) {
+                    throw std::bad_alloc();
+                });
+        f.get();
+
+        HPX_TEST(false);
+    }
+    catch(std::bad_alloc const&) {
+        caught_exception = true;
+    }
+    catch(...) {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
+template <typename IteratorTag>
+void test_for_each_bad_alloc()
+{
+    using namespace hpx::parallel;
+
+    test_for_each_bad_alloc(seq, IteratorTag());
+    test_for_each_bad_alloc(par, IteratorTag());
+    test_for_each_bad_alloc(vec, IteratorTag());
+    test_for_each_bad_alloc(task, IteratorTag());
+
+    test_for_each_bad_alloc(execution_policy(seq), IteratorTag());
+    test_for_each_bad_alloc(execution_policy(par), IteratorTag());
+    test_for_each_bad_alloc(execution_policy(vec), IteratorTag());
+    test_for_each_bad_alloc(execution_policy(task), IteratorTag());
+}
+
+void for_each_bad_alloc_test()
+{
+    test_for_each_bad_alloc<std::random_access_iterator_tag>();
+    test_for_each_bad_alloc<std::forward_iterator_tag>();
+    test_for_each_bad_alloc<std::input_iterator_tag>();
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
     for_each_test();
     for_each_exception_test();
+    for_each_bad_alloc_test();
     return hpx::finalize();
 }
 

@@ -26,6 +26,22 @@ namespace hpx { namespace parallel { namespace util
         {
             typedef default_partitioner_tag type;
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        // std::bad_alloc has to be handled separately
+        void handle_exception(boost::exception_ptr const& e,
+            std::list<boost::exception_ptr>& errors)
+        {
+            try {
+                boost::rethrow_exception(e);
+            }
+            catch (std::bad_alloc const& ba) {
+                boost::throw_exception(ba);
+            }
+            catch (...) {
+                errors.push_back(e);
+            }
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -64,6 +80,7 @@ namespace hpx { namespace parallel { namespace util
             // execute last chunk directly
             if (count != 0)
             {
+                // std::bad_alloc has to be handled separately
                 try {
                     func(first, count);
                 }
@@ -82,7 +99,7 @@ namespace hpx { namespace parallel { namespace util
             for (hpx::future<void>& f: workitems)
             {
                 if (f.has_exception())
-                    errors.push_back(f.get_exception_ptr());
+                    detail::handle_exception(f.get_exception_ptr(), errors);
             }
 
             if (!errors.empty())
@@ -136,7 +153,7 @@ namespace hpx { namespace parallel { namespace util
                     for (hpx::future<void>& f: result)
                     {
                         if (f.has_exception())
-                            errors.push_back(f.get_exception_ptr());
+                            detail::handle_exception(f.get_exception_ptr(), errors);
                     }
 
                     if (!errors.empty())
