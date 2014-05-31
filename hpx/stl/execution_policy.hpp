@@ -16,6 +16,7 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/type_traits/is_base_of.hpp>
+#include <boost/detail/scoped_enum_emulation.hpp>
 
 #include <memory>
 
@@ -28,7 +29,7 @@ namespace hpx { namespace parallel
     struct parallel_execution_policy {};
 
     /// Default parallel execution policy object.
-    parallel_execution_policy const par;
+    BOOST_CONSTEXPR_OR_CONST parallel_execution_policy par;
 
     /// The class sequential_execution_policy is an execution policy type used
     /// as a unique type to disambiguate parallel algorithm overloading and
@@ -36,7 +37,7 @@ namespace hpx { namespace parallel
     struct sequential_execution_policy {};
 
     /// Default sequential execution policy object.
-    sequential_execution_policy const seq;
+    BOOST_CONSTEXPR_OR_CONST sequential_execution_policy seq;
 
     /// The class vector_execution_policy is an execution policy type used as
     /// a unique type to disambiguate parallel algorithm overloading and
@@ -44,7 +45,7 @@ namespace hpx { namespace parallel
     struct vector_execution_policy {};
 
     /// Default vector execution policy object.
-    vector_execution_policy const vec;
+    BOOST_CONSTEXPR_OR_CONST vector_execution_policy vec;
 
     /// extension:
     ///
@@ -56,7 +57,7 @@ namespace hpx { namespace parallel
     struct task_execution_policy {};
 
     /// Default vector execution policy object.
-    task_execution_policy const task;
+    BOOST_CONSTEXPR_OR_CONST task_execution_policy task;
 
 
     ///////////////////////////////////////////////////////////////////////////
@@ -261,6 +262,34 @@ namespace hpx { namespace parallel
             return static_cast<ExPolicy const*>(inner_.get());
         }
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        BOOST_SCOPED_ENUM_START(execution_policy_enum)
+        {
+            unknown = -1,
+            sequential = 0,
+            parallel = 1,
+            vector = 2,
+            task = 3
+        };
+        BOOST_SCOPED_ENUM_END
+
+        inline int which(execution_policy const& policy)
+        {
+            std::type_info const& t = policy.type();
+            if (t == typeid(parallel_execution_policy))
+                return static_cast<int>(execution_policy_enum::parallel);
+            if (t == typeid(sequential_execution_policy))
+                return static_cast<int>(execution_policy_enum::sequential);
+            if (t == typeid(task_execution_policy))
+                return static_cast<int>(execution_policy_enum::task);
+            if (t == typeid(vector_execution_policy))
+                return static_cast<int>(execution_policy_enum::vector);
+            return static_cast<int>(execution_policy_enum::unknown);
+        }
+    }
 }}
 
 #endif

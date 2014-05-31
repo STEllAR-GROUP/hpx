@@ -26,6 +26,22 @@ namespace hpx { namespace parallel { namespace util
         {
             typedef default_partitioner_tag type;
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        // std::bad_alloc has to be handled separately
+        void handle_exception(boost::exception_ptr const& e,
+            std::list<boost::exception_ptr>& errors)
+        {
+            try {
+                boost::rethrow_exception(e);
+            }
+            catch (std::bad_alloc const& ba) {
+                boost::throw_exception(ba);
+            }
+            catch (...) {
+                errors.push_back(e);
+            }
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -59,24 +75,35 @@ namespace hpx { namespace parallel { namespace util
                 std::advance(first, chunk_size);
             }
 
+            std::list<boost::exception_ptr> errors;
+
             // execute last chunk directly
             if (count != 0)
             {
-                func(first, count);
+                // std::bad_alloc has to be handled separately
+                try {
+                    func(first, count);
+                }
+                catch (std::bad_alloc const& e) {
+                    boost::throw_exception(e);
+                }
+                catch (...) {
+                    errors.push_back(boost::current_exception());
+                }
                 std::advance(first, count);
             }
 
             // wait for all tasks to finish
             hpx::wait_all(workitems);
 
-            std::list<boost::exception_ptr> errors;
             for (hpx::future<void>& f: workitems)
             {
                 if (f.has_exception())
-                    errors.push_back(f.get_exception_ptr());
+                    detail::handle_exception(f.get_exception_ptr(), errors);
             }
+
             if (!errors.empty())
-                throw exception_list(std::move(errors));
+                boost::throw_exception(exception_list(std::move(errors)));
 
             return first;
         }
@@ -126,10 +153,11 @@ namespace hpx { namespace parallel { namespace util
                     for (hpx::future<void>& f: result)
                     {
                         if (f.has_exception())
-                            errors.push_back(f.get_exception_ptr());
+                            detail::handle_exception(f.get_exception_ptr(), errors);
                     }
+
                     if (!errors.empty())
-                        throw exception_list(std::move(errors));
+                        boost::throw_exception(exception_list(std::move(errors)));
 
                     return first;
                 }

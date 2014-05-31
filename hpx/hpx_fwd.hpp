@@ -383,7 +383,7 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         /// \ cond NODETAIL
-        thread_id_repr_type const invalid_thread_id_repr = 0;
+        BOOST_CONSTEXPR_OR_CONST thread_id_repr_type invalid_thread_id_repr = 0;
         thread_id_type const invalid_thread_id = thread_id_type();
         /// \ endcond
 

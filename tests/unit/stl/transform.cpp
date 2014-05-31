@@ -8,24 +8,24 @@
 #include <hpx/include/algorithm.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include "test_iterator.hpp"
+#include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_for_each(ExPolicy const& policy, IteratorTag)
+void test_transform(ExPolicy const& policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10000);
+    std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    hpx::parallel::transform(policy,
+    base_iterator outiter = hpx::parallel::transform(policy,
         iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
-        [](std::size_t& v) {
+        [](std::size_t v) {
             return v + 1;
         });
 
@@ -41,16 +41,16 @@ void test_for_each(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_for_each(hpx::parallel::task_execution_policy, IteratorTag)
+void test_transform(hpx::parallel::task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10000);
+    std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    hpx::future<void> f =
+    hpx::future<base_iterator> f =
         hpx::parallel::transform(hpx::parallel::task,
             iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
             [](std::size_t& v) {
@@ -70,120 +70,232 @@ void test_for_each(hpx::parallel::task_execution_policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_for_each()
+void test_transform()
 {
     using namespace hpx::parallel;
 
-    test_for_each(seq, IteratorTag());
-    test_for_each(par, IteratorTag());
-    test_for_each(vec, IteratorTag());
-    test_for_each(task, IteratorTag());
+    test_transform(seq, IteratorTag());
+    test_transform(par, IteratorTag());
+    test_transform(vec, IteratorTag());
+    test_transform(task, IteratorTag());
 
-    test_for_each(execution_policy(seq), IteratorTag());
-    test_for_each(execution_policy(par), IteratorTag());
-    test_for_each(execution_policy(vec), IteratorTag());
-    test_for_each(execution_policy(task), IteratorTag());
+    test_transform(execution_policy(seq), IteratorTag());
+    test_transform(execution_policy(par), IteratorTag());
+    test_transform(execution_policy(vec), IteratorTag());
+    test_transform(execution_policy(task), IteratorTag());
 }
 
-void for_each_test()
+void transform_test()
 {
-    test_for_each<std::random_access_iterator_tag>();
-    test_for_each<std::forward_iterator_tag>();
-    test_for_each<std::input_iterator_tag>();
+    test_transform<std::random_access_iterator_tag>();
+    test_transform<std::forward_iterator_tag>();
+    test_transform<std::input_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// template <typename ExPolicy, typename IteratorTag>
-// void test_for_each_exception(ExPolicy const& policy, IteratorTag)
-// {
-//     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
-//
-//     typedef std::vector<std::size_t>::iterator base_iterator;
-//     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-//
-//     std::vector<std::size_t> c(10000);
-//
-//     bool caught_exception = false;
-//     try {
-//         hpx::parallel::for_each(policy,
-//             iterator(boost::begin(c)), iterator(boost::end(c)),
-//             [](std::size_t& v) {
-//                 throw std::runtime_error("test");
-//             });
-//
-//         HPX_TEST(false);
-//     }
-//     catch(...) {
-//         caught_exception = true;
-//         boost::exception_ptr e = boost::current_exception();
-//     }
-//
-//     HPX_TEST(caught_exception);
-// }
-//
-// template <typename IteratorTag>
-// void test_for_each_exception(hpx::parallel::task_execution_policy, IteratorTag)
-// {
-//     typedef std::vector<std::size_t>::iterator base_iterator;
-//     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-//
-//     std::vector<std::size_t> c(10000);
-//
-//     bool caught_exception = false;
-//     try {
-//         hpx::future<void> f =
-//             hpx::parallel::for_each(hpx::parallel::task,
-//                 iterator(boost::begin(c)), iterator(boost::end(c)),
-//                 [](std::size_t& v) {
-//                     throw std::runtime_error("test");
-//                 });
-//         f.get();
-//
-//         HPX_TEST(false);
-//     }
-//     catch(...) {
-//         caught_exception = true;
-//         boost::exception_ptr e = boost::current_exception();
-//     }
-//
-//     HPX_TEST(caught_exception);
-// }
-//
-// template <typename IteratorTag>
-// void test_for_each_exception()
-// {
-//     using namespace hpx::parallel;
-//
-//     test_for_each_exception(seq, IteratorTag());
-//     test_for_each_exception(par, IteratorTag());
-//     test_for_each_exception(vec, IteratorTag());
-//     test_for_each_exception(task, IteratorTag());
-//
-//     test_for_each_exception(execution_policy(seq), IteratorTag());
-//     test_for_each_exception(execution_policy(par), IteratorTag());
-//     test_for_each_exception(execution_policy(vec), IteratorTag());
-//     test_for_each_exception(execution_policy(task), IteratorTag());
-// }
-//
-// void for_each_exception_test()
-// {
-//     test_for_each_exception<std::random_access_iterator_tag>();
-//     test_for_each_exception<std::forward_iterator_tag>();
-//     test_for_each_exception<std::input_iterator_tag>();
-// }
+template <typename ExPolicy, typename IteratorTag>
+void test_transform_exception(ExPolicy const& policy, IteratorTag)
+{
+    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> d(c.size());
+    std::iota(boost::begin(c), boost::end(c), std::rand());
+
+    bool caught_exception = false;
+    try {
+        base_iterator outiter = hpx::parallel::transform(policy,
+            iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
+            [](std::size_t v) {
+                throw std::runtime_error("test");
+                return v;
+            });
+
+        HPX_TEST(false);
+    }
+    catch(hpx::exception_list const& e) {
+        caught_exception = true;
+        test::test_num_exeptions<ExPolicy, IteratorTag>::call(policy, e);
+    }
+    catch(...) {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
+template <typename IteratorTag>
+void test_transform_exception(hpx::parallel::task_execution_policy, IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> d(c.size());
+    std::iota(boost::begin(c), boost::end(c), std::rand());
+
+    bool caught_exception = false;
+    try {
+        hpx::future<base_iterator> f =
+            hpx::parallel::transform(hpx::parallel::task,
+                iterator(boost::begin(c)), iterator(boost::end(c)),
+                boost::begin(d),
+                [](std::size_t v) {
+                    throw std::runtime_error("test");
+                    return v;
+                });
+        f.get();
+
+        HPX_TEST(false);
+    }
+    catch(hpx::exception_list const& e) {
+        caught_exception = true;
+        test::test_num_exeptions<
+            hpx::parallel::task_execution_policy, IteratorTag
+        >::call(hpx::parallel::task, e);
+    }
+    catch(...) {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
+template <typename IteratorTag>
+void test_transform_exception()
+{
+    using namespace hpx::parallel;
+
+    test_transform_exception(seq, IteratorTag());
+    test_transform_exception(par, IteratorTag());
+    test_transform_exception(vec, IteratorTag());
+    test_transform_exception(task, IteratorTag());
+
+    test_transform_exception(execution_policy(seq), IteratorTag());
+    test_transform_exception(execution_policy(par), IteratorTag());
+    test_transform_exception(execution_policy(vec), IteratorTag());
+    test_transform_exception(execution_policy(task), IteratorTag());
+}
+
+void transform_exception_test()
+{
+    test_transform_exception<std::random_access_iterator_tag>();
+    test_transform_exception<std::forward_iterator_tag>();
+    test_transform_exception<std::input_iterator_tag>();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+template <typename ExPolicy, typename IteratorTag>
+void test_transform_bad_alloc(ExPolicy const& policy, IteratorTag)
+{
+    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> d(c.size());
+    std::iota(boost::begin(c), boost::end(c), std::rand());
+
+    bool caught_bad_alloc = false;
+    try {
+        base_iterator outiter = hpx::parallel::transform(policy,
+            iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
+            [](std::size_t v) {
+                throw std::bad_alloc();
+                return v;
+            });
+
+        HPX_TEST(false);
+    }
+    catch(std::bad_alloc const&) {
+        caught_bad_alloc = true;
+    }
+    catch(...) {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_bad_alloc);
+}
+
+template <typename IteratorTag>
+void test_transform_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> d(c.size());
+    std::iota(boost::begin(c), boost::end(c), std::rand());
+
+    bool caught_bad_alloc = false;
+    try {
+        hpx::future<base_iterator> f =
+            hpx::parallel::transform(hpx::parallel::task,
+                iterator(boost::begin(c)), iterator(boost::end(c)),
+                boost::begin(d),
+                [](std::size_t v) {
+                    throw std::bad_alloc();
+                    return v;
+                });
+        f.get();
+
+        HPX_TEST(false);
+    }
+    catch(std::bad_alloc const&) {
+        caught_bad_alloc = true;
+    }
+    catch(...) {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_bad_alloc);
+}
+
+template <typename IteratorTag>
+void test_transform_bad_alloc()
+{
+    using namespace hpx::parallel;
+
+    test_transform_bad_alloc(seq, IteratorTag());
+    test_transform_bad_alloc(par, IteratorTag());
+    test_transform_bad_alloc(vec, IteratorTag());
+    test_transform_bad_alloc(task, IteratorTag());
+
+    test_transform_bad_alloc(execution_policy(seq), IteratorTag());
+    test_transform_bad_alloc(execution_policy(par), IteratorTag());
+    test_transform_bad_alloc(execution_policy(vec), IteratorTag());
+    test_transform_bad_alloc(execution_policy(task), IteratorTag());
+}
+
+void transform_bad_alloc_test()
+{
+    test_transform_bad_alloc<std::random_access_iterator_tag>();
+    test_transform_bad_alloc<std::forward_iterator_tag>();
+    test_transform_bad_alloc<std::input_iterator_tag>();
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    for_each_test();
-//     for_each_exception_test();
+    transform_test();
+    transform_exception_test();
+    transform_bad_alloc_test();
     return hpx::finalize();
 }
 
 int main(int argc, char* argv[])
 {
+    // By default this test should run on all available cores
+    std::vector<std::string> cfg;
+    cfg.push_back("hpx.os_threads=" +
+        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency()));
+
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
+    HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,
         "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
