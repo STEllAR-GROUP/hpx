@@ -42,7 +42,9 @@ namespace hpx { namespace parallel
                 throw e;
             }
             catch (...) {
-                throw hpx::exception_list(boost::current_exception());
+                boost::throw_exception(
+                    hpx::exception_list(boost::current_exception())
+                );
             }
         }
 
@@ -160,7 +162,9 @@ namespace hpx { namespace parallel
                 throw e;
             }
             catch (...) {
-                throw hpx::exception_list(boost::current_exception());
+                boost::throw_exception(
+                    hpx::exception_list(boost::current_exception())
+                );
             }
         }
 

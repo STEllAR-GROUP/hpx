@@ -8,7 +8,7 @@
 #include <hpx/include/algorithm.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include "test_iterator.hpp"
+#include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
@@ -139,10 +139,7 @@ void test_transform_binary_exception(ExPolicy const& policy, IteratorTag)
     }
     catch(hpx::exception_list const& e) {
         caught_exception = true;
-
-        // The static partitioner uses the number of threads/cores for the
-        // number chunks to create.
-        HPX_TEST_EQ(e.size(), hpx::threads::hardware_concurrency());
+        test::test_num_exeptions<ExPolicy, IteratorTag>::call(policy, e);
     }
     catch(...) {
         HPX_TEST(false);
@@ -179,10 +176,9 @@ void test_transform_binary_exception(hpx::parallel::task_execution_policy, Itera
     }
     catch(hpx::exception_list const& e) {
         caught_exception = true;
-
-        // The static partitioner uses the number of threads/cores for the
-        // number chunks to create.
-        HPX_TEST_EQ(e.size(), hpx::threads::hardware_concurrency());
+        test::test_num_exeptions<
+            hpx::parallel::task_execution_policy, IteratorTag
+        >::call(hpx::parallel::task, e);
     }
     catch(...) {
         HPX_TEST(false);
@@ -218,7 +214,7 @@ void transform_binary_exception_test()
 int hpx_main()
 {
     transform_binary_test();
-//     transform_binary_exception_test();
+    transform_binary_exception_test();
     return hpx::finalize();
 }
 

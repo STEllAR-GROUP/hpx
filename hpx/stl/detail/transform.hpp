@@ -39,7 +39,9 @@ namespace hpx { namespace parallel
                 throw e;
             }
             catch (...) {
-                throw hpx::exception_list(boost::current_exception());
+                boost::throw_exception(
+                    hpx::exception_list(boost::current_exception())
+                );
             }
         }
 
@@ -174,7 +176,9 @@ namespace hpx { namespace parallel
                 throw e;
             }
             catch (...) {
-                throw hpx::exception_list(boost::current_exception());
+                boost::throw_exception(
+                    hpx::exception_list(boost::current_exception())
+                );
             }
         }
 
@@ -271,16 +275,20 @@ namespace hpx { namespace parallel
     transform(ExPolicy && policy, InIter1 first1, InIter1 last1, InIter2 first2,
         OutIter dest, F && f)
     {
+        typedef typename std::iterator_traits<InIter1>::iterator_category category1;
+        typedef typename std::iterator_traits<InIter2>::iterator_category category2;
+
         BOOST_STATIC_ASSERT_MSG(
-            boost::is_base_of<std::input_iterator_tag,
-                typename std::iterator_traits<InIter1>::iterator_category>::value,
+            boost::is_base_of<std::input_iterator_tag, category1>::value,
             "Required at least input iterator.");
         BOOST_STATIC_ASSERT_MSG(
-            boost::is_base_of<std::input_iterator_tag,
-                typename std::iterator_traits<InIter2>::iterator_category>::value,
+            boost::is_base_of<std::input_iterator_tag, category2>::value,
             "Required at least input iterator.");
 
-        detail::zip_iterator_category_helper<InIter1, InIter2>::iterator_category category;
+        detail::zip_iterator_category_helper<
+            category1, category2
+        >::iterator_category category;
+
         return detail::transform_binary(policy, first1, last1, first2,
             dest, std::forward<F>(f), category);
     }

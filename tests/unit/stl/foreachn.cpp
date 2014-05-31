@@ -8,7 +8,7 @@
 #include <hpx/include/algorithm.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include "test_iterator.hpp"
+#include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
@@ -112,10 +112,7 @@ void test_for_each_n_exception(ExPolicy const& policy, IteratorTag)
     }
     catch(hpx::exception_list const& e) {
         caught_exception = true;
-
-        // The static partitioner uses the number of threads/cores for the
-        // number chunks to create.
-        HPX_TEST_EQ(e.size(), hpx::threads::hardware_concurrency());
+        test::test_num_exeptions<ExPolicy, IteratorTag>::call(policy, e);
     }
     catch(...) {
         HPX_TEST(false);
@@ -147,10 +144,9 @@ void test_for_each_n_exception(hpx::parallel::task_execution_policy, IteratorTag
     }
     catch(hpx::exception_list const& e) {
         caught_exception = true;
-
-        // The static partitioner uses the number of threads/cores for the
-        // number chunks to create.
-        HPX_TEST_EQ(e.size(), hpx::threads::hardware_concurrency());
+        test::test_num_exeptions<
+            hpx::parallel::task_execution_policy, IteratorTag
+        >::call(hpx::parallel::task, e);
     }
     catch(...) {
         HPX_TEST(false);
