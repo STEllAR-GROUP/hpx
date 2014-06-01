@@ -52,10 +52,10 @@ namespace hpx { namespace parallel
         }
 
         template <int N, typename R, typename ZipIter>
-        R get_iter(hpx::future<ZipIter> && zipiter)
+        R get_iter(hpx::future<ZipIter>&& zipiter)
         {
             return zipiter.then(
-                [](hpx::future<ZipIter> f) {
+                [](hpx::future<ZipIter>&& f) {
                     typename std::iterator_traits<ZipIter>::value_type t =
                         *f.get();
                     return boost::get<N>(t);
