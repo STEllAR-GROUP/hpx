@@ -6,6 +6,7 @@
 set(tests
     foreach
     foreachn
+    reduce_
     transform
     transform_binary
    )
