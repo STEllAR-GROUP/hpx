@@ -145,7 +145,7 @@ namespace hpx { namespace parallel { namespace util
 
             // wait for all tasks to finish
             return hpx::when_all(workitems).then(
-                [first](hpx::future<std::vector<hpx::future<void> > > r)
+                [first](hpx::future<std::vector<hpx::future<void> > >&& r)
                 {
                     std::vector<hpx::future<void> > result = r.get();
 
