@@ -10,6 +10,7 @@
 
 #include <hpx/stl/detail/for_each.hpp>
 #include <hpx/stl/detail/transform.hpp>
+#include <hpx/stl/detail/copy.hpp>
 
 #endif
 
