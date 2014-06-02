@@ -19,14 +19,14 @@ void test_copy(ExPolicy const& policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10000);
+    std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     base_iterator outiter = hpx::parallel::copy(policy,
         iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d));
 
-    std::size_t count =0;
+    std::size_t count = 0;
     HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
         [&count](std::size_t v1, std::size_t v2) {
             HPX_TEST_EQ(v1, v2);
@@ -42,7 +42,7 @@ void test_copy(hpx::parallel::task_execution_policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10000);
+    std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
