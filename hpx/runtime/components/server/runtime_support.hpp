@@ -374,7 +374,7 @@ namespace hpx { namespace components { namespace server
 
         bool load_component_static(
             util::section& ini, std::string const& instance,
-            std::string const& component, boost::filesystem::path lib,
+            std::string const& component, boost::filesystem::path const& lib,
             naming::gid_type const& prefix, naming::resolver_client& agas_client,
             bool isdefault, bool isenabled,
             boost::program_options::options_description& options,

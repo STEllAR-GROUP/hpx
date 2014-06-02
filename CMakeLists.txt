@@ -210,6 +210,7 @@ endif()
 if (NOT DEFINED LIB)
   set(LIB "lib")
 endif(NOT DEFINED LIB)
+
 ###############################################################################
 if(UNIX)
   hpx_link_directories("${CMAKE_BINARY_DIR}/lib/hpx")
@@ -482,7 +483,7 @@ hpx_include(SetOutputPaths)
 # RPATH configuration
 ################################################################################
 if(NOT MSVC AND NOT HPX_STATIC_LINKING)
-  set(HPX_RPATH "${CMAKE_INSTALL_PREFIX}/lib/hpx:${CMAKE_BINARY_DIR}/lib/hpx"
+  set(HPX_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB}/hpx:${CMAKE_BINARY_DIR}/lib/hpx"
       CACHE STRING "Base RPATH for linking" FORCE)
 endif()
 
@@ -1787,11 +1788,11 @@ if(NOT HPX_NO_INSTALL)
       #make copy, so that we have intact symlink in CMAKE_BINARY_DIR
       execute_process(
         COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${script}" "${script_name}"
-	WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
+    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
 
       execute_process(
         COMMAND "${CMAKE_COMMAND}" -E create_symlink "${script_name}" "${script_name_we}"
-	WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
+    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
 
       install(FILES "${CMAKE_BINARY_DIR}/python/scripts/${script_name_we}" DESTINATION "bin")
     endforeach()
