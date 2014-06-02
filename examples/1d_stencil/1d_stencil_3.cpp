@@ -165,6 +165,7 @@ int main(int argc, char* argv[])
 
     po::options_description desc_commandline;
     desc_commandline.add_options()
+        ("results", "print generated results (default: false)")
         ("nx", po::value<boost::uint64_t>()->default_value(10),
          "Local x dimension (of each partition)")
         ("nt", po::value<boost::uint64_t>()->default_value(45),
