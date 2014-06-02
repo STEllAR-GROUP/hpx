@@ -1,4 +1,5 @@
 //  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014 Bryce Adelstein-Lelbach
 //  Copyright (c) 2014 Patricia Grubel
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,11 +26,10 @@ inline boost::uint64_t now()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Command-line variables
+bool header = true; // print csv heading
 double k = 0.5;     // heat transfer coefficient
 double dt = 1.;     // time step
 double dx = 1.;     // grid spacing
-
-bool header = true;
 
 ///////////////////////////////////////////////////////////////////////////////
 struct stepper
@@ -94,6 +94,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     // Execute nt time steps on nx grid points.
     stepper::space solution = step.do_work(nx, nt);
+    
 
     // Print the final solution
     if (vm.count("results"))
@@ -127,8 +128,7 @@ int main(int argc, char* argv[])
          "Timestep unit (default: 1.0[s])")
         ("dx", po::value<double>(&dx)->default_value(1.0),
          "Local x dimension")
-        ( "no-header"
-          , "do not print out the csv header row")
+        ( "no-header", "do not print out the csv header row")
     ;
 
     // Initialize and run HPX

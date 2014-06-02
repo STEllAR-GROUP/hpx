@@ -1,4 +1,5 @@
 //  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014 Bryce Adelstein-Lelbach
 //  Copyright (c) 2014 Patricia Grubel
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,18 +18,14 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
-#include <hpx/include/iostreams.hpp>
-
-#include <stdexcept>
-
 #include "print_time_results.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Command-line variables
+bool header = true; // print csv heading
 double k = 0.5;     // heat transfer coefficient
 double dt = 1.;     // time step
 double dx = 1.;     // grid spacing
-bool header = true;
 
 inline std::size_t idx(std::size_t i, std::size_t size)
 {
@@ -153,7 +150,6 @@ int hpx_main(boost::program_options::variables_map& vm)
     if (vm.count("no-header"))
         header = false;
 
-    //    std::size_t num_os_threads = hpx::get_os_thread_count();
 
     // Create the stepper object
     stepper step;
@@ -178,7 +174,6 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
     
-
     boost::uint64_t const os_thread_count = hpx::get_os_thread_count();
     print_time_results(os_thread_count, elapsed, nx, np, nt, header);
 
@@ -206,8 +201,7 @@ int main(int argc, char* argv[])
          "Timestep unit (default: 1.0[s])")
         ("dx", value<double>(&dx)->default_value(1.0),
          "Local x dimension")
-        ( "no-header" 
-        , "do not print out the csv header row")
+        ( "no-header", "do not print out the csv header row")
     ;
 
     // Initialize and run HPX
