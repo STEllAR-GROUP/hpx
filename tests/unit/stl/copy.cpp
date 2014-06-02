@@ -1,3 +1,8 @@
+//  Copyright (c) 2014 Grant Mercer
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/algorithm.hpp>
@@ -6,7 +11,7 @@
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
-template<typename ExPolicy, typename IteratorTag>
+template <typename ExPolicy, typename IteratorTag>
 void test_copy(ExPolicy const& policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
@@ -27,11 +32,11 @@ void test_copy(ExPolicy const& policy, IteratorTag)
             HPX_TEST_EQ(v1, v2);
             ++count;
             return v1 == v2;
-    }));
+        }));
     HPX_TEST_EQ(count, d.size());
 }
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void test_copy(hpx::parallel::task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
@@ -52,7 +57,7 @@ void test_copy(hpx::parallel::task_execution_policy, IteratorTag)
             HPX_TEST_EQ(v1, v2);
             ++count;
             return v1 == v2;
-    }));
+        }));
     HPX_TEST_EQ(count, d.size());
 }
 
@@ -78,7 +83,6 @@ void copy_test()
     test_copy<std::forward_iterator_tag>();
     test_copy<std::input_iterator_tag>();
 }
-
 
 int hpx_main()
 {
