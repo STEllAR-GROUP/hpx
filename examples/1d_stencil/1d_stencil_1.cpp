@@ -1,4 +1,5 @@
 //  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014 Patricia Grubel
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,6 +13,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
+#include "print_time_results.hpp"
 ///////////////////////////////////////////////////////////////////////////////
 // Timer with nanosecond resolution
 inline boost::uint64_t now()
@@ -22,9 +24,12 @@ inline boost::uint64_t now()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Command-line variables
 double k = 0.5;     // heat transfer coefficient
 double dt = 1.;     // time step
 double dx = 1.;     // grid spacing
+
+bool header = true;
 
 ///////////////////////////////////////////////////////////////////////////////
 struct stepper
@@ -78,6 +83,9 @@ int hpx_main(boost::program_options::variables_map& vm)
     boost::uint64_t nx = vm["nx"].as<boost::uint64_t>();   // Number of grid points.
     boost::uint64_t nt = vm["nt"].as<boost::uint64_t>();   // Number of steps.
 
+    if (vm.count("no-header"))
+        header = false;
+    
     // Create the stepper object
     stepper step;
 
@@ -95,8 +103,10 @@ int hpx_main(boost::program_options::variables_map& vm)
     }
 
     boost::uint64_t elapsed = now() - t;
-    std::cout << "Elapsed time: " << elapsed / 1e9 << " [s]" << std::endl;
-
+    
+    boost::uint64_t const os_thread_count = hpx::get_os_thread_count();
+    print_time_results(os_thread_count, elapsed, nx, nt, header);
+    
     return hpx::finalize();
 }
 
@@ -117,6 +127,8 @@ int main(int argc, char* argv[])
          "Timestep unit (default: 1.0[s])")
         ("dx", po::value<double>(&dx)->default_value(1.0),
          "Local x dimension")
+        ( "no-header"
+          , "do not print out the csv header row")
     ;
 
     // Initialize and run HPX
