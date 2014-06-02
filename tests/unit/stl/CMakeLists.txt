@@ -7,6 +7,7 @@ set(tests
 	copy
     foreach
     foreachn
+    reduce_
     transform
     transform_binary
    )

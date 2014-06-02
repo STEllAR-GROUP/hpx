@@ -11,6 +11,7 @@
 #include <hpx/stl/execution_policy.hpp>
 #include <hpx/stl/detail/algorithm_result.hpp>
 #include <hpx/stl/detail/zip_iterator.hpp>
+#include <hpx/util/move.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -26,10 +27,10 @@ namespace hpx { namespace parallel
     namespace detail
     {
         template <typename ExPolicy, typename InIter, typename OutIter,
-            typename F, typename IterTag>
+            typename F>
         typename detail::algorithm_result<ExPolicy, OutIter>::type
         transform_seq(ExPolicy const&, InIter first, InIter last, OutIter dest,
-            F && f, IterTag)
+            F && f)
         {
             try {
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
@@ -91,18 +92,18 @@ namespace hpx { namespace parallel
             typename detail::algorithm_result<ExPolicy, OutIter>::type
         >::type
         transform (ExPolicy const& policy, InIter first, InIter last,
-            OutIter dest, F && f, std::input_iterator_tag category)
+            OutIter dest, F && f, std::input_iterator_tag)
         {
             return transform_seq(policy, first, last, dest,
-                std::forward<F>(f), category);
+                std::forward<F>(f));
         }
 
         template <typename InIter, typename OutIter, typename F, typename IterTag>
         OutIter transform(sequential_execution_policy const& policy,
-            InIter first, InIter last, OutIter dest, F && f, IterTag category)
+            InIter first, InIter last, OutIter dest, F && f, IterTag)
         {
             return detail::transform_seq(policy, first, last, dest,
-                std::forward<F>(f), category);
+                std::forward<F>(f));
         }
 
         template <typename InIter, typename OutIter, typename F, typename IterTag>
@@ -141,7 +142,7 @@ namespace hpx { namespace parallel
     }
 
     template <typename ExPolicy, typename InIter, typename OutIter, typename F>
-    typename boost::enable_if<
+    inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
         typename detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
@@ -162,10 +163,10 @@ namespace hpx { namespace parallel
     namespace detail
     {
         template <typename ExPolicy, typename InIter1, typename InIter2,
-            typename OutIter, typename F, typename IterTag>
+            typename OutIter, typename F>
         typename detail::algorithm_result<ExPolicy, OutIter>::type
-        transform_binary_seq(ExPolicy const &, InIter1 first1, InIter1 last1,
-            InIter2 first2, OutIter dest, F && f, IterTag)
+        transform_binary_seq(ExPolicy const&, InIter1 first1, InIter1 last1,
+            InIter2 first2, OutIter dest, F && f)
         {
             try {
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
@@ -213,20 +214,20 @@ namespace hpx { namespace parallel
             typename detail::algorithm_result<ExPolicy, OutIter>::type
         >::type
         transform_binary(ExPolicy const& policy, InIter1 first1, InIter1 last1,
-            InIter2 first2, OutIter dest, F && f, std::input_iterator_tag category)
+            InIter2 first2, OutIter dest, F && f, std::input_iterator_tag)
         {
             return transform_binary_seq(policy, first1, last1, first2,
-                dest, std::forward<F>(f), category);
+                dest, std::forward<F>(f));
         }
 
         template <typename InIter1, typename InIter2, typename OutIter,
             typename F, typename IterTag>
         OutIter transform_binary(sequential_execution_policy const& policy,
             InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest,
-            F && f, IterTag category)
+            F && f, IterTag)
         {
             return detail::transform_binary_seq(policy, first1, last1, first2,
-                dest, std::forward<F>(f), category);
+                dest, std::forward<F>(f));
         }
 
         template <typename InIter1, typename InIter2, typename OutIter,
@@ -240,7 +241,7 @@ namespace hpx { namespace parallel
             case detail::execution_policy_enum::sequential:
                 return detail::transform_binary_seq(
                     *policy.get<sequential_execution_policy>(),
-                    first1, last1, first2, dest, std::forward<F>(f), category);
+                    first1, last1, first2, dest, std::forward<F>(f));
 
             case detail::execution_policy_enum::parallel:
                 return detail::transform_binary(
@@ -268,7 +269,7 @@ namespace hpx { namespace parallel
 
     template <typename ExPolicy, typename InIter1, typename InIter2,
         typename OutIter, typename F>
-    typename boost::enable_if<
+    inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
         typename detail::algorithm_result<ExPolicy, OutIter>::type
     >::type

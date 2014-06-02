@@ -93,8 +93,8 @@ struct stepper
 
         next[0] = heat(left[size-1], middle[0], middle[1]);
 
-        using hpx::parallel::par;
-        hpx::parallel::for_each(par, iterator(1), iterator(size-1),
+        using namespace hpx::parallel;
+        for_each(par, iterator(1), iterator(size-1),
             [&next, &middle](std::size_t i)
             {
                 next[i] = heat(middle[i-1], middle[i], middle[i+1]);
@@ -110,6 +110,9 @@ struct stepper
     hpx::future<space> do_work(std::size_t np, std::size_t nx, std::size_t nt)
     {
         using hpx::util::unwrapped;
+        using hpx::lcos::local::dataflow;
+        using hpx::parallel::for_each;
+        using hpx::parallel::par;
 
         // U[t][i] is the state of position i at time t.
         std::vector<space> U(2);
@@ -130,11 +133,9 @@ struct stepper
 
             typedef boost::counting_iterator<std::size_t> iterator;
 
-            using hpx::parallel::par;
-            hpx::parallel::for_each(par, iterator(0), iterator(np),
+            for_each(par, iterator(0), iterator(np),
                 [&next, &current, np, &Op](std::size_t i)
                 {
-                    using hpx::lcos::local::dataflow;
                     next[i] = dataflow(
                             hpx::launch::async, Op,
                             current[idx(i-1, np)], current[i], current[idx(i+1, np)]
