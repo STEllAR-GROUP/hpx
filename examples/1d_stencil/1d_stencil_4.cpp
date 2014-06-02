@@ -1,5 +1,4 @@
 //  Copyright (c) 2014 Hartmut Kaiser
-//  Copyright (c) 2014 Bryce Adelstein-Lelbach
 //  Copyright (c) 2014 Patricia Grubel
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
