@@ -97,7 +97,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     stepper::space solution = step.do_work(nx, nt);
 
     // Print the final solution
-    if (vm.count("result"))
+    if (vm.count("results"))
     {
         for (std::size_t i = 0; i != nx; ++i)
             std::cout << "U[" << i << "] = " << solution[i] << std::endl;

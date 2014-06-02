@@ -356,7 +356,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     stepper::space solution = step.do_work(np, nx, nt);
 
     // Print the final solution
-    if (vm.count("result"))
+    if (vm.count("results"))
     {
         for (std::size_t i = 0; i != np; ++i)
         {

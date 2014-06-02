@@ -477,7 +477,7 @@ int hpx_main(boost::program_options::variables_map& vm)
             hpx::lcos::gather_here(gather_basename, std::move(result), nl);
 
         // Print the solution at time-step 'nt'.
-        if (vm.count("result"))
+        if (vm.count("results"))
         {
             std::vector<stepper_server::space> solution = overall_result.get();
             elapsed = hpx::util::high_resolution_clock::now() - t;
