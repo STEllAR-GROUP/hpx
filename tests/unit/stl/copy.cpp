@@ -79,30 +79,10 @@ void copy_test()
     test_copy<std::input_iterator_tag>();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-template<typename ExPolicy, typename IteratorTag>
-void test_copy_exception(ExPolicy const& policy, IteratorTag)
-{
-    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
-
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef std::test_iterator<base_iterator, IteratorTag> iterator;
-
-    std::vector<std::size_t> c(10000);
-    std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
-
-    bool caught_exception = false;
-    try {
-        base_iterator outiter = hpx::parallel::copy(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
-
 
 int hpx_main()
 {
     copy_test();
-    std::cout << "test file testing";
-    char c; std::cin >> c;
     return hpx::finalize();
 }
 
