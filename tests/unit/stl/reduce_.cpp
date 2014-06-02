@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/algorithm.hpp>
+#include <hpx/include/numeric.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include "test_utils.hpp"
