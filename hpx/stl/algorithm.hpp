@@ -11,6 +11,7 @@
 #include <hpx/stl/detail/for_each.hpp>
 #include <hpx/stl/detail/reduce.hpp>
 #include <hpx/stl/detail/transform.hpp>
+#include <hpx/stl/detail/copy.hpp>
 
 #endif
 
