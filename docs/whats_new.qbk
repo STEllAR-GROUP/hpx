@@ -24,6 +24,14 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1146] - Stencil print
+* [issue 1145] - N3960 hpx::parallel::copy implemented and tested
+* [issue 1145] - OpenMP examples 1d_stencil do not build
+* [issue 1143] - 1d_stencil OpenMP examples do not build
+* [issue 1142] - Cannot build HPX with gcc 4.6 on OS X
+* [issue 1140] - Fix OpenMP lookup, enable usage of config tests in external
+                 CMake projects.
+* [issue 1139] - hpx/hpx/config/compiler_specific.hpp
 * [issue 1137] - Improvements to create binary packages
 * [issue 1136] - HPX_GCC_VERSION not defined on all compilers
 * [issue 1136] - HPX_GCC_VERSION not defined on all compilers
@@ -83,6 +91,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1082] - Implement proper termination detection during shutdown
 * [issue 1081] - Implement thread_specific_ptr for hpx::threads
 * [issue 1070] - Complete quoting for parameters of some CMake commands
+* [issue 1059] - Fix more unused variable warnings
 * [issue 879]  - Hung test leads to cascading test failure; make tests should
                  support the MPI parcelport
 
