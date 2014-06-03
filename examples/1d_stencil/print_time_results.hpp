@@ -18,8 +18,8 @@
 void print_time_results(
     boost::uint64_t num_os_threads
   , boost::uint64_t elapsed
-  , boost::uint64_t np
   , boost::uint64_t nx
+  , boost::uint64_t np
   , boost::uint64_t nt
   , bool header
     )
