@@ -11,8 +11,34 @@
 #include <iterator>
 #include <algorithm>
 
+#include <boost/atomic.hpp>
+
 namespace hpx { namespace parallel { namespace util
 {
+    ///////////////////////////////////////////////////////////////////////////
+    // cancellation_token is used for premature cancellation of algorithms
+    class cancellation_token
+    {
+    private:
+        boost::atomic<bool> was_cancelled_;
+
+    public:
+        cancellation_token()
+          : was_cancelled_(false)
+        {}
+
+        bool was_cancelled() const BOOST_NOEXCEPT
+        {
+            return was_cancelled_.load(boost::memory_order_relaxed);
+        }
+
+        void cancel() BOOST_NOEXCEPT
+        {
+            was_cancelled_.store(true, boost::memory_order_relaxed);
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     // Helper class to repeatedly call a function starting from a given
     // iterator position.
     template <typename IterCat>
@@ -24,6 +50,18 @@ namespace hpx { namespace parallel { namespace util
             for (/**/; it != end; ++it)
                 func(*it);
 
+            return it;
+        }
+
+        template <typename Iter, typename F, typename CancelToken>
+        static Iter call(Iter it, Iter end, F && func, CancelToken& tok)
+        {
+            for (/**/; it != end; ++it)
+            {
+                func(*it);
+                if (tok.was_cancelled())
+                    break;
+            }
             return it;
         }
     };
@@ -42,6 +80,18 @@ namespace hpx { namespace parallel { namespace util
 
             return it;
         }
+
+        template <typename Iter, typename F, typename CancelToken>
+        static Iter call(Iter it, std::size_t count, F && func, CancelToken& tok)
+        {
+            for (/**/; count != 0; --count, ++it)
+            {
+                func(*it);
+                if (tok.was_cancelled())
+                    break;
+            }
+            return it;
+        }
     };
 
     // specialization for random access iterators
@@ -55,6 +105,20 @@ namespace hpx { namespace parallel { namespace util
                 func(it[i]);
 
             std::advance(it, count);
+            return it;
+        }
+
+        template <typename Iter, typename F, typename CancelToken>
+        static Iter call(Iter it, std::size_t count, F && func, CancelToken& tok)
+        {
+            std::size_t i = 0;
+            for (/**/; i != count; ++i)
+            {
+                func(it[i]);
+                if (tok.was_cancelled())
+                    break;
+            }
+            std::advance(it, i);
             return it;
         }
     };
