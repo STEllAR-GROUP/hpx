@@ -182,7 +182,7 @@ namespace hpx
     /// console mode or worker mode depending on the command line settings).
     namespace detail
     {
-        inline int init_helper(boost::program_options::variables_map& vm,
+        inline int init_helper(boost::program_options::variables_map& /*vm*/,
             HPX_STD_FUNCTION<int(int, char**)> const& f, int argc, char** argv)
         {
             return f(argc, argv);
@@ -190,7 +190,7 @@ namespace hpx
     }
 
     inline int init(HPX_STD_FUNCTION<int(int, char**)> const& f,
-        std::string const& app_name, int argc, char** argv, hpx::runtime_mode mode)
+        std::string const& /*app_name*/, int argc, char** argv, hpx::runtime_mode mode)
     {
         using boost::program_options::options_description;
         options_description desc_commandline(

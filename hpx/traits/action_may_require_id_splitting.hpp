@@ -18,7 +18,7 @@ namespace hpx { namespace traits
     {
         // return a new instance of a serialization filter
         template <typename Arguments>
-        static bool call(Arguments const& act)
+        static bool call(Arguments const& /*act*/)
         {
             // by default actions are assumed to require id-splitting
             return true;
