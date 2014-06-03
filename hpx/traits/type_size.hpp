@@ -30,7 +30,7 @@ namespace hpx { namespace traits
     {
         typedef void uses_sizeof;
 
-        static BOOST_FORCEINLINE std::size_t call(T const& t)
+        static BOOST_FORCEINLINE std::size_t call(T const&)
         {
             return sizeof(T);
         }

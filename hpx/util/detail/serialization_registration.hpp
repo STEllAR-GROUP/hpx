@@ -55,7 +55,7 @@ namespace hpx { namespace util { namespace detail
         return static_cast<char>(number_tmp - 10 + 'A');
     }
 
-#if defined(HPX_DISABLE_ASSERTS)
+#if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
     inline void convert_byte(boost::uint8_t b, char*& buffer, char const* /*end*/)
 #else
     inline void convert_byte(boost::uint8_t b, char*& buffer, char const* end)

@@ -16,23 +16,35 @@
 namespace hpx { namespace util { namespace detail
 {
     template <typename Lock>
-    void assert_owns_lock(Lock& l, int)
+    void assert_owns_lock(Lock& /*l*/, int)
     {}
     
     template <typename Mutex>
+#if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
+    void assert_owns_lock(boost::unique_lock<Mutex>& /*l*/, long)
+#else
     void assert_owns_lock(boost::unique_lock<Mutex>& l, long)
+#endif
     {
         HPX_ASSERT(l.owns_lock());
     }
     
     template <typename Mutex>
+#if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
+    void assert_owns_lock(boost::shared_lock<Mutex>& /*l*/, long)
+#else
     void assert_owns_lock(boost::shared_lock<Mutex>& l, long)
+#endif
     {
         HPX_ASSERT(l.owns_lock());
     }
     
     template <typename Mutex>
+#if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
+    void assert_owns_lock(boost::upgrade_lock<Mutex>& /*l*/, long)
+#else
     void assert_owns_lock(boost::upgrade_lock<Mutex>& l, long)
+#endif
     {
         HPX_ASSERT(l.owns_lock());
     }
@@ -40,7 +52,11 @@ namespace hpx { namespace util { namespace detail
 #   if !defined(BOOST_NO_CXX11_DECLTYPE_N3276) && !defined(BOOST_NO_SFINAE_EXPR)
     template <typename Lock>
     decltype(boost::declval<Lock>().owns_lock())
+#if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
+    assert_owns_lock(Lock& /*l*/, long)
+#else
     assert_owns_lock(Lock& l, long)
+#endif
     {
         HPX_ASSERT(l.owns_lock());
         return true;
