@@ -41,6 +41,7 @@ namespace mini_ghost {
       : gen(0)
       , random(0.0, 1.0)
       , rank(-1)
+      , init_future_(init_promise_.get_future())
     {}
 
     template <typename Real>
@@ -107,6 +108,7 @@ namespace mini_ghost {
                 }
 
                 // wait for all local partitions to be initialized
+                init_promise_.set_value();
                 hpx::wait_all(partition_initialized);
 
                 //FIXME: setup performance captures...
@@ -155,6 +157,7 @@ namespace mini_ghost {
     void stepper<Real>::set_north_zone(buffer_type buffer, std::size_t step,
         std::size_t var)
     {
+        init_future_.wait();
         partitions_[var].recv_buffer_north_.set_buffer(buffer, step);
     }
 
@@ -162,6 +165,7 @@ namespace mini_ghost {
     void stepper<Real>::set_south_zone(buffer_type buffer, std::size_t step,
         std::size_t var)
     {
+        init_future_.wait();
         partitions_[var].recv_buffer_south_.set_buffer(buffer, step);
     }
 
@@ -169,6 +173,7 @@ namespace mini_ghost {
     void stepper<Real>::set_east_zone(buffer_type buffer, std::size_t step,
         std::size_t var)
     {
+        init_future_.wait();
         partitions_[var].recv_buffer_east_.set_buffer(buffer, step);
     }
 
@@ -176,6 +181,7 @@ namespace mini_ghost {
     void stepper<Real>::set_west_zone(buffer_type buffer, std::size_t step,
         std::size_t var)
     {
+        init_future_.wait();
         partitions_[var].recv_buffer_west_.set_buffer(buffer, step);
     }
 
@@ -183,6 +189,7 @@ namespace mini_ghost {
     void stepper<Real>::set_front_zone(buffer_type buffer, std::size_t step,
         std::size_t var)
     {
+        init_future_.wait();
         partitions_[var].recv_buffer_front_.set_buffer(buffer, step);
     }
 
@@ -190,6 +197,7 @@ namespace mini_ghost {
     void stepper<Real>::set_back_zone(buffer_type buffer, std::size_t step,
         std::size_t var)
     {
+        init_future_.wait();
         partitions_[var].recv_buffer_back_.set_buffer(buffer, step);
     }
 
@@ -197,6 +205,7 @@ namespace mini_ghost {
     void stepper<Real>::set_global_sum(std::size_t generation, std::size_t which,
         Real value, std::size_t idx, std::size_t id)
     {
+        init_future_.wait();
         HPX_ASSERT(which < stepper_ids.size());
         partitions_[idx].sum_allreduce(id, generation, which, value);
     }

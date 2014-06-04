@@ -92,6 +92,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         std::ofstream fs("results.yaml");
         mini_ghost::profiling::report(fs, profiling_data, p);
         std::cout << "finalizing ...\n";
+
         return hpx::finalize();
     }
     else

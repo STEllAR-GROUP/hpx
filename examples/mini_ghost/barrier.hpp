@@ -32,6 +32,11 @@ namespace mini_ghost
         detail::get_barrier().wait();
     }
 
+    void free_barrier()
+    {
+        detail::get_barrier() = hpx::lcos::barrier();
+    }
+
     void create_barrier()
     {
         boost::uint32_t rank = hpx::get_locality_id();
@@ -48,6 +53,9 @@ namespace mini_ghost
             hpx::id_type id = hpx::unmanaged(b.get_gid());
             hpx::agas::register_name_sync(HPX_MINI_GHOST_BARRIER, id.get_gid());
         }
+
+        // make sure the barrier is released before exiting
+        hpx::register_pre_shutdown_function(&mini_ghost::free_barrier);
     }
 
     void find_barrier()

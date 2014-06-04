@@ -85,6 +85,9 @@ namespace mini_ghost {
             >
             partition_type;
         std::vector<partition_type> partitions_;
+
+        hpx::lcos::local::promise<void> init_promise_;
+        hpx::future<void> init_future_;
     };
 }
 
