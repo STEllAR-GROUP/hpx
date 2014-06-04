@@ -25,8 +25,8 @@ void print_time_results(
     )
 {
     if (header)
-        std::cout << "OS-threads, Execution Time (seconds),"
-                " Points/Partion, Partitions, Time Steps\n"
+        std::cout << "OS-threads, Execution-Time(seconds),"
+                " Points/Partition, Partitions, Time-Steps\n"
              << hpx::flush;
 
     std::string const threads_str = boost::str(boost::format("%lu,") % num_os_threads);
