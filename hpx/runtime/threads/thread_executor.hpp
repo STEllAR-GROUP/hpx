@@ -76,9 +76,7 @@ namespace hpx { namespace threads
         class executor_base
         {
         public:
-            typedef
-                util::detail::unique_function<void(), void, void>
-                closure_type;
+            typedef util::unique_function_nonser<void()> closure_type;
 
             executor_base() : count_(0) {}
             virtual ~executor_base() {}

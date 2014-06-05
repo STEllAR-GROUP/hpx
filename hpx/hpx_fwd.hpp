@@ -339,7 +339,7 @@ namespace hpx
         typedef threads::detail::tagged_thread_state<thread_state_ex_enum> thread_state_ex;
 
         typedef thread_state_enum thread_function_sig(thread_state_ex_enum);
-        typedef util::detail::unique_function<thread_function_sig> thread_function_type;
+        typedef util::unique_function_nonser<thread_function_sig> thread_function_type;
 
         /// \enum thread_stacksize
         enum thread_stacksize

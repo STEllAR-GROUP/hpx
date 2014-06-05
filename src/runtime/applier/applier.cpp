@@ -28,7 +28,7 @@ namespace hpx { namespace applier
 {
     ///////////////////////////////////////////////////////////////////////////
     static inline threads::thread_state_enum thread_function(
-        util::detail::unique_function<void(threads::thread_state_ex_enum)> func)
+        util::unique_function_nonser<void(threads::thread_state_ex_enum)> func)
     {
         // execute the actual thread function
         func(threads::wait_signaled);
@@ -42,7 +42,7 @@ namespace hpx { namespace applier
     }
 
     static inline threads::thread_state_enum thread_function_nullary(
-        util::detail::unique_function<void()> func)
+        util::unique_function_nonser<void()> func)
     {
         // execute the actual thread function
         func();
@@ -57,7 +57,7 @@ namespace hpx { namespace applier
 
     ///////////////////////////////////////////////////////////////////////////
     threads::thread_id_type register_thread_nullary(
-        util::detail::unique_function<void()> && func, char const* desc,
+        util::unique_function_nonser<void()> && func, char const* desc,
         threads::thread_state_enum state, bool run_now,
         threads::thread_priority priority, std::size_t os_thread,
         threads::thread_stacksize stacksize, error_code& ec)
@@ -80,7 +80,7 @@ namespace hpx { namespace applier
     }
 
     threads::thread_id_type register_thread(
-        util::detail::unique_function<void(threads::thread_state_ex_enum)> && func,
+        util::unique_function_nonser<void(threads::thread_state_ex_enum)> && func,
         char const* desc, threads::thread_state_enum state, bool run_now,
         threads::thread_priority priority, std::size_t os_thread,
         threads::thread_stacksize stacksize, error_code& ec)
@@ -103,7 +103,7 @@ namespace hpx { namespace applier
     }
 
     threads::thread_id_type register_non_suspendable_thread(
-        util::detail::unique_function<void(threads::thread_state_ex_enum)> && func,
+        util::unique_function_nonser<void(threads::thread_state_ex_enum)> && func,
         char const* desc, threads::thread_state_enum state, bool run_now,
         threads::thread_priority priority, std::size_t os_thread,
         error_code& ec)
@@ -166,7 +166,7 @@ namespace hpx { namespace applier
 
     ///////////////////////////////////////////////////////////////////////////
     void register_work_nullary(
-        util::detail::unique_function<void()> && func, char const* desc,
+        util::unique_function_nonser<void()> && func, char const* desc,
         threads::thread_state_enum state, threads::thread_priority priority,
         std::size_t os_thread, threads::thread_stacksize stacksize,
         error_code& ec)
@@ -188,7 +188,7 @@ namespace hpx { namespace applier
     }
 
     void register_work(
-        util::detail::unique_function<void(threads::thread_state_ex_enum)> && func,
+        util::unique_function_nonser<void(threads::thread_state_ex_enum)> && func,
         char const* desc, threads::thread_state_enum state,
         threads::thread_priority priority, std::size_t os_thread,
         threads::thread_stacksize stacksize, error_code& ec)
@@ -210,7 +210,7 @@ namespace hpx { namespace applier
     }
 
     void register_non_suspendable_work(
-        util::detail::unique_function<void(threads::thread_state_ex_enum)> && func,
+        util::unique_function_nonser<void(threads::thread_state_ex_enum)> && func,
         char const* desc, threads::thread_state_enum state,
         threads::thread_priority priority, std::size_t os_thread,
         error_code& ec)

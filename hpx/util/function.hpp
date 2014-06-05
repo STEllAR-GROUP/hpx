@@ -11,45 +11,39 @@
 #include <hpx/error.hpp>
 #include <hpx/runtime/actions/guid_initialization.hpp>
 #include <hpx/util/detail/function_template.hpp>
-#include <hpx/util/detail/vtable_ptr_base.hpp>
-#include <hpx/util/detail/vtable_ptr.hpp>
-#include <hpx/util/detail/get_table.hpp>
-#include <hpx/util/detail/vtable.hpp>
-#include <hpx/util/detail/get_empty_table.hpp>
-#include <hpx/util/detail/empty_vtable.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <boost/preprocessor/cat.hpp>
 
+#include <utility>
+
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_CONTINUATION_REGISTER_FUNCTION_FACTORY(Vtable, Name)              \
-    static ::hpx::util::detail::function_registration<Vtable>                 \
-        const BOOST_PP_CAT(Name, _function_factory_registration) =            \
-            ::hpx::util::detail::function_registration<Vtable>();             \
+#define HPX_CONTINUATION_REGISTER_FUNCTION_FACTORY(VTable, Name)              \
+    static ::hpx::util::detail::function_registration<                        \
+        VTable::first_type, VTable::second_type                               \
+    > const BOOST_PP_CAT(Name, _function_factory_registration) =              \
+            ::hpx::util::detail::function_registration<                       \
+                VTable::first_type, VTable::second_type                       \
+            >();                                                              \
 /**/
 
-#define HPX_DECLARE_GET_FUNCTION_NAME(Vtable, Name)                           \
+#define HPX_DECLARE_GET_FUNCTION_NAME(VTable, Name)                           \
     namespace hpx { namespace util { namespace detail {                       \
         template<> HPX_ALWAYS_EXPORT                                          \
-        char const* get_function_name<Vtable>();                              \
+        char const* get_function_name<VTable>();                              \
     }}}                                                                       \
 /**/
 
 #define HPX_UTIL_REGISTER_FUNCTION_DECLARATION(Sig, Functor, Name)            \
     namespace hpx { namespace util { namespace detail {                       \
         typedef                                                               \
-            vtable_ptr<                                                       \
-                Sig                                                           \
-              , portable_binary_iarchive                                      \
-              , portable_binary_oarchive                                      \
-              , vtable<sizeof(util::decay<HPX_UTIL_STRIP(Functor)>::type) <=  \
-                       sizeof(void *)>::type<                                 \
-                    util::decay<HPX_UTIL_STRIP(Functor)>::type                \
-                  , Sig                                                       \
-                  , portable_binary_iarchive                                  \
-                  , portable_binary_oarchive                                  \
+            std::pair<                                                        \
+                function_vtable_ptr<                                          \
+                    Sig                                                       \
+                  , portable_binary_iarchive, portable_binary_oarchive        \
                 >                                                             \
+              , util::decay<HPX_UTIL_STRIP(Functor)>::type                    \
             >                                                                 \
             BOOST_PP_CAT(BOOST_PP_CAT(__,                                     \
                 BOOST_PP_CAT(hpx_function_serialization_, Name)), _type);     \
@@ -68,10 +62,10 @@
     }}                                                                        \
 /**/
 
-#define HPX_DEFINE_GET_FUNCTION_NAME(Vtable, Name)                            \
+#define HPX_DEFINE_GET_FUNCTION_NAME(VTable, Name)                            \
     namespace hpx { namespace util { namespace detail {                       \
         template<> HPX_ALWAYS_EXPORT                                          \
-        char const* get_function_name<Vtable>()                               \
+        char const* get_function_name<VTable>()                               \
         {                                                                     \
             return BOOST_PP_STRINGIZE(Name);                                  \
         }                                                                     \
@@ -88,39 +82,5 @@
             BOOST_PP_CAT(hpx_function_serialization_, Name)), _type)          \
       , Name)                                                                 \
 /**/
-
-// default register empty functions
-namespace hpx { namespace traits {
-    template <typename Sig, typename IArchive, typename OArchive>
-    struct needs_automatic_registration<
-        hpx::util::detail::vtable_ptr<
-            Sig
-          , IArchive
-          , OArchive
-          , hpx::util::detail::empty_vtable<Sig, IArchive, OArchive>
-        >
-    >
-      : boost::mpl::false_
-    {};
-}}
-
-namespace hpx { namespace util { namespace detail {
-    template <typename Sig, typename IArchive, typename OArchive>
-    struct get_function_name_impl<
-        vtable_ptr<
-            Sig
-          , IArchive
-          , OArchive
-          , empty_vtable<Sig, IArchive, OArchive>
-        >
-    >
-    {
-        static const char* call()
-        {
-            HPX_ASSERT(false);
-            return "empty_vtable";
-        }
-    };
-}}}
 
 #endif

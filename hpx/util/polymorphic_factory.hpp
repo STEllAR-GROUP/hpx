@@ -43,7 +43,7 @@ namespace hpx { namespace util
 {
     namespace detail
     {
-        template <typename Function>
+        template <typename VTable, typename T>
         struct function_registration;
     }
 
@@ -75,7 +75,7 @@ namespace hpx { namespace util
         template <typename Continuation>
         friend struct actions::detail::continuation_registration;
 
-        template <typename Function>
+        template <typename VTable, typename T>
         friend struct util::detail::function_registration;
     };
 }}
