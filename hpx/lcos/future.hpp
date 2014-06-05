@@ -968,7 +968,7 @@ namespace hpx { namespace lcos
             // no error has been reported, return the result
             return detail::future_value<R>::get(data.move_value());
         }
-        
+
         typename traits::future_traits<future>::result_type
         get(error_code& ec)
         {
@@ -1113,6 +1113,17 @@ namespace hpx { namespace lcos
         {
             other = future<R>();
         }
+
+        // Effects: constructs a shared_future object by moving the instance
+        //          referred to by rhs and unwrapping the inner future
+        //          (see unwrap()).
+        // Postconditions:
+        //   - valid() returns the same value as other.valid() prior to the
+        //     constructor invocation.
+        //   - other.valid() == false.
+        shared_future(future<shared_future> && other) BOOST_NOEXCEPT
+          : base_type(other.valid() ? other.unwrap() : base_type())
+        {}
 
         // Effects: constructs a future<void> object that will be ready when
         //          the given future is ready
