@@ -63,7 +63,7 @@ namespace hpx { namespace parallel
                     [](reference it) {
                         *boost::get<1>(it) = *boost::get<0>(it);
                     },
-                    category));
+                    boost::mpl::false_()));
         }
 
         template<typename ExPolicy, typename InIter, typename OutIter>

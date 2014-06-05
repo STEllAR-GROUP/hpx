@@ -83,7 +83,7 @@ namespace hpx { namespace parallel
                     [f](reference it) {
                         *boost::get<1>(it) = f(*boost::get<0>(it));
                     },
-                    category));
+                    boost::mpl::false_()));
         }
 
         template <typename ExPolicy, typename InIter, typename OutIter, typename F>
@@ -204,7 +204,7 @@ namespace hpx { namespace parallel
                         *boost::get<2>(it) =
                             f(*boost::get<0>(it), *boost::get<1>(it));
                     },
-                    category));
+                    boost::mpl::false_()));
         }
 
         template <typename ExPolicy, typename InIter1, typename InIter2,
