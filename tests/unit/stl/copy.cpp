@@ -14,21 +14,16 @@
 template <typename ExPolicy, typename IteratorTag>
 void test_copy(ExPolicy const& policy, IteratorTag)
 {
-    std::stringstream ss;
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::ostream_iterator<std::size_t> out_it (ss," ");
-
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
-    auto outiter = hpx::parallel::copy(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)), out_it);
-
-    std::cout << ss.str() << std::endl;
+    base_iterator outiter = hpx::parallel::copy(policy,
+        iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d));
 
     std::size_t count = 0;
     HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
@@ -69,7 +64,6 @@ template <typename IteratorTag>
 void test_copy()
 {
     using namespace hpx::parallel;
-
     test_copy(seq, IteratorTag());
     test_copy(par, IteratorTag());
     test_copy(vec, IteratorTag());
@@ -79,6 +73,7 @@ void test_copy()
     test_copy(execution_policy(par), IteratorTag());
     test_copy(execution_policy(vec), IteratorTag());
     test_copy(execution_policy(task), IteratorTag());
+    std::cout << std::endl << std::endl;
 }
 
 void copy_test()
@@ -91,6 +86,7 @@ void copy_test()
 int hpx_main()
 {
     copy_test();
+    char c; std::cin >> c;
     return hpx::finalize();
 }
 
