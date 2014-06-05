@@ -28,14 +28,17 @@ namespace hpx { namespace parallel
     // for_each_n
     namespace detail
     {
-        template <typename ExPolicy, typename InIter, typename F, typename IterTag>
+        template <typename ExPolicy, typename InIter, typename F>
         typename detail::algorithm_result<ExPolicy, InIter>::type
-        for_each_n_seq(ExPolicy const&, InIter first,
-            std::size_t count, F && f, IterTag)
+        for_each_n(ExPolicy const&, InIter first,
+            std::size_t count, F && f, boost::mpl::true_)
         {
+            typedef typename std::iterator_traits<InIter>::iterator_category
+                catecory;
+
             try {
                 return detail::algorithm_result<ExPolicy, InIter>::get(
-                    util::loop_n<IterTag>::call(first, count, std::forward<F>(f)));
+                    util::loop_n<catecory>::call(first, count, std::forward<F>(f)));
             }
             catch(std::bad_alloc const& e) {
                 boost::throw_exception(e);
@@ -47,18 +50,21 @@ namespace hpx { namespace parallel
             }
         }
 
-        template <typename ExPolicy, typename InIter, typename F,
-            typename IterTag>
+        template <typename ExPolicy, typename InIter, typename F>
         typename detail::algorithm_result<ExPolicy, InIter>::type
-        for_each_n(ExPolicy const&, InIter first, std::size_t count, F && f, IterTag)
+        for_each_n(ExPolicy const&, InIter first, std::size_t count, F && f,
+            boost::mpl::false_)
         {
+            typedef typename std::iterator_traits<InIter>::iterator_category
+                catecory;
+
             if (count > 0)
             {
                 return util::partitioner<ExPolicy>::call(
                     first, count,
                     [f](InIter part_begin, std::size_t part_count)
                     {
-                        util::loop_n<IterTag>::call(part_begin, part_count, f);
+                        util::loop_n<catecory>::call(part_begin, part_count, f);
                     });
             }
 
@@ -66,51 +72,31 @@ namespace hpx { namespace parallel
                 std::move(first));
         }
 
-        template <typename ExPolicy, typename InIter, typename F>
-        typename boost::enable_if<
-            is_parallel_execution_policy<ExPolicy>,
-            typename detail::algorithm_result<ExPolicy, InIter>::type
-        >::type
-        for_each_n(ExPolicy const& policy, InIter first, std::size_t count,
-            F && f, std::input_iterator_tag category)
-        {
-            return detail::for_each_n_seq(policy, first, count,
-                std::forward<F>(f), category);
-        }
-
-        template <typename InIter, typename F, typename IterTag>
-        InIter for_each_n(sequential_execution_policy const& policy,
-            InIter first, std::size_t count, F && f, IterTag category)
-        {
-            return detail::for_each_n_seq(policy, first, count,
-                std::forward<F>(f), category);
-        }
-
-        template <typename InIter, typename F, typename IterTag>
+        template <typename InIter, typename F>
         InIter for_each_n(execution_policy const& policy,
-            InIter first, std::size_t count, F && f, IterTag category)
+            InIter first, std::size_t count, F && func, boost::mpl::false_ f)
         {
             switch (detail::which(policy))
             {
             case detail::execution_policy_enum::sequential:
-                return detail::for_each_n_seq(
+                return detail::for_each_n(
                     *policy.get<sequential_execution_policy>(),
-                    first, count, std::forward<F>(f), category);
+                    first, count, std::forward<F>(func), boost::mpl::true_());
 
             case detail::execution_policy_enum::parallel:
                 return detail::for_each_n(
                     *policy.get<parallel_execution_policy>(),
-                    first, count, std::forward<F>(f), category);
+                    first, count, std::forward<F>(func), f);
 
             case detail::execution_policy_enum::vector:
                 return detail::for_each_n(
                     *policy.get<vector_execution_policy>(),
-                    first, count, std::forward<F>(f), category);
+                    first, count, std::forward<F>(func), f);
 
             case detail::execution_policy_enum::task:
                 // the dynamic case will never return a future
                 return detail::for_each_n(
-                    par, first, count, std::forward<F>(f), category);
+                    par, first, count, std::forward<F>(func), f);
 
             default:
                 HPX_THROW_EXCEPTION(hpx::bad_parameter,
@@ -118,6 +104,14 @@ namespace hpx { namespace parallel
                     "Not supported execution policy");
                 break;
             }
+        }
+
+        template <typename InIter, typename F>
+        InIter for_each_n(execution_policy const& policy,
+            InIter first, std::size_t count, F && f, boost::mpl::true_ t)
+        {
+            return detail::for_each_n(sequential_execution_policy(),
+                first, count, std::forward<F>(f), t);
         }
     }
 
@@ -135,9 +129,14 @@ namespace hpx { namespace parallel
             boost::is_base_of<std::input_iterator_tag, iterator_category>::value,
             "Requires at least input iterator.");
 
+        typedef typename boost::mpl::or_<
+            boost::is_same<sequential_execution_policy, ExPolicy>,
+            boost::is_same<std::input_iterator_tag, iterator_category>
+        >::type is_seq;
+
         return detail::for_each_n(
             std::forward<ExPolicy>(policy),
-            first, count, std::forward<F>(f), iterator_category());
+            first, count, std::forward<F>(f), is_seq());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -173,7 +172,7 @@ namespace hpx { namespace parallel
 
             return hpx::util::void_guard<result_type>(),
                 detail::for_each_n(policy, first, std::distance(first, last),
-                    std::forward<F>(f), category);
+                    std::forward<F>(f), boost::mpl::false_());
         }
 
         template <typename ExPolicy, typename InIter, typename F>
