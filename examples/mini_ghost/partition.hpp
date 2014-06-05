@@ -623,7 +623,7 @@ namespace mini_ghost {
                         hpx::util::high_resolution_timer timer_comp;
 
                         // Sum grid ...
-                        Real sum(sum_all_grid(dst));
+                        Real sum(this->sum_all_grid(dst));
                         flux_out_ += flux_out_future.get();
                         sum += flux_out_;
 
@@ -662,7 +662,7 @@ namespace mini_ghost {
                     }
                   , dependencies
                   , flux_out_future
-                );
+                ).unwrap();
         }
 
         ///////////////////////////////////////////////////////////////////////
