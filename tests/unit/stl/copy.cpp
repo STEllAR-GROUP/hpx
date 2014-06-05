@@ -73,7 +73,6 @@ void test_copy()
     test_copy(execution_policy(par), IteratorTag());
     test_copy(execution_policy(vec), IteratorTag());
     test_copy(execution_policy(task), IteratorTag());
-    std::cout << std::endl << std::endl;
 }
 
 void copy_test()
@@ -86,7 +85,6 @@ void copy_test()
 int hpx_main()
 {
     copy_test();
-    char c; std::cin >> c;
     return hpx::finalize();
 }
 
