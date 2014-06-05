@@ -12,7 +12,7 @@
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_copy(ExPolicy const& policy, IteratorTag)
+void test_copy_n(ExPolicy const& policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -22,8 +22,9 @@ void test_copy(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
-    base_iterator outiter = hpx::parallel::copy(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d));
+
+    base_iterator outiter = hpx::parallel::copy_n(policy,
+        iterator(boost::begin(c)), c.size(), boost::begin(d));
 
     std::size_t count = 0;
     HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
@@ -36,7 +37,7 @@ void test_copy(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_copy(hpx::parallel::task_execution_policy, IteratorTag)
+void test_copy_n(hpx::parallel::task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -46,8 +47,8 @@ void test_copy(hpx::parallel::task_execution_policy, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     hpx::future<base_iterator> f =
-        hpx::parallel::copy(hpx::parallel::task,
-            iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d));
+        hpx::parallel::copy_n(hpx::parallel::task,
+            iterator(boost::begin(c)), c.size(), boost::begin(d));
     f.wait();
 
     std::size_t count = 0;
@@ -61,32 +62,31 @@ void test_copy(hpx::parallel::task_execution_policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_copy()
+void test_copy_n()
 {
     using namespace hpx::parallel;
-    test_copy(seq, IteratorTag());
-    test_copy(par, IteratorTag());
-    test_copy(vec, IteratorTag());
-    test_copy(task, IteratorTag());
 
-    test_copy(execution_policy(seq), IteratorTag());
-    test_copy(execution_policy(par), IteratorTag());
-    test_copy(execution_policy(vec), IteratorTag());
-    test_copy(execution_policy(task), IteratorTag());
-    std::cout << std::endl << std::endl;
+    test_copy_n(seq, IteratorTag());
+    test_copy_n(par, IteratorTag());
+    test_copy_n(vec, IteratorTag());
+    test_copy_n(task, IteratorTag());
+
+    test_copy_n(execution_policy(seq), IteratorTag());
+    test_copy_n(execution_policy(par), IteratorTag());
+    test_copy_n(execution_policy(vec), IteratorTag());
+    test_copy_n(execution_policy(task), IteratorTag());
 }
 
-void copy_test()
+void n_copy_test()
 {
-    test_copy<std::random_access_iterator_tag>();
-    test_copy<std::forward_iterator_tag>();
-    test_copy<std::input_iterator_tag>();
+    test_copy_n<std::random_access_iterator_tag>();
+    test_copy_n<std::forward_iterator_tag>();
+    test_copy_n<std::input_iterator_tag>();
 }
 
 int hpx_main()
 {
-    copy_test();
-    char c; std::cin >> c;
+    n_copy_test();
     return hpx::finalize();
 }
 
