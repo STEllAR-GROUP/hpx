@@ -94,7 +94,7 @@ namespace hpx { namespace util { namespace detail
     template <typename Sig, typename IArchive, typename OArchive>
     struct unique_function : unique_function_base<Sig, IArchive, OArchive>
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(unique_function);
+        //HPX_MOVABLE_BUT_NOT_COPYABLE(unique_function);
 
     public:
         typedef unique_function_base<Sig, IArchive, OArchive> base_type;
@@ -124,6 +124,15 @@ namespace hpx { namespace util { namespace detail
             this->base_type::operator=(std::move(static_cast<base_type &&>(t)));
             return *this;
         }
+
+#if defined(HPX_INTEL14_WORKAROUND)
+        // The Intel Compiler sometimes erroneously instantiates this ctor. In order
+        // to avoid compile errors, we provide the definition here
+        unique_function(unique_function const & other) BOOST_NOEXCEPT
+        {
+            HPX_ASSERT(false);
+        }
+#endif
 
     private:
         friend class boost::serialization::access;
@@ -181,7 +190,7 @@ namespace hpx { namespace util { namespace detail
     struct unique_function<Sig, void, void>
       : unique_function_base<Sig, void, void>
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(unique_function);
+        //HPX_MOVABLE_BUT_NOT_COPYABLE(unique_function);
 
     public:
         typedef unique_function_base<Sig, void, void> base_type;
@@ -211,6 +220,15 @@ namespace hpx { namespace util { namespace detail
             this->base_type::operator=(std::move(static_cast<base_type &&>(t)));
             return *this;
         }
+
+#if defined(HPX_INTEL14_WORKAROUND)
+        // The Intel Compiler sometimes erroneously instantiates this ctor. In order
+        // to avoid compile errors, we provide the definition here
+        unique_function(unique_function const & other) BOOST_NOEXCEPT
+        {
+            HPX_ASSERT(false);
+        }
+#endif
     };
 }}}
 
