@@ -119,22 +119,12 @@ namespace hpx { namespace parallel
     {
         template <typename T>
         struct is_parallel_execution_policy
+          : boost::mpl::true_
+        {};
+
+        template <>
+        struct is_parallel_execution_policy<sequential_execution_policy>
           : boost::mpl::false_
-        {};
-
-        template <>
-        struct is_parallel_execution_policy<parallel_execution_policy>
-          : boost::mpl::true_
-        {};
-
-        template <>
-        struct is_parallel_execution_policy<vector_execution_policy>
-          : boost::mpl::true_
-        {};
-
-        template <>
-        struct is_parallel_execution_policy<task_execution_policy>
-          : boost::mpl::true_
         {};
 
     }
@@ -156,21 +146,6 @@ namespace hpx { namespace parallel
         template <>
         struct is_sequential_execution_policy<sequential_execution_policy>
             : boost::mpl::true_
-        {};
-
-        template <>
-        struct is_sequential_execution_policy<parallel_execution_policy>
-            : boost::mpl::false_
-        {};
-
-        template <>
-        struct is_sequential_execution_policy<vector_execution_policy>
-            : boost::mpl::false_
-        {};
-
-        template<>
-        struct is_sequential_execution_policy<task_execution_policy>
-            : boost::mpl::false_
         {};
     }
 

@@ -67,7 +67,7 @@ namespace hpx { namespace parallel
             typename F>
         typename detail::algorithm_result<ExPolicy, OutIter>::type
         transform(ExPolicy const& policy, InIter first, InIter last,
-            OutIter dest, F && f, boost::mpl::false_)
+            OutIter dest, F && f, boost::mpl::false_ fls)
         {
             typedef boost::tuple<InIter, OutIter> iterator_tuple;
             typedef detail::zip_iterator<iterator_tuple> zip_iterator;
@@ -83,12 +83,12 @@ namespace hpx { namespace parallel
                     [f](reference it) {
                         *boost::get<1>(it) = f(*boost::get<0>(it));
                     },
-                    boost::mpl::false_()));
+                    fls));
         }
 
         template <typename InIter, typename OutIter, typename F>
         OutIter transform(execution_policy const& policy,
-            InIter first, InIter last, OutIter dest, F && f, boost::mpl::false_)
+            InIter first, InIter last, OutIter dest, F && f, boost::mpl::false_ fls)
         {
             switch (detail::which(policy))
             {
@@ -100,17 +100,17 @@ namespace hpx { namespace parallel
             case detail::execution_policy_enum::parallel:
                 return detail::transform(
                     *policy.get<parallel_execution_policy>(),
-                    first, last, dest, std::forward<F>(f), boost::mpl::false_());
+                    first, last, dest, std::forward<F>(f), fls);
 
             case detail::execution_policy_enum::vector:
                 return detail::transform(
                     *policy.get<vector_execution_policy>(),
-                    first, last, dest, std::forward<F>(f), boost::mpl::false_());
+                    first, last, dest, std::forward<F>(f), fls);
 
             case detail::execution_policy_enum::task:
                 // the dynamic case will never return a future
                 return detail::transform(par,
-                    first, last, dest, std::forward<F>(f), boost::mpl::false_());
+                    first, last, dest, std::forward<F>(f), fls);
 
             default:
                 HPX_THROW_EXCEPTION(hpx::bad_parameter,
@@ -122,10 +122,10 @@ namespace hpx { namespace parallel
 
         template <typename InIter, typename OutIter, typename F>
         OutIter transform(execution_policy const& policy,
-            InIter first, InIter last, OutIter dest, F && f, boost::mpl::true_)
+            InIter first, InIter last, OutIter dest, F && f, boost::mpl::true_ t)
         {
             return detail::transform(sequential_execution_policy(),
-                first, last, dest, std::forward<F>(f), boost::mpl::true_());
+                first, last, dest, std::forward<F>(f), t);
         }
     }
 
@@ -183,7 +183,7 @@ namespace hpx { namespace parallel
             typename OutIter, typename F>
         typename detail::algorithm_result<ExPolicy, OutIter>::type
         transform_binary(ExPolicy const& policy, InIter1 first1, InIter1 last1,
-            InIter2 first2, OutIter dest, F && f, boost::mpl::false_)
+            InIter2 first2, OutIter dest, F && f, boost::mpl::false_ fls)
         {
             typedef boost::tuple<InIter1, InIter2, OutIter> iterator_tuple;
             typedef detail::zip_iterator<iterator_tuple> zip_iterator;
@@ -200,14 +200,14 @@ namespace hpx { namespace parallel
                         *boost::get<2>(it) =
                             f(*boost::get<0>(it), *boost::get<1>(it));
                     },
-                    boost::mpl::false_()));
+                    fls));
         }
 
         template <typename InIter1, typename InIter2, typename OutIter,
             typename F>
         OutIter transform_binary(execution_policy const& policy,
             InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest,
-            F && f, boost::mpl::false_)
+            F && f, boost::mpl::false_ fls)
         {
             switch (detail::which(policy))
             {
@@ -221,19 +221,19 @@ namespace hpx { namespace parallel
                 return detail::transform_binary(
                     *policy.get<parallel_execution_policy>(),
                     first1, last1, first2, dest, std::forward<F>(f),
-                    boost::mpl::false_());
+                    fls);
 
             case detail::execution_policy_enum::vector:
                 return detail::transform_binary(
                     *policy.get<vector_execution_policy>(),
                     first1, last1, first2, dest, std::forward<F>(f),
-                    boost::mpl::false_());
+                    fls);
 
             case detail::execution_policy_enum::task:
                 // the dynamic case will never return a future
                 return detail::transform_binary(par,
                     first1, last1, first2, dest, std::forward<F>(f),
-                    boost::mpl::false_());
+                    fls);
 
             default:
                 HPX_THROW_EXCEPTION(hpx::bad_parameter,
@@ -247,11 +247,11 @@ namespace hpx { namespace parallel
             typename F>
         OutIter transform_binary(execution_policy const& policy,
             InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest,
-            F && f, boost::mpl::true_)
+            F && f, boost::mpl::true_ t)
         {
             return detail::transform_binary(sequential_execution_policy(),
                 first1, last1, first2, dest, std::forward<F>(f), 
-                boost::mpl::true_());
+                t);
         }
     }
 

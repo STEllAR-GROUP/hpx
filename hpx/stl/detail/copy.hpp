@@ -47,7 +47,7 @@ namespace hpx { namespace parallel
         template <typename ExPolicy, typename InIter, typename OutIter>
         typename detail::algorithm_result<ExPolicy, OutIter>::type
         copy(ExPolicy const& policy, InIter first, InIter last, OutIter dest, 
-            boost::mpl::false_)
+            boost::mpl::false_ fls)
         {
             typedef boost::tuple<InIter, OutIter> iterator_tuple;
             typedef detail::zip_iterator<iterator_tuple> zip_iterator;
@@ -63,12 +63,12 @@ namespace hpx { namespace parallel
                     [](reference it) {
                         *boost::get<1>(it) = *boost::get<0>(it);
                     },
-                    boost::mpl::false_()));
+                    fls));
         }
 
         template <typename InIter, typename OutIter>
         OutIter copy(execution_policy const& policy,
-            InIter first, InIter last, OutIter dest, boost::mpl::false_)
+            InIter first, InIter last, OutIter dest, boost::mpl::false_ fls)
         {
             switch (detail::which(policy))
             {
@@ -80,16 +80,16 @@ namespace hpx { namespace parallel
             case detail::execution_policy_enum::parallel:
                 return detail::copy(
                     *policy.get<parallel_execution_policy>(),
-                    first, last, dest, boost::mpl::false_());
+                    first, last, dest, fls);
 
             case detail::execution_policy_enum::vector:
                 return detail::copy(
                     *policy.get<vector_execution_policy>(),
-                    first, last, dest, boost::mpl::false_());
+                    first, last, dest, fls);
 
             case detail::execution_policy_enum::task:
                 return detail::copy(par,
-                    first, last, dest, boost::mpl::false_());
+                    first, last, dest, fls);
 
             default:
                 HPX_THROW_EXCEPTION(hpx::bad_parameter,
@@ -101,10 +101,10 @@ namespace hpx { namespace parallel
 
         template <typename InIter, typename OutIter>
         OutIter copy(execution_policy const& policy,
-            InIter first, InIter last, OutIter dest, boost::mpl::true_)
+            InIter first, InIter last, OutIter dest, boost::mpl::true_ t)
         {
             return detail::copy(sequential_execution_policy(),
-                first, last, dest, boost::mpl::true_());
+                first, last, dest, t);
         }
     }
 
@@ -116,7 +116,8 @@ namespace hpx { namespace parallel
     copy(ExPolicy && policy, InIter first, InIter last, OutIter dest)
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
-            iterator_category;
+            input_iterator_category;
+
 
         BOOST_STATIC_ASSERT_MSG(
             boost::is_base_of<std::input_iterator_tag,
@@ -125,7 +126,7 @@ namespace hpx { namespace parallel
 
         typedef boost::mpl::or_<
             is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>
+            boost::is_same<std::input_iterator_tag, input_iterator_category>
         >::type is_seq;
 
         return detail::copy( std::forward<ExPolicy>(policy),
@@ -158,7 +159,7 @@ namespace hpx { namespace parallel
         template <typename ExPolicy, typename InIter, typename OutIter>
         typename detail::algorithm_result<ExPolicy, OutIter>::type
         copy_n(ExPolicy const& policy, InIter first, std::size_t count, OutIter dest,
-            boost::mpl::false_)
+            boost::mpl::false_ fls)
         {
             typedef boost::tuple<InIter,OutIter> iterator_tuple;
             typedef detail::zip_iterator<iterator_tuple> zip_iterator;
@@ -174,12 +175,12 @@ namespace hpx { namespace parallel
                     [](reference it) {
                         *boost::get<1>(it) = *boost::get<0>(it);
                 }, 
-                boost::mpl::false_()));
+                fls));
         }
 
         template <typename InIter, typename OutIter>
         OutIter copy_n(execution_policy const& policy,
-            InIter first, std::size_t count, OutIter dest, boost::mpl::false_)
+            InIter first, std::size_t count, OutIter dest, boost::mpl::false_ fls)
         {
             switch (detail::which(policy))
             {
@@ -191,16 +192,16 @@ namespace hpx { namespace parallel
             case detail::execution_policy_enum::parallel:
                 return detail::copy_n(
                     *policy.get<parallel_execution_policy>(),
-                    first, count, dest, boost::mpl::false_());
+                    first, count, dest, fls);
 
             case detail::execution_policy_enum::vector:
                 return detail::copy_n(
                     *policy.get<parallel_execution_policy>(),
-                    first, count, dest, boost::mpl::false_());
+                    first, count, dest, fls);
 
             case detail::execution_policy_enum::task:
                 return detail::copy_n(par,
-                    first, count, dest, boost::mpl::false_());
+                    first, count, dest, fls);
 
             default:
                 HPX_THROW_EXCEPTION(hpx::bad_parameter,
@@ -212,10 +213,10 @@ namespace hpx { namespace parallel
 
         template <typename InIter, typename OutIter>
         OutIter copy_n(execution_policy const& policy,
-            InIter first, std::size_t count, OutIter dest, boost::mpl::true_)
+            InIter first, std::size_t count, OutIter dest, boost::mpl::true_ t)
         {
             return detail::copy_n(sequential_execution_policy(),
-                first, count, dest, boost::mpl::true_());
+                first, count, dest, t);
         }
     }
 
@@ -227,7 +228,7 @@ namespace hpx { namespace parallel
     copy_n(ExPolicy && policy, InIter first, std::size_t count, OutIter dest)
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
-            iterator_category;
+            input_iterator_category;
 
         BOOST_STATIC_ASSERT_MSG(
             boost::is_base_of<std::input_iterator_tag,
@@ -236,7 +237,7 @@ namespace hpx { namespace parallel
 
         typedef boost::mpl::or_<
             is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>
+            boost::is_same<std::input_iterator_tag, input_iterator_category>
         >::type is_seq;
 
         return detail::copy_n(std::forward<ExPolicy>(policy), 
@@ -271,7 +272,7 @@ namespace hpx { namespace parallel
             typename F>
         typename detail::algorithm_result<ExPolicy, OutIter>::type
         copy_if(ExPolicy const& policy, InIter first, InIter last, OutIter dest,
-            F && f, boost::mpl::false_)
+            F && f, boost::mpl::false_ fls)
         {
             typedef boost::tuple<InIter, OutIter> iterator_tuple;
             typedef detail::zip_iterator<iterator_tuple> zip_iterator;
@@ -288,12 +289,12 @@ namespace hpx { namespace parallel
                     if(f(*boost::get<0>(it)))
                         *boost::get<1>(it)=*boost::get<0>(it);
                 },
-                boost::mpl::false_()));
+                fls));
         }
 
         template <typename InIter, typename OutIter, typename F>
         OutIter copy_if(execution_policy const& policy,
-            InIter first, InIter last, OutIter dest, F && f, boost::mpl::false_)
+            InIter first, InIter last, OutIter dest, F && f, boost::mpl::false_ fls)
         {
             switch(detail::which(policy))
             {
@@ -305,16 +306,16 @@ namespace hpx { namespace parallel
             case detail::execution_policy_enum::parallel:
                 return detail::copy_if(
                     *policy.get<parallel_execution_policy>(),
-                    first, last, dest, std::forward<F>(f), boost::mpl::false_());
+                    first, last, dest, std::forward<F>(f), fls);
 
             case detail::execution_policy_enum::vector:
                 return detail::copy_if(
                     *policy.get<vector_execution_policy>(),
-                    first, last, dest, std::forward<F>(f), boost::mpl::false_());
+                    first, last, dest, std::forward<F>(f), fls);
 
             case detail::execution_policy_enum::task:
                 return detail::copy_if(par,
-                    first, last, dest, std::forward<F>(f), boost::mpl::false_());
+                    first, last, dest, std::forward<F>(f), fls);
 
             default:
                 HPX_THROW_EXCEPTION(hpx::bad_parameter,
@@ -327,10 +328,10 @@ namespace hpx { namespace parallel
         
         template <typename InIter, typename OutIter, typename F>
         OutIter copy_if(execution_policy const& policy,
-            InIter first, InIter last, OutIter dest, F && f, boost::mpl::true_)
+            InIter first, InIter last, OutIter dest, F && f, boost::mpl::true_ t)
         {
             return detail::copy_if(sequential_execution_policy(),
-                first, last, dest, std::forward<F>(f), boost::mpl::true_());
+                first, last, dest, std::forward<F>(f), t);
         }
     }
 
@@ -342,7 +343,7 @@ namespace hpx { namespace parallel
     copy_if(ExPolicy&& policy, InIter first, InIter last, OutIter dest, F && f)
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
-            iterator_category;
+            input_iterator_category;
 
         BOOST_STATIC_ASSERT_MSG(
             boost::is_base_of<std::input_iterator_tag,
@@ -351,7 +352,7 @@ namespace hpx { namespace parallel
 
         typedef boost::mpl::or_<
             is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>
+            boost::is_same<std::input_iterator_tag, input_iterator_category>
         >::type is_seq;
 
         return detail::copy_if( std::forward<ExPolicy>(policy),

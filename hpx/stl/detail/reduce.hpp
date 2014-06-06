@@ -79,7 +79,7 @@ namespace hpx { namespace parallel
 
         template <typename InIter, typename T, typename Pred>
         T reduce(execution_policy const& policy, InIter first, InIter last,
-            T && init, Pred && op, boost::mpl::false_)
+            T && init, Pred && op, boost::mpl::false_ fls)
         {
             switch (detail::which(policy))
             {
@@ -93,19 +93,19 @@ namespace hpx { namespace parallel
                 return detail::reduce(
                     *policy.get<parallel_execution_policy>(),
                     first, last, std::forward<T>(init), std::forward<Pred>(op),
-                    boost::mpl::false_());
+                    fls);
 
             case detail::execution_policy_enum::vector:
                 return detail::reduce(
                     *policy.get<vector_execution_policy>(),
                     first, last, std::forward<T>(init), std::forward<Pred>(op),
-                    boost::mpl::false_());
+                    fls);
 
             case detail::execution_policy_enum::task:
                 // the dynamic case will never return a future
                 return detail::reduce(par,
                     first, last, std::forward<T>(init), std::forward<Pred>(op),
-                    boost::mpl::false_());
+                    fls);
 
             default:
                 HPX_THROW_EXCEPTION(hpx::bad_parameter,
@@ -117,10 +117,10 @@ namespace hpx { namespace parallel
 
         template<typename InIter, typename T, typename Pred>
         T reduce(execution_policy const& policy, InIter first, InIter last,
-            T init, Pred && op, boost::mpl::true_)
+            T init, Pred && op, boost::mpl::true_ t)
         {
             return detail::reduce(sequential_execution_policy(),
-                first, last, std::forward<T>(init), std::forward<Pred>(op), boost::mpl::true_());
+                first, last, std::forward<T>(init), std::forward<Pred>(op), t);
         }
     }
 
