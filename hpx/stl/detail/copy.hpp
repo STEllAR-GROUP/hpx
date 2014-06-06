@@ -209,14 +209,14 @@ namespace hpx { namespace parallel
                 break;
             }
         }
-    }
 
-    template <typename InIter, typename OutIter>
-    OutIter copy_n(execution_policy const& policy,
-        InIter first, std::size_t count, OutIter dest, boost::mpl::true_)
-    {
-        return detail::copy(sequential_execution_policy(),
-            first, count, dest, boost::mpl::true_());
+        template <typename InIter, typename OutIter>
+        OutIter copy_n(execution_policy const& policy,
+            InIter first, std::size_t count, OutIter dest, boost::mpl::true_)
+        {
+            return detail::copy_n(sequential_execution_policy(),
+                first, count, dest, boost::mpl::true_());
+        }
     }
 
     template <typename ExPolicy, typename InIter, typename OutIter>
@@ -323,14 +323,15 @@ namespace hpx { namespace parallel
                 break;
             }
         }
-    }
 
-    template <typename InIter, typename OutIter, typename F>
-    OutIter copy_if(execution_policy const& policy,
-        InIter first, InIter last, OutIter dest, F && f, boost::mpl::true_)
-    {
-        return detail::copy_if(sequential_execution_policy(),
-            first, last, dest, std::forward<F>(f), boost::mpl::true_());
+        
+        template <typename InIter, typename OutIter, typename F>
+        OutIter copy_if(execution_policy const& policy,
+            InIter first, InIter last, OutIter dest, F && f, boost::mpl::true_)
+        {
+            return detail::copy_if(sequential_execution_policy(),
+                first, last, dest, std::forward<F>(f), boost::mpl::true_());
+        }
     }
 
     template <typename ExPolicy, typename InIter, typename OutIter, typename F>

@@ -90,6 +90,7 @@ void transform_test()
     test_transform<std::random_access_iterator_tag>();
     test_transform<std::forward_iterator_tag>();
     test_transform<std::input_iterator_tag>();
+    std::cout << std::endl << std::endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
