@@ -8,8 +8,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/date_time_chrono.hpp>
+#include <hpx/util/unique_function.hpp>
 #include <hpx/util/safe_bool.hpp>
-#include <hpx/util/detail/unique_function.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>

@@ -19,7 +19,7 @@
 
 namespace hpx { namespace util { namespace detail
 {
-    /////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Function>
     struct get_function_name_impl
     {
@@ -28,10 +28,11 @@ namespace hpx { namespace util { namespace detail
         ;
 #else
         {
-            // If you encounter this assert while compiling code, that means that
-            // you have a HPX_UTIL_REGISTER_FUNCTION macro somewhere in a
-            // source file, but the header in which the continuation is defined
-            // misses a HPX_UTIL_REGISTER_FUNCTION_DECLARATION
+            // If you encounter this assert while compiling code, that means 
+            // that you have a HPX_UTIL_REGISTER_[UNIQUE_]FUNCTION macro 
+            // somewhere in a source file, but the header in which the 
+            // continuation is defined misses a 
+            // HPX_UTIL_REGISTER_[UNIQUE_]FUNCTION_DECLARATION
             BOOST_MPL_ASSERT_MSG(
                 traits::needs_automatic_registration<Function>::value
               , HPX_UTIL_REGISTER_FUNCTION_DECLARATION_MISSING
@@ -42,14 +43,14 @@ namespace hpx { namespace util { namespace detail
 #endif
     };
 
-    /////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Function>
     char const* get_function_name()
     {
         return get_function_name_impl<Function>::call();
     }
 
-    /////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     struct function_registration_info_base
     {
         virtual void const* get_table_ptr() const = 0;

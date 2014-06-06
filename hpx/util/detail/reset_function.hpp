@@ -7,7 +7,7 @@
 #define HPX_UTIL_DETAIL_RESET_FUNCTION_OCT_22_2013_0854AM
 
 #include <hpx/util/detail/function_template.hpp>
-#include <hpx/util/detail/unique_function.hpp>
+#include <hpx/util/detail/unique_function_template.hpp>
 
 namespace hpx { namespace util { namespace detail
 {
