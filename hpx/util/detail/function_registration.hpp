@@ -30,9 +30,8 @@ namespace hpx { namespace util { namespace detail
         {
             // If you encounter this assert while compiling code, that means 
             // that you have a HPX_UTIL_REGISTER_[UNIQUE_]FUNCTION macro 
-            // somewhere in a source file, but the header in which the 
-            // continuation is defined misses a 
-            // HPX_UTIL_REGISTER_[UNIQUE_]FUNCTION_DECLARATION
+            // somewhere in a source file, but the header in which the function
+            // is defined misses a HPX_UTIL_REGISTER_[UNIQUE_]FUNCTION_DECLARATION
             BOOST_MPL_ASSERT_MSG(
                 traits::needs_automatic_registration<Function>::value
               , HPX_UTIL_REGISTER_FUNCTION_DECLARATION_MISSING
@@ -81,7 +80,7 @@ namespace hpx { namespace util { namespace detail
         {
             util::polymorphic_factory<function_registration_info_base>::get_instance().
                 add_factory_function(
-                    detail::get_function_name<function_registration>()
+                    detail::get_function_name<std::pair<VTable, T> >()
                   , &function_registration::create
                 );
         }

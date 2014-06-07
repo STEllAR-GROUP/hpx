@@ -76,7 +76,7 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         unique_function_vtable_ptr(boost::mpl::identity<T>) BOOST_NOEXCEPT
           : unique_function_vtable_ptr<Sig, void, void>(boost::mpl::identity<T>())
-          , name(get_function_name<T>())
+          , name(get_function_name<std::pair<unique_function_vtable_ptr, T> >())
           , save_object(&serializable_vtable<IAr, OAr>::template save_object<T>)
           , load_object(&serializable_vtable<IAr, OAr>::template load_object<T>)
         {
