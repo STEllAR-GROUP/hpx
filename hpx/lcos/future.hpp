@@ -224,6 +224,9 @@ namespace hpx { namespace lcos { namespace detail
     {
         typedef typename traits::future_traits<Future>::type value_type;
 
+        if (f.valid())
+            f.wait();
+
         int state = future_state::invalid;
         if (f.has_value())
         {
@@ -245,6 +248,9 @@ namespace hpx { namespace lcos { namespace detail
         boost::is_void<typename traits::future_traits<Future>::type>
     >::type serialize_future_save(Archive& ar, Future const& f)
     {
+        if (f.valid())
+            f.wait();
+
         int state = future_state::invalid;
         if (f.has_value())
         {
