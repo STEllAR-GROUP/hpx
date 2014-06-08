@@ -145,7 +145,8 @@ namespace hpx { namespace parallel
     {
         template <typename ExPolicy, typename InIter, typename F>
         typename detail::algorithm_result<ExPolicy, void>::type
-        for_each_seq(ExPolicy const&, InIter first, InIter last, F && f)
+        for_each(ExPolicy const&, InIter first, InIter last, F && f,
+            boost::mpl::true_)
         {
             try {
                 std::for_each(first, last, std::forward<F>(f));
@@ -161,10 +162,10 @@ namespace hpx { namespace parallel
             }
         }
 
-        template <typename ExPolicy, typename InIter, typename F, typename IterTag>
+        template <typename ExPolicy, typename InIter, typename F>
         typename detail::algorithm_result<ExPolicy, void>::type
         for_each(ExPolicy const& policy, InIter first, InIter last, F && f,
-            IterTag category)
+            boost::mpl::false_ fls)
         {
             typedef
                 typename detail::algorithm_result<ExPolicy, void>::type
@@ -175,54 +176,34 @@ namespace hpx { namespace parallel
                     std::forward<F>(f), boost::mpl::false_());
         }
 
-        template <typename ExPolicy, typename InIter, typename F>
-        typename boost::enable_if<
-            is_parallel_execution_policy<ExPolicy>,
-            typename detail::algorithm_result<ExPolicy, void>::type
-        >::type
-        for_each(ExPolicy const& policy, InIter first, InIter last, F && f,
-            std::input_iterator_tag)
-        {
-            return detail::for_each_seq(policy, first, last,
-                std::forward<F>(f));
-        }
-
-        template <typename InIter, typename F, typename IterTag>
-        void for_each(sequential_execution_policy const& policy,
-            InIter first, InIter last, F && f, IterTag)
-        {
-            detail::for_each_seq(policy, first, last,
-                std::forward<F>(f));
-        }
-
         template <typename InIter, typename F, typename IterTag>
         void for_each(execution_policy const& policy,
-            InIter first, InIter last, F && f, IterTag category)
+            InIter first, InIter last, F && f, boost::mpl::false_ fls)
         {
             switch (detail::which(policy))
             {
             case detail::execution_policy_enum::sequential:
-                detail::for_each_seq(
+                detail::for_each(
                     *policy.get<sequential_execution_policy>(),
-                    first, last, std::forward<F>(f));
+                    first, last, std::forward<F>(f), boost::mpl::true_());
                 break;
 
             case detail::execution_policy_enum::parallel:
                 detail::for_each(
                     *policy.get<parallel_execution_policy>(),
-                    first, last, std::forward<F>(f), category);
+                    first, last, std::forward<F>(f), fls);
                 break;
 
             case detail::execution_policy_enum::vector:
                 detail::for_each(
                     *policy.get<vector_execution_policy>(),
-                    first, last, std::forward<F>(f), category);
+                    first, last, std::forward<F>(f), fls);
                 break;
 
             case detail::execution_policy_enum::task:
                 // the dynamic case will never return a future
                 detail::for_each(par, first, last, std::forward<F>(f),
-                    category);
+                    fls);
                 break;
 
             default:
@@ -248,9 +229,14 @@ namespace hpx { namespace parallel
             boost::is_base_of<std::input_iterator_tag, iterator_category>::value,
             "Requires at least input iterator.");
 
+        typedef boost::mpl::or_<
+            is_sequential_execution_policy<ExPolicy>,
+            boost::is_same<std::input_iterator_tag, iterator_category>
+        >::type is_seq;
+
         return detail::for_each(
             std::forward<ExPolicy>(policy),
-            first, last, std::forward<F>(f), iterator_category());
+            first, last, std::forward<F>(f), is_seq());
     }
 }}
 
