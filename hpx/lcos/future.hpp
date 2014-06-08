@@ -144,7 +144,7 @@ namespace hpx { namespace lcos { namespace detail
     {
         return traits::future_access<Future>::get_shared_state(f);
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////
     enum future_state
     {
@@ -224,8 +224,6 @@ namespace hpx { namespace lcos { namespace detail
     {
         typedef typename traits::future_traits<Future>::type value_type;
 
-        HPX_ASSERT(!f.valid() || f.is_ready());
-
         int state = future_state::invalid;
         if (f.has_value())
         {
@@ -247,8 +245,6 @@ namespace hpx { namespace lcos { namespace detail
         boost::is_void<typename traits::future_traits<Future>::type>
     >::type serialize_future_save(Archive& ar, Future const& f)
     {
-        HPX_ASSERT(!f.valid() || f.is_ready());
-
         int state = future_state::invalid;
         if (f.has_value())
         {
@@ -262,7 +258,7 @@ namespace hpx { namespace lcos { namespace detail
             ar << state;
         }
     }
-    
+
     template <typename Archive, typename Future>
     typename boost::disable_if<
         typename Archive::is_saving
@@ -270,7 +266,7 @@ namespace hpx { namespace lcos { namespace detail
     {
         serialize_future_load(ar, f);
     }
-    
+
     template <typename Archive, typename Future>
     typename boost::enable_if<
         typename Archive::is_saving
