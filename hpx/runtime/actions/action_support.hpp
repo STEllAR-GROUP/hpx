@@ -213,74 +213,6 @@ namespace hpx { namespace actions
                 return *this;
             }
         };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Future>
-        struct serializable_ready_future_wrapper
-        {
-            typedef typename util::decay<Future>::type future_type;
-
-            explicit serializable_ready_future_wrapper(Future& future)
-              : future_(future)
-            {}
-
-            // serialization support
-            template <typename Archive>
-            void load(Archive& ar, unsigned)
-            {
-                using traits::future_access;
-                future_access<future_type>::load(ar, future_);
-            }
-
-            template <typename Archive>
-            void save(Archive& ar, unsigned) const
-            {
-                using traits::future_access;
-                future_access<future_type>::save(ar, future_);
-            }
-
-            BOOST_SERIALIZATION_SPLIT_MEMBER();
-
-            Future& future_;
-        };
-
-        struct serializable_arguments
-        {
-            template <typename, typename Enable = void>
-            struct result;
-
-            template <typename This, typename T>
-            struct result<This(T&), typename boost::disable_if<
-                traits::is_future<typename util::decay<T>::type> >::type>
-            {
-                typedef T& type;
-            };
-
-            template <typename This, typename T>
-            struct result<This(T&), typename boost::enable_if<
-                traits::is_future<typename util::decay<T>::type> >::type>
-            {
-                typedef serializable_ready_future_wrapper<T> type;
-            };
-
-            template <typename T>
-            BOOST_FORCEINLINE typename boost::lazy_disable_if<
-                traits::is_future<typename util::decay<T>::type>,
-                result<serializable_arguments(T&)>
-            >::type operator()(T& v) const
-            {
-                return v;
-            }
-
-            template <typename T>
-            BOOST_FORCEINLINE typename boost::lazy_enable_if<
-                traits::is_future<typename util::decay<T>::type>,
-                result<serializable_arguments(T&)>
-            >::type operator()(T& v) const
-            {
-                return serializable_ready_future_wrapper<T>(v);
-            }
-        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -801,10 +733,7 @@ namespace hpx { namespace actions
         // serialization support
         void load(hpx::util::portable_binary_iarchive & ar)
         {
-            boost::fusion::transform_view<
-                arguments_type, detail::serializable_arguments
-            > serializable_arguments(arguments_, detail::serializable_arguments());
-            util::serialize_sequence(ar, serializable_arguments);
+            util::serialize_sequence(ar, arguments_);
 
             // Always serialize the parent information to maintain binary
             // compatibility on the wire.
@@ -838,10 +767,7 @@ namespace hpx { namespace actions
 
         void save(hpx::util::portable_binary_oarchive & ar) const
         {
-            boost::fusion::transform_view<
-                arguments_type const, detail::serializable_arguments
-            > serializable_arguments(arguments_, detail::serializable_arguments());
-            util::serialize_sequence(ar, serializable_arguments);
+            util::serialize_sequence(ar, arguments_);
 
             // Always serialize the parent information to maintain binary
             // compatibility on the wire.

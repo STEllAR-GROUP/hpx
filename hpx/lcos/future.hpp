@@ -60,28 +60,6 @@ namespace hpx { namespace lcos { namespace detail
     struct shared_state_ptr_for<Future &&>
       : shared_state_ptr_for<Future>
     {};
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Archive, typename Future>
-    typename boost::disable_if<
-        boost::is_void<typename traits::future_traits<Future>::type>
-    >::type serialize_future_load(Archive& ar, Future& f);
-
-    template <typename Archive, typename Future>
-    typename boost::enable_if<
-        boost::is_void<typename traits::future_traits<Future>::type>
-    >::type serialize_future_load(Archive& ar, Future& f);
-
-    template <typename Archive, typename Future>
-    typename boost::disable_if<
-        boost::is_void<typename traits::future_traits<Future>::type>
-    >::type serialize_future_save(Archive& ar, Future const& f);
-
-    template <typename Archive, typename Future>
-    typename boost::enable_if<
-        boost::is_void<typename traits::future_traits<Future>::type>
-    >::type serialize_future_save(Archive& ar, Future const& f);
-
 }}}
 
 namespace hpx { namespace traits
@@ -120,18 +98,6 @@ namespace hpx { namespace traits
         {
             return f.shared_state_;
         }
-
-        template <typename Archive>
-        static void load(Archive& ar, future<R>& f)
-        {
-            lcos::detail::serialize_future_load(ar, f);
-        }
-
-        template <typename Archive>
-        static void save(Archive& ar, future<R> const& f)
-        {
-            lcos::detail::serialize_future_save(ar, f);
-        }
     };
 
     template <typename R>
@@ -164,18 +130,6 @@ namespace hpx { namespace traits
         {
             return f.shared_state_;
         }
-
-        template <typename Archive>
-        static void load(Archive& ar, shared_future<R>& f)
-        {
-            lcos::detail::serialize_future_load(ar, f);
-        }
-
-        template <typename Archive>
-        static void save(Archive& ar, shared_future<R> const& f)
-        {
-            lcos::detail::serialize_future_save(ar, f);
-        }
     };
 }}
 
@@ -190,7 +144,7 @@ namespace hpx { namespace lcos { namespace detail
     {
         return traits::future_access<Future>::get_shared_state(f);
     }
-
+    
     ///////////////////////////////////////////////////////////////////////////
     enum future_state
     {
@@ -307,6 +261,22 @@ namespace hpx { namespace lcos { namespace detail
             state = future_state::invalid;
             ar << state;
         }
+    }
+    
+    template <typename Archive, typename Future>
+    typename boost::disable_if<
+        typename Archive::is_saving
+    >::type serialize_future(Archive& ar, Future& f, unsigned)
+    {
+        serialize_future_load(ar, f);
+    }
+    
+    template <typename Archive, typename Future>
+    typename boost::enable_if<
+        typename Archive::is_saving
+    >::type serialize_future(Archive& ar, Future& f, unsigned)
+    {
+        serialize_future_save(ar, f);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1813,6 +1783,23 @@ namespace hpx { namespace actions
 
         util::function<void(naming::id_type)> f_;
     };
+}}
+
+namespace boost { namespace serialization
+{
+    template <typename Archive, typename T>
+    BOOST_FORCEINLINE
+    void serialize(Archive& ar, ::hpx::lcos::future<T>& f, unsigned version)
+    {
+        hpx::lcos::detail::serialize_future(ar, f, version);
+    }
+
+    template <typename Archive, typename T>
+    BOOST_FORCEINLINE
+    void serialize(Archive& ar, ::hpx::lcos::shared_future<T>& f, unsigned version)
+    {
+        hpx::lcos::detail::serialize_future(ar, f, version);
+    }
 }}
 
 #include <hpx/lcos/local/packaged_continuation.hpp>
