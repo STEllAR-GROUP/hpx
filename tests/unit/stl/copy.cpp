@@ -22,8 +22,8 @@ void test_copy(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
-	base_iterator res = hpx::parallel::copy(policy,
-		iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d));
+    base_iterator res = hpx::parallel::copy(policy,
+        iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d));
 
     std::size_t count = 0;
     HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
