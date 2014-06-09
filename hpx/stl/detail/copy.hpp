@@ -117,6 +117,8 @@ namespace hpx { namespace parallel
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
             input_iterator_category;
+		typedef typename std::iterator_traits<OutIter>::iterator_category
+			output_iterator_category;
 
 
         BOOST_STATIC_ASSERT_MSG(
@@ -126,7 +128,8 @@ namespace hpx { namespace parallel
 
         typedef boost::mpl::or_<
             is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, input_iterator_category>
+            boost::is_same<std::input_iterator_tag, input_iterator_category>,
+			boost::is_same<std::output_iterator_tag, output_iterator_category>
         >::type is_seq;
 
         return detail::copy( std::forward<ExPolicy>(policy),
@@ -229,6 +232,8 @@ namespace hpx { namespace parallel
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
             input_iterator_category;
+		typedef typename std::iterator_traits<OutIter>::iterator_category
+			output_iterator_category;
 
         BOOST_STATIC_ASSERT_MSG(
             boost::is_base_of<std::input_iterator_tag,
@@ -237,7 +242,8 @@ namespace hpx { namespace parallel
 
         typedef boost::mpl::or_<
             is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, input_iterator_category>
+            boost::is_same<std::input_iterator_tag, input_iterator_category>,
+			boost::is_same<std::output_iterator_tag, output_iterator_category>
         >::type is_seq;
 
         return detail::copy_n(std::forward<ExPolicy>(policy), 
@@ -344,6 +350,8 @@ namespace hpx { namespace parallel
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
             input_iterator_category;
+		typedef typename std::iterator_traits<OutIter>::iterator_category
+			output_iterator_category;
 
         BOOST_STATIC_ASSERT_MSG(
             boost::is_base_of<std::input_iterator_tag,
@@ -352,7 +360,8 @@ namespace hpx { namespace parallel
 
         typedef boost::mpl::or_<
             is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, input_iterator_category>
+            boost::is_same<std::input_iterator_tag, input_iterator_category>,
+			boost::is_same<std::output_iterator_tag, output_iterator_category>
         >::type is_seq;
 
         return detail::copy_if( std::forward<ExPolicy>(policy),
