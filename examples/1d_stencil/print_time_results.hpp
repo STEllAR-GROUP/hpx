@@ -34,7 +34,7 @@ void print_time_results(
     std::string const np_str = boost::str(boost::format("%lu,") % np);
     std::string const nt_str = boost::str(boost::format("%lu ") % nt);
 
-    std::cout << ( boost::format("%-21s %10.12s, %-21s %-21s %-21s\n")
+    std::cout << ( boost::format("%-21s %.14g, %-21s %-21s %-21s\n")
             % threads_str % (elapsed / 1e9) %nx_str % np_str
             % nt_str) << hpx::flush;
 }
