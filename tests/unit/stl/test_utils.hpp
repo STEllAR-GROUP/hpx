@@ -29,6 +29,44 @@ namespace test
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename BaseIterator, typename IteratorTag>
+    struct test_bad_alloc_iterator
+      : boost::iterator_adaptor<
+            test_bad_alloc_iterator<BaseIterator, IteratorTag>,
+            BaseIterator, boost::use_default, IteratorTag>
+    {
+    private:
+        typedef boost::iterator_adaptor<
+            test_bad_alloc_iterator<BaseIterator, IteratorTag>,
+            BaseIterator, boost::use_default, IteratorTag>
+        base_type;
+
+    public:
+        int operator*() const {throw std::bad_alloc();}
+        test_bad_alloc_iterator() : base_type() {}
+        test_bad_alloc_iterator(BaseIterator base) : base_type(base) {};
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename BaseIterator, typename IteratorTag>
+    struct test_runtime_error_iterator
+      : boost::iterator_adaptor<
+            test_runtime_error_iterator<BaseIterator, IteratorTag>,
+            BaseIterator, boost::use_default, IteratorTag>
+    {
+    private:
+        typedef boost::iterator_adaptor<
+            test_runtime_error_iterator<BaseIterator, IteratorTag>,
+            BaseIterator, boost::use_default, IteratorTag>
+        base_type;
+
+    public:
+        int operator*() const {throw std::runtime_error("test");}
+        test_runtime_error_iterator() : base_type() {}
+        test_runtime_error_iterator(BaseIterator base) : base_type(base) {};
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename IteratorTag>
     struct test_num_exeptions
     {

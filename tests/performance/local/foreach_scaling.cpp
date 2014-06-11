@@ -22,6 +22,7 @@ enum {
     MICROSECONDS
 };
 
+//constants to convert seconds
 const int c_MICROSECONDS = 1000000;
 const int c_MILLISECONDS = 1000;
 
@@ -114,7 +115,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 {
     //pull values from cmd
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();
-    int mtime = vm["mTime"].as<int>();
+    int mtime = vm["mtime"].as<int>();
     delay = vm["work_delay"].as<int>();
     test_count = vm["test_count"].as<int>();
     
@@ -163,7 +164,7 @@ int main(int argc, char* argv[])
     
     cmdline.add_options()
         ( "vector_size"
-        , boost::program_options::value<std::size_t>()->default_value(100000)
+        , boost::program_options::value<std::size_t>()->default_value(1000)
         , "size of vector")
 
         ( "mTime"

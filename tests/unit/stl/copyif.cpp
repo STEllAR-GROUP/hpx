@@ -85,6 +85,7 @@ void test_copy_if(hpx::parallel::task_execution_policy, IteratorTag)
     HPX_TEST_EQ(count, d.size());
 }
 
+
 template <typename IteratorTag>
 void test_copy_if()
 {
@@ -123,7 +124,7 @@ void test_copy_if_exception(ExPolicy const& policy, IteratorTag)
 
     bool caught_exception = false;
     try {
-        base_iterator outiter = hpx::parallel::transform(policy,
+        base_iterator outiter = hpx::parallel::copy_if(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
             [](std::size_t v) {
                 throw std::runtime_error("test");
