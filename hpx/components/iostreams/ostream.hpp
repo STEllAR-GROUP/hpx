@@ -64,6 +64,9 @@ namespace hpx { namespace iostreams
         ///////////////////////////////////////////////////////////////////////
         template <typename Tag>
         hpx::future<naming::id_type> create_ostream(Tag tag);
+
+        void register_ostreams();
+        void unregister_ostreams();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -138,12 +141,9 @@ namespace hpx { namespace iostreams
             return *this;
         } // }}}
 
-    public:
-        ostream()
-          : base_type()
-          , buffer()
-          , stream_base_type(*static_cast<buffer*>(this))
-        {}
+        ///////////////////////////////////////////////////////////////////////
+        friend void detail::register_ostreams();
+        friend void detail::unregister_ostreams();
 
         // late initialization during runtime system startup
         template <typename Tag>
@@ -163,6 +163,13 @@ namespace hpx { namespace iostreams
             }
             this->base_type::free();
         }
+
+    public:
+        ostream()
+          : base_type()
+          , buffer()
+          , stream_base_type(*static_cast<buffer*>(this))
+        {}
 
         // hpx::flush manipulator (alias for hpx::sync_flush)
         ostream& operator<<(hpx::iostreams::flush_type const& m)
