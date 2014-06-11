@@ -18,6 +18,7 @@
 #include <hpx/include/client.hpp>
 #include <hpx/components/iostreams/manipulators.hpp>
 #include <hpx/components/iostreams/stubs/output_stream.hpp>
+#include <hpx/util/move.hpp>
 
 namespace hpx { namespace iostreams
 {
@@ -80,6 +81,8 @@ namespace hpx { namespace iostreams
         typedef detail::ostream_creator<char>::stream_type stream_base_type;
         typedef detail::ostream_creator<char>::iterator_type iterator_type;
         typedef lcos::local::mutex mutex_type;
+
+        HPX_MOVABLE_BUT_NOT_COPYABLE(ostream);
 
     private:
         mutex_type mtx;
