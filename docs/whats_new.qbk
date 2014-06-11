@@ -24,9 +24,13 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1150] - Client Serialization error
+* [issue 1149] - Segfault on Stampede
+* [issue 1148] - Refactoring mini-ghost
+* [issue 1147] - N3960 copy_if and copy_n implemented and tested
 * [issue 1146] - Stencil print
 * [issue 1145] - N3960 hpx::parallel::copy implemented and tested
-* [issue 1145] - OpenMP examples 1d_stencil do not build
+* [issue 1144] - OpenMP examples 1d_stencil do not build
 * [issue 1143] - 1d_stencil OpenMP examples do not build
 * [issue 1142] - Cannot build HPX with gcc 4.6 on OS X
 * [issue 1140] - Fix OpenMP lookup, enable usage of config tests in external
@@ -54,6 +58,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1117] - local_queue_executor linker error on vc110
 * [issue 1116] - Disabled performance counter should give runtime errors, not
                  invalid data
+* [issue 1115] - Compile error with Intel C++ 13.1
 * [issue 1114] - Default constructed executor is not usable
 * [issue 1113] - Fast compilation of logging causes ABI incompatibilities
                  between different `NDEBUG` values
@@ -92,8 +97,18 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1081] - Implement thread_specific_ptr for hpx::threads
 * [issue 1070] - Complete quoting for parameters of some CMake commands
 * [issue 1059] - Fix more unused variable warnings
+* [issue 973]  - Would like option to report hwloc bindings
+* [issue 941]  - Create a proper user level context switching class for BG/Q
+* [issue 935]  - Build error with gcc 4.6 and Boost 1.54.0 on hpx trunk and 0.9.6
 * [issue 879]  - Hung test leads to cascading test failure; make tests should
                  support the MPI parcelport
+* [issue 865]  - future<T> and friends shall work for movable only Ts
+* [issue 525]  - Extend barrier LCO test to run in distributed
+* [issue 509]  - Push Boost.Atomic changes upstream
+* [issue 456]  - hpx_run_tests.py should log output from tests that timeout
+* [issue 454]  - Investigate threadmanager performance
+* [issue 183]  - Use Boost.ICL for correctness in AGAS
+* [issue 44]   - Implement real futures
 
 [endsect]
 
