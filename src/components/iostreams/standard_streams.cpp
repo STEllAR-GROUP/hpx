@@ -112,7 +112,7 @@ HPX_PLAIN_ACTION(hpx::iostreams::create_cerr, create_cerr_action);
 namespace hpx
 {
     // global standard ostream objects
-    iostreams::ostream cout = iostreams::ostream();
-    iostreams::ostream cerr = iostreams::ostream();
+    iostreams::ostream cout;
+    iostreams::ostream cerr;
 }
 
