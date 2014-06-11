@@ -58,7 +58,7 @@ namespace hpx { namespace iostreams
         {
             typedef std::back_insert_iterator<std::vector<Char> > iterator_type;
             typedef buffer_sink<Char> device_type;
-            typedef boost::iostreams::stream<device_type> type;
+            typedef boost::iostreams::stream<device_type> stream_type;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -73,11 +73,11 @@ namespace hpx { namespace iostreams
     struct ostream
         : components::client_base<ostream, stubs::output_stream>
         , detail::buffer
-        , detail::ostream_creator<char>::type
+        , detail::ostream_creator<char>::stream_type
     {
     private:
         typedef components::client_base<ostream, stubs::output_stream> base_type;
-        typedef detail::ostream_creator<char>::type stream_base_type;
+        typedef detail::ostream_creator<char>::stream_type stream_base_type;
         typedef detail::ostream_creator<char>::iterator_type iterator_type;
         typedef lcos::local::mutex mutex_type;
 
@@ -100,7 +100,8 @@ namespace hpx { namespace iostreams
             // apply the subject to the local stream
             *static_cast<stream_base_type*>(this) << subject;
 
-            // If the buffer isn't empty, send it to the destination.
+            // If the buffer isn't empty, send it asynchronously to the
+            // destination.
             if (!this->detail::buffer::empty())
             {
                 // Create the next buffer, returns the previous buffer
@@ -155,11 +156,10 @@ namespace hpx { namespace iostreams
         // reset this object during runtime system shutdown
         void uninitialize()
         {
-            if (threads::threadmanager_is(running))
+            mutex_type::scoped_lock l(mtx, boost::try_to_lock);
+            if (l)
             {
-                mutex_type::scoped_lock l(mtx, boost::try_to_lock);
-                if (l)
-                    streaming_operator_sync(hpx::sync_flush, l);
+                streaming_operator_sync(hpx::async_flush, l);   // unlocks l
             }
             this->base_type::free();
         }
@@ -171,29 +171,15 @@ namespace hpx { namespace iostreams
           , stream_base_type(*static_cast<buffer*>(this))
         {}
 
-        // hpx::flush manipulator (alias for hpx::sync_flush)
+        // hpx::flush manipulator
         ostream& operator<<(hpx::iostreams::flush_type const& m)
         {
             mutex_type::scoped_lock l(mtx);
             return streaming_operator_sync(m, l);
         }
 
-        // hpx::endl manipulator (alias for hpx::sync_endl)
+        // hpx::endl manipulator
         ostream& operator<<(hpx::iostreams::endl_type const& m)
-        {
-            mutex_type::scoped_lock l(mtx);
-            return streaming_operator_sync(m, l);
-        }
-
-        // hpx::sync_flush manipulator
-        ostream& operator<<(hpx::iostreams::sync_flush_type const& m)
-        {
-            mutex_type::scoped_lock l(mtx);
-            return streaming_operator_sync(m, l);
-        }
-
-        // hpx::sync_endl manipulator
-        ostream& operator<<(hpx::iostreams::sync_endl_type const& m)
         {
             mutex_type::scoped_lock l(mtx);
             return streaming_operator_sync(m, l);
@@ -213,12 +199,15 @@ namespace hpx { namespace iostreams
             return streaming_operator_async(m, l);
         }
 
+        ///////////////////////////////////////////////////////////////////////
         template <typename T>
         ostream& operator<<(T const& subject)
         {
             mutex_type::scoped_lock l(mtx);
             return streaming_operator_lazy(subject);
         }
+
+        using stream_base_type::operator<<;
     };
 }}
 
