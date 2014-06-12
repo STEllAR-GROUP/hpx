@@ -32,7 +32,7 @@ namespace hpx { namespace parallel
         {
             try {
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
-                    std::copy(first,last,dest));
+                    std::copy(first, last, dest));
             }
             catch(std::bad_alloc const& e) {
                boost::throw_exception(e);
@@ -43,10 +43,10 @@ namespace hpx { namespace parallel
                 );
             }
         }
-    
+
         template <typename ExPolicy, typename InIter, typename OutIter>
         typename detail::algorithm_result<ExPolicy, OutIter>::type
-        copy(ExPolicy const& policy, InIter first, InIter last, OutIter dest, 
+        copy(ExPolicy const& policy, InIter first, InIter last, OutIter dest,
             boost::mpl::false_ fls)
         {
             typedef boost::tuple<InIter, OutIter> iterator_tuple;
@@ -135,7 +135,7 @@ namespace hpx { namespace parallel
         return detail::copy( std::forward<ExPolicy>(policy),
             first, last, dest, is_seq());
     }
-    
+
     /////////////////////////////////////////////////////////////////////////////
     // copy_n
     namespace detail
@@ -148,19 +148,17 @@ namespace hpx { namespace parallel
             typedef boost::tuple<InIter, OutIter> iterator_tuple;
             typedef detail::zip_iterator<iterator_tuple> zip_iterator;
             typedef typename zip_iterator::reference reference;
-            typedef
-                typename detail::algorithm_result<ExPolicy, OutIter>::type
-            result_type;
-            try{
+
+            try {
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
                     get_iter<1, OutIter>(
                         for_each_n(sequential_execution_policy(),
-                        detail::make_zip_iterator(boost::make_tuple(first,dest)),
-                        count,
-                        [](reference it){
-                            *boost::get<1>(it) = *boost::get<0>(it);
-                        },
-                        boost::mpl::true_())
+                            detail::make_zip_iterator(boost::make_tuple(first, dest)),
+                            count,
+                            [](reference it) {
+                                *boost::get<1>(it) = *boost::get<0>(it);
+                            },
+                            boost::mpl::true_())
                     )
                 );
             }
@@ -176,8 +174,8 @@ namespace hpx { namespace parallel
 
         template <typename ExPolicy, typename InIter, typename OutIter>
         typename detail::algorithm_result<ExPolicy, OutIter>::type
-        copy_n(ExPolicy const& policy, InIter first, std::size_t count, OutIter dest,
-            boost::mpl::false_ fls)
+        copy_n(ExPolicy const& policy, InIter first, std::size_t count,
+            OutIter dest, boost::mpl::false_ fls)
         {
             typedef boost::tuple<InIter,OutIter> iterator_tuple;
             typedef detail::zip_iterator<iterator_tuple> zip_iterator;
@@ -188,12 +186,12 @@ namespace hpx { namespace parallel
 
             return get_iter<1, result_type>(
                 for_each_n(policy,
-                    detail::make_zip_iterator(boost::make_tuple(first,dest)),
+                    detail::make_zip_iterator(boost::make_tuple(first, dest)),
                     count,
                     [](reference it) {
                         *boost::get<1>(it) = *boost::get<0>(it);
-                    }, 
-                fls));
+                    },
+                    fls));
         }
 
         template <typename InIter, typename OutIter>
@@ -261,10 +259,10 @@ namespace hpx { namespace parallel
             boost::is_same<std::output_iterator_tag, output_iterator_category>
         >::type is_seq;
 
-        return detail::copy_n(std::forward<ExPolicy>(policy), 
+        return detail::copy_n(std::forward<ExPolicy>(policy),
             first, count, dest, is_seq());
     }
-    
+
     /////////////////////////////////////////////////////////////////////////////
     // copy_if
     namespace detail
@@ -278,19 +276,18 @@ namespace hpx { namespace parallel
             typedef boost::tuple<InIter, OutIter> iterator_tuple;
             typedef detail::zip_iterator<iterator_tuple> zip_iterator;
             typedef typename zip_iterator::reference reference;
-            typedef
-                typename detail::algorithm_result<ExPolicy, OutIter>::type
-            result_type;
+
             try{
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
                     get_iter<1, OutIter>(
                         for_each_n(sequential_execution_policy(),
-                        detail::make_zip_iterator(boost::make_tuple(first, dest)),
-                        std::distance(first, last),
-                        [f](reference it) {
-                            if(f(*boost::get<0>(it)))
-                                *boost::get<1>(it)=*boost::get<0>(it);
-                        }, boost::mpl::true_())
+                            detail::make_zip_iterator(boost::make_tuple(first, dest)),
+                            std::distance(first, last),
+                            [f](reference it) {
+                                if (f(*boost::get<0>(it)))
+                                    *boost::get<1>(it) = *boost::get<0>(it);
+                            },
+                            boost::mpl::true_())
                     )
                 );
             }
@@ -317,15 +314,15 @@ namespace hpx { namespace parallel
                 typename detail::algorithm_result<ExPolicy, OutIter>::type
             result_type;
 
-            return get_iter<1,result_type>(
+            return get_iter<1, result_type>(
                 for_each_n(policy,
-                detail::make_zip_iterator(boost::make_tuple(first, dest)),
-                std::distance(first,last),
-                [f](reference it) {
-                    if(f(*boost::get<0>(it)))
-                        *boost::get<1>(it)=*boost::get<0>(it);
-                },
-                fls));
+                    detail::make_zip_iterator(boost::make_tuple(first, dest)),
+                    std::distance(first,last),
+                    [f](reference it) {
+                        if (f(*boost::get<0>(it)))
+                            *boost::get<1>(it) = *boost::get<0>(it);
+                    },
+                    fls));
         }
 
         template <typename InIter, typename OutIter, typename F>
@@ -361,7 +358,6 @@ namespace hpx { namespace parallel
             }
         }
 
-        
         template <typename InIter, typename OutIter, typename F>
         OutIter copy_if(execution_policy const& policy,
             InIter first, InIter last, OutIter dest, F && f, boost::mpl::true_ t)
