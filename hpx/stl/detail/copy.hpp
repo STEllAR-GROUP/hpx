@@ -145,9 +145,24 @@ namespace hpx { namespace parallel
         copy_n(ExPolicy const&, InIter first, std::size_t count, OutIter dest,
             boost::mpl::true_)
         {
-            try {
+            typedef boost::tuple<InIter, OutIter> iterator_tuple;
+            typedef detail::zip_iterator<iterator_tuple> zip_iterator;
+            typedef typename zip_iterator::reference reference;
+            typedef
+                typename detail::algorithm_result<ExPolicy, OutIter>::type
+            result_type;
+            try{
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
-                    std::copy_n(first, count, dest));
+                    get_iter<1, OutIter>(
+                        for_each_n(sequential_execution_policy(),
+                        detail::make_zip_iterator(boost::make_tuple(first,dest)),
+                        count,
+                        [](reference it){
+                            *boost::get<1>(it) = *boost::get<0>(it);
+                        },
+                        boost::mpl::true_())
+                    )
+                );
             }
             catch(std::bad_alloc const& e) {
                 boost::throw_exception(e);
@@ -260,9 +275,24 @@ namespace hpx { namespace parallel
         copy_if(ExPolicy const&, InIter first, InIter last, OutIter dest,
             F && f, boost::mpl::true_)
         {
+            typedef boost::tuple<InIter, OutIter> iterator_tuple;
+            typedef detail::zip_iterator<iterator_tuple> zip_iterator;
+            typedef typename zip_iterator::reference reference;
+            typedef
+                typename detail::algorithm_result<ExPolicy, OutIter>::type
+            result_type;
             try{
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
-                    std::copy_if(first,last,dest,std::forward<F>(f)));
+                    get_iter<1, OutIter>(
+                        for_each_n(sequential_execution_policy(),
+                        detail::make_zip_iterator(boost::make_tuple(first, dest)),
+                        std::distance(first, last),
+                        [f](reference it) {
+                            if(f(*boost::get<0>(it)))
+                                *boost::get<1>(it)=*boost::get<0>(it);
+                        }, boost::mpl::true_())
+                    )
+                );
             }
             catch(std::bad_alloc const& e) {
                 boost::throw_exception(e);
