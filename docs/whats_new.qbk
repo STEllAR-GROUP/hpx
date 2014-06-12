@@ -24,6 +24,11 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1154] - Fixing iostreams
+* [issue 1153] - Standard manipulators (like std::endl) do not work with
+                 hpx::ostream
+* [issue 1152] - Functions revamp
+* [issue 1151] - Supressing cmake 3.0 policy warning for CMP0026
 * [issue 1150] - Client Serialization error
 * [issue 1149] - Segfault on Stampede
 * [issue 1148] - Refactoring mini-ghost
@@ -105,8 +110,11 @@ Here is a list of the important tickets we closed for this release.
 * [issue 865]  - future<T> and friends shall work for movable only Ts
 * [issue 525]  - Extend barrier LCO test to run in distributed
 * [issue 509]  - Push Boost.Atomic changes upstream
+* [issue 461]  - Add a compilation sanity test
 * [issue 456]  - hpx_run_tests.py should log output from tests that timeout
 * [issue 454]  - Investigate threadmanager performance
+* [issue 190]  - hpx::cout should be a std::ostream
+* [issue 189]  - iostreams component should use startup/shutdown functions
 * [issue 183]  - Use Boost.ICL for correctness in AGAS
 * [issue 44]   - Implement real futures
 
