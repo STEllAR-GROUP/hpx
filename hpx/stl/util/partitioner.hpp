@@ -15,20 +15,29 @@
 #include <hpx/stl/detail/algorithm_result.hpp>
 #include <hpx/util/decay.hpp>
 
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace util
 {
-    ///////////////////////////////////////////////////////////////////////////
     struct static_partitioner_tag {};
+    struct auto_partitioner_tag {};
     struct default_partitioner_tag {};
+}}}
 
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace parallel { namespace traits
+{
+    template <typename ExPolicy, typename Enable = void>
+    struct extract_partitioner
+    {
+        typedef parallel::util::default_partitioner_tag type;
+    };
+}}}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace parallel { namespace util
+{
     namespace detail
     {
-        template <typename ExPolicy>
-        struct extract_partitioner
-        {
-            typedef default_partitioner_tag type;
-        };
-
         ///////////////////////////////////////////////////////////////////////
         // std::bad_alloc has to be handled separately
         inline void handle_exception(boost::exception_ptr const& e,
@@ -89,6 +98,8 @@ namespace hpx { namespace parallel { namespace util
         }
 
         ///////////////////////////////////////////////////////////////////////
+        // The static partitioner simply spawns one chunk of iterations for
+        // each available core.
         template <typename ExPolicy, typename R, typename Result = void>
         struct static_partitioner
         {
@@ -193,6 +204,7 @@ namespace hpx { namespace parallel { namespace util
         template <typename ExPolicy, typename R, typename PartTag>
         struct partitioner;
 
+        ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy>
         struct partitioner<ExPolicy, void, static_partitioner_tag>
         {
@@ -243,6 +255,179 @@ namespace hpx { namespace parallel { namespace util
         };
 
         ///////////////////////////////////////////////////////////////////////
+        // The auto_partitioner spawns chunks of tasks the size of which is
+        // determined based on the number of available cores and the amount of
+        // iterations to perform. Chunks have different sizes, starting from
+        // task_count / num_cores, going down to chunk_size.
+        template <typename ExPolicy, typename R, typename Result = void>
+        struct auto_partitioner
+        {
+            template <typename FwdIter, typename F1, typename F2>
+            static R call(FwdIter first, std::size_t count, F1 && f1,
+                F2 && f2, std::size_t chunk_size = 0)
+            {
+                // estimate a chunk size
+                if (chunk_size == 0)
+                    chunk_size = 2u;
+
+                std::size_t const cores = hpx::get_num_worker_threads();
+                std::size_t workitems_size = 1;
+
+                std::size_t cnt = count;
+                while (cnt > chunk_size)
+                {
+                    std::size_t step = (std::max)(cnt / cores, chunk_size);
+                    cnt -= step;
+                    workitems_size++;
+                }
+
+                // schedule every chunk on a separate thread
+                std::vector<hpx::future<Result> > workitems;
+                workitems.reserve(workitems_size);
+
+                while (count > chunk_size)
+                {
+                    std::size_t step = (std::max)(count / cores, chunk_size);
+                    workitems.push_back(hpx::async(
+                        hpx::util::bind(f1, first, step)));
+                    count -= step;
+                    std::advance(first, step);
+                }
+
+                std::list<boost::exception_ptr> errors;
+
+                // execute last chunk directly
+                if (count != 0)
+                {
+                    // std::bad_alloc has to be handled separately
+                    try {
+                        add_ready_future(workitems, std::forward<F1>(f1),
+                            first, count);
+                    }
+                    catch (std::bad_alloc const& e) {
+                        boost::throw_exception(e);
+                    }
+                    catch (...) {
+                        errors.push_back(boost::current_exception());
+                    }
+                    std::advance(first, count);
+                }
+
+                // wait for all tasks to finish
+                hpx::wait_all(workitems);
+                detail::handle_exceptions(workitems, errors);
+                return handle_step_two(std::forward<F2>(f2), first,
+                    std::move(workitems));
+            }
+        };
+
+        template <typename R, typename Result>
+        struct auto_partitioner<task_execution_policy, R, Result>
+        {
+            template <typename FwdIter, typename F1, typename F2>
+            static hpx::future<R> call(FwdIter first, std::size_t count,
+                F1 && f1, F2 && f2, std::size_t chunk_size = 0)
+            {
+                // estimate a chunk size
+                if (chunk_size == 0)
+                    chunk_size = 2u;
+
+                std::size_t const cores = hpx::get_num_worker_threads();
+                std::size_t workitems_size = 1;
+
+                std::size_t cnt = count;
+                while (cnt > chunk_size)
+                {
+                    std::size_t step = (std::max)(cnt / cores, chunk_size);
+                    cnt -= step;
+                    workitems_size++;
+                }
+
+                // schedule every chunk on a separate thread
+                std::vector<hpx::future<Result> > workitems;
+                workitems.reserve(workitems_size);
+
+                while (count > chunk_size)
+                {
+                    std::size_t step = (std::max)(count / cores, chunk_size);
+                    workitems.push_back(hpx::async(
+                        hpx::util::bind(f1, first, step)));
+                    count -= step;
+                    std::advance(first, step);
+                }
+
+                // add last chunk
+                if (count != 0)
+                {
+                    workitems.push_back(hpx::async(
+                        hpx::util::bind(f1, first, count)));
+                    std::advance(first, count);
+                }
+
+                // wait for all tasks to finish
+                return hpx::when_all(workitems).then(
+                    [first, f2](hpx::future<std::vector<hpx::future<Result> > >&& r) mutable
+                    {
+                        std::vector<hpx::future<Result> > result = r.get();
+                        std::list<boost::exception_ptr> errors;
+                        detail::handle_exceptions(result, errors);
+                        return handle_step_two(f2, first, std::move(result));
+                    }
+                );
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename ExPolicy>
+        struct partitioner<ExPolicy, void, auto_partitioner_tag>
+        {
+            template <typename FwdIter, typename F>
+            static FwdIter call(FwdIter first, std::size_t count, F && f,
+                std::size_t chunk_size = 0)
+            {
+                return auto_partitioner<ExPolicy, FwdIter, void>::call(
+                    first, count, std::forward<F>(f), 0, chunk_size);
+            }
+        };
+
+        template <typename ExPolicy, typename R>
+        struct partitioner<ExPolicy, R, auto_partitioner_tag>
+        {
+            template <typename FwdIter, typename F1, typename F2>
+            static R call(FwdIter first, std::size_t count, F1 && f1,
+                F2 && f2, std::size_t chunk_size = 0)
+            {
+                return auto_partitioner<ExPolicy, R, R>::call(first, count,
+                    std::forward<F1>(f1), std::forward<F2>(f2), chunk_size);
+            }
+        };
+
+        template <>
+        struct partitioner<task_execution_policy, void, auto_partitioner_tag>
+        {
+            template <typename FwdIter, typename F>
+            static hpx::future<FwdIter> call(FwdIter first, std::size_t count,
+                F && f, std::size_t chunk_size = 0)
+            {
+                return auto_partitioner<task_execution_policy, FwdIter>::call(
+                    first, count, std::forward<F>(f), 0, chunk_size);
+            }
+        };
+
+        template <typename R>
+        struct partitioner<task_execution_policy, R, auto_partitioner_tag>
+        {
+            template <typename FwdIter, typename F1, typename F2>
+            static hpx::future<R> call(FwdIter first, std::size_t count,
+                F1 && f1, F2 && f2, std::size_t chunk_size = 0)
+            {
+                return auto_partitioner<task_execution_policy, R, R>::call(
+                    first, count, std::forward<F1>(f1), std::forward<F2>(f2),
+                    chunk_size);
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename R>
         struct partitioner<ExPolicy, R, default_partitioner_tag>
           : partitioner<ExPolicy, R, static_partitioner_tag>
@@ -251,7 +436,7 @@ namespace hpx { namespace parallel { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename R = void,
-        typename PartTag = typename detail::extract_partitioner<
+        typename PartTag = typename parallel::traits::extract_partitioner<
             typename hpx::util::decay<ExPolicy>::type
         >::type>
     struct partitioner
