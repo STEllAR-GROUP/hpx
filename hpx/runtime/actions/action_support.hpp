@@ -41,6 +41,7 @@
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/util/detail/serialization_registration.hpp>
 #include <hpx/util/static.hpp>
 #include <hpx/lcos/async_fwd.hpp>
 #include <hpx/lcos/future.hpp>
