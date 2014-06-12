@@ -37,7 +37,7 @@ void test_copy_if(ExPolicy const& policy, IteratorTag)
             return v1 == v2;
         }));
 
-    HPX_TEST(std::equal(middle,boost::end(c), 
+    HPX_TEST(std::equal(middle,boost::end(c),
         boost::begin(d) + (1 + d.size()/2),
         [&count](int v1, int v2) {
             HPX_TEST_NEQ(v1,v2);
@@ -62,7 +62,7 @@ void test_copy_if(hpx::parallel::task_execution_policy, IteratorTag)
 
     hpx::future<base_iterator> f =
         hpx::parallel::copy_if(hpx::parallel::task,
-            iterator(boost::begin(c)), iterator(boost::end(c)), 
+            iterator(boost::begin(c)), iterator(boost::end(c)),
             boost::begin(d), [](int i){return !(i<0);});
     f.wait();
 
@@ -74,7 +74,7 @@ void test_copy_if(hpx::parallel::task_execution_policy, IteratorTag)
             return v1 == v2;
         }));
 
-    HPX_TEST(std::equal(middle,boost::end(c), 
+    HPX_TEST(std::equal(middle,boost::end(c),
         boost::begin(d) + (1 + d.size()/2),
         [&count](int v1, int v2) {
             HPX_TEST_NEQ(v1,v2);
@@ -116,7 +116,7 @@ void test_copy_if_exception(ExPolicy const& policy, IteratorTag)
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator,IteratorTag> iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
@@ -132,11 +132,11 @@ void test_copy_if_exception(ExPolicy const& policy, IteratorTag)
             });
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e) {
         caught_exception = true;
         test::test_num_exeptions<ExPolicy, IteratorTag>::call(policy, e);
     }
-    catch(...) {
+    catch (...) {
         HPX_TEST(false);
     }
 
@@ -155,14 +155,14 @@ void test_copy_if_exception(hpx::parallel::task_execution_policy, IteratorTag)
 
     bool caught_exception = false;
     try {
-        hpx::future<base_iterator> f = 
+        hpx::future<base_iterator> f =
             hpx::parallel::copy_if(hpx::parallel::task,
                 iterator(boost::begin(c)), iterator(boost::end(c)),
                 boost::begin(d),
                 [](std::size_t v) {
                     throw std::runtime_error("test");
                     return v;
-            });
+                });
         f.get();
 
         HPX_TEST(false);
