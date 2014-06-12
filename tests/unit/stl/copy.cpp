@@ -88,8 +88,9 @@ void test_copy_exception(ExPolicy const& policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
+    using test::decorate;
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_runtime_error_iterator<base_iterator,IteratorTag> iterator;
+    typedef test::test_iterator<base_iterator,IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
@@ -98,7 +99,8 @@ void test_copy_exception(ExPolicy const& policy, IteratorTag)
     bool caught_exception = false;
     try {
         base_iterator outiter = hpx::parallel::copy(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)), 
+            decorate(iterator(boost::begin(c)), [](){throw std::runtime_error("test");}),
+            decorate(iterator(boost::end(c)), [](){}),
             boost::begin(d));
         HPX_TEST(false);
     }
@@ -116,8 +118,9 @@ void test_copy_exception(ExPolicy const& policy, IteratorTag)
 template<typename IteratorTag>
 void test_copy_exception(hpx::parallel::task_execution_policy, IteratorTag)
 {
+    using test::decorate;
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_runtime_error_iterator<base_iterator, IteratorTag> iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
@@ -127,7 +130,8 @@ void test_copy_exception(hpx::parallel::task_execution_policy, IteratorTag)
     try {
         hpx::future<base_iterator> f = 
             hpx::parallel::copy(hpx::parallel::task,
-                iterator(boost::begin(c)), iterator(boost::end(c)),
+                decorate(iterator(boost::begin(c)), [](){throw std::runtime_error("test");}),
+                decorate(iterator(boost::end(c)), [](){}),
                 boost::begin(d));
         f.get();
 
@@ -175,8 +179,9 @@ void test_copy_bad_alloc(ExPolicy const& policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
+    using test::decorate;
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_bad_alloc_iterator<base_iterator, IteratorTag> iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(100007);
     std::vector<std::size_t> d(c.size());
@@ -185,7 +190,9 @@ void test_copy_bad_alloc(ExPolicy const& policy, IteratorTag)
     bool caught_bad_alloc = false;
     try {
         base_iterator outiter = hpx::parallel::copy(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d));
+            decorate(iterator(boost::begin(c)), [](){throw std::bad_alloc();}), 
+            decorate(iterator(boost::end(c)),  [](){}),
+            boost::begin(d));
         HPX_TEST(false);
     }
     catch(std::bad_alloc const&) {
@@ -201,8 +208,9 @@ void test_copy_bad_alloc(ExPolicy const& policy, IteratorTag)
 template<typename IteratorTag>
 void test_copy_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
 {
+    using test::decorate;
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_bad_alloc_iterator<base_iterator, IteratorTag> iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
@@ -212,7 +220,8 @@ void test_copy_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
     try {
         hpx::future<base_iterator> f =
             hpx::parallel::copy(hpx::parallel::task,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
+                decorate(iterator(boost::begin(c)),[](){throw std::bad_alloc();}),
+                decorate(iterator(boost::end(c)),[](){}),
             boost::begin(d));
 
         f.get();
