@@ -51,7 +51,7 @@ as the dependecies are meet.  Unfortunaly, this example runs
 terribly slow. This increase in execution time is caused 
 by the increased overheads needed to create a future for each
 data point. Because the work done within each call to heat is very
-small the overhead of creating and schedualing each of the three
+small, the overhead of creating and schedualing each of the three
 futures is greater than that of the actual useful work! In order
 amatorize [SP] the oveerheads of our syncronization techniques,
 we need to be able to control the amount of work that with be
@@ -67,7 +67,7 @@ by creating the stuct partition and defineing space to now
 be a vector of partions.
 
 In example 4 we take advangate of the partion setup by redefining
-spacd to be a vector of shared_futures whaich represent partitions.
+space to be a vector of shared_futures whaich represent partitions.
 In hpx_main we create a future vector of space named result which
 contains the final calculated data points and set it equal
 to the step member function do_work.  We pass the number 
@@ -76,6 +76,23 @@ the number of steps that the program will simulate to this
 function, which sets up the execution tree.  It should be noted
 how strikingly similar example 4 is to example 2.
 
+Example 4 finaly shows us some good results.  This code 
+is faster than the OpenMP version by a factor of [INSERT FACTOR HERE].
+While these results are impressive our work on this
+algorithm is not over. This example only runs on one locality.
+To get the full benefit of HPX we need to be albe to distibute
+the work to other machines in a cluster. We begin this process in
+example 5.
+
+In order to run in distributed a large amount of boilerplate code
+must be added. Fortunatley, HPX provides us with the concept of
+a component which saves us from having to write quite as much code.
+ A component simply is an object which can be 
+remotely accessed using its global address. Components
+are made of two parts: a server and a client class.
+While it is not required to write them this way, abstracting 
+the server and the client allow us to hide the boiler plate code 
+and use the component in a more natural way.
 
 [/////////////////////////////////////////////////////////////////////////////]
 
