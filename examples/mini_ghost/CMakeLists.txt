@@ -15,7 +15,7 @@ if(HPX_HAVE_CXX11_LAMBDAS)
     MODULE mini_ghost
     AUTOGLOB
     ${mini_ghost_FLAGS}
-    FOLDER "Examples/Mini Ghost")
+    FOLDER "Examples/MiniGhost")
 
   # add a custom target for this example
   add_hpx_pseudo_target(examples.mini_ghost.mini_ghost)
