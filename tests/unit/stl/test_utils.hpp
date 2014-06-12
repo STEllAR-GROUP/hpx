@@ -29,25 +29,37 @@ namespace test
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template<typename T>
-    struct Decorator: public T {
-        template<typename V>
-        Decorator(T iterator, V f): T(iterator), m_callback(f) {}
+    template <typename BaseIterator, typename IteratorTag>
+    struct decorated_iterator
+      : boost::iterator_adaptor<
+            decorated_iterator<BaseIterator, IteratorTag>,
+            BaseIterator, boost::use_default, IteratorTag>
+    {
+    private:
+        typedef boost::iterator_adaptor<
+            decorated_iterator<BaseIterator, IteratorTag>,
+            BaseIterator, boost::use_default, IteratorTag>
+        base_type;
 
-        typename T::value_type & operator*() {
+    public:
+        decorated_iterator() : base_type() {}
+        decorated_iterator(BaseIterator base, std::function<void()> f)
+          : base_type(base), m_callback(f)
+        {};
+
+    private:
+        friend class boost::iterator_core_access;
+
+        typename base_type::reference dereference() const
+        {
             m_callback();
-            return T::operator*();
+            return *(this->base());
         }
 
     private:
         std::function<void()> m_callback;
     };
 
-    template<typename T, typename V>
-    Decorator<T> decorate(T iterator, V v) {
-        return Decorator<T>(iterator, v);
-    }
-    
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename IteratorTag>
     struct test_num_exeptions

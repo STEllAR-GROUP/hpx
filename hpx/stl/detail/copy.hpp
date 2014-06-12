@@ -145,9 +145,9 @@ namespace hpx { namespace parallel
         copy_n(ExPolicy const&, InIter first, std::size_t count, OutIter dest,
             boost::mpl::true_)
         {
-            try{
+            try {
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
-                    std::copy_n(first,count,dest));
+                    std::copy_n(first, count, dest));
             }
             catch(std::bad_alloc const& e) {
                 boost::throw_exception(e);
@@ -177,7 +177,7 @@ namespace hpx { namespace parallel
                     count,
                     [](reference it) {
                         *boost::get<1>(it) = *boost::get<0>(it);
-                }, 
+                    }, 
                 fls));
         }
 
