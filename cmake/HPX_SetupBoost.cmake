@@ -37,24 +37,13 @@ if(Boost_VERSION GREATER 105000)
   endif()
 endif()
 
-set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
-
-hpx_option(
-  WITH_GENERIC_COROUTINE_CONTEXT BOOL ${use_generic_coroutine_context}
+option(
+  WITH_GENERIC_COROUTINE_CONTEXT
   "Use Boost.Context as the underlying coroutines context switch implementation."
+  ${use_generic_coroutine_context}
 )
 
-if(WITH_GENERIC_COROUTINE_CONTEXT)
-  if(NOT Boost_CONTEXT_FOUND)
-    hpx_error("The usage of Boost.Context was selected but Boost.Context was not found (Version 1.51 or higher is required).")
-  endif()
-  if(HPX_PLATFORM_UC STREQUAL "BLUEGENEQ")
-    if(Boost_VERSION LESS 105600)
-      hpx_error("On BlueGene/Q, Boost.Context can only be used with a Boost >=1.56")
-    endif()
-  endif()
-  hpx_add_config_define(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
-endif()
+set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
 
 # If the found Boost installation is < 1.53, we need to include our packaged
 # atomic library
@@ -96,3 +85,5 @@ if(Boost_VERSION LESS 105300)
   hpx_add_config_define(BOOST_NO_0X_HDR_ATOMIC)
 endif()
 
+include_directories(${Boost_INCLUDE_DIRS})
+hpx_libraries(${Boost_LIBRARIES})

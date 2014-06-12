@@ -237,13 +237,7 @@ else()
 endif()
 
 set(hpx_serialization_link_flag_properties)
-if(NOT MSVC)
-  set_target_properties(hpx_serialization
-                        PROPERTIES SKIP_BUILD_RPATH TRUE
-                                   BUILD_WITH_INSTALL_RPATH TRUE
-                                   INSTALL_RPATH_USE_LINK_PATH TRUE
-                                   INSTALL_RPATH ${HPX_RPATH})
-else()
+if(MSVC)
   if(TCMALLOC_FOUND AND "${HPX_MALLOC}" MATCHES "tcmalloc|TCMalloc|TCMALLOC")
     set(hpx_serialization_link_flag_properties "${hpx_serialization_link_flag_properties} /include:__tcmalloc")
     hpx_debug("malloc" "hpx_serialization: forcing linking to __tcmalloc")
@@ -370,13 +364,7 @@ if(HPX_HAVE_PARCELPORT_MPI AND MPI_FOUND)
   set(hpx_link_flag_properties "${hpx_link_flag_properties} ${MPI_CXX_LINK_FLAGS}")
 endif()
 
-if(NOT MSVC)
-  set_target_properties(hpx
-                        PROPERTIES SKIP_BUILD_RPATH TRUE
-                                   BUILD_WITH_INSTALL_RPATH TRUE
-                                   INSTALL_RPATH_USE_LINK_PATH TRUE
-                                   INSTALL_RPATH "${HPX_RPATH}")
-else()
+if(MSVC)
   if(HPX_HAVE_SWAP_CONTEXT_EMULATION)
     set(hpx_link_flag_properties "${hpx_link_flag_properties} /EXPORT:switch_to_fiber")
   endif()

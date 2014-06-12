@@ -114,15 +114,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             write_connections_.clear();
 #endif
         }
-
-        // cancel all pending accept operations
-        if (NULL != acceptor_)
-        {
-            boost::system::error_code ec;
-            acceptor_->close(ec);
-            delete acceptor_;
-            acceptor_ = NULL;
-        }
     }
 
     boost::shared_ptr<sender> connection_handler::create_connection(

@@ -6,6 +6,8 @@
 # This is a wrapper for FindMPI.cmake avoiding to re-detect MPI during each
 # cmake configuration
 
+#TODO: remove
+
 set(languages CXX C Fortran)
 
 if(MPI_DISABLE)
@@ -36,7 +38,7 @@ else()
       set(MPI_${language}_COMPILER_QUIETLY TRUE)
       set(MPI_${language}_FIND_QUIETLY TRUE)
     endforeach()
-    
+
     find_package(MPI)
 
     if(MPI_FOUND)

@@ -234,17 +234,8 @@ namespace hpx { namespace util
                     throw std::logic_error("Requested more than "
                         BOOST_PP_STRINGIZE(HPX_MAX_CPU_COUNT)" --hpx:threads "
                         "to use for this application, use the option "
-                        "-DHPX_MAX_CPU_COUNT=<N> or "
-                        "-DHPX_USE_MORE_THAN_64_THREADS when configuring HPX.");
+                        "-DHPX_MAX_CPU_COUNT=<N> when configuring HPX.");
                 }
-#elif !defined(HPX_HAVE_MORE_THAN_64_THREADS)
-                if (threads > 64) {
-                    throw std::logic_error("Requested more than 64 "
-                        "--hpx:threads to use for this application, use the "
-                        "option -DHPX_MAX_CPU_COUNT=<N> or "
-                        "-DHPX_USE_MORE_THAN_64_THREADS when configuring HPX.");
-                }
-#endif
             }
             return threads;
         }

@@ -1,3 +1,4 @@
+# Copyright (c) 2014 Thomas Heller
 # Copyright (c) 2011 Bryce Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,85 +20,19 @@ endmacro()
 
 macro(hpx_executable_install name suffix)
   if(NOT HPX_NO_INSTALL)
-    hpx_get_target_location(location ${name})
-
-    set(target_directory "${CMAKE_INSTALL_PREFIX}/${suffix}")
-
-    set(install_code
-        "file(INSTALL FILES \"${location}\"
-              DESTINATION \"${target_directory}\"
-              TYPE EXECUTABLE
-              OPTIONAL
-              PERMISSIONS OWNER_READ OWNER_EXECUTE OWNER_WRITE
-                          GROUP_READ GROUP_EXECUTE
-                          WORLD_READ WORLD_EXECUTE)")
-
-    hpx_debug("hpx_executable_install.${name}"
-      "installing: ${location} to ${target_directory}")
-    hpx_debug("hpx_executable_install.${name}"
-      "install code: ${install_code}")
-
-    install(CODE "${install_code}")
+      install(TARGETS ${name} DESTINATION ${suffix} OPTIONAL)
   endif()
 endmacro()
 
 macro(hpx_library_install name suffix)
   if(NOT HPX_NO_INSTALL)
-    hpx_get_target_file(lib "${name}")
-    hpx_get_target_path(output_dir "${name}")
-
-    if(UNIX)
-      set(targets ${lib} ${lib}.${HPX_SOVERSION} ${lib}.${HPX_VERSION})
-    else()
-      set(targets ${lib})
-    endif()
-
-    set(target_directory "${CMAKE_INSTALL_PREFIX}/${suffix}")
-
-    if(MSVC OR MINGW)
-      install(TARGETS ${name} ARCHIVE DESTINATION "${target_directory}" OPTIONAL)
-    endif()
-
-    foreach(target ${targets})
-      set(install_code
-        "file(INSTALL FILES \"${output_dir}/${target}\"
-              DESTINATION \"${target_directory}\"
-              TYPE SHARED_LIBRARY
-              OPTIONAL
-              PERMISSIONS OWNER_READ OWNER_EXECUTE OWNER_WRITE
-                          GROUP_READ GROUP_EXECUTE
-                          WORLD_READ WORLD_EXECUTE)")
-
-      hpx_debug("hpx_library_install.${name}"
-        "installing: ${output_dir}/${target} to ${target_directory}")
-      hpx_debug("hpx_library_install.${name}"
-        "install code: ${install_code}")
-
-      install(CODE "${install_code}")
-    endforeach()
+      install(TARGETS ${name} DESTINATION ${suffix} OPTIONAL)
   endif()
 endmacro()
 
 macro(hpx_archive_install name suffix)
   if(NOT HPX_NO_INSTALL)
-    hpx_get_target_location(location "${name}")
-
-    set(target_directory "${CMAKE_INSTALL_PREFIX}/${suffix}")
-
-    set(install_code
-      "file(INSTALL FILES \"${location}\"
-            DESTINATION \"${target_directory}\"
-            OPTIONAL
-            PERMISSIONS OWNER_READ OWNER_READ OWNER_READ
-                        GROUP_READ GROUP_READ
-                        WORLD_READ WORLD_READ)")
-
-      hpx_debug("hpx_archive_install.${name}"
-        "installing: ${location} to ${target_directory}")
-      hpx_debug("hpx_archive_install.${name}"
-        "install code: ${install_code}")
-
-    install(CODE "${install_code}")
+      install(TARGETS ${name} DESTINATION ${suffix} OPTIONAL)
   endif()
 endmacro()
 

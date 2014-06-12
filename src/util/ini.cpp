@@ -40,6 +40,7 @@
 extern char **environ;
 #endif
 
+#if defined(__bgclang__)
 ///////////////////////////////////////////////////////////////////////////////
 // Explicitly instantiate a perl_matcher, this is needed to make hpx applications
 // link with bgclang
@@ -55,6 +56,7 @@ namespace boost { namespace re_detail {
       , boost::regex_traits<char, boost::cpp_regex_traits<char> >
     >;
 }}
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util

@@ -219,14 +219,6 @@ macro(add_hpx_library name)
     endif()
   endif()
 
-  if(NOT MSVC)
-    set_target_properties(${name}_lib
-                          PROPERTIES SKIP_BUILD_RPATH TRUE
-                                     BUILD_WITH_INSTALL_RPATH TRUE
-                                     INSTALL_RPATH_USE_LINK_PATH TRUE
-                                     INSTALL_RPATH "${HPX_RPATH}")
-  endif()
-
   if(${name}_FOLDER)
     set_target_properties(${name}_lib PROPERTIES FOLDER "${${name}_FOLDER}")
   endif()

@@ -1,26 +1,30 @@
+# Copyright (c) 2014 Thomas Heller
 # Copyright (c) 2011 Bryce Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# FIXME: Use parse arg.
+include(CMakeParseArguments)
 
-macro(hpx_option option type description default)
-#  hpx_info("option.${option}" "type:${type}")
-#  hpx_info("option.${option}" "description:${description}")
-#  hpx_info("option.${option}" "default:${default}")
+function(hpx_option option type description default)
+  set(options ADVANCED)
+  set(one_value_args CATEGORY)
+  set(multi_value_args)
+  cmake_parse_arguments(HPX_OPTION "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   if(NOT DEFINED ${option})
-    set(${option} ${default})
-    set(${option} ${default} CACHE ${type} "${description}" FORCE)
+    set(${option} ${default} CACHE ${type} "${description}")
+    if(HPX_OPTION_ADVANCED)
+      mark_as_advanced(${option})
+    endif()
   endif()
 
-  foreach(arg ${ARGN})
-    if(arg STREQUAL "ADVANCED")
-      mark_as_advanced(FORCE ${option})
-    else()
-      hpx_error("Unknown argument while calling hpx_option: ${arg} (only allowed value: 'ADVANCED')")
-    endif()
-  endforeach()
-endmacro()
+  set(_category "Generic")
+  if(HPX_OPTION_CATEGORY)
+    set(_category "${HPX_OPTION_CATEGORY}")
+  endif()
+  get_property(strings CACHE "${option}" PROPERTY STRINGS)
+  set(strings "HPX_OPTION;${_category};${strings}")
+  set_property(CACHE "${option}" PROPERTY STRINGS ${strings})
+endfunction()
 

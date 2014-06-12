@@ -167,11 +167,6 @@ macro(add_hpx_executable name)
   endif()
 
   if(NOT MSVC)
-    set_target_properties(${name}_exe
-                          PROPERTIES SKIP_BUILD_RPATH TRUE
-                                     BUILD_WITH_INSTALL_RPATH TRUE
-                                     INSTALL_RPATH_USE_LINK_PATH TRUE
-                                     INSTALL_RPATH ${HPX_RPATH})
     if(HPX_PIE)
        hpx_append_property(${name}_exe LINK_FLAGS -pie)
     endif()

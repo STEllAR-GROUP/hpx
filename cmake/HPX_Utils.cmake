@@ -10,10 +10,13 @@ hpx_include(Message
             ListContains
             ParseArguments
             AppendProperty
+            AppendLibraries
             Install
             GetIncludeDirectory
             Compile
             TargetPaths
+            AddCompileFlag
+            AddLinkFlag
             AddComponent
             AddDefinitions
             AddLibrary
