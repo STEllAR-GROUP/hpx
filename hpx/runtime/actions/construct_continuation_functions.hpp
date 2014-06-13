@@ -16,6 +16,12 @@
 #include <boost/preprocessor/iterate.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 
+#if defined(HPX_GCC_VERSION)
+#define HPX_MAYBE_FORCEINLINE inline
+#else
+#define HPX_MAYBE_FORCEINLINE BOOST_FORCEINLINE
+#endif
+
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/runtime/actions/preprocessed/construct_continuation_functions.hpp>
 #else
@@ -29,12 +35,6 @@
     util::get<n>(std::forward<Arguments_>(data))                              \
     /**/
 
-#if defined(HPX_GCC_VERSION)
-#define HPX_MAYBE_FORCEINLINE inline
-#else
-#define HPX_MAYBE_FORCEINLINE BOOST_FORCEINLINE
-#endif
-
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (0, HPX_ACTION_ARGUMENT_LIMIT,                                        \
     "hpx/runtime/actions/construct_continuation_functions.hpp"))              \
@@ -42,7 +42,6 @@
 
 #include BOOST_PP_ITERATE()
 
-#undef HPX_MAYBE_FORCEINLINE
 #undef HPX_ACTION_DIRECT_ARGUMENT
 
 #if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
@@ -50,6 +49,8 @@
 #endif
 
 #endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
+
+#undef HPX_MAYBE_FORCEINLINE
 
 #endif
 
