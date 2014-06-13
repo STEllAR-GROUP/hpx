@@ -10,7 +10,7 @@
 
 namespace hpx { namespace util { namespace detail
 {
-
+    
     template <typename VTablePtr,
         typename R, typename A0>
     class basic_function<VTablePtr, R(A0)>
@@ -24,7 +24,6 @@ namespace hpx { namespace util { namespace detail
         struct is_callable
           : traits::is_callable<T(A0)>
         {};
-
         basic_function() BOOST_NOEXCEPT
           : base_type()
         {}
@@ -63,7 +62,7 @@ namespace hpx { namespace util { namespace detail
 }}}
 namespace hpx { namespace util { namespace detail
 {
-
+    
     template <typename VTablePtr,
         typename R, typename A0 , typename A1>
     class basic_function<VTablePtr, R(A0 , A1)>
@@ -77,7 +76,6 @@ namespace hpx { namespace util { namespace detail
         struct is_callable
           : traits::is_callable<T(A0 , A1)>
         {};
-
         basic_function() BOOST_NOEXCEPT
           : base_type()
         {}
@@ -116,7 +114,7 @@ namespace hpx { namespace util { namespace detail
 }}}
 namespace hpx { namespace util { namespace detail
 {
-
+    
     template <typename VTablePtr,
         typename R, typename A0 , typename A1 , typename A2>
     class basic_function<VTablePtr, R(A0 , A1 , A2)>
@@ -130,7 +128,6 @@ namespace hpx { namespace util { namespace detail
         struct is_callable
           : traits::is_callable<T(A0 , A1 , A2)>
         {};
-
         basic_function() BOOST_NOEXCEPT
           : base_type()
         {}
@@ -169,7 +166,7 @@ namespace hpx { namespace util { namespace detail
 }}}
 namespace hpx { namespace util { namespace detail
 {
-
+    
     template <typename VTablePtr,
         typename R, typename A0 , typename A1 , typename A2 , typename A3>
     class basic_function<VTablePtr, R(A0 , A1 , A2 , A3)>
@@ -183,7 +180,6 @@ namespace hpx { namespace util { namespace detail
         struct is_callable
           : traits::is_callable<T(A0 , A1 , A2 , A3)>
         {};
-
         basic_function() BOOST_NOEXCEPT
           : base_type()
         {}
@@ -222,7 +218,7 @@ namespace hpx { namespace util { namespace detail
 }}}
 namespace hpx { namespace util { namespace detail
 {
-
+    
     template <typename VTablePtr,
         typename R, typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
     class basic_function<VTablePtr, R(A0 , A1 , A2 , A3 , A4)>
@@ -236,7 +232,6 @@ namespace hpx { namespace util { namespace detail
         struct is_callable
           : traits::is_callable<T(A0 , A1 , A2 , A3 , A4)>
         {};
-
         basic_function() BOOST_NOEXCEPT
           : base_type()
         {}
@@ -275,7 +270,7 @@ namespace hpx { namespace util { namespace detail
 }}}
 namespace hpx { namespace util { namespace detail
 {
-
+    
     template <typename VTablePtr,
         typename R, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
     class basic_function<VTablePtr, R(A0 , A1 , A2 , A3 , A4 , A5)>
@@ -289,7 +284,6 @@ namespace hpx { namespace util { namespace detail
         struct is_callable
           : traits::is_callable<T(A0 , A1 , A2 , A3 , A4 , A5)>
         {};
-
         basic_function() BOOST_NOEXCEPT
           : base_type()
         {}
@@ -328,7 +322,7 @@ namespace hpx { namespace util { namespace detail
 }}}
 namespace hpx { namespace util { namespace detail
 {
-
+    
     template <typename VTablePtr,
         typename R, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
     class basic_function<VTablePtr, R(A0 , A1 , A2 , A3 , A4 , A5 , A6)>
@@ -342,7 +336,6 @@ namespace hpx { namespace util { namespace detail
         struct is_callable
           : traits::is_callable<T(A0 , A1 , A2 , A3 , A4 , A5 , A6)>
         {};
-
         basic_function() BOOST_NOEXCEPT
           : base_type()
         {}
@@ -381,7 +374,7 @@ namespace hpx { namespace util { namespace detail
 }}}
 namespace hpx { namespace util { namespace detail
 {
-
+    
     template <typename VTablePtr,
         typename R, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
     class basic_function<VTablePtr, R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)>
@@ -395,7 +388,6 @@ namespace hpx { namespace util { namespace detail
         struct is_callable
           : traits::is_callable<T(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)>
         {};
-
         basic_function() BOOST_NOEXCEPT
           : base_type()
         {}
@@ -434,7 +426,7 @@ namespace hpx { namespace util { namespace detail
 }}}
 namespace hpx { namespace util { namespace detail
 {
-
+    
     template <typename VTablePtr,
         typename R, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
     class basic_function<VTablePtr, R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)>
@@ -448,7 +440,6 @@ namespace hpx { namespace util { namespace detail
         struct is_callable
           : traits::is_callable<T(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)>
         {};
-
         basic_function() BOOST_NOEXCEPT
           : base_type()
         {}
@@ -487,7 +478,7 @@ namespace hpx { namespace util { namespace detail
 }}}
 namespace hpx { namespace util { namespace detail
 {
-
+    
     template <typename VTablePtr,
         typename R, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
     class basic_function<VTablePtr, R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)>
@@ -501,7 +492,6 @@ namespace hpx { namespace util { namespace detail
         struct is_callable
           : traits::is_callable<T(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)>
         {};
-
         basic_function() BOOST_NOEXCEPT
           : base_type()
         {}
@@ -540,7 +530,7 @@ namespace hpx { namespace util { namespace detail
 }}}
 namespace hpx { namespace util { namespace detail
 {
-
+    
     template <typename VTablePtr,
         typename R, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10>
     class basic_function<VTablePtr, R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)>
@@ -554,7 +544,6 @@ namespace hpx { namespace util { namespace detail
         struct is_callable
           : traits::is_callable<T(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)>
         {};
-
         basic_function() BOOST_NOEXCEPT
           : base_type()
         {}
@@ -593,7 +582,7 @@ namespace hpx { namespace util { namespace detail
 }}}
 namespace hpx { namespace util { namespace detail
 {
-
+    
     template <typename VTablePtr,
         typename R, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11>
     class basic_function<VTablePtr, R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)>
@@ -607,7 +596,6 @@ namespace hpx { namespace util { namespace detail
         struct is_callable
           : traits::is_callable<T(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)>
         {};
-
         basic_function() BOOST_NOEXCEPT
           : base_type()
         {}
@@ -646,7 +634,7 @@ namespace hpx { namespace util { namespace detail
 }}}
 namespace hpx { namespace util { namespace detail
 {
-
+    
     template <typename VTablePtr,
         typename R, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12>
     class basic_function<VTablePtr, R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)>
@@ -660,7 +648,6 @@ namespace hpx { namespace util { namespace detail
         struct is_callable
           : traits::is_callable<T(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)>
         {};
-
         basic_function() BOOST_NOEXCEPT
           : base_type()
         {}

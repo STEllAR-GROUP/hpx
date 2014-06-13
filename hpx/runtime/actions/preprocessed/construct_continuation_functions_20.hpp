@@ -16,7 +16,7 @@
         template <typename Object
              
              >
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(),
             Object* obj
            ) const
@@ -37,7 +37,7 @@
         template <typename Object
              
              >
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 ) const,
             Component* obj
@@ -92,7 +92,7 @@
         template <typename Object
              
              >
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(),
             Component* obj
            ) const
@@ -114,7 +114,7 @@
         template <typename Object
              
              >
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 ) const,
             Component* obj
@@ -171,7 +171,7 @@
         template <typename Object
             , typename Arg0
             , typename FArg0>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0),
             Object* obj
           , Arg0 && arg0) const
@@ -192,7 +192,7 @@
         template <typename Object
             , typename Arg0
             , typename FArg0>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 FArg0 arg0) const,
             Component* obj
@@ -247,7 +247,7 @@
         template <typename Object
             , typename Arg0
             , typename FArg0>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0),
             Component* obj
           , Arg0 && arg0) const
@@ -269,7 +269,7 @@
         template <typename Object
             , typename Arg0
             , typename FArg0>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 FArg0 arg0) const,
             Component* obj
@@ -326,7 +326,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1
             , typename FArg0 , typename FArg1>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1),
             Object* obj
           , Arg0 && arg0 , Arg1 && arg1) const
@@ -347,7 +347,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1
             , typename FArg0 , typename FArg1>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1) const,
             Component* obj
@@ -402,7 +402,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1
             , typename FArg0 , typename FArg1>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1),
             Component* obj
           , Arg0 && arg0 , Arg1 && arg1) const
@@ -424,7 +424,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1
             , typename FArg0 , typename FArg1>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1) const,
             Component* obj
@@ -481,7 +481,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2
             , typename FArg0 , typename FArg1 , typename FArg2>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2),
             Object* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2) const
@@ -502,7 +502,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2
             , typename FArg0 , typename FArg1 , typename FArg2>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2) const,
             Component* obj
@@ -557,7 +557,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2
             , typename FArg0 , typename FArg1 , typename FArg2>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2),
             Component* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2) const
@@ -579,7 +579,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2
             , typename FArg0 , typename FArg1 , typename FArg2>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2) const,
             Component* obj
@@ -636,7 +636,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3),
             Object* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3) const
@@ -657,7 +657,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3) const,
             Component* obj
@@ -712,7 +712,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3),
             Component* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3) const
@@ -734,7 +734,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3) const,
             Component* obj
@@ -791,7 +791,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4),
             Object* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4) const
@@ -812,7 +812,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4) const,
             Component* obj
@@ -867,7 +867,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4),
             Component* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4) const
@@ -889,7 +889,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4) const,
             Component* obj
@@ -946,7 +946,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5),
             Object* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5) const
@@ -967,7 +967,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5) const,
             Component* obj
@@ -1022,7 +1022,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5),
             Component* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5) const
@@ -1044,7 +1044,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5) const,
             Component* obj
@@ -1101,7 +1101,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6),
             Object* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6) const
@@ -1122,7 +1122,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6) const,
             Component* obj
@@ -1177,7 +1177,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6),
             Component* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6) const
@@ -1199,7 +1199,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6) const,
             Component* obj
@@ -1256,7 +1256,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7),
             Object* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7) const
@@ -1277,7 +1277,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7) const,
             Component* obj
@@ -1332,7 +1332,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7),
             Component* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7) const
@@ -1354,7 +1354,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7) const,
             Component* obj
@@ -1411,7 +1411,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8),
             Object* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8) const
@@ -1432,7 +1432,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8) const,
             Component* obj
@@ -1487,7 +1487,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8),
             Component* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8) const
@@ -1509,7 +1509,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8) const,
             Component* obj
@@ -1566,7 +1566,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9),
             Object* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9) const
@@ -1587,7 +1587,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9) const,
             Component* obj
@@ -1642,7 +1642,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9),
             Component* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9) const
@@ -1664,7 +1664,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9) const,
             Component* obj
@@ -1721,7 +1721,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10),
             Object* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10) const
@@ -1742,7 +1742,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10) const,
             Component* obj
@@ -1797,7 +1797,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10),
             Component* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10) const
@@ -1819,7 +1819,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10) const,
             Component* obj
@@ -1876,7 +1876,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11),
             Object* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11) const
@@ -1897,7 +1897,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11) const,
             Component* obj
@@ -1952,7 +1952,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11),
             Component* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11) const
@@ -1974,7 +1974,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11) const,
             Component* obj
@@ -2031,7 +2031,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12),
             Object* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12) const
@@ -2052,7 +2052,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12) const,
             Component* obj
@@ -2107,7 +2107,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12),
             Component* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12) const
@@ -2129,7 +2129,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12) const,
             Component* obj
@@ -2186,7 +2186,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13),
             Object* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13) const
@@ -2207,7 +2207,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13) const,
             Component* obj
@@ -2262,7 +2262,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13),
             Component* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13) const
@@ -2284,7 +2284,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13) const,
             Component* obj
@@ -2341,7 +2341,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14),
             Object* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14) const
@@ -2362,7 +2362,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14) const,
             Component* obj
@@ -2417,7 +2417,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14),
             Component* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14) const
@@ -2439,7 +2439,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14) const,
             Component* obj
@@ -2496,7 +2496,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15),
             Object* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15) const
@@ -2517,7 +2517,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15) const,
             Component* obj
@@ -2572,7 +2572,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15),
             Component* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15) const
@@ -2594,7 +2594,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15) const,
             Component* obj
@@ -2651,7 +2651,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15 , typename FArg16>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16),
             Object* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16) const
@@ -2672,7 +2672,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15 , typename FArg16>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16) const,
             Component* obj
@@ -2727,7 +2727,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15 , typename FArg16>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16),
             Component* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16) const
@@ -2749,7 +2749,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15 , typename FArg16>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16) const,
             Component* obj
@@ -2806,7 +2806,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15 , typename FArg16 , typename FArg17>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16 , FArg17 arg17),
             Object* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17) const
@@ -2827,7 +2827,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15 , typename FArg16 , typename FArg17>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16 , FArg17 arg17) const,
             Component* obj
@@ -2882,7 +2882,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15 , typename FArg16 , typename FArg17>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16 , FArg17 arg17),
             Component* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17) const
@@ -2904,7 +2904,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15 , typename FArg16 , typename FArg17>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16 , FArg17 arg17) const,
             Component* obj
@@ -2961,7 +2961,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15 , typename FArg16 , typename FArg17 , typename FArg18>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16 , FArg17 arg17 , FArg18 arg18),
             Object* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18) const
@@ -2982,7 +2982,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15 , typename FArg16 , typename FArg17 , typename FArg18>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16 , FArg17 arg17 , FArg18 arg18) const,
             Component* obj
@@ -3037,7 +3037,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15 , typename FArg16 , typename FArg17 , typename FArg18>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16 , FArg17 arg17 , FArg18 arg18),
             Component* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18) const
@@ -3059,7 +3059,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15 , typename FArg16 , typename FArg17 , typename FArg18>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16 , FArg17 arg17 , FArg18 arg18) const,
             Component* obj
@@ -3116,7 +3116,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15 , typename FArg16 , typename FArg17 , typename FArg18 , typename FArg19>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16 , FArg17 arg17 , FArg18 arg18 , FArg19 arg19),
             Object* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19) const
@@ -3137,7 +3137,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15 , typename FArg16 , typename FArg17 , typename FArg18 , typename FArg19>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16 , FArg17 arg17 , FArg18 arg18 , FArg19 arg19) const,
             Component* obj
@@ -3192,7 +3192,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15 , typename FArg16 , typename FArg17 , typename FArg18 , typename FArg19>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16 , FArg17 arg17 , FArg18 arg18 , FArg19 arg19),
             Component* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19) const
@@ -3214,7 +3214,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15 , typename FArg16 , typename FArg17 , typename FArg18 , typename FArg19>
-        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
+        HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16 , FArg17 arg17 , FArg18 arg18 , FArg19 arg19) const,
             Component* obj
