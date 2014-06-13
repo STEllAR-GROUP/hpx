@@ -92,7 +92,29 @@ remotely accessed using its global address. Components
 are made of two parts: a server and a client class.
 While it is not required to write them this way, abstracting 
 the server and the client allow us to hide the boiler plate code 
-and use the component in a more natural way.
+and ensure type safety instead of having to pass around pointers
+to global objects. Example 5 renames example 4's 
+struct partiiton [TELETYPE] to partition_data [TELETYPE] and
+adds serialization support. Next we add the server side
+representation of the data in the structure partition_server [TELETYPE].
+This object's public members are accessable anywhere on the
+machine via its Global Identifyer (GID). To encapsulate
+the component, we create a client side helper class.  This
+object allows us to create new instances of our component,
+and access its members without having to know its GID. In addition,
+ we are using the client class to assist us with managing 
+our asyncrony and futures.
+
+In the structure stepper, we have also had to make some changes
+to accomadate a distributed environment.  In order to get the data from a 
+neighboring partition, which could be remote, we must retreve the 
+data from the neiboring partitions. These retrevals should be asycronous
+and the funciton heat_part_data [TELETYPE], which amongst other things calls
+heat, should not be called unless the data from the neigboring partitions
+have arrived.  Therefore it should come as no supprize that we syncronize 
+this operarion with another instance of dataflow.
+...talk about the unwrapped in heat_part...
+
 
 [/////////////////////////////////////////////////////////////////////////////]
 
