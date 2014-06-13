@@ -176,7 +176,7 @@ namespace hpx { namespace parallel
                     std::forward<F>(f), boost::mpl::false_());
         }
 
-        template <typename InIter, typename F, typename IterTag>
+        template <typename InIter, typename F>
         void for_each(execution_policy const& policy,
             InIter first, InIter last, F && f, boost::mpl::false_ fls)
         {
@@ -212,6 +212,14 @@ namespace hpx { namespace parallel
                     "Not supported execution policy");
                 break;
             }
+        }
+
+        template <typename InIter, typename F>
+        void for_each(execution_policy const& policy,
+            InIter first, InIter last, F && f, boost::mpl::true_ t)
+        {
+            detail::for_each(sequential_execution_policy(),
+                first, last, std::forward<F>(f), t);
         }
     }
 

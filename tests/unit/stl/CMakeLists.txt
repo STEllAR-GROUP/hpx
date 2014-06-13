@@ -7,6 +7,8 @@ set(tests
     copy
     copyif
     copyn
+    fill
+    filln
     foreach
     foreachn
     reduce_
