@@ -60,6 +60,55 @@ void test_copy(hpx::parallel::task_execution_policy, IteratorTag)
     HPX_TEST_EQ(count, d.size());
 }
 
+template<typename ExPolicy, typename IteratorTag>
+void test_copy_outiter(ExPolicy const& policy, IteratorTag)
+{
+        BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> d(0);
+    std::iota(boost::begin(c), boost::end(c), std::rand());
+    auto res = hpx::parallel::copy(policy,
+        iterator(boost::begin(c)), iterator(boost::end(c)), std::back_inserter(d));
+
+    std::size_t count = 0;
+    HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
+        [&count](std::size_t v1, std::size_t v2) {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST_EQ(count, d.size());
+}
+
+template <typename IteratorTag>
+void test_copy_outiter(hpx::parallel::task_execution_policy, IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> d(0);
+    std::iota(boost::begin(c), boost::end(c), std::rand());
+
+    auto f =
+        hpx::parallel::copy(hpx::parallel::task,
+            iterator(boost::begin(c)), iterator(boost::end(c)), std::back_inserter(d));
+    f.wait();
+
+    std::size_t count = 0;
+    HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
+        [&count](std::size_t v1, std::size_t v2) {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST_EQ(count, d.size());
+}
+
 template <typename IteratorTag>
 void test_copy()
 {
@@ -73,6 +122,17 @@ void test_copy()
     test_copy(execution_policy(par), IteratorTag());
     test_copy(execution_policy(vec), IteratorTag());
     test_copy(execution_policy(task), IteratorTag());
+    
+    //assure output iterator will work
+    test_copy_outiter(seq, IteratorTag());
+    test_copy_outiter(par, IteratorTag());
+    test_copy_outiter(vec, IteratorTag());
+    test_copy_outiter(task, IteratorTag());
+
+    test_copy_outiter(execution_policy(seq), IteratorTag());
+    test_copy_outiter(execution_policy(par), IteratorTag());
+    test_copy_outiter(execution_policy(vec), IteratorTag());
+    test_copy_outiter(execution_policy(task), IteratorTag());
 }
 
 void copy_test()
