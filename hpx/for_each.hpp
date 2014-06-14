@@ -60,7 +60,7 @@ namespace hpx {
         {
             BOOST_FOREACH(value_type const & v, range)
             {
-                futures.push_back(hpx::async(HPX_STD_PROTECT(f), v));
+                futures.push_back(hpx::async(f, v));
             }
 
             return futures;
@@ -76,14 +76,14 @@ namespace hpx {
             hpx::async(
                   for_each_impl
                 , boost::make_iterator_range(begin, mid)
-                , HPX_STD_PROTECT(f)
+                , f
             );
 
         lcos::future<futures_type> right_future =
             hpx::async(
                   for_each_impl
                 , boost::make_iterator_range(mid, end)
-                , HPX_STD_PROTECT(f)
+                , f
             );
 
         typedef typename futures_type::iterator futures_iterator_type;

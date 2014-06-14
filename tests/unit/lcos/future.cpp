@@ -462,7 +462,7 @@ void test_wait_callback()
     hpx::lcos::future<int> fi = pi.get_future();
 
     hpx::lcos::future<void> ft = fi.then(&wait_callback);
-    hpx::thread t(hpx::util::bind(&promise_set_value, boost::ref(pi)));
+    hpx::thread t(&promise_set_value, boost::ref(pi));
 
     ft.wait();
 

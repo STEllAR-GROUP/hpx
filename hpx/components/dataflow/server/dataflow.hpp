@@ -118,7 +118,7 @@ namespace hpx { namespace lcos { namespace server
         {
             /*
             applier::register_thread(
-                HPX_STD_BIND(&dataflow::init<typename Action::type>
+                util::bind(&dataflow::init<typename Action::type>
                   , this
                   , target
                 )
@@ -237,7 +237,7 @@ namespace hpx { namespace lcos { namespace server
         {
             /*
             applier::register_thread(
-                HPX_STD_BIND(&dataflow::init<
+                util::bind(&dataflow::init<
                         typename Action::type, BOOST_PP_ENUM_PARAMS(N, A)
                     >
                   , this

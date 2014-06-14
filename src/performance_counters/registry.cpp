@@ -206,8 +206,8 @@ namespace hpx { namespace performance_counters
 
             if (mode == discover_counters_full)
             {
-                using HPX_STD_PLACEHOLDERS::_1;
-                discover_counter = HPX_STD_BIND(&expand_counter_info, _1,
+                using util::placeholders::_1;
+                discover_counter = util::bind(&expand_counter_info, _1,
                     discover_counter, boost::ref(ec));
             }
 
@@ -227,8 +227,8 @@ namespace hpx { namespace performance_counters
 
             if (mode == discover_counters_full)
             {
-                using HPX_STD_PLACEHOLDERS::_1;
-                discover_counter = HPX_STD_BIND(&expand_counter_info, _1,
+                using util::placeholders::_1;
+                discover_counter = util::bind(&expand_counter_info, _1,
                     discover_counter, boost::ref(ec));
             }
 
@@ -281,8 +281,8 @@ namespace hpx { namespace performance_counters
     {
         if (mode == discover_counters_full)
         {
-            using HPX_STD_PLACEHOLDERS::_1;
-            discover_counter = HPX_STD_BIND(&expand_counter_info, _1,
+            using util::placeholders::_1;
+            discover_counter = util::bind(&expand_counter_info, _1,
                 discover_counter, boost::ref(ec));
         }
 

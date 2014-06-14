@@ -469,8 +469,8 @@ namespace detail
 
             error_code ec;
             threads::thread_id_type id = threads::register_thread_nullary(
-                HPX_STD_BIND(&timed_future_data::set_data, this_,
-                    std::forward<Result_>(init)),
+                util::bind(util::one_shot(&timed_future_data::set_data),
+                    this_, std::forward<Result_>(init)),
                 "timed_future_data<Result>::timed_future_data",
                 threads::suspended, true, threads::thread_priority_normal,
                 std::size_t(-1), threads::thread_stacksize_default, ec);
@@ -593,13 +593,13 @@ namespace detail
                 hpx::threads::get_self_id());
 
             if (sched_) {
-                sched_->add(HPX_STD_BIND(&task_base::run_impl, this_),
+                sched_->add(util::bind(&task_base::run_impl, this_),
                     desc ? desc : "task_base::apply", threads::pending, false,
                     stacksize, ec);
             }
             else {
                 threads::register_thread_plain(
-                    HPX_STD_BIND(&task_base::run_impl, this_),
+                    util::bind(&task_base::run_impl, this_),
                     desc ? desc : "task_base::apply", threads::pending, false,
                     priority, std::size_t(-1), stacksize, ec);
             }

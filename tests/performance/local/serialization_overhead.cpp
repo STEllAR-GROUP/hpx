@@ -148,9 +148,9 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::vector<hpx::future<double> > timings;
     for (std::size_t i = 0; i != concurrency; ++i)
     {
-        timings.push_back(hpx::async(hpx::util::bind(
+        timings.push_back(hpx::async(
             &benchmark_serialization, data_size, iterations,
-            continuation, zerocopy)));
+            continuation, zerocopy));
     }
 
     double overall_time = 0;

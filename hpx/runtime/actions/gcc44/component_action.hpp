@@ -93,7 +93,7 @@ namespace hpx { namespace actions
                 &Derived::template thread_function<naming::address::address_type>;
 
             return traits::action_decorate_function<Derived>::call(
-                lva, HPX_STD_BIND(f, lva));
+                lva, util::bind(f, lva));
         }
 
         /// \brief This static \a construct_thread_function allows to construct
@@ -283,7 +283,7 @@ namespace hpx { namespace actions
                 &Derived::template thread_function<naming::address::address_type>;
 
             return traits::action_decorate_function<Derived>::call(
-                lva, HPX_STD_BIND(f, lva));
+                lva, util::bind(f, lva));
         }
 
         /// \brief This static \a construct_thread_function allows to construct

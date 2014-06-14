@@ -109,14 +109,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         if(!hpx::is_starting() && !use_io_pool_)
         {
             hpx::applier::register_thread_nullary(
-                HPX_STD_BIND(&connection_handler::handle_messages, this),
+                util::bind(&connection_handler::handle_messages, this),
                 "mpi::connection_handler::handle_messages",
                 threads::pending, true, threads::thread_priority_critical);
         }
         else
         {
             boost::asio::io_service& io_service = io_service_pool_.get_io_service();
-            io_service.post(HPX_STD_BIND(&connection_handler::handle_messages, this));
+            io_service.post(util::bind(&connection_handler::handle_messages, this));
         }
     }
 
