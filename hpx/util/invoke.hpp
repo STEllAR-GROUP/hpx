@@ -29,12 +29,6 @@
 #include <boost/type_traits/remove_pointer.hpp>
 #include <boost/utility/enable_if.hpp>
 
-#if !defined(HPX_GCC_VERSION)
-#   define HPX_UTIL_INVOKE_FORCEINLINE BOOST_FORCEINLINE
-#else
-#   define HPX_UTIL_INVOKE_FORCEINLINE inline
-#endif
-
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -45,7 +39,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename R, typename FR>
-    HPX_UTIL_INVOKE_FORCEINLINE
+    HPX_MAYBE_FORCEINLINE
     R
     invoke_r(FR (*f)())
     {
@@ -53,7 +47,7 @@ namespace hpx { namespace util
     }
 
     template <typename R, typename FR, typename C, typename T>
-    HPX_UTIL_INVOKE_FORCEINLINE
+    HPX_MAYBE_FORCEINLINE
     typename boost::enable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -63,7 +57,7 @@ namespace hpx { namespace util
         return util::void_guard<R>(), (std::forward<T>(t).*f);
     }
     template <typename R, typename FR, typename C, typename T>
-    HPX_UTIL_INVOKE_FORCEINLINE
+    HPX_MAYBE_FORCEINLINE
     typename boost::disable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -75,7 +69,7 @@ namespace hpx { namespace util
     }
 
     template <typename R, typename FR, typename C, typename T>
-    HPX_UTIL_INVOKE_FORCEINLINE
+    HPX_MAYBE_FORCEINLINE
     typename boost::enable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -85,7 +79,7 @@ namespace hpx { namespace util
         return util::void_guard<R>(), (std::forward<T>(t).*f)();
     }
     template <typename R, typename FR, typename C, typename T>
-    HPX_UTIL_INVOKE_FORCEINLINE
+    HPX_MAYBE_FORCEINLINE
     typename boost::disable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -96,7 +90,7 @@ namespace hpx { namespace util
         return util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)();
     }
     template <typename R, typename FR, typename C, typename T>
-    HPX_UTIL_INVOKE_FORCEINLINE
+    HPX_MAYBE_FORCEINLINE
     typename boost::enable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -106,7 +100,7 @@ namespace hpx { namespace util
         return util::void_guard<R>(), (std::forward<T>(t).*f)();
     }
     template <typename R, typename FR, typename C, typename T>
-    HPX_UTIL_INVOKE_FORCEINLINE
+    HPX_MAYBE_FORCEINLINE
     typename boost::disable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -118,7 +112,7 @@ namespace hpx { namespace util
     }
 
     template <typename R, typename F>
-    HPX_UTIL_INVOKE_FORCEINLINE
+    HPX_MAYBE_FORCEINLINE
     typename boost::enable_if<
         boost::is_reference_wrapper<typename util::decay<F>::type>
       , R
@@ -129,7 +123,7 @@ namespace hpx { namespace util
     }
 
     template <typename R, typename F>
-    HPX_UTIL_INVOKE_FORCEINLINE
+    HPX_MAYBE_FORCEINLINE
     typename boost::disable_if<
         boost::mpl::or_<
             boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
@@ -145,7 +139,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename R>
-    HPX_UTIL_INVOKE_FORCEINLINE
+    HPX_MAYBE_FORCEINLINE
     R
     invoke(R (*f)())
     {
@@ -153,7 +147,7 @@ namespace hpx { namespace util
     }
 
     template <typename R, typename C, typename T>
-    HPX_UTIL_INVOKE_FORCEINLINE
+    HPX_MAYBE_FORCEINLINE
     typename invoke_result_of<R C::*(T)>::type
     invoke(R C::*f, T && t)
     {
@@ -165,14 +159,14 @@ namespace hpx { namespace util
     }
 
     template <typename R, typename C, typename T>
-    HPX_UTIL_INVOKE_FORCEINLINE
+    HPX_MAYBE_FORCEINLINE
     R
     invoke(R (C::*f)(), T && t)
     {
         return util::invoke_r<R>(f, std::forward<T>(t));
     }
     template <typename R, typename C, typename T>
-    HPX_UTIL_INVOKE_FORCEINLINE
+    HPX_MAYBE_FORCEINLINE
     R
     invoke(R (C::*f)() const, T && t)
     {
@@ -180,7 +174,7 @@ namespace hpx { namespace util
     }
 
     template <typename F>
-    HPX_UTIL_INVOKE_FORCEINLINE
+    HPX_MAYBE_FORCEINLINE
     typename boost::disable_if<
         boost::mpl::or_<
             boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
@@ -227,8 +221,6 @@ namespace hpx { namespace util
 
 #endif
 
-#undef HPX_UTIL_INVOKE_FORCEINLINE
-
 #else // !BOOST_PP_IS_ITERATING
 
 #define N BOOST_PP_ITERATION()
@@ -238,7 +230,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     template <typename R, typename FR, BOOST_PP_ENUM_PARAMS(N, typename A)
       , BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    HPX_UTIL_INVOKE_FORCEINLINE
+    HPX_MAYBE_FORCEINLINE
     R
     invoke_r(FR (*f)(BOOST_PP_ENUM_PARAMS(N, A))
       , HPX_ENUM_FWD_ARGS(N, Arg, arg))
@@ -252,7 +244,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, BOOST_PP_ENUM_PARAMS(N, typename A)
       , typename T, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    HPX_UTIL_INVOKE_FORCEINLINE
+    HPX_MAYBE_FORCEINLINE
     typename boost::enable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -267,7 +259,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, BOOST_PP_ENUM_PARAMS(N, typename A)
       , typename T, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    HPX_UTIL_INVOKE_FORCEINLINE
+    HPX_MAYBE_FORCEINLINE
     typename boost::disable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -283,7 +275,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, BOOST_PP_ENUM_PARAMS(N, typename A)
       , typename T, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    HPX_UTIL_INVOKE_FORCEINLINE
+    HPX_MAYBE_FORCEINLINE
     typename boost::enable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -298,7 +290,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, BOOST_PP_ENUM_PARAMS(N, typename A)
       , typename T, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    HPX_UTIL_INVOKE_FORCEINLINE
+    HPX_MAYBE_FORCEINLINE
     typename boost::disable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -314,7 +306,7 @@ namespace hpx { namespace util
 #   endif /*N < HPX_FUNCTION_ARGUMENT_LIMIT*/
 
     template <typename R, typename F, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    HPX_UTIL_INVOKE_FORCEINLINE
+    HPX_MAYBE_FORCEINLINE
     typename boost::enable_if<
         boost::is_reference_wrapper<typename util::decay<F>::type>
       , R
@@ -327,7 +319,7 @@ namespace hpx { namespace util
     }
 
     template <typename R, typename F, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    HPX_UTIL_INVOKE_FORCEINLINE
+    HPX_MAYBE_FORCEINLINE
     typename boost::disable_if<
         boost::mpl::or_<
             boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
@@ -346,7 +338,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     template <typename R, BOOST_PP_ENUM_PARAMS(N, typename A)
       , BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    HPX_UTIL_INVOKE_FORCEINLINE
+    HPX_MAYBE_FORCEINLINE
     R
     invoke(R (*f)(BOOST_PP_ENUM_PARAMS(N, A))
       , HPX_ENUM_FWD_ARGS(N, Arg, arg))
@@ -361,7 +353,7 @@ namespace hpx { namespace util
 #   if N < HPX_FUNCTION_ARGUMENT_LIMIT
     template <typename R, typename C, BOOST_PP_ENUM_PARAMS(N, typename A)
       , typename T, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    HPX_UTIL_INVOKE_FORCEINLINE
+    HPX_MAYBE_FORCEINLINE
     R
     invoke(R (C::*f)(BOOST_PP_ENUM_PARAMS(N, A))
       , T && t, HPX_ENUM_FWD_ARGS(N, Arg, arg))
@@ -374,7 +366,7 @@ namespace hpx { namespace util
     }
     template <typename R, typename C, BOOST_PP_ENUM_PARAMS(N, typename A)
       , typename T, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    HPX_UTIL_INVOKE_FORCEINLINE
+    HPX_MAYBE_FORCEINLINE
     R
     invoke(R (C::*f)(BOOST_PP_ENUM_PARAMS(N, A)) const
       , T && t, HPX_ENUM_FWD_ARGS(N, Arg, arg))
@@ -388,7 +380,7 @@ namespace hpx { namespace util
 #   endif /*N < HPX_FUNCTION_ARGUMENT_LIMIT*/
 
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    HPX_UTIL_INVOKE_FORCEINLINE
+    HPX_MAYBE_FORCEINLINE
     typename boost::disable_if<
         boost::mpl::or_<
             boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>

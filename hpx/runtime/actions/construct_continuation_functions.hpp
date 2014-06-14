@@ -16,12 +16,6 @@
 #include <boost/preprocessor/iterate.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 
-#if defined(HPX_GCC_VERSION)
-#define HPX_MAYBE_FORCEINLINE inline
-#else
-#define HPX_MAYBE_FORCEINLINE BOOST_FORCEINLINE
-#endif
-
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/runtime/actions/preprocessed/construct_continuation_functions.hpp>
 #else
@@ -49,8 +43,6 @@
 #endif
 
 #endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-
-#undef HPX_MAYBE_FORCEINLINE
 
 #endif
 
