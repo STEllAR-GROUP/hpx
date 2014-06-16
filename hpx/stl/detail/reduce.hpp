@@ -28,7 +28,7 @@ namespace hpx { namespace parallel
     namespace detail
     {
         template <typename ExPolicy, typename InIter, typename T, typename Pred>
-        typename detail::algorithm_result<ExPolicy, T>::type
+        typename detail::algorithm_result<ExPolicy, T>::type 
         reduce(ExPolicy const&, InIter first, InIter last, T && init,
             Pred && op, boost::mpl::true_)
         {

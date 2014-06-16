@@ -11,6 +11,7 @@ set(tests
     filln
     foreach
     foreachn
+    move
     reduce_
     transform
     transform_binary
