@@ -1537,7 +1537,7 @@ void test_wait_for_two_out_of_five_futures()
       , hpx::lcos::future<int>
       , hpx::lcos::future<int>
       , hpx::lcos::future<int> > result_type;
-    hpx::lcos::future<result_type> r = hpx::when_n(count, f1, f2, f3, f4, f5);
+    hpx::lcos::future<result_type> r = hpx::when_some(count, f1, f2, f3, f4, f5);
 
     result_type result = r.get();
 
@@ -1578,7 +1578,7 @@ void test_wait_for_three_out_of_five_futures()
       , hpx::lcos::future<int>
       , hpx::lcos::future<int>
       , hpx::lcos::future<int> > result_type;
-    hpx::lcos::future<result_type> r = hpx::when_n(count, f1, f2, f3, f4, f5);
+    hpx::lcos::future<result_type> r = hpx::when_some(count, f1, f2, f3, f4, f5);
 
     result_type result = r.get();
 

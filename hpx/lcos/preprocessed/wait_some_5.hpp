@@ -12,7 +12,7 @@ namespace hpx { namespace lcos
 {
     
     template <typename T0>
-    void wait_n(std::size_t n, T0 && f0,
+    void wait_some(std::size_t n, T0 && f0,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -27,12 +27,12 @@ namespace hpx { namespace lcos
         if (n > 1)
         {
             HPX_THROWS_IF(ec, hpx::bad_parameter,
-                "hpx::lcos::wait_n",
+                "hpx::lcos::wait_some",
                 "number of results to wait for is out of bounds");
             return;
         }
-        boost::shared_ptr<detail::wait_n<result_type> > f =
-            boost::make_shared<detail::wait_n<result_type> >(
+        boost::shared_ptr<detail::wait_some<result_type> > f =
+            boost::make_shared<detail::wait_some<result_type> >(
                 std::move(lazy_values_), n);
         return (*f.get())();
     }
@@ -41,7 +41,7 @@ namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1>
-    void wait_n(std::size_t n, T0 && f0 , T1 && f1,
+    void wait_some(std::size_t n, T0 && f0 , T1 && f1,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -56,12 +56,12 @@ namespace hpx { namespace lcos
         if (n > 2)
         {
             HPX_THROWS_IF(ec, hpx::bad_parameter,
-                "hpx::lcos::wait_n",
+                "hpx::lcos::wait_some",
                 "number of results to wait for is out of bounds");
             return;
         }
-        boost::shared_ptr<detail::wait_n<result_type> > f =
-            boost::make_shared<detail::wait_n<result_type> >(
+        boost::shared_ptr<detail::wait_some<result_type> > f =
+            boost::make_shared<detail::wait_some<result_type> >(
                 std::move(lazy_values_), n);
         return (*f.get())();
     }
@@ -70,7 +70,7 @@ namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1 , typename T2>
-    void wait_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2,
+    void wait_some(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -85,12 +85,12 @@ namespace hpx { namespace lcos
         if (n > 3)
         {
             HPX_THROWS_IF(ec, hpx::bad_parameter,
-                "hpx::lcos::wait_n",
+                "hpx::lcos::wait_some",
                 "number of results to wait for is out of bounds");
             return;
         }
-        boost::shared_ptr<detail::wait_n<result_type> > f =
-            boost::make_shared<detail::wait_n<result_type> >(
+        boost::shared_ptr<detail::wait_some<result_type> > f =
+            boost::make_shared<detail::wait_some<result_type> >(
                 std::move(lazy_values_), n);
         return (*f.get())();
     }
@@ -99,7 +99,7 @@ namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1 , typename T2 , typename T3>
-    void wait_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3,
+    void wait_some(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -114,12 +114,12 @@ namespace hpx { namespace lcos
         if (n > 4)
         {
             HPX_THROWS_IF(ec, hpx::bad_parameter,
-                "hpx::lcos::wait_n",
+                "hpx::lcos::wait_some",
                 "number of results to wait for is out of bounds");
             return;
         }
-        boost::shared_ptr<detail::wait_n<result_type> > f =
-            boost::make_shared<detail::wait_n<result_type> >(
+        boost::shared_ptr<detail::wait_some<result_type> > f =
+            boost::make_shared<detail::wait_some<result_type> >(
                 std::move(lazy_values_), n);
         return (*f.get())();
     }
@@ -128,7 +128,7 @@ namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4>
-    void wait_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4,
+    void wait_some(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -143,12 +143,12 @@ namespace hpx { namespace lcos
         if (n > 5)
         {
             HPX_THROWS_IF(ec, hpx::bad_parameter,
-                "hpx::lcos::wait_n",
+                "hpx::lcos::wait_some",
                 "number of results to wait for is out of bounds");
             return;
         }
-        boost::shared_ptr<detail::wait_n<result_type> > f =
-            boost::make_shared<detail::wait_n<result_type> >(
+        boost::shared_ptr<detail::wait_some<result_type> > f =
+            boost::make_shared<detail::wait_some<result_type> >(
                 std::move(lazy_values_), n);
         return (*f.get())();
     }
@@ -157,7 +157,7 @@ namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5>
-    void wait_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5,
+    void wait_some(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -172,12 +172,12 @@ namespace hpx { namespace lcos
         if (n > 6)
         {
             HPX_THROWS_IF(ec, hpx::bad_parameter,
-                "hpx::lcos::wait_n",
+                "hpx::lcos::wait_some",
                 "number of results to wait for is out of bounds");
             return;
         }
-        boost::shared_ptr<detail::wait_n<result_type> > f =
-            boost::make_shared<detail::wait_n<result_type> >(
+        boost::shared_ptr<detail::wait_some<result_type> > f =
+            boost::make_shared<detail::wait_some<result_type> >(
                 std::move(lazy_values_), n);
         return (*f.get())();
     }
@@ -186,7 +186,7 @@ namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6>
-    void wait_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6,
+    void wait_some(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -201,12 +201,12 @@ namespace hpx { namespace lcos
         if (n > 7)
         {
             HPX_THROWS_IF(ec, hpx::bad_parameter,
-                "hpx::lcos::wait_n",
+                "hpx::lcos::wait_some",
                 "number of results to wait for is out of bounds");
             return;
         }
-        boost::shared_ptr<detail::wait_n<result_type> > f =
-            boost::make_shared<detail::wait_n<result_type> >(
+        boost::shared_ptr<detail::wait_some<result_type> > f =
+            boost::make_shared<detail::wait_some<result_type> >(
                 std::move(lazy_values_), n);
         return (*f.get())();
     }
@@ -215,7 +215,7 @@ namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7>
-    void wait_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7,
+    void wait_some(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -230,12 +230,12 @@ namespace hpx { namespace lcos
         if (n > 8)
         {
             HPX_THROWS_IF(ec, hpx::bad_parameter,
-                "hpx::lcos::wait_n",
+                "hpx::lcos::wait_some",
                 "number of results to wait for is out of bounds");
             return;
         }
-        boost::shared_ptr<detail::wait_n<result_type> > f =
-            boost::make_shared<detail::wait_n<result_type> >(
+        boost::shared_ptr<detail::wait_some<result_type> > f =
+            boost::make_shared<detail::wait_some<result_type> >(
                 std::move(lazy_values_), n);
         return (*f.get())();
     }
