@@ -54,12 +54,12 @@ namespace hpx { namespace parallel
         {
             typedef typename detail::algorithm_result<ExPolicy, void>::type
             result_type;
-            typedef typename std::iterator_traits<InIter>::value_type value_type;
+            typedef typename std::iterator_traits<InIter>::reference type;
 
             return hpx::util::void_guard<result_type>(),
                 for_each_n(policy, first, 
                 std::distance(first, last),
-                [val](value_type& v){
+                [val](type v){
                     v = val;
                 }, f);
         }
@@ -157,11 +157,11 @@ namespace hpx { namespace parallel
         {
             typedef typename std::iterator_traits<OutIter>::iterator_category
                 category;
-            typedef typename std::iterator_traits<OutIter>::value_type value_type;
+            typedef typename std::iterator_traits<OutIter>::reference type;
 
             return
                     for_each_n(policy, first, count,
-                    [val](value_type& v){
+                    [val](type v){
                         v = val;
                     }, f);
                
