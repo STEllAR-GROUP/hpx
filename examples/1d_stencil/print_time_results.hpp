@@ -25,8 +25,13 @@ void print_time_results(
     )
 {
     if (header)
+<<<<<<< HEAD
         std::cout << "OS_Threads,Execution_Time_sec,"
                 "Points_per_Partition,Partitions,Time_Steps\n"
+=======
+        std::cout << "OS-threads, Execution-Time(seconds),"
+                " Points/Partition, Partitions, Time-Steps\n"
+>>>>>>> master
              << hpx::flush;
 
     std::string const threads_str = boost::str(boost::format("%lu,") % num_os_threads);
@@ -48,8 +53,13 @@ void print_time_results(
     )
 {
     if (header)
+<<<<<<< HEAD
         std::cout << "OS_Threads,Execution_Time_sec,"
                 "Grid_Points,Time_Steps\n"
+=======
+        std::cout << "OS-threads, Execution-Time(seconds),"
+                " Grid-Points, Time-Steps\n"
+>>>>>>> master
              << hpx::flush;
 
     std::string const threads_str = boost::str(boost::format("%lu,") % num_os_threads);

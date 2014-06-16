@@ -99,36 +99,6 @@ namespace hpx { namespace traits
         {
             return client.share().shared_state_;
         }
-
-        template <typename Archive>
-        static void load(Archive& ar, Derived& client)
-        {
-            typedef shared_future<naming::id_type> future_type;
-
-            future_type f;
-            future_access<future_type>::load(ar, f);
-
-            future<naming::id_type> id;
-            if (f.has_value())
-            {
-                id = hpx::make_ready_future(f.get());
-            }
-            else if (f.has_exception())
-            {
-                id = hpx::make_error_future<naming::id_type>(f.get_exception_ptr());
-            }
-            client = Derived(std::move(id));
-            ar >> client;
-        }
-
-        template <typename Archive>
-        static void save(Archive& ar, Derived const& client)
-        {
-            typedef shared_future<naming::id_type> future_type;
-
-            future_access<future_type>::save(ar, client.share());
-            ar << client;
-        }
     };
 }}
 
@@ -365,14 +335,10 @@ namespace hpx { namespace components
         friend class boost::serialization::access;
 
         template <typename Archive>
-        void load(Archive & ar, unsigned)
-        {}
-
-        template <typename Archive>
-        void save(Archive & ar, unsigned) const
-        {}
-
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
+        void serialize(Archive & ar, unsigned)
+        {
+            ar & gid_;
+        }
 
     protected:
         future_type gid_;

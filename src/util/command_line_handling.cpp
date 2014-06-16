@@ -737,15 +737,36 @@ namespace hpx { namespace util
         threads::topology& top = threads::create_topology();
         runtime & rt = get_runtime();
         {
-            util::osstream strm;        // make sure all ouput is kept together
+            util::osstream strm;    // make sure all output is kept together
 
             strm << std::string(79, '*') << '\n';
             strm << "locality: " << hpx::get_locality_id() << '\n';
             for (std::size_t i = 0; i != num_threads; ++i)
             {
-                top.print_affinity_mask(
-                    strm, i, rt.get_thread_manager().get_pu_mask(top, i)
-                );
+                // print the mask for the current PU
+                threads::mask_cref_type pu_mask =
+                    rt.get_thread_manager().get_pu_mask(top, i);
+
+                top.print_affinity_mask(strm, i, pu_mask);
+
+                // Make sure the mask does not contradict the CPU bindings
+                // returned by the system (see #973: Would like option to
+                // report HWLOC bindings).
+                error_code ec(lightweight);
+                threads::mask_type boundcpu = top.get_cpubind_mask(ec);
+
+                // The masks reported by HPX must be the same as the ones
+                // reported from HWLOC.
+                if (!ec && threads::any(boundcpu) &&
+                    !threads::equal(boundcpu, pu_mask, num_threads))
+                {
+                    HPX_THROW_EXCEPTION(invalid_status,
+                        "handle_print_bind",
+                        boost::str(
+                            boost::format("unexpected mismatch between "
+                                "binding reported from HWLOC(%1%) and HPX(%2%)"
+                            ) % boundcpu % pu_mask));
+                }
             }
 
             std::cout << util::osstream_get_string(strm);

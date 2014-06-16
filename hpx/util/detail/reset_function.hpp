@@ -7,7 +7,7 @@
 #define HPX_UTIL_DETAIL_RESET_FUNCTION_OCT_22_2013_0854AM
 
 #include <hpx/util/detail/function_template.hpp>
-#include <hpx/util/detail/unique_function.hpp>
+#include <hpx/util/detail/unique_function_template.hpp>
 
 namespace hpx { namespace util { namespace detail
 {
@@ -24,7 +24,13 @@ namespace hpx { namespace util { namespace detail
     }
     
     template <typename Sig, typename IArchive, typename OArchive>
-    inline void reset_function(hpx::util::detail::unique_function<Sig, IArchive, OArchive>& f)
+    inline void reset_function(hpx::util::unique_function<Sig, IArchive, OArchive>& f)
+    {
+        f.reset();
+    }
+    
+    template <typename Sig>
+    inline void reset_function(hpx::util::unique_function_nonser<Sig>& f)
     {
         f.reset();
     }

@@ -10,16 +10,11 @@
 
 # add headers to preprocessing
 set(function_argument_limit_preprocessing_files
+  "hpx/util/detail/basic_function.hpp"
   "hpx/util/detail/define_bind_action_function_operators.hpp"
   "hpx/util/detail/define_bind_function_operators.hpp"
-  "hpx/util/detail/function_template.hpp"
-  "hpx/util/detail/unique_function.hpp"
-  "hpx/util/detail/get_table.hpp"
-  "hpx/util/detail/get_empty_table.hpp"
-  "hpx/util/detail/vtable.hpp"
-  "hpx/util/detail/empty_vtable.hpp"
-  "hpx/util/detail/vtable_ptr.hpp"
-  "hpx/util/detail/vtable_ptr_base.hpp"
+  "hpx/util/detail/empty_function.hpp"
+  "hpx/util/detail/vtable/callable_vtable.hpp"
   "hpx/util/bind.hpp"
   "hpx/util/bind_action.hpp"
   "hpx/util/deferred_call.hpp"

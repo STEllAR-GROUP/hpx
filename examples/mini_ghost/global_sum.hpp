@@ -13,6 +13,7 @@ namespace mini_ghost {
     template <typename T>
     struct global_sum
     {
+    private:
         HPX_MOVABLE_BUT_NOT_COPYABLE(global_sum);
         typedef hpx::lcos::local::spinlock mutex_type;
 
@@ -30,6 +31,7 @@ namespace mini_ghost {
           , gate_(std::move(other.gate_))
         {
         }
+
         global_sum& operator=(global_sum &&other)
         {
             if(this != &other)
@@ -41,26 +43,22 @@ namespace mini_ghost {
             }
             return *this;
         }
+
         template<typename Action>
-        hpx::future<T> add(Action action, std::vector<hpx::id_type> const & ids,
+        hpx::future<T>
+        add(Action action, std::vector<hpx::id_type> const & ids,
             std::size_t which, T val, std::size_t id, std::size_t idx)
         {
             hpx::future<void> f = gate_.get_future(ids.size(), &generation_);
             HPX_ASSERT(value_ == 0);
 
             hpx::lcos::broadcast_apply<Action>(ids, generation_, which, val, id, idx);
-            
-            /*
-            for(hpx::id_type const & id_ : ids)
-            {
-                hpx::apply(action, id_, generation_, which, val, id);
-            }
-            */
-            
 
             return f.then(
                 hpx::launch::sync,
-                [this](hpx::future<void>) -> T {
+                [this](hpx::future<void>) -> T
+                {
+                    mutex_type::scoped_lock l(mtx_);
                     T v = value_; value_ = T(0); return v;
                 }
             );
@@ -73,7 +71,6 @@ namespace mini_ghost {
                 mutex_type::scoped_lock l(mtx_);
                 value_ += value;
             }
-
             gate_.set(which);         // trigger corresponding and-gate input
         }
 

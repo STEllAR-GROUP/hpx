@@ -883,6 +883,41 @@ namespace hpx { namespace threads
     {
         return num_of_pus_;
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    mask_type hwloc_topology::get_cpubind_mask(error_code& ec) const
+    {
+        hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
+
+        mask_type mask = mask_type();
+        resize(mask, get_number_of_pus());
+
+        {
+            scoped_lock lk(topo_mtx);
+            if (hwloc_get_cpubind(topo, cpuset, HWLOC_CPUBIND_THREAD))
+            {
+                hwloc_bitmap_free(cpuset);
+                HPX_THROWS_IF(ec, kernel_error
+                  , "hpx::threads::hwloc_topology::get_cpubind_mask"
+                  , "hwloc_get_cpubind failed");
+                return empty_mask;
+            }
+
+            int const pu_depth = hwloc_get_type_or_below_depth(topo, HWLOC_OBJ_PU);
+            for (unsigned int i = 0; i != num_of_pus_; ++i)
+            {
+                hwloc_obj_t const pu_obj = hwloc_get_obj_by_depth(topo, pu_depth, i);
+                set(mask, hwloc_bitmap_isset(cpuset, pu_obj->os_index) != 0);
+            }
+        }
+
+        hwloc_bitmap_free(cpuset);
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return mask;
+    }
 }}
 
 #endif

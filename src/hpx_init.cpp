@@ -517,7 +517,7 @@ namespace hpx
             add_startup_functions(rt, vm, mode, startup, shutdown);
 
             // Run this runtime instance using the given function f.
-            if (0 != f)
+            if (!f.empty())
                 return rt.run(boost::bind(f, vm));
 
             // Run this runtime instance without an hpx_main
@@ -532,7 +532,7 @@ namespace hpx
         {
             add_startup_functions(rt, vm, mode, startup, shutdown);
 
-            if (0 != f) {
+            if (!f.empty()) {
                 // Run this runtime instance using the given function f.
                 return rt.start(boost::bind(f, vm));
             }

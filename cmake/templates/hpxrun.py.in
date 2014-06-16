@@ -207,7 +207,7 @@ if __name__ == '__main__':
       , help='Which runwrapper to use (Options are: none, mpi, srun) '
              '(environment variable HPXRUN_ (environment variable'
              'HPXRUN_RUNWRAPPER)')
-    
+
     parser.add_option('-e', '--expected'
       , action='store', type='int'
       , dest='expected', default=default_env('HPXRUN_EXPECTED', '0')
@@ -240,22 +240,27 @@ if __name__ == '__main__':
             # Output which process failed
             msg = 'Process 0 failed with an unexpected error '
             msg += 'code of ' + str(ret) + ' (expected ' + str(options.expected)
-            msg += ')' 
+            msg += ')'
         sys.exit(ret)
 
     procs_lock = threading.Lock()
     returncode = 0
+    if options.expected == 0:
+        ret_expected = (lambda ret : True if ret == 0 else False)
+    else:
+        ret_expected = (lambda ret : False if ret == 0 else True)
+
     def wait_on_proc(proc, which):
         proc.wait()
         ret = proc.returncode
         procs_lock.acquire()
         if procs: procs.pop(which)
-        if ret != options.expected:
+        if not ret_expected(ret):
             returncode = 1
             # Output which process failed
             msg = 'Process ' + str(which) + ' failed with an unexpected error '
             msg += 'code of ' + str(ret) + ' (expected ' + str(options.expected)
-            msg += ')' 
+            msg += ')'
             print(msg)
             while procs:
                 term(procs.pop(0))
@@ -268,7 +273,7 @@ if __name__ == '__main__':
         proc_watchdog.start()
         proc_watchdogs.append(proc_watchdog)
         which = which + 1
-    
+
     for proc_watchdog in proc_watchdogs:
         proc_watchdog.join()
 

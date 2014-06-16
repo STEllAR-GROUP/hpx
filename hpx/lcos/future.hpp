@@ -60,28 +60,6 @@ namespace hpx { namespace lcos { namespace detail
     struct shared_state_ptr_for<Future &&>
       : shared_state_ptr_for<Future>
     {};
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Archive, typename Future>
-    typename boost::disable_if<
-        boost::is_void<typename traits::future_traits<Future>::type>
-    >::type serialize_future_load(Archive& ar, Future& f);
-
-    template <typename Archive, typename Future>
-    typename boost::enable_if<
-        boost::is_void<typename traits::future_traits<Future>::type>
-    >::type serialize_future_load(Archive& ar, Future& f);
-
-    template <typename Archive, typename Future>
-    typename boost::disable_if<
-        boost::is_void<typename traits::future_traits<Future>::type>
-    >::type serialize_future_save(Archive& ar, Future const& f);
-
-    template <typename Archive, typename Future>
-    typename boost::enable_if<
-        boost::is_void<typename traits::future_traits<Future>::type>
-    >::type serialize_future_save(Archive& ar, Future const& f);
-
 }}}
 
 namespace hpx { namespace traits
@@ -120,18 +98,6 @@ namespace hpx { namespace traits
         {
             return f.shared_state_;
         }
-
-        template <typename Archive>
-        static void load(Archive& ar, future<R>& f)
-        {
-            lcos::detail::serialize_future_load(ar, f);
-        }
-
-        template <typename Archive>
-        static void save(Archive& ar, future<R> const& f)
-        {
-            lcos::detail::serialize_future_save(ar, f);
-        }
     };
 
     template <typename R>
@@ -163,18 +129,6 @@ namespace hpx { namespace traits
         get_shared_state(shared_future<R> const& f)
         {
             return f.shared_state_;
-        }
-
-        template <typename Archive>
-        static void load(Archive& ar, shared_future<R>& f)
-        {
-            lcos::detail::serialize_future_load(ar, f);
-        }
-
-        template <typename Archive>
-        static void save(Archive& ar, shared_future<R> const& f)
-        {
-            lcos::detail::serialize_future_save(ar, f);
         }
     };
 }}
@@ -270,7 +224,8 @@ namespace hpx { namespace lcos { namespace detail
     {
         typedef typename traits::future_traits<Future>::type value_type;
 
-        HPX_ASSERT(!f.valid() || f.is_ready());
+        if (f.valid())
+            f.wait();
 
         int state = future_state::invalid;
         if (f.has_value())
@@ -293,7 +248,8 @@ namespace hpx { namespace lcos { namespace detail
         boost::is_void<typename traits::future_traits<Future>::type>
     >::type serialize_future_save(Archive& ar, Future const& f)
     {
-        HPX_ASSERT(!f.valid() || f.is_ready());
+        if (f.valid())
+            f.wait();
 
         int state = future_state::invalid;
         if (f.has_value())
@@ -307,6 +263,22 @@ namespace hpx { namespace lcos { namespace detail
             state = future_state::invalid;
             ar << state;
         }
+    }
+
+    template <typename Archive, typename Future>
+    typename boost::disable_if<
+        typename Archive::is_saving
+    >::type serialize_future(Archive& ar, Future& f, unsigned)
+    {
+        serialize_future_load(ar, f);
+    }
+
+    template <typename Archive, typename Future>
+    typename boost::enable_if<
+        typename Archive::is_saving
+    >::type serialize_future(Archive& ar, Future& f, unsigned)
+    {
+        serialize_future_save(ar, f);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -968,7 +940,7 @@ namespace hpx { namespace lcos
             // no error has been reported, return the result
             return detail::future_value<R>::get(data.move_value());
         }
-        
+
         typename traits::future_traits<future>::result_type
         get(error_code& ec)
         {
@@ -1113,6 +1085,17 @@ namespace hpx { namespace lcos
         {
             other = future<R>();
         }
+
+        // Effects: constructs a shared_future object by moving the instance
+        //          referred to by rhs and unwrapping the inner future
+        //          (see unwrap()).
+        // Postconditions:
+        //   - valid() returns the same value as other.valid() prior to the
+        //     constructor invocation.
+        //   - other.valid() == false.
+        shared_future(future<shared_future> && other) BOOST_NOEXCEPT
+          : base_type(other.valid() ? other.unwrap() : base_type())
+        {}
 
         // Effects: constructs a future<void> object that will be ready when
         //          the given future is ready
@@ -1802,6 +1785,23 @@ namespace hpx { namespace actions
 
         util::function<void(naming::id_type)> f_;
     };
+}}
+
+namespace boost { namespace serialization
+{
+    template <typename Archive, typename T>
+    BOOST_FORCEINLINE
+    void serialize(Archive& ar, ::hpx::lcos::future<T>& f, unsigned version)
+    {
+        hpx::lcos::detail::serialize_future(ar, f, version);
+    }
+
+    template <typename Archive, typename T>
+    BOOST_FORCEINLINE
+    void serialize(Archive& ar, ::hpx::lcos::shared_future<T>& f, unsigned version)
+    {
+        hpx::lcos::detail::serialize_future(ar, f, version);
+    }
 }}
 
 #include <hpx/lcos/local/packaged_continuation.hpp>

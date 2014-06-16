@@ -281,7 +281,7 @@ namespace detail
 
         /// Reset the promise to allow to restart an asynchronous
         /// operation. Allows any subsequent set_data operation to succeed.
-        void reset(error_code& ec = throws)
+        void reset(error_code& /*ec*/ = throws)
         {
             typename mutex_type::scoped_lock l(this->mtx_);
             state_ = empty;
@@ -539,13 +539,13 @@ namespace detail
         }
 
         virtual BOOST_SCOPED_ENUM(future_status)
-        wait_for(boost::posix_time::time_duration const& p, error_code& ec = throws)
+        wait_for(boost::posix_time::time_duration const& /*p*/, error_code& /*ec*/ = throws)
         {
             return future_status::deferred; //-V110
         }
 
         virtual BOOST_SCOPED_ENUM(future_status)
-        wait_until(boost::posix_time::ptime const& at, error_code& ec = throws)
+        wait_until(boost::posix_time::ptime const& /*at*/, error_code& /*ec*/ = throws)
         {
             return future_status::deferred; //-V110
         };
