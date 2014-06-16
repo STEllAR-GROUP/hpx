@@ -12,7 +12,13 @@ namespace hpx { namespace lcos
 {
     
     template <typename T0, typename F>
-    lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type> >
+    typename boost::disable_if<
+        boost::mpl::or_<
+            boost::mpl::not_<traits::is_future<T0> >,
+            traits::is_future<F>
+        >,
+        lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type> >
+    >::type
     when_each(T0 && f0, F && func)
     {
         typedef HPX_STD_TUPLE<
@@ -34,7 +40,13 @@ namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1, typename F>
-    lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type> >
+    typename boost::disable_if<
+        boost::mpl::or_<
+            boost::mpl::not_<traits::is_future<T0> >,
+            traits::is_future<F>
+        >,
+        lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type> >
+    >::type
     when_each(T0 && f0 , T1 && f1, F && func)
     {
         typedef HPX_STD_TUPLE<
@@ -56,7 +68,13 @@ namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1 , typename T2, typename F>
-    lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type> >
+    typename boost::disable_if<
+        boost::mpl::or_<
+            boost::mpl::not_<traits::is_future<T0> >,
+            traits::is_future<F>
+        >,
+        lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type> >
+    >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2, F && func)
     {
         typedef HPX_STD_TUPLE<
@@ -78,7 +96,13 @@ namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1 , typename T2 , typename T3, typename F>
-    lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type> >
+    typename boost::disable_if<
+        boost::mpl::or_<
+            boost::mpl::not_<traits::is_future<T0> >,
+            traits::is_future<F>
+        >,
+        lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type> >
+    >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3, F && func)
     {
         typedef HPX_STD_TUPLE<
@@ -100,7 +124,13 @@ namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4, typename F>
-    lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type> >
+    typename boost::disable_if<
+        boost::mpl::or_<
+            boost::mpl::not_<traits::is_future<T0> >,
+            traits::is_future<F>
+        >,
+        lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type> >
+    >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4, F && func)
     {
         typedef HPX_STD_TUPLE<
@@ -122,7 +152,13 @@ namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5, typename F>
-    lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type> >
+    typename boost::disable_if<
+        boost::mpl::or_<
+            boost::mpl::not_<traits::is_future<T0> >,
+            traits::is_future<F>
+        >,
+        lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type> >
+    >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5, F && func)
     {
         typedef HPX_STD_TUPLE<
@@ -144,7 +180,13 @@ namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6, typename F>
-    lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type> >
+    typename boost::disable_if<
+        boost::mpl::or_<
+            boost::mpl::not_<traits::is_future<T0> >,
+            traits::is_future<F>
+        >,
+        lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type> >
+    >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6, F && func)
     {
         typedef HPX_STD_TUPLE<
@@ -166,7 +208,13 @@ namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7, typename F>
-    lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type> >
+    typename boost::disable_if<
+        boost::mpl::or_<
+            boost::mpl::not_<traits::is_future<T0> >,
+            traits::is_future<F>
+        >,
+        lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type> >
+    >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7, F && func)
     {
         typedef HPX_STD_TUPLE<

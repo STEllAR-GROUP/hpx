@@ -184,7 +184,7 @@ namespace hpx { namespace lcos
 
     template <typename Iterator, typename F>
     lcos::future<Iterator>
-    when_each(std::size_t n, Iterator begin, Iterator end, F && f)
+    when_each(Iterator begin, Iterator end, F && f)
     {
         typedef
             typename lcos::detail::future_iterator_traits<Iterator>::type
@@ -270,7 +270,13 @@ namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
     template <BOOST_PP_ENUM_PARAMS(N, typename T), typename F>
-    lcos::future<HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_SOME_DECAY_FUTURE, _)> >
+    typename boost::disable_if<
+        boost::mpl::or_<
+            boost::mpl::not_<traits::is_future<T0> >,
+            traits::is_future<F>
+        >,
+        lcos::future<HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_SOME_DECAY_FUTURE, _)> >
+    >::type
     when_each(HPX_ENUM_FWD_ARGS(N, T, f), F && func)
     {
         typedef HPX_STD_TUPLE<
