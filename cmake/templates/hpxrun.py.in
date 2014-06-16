@@ -233,22 +233,24 @@ if __name__ == '__main__':
 
     run(cmd, options.runwrapper, options.localities, options.verbose)
 
-    if len(procs) == 1:
-        procs[0].wait()
-        ret = procs[0].returncode
-        if ret != options.expected:
-            # Output which process failed
-            msg = 'Process 0 failed with an unexpected error '
-            msg += 'code of ' + str(ret) + ' (expected ' + str(options.expected)
-            msg += ')'
-        sys.exit(ret)
-
-    procs_lock = threading.Lock()
-    returncode = 0
     if options.expected == 0:
         ret_expected = (lambda ret : True if ret == 0 else False)
     else:
         ret_expected = (lambda ret : False if ret == 0 else True)
+
+    if len(procs) == 1:
+        procs[0].wait()
+        ret = procs[0].returncode
+        if not ret_expected(ret):
+            # Output which process failed
+            msg = 'Process 0 failed with an unexpected error '
+            msg += 'code of ' + str(ret) + ' (expected ' + str(options.expected)
+            msg += ')'
+            sys.exit(1)
+        sys.exit(0)
+
+    procs_lock = threading.Lock()
+    returncode = 0
 
     def wait_on_proc(proc, which):
         proc.wait()
