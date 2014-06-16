@@ -33,12 +33,9 @@ namespace hpx { namespace parallel
         for_each_n(ExPolicy const&, InIter first,
             std::size_t count, F && f, boost::mpl::true_)
         {
-            typedef typename std::iterator_traits<InIter>::iterator_category
-                catecory;
-
             try {
                 return detail::algorithm_result<ExPolicy, InIter>::get(
-                    util::loop_n<catecory>::call(first, count, std::forward<F>(f)));
+                    util::loop_n(first, count, std::forward<F>(f)));
             }
             catch(std::bad_alloc const& e) {
                 boost::throw_exception(e);
@@ -55,16 +52,13 @@ namespace hpx { namespace parallel
         for_each_n(ExPolicy const&, InIter first, std::size_t count, F && f,
             boost::mpl::false_)
         {
-            typedef typename std::iterator_traits<InIter>::iterator_category
-                catecory;
-
             if (count > 0)
             {
                 return util::partitioner<ExPolicy>::call(
                     first, count,
                     [f](InIter part_begin, std::size_t part_count)
                     {
-                        util::loop_n<catecory>::call(part_begin, part_count, f);
+                        util::loop_n(part_begin, part_count, f);
                     });
             }
 

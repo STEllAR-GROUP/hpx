@@ -57,11 +57,11 @@ namespace hpx { namespace parallel
             typedef typename std::iterator_traits<InIter>::reference type;
 
             return hpx::util::void_guard<result_type>(),
-                for_each_n(policy, first, 
-                std::distance(first, last),
-                [val](type v){
-                    v = val;
-                }, f);
+                for_each_n(policy, first,
+                    std::distance(first, last),
+                    [val](value_type& v){
+                        v = val;
+                    }, f);
         }
 
         template<typename InIter, typename T>
@@ -96,7 +96,7 @@ namespace hpx { namespace parallel
                 break;
             }
         }
-        
+
        template <typename InIter, typename T>
         void fill(execution_policy const& policy,
             InIter first, InIter last, T val, boost::mpl::true_ t)
@@ -104,7 +104,6 @@ namespace hpx { namespace parallel
             detail::fill(sequential_execution_policy(),
                 first, last, val, t);
         }
-        
     }
 
     template <typename ExPolicy, typename InIter, typename T>
@@ -159,12 +158,11 @@ namespace hpx { namespace parallel
                 category;
             typedef typename std::iterator_traits<OutIter>::reference type;
 
-            return
-                    for_each_n(policy, first, count,
-                    [val](type v){
-                        v = val;
-                    }, f);
-               
+            return for_each_n(policy, first, count,
+                        [val](value_type& v) {
+                            v = val;
+                        }, f);
+
         }
 
         template<typename OutIter, typename T>
@@ -207,7 +205,6 @@ namespace hpx { namespace parallel
             return detail::fill_n(sequential_execution_policy(),
                 first, count, val, t);
         }
-        
     }
 
     template<typename ExPolicy, typename OutIter, typename T>
@@ -233,7 +230,6 @@ namespace hpx { namespace parallel
             std::forward<ExPolicy>(policy),
             first, count, val, is_seq());
     }
-    
 }}
 
 #endif

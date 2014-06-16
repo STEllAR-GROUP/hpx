@@ -38,118 +38,245 @@ namespace hpx { namespace parallel { namespace util
         }
     };
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Helper class to repeatedly call a function starting from a given
-    // iterator position.
-    template <typename IterCat>
-    struct loop
+    namespace detail
     {
-        template <typename Iter, typename F>
-        static Iter call(Iter it, Iter end, F && func)
+        ///////////////////////////////////////////////////////////////////////
+        // Helper class to repeatedly call a function starting from a given
+        // iterator position.
+        template <typename IterCat>
+        struct loop
         {
-            for (/**/; it != end; ++it)
-                func(*it);
-
-            return it;
-        }
-
-        template <typename Iter, typename F, typename CancelToken>
-        static Iter call(Iter it, Iter end, F && func, CancelToken& tok)
-        {
-            for (/**/; it != end; ++it)
+            ///////////////////////////////////////////////////////////////////
+            template <typename Iter, typename F>
+            static Iter call(Iter it, Iter end, F && f, boost::mpl::false_)
             {
-                func(*it);
-                if (tok.was_cancelled())
-                    break;
+                for (/**/; it != end; ++it)
+                    f(*it);
+
+                return it;
             }
-            return it;
-        }
-    };
+
+            template <typename Iter, typename F>
+            static Iter call(Iter it, Iter end, F && f, boost::mpl::true_)
+            {
+                typedef typename std::iterator_traits<Iter>::value_type type;
+                hpx::wait_each(it, end,
+                    [&f](hpx::future<type> fut)
+                    {
+                        f(fut.get());
+                        return true;
+                    });
+                return end;
+            }
+
+            ///////////////////////////////////////////////////////////////////////
+            template <typename Iter, typename F, typename CancelToken>
+            static Iter call(Iter it, Iter end, F && func, CancelToken& tok)
+            {
+                for (/**/; it != end; ++it)
+                {
+                    func(*it);
+                    if (tok.was_cancelled())
+                        break;
+                }
+                return it;
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////////
+        // Helper class to repeatedly call a function a given number of times
+        // starting from a given iterator position.
+        template <typename IterCat>
+        struct loop_n
+        {
+            ///////////////////////////////////////////////////////////////////
+            // handle sequences of non-futures
+            template <typename Iter, typename F>
+            static Iter call(Iter it, std::size_t count, F && f,
+                boost::mpl::false_)
+            {
+                for (/**/; count != 0; --count, ++it)
+                    f(*it);
+
+                return it;
+            }
+
+            template <typename Iter, typename F, typename CancelToken>
+            static Iter call(Iter it, std::size_t count, F && f,
+                CancelToken& tok, boost::mpl::false_)
+            {
+                for (/**/; count != 0; --count, ++it)
+                {
+                    f(*it);
+                    if (tok.was_cancelled())
+                        break;
+                }
+                return it;
+            }
+
+            ///////////////////////////////////////////////////////////////////
+            // handle sequences of futures
+            template <typename Iter, typename F>
+            static Iter call(Iter it, std::size_t count, F && f,
+                boost::mpl::true_)
+            {
+                typedef typename std::iterator_traits<Iter>::value_type type;
+                return hpx::wait_each_n(it, count,
+                    [&f](hpx::future<type> fut)
+                    {
+                        f(fut.get());
+                        return true;
+                    });
+            }
+
+            template <typename Iter, typename F, typename CancelToken>
+            static Iter call(Iter it, std::size_t count, F && f,
+                CancelToken& tok, boost::mpl::true_)
+            {
+                typedef typename std::iterator_traits<Iter>::value_type type;
+                return hpx::wait_each_n(it, count,
+                    [&f, &tok](hpx::future<type> fut)
+                    {
+                        f(fut.get());
+                        return !tok.was_cancelled();
+                    });
+            }
+        };
+
+        // specialization for random access iterators
+        template <>
+        struct loop_n<std::random_access_iterator_tag>
+        {
+            ///////////////////////////////////////////////////////////////////
+            // handle sequences of non-futures
+            template <typename Iter, typename F>
+            static Iter call(Iter it, std::size_t count, F && f,
+                boost::mpl::false_)
+            {
+                for (std::size_t i = 0; i != count; ++i)
+                    f(it[i]);
+
+                std::advance(it, count);
+                return it;
+            }
+
+            template <typename Iter, typename F, typename CancelToken>
+            static Iter call(Iter it, std::size_t count, F && func,
+                CancelToken& tok, boost::mpl::false_)
+            {
+                std::size_t i = 0;
+                for (/**/; i != count; ++i)
+                {
+                    func(it[i]);
+                    if (tok.was_cancelled())
+                        break;
+                }
+                std::advance(it, i);
+                return it;
+            }
+
+            ///////////////////////////////////////////////////////////////////
+            // handle sequence of futures
+            template <typename Iter, typename F>
+            static Iter call(Iter it, std::size_t count, F && f,
+                boost::mpl::true_)
+            {
+                typedef typename std::iterator_traits<Iter>::value_type type;
+                return hpx::wait_each_n(it, count,
+                    [&f](hpx::future<type> fut)
+                    {
+                        f(fut.get());
+                        return true;
+                    });
+            }
+
+            template <typename Iter, typename F, typename CancelToken>
+            static Iter call(Iter it, std::size_t count, F && func,
+                CancelToken& tok, boost::mpl::true_)
+            {
+                typedef typename std::iterator_traits<Iter>::value_type type;
+                return hpx::wait_each_n(it, count,
+                    [&f, &tok](hpx::future<type> fut)
+                    {
+                        f(fut.get());
+                        return !tok.was_cancelled();
+                    });
+            }
+        };
+    }
 
     ///////////////////////////////////////////////////////////////////////////
-    // Helper class to repeatedly call a function a given number of times
-    // starting from a given iterator position.
-    template <typename IterCat>
-    struct loop_n
+    template <typename Iter, typename F>
+    BOOST_FORCEINLINE Iter
+    loop_n(Iter it, std::size_t count, F && f)
     {
-        template <typename Iter, typename F>
-        static Iter call(Iter it, std::size_t count, F && func)
-        {
-            for (/**/; count != 0; --count, ++it)
-                func(*it);
+        typedef typename std::iterator_traits<Iter>::iterator_category cat;
+        typedef typename hpx::traits::is_future<
+            typename std::iterator_traits<Iter>::value_type
+        >::type pred;
 
-            return it;
-        }
+        return detail::loop_n<cat>::call(it, count, std::forward<F>(f), pred());
+    }
 
-        template <typename Iter, typename F, typename CancelToken>
-        static Iter call(Iter it, std::size_t count, F && func, CancelToken& tok)
-        {
-            for (/**/; count != 0; --count, ++it)
-            {
-                func(*it);
-                if (tok.was_cancelled())
-                    break;
-            }
-            return it;
-        }
+    template <typename Iter, typename F, typename CancelToken>
+    BOOST_FORCEINLINE Iter
+    loop_n(Iter it, std::size_t count, F && f, CancelToken& tok)
+    {
+        typedef typename std::iterator_traits<Iter>::iterator_category cat;
+        typedef typename hpx::traits::is_future<
+            typename std::iterator_traits<Iter>::value_type
+        >::type pred;
+
+        return detail::loop_n<cat>::call(it, count, std::forward<F>(f), tok,
+            pred());
     };
 
-    // specialization for random access iterators
-    template <>
-    struct loop_n<std::random_access_iterator_tag>
+    namespace detail
     {
-        template <typename Iter, typename F>
-        static Iter call(Iter it, std::size_t count, F && func)
+        ///////////////////////////////////////////////////////////////////////
+        // Helper class to repeatedly call a function a given number of times
+        // starting from a given iterator position.
+        template <typename IterCat>
+        struct accumulate_n
         {
-            for (std::size_t i = 0; i != count; ++i)
-                func(it[i]);
-
-            std::advance(it, count);
-            return it;
-        }
-
-        template <typename Iter, typename F, typename CancelToken>
-        static Iter call(Iter it, std::size_t count, F && func, CancelToken& tok)
-        {
-            std::size_t i = 0;
-            for (/**/; i != count; ++i)
+            template <typename Iter, typename T, typename Pred>
+            static T call(Iter it, std::size_t count, T init, Pred && f,
+                boost::mpl::false_)
             {
-                func(it[i]);
-                if (tok.was_cancelled())
-                    break;
+                for (/**/; count != 0; --count, ++it)
+                    init = f(init, *it);
+                return init;
             }
-            std::advance(it, i);
-            return it;
-        }
-    };
+        };
+
+        // specialization for random access iterators
+        template <>
+        struct accumulate_n<std::random_access_iterator_tag>
+        {
+            template <typename Iter, typename T, typename Pred>
+            static T call(Iter it, std::size_t count, T init, Pred && f,
+                boost::mpl::false_)
+            {
+                for (std::size_t i = 0; i != count; ++i)
+                    init = f(init, it[i]);
+                return init;
+            }
+        };
+    }
 
     ///////////////////////////////////////////////////////////////////////////
-    // Helper class to repeatedly call a function a given number of times
-    // starting from a given iterator position.
-    template <typename IterCat>
-    struct accumulate_n
+    template <typename Iter, typename T, typename Pred>
+    BOOST_FORCEINLINE Iter
+    accumulate_n(Iter it, std::size_t count, T init, Pred && f)
     {
-        template <typename Iter, typename T, typename Pred>
-        static T call(Iter it, std::size_t count, T init, Pred && func)
-        {
-            for (/**/; count != 0; --count, ++it)
-                init = func(init, *it);
-            return init;
-        }
-    };
+        typedef typename std::iterator_traits<Iter>::iterator_category cat;
+        typedef typename hpx::traits::is_future<
+            typename std::iterator_traits<Iter>::value_type
+        >::type pred;
 
-    // specialization for random access iterators
-    template <>
-    struct accumulate_n<std::random_access_iterator_tag>
-    {
-        template <typename Iter, typename T, typename Pred>
-        static T call(Iter it, std::size_t count, T init, Pred && func)
-        {
-            for (std::size_t i = 0; i != count; ++i)
-                init = func(init, it[i]);
-            return init;
-        }
-    };
+        return detail::accumulate_n<cat>::call(it, count, std::move(init),
+            std::forward<F>(f), pred());
+    }
 }}}
 
 #endif
