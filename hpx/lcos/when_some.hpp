@@ -167,7 +167,8 @@ namespace hpx { namespace lcos
                 if (count_.load(boost::memory_order_acquire) < needed_count_)
                 {
                     // wait for any of the futures to return to become ready
-                    this_thread::suspend(threads::suspended);
+                    this_thread::suspend(threads::suspended,
+                        "hpx::lcos::detail::when_some::operator()");
                 }
 
                 // at least N futures should be ready
