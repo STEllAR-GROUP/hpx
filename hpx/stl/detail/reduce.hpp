@@ -33,6 +33,7 @@ namespace hpx { namespace parallel
             Pred && op, boost::mpl::true_)
         {
             try {
+                synchronize(first, last);
                 return detail::algorithm_result<ExPolicy, T>::get(
                     std::accumulate(first, last, std::forward<T>(init),
                         std::forward<Pred>(op)));

@@ -31,6 +31,7 @@ namespace hpx { namespace parallel
             boost::mpl::true_)
         {
             try {
+                detail::synchronize(first, last);
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
                     std::copy(first, last, dest));
             }
@@ -58,8 +59,8 @@ namespace hpx { namespace parallel
 
             return get_iter<1, result_type>(
                 for_each_n(policy,
-                    detail::make_zip_iterator(boost::make_tuple(first,dest)),
-                    std::distance(first,last),
+                    detail::make_zip_iterator(boost::make_tuple(first, dest)),
+                    std::distance(first, last),
                     [](reference it) {
                         *boost::get<1>(it) = *boost::get<0>(it);
                     },

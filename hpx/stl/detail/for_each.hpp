@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/stl/execution_policy.hpp>
 #include <hpx/stl/detail/algorithm_result.hpp>
+#include <hpx/stl/detail/synchronize.hpp>
 #include <hpx/stl/util/partitioner.hpp>
 #include <hpx/stl/util/loop.hpp>
 #include <hpx/exception_list.hpp>
@@ -143,6 +144,7 @@ namespace hpx { namespace parallel
             boost::mpl::true_)
         {
             try {
+                detail::synchronize(first, last);
                 std::for_each(first, last, std::forward<F>(f));
                 return detail::algorithm_result<ExPolicy, void>::get();
             }

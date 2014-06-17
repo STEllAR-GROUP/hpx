@@ -10,6 +10,7 @@ set(tests
     fill
     filln
     foreach
+    foreach_futures
     foreachn
     move
     reduce_

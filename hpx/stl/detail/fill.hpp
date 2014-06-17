@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/stl/execution_policy.hpp>
 #include <hpx/stl/detail/algorithm_result.hpp>
+#include <hpx/stl/detail/synchronize.hpp>
 #include <hpx/stl/util/partitioner.hpp>
 #include <hpx/stl/util/loop.hpp>
 #include <hpx/exception_list.hpp>
@@ -34,7 +35,8 @@ namespace hpx { namespace parallel
         boost::mpl::true_)
         {
             try {
-                std::fill(first,last,val);
+                detail::synchronize(first, last);
+                std::fill(first, last, val);
                 return detail::algorithm_result<ExPolicy, void>::get();
             }
             catch(std::bad_alloc const& e) {
@@ -135,7 +137,8 @@ namespace hpx { namespace parallel
         fill_n(ExPolicy const&, OutIter first, std::size_t count, T val,
         boost::mpl::true_)
         {
-            try{
+            try {
+                detail::synchronize(first, last);
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
                     std::fill_n(first, count, val));
             }

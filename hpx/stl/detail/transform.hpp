@@ -33,6 +33,7 @@ namespace hpx { namespace parallel
             F && f, boost::mpl::true_)
         {
             try {
+                synchronize(first, last);
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
                     std::transform(first, last, dest, std::forward<F>(f)));
             }
@@ -149,7 +150,7 @@ namespace hpx { namespace parallel
             boost::is_same<std::input_iterator_tag, iterator_category>
         >::type is_seq;
 
-        return detail::transform(std::forward<ExPolicy>(policy), 
+        return detail::transform(std::forward<ExPolicy>(policy),
             first, last, dest,
             std::forward<F>(f), is_seq());
     }
@@ -165,6 +166,7 @@ namespace hpx { namespace parallel
             InIter2 first2, OutIter dest, F && f, boost::mpl::true_)
         {
             try {
+                synchronize(first, last);
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
                     std::transform(first1, last1, first2, dest,
                         std::forward<F>(f)));
@@ -250,7 +252,7 @@ namespace hpx { namespace parallel
             F && f, boost::mpl::true_ t)
         {
             return detail::transform_binary(sequential_execution_policy(),
-                first1, last1, first2, dest, std::forward<F>(f), 
+                first1, last1, first2, dest, std::forward<F>(f),
                 t);
         }
     }

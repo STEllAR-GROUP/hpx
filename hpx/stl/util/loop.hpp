@@ -7,6 +7,7 @@
 #define HPX_STL_UTIL_LOOP_MAY_27_2014_1040PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/lcos/wait_each.hpp>
 
 #include <iterator>
 #include <algorithm>
@@ -56,22 +57,9 @@ namespace hpx { namespace parallel { namespace util
                 return it;
             }
 
-            template <typename Iter, typename F>
-            static Iter call(Iter it, Iter end, F && f, boost::mpl::true_)
-            {
-                typedef typename std::iterator_traits<Iter>::value_type type;
-                hpx::wait_each(it, end,
-                    [&f](hpx::future<type> fut)
-                    {
-                        f(fut.get());
-                        return true;
-                    });
-                return end;
-            }
-
-            ///////////////////////////////////////////////////////////////////////
             template <typename Iter, typename F, typename CancelToken>
-            static Iter call(Iter it, Iter end, F && func, CancelToken& tok)
+            static Iter call(Iter it, Iter end, F && func, CancelToken& tok,
+                boost::mpl::false_)
             {
                 for (/**/; it != end; ++it)
                 {
@@ -81,8 +69,63 @@ namespace hpx { namespace parallel { namespace util
                 }
                 return it;
             }
-        };
 
+            ///////////////////////////////////////////////////////////////////
+            template <typename Iter, typename F>
+            static Iter call(Iter it, Iter end, F && f, boost::mpl::true_)
+            {
+                typedef typename std::iterator_traits<Iter>::value_type type;
+                return hpx::wait_each(it, end,
+                    [&f](type& fut)
+                    {
+                        f(std::move(fut));
+                        return true;
+                    });
+            }
+
+            template <typename Iter, typename F, typename CancelToken>
+            static Iter call(Iter it, Iter end, F && func, CancelToken& tok,
+                boost::mpl::true_)
+            {
+                typedef typename std::iterator_traits<Iter>::value_type type;
+                return hpx::wait_each(it, end,
+                    [&f, &tok](type& fut)
+                    {
+                        f(std::move(fut));
+                        return !tok.was_cancelled();
+                    });
+            }
+        };
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Iter, typename F>
+    BOOST_FORCEINLINE Iter
+    loop(Iter begin, Iter end, F && f)
+    {
+        typedef typename std::iterator_traits<Iter>::iterator_category cat;
+        typedef typename hpx::traits::is_future<
+            typename std::iterator_traits<Iter>::value_type
+        >::type pred;
+
+        return detail::loop<cat>::call(begin, end, std::forward<F>(f), pred());
+    }
+
+    template <typename Iter, typename F, typename CancelToken>
+    BOOST_FORCEINLINE Iter
+    loop_n(Iter begin, Iter end, F && f, CancelToken& tok)
+    {
+        typedef typename std::iterator_traits<Iter>::iterator_category cat;
+        typedef typename hpx::traits::is_future<
+            typename std::iterator_traits<Iter>::value_type
+        >::type pred;
+
+        return detail::loop<cat>::call(begin, end, std::forward<F>(f), tok,
+            pred());
+    };
+
+    namespace detail
+    {
         ///////////////////////////////////////////////////////////////////////////
         // Helper class to repeatedly call a function a given number of times
         // starting from a given iterator position.
@@ -122,9 +165,9 @@ namespace hpx { namespace parallel { namespace util
             {
                 typedef typename std::iterator_traits<Iter>::value_type type;
                 return hpx::wait_each_n(it, count,
-                    [&f](hpx::future<type> fut)
+                    [&f](type& fut)
                     {
-                        f(fut.get());
+                        f(std::move(fut));
                         return true;
                     });
             }
@@ -135,9 +178,9 @@ namespace hpx { namespace parallel { namespace util
             {
                 typedef typename std::iterator_traits<Iter>::value_type type;
                 return hpx::wait_each_n(it, count,
-                    [&f, &tok](hpx::future<type> fut)
+                    [&f, &tok](type& fut)
                     {
-                        f(fut.get());
+                        f(std::move(fut));
                         return !tok.was_cancelled();
                     });
             }
@@ -183,9 +226,9 @@ namespace hpx { namespace parallel { namespace util
             {
                 typedef typename std::iterator_traits<Iter>::value_type type;
                 return hpx::wait_each_n(it, count,
-                    [&f](hpx::future<type> fut)
+                    [&f](type& fut)
                     {
-                        f(fut.get());
+                        f(std::move(fut));
                         return true;
                     });
             }
@@ -196,9 +239,9 @@ namespace hpx { namespace parallel { namespace util
             {
                 typedef typename std::iterator_traits<Iter>::value_type type;
                 return hpx::wait_each_n(it, count,
-                    [&f, &tok](hpx::future<type> fut)
+                    [&f, &tok](type& fut)
                     {
-                        f(fut.get());
+                        f(std::move(fut));
                         return !tok.was_cancelled();
                     });
             }
