@@ -37,27 +37,27 @@ namespace hpx { namespace lcos
     }
 
     template <typename Future, typename F>
-    void wait_each(std::vector<Future> && lazy_values)
+    void wait_each(std::vector<Future> && lazy_values, F && f)
     {
-        lcos::when_each(lazy_values, std::forward<F>(func)).get();
+        lcos::when_each(lazy_values, std::forward<F>(f)).get();
     }
 
     template <typename Iterator, typename F>
     Iterator wait_each(Iterator begin, Iterator end, F && f)
     {
-        return lcos::when_each(begin, end, std::forward<F>(func)).get();
+        return lcos::when_each(begin, end, std::forward<F>(f)).get();
     }
 
     template <typename Iterator, typename F>
-    Iterator wait_all_n(Iterator begin, std::size_t count, F && f)
+    Iterator wait_each_n(Iterator begin, std::size_t count, F && f)
     {
-        return when_each_n(begin, count, std::forward<F>(func)).get();
+        return when_each_n(begin, count, std::forward<F>(f)).get();
     }
 
     template <typename F>
     inline void wait_each(F && f)
     {
-        lcos::when_each(std::forward<F>(func)).get();
+        lcos::when_each(std::forward<F>(f)).get();
     }
 }}
 
@@ -83,6 +83,7 @@ namespace hpx { namespace lcos
 namespace hpx
 {
     using lcos::wait_each;
+    using lcos::wait_each_n;
 }
 
 #endif

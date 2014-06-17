@@ -17,13 +17,11 @@ namespace hpx { namespace lcos
             boost::mpl::not_<traits::is_future<T0> >,
             traits::is_future<F>
         >,
-        lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type> >
+        lcos::future<void>
     >::type
     when_each(T0 && f0, F && func)
     {
-        typedef HPX_STD_TUPLE<
-            typename util::decay<T0>::type>
-            result_type;
+        typedef void result_type;
         typedef util::decay<F>::type func_type;
         typedef detail::when_each<result_type, func_type> when_each_type;
         result_type lazy_values(detail::when_acquire_future<T0>()(f0));
@@ -45,13 +43,11 @@ namespace hpx { namespace lcos
             boost::mpl::not_<traits::is_future<T0> >,
             traits::is_future<F>
         >,
-        lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type> >
+        lcos::future<void>
     >::type
     when_each(T0 && f0 , T1 && f1, F && func)
     {
-        typedef HPX_STD_TUPLE<
-            typename util::decay<T0>::type , typename util::decay<T1>::type>
-            result_type;
+        typedef void result_type;
         typedef util::decay<F>::type func_type;
         typedef detail::when_each<result_type, func_type> when_each_type;
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1));
@@ -73,13 +69,11 @@ namespace hpx { namespace lcos
             boost::mpl::not_<traits::is_future<T0> >,
             traits::is_future<F>
         >,
-        lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type> >
+        lcos::future<void>
     >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2, F && func)
     {
-        typedef HPX_STD_TUPLE<
-            typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type>
-            result_type;
+        typedef void result_type;
         typedef util::decay<F>::type func_type;
         typedef detail::when_each<result_type, func_type> when_each_type;
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2));
@@ -101,13 +95,11 @@ namespace hpx { namespace lcos
             boost::mpl::not_<traits::is_future<T0> >,
             traits::is_future<F>
         >,
-        lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type> >
+        lcos::future<void>
     >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3, F && func)
     {
-        typedef HPX_STD_TUPLE<
-            typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type>
-            result_type;
+        typedef void result_type;
         typedef util::decay<F>::type func_type;
         typedef detail::when_each<result_type, func_type> when_each_type;
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3));
@@ -129,13 +121,11 @@ namespace hpx { namespace lcos
             boost::mpl::not_<traits::is_future<T0> >,
             traits::is_future<F>
         >,
-        lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type> >
+        lcos::future<void>
     >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4, F && func)
     {
-        typedef HPX_STD_TUPLE<
-            typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type>
-            result_type;
+        typedef void result_type;
         typedef util::decay<F>::type func_type;
         typedef detail::when_each<result_type, func_type> when_each_type;
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4));
@@ -157,13 +147,11 @@ namespace hpx { namespace lcos
             boost::mpl::not_<traits::is_future<T0> >,
             traits::is_future<F>
         >,
-        lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type> >
+        lcos::future<void>
     >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5, F && func)
     {
-        typedef HPX_STD_TUPLE<
-            typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type>
-            result_type;
+        typedef void result_type;
         typedef util::decay<F>::type func_type;
         typedef detail::when_each<result_type, func_type> when_each_type;
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5));
@@ -185,13 +173,11 @@ namespace hpx { namespace lcos
             boost::mpl::not_<traits::is_future<T0> >,
             traits::is_future<F>
         >,
-        lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type> >
+        lcos::future<void>
     >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6, F && func)
     {
-        typedef HPX_STD_TUPLE<
-            typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type>
-            result_type;
+        typedef void result_type;
         typedef util::decay<F>::type func_type;
         typedef detail::when_each<result_type, func_type> when_each_type;
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6));
@@ -213,13 +199,11 @@ namespace hpx { namespace lcos
             boost::mpl::not_<traits::is_future<T0> >,
             traits::is_future<F>
         >,
-        lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type> >
+        lcos::future<void>
     >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7, F && func)
     {
-        typedef HPX_STD_TUPLE<
-            typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type>
-            result_type;
+        typedef void result_type;
         typedef util::decay<F>::type func_type;
         typedef detail::when_each<result_type, func_type> when_each_type;
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7));

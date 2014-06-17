@@ -124,6 +124,7 @@ namespace hpx { namespace lcos
 namespace hpx
 {
     using lcos::when_all;
+    using lcos::when_all_n;
 }
 
 #endif

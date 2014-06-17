@@ -21,20 +21,34 @@ namespace hpx { namespace lcos
         template <typename Sequence, typename F>
         struct when_each;
 
-        template <typename Sequence, typename F, typename Callback>
+        template <typename Sequence, typename F>
         struct set_when_each_on_completed_callback_impl
         {
             explicit set_when_each_on_completed_callback_impl(
-                    when_each<Sequence, F>& when, Callback const& callback)
-              : when_(when),
-                callback_(callback)
+                    boost::shared_ptr<when_each<Sequence, F> > when)
+              : when_(when)
             {}
+
+            template <typename Future>
+            static void on_future_ready(Future& future,
+                boost::shared_ptr<when_each<Sequence, F> > when,
+                threads::thread_id_type const& id)
+            {
+                when->f_(future);
+
+                if (when->count_.fetch_add(1) + 1 == when->needed_count_)
+                {
+                    // reactivate waiting thread only if it's not us
+                    if (id != threads::get_self_id())
+                        threads::set_thread_state(id, threads::pending);
+                }
+            }
 
             template <typename Future>
             void operator()(Future& future) const
             {
-                std::size_t counter = when_.count_.load(boost::memory_order_acquire);
-                if (counter < when_.needed_count_ && !future.is_ready()) {
+                std::size_t counter = when_->count_.load(boost::memory_order_acquire);
+                if (counter < when_->needed_count_ && !future.is_ready()) {
                     // handle future only if not enough futures are ready yet
                     // also, do not touch any futures which are already ready
 
@@ -45,11 +59,13 @@ namespace hpx { namespace lcos
                     shared_state_ptr const& shared_state =
                         lcos::detail::get_shared_state(future);
 
-                    shared_state->set_on_completed(Callback(callback_));
+                    shared_state->set_on_completed(util::bind(
+                        &set_when_each_on_completed_callback_impl::on_future_ready<Future>,
+                        boost::ref(future), when_, threads::get_self_id()));
                 }
                 else {
-                    ++when_.count_;
-                    when_.f_(std::move(future));    // invoke callback right away
+                    ++when_->count_;
+                    when_->f_(future);    // invoke callback right away
                 }
             }
 
@@ -67,39 +83,36 @@ namespace hpx { namespace lcos
                 std::for_each(sequence.begin(), sequence.end(), *this);
             }
 
-            when_each<Sequence, F>& when_;
-            Callback const& callback_;
+            boost::shared_ptr<when_each<Sequence, F> > when_;
         };
+
+        template <typename Sequence, typename F>
+        void set_on_completed_callback(
+            boost::shared_ptr<when_each<Sequence, F> > when)
+        {
+            set_when_each_on_completed_callback_impl<Sequence, F>
+                set_on_completed_callback_helper(when);
+            set_on_completed_callback_helper.apply(when->lazy_values_);
+        }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Sequence, typename F>
         struct when_each
+          : boost::enable_shared_from_this<when_each<Sequence, F> >
         {
         private:
             HPX_MOVABLE_BUT_NOT_COPYABLE(when_each)
-
-        protected:
-            void on_future_ready(std::size_t i, threads::thread_id_type const& id)
-            {
-                f_(std::move(lazy_values_[i]));     // invoke callback function
-
-                if (count_.fetch_add(1) + 1 == lazy_values_.size())
-                {
-                    // reactivate waiting thread only if it's not us
-                    if (id != threads::get_self_id())
-                        threads::set_thread_state(id, threads::pending);
-                }
-            }
 
         public:
             typedef Sequence argument_type;
             typedef void result_type;
 
             template <typename F_>
-            when_each(argument_type && lazy_values, F_ && f)
+            when_each(argument_type && lazy_values, F_ && f, std::size_t n)
               : lazy_values_(std::move(lazy_values)),
-                ready_count_(0),
+                count_(0),
                 f_(std::forward<F>(f)),
+                needed_count_(n)
             {}
 
             result_type operator()()
@@ -107,15 +120,12 @@ namespace hpx { namespace lcos
                 count_.store(0);
 
                 // set callback functions to executed when future is ready
-                set_on_completed_callback(*this,
-                    util::bind(
-                        &when_each::on_future_ready, this->shared_from_this(),
-                        i, threads::get_self_id()));
+                set_on_completed_callback(this->shared_from_this());
 
                 // If all of the requested futures are already set then our
                 // callback above has already been called, otherwise we suspend
                 // ourselves.
-                if (count_ < size)
+                if (count_ < needed_count_)
                 {
                     // wait for all of the futures to return to become ready
                     this_thread::suspend(threads::suspended,
@@ -123,12 +133,13 @@ namespace hpx { namespace lcos
                 }
 
                 // all futures should be ready
-                HPX_ASSERT(count_.load(boost::memory_order_acquire) == size);
+                HPX_ASSERT(count_.load(boost::memory_order_acquire) == needed_count_);
             }
 
-            result_type lazy_values_;
+            argument_type lazy_values_;
             boost::atomic<std::size_t> count_;
             F f_;
+            std::size_t const needed_count_;
         };
     }
 
@@ -153,11 +164,12 @@ namespace hpx { namespace lcos
         BOOST_STATIC_ASSERT_MSG(
             traits::is_future<Future>::value, "invalid use of when_each");
 
-        typedef lcos::future<void> result_type;
+        typedef void result_type;
+        typedef std::vector<Future> argument_type;
         typedef typename util::decay<F>::type func_type;
-        typedef detail::when_each<result_type, func_type> when_each_type;
+        typedef detail::when_each<argument_type, func_type> when_each_type;
 
-        result_type lazy_values_;
+        std::vector<Future> lazy_values_;
         lazy_values_.reserve(lazy_values.size());
 
         std::transform(lazy_values.begin(), lazy_values.end(),
@@ -166,7 +178,7 @@ namespace hpx { namespace lcos
 
         boost::shared_ptr<when_each_type> f =
             boost::make_shared<when_each_type>(std::move(lazy_values_),
-                std::forward<F>(func));
+                std::forward<F>(func), lazy_values_.size());
 
         lcos::local::futures_factory<result_type()> p(
             util::bind(&when_each_type::operator(), f));
@@ -191,7 +203,7 @@ namespace hpx { namespace lcos
             future_type;
         typedef void result_type;
 
-        result_type lazy_values_;
+        std::vector<future_type> lazy_values_;
         std::transform(begin, end, std::back_inserter(lazy_values_),
             detail::when_acquire_future<future_type>());
 
@@ -202,15 +214,15 @@ namespace hpx { namespace lcos
 
     template <typename Iterator, typename F>
     lcos::future<Iterator>
-    when_each_n(std::size_t n, Iterator begin, std::size_t count, F && f)
+    when_each_n(Iterator begin, std::size_t count, F && f)
     {
         typedef
             typename lcos::detail::future_iterator_traits<Iterator>::type
             future_type;
-        typedef std::vector<future_type> result_type;
+        typedef std::vector<Iterator> result_type;
 
-        result_type lazy_values_;
-        lazy_values_.resize(count);
+        std::vector<future_type> lazy_values_;
+        lazy_values_.reserve(count);
         detail::when_acquire_future<future_type> func;
         for (std::size_t i = 0; i != count; ++i)
             lazy_values_.push_back(func(*begin++));
@@ -250,6 +262,7 @@ namespace hpx { namespace lcos
 namespace hpx
 {
     using lcos::when_each;
+    using lcos::when_each_n;
 }
 
 #endif
@@ -275,13 +288,11 @@ namespace hpx { namespace lcos
             boost::mpl::not_<traits::is_future<T0> >,
             traits::is_future<F>
         >,
-        lcos::future<HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_SOME_DECAY_FUTURE, _)> >
+        lcos::future<void>
     >::type
     when_each(HPX_ENUM_FWD_ARGS(N, T, f), F && func)
     {
-        typedef HPX_STD_TUPLE<
-            BOOST_PP_ENUM(N, HPX_WHEN_SOME_DECAY_FUTURE, _)>
-            result_type;
+        typedef void result_type;
         typedef util::decay<F>::type func_type;
         typedef detail::when_each<result_type, func_type> when_each_type;
 
@@ -289,7 +300,7 @@ namespace hpx { namespace lcos
 
         boost::shared_ptr<when_each_type> f =
             boost::make_shared<when_each_type>(std::move(lazy_values),
-                std::forward<F>(func));
+                std::forward<F>(func), N);
 
         lcos::local::futures_factory<result_type()> p(
             util::bind(&when_each_type::operator(), f));

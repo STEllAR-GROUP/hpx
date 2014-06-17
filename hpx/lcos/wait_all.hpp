@@ -132,6 +132,7 @@ namespace hpx { namespace lcos
 namespace hpx
 {
     using lcos::wait_all;
+    using lcos::wait_all_n;
 }
 
 #endif
