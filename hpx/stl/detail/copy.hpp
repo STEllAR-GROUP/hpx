@@ -31,7 +31,6 @@ namespace hpx { namespace parallel
             boost::mpl::true_)
         {
             try {
-                detail::synchronize(first, last);
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
                     std::copy(first, last, dest));
             }
@@ -58,7 +57,7 @@ namespace hpx { namespace parallel
             result_type;
 
             return get_iter<1, result_type>(
-                for_each_n(policy,
+                plain_for_each_n(policy,
                     detail::make_zip_iterator(boost::make_tuple(first, dest)),
                     std::distance(first, last),
                     [](reference it) {
@@ -121,11 +120,19 @@ namespace hpx { namespace parallel
         typedef typename std::iterator_traits<OutIter>::iterator_category
             output_iterator_category;
 
+        BOOST_STATIC_ASSERT_MSG(
+            boost::is_base_of<
+                std::input_iterator_tag, input_iterator_category>::value,
+            "Required at least input iterator.");
 
         BOOST_STATIC_ASSERT_MSG(
-            boost::is_base_of<std::input_iterator_tag,
-                typename std::iterator_traits<InIter>::iterator_category>::value,
-            "Required at least input iterator.");
+            boost::mpl::or_<
+                boost::is_base_of<
+                    std::forward_iterator_tag, output_iterator_category>,
+                boost::is_same<
+                    std::output_iterator_tag, output_iterator_category>
+            >::value,
+            "Requires at least output iterator.");
 
         typedef boost::mpl::or_<
             is_sequential_execution_policy<ExPolicy>,
@@ -153,7 +160,7 @@ namespace hpx { namespace parallel
             try {
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
                     get_iter<1, OutIter>(
-                        for_each_n(sequential_execution_policy(),
+                        plain_for_each_n(sequential_execution_policy(),
                             detail::make_zip_iterator(boost::make_tuple(first, dest)),
                             count,
                             [](reference it) {
@@ -186,7 +193,7 @@ namespace hpx { namespace parallel
             result_type;
 
             return get_iter<1, result_type>(
-                for_each_n(policy,
+                plain_for_each_n(policy,
                     detail::make_zip_iterator(boost::make_tuple(first, dest)),
                     count,
                     [](reference it) {
@@ -250,9 +257,18 @@ namespace hpx { namespace parallel
             output_iterator_category;
 
         BOOST_STATIC_ASSERT_MSG(
-            boost::is_base_of<std::input_iterator_tag,
-                typename std::iterator_traits<InIter>::iterator_category>::value,
+            boost::is_base_of<
+                std::input_iterator_tag, input_iterator_category>::value,
             "Required at least input iterator.");
+
+        BOOST_STATIC_ASSERT_MSG(
+            boost::mpl::or_<
+                boost::is_base_of<
+                    std::forward_iterator_tag, output_iterator_category>,
+                boost::is_same<
+                    std::output_iterator_tag, output_iterator_category>
+            >::value,
+            "Requires at least output iterator.");
 
         typedef boost::mpl::or_<
             is_sequential_execution_policy<ExPolicy>,
@@ -281,7 +297,7 @@ namespace hpx { namespace parallel
             try{
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
                     get_iter<1, OutIter>(
-                        for_each_n(sequential_execution_policy(),
+                        plain_for_each_n(sequential_execution_policy(),
                             detail::make_zip_iterator(boost::make_tuple(first, dest)),
                             std::distance(first, last),
                             [f](reference it) {
@@ -316,7 +332,7 @@ namespace hpx { namespace parallel
             result_type;
 
             return get_iter<1, result_type>(
-                for_each_n(policy,
+                plain_for_each_n(policy,
                     detail::make_zip_iterator(boost::make_tuple(first, dest)),
                     std::distance(first,last),
                     [f](reference it) {
@@ -381,9 +397,18 @@ namespace hpx { namespace parallel
             output_iterator_category;
 
         BOOST_STATIC_ASSERT_MSG(
-            boost::is_base_of<std::input_iterator_tag,
-                typename std::iterator_traits<InIter>::iterator_category>::value,
+            boost::is_base_of<
+                std::input_iterator_tag, input_iterator_category>::value,
             "Required at least input iterator.");
+
+        BOOST_STATIC_ASSERT_MSG(
+            boost::mpl::or_<
+                boost::is_base_of<
+                    std::forward_iterator_tag, output_iterator_category>,
+                boost::is_same<
+                    std::output_iterator_tag, output_iterator_category>
+            >::value,
+            "Requires at least output iterator.");
 
         typedef boost::mpl::or_<
             is_sequential_execution_policy<ExPolicy>,

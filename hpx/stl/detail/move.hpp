@@ -11,6 +11,7 @@
 #include <hpx/stl/execution_policy.hpp>
 #include <hpx/stl/detail/algorithm_result.hpp>
 #include <hpx/stl/detail/zip_iterator.hpp>
+#include <hpx/stl/detail/synchronize.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -26,7 +27,7 @@ namespace hpx { namespace parallel
     namespace detail
     {
         template <typename ExPolicy, typename InIter, typename OutIter>
-        typename detail::algorithm_result<ExPolicy, OutIter>::type 
+        typename detail::algorithm_result<ExPolicy, OutIter>::type
         move(ExPolicy const&, InIter first, InIter last, OutIter dest,
             boost::mpl::true_)
         {
@@ -57,7 +58,7 @@ namespace hpx { namespace parallel
             result_type;
 
             return get_iter<1, result_type>(
-                for_each_n(policy,
+                plain_for_each_n(policy,
                     detail::make_zip_iterator(boost::make_tuple(first,dest)),
                     std::distance(first,last),
                     [](reference it) {
@@ -93,7 +94,7 @@ namespace hpx { namespace parallel
 
             default:
                 HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                    "hpx::parallel::detail::copy",
+                    "hpx::parallel::detail::move",
                     "Not supported execution policy");
                 break;
             }
@@ -120,11 +121,19 @@ namespace hpx { namespace parallel
         typedef typename std::iterator_traits<OutIter>::iterator_category
             output_iterator_category;
 
+        BOOST_STATIC_ASSERT_MSG(
+            boost::is_base_of<
+                std::input_iterator_tag, input_iterator_category>::value,
+            "Required at least input iterator.");
 
         BOOST_STATIC_ASSERT_MSG(
-            boost::is_base_of<std::input_iterator_tag,
-                typename std::iterator_traits<InIter>::iterator_category>::value,
-            "Required at least input iterator.");
+            boost::mpl::or_<
+                boost::is_base_of<
+                    std::forward_iterator_tag, output_iterator_category>,
+                boost::is_same<
+                    std::output_iterator_tag, output_iterator_category>
+            >::value,
+            "Requires at least output iterator.");
 
         typedef boost::mpl::or_<
             is_sequential_execution_policy<ExPolicy>,
@@ -135,6 +144,6 @@ namespace hpx { namespace parallel
         return detail::move( std::forward<ExPolicy>(policy),
             first, last, dest, is_seq());
     }
-
 }}
+
 #endif

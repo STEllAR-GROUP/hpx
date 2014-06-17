@@ -11,6 +11,7 @@
 #include <hpx/stl/execution_policy.hpp>
 #include <hpx/stl/detail/algorithm_result.hpp>
 #include <hpx/stl/detail/zip_iterator.hpp>
+#include <hpx/stl/detail/synchronize.hpp>
 #include <hpx/util/move.hpp>
 
 #include <algorithm>
@@ -33,7 +34,7 @@ namespace hpx { namespace parallel
             F && f, boost::mpl::true_)
         {
             try {
-                synchronize(first, last);
+                detail::synchronize(first, last);
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
                     std::transform(first, last, dest, std::forward<F>(f)));
             }
@@ -45,23 +46,6 @@ namespace hpx { namespace parallel
                     hpx::exception_list(boost::current_exception())
                 );
             }
-        }
-
-        template <int N, typename R, typename ZipIter>
-        R get_iter(ZipIter&& zipiter)
-        {
-            return boost::get<N>(*zipiter);
-        }
-
-        template <int N, typename R, typename ZipIter>
-        R get_iter(hpx::future<ZipIter>&& zipiter)
-        {
-            return zipiter.then(
-                [](hpx::future<ZipIter>&& f) {
-                    typename std::iterator_traits<ZipIter>::value_type t =
-                        *f.get();
-                    return boost::get<N>(t);
-                });
         }
 
         template <typename ExPolicy, typename InIter, typename OutIter,
@@ -166,7 +150,7 @@ namespace hpx { namespace parallel
             InIter2 first2, OutIter dest, F && f, boost::mpl::true_)
         {
             try {
-                synchronize(first, last);
+                detail::synchronize_binary(first1, last1, first2);
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
                     std::transform(first1, last1, first2, dest,
                         std::forward<F>(f)));

@@ -14,6 +14,7 @@
 
 namespace hpx { namespace parallel { namespace detail
 {
+    ///////////////////////////////////////////////////////////////////////////
     // Helper that picks the lowest common iterator type from given iterator
     // tags
     template <typename IterTag0, typename IterTag1>
@@ -197,6 +198,24 @@ namespace hpx { namespace parallel { namespace detail
     make_zip_iterator(IteratorTuple t)
     {
         return zip_iterator<IteratorTuple>(t);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <int N, typename R, typename ZipIter>
+    R get_iter(ZipIter&& zipiter)
+    {
+        return boost::get<N>(*zipiter);
+    }
+
+    template <int N, typename R, typename ZipIter>
+    R get_iter(hpx::future<ZipIter>&& zipiter)
+    {
+        return zipiter.then(
+            [](hpx::future<ZipIter>&& f) {
+                typename std::iterator_traits<ZipIter>::value_type t =
+                    *f.get();
+                return boost::get<N>(t);
+            });
     }
 }}}
 

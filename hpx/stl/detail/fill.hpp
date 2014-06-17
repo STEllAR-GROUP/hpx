@@ -32,10 +32,9 @@ namespace hpx { namespace parallel
         template <typename ExPolicy, typename InIter, typename T>
         typename detail::algorithm_result<ExPolicy, void>::type
         fill(ExPolicy const&, InIter first, InIter last, T val,
-        boost::mpl::true_)
+            boost::mpl::true_)
         {
             try {
-                detail::synchronize(first, last);
                 std::fill(first, last, val);
                 return detail::algorithm_result<ExPolicy, void>::get();
             }
@@ -52,16 +51,16 @@ namespace hpx { namespace parallel
         template <typename ExPolicy, typename InIter, typename T>
         typename detail::algorithm_result<ExPolicy, void>::type
         fill(ExPolicy const& policy, InIter first, InIter last, T val,
-        boost::mpl::false_ f)
+            boost::mpl::false_ f)
         {
             typedef typename detail::algorithm_result<ExPolicy, void>::type
-            result_type;
-            typedef typename std::iterator_traits<InIter>::reference type;
+                result_type;
+            typedef typename std::iterator_traits<InIter>::value_type type;
 
             return hpx::util::void_guard<result_type>(),
-                for_each_n(policy, first,
+                plain_for_each_n(policy, first,
                     std::distance(first, last),
-                    [val](value_type& v){
+                    [val](type& v){
                         v = val;
                     }, f);
         }
@@ -119,8 +118,8 @@ namespace hpx { namespace parallel
              iterator_category;
 
         BOOST_STATIC_ASSERT_MSG(
-            boost::is_base_of<std::forward_iterator_tag,
-            typename std::iterator_traits<InIter>::iterator_category>::value,
+            boost::is_base_of<
+                std::forward_iterator_tag, iterator_category>::value,
             "Required at least forward iterator.");
 
         typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
@@ -138,7 +137,6 @@ namespace hpx { namespace parallel
         boost::mpl::true_)
         {
             try {
-                detail::synchronize(first, last);
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
                     std::fill_n(first, count, val));
             }
@@ -159,10 +157,10 @@ namespace hpx { namespace parallel
         {
             typedef typename std::iterator_traits<OutIter>::iterator_category
                 category;
-            typedef typename std::iterator_traits<OutIter>::reference type;
+            typedef typename std::iterator_traits<OutIter>::value_type type;
 
-            return for_each_n(policy, first, count,
-                        [val](value_type& v) {
+            return plain_for_each_n(policy, first, count,
+                        [val](type& v) {
                             v = val;
                         }, f);
 
@@ -221,7 +219,12 @@ namespace hpx { namespace parallel
             iterator_category;
 
         BOOST_STATIC_ASSERT_MSG(
-            boost::is_base_of<std::output_iterator_tag, iterator_category>::value,
+            boost::mpl::or_<
+                boost::is_base_of<
+                    std::forward_iterator_tag, iterator_category>,
+                boost::is_same<
+                    std::output_iterator_tag, iterator_category>
+            >::value,
             "Requires at least output iterator.");
 
         typedef boost::mpl::or_<

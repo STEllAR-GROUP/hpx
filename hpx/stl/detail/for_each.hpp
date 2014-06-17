@@ -67,6 +67,44 @@ namespace hpx { namespace parallel
                 std::move(first));
         }
 
+        template <typename ExPolicy, typename InIter, typename F>
+        typename detail::algorithm_result<ExPolicy, InIter>::type
+        plain_for_each_n(ExPolicy const&, InIter first,
+            std::size_t count, F && f, boost::mpl::true_)
+        {
+            try {
+                return detail::algorithm_result<ExPolicy, InIter>::get(
+                    util::plain_loop_n(first, count, std::forward<F>(f)));
+            }
+            catch(std::bad_alloc const& e) {
+                boost::throw_exception(e);
+            }
+            catch (...) {
+                boost::throw_exception(
+                    hpx::exception_list(boost::current_exception())
+                );
+            }
+        }
+
+        template <typename ExPolicy, typename InIter, typename F>
+        typename detail::algorithm_result<ExPolicy, InIter>::type
+        plain_for_each_n(ExPolicy const&, InIter first, std::size_t count,
+            F && f, boost::mpl::false_)
+        {
+            if (count > 0)
+            {
+                return util::partitioner<ExPolicy>::call(
+                    first, count,
+                    [f](InIter part_begin, std::size_t part_count)
+                    {
+                        util::plain_loop_n(part_begin, part_count, f);
+                    });
+            }
+
+            return detail::algorithm_result<ExPolicy, InIter>::get(
+                std::move(first));
+        }
+
         template <typename InIter, typename F>
         InIter for_each_n(execution_policy const& policy,
             InIter first, std::size_t count, F && func, boost::mpl::false_ f)

@@ -28,12 +28,12 @@ namespace hpx { namespace parallel
     namespace detail
     {
         template <typename ExPolicy, typename InIter, typename T, typename Pred>
-        typename detail::algorithm_result<ExPolicy, T>::type 
+        typename detail::algorithm_result<ExPolicy, T>::type
         reduce(ExPolicy const&, InIter first, InIter last, T && init,
             Pred && op, boost::mpl::true_)
         {
             try {
-                synchronize(first, last);
+                detail::synchronize(first, last);
                 return detail::algorithm_result<ExPolicy, T>::get(
                     std::accumulate(first, last, std::forward<T>(init),
                         std::forward<Pred>(op)));
@@ -67,13 +67,13 @@ namespace hpx { namespace parallel
                 [op](InIter part_begin, std::size_t part_count)
                 {
                     T val = *part_begin;
-                    return util::accumulate_n<category>::call(
-                        ++part_begin, --part_count, val, op);
+                    return util::accumulate_n(++part_begin, --part_count,
+                        val, op);
                 },
                 hpx::util::unwrapped([init, op](std::vector<T>&& results)
                 {
-                    return util::accumulate_n<category>::call(
-                        boost::begin(results), boost::size(results), init, op);
+                    return util::accumulate_n(boost::begin(results),
+                        boost::size(results), init, op);
                 }));
         }
 

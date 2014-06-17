@@ -29,12 +29,66 @@ namespace hpx { namespace parallel { namespace detail
     template <typename Iter>
     void synchronize(Iter begin, Iter end)
     {
-        typedef typename std::iterator_traits<Iter>::iterator_category cat;
         typedef typename hpx::traits::is_future<
             typename std::iterator_traits<Iter>::value_type
         >::type pred;
 
         detail::synchronize(begin, end, pred());
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Iter1, typename Iter2>
+    static void synchronize_binary(Iter1 begin1, Iter1 end1, Iter2 begin2,
+        boost::mpl::false_)
+    {
+    }
+
+    template <typename Iter1, typename Iter2, typename F>
+    void for_each2(Iter1 begin1, Iter1 end1, Iter2 begin2, F && f)
+    {
+        for (/**/; begin1 != end1; ++begin1, ++begin2)
+            f(*begin1, *begin2);
+    }
+
+    template <typename Future>
+    typename boost::disable_if<hpx::traits::is_future<Future> >::type
+    future_wait(Future& f)
+    {
+    }
+
+    template <typename Future>
+    typename boost::enable_if<hpx::traits::is_future<Future> >::type
+    future_wait(Future& f)
+    {
+        f.wait();
+    }
+
+    template <typename Iter1, typename Iter2>
+    static void synchronize_binary(Iter1 begin1, Iter1 end1, Iter2 begin2,
+        boost::mpl::true_)
+    {
+        typedef typename std::iterator_traits<Iter1>::value_type type1;
+        typedef typename std::iterator_traits<Iter2>::value_type type2;
+
+        for_each2(begin1, end1, begin2,
+            [](type1& v1, type2& v2)
+            {
+                future_wait(v1);
+                future_wait(v2);
+            });
+    }
+
+    template <typename Iter1, typename Iter2>
+    void synchronize_binary(Iter1 begin1, Iter1 end1, Iter2 begin2)
+    {
+        typedef typename boost::mpl::or_<
+            hpx::traits::is_future<
+                typename std::iterator_traits<Iter1>::value_type>,
+            hpx::traits::is_future<
+                typename std::iterator_traits<Iter2>::value_type>
+        >::type pred;
+
+        detail::synchronize_binary(begin1, end1, begin2, pred());
     }
 }}}
 

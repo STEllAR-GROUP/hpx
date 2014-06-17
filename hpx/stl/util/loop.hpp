@@ -99,6 +99,7 @@ namespace hpx { namespace parallel { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // futures are handled in a special way
     template <typename Iter, typename F>
     BOOST_FORCEINLINE Iter
     loop(Iter begin, Iter end, F && f)
@@ -113,7 +114,7 @@ namespace hpx { namespace parallel { namespace util
 
     template <typename Iter, typename F, typename CancelToken>
     BOOST_FORCEINLINE Iter
-    loop_n(Iter begin, Iter end, F && f, CancelToken& tok)
+    loop(Iter begin, Iter end, F && f, CancelToken& tok)
     {
         typedef typename std::iterator_traits<Iter>::iterator_category cat;
         typedef typename hpx::traits::is_future<
@@ -124,9 +125,28 @@ namespace hpx { namespace parallel { namespace util
             pred());
     };
 
+    // no special handling for futures
+    template <typename Iter, typename F>
+    BOOST_FORCEINLINE Iter
+    plain_loop(Iter begin, Iter end, F && f)
+    {
+        typedef typename std::iterator_traits<Iter>::iterator_category cat;
+        return detail::loop<cat>::call(begin, end, std::forward<F>(f),
+            boost::mpl::false_());
+    }
+
+    template <typename Iter, typename F, typename CancelToken>
+    BOOST_FORCEINLINE Iter
+    plain_loop(Iter begin, Iter end, F && f, CancelToken& tok)
+    {
+        typedef typename std::iterator_traits<Iter>::iterator_category cat;
+        return detail::loop<cat>::call(begin, end, std::forward<F>(f), tok,
+            boost::mpl::false_());
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        ///////////////////////////////////////////////////////////////////////////
         // Helper class to repeatedly call a function a given number of times
         // starting from a given iterator position.
         template <typename IterCat>
@@ -249,6 +269,7 @@ namespace hpx { namespace parallel { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // futures are handled in a special way
     template <typename Iter, typename F>
     BOOST_FORCEINLINE Iter
     loop_n(Iter it, std::size_t count, F && f)
@@ -274,9 +295,28 @@ namespace hpx { namespace parallel { namespace util
             pred());
     };
 
+    // no special handling of futures
+    template <typename Iter, typename F>
+    BOOST_FORCEINLINE Iter
+    plain_loop_n(Iter it, std::size_t count, F && f)
+    {
+        typedef typename std::iterator_traits<Iter>::iterator_category cat;
+        return detail::loop_n<cat>::call(it, count, std::forward<F>(f),
+            boost::mpl::false_());
+    }
+
+    template <typename Iter, typename F, typename CancelToken>
+    BOOST_FORCEINLINE Iter
+    plain_loop_n(Iter it, std::size_t count, F && f, CancelToken& tok)
+    {
+        typedef typename std::iterator_traits<Iter>::iterator_category cat;
+        return detail::loop_n<cat>::call(it, count, std::forward<F>(f), tok,
+            boost::mpl::false_());
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        ///////////////////////////////////////////////////////////////////////
         // Helper class to repeatedly call a function a given number of times
         // starting from a given iterator position.
         template <typename IterCat>
@@ -309,16 +349,12 @@ namespace hpx { namespace parallel { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename T, typename Pred>
-    BOOST_FORCEINLINE Iter
+    BOOST_FORCEINLINE T
     accumulate_n(Iter it, std::size_t count, T init, Pred && f)
     {
         typedef typename std::iterator_traits<Iter>::iterator_category cat;
-        typedef typename hpx::traits::is_future<
-            typename std::iterator_traits<Iter>::value_type
-        >::type pred;
-
         return detail::accumulate_n<cat>::call(it, count, std::move(init),
-            std::forward<F>(f), pred());
+            std::forward<Pred>(f), boost::mpl::false_());
     }
 }}}
 
