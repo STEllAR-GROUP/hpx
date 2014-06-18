@@ -69,7 +69,7 @@ namespace hpx { namespace parallel
             
         }
 
-        template<typename InIter, typename T>
+        template <typename InIter, typename T>
         typename std::iterator_traits<InIter>::difference_type count(
             execution_policy const& policy, InIter first, InIter last,
             const T& value, boost::mpl::false_ f)
@@ -182,7 +182,7 @@ namespace hpx { namespace parallel
                 ::get(std::move(ret));
         }
 
-        template<typename InIter, typename Pred>
+        template <typename InIter, typename Pred>
         typename std::iterator_traits<InIter>::difference_type count_if(
             execution_policy const& policy, InIter first, InIter last,
             Pred && op, boost::mpl::false_ f)

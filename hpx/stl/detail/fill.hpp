@@ -65,7 +65,7 @@ namespace hpx { namespace parallel
                     }, f);
         }
 
-        template<typename InIter, typename T>
+        template <typename InIter, typename T>
         void fill(execution_policy const& policy,
             InIter first, InIter last, T val, boost::mpl::false_ f)
         {
@@ -131,7 +131,7 @@ namespace hpx { namespace parallel
     // fill_n
     namespace detail
     {
-        template<typename ExPolicy, typename OutIter, typename T>
+        template <typename ExPolicy, typename OutIter, typename T>
         typename detail::algorithm_result<ExPolicy, OutIter>::type
         fill_n(ExPolicy const&, OutIter first, std::size_t count, T val,
         boost::mpl::true_)
@@ -166,7 +166,7 @@ namespace hpx { namespace parallel
 
         }
 
-        template<typename OutIter, typename T>
+        template <typename OutIter, typename T>
         OutIter fill_n(execution_policy const& policy,
             OutIter first, std::size_t count, T val, boost::mpl::false_ f)
         {
@@ -199,7 +199,7 @@ namespace hpx { namespace parallel
             }
         }
 
-        template<typename OutIter, typename T>
+        template <typename OutIter, typename T>
         OutIter fill_n(execution_policy const& policy,
             OutIter first, std::size_t count, T val, boost::mpl::true_ t)
         {
@@ -208,7 +208,7 @@ namespace hpx { namespace parallel
         }
     }
 
-    template<typename ExPolicy, typename OutIter, typename T>
+    template <typename ExPolicy, typename OutIter, typename T>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
         typename detail::algorithm_result<ExPolicy, OutIter>::type

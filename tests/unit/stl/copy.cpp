@@ -60,7 +60,7 @@ void test_copy(hpx::parallel::task_execution_policy, IteratorTag)
     HPX_TEST_EQ(count, d.size());
 }
 
-template<typename ExPolicy, typename IteratorTag>
+template <typename ExPolicy, typename IteratorTag>
 void test_copy_outiter(ExPolicy const& policy, IteratorTag)
 {
         BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
@@ -143,13 +143,12 @@ void copy_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-template<typename ExPolicy, typename IteratorTag>
+template <typename ExPolicy, typename IteratorTag>
 void test_copy_exception(ExPolicy const& policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator,IteratorTag> iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
@@ -178,11 +177,10 @@ void test_copy_exception(ExPolicy const& policy, IteratorTag)
     HPX_TEST(caught_exception);
 }
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void test_copy_exception(hpx::parallel::task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
@@ -216,7 +214,7 @@ void test_copy_exception(hpx::parallel::task_execution_policy, IteratorTag)
     HPX_TEST(caught_exception);
 }
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void test_copy_exception()
 {
     using namespace hpx::parallel;
@@ -240,13 +238,12 @@ void copy_exception_test()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-template<typename ExPolicy, typename IteratorTag>
+template <typename ExPolicy, typename IteratorTag>
 void test_copy_bad_alloc(ExPolicy const& policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
@@ -274,11 +271,10 @@ void test_copy_bad_alloc(ExPolicy const& policy, IteratorTag)
     HPX_TEST(caught_bad_alloc);
 }
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void test_copy_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
@@ -310,7 +306,7 @@ void test_copy_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
     HPX_TEST(caught_bad_alloc);
 }
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void test_copy_bad_alloc()
 {
     using namespace hpx::parallel;

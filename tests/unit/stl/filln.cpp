@@ -35,7 +35,7 @@ void test_fill_n(ExPolicy const& policy, IteratorTag)
     HPX_TEST_EQ(count, c.size());
 }
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void test_fill_n(hpx::parallel::task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
@@ -82,7 +82,7 @@ void fill_n_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-template<typename ExPolicy, typename IteratorTag>
+template <typename ExPolicy, typename IteratorTag>
 void test_fill_n_exception(ExPolicy const& policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
@@ -114,7 +114,7 @@ void test_fill_n_exception(ExPolicy const& policy, IteratorTag)
     HPX_TEST(caught_exception);
 }
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void test_fill_n_exception(hpx::parallel::task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
@@ -150,7 +150,7 @@ void test_fill_n_exception(hpx::parallel::task_execution_policy, IteratorTag)
     HPX_TEST(caught_exception);
 }
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void test_fill_n_exception()
 {
     using namespace hpx::parallel;
@@ -173,7 +173,7 @@ void fill_n_exception_test()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-template<typename ExPolicy, typename IteratorTag>
+template <typename ExPolicy, typename IteratorTag>
 void test_fill_n_bad_alloc(ExPolicy const& policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
@@ -205,7 +205,7 @@ void test_fill_n_bad_alloc(ExPolicy const& policy, IteratorTag)
     HPX_TEST(caught_bad_alloc);
 }
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void test_fill_n_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
@@ -239,7 +239,7 @@ void test_fill_n_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
     HPX_TEST(caught_bad_alloc);
 }
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void test_fill_n_bad_alloc()
 {
     using namespace hpx::parallel;

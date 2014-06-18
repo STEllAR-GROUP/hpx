@@ -35,7 +35,7 @@ void test_count(ExPolicy const& policy, IteratorTag)
 
 }
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void test_count(hpx::parallel::task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
@@ -81,7 +81,7 @@ void count_test()
 
 /*
 //////////////////////////////////////////////////////////////////////////////
-template<typename ExPolicy, typename IteratorTag>
+template <typename ExPolicy, typename IteratorTag>
 void test_count_exception(ExPolicy const& policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
@@ -113,7 +113,7 @@ void test_count_exception(ExPolicy const& policy, IteratorTag)
     HPX_TEST(caught_exception);
 }
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void test_count_exception(hpx::parallel::task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
@@ -149,7 +149,7 @@ void test_count_exception(hpx::parallel::task_execution_policy, IteratorTag)
     HPX_TEST(caught_exception);
 }
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void test_count_exception()
 {
     using namespace hpx::parallel;
