@@ -7,6 +7,8 @@ set(tests
     copy
     copyif
     copyn
+    count
+    countif
     fill
     filln
     foreach
