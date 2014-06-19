@@ -157,7 +157,7 @@ namespace hpx { namespace util
     typename boost::disable_if<
         boost::mpl::or_<
             boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_pointer<typename util::decay<F>::type>
+          , boost::is_member_function_pointer<typename util::decay<F>::type>
         >
       , typename invoke_result_of<F(Arg0)>::type
     >::type
@@ -322,7 +322,7 @@ namespace hpx { namespace util
     typename boost::disable_if<
         boost::mpl::or_<
             boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_pointer<typename util::decay<F>::type>
+          , boost::is_member_function_pointer<typename util::decay<F>::type>
         >
       , typename invoke_result_of<F(Arg0 , Arg1)>::type
     >::type
@@ -487,7 +487,7 @@ namespace hpx { namespace util
     typename boost::disable_if<
         boost::mpl::or_<
             boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_pointer<typename util::decay<F>::type>
+          , boost::is_member_function_pointer<typename util::decay<F>::type>
         >
       , typename invoke_result_of<F(Arg0 , Arg1 , Arg2)>::type
     >::type
@@ -652,7 +652,7 @@ namespace hpx { namespace util
     typename boost::disable_if<
         boost::mpl::or_<
             boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_pointer<typename util::decay<F>::type>
+          , boost::is_member_function_pointer<typename util::decay<F>::type>
         >
       , typename invoke_result_of<F(Arg0 , Arg1 , Arg2 , Arg3)>::type
     >::type
@@ -817,7 +817,7 @@ namespace hpx { namespace util
     typename boost::disable_if<
         boost::mpl::or_<
             boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_pointer<typename util::decay<F>::type>
+          , boost::is_member_function_pointer<typename util::decay<F>::type>
         >
       , typename invoke_result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4)>::type
     >::type
@@ -982,7 +982,7 @@ namespace hpx { namespace util
     typename boost::disable_if<
         boost::mpl::or_<
             boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_pointer<typename util::decay<F>::type>
+          , boost::is_member_function_pointer<typename util::decay<F>::type>
         >
       , typename invoke_result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5)>::type
     >::type
@@ -1147,7 +1147,7 @@ namespace hpx { namespace util
     typename boost::disable_if<
         boost::mpl::or_<
             boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_pointer<typename util::decay<F>::type>
+          , boost::is_member_function_pointer<typename util::decay<F>::type>
         >
       , typename invoke_result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6)>::type
     >::type
@@ -1224,7 +1224,7 @@ namespace hpx { namespace util
     typename boost::disable_if<
         boost::mpl::or_<
             boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_pointer<typename util::decay<F>::type>
+          , boost::is_member_function_pointer<typename util::decay<F>::type>
         >
       , typename invoke_result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7)>::type
     >::type

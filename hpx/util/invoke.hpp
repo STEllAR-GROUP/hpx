@@ -373,7 +373,7 @@ namespace hpx { namespace util
     typename boost::disable_if<
         boost::mpl::or_<
             boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_pointer<typename util::decay<F>::type>
+          , boost::is_member_function_pointer<typename util::decay<F>::type>
         >
       , typename invoke_result_of<F(BOOST_PP_ENUM_PARAMS(N, Arg))>::type
     >::type
