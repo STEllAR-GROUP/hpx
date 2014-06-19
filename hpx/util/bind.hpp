@@ -151,7 +151,7 @@ namespace hpx { namespace util
             static BOOST_FORCEINLINE
             type call(T& t, UnboundArgs && unbound_args)
             {
-                return util::invoke_fused
+                return util::invoke_fused_r<type>
                     (t, std::forward<UnboundArgs>(unbound_args));
             }
         };

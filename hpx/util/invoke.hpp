@@ -24,6 +24,7 @@
 #include <boost/shared_ptr.hpp> // for get_pointer(shared_ptr<X>)
 #include <boost/type_traits/is_function.hpp>
 #include <boost/type_traits/is_base_of.hpp>
+#include <boost/type_traits/is_member_function_pointer.hpp>
 #include <boost/type_traits/is_member_pointer.hpp>
 #include <boost/type_traits/is_pointer.hpp>
 #include <boost/type_traits/remove_pointer.hpp>
@@ -148,18 +149,6 @@ namespace hpx { namespace util
 
     template <typename R, typename C, typename T>
     HPX_MAYBE_FORCEINLINE
-    typename invoke_result_of<R C::*(T)>::type
-    invoke(R C::*f, T && t)
-    {
-        typedef
-            typename invoke_result_of<R C::*(T)>::type
-            result_type;
-
-        return util::invoke_r<result_type>(f, std::forward<T>(t));
-    }
-
-    template <typename R, typename C, typename T>
-    HPX_MAYBE_FORCEINLINE
     R
     invoke(R (C::*f)(), T && t)
     {
@@ -178,7 +167,7 @@ namespace hpx { namespace util
     typename boost::disable_if<
         boost::mpl::or_<
             boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_pointer<typename util::decay<F>::type>
+          , boost::is_member_function_pointer<typename util::decay<F>::type>
         >
       , typename invoke_result_of<F()>::type
     >::type
@@ -323,7 +312,7 @@ namespace hpx { namespace util
     typename boost::disable_if<
         boost::mpl::or_<
             boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_pointer<typename util::decay<F>::type>
+          , boost::is_member_function_pointer<typename util::decay<F>::type>
           , boost::is_reference_wrapper<typename util::decay<F>::type>
         >
       , R
