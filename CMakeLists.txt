@@ -1251,11 +1251,13 @@ else()
   endif()
 
   if(APPLE)
-    hpx_option(HPX_STDLIB_IS_LIBCPP BOOL "Adds -stdlib=libc++ to the linker command by default" OFF ADVANCED)
+    hpx_option(HPX_STDLIB_IS_LIBCPP BOOL "Adds -stdlib=libc++ to the linker command by default" ON ADVANCED)
     if(HPX_STDLIB_IS_LIBCPP)
       hpx_use_flag_if_available(-stdlib=libc++ LANGUAGES CXX)
     endif()
     hpx_use_flag_if_available(-ftemplate-depth=256 LANGUAGES CXX)
+    set(CMAKE_OSX_ARCHITECTURES "x86_64" CACHE
+      STRING "Forced OS X architectures to 64 bit" FORCE)
   endif()
 
   ##############################################################################

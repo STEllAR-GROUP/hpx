@@ -105,7 +105,7 @@ macro(add_hpx_executable name)
   hpx_print_list("DEBUG" "add_executable.${name}" "Component dependencies for ${name}" ${name}_COMPONENT_DEPENDENCIES)
 
   # add the executable build target
-  if(NOT HPX_EXTERNAL_CMAKE)
+  if(HPX_EXTERNAL_CMAKE)
     set(exclude_from_all EXCLUDE_FROM_ALL)
   endif()
 
@@ -252,4 +252,3 @@ macro(add_hpx_executable name)
     endif()
   endif()
 endmacro()
-
