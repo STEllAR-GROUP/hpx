@@ -27,7 +27,7 @@
 
 #if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 40500) || \
      defined(HPX_CLANG_VERSION) || \
-    (defined(HPX_INTEL_VERSION) || !defined(BOOST_INTEL_LINUX))
+    (defined(HPX_INTEL_VERSION) && !defined(BOOST_INTEL_LINUX))
 # define HPX_ASSERT(expr) ((expr) ? (void)0 : __builtin_unreachable())
 #else
 # define HPX_ASSERT(expr) ((void)0)
@@ -63,7 +63,7 @@ namespace hpx
 
 #if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 40500) || \
      defined(HPX_CLANG_VERSION) || \
-    (defined(HPX_INTEL_VERSION) || !defined(BOOST_INTEL_LINUX))
+    (defined(HPX_INTEL_VERSION) && !defined(BOOST_INTEL_LINUX))
 # define HPX_ASSERT_MSG(expr, msg) ((expr) ? (void)0 : __builtin_unreachable())
 #else
 # define HPX_ASSERT_MSG(expr, msg) ((void)0)
