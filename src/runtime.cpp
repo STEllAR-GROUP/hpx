@@ -1013,6 +1013,20 @@ namespace hpx
         return rt->get_config().get_os_thread_count();
     }
 
+    std::size_t get_os_thread_count(threads::executor& exec)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (NULL == rt)
+            return std::size_t(0);
+
+        if (!exec)
+            return rt->get_config().get_os_thread_count();
+
+        error_code ec(lightweight);
+        return exec.executor_data_->get_policy_element(
+            threads::detail::current_concurrency, ec);
+    }
+
     std::size_t get_worker_thread_num()
     {
         runtime* rt = get_runtime_ptr();
@@ -1028,7 +1042,7 @@ namespace hpx
             return std::size_t(0);
         error_code ec(lightweight);
         return static_cast<std::size_t>(
-            rt->get_agas_client().get_num_overall_threads());
+            rt->get_agas_client().get_num_overall_threads(ec));
     }
 
     bool is_scheduler_numa_sensitive()

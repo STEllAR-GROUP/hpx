@@ -109,9 +109,10 @@ namespace hpx { namespace parallel { namespace util
                 std::size_t chunk_size = 0)
             {
                 // estimate a chunk size based on number of cores used
+                threads::executor exec = policy.get_executor();
                 if (chunk_size == 0)
                 {
-                    std::size_t const cores = hpx::get_num_worker_threads();
+                    std::size_t const cores = hpx::get_os_thread_count(exec);
                     chunk_size = (count + cores - 1) / cores;
                 }
 
@@ -119,7 +120,6 @@ namespace hpx { namespace parallel { namespace util
                 std::vector<hpx::future<Result> > workitems;
                 workitems.reserve(count / chunk_size + 1);
 
-                threads::executor exec = policy.get_executor();
                 while (count > chunk_size)
                 {
                     workitems.push_back(hpx::async(exec, f1, first, chunk_size));
@@ -163,9 +163,10 @@ namespace hpx { namespace parallel { namespace util
                 F1 && f1, F2 && f2, std::size_t chunk_size = 0)
             {
                 // estimate a chunk size based on number of cores used
+                threads::executor exec = policy.get_executor();
                 if (chunk_size == 0)
                 {
-                    std::size_t const cores = hpx::get_num_worker_threads();
+                    std::size_t const cores = hpx::get_os_thread_count(exec);
                     chunk_size = (count + cores - 1) / cores;
                 }
 
@@ -173,7 +174,6 @@ namespace hpx { namespace parallel { namespace util
                 std::vector<hpx::future<Result> > workitems;
                 workitems.reserve(count / chunk_size + 1);
 
-                threads::executor exec = policy.get_executor();
                 while (count > chunk_size)
                 {
                     workitems.push_back(hpx::async(exec, f1, first, chunk_size));
@@ -276,7 +276,8 @@ namespace hpx { namespace parallel { namespace util
                 if (chunk_size == 0)
                     chunk_size = 2u;
 
-                std::size_t const cores = hpx::get_num_worker_threads();
+                threads::executor exec = policy.get_executor();
+                std::size_t const cores = hpx::get_os_thread_count(exec);
                 std::size_t workitems_size = 1;
 
                 std::size_t cnt = count;
@@ -291,7 +292,6 @@ namespace hpx { namespace parallel { namespace util
                 std::vector<hpx::future<Result> > workitems;
                 workitems.reserve(workitems_size);
 
-                threads::executor exec = policy.get_executor();
                 while (count > chunk_size)
                 {
                     std::size_t step = (std::max)(count / cores, chunk_size);
@@ -339,7 +339,8 @@ namespace hpx { namespace parallel { namespace util
                 if (chunk_size == 0)
                     chunk_size = 2u;
 
-                std::size_t const cores = hpx::get_num_worker_threads();
+                threads::executor exec = policy.get_executor();
+                std::size_t const cores = hpx::get_os_thread_count(exec);
                 std::size_t workitems_size = 1;
 
                 std::size_t cnt = count;
@@ -354,7 +355,6 @@ namespace hpx { namespace parallel { namespace util
                 std::vector<hpx::future<Result> > workitems;
                 workitems.reserve(workitems_size);
 
-                threads::executor exec = policy.get_executor();
                 while (count > chunk_size)
                 {
                     std::size_t step = (std::max)(count / cores, chunk_size);
