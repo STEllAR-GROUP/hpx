@@ -171,21 +171,15 @@ namespace hpx { namespace parallel
             Pred && op, boost::mpl::false_ f)
         {
             typedef typename std::iterator_traits<InIter>::value_type type;
-<<<<<<< HEAD
-    
-            plain_for_each_n(policy,
-=======
             typedef typename std::iterator_traits<InIter>::difference_type
                 difference_type;
 
             // FIXME: this is not thread safe! I'd suggest implementing this
             // similarly to reduce
             difference_type ret = 0;
-
             for_each_n(policy,
->>>>>>> 88b9df4dcacc7e13297d2a090931cf260616a78a
                 first, std::distance(first, last),
-                [op, &ret](type const& v) {
+                [&op, &ret](type const& v) {
                     if (op(v))
                         ++ret;
                 }, f);
