@@ -16,6 +16,7 @@ set(tests
     foreachn
     move
     reduce_
+    swapranges
     transform
     transform_binary
    )

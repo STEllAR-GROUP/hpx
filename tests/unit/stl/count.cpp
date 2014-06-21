@@ -79,7 +79,7 @@ void count_test()
     test_count<std::input_iterator_tag>();
 }
 
-/*
+
 //////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
 void test_count_exception(ExPolicy const& policy, IteratorTag)
@@ -169,8 +169,9 @@ void count_exception_test()
 {
     test_count_exception<std::random_access_iterator_tag>();
     test_count_exception<std::forward_iterator_tag>();
+    test_count_exception<std::input_iterator_tag>();
 }
-*/
+
 int hpx_main()
 {
     count_test();

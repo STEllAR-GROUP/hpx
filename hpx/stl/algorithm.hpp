@@ -15,6 +15,7 @@
 #include <hpx/stl/detail/fill.hpp>
 #include <hpx/stl/detail/reduce.hpp>
 #include <hpx/stl/detail/move.hpp>
+#include <hpx/stl/detail/swap_ranges.hpp>
 
 #endif
 

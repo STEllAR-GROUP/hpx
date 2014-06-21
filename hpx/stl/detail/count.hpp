@@ -57,7 +57,7 @@ namespace hpx { namespace parallel
             typename std::iterator_traits<InIter>::difference_type ret = 0;
             
 
-            for_each_n(policy,
+            plain_for_each_n(policy,
                 first, std::distance(first,last),
                 [&value, &ret](type v) {
                     if (v == value)
@@ -171,7 +171,7 @@ namespace hpx { namespace parallel
             typename std::iterator_traits<InIter>::difference_type ret = 0;
             typedef typename std::iterator_traits<InIter>::value_type type;
     
-            for_each_n(policy,
+            plain_for_each_n(policy,
                 first, std::distance(first, last),
                 [op, &ret](type v) {
                     if( op(v) )
