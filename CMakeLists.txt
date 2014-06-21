@@ -1541,14 +1541,14 @@ else()
   hpx_option(HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION BOOL
       "Disable automatic registration with Boost.Serialization (Default: Off)" Off ADVANCED)
 
-  ##############################################################################
+  #############################################################################
   # Macro definitions for system headers
-  ##############################################################################
+  #############################################################################
   hpx_add_definitions(-D_GNU_SOURCE)
 
-  ##############################################################################
+  #############################################################################
   # System libraries
-  ##############################################################################
+  #############################################################################
   if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
     set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} dl)
   endif()
@@ -1585,9 +1585,9 @@ if(HPX_HAVE_CXX11_ALIAS_TEMPLATES)
   endif()
 endif()
 
-################################################################################
+###############################################################################
 # Target specification
-################################################################################
+###############################################################################
 # Recurse into some subdirectories. This does not actually cause another cmake
 # executable to run. The same process will walk through the project's entire
 # directory structure.
@@ -1607,7 +1607,6 @@ endif()
 add_plugin_modules()
 
 ###############################################################################
-
 find_package(PythonInterp)
 
 if(NOT PYTHONINTERP_FOUND)
@@ -1652,9 +1651,11 @@ if(HPX_BUILD_TOOLS)
   add_subdirectory(tools)
 endif()
 
-hpx_option(HPX_BUILD_DOCUMENTATION BOOL "The HPX documentation toolchain is available (default OFF)." OFF)
+hpx_option(HPX_BUILD_DOCUMENTATION BOOL
+    "The HPX documentation toolchain is available (default OFF)." OFF)
 if(HPX_BUILD_DOCUMENTATION)
-  hpx_option(HPX_BUILD_DOCUMENTATION_SINGLEPAGE BOOL "The HPX documentation should be build as a single page HTML (default OFF)." OFF)
+  hpx_option(HPX_BUILD_DOCUMENTATION_SINGLEPAGE BOOL
+      "The HPX documentation should be build as a single page HTML (default OFF)." OFF)
   add_subdirectory(docs)
 endif()
 
@@ -1667,6 +1668,7 @@ endif()
 ################################################################################
 list(SORT HPX_CONFIG_DEFINITIONS)
 list(REMOVE_DUPLICATES HPX_CONFIG_DEFINITIONS)
+
 set(hpx_config_defines "\n")
 foreach(def ${HPX_CONFIG_DEFINITIONS})
     if("${def}" STREQUAL "HPX_PREFIX" AND NOT MSVC)
@@ -1762,8 +1764,9 @@ if(NOT HPX_NO_INSTALL)
 
   if(UNIX)
     file(GLOB scripts "${CMAKE_SOURCE_DIR}/python/scripts/*.py")
-    execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory
-      "${CMAKE_BINARY_DIR}/python/scripts" )
+    execute_process(
+      COMMAND "${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/python/scripts")
+
     foreach(script ${scripts})
       get_filename_component(script_name ${script} NAME)
       get_filename_component(script_name_we ${script} NAME_WE)
@@ -1771,13 +1774,15 @@ if(NOT HPX_NO_INSTALL)
       #make copy, so that we have intact symlink in CMAKE_BINARY_DIR
       execute_process(
         COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${script}" "${script_name}"
-	WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
 
       execute_process(
         COMMAND "${CMAKE_COMMAND}" -E create_symlink "${script_name}" "${script_name_we}"
-	WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
 
-      install(FILES "${CMAKE_BINARY_DIR}/python/scripts/${script_name_we}" DESTINATION "bin")
+      install(
+        FILES "${CMAKE_BINARY_DIR}/python/scripts/${script_name_we}"
+        DESTINATION "bin")
     endforeach()
   endif()
 
@@ -1788,12 +1793,18 @@ if(NOT HPX_NO_INSTALL)
     FILES_MATCHING PATTERN "*.py"
     PATTERN ".git" EXCLUDE)
 
-  execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/python" )
-  #make symlink, so that we have intact hpx symlink in CMAKE_BINARY_DIR
-  execute_process(COMMAND "${CMAKE_COMMAND}" -E create_symlink "${CMAKE_SOURCE_DIR}/python/hpx"
-    "hpx-${HPX_VERSION}" WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python")
+  execute_process(
+    COMMAND "${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/python")
+
+  # make symlink, so that we have intact hpx symlink in CMAKE_BINARY_DIR
+  execute_process(
+    COMMAND "${CMAKE_COMMAND}" -E create_symlink "${CMAKE_SOURCE_DIR}/python/hpx" "hpx-${HPX_VERSION}"
+    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python")
+
   # create a symlink in share pointing to the latest HPX installation
-  execute_process(COMMAND "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx" WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python")
+  execute_process(
+    COMMAND "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx"
+    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python")
   install(DIRECTORY "${CMAKE_BINARY_DIR}/python/hpx" DESTINATION "share")
 
   install( # Install external dependencies
@@ -1978,7 +1989,8 @@ endforeach()
 # Make list unique
 list(REMOVE_DUPLICATES external_definitions)
 
-set(CMAKE_DIR "cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" CACHE STRING "directory (in share), where to put FindHPX cmake module")
+set(CMAKE_DIR "cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}"
+    CACHE STRING "directory (in share), where to put FindHPX cmake module")
 
 if(MSVC)
   set(output_dir "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
@@ -2039,6 +2051,6 @@ if(NOT HPX_NO_INSTALL)
 endif()
 
 # Create a symlink in share pointing to the latest HPX installation
-execute_process(COMMAND
-  "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx"
+execute_process(
+  COMMAND "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx"
   WORKING_DIRECTORY "${output_dir}/share")
