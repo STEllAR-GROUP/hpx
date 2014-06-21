@@ -63,7 +63,7 @@ namespace hpx { namespace parallel
                 category;
 
             return util::partitioner<ExPolicy, T>::call(
-                first, std::distance(first, last),
+                policy, first, std::distance(first, last),
                 [op](InIter part_begin, std::size_t part_count)
                 {
                     T val = *part_begin;

@@ -8,6 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/runtime/threads/thread_executor.hpp>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
@@ -26,7 +27,26 @@ namespace hpx { namespace parallel
     /// The class parallel_execution_policy is an execution policy type used
     /// as a unique type to disambiguate parallel algorithm overloading and
     /// indicate that a parallel algorithm's execution may be parallelized.
-    struct parallel_execution_policy {};
+    struct parallel_execution_policy
+    {
+    public:
+        parallel_execution_policy() {}
+
+        // create a new parallel_execution_policy referencing a executor
+        parallel_execution_policy operator()(threads::executor& exec) const
+        {
+            return parallel_execution_policy(exec);
+        }
+
+        threads::executor const& get_executor() const { return exec_; }
+
+    private:
+        parallel_execution_policy(threads::executor& exec)
+          : exec_(exec)
+        {}
+
+        threads::executor exec_;
+    };
 
     /// Default parallel execution policy object.
     BOOST_CONSTEXPR_OR_CONST parallel_execution_policy par;
@@ -42,7 +62,10 @@ namespace hpx { namespace parallel
     /// The class vector_execution_policy is an execution policy type used as
     /// a unique type to disambiguate parallel algorithm overloading and
     /// indicate that a parallel algorithm's execution may be vectorized.
-    struct vector_execution_policy {};
+    struct vector_execution_policy
+    {
+        threads::executor get_executor() const { return threads::executor(); }
+    };
 
     /// Default vector execution policy object.
     BOOST_CONSTEXPR_OR_CONST vector_execution_policy vec;
@@ -54,7 +77,26 @@ namespace hpx { namespace parallel
     /// indicate that a parallel algorithm's execution may be parallelized. The
     /// algorithm returns a future representing the result of the corresponding
     /// algorithm when invoked with the parallel_execution_policy.
-    struct task_execution_policy {};
+    struct task_execution_policy
+    {
+    public:
+        task_execution_policy() {}
+
+        // create a new task_execution_policy referencing a executor
+        task_execution_policy operator()(threads::executor& exec) const
+        {
+            return task_execution_policy(exec);
+        }
+
+        threads::executor const& get_executor() const { return exec_; }
+
+    private:
+        task_execution_policy(threads::executor& exec)
+          : exec_(exec)
+        {}
+
+        threads::executor exec_;
+    };
 
     /// Default vector execution policy object.
     BOOST_CONSTEXPR_OR_CONST task_execution_policy task;

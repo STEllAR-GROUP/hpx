@@ -104,8 +104,9 @@ namespace hpx { namespace parallel { namespace util
         struct static_partitioner
         {
             template <typename FwdIter, typename F1, typename F2>
-            static R call(FwdIter first, std::size_t count, F1 && f1,
-                F2 && f2, std::size_t chunk_size = 0)
+            static R call(ExPolicy const& policy, FwdIter first,
+                std::size_t count, F1 && f1, F2 && f2,
+                std::size_t chunk_size = 0)
             {
                 // estimate a chunk size based on number of cores used
                 if (chunk_size == 0)
@@ -118,10 +119,10 @@ namespace hpx { namespace parallel { namespace util
                 std::vector<hpx::future<Result> > workitems;
                 workitems.reserve(count / chunk_size + 1);
 
+                threads::executor exec = policy.get_executor();
                 while (count > chunk_size)
                 {
-                    workitems.push_back(hpx::async(
-                        hpx::util::bind(f1, first, chunk_size)));
+                    workitems.push_back(hpx::async(exec, f1, first, chunk_size));
                     count -= chunk_size;
                     std::advance(first, chunk_size);
                 }
@@ -157,7 +158,8 @@ namespace hpx { namespace parallel { namespace util
         struct static_partitioner<task_execution_policy, R, Result>
         {
             template <typename FwdIter, typename F1, typename F2>
-            static hpx::future<R> call(FwdIter first, std::size_t count,
+            static hpx::future<R> call(task_execution_policy const& policy,
+                FwdIter first, std::size_t count,
                 F1 && f1, F2 && f2, std::size_t chunk_size = 0)
             {
                 // estimate a chunk size based on number of cores used
@@ -171,10 +173,10 @@ namespace hpx { namespace parallel { namespace util
                 std::vector<hpx::future<Result> > workitems;
                 workitems.reserve(count / chunk_size + 1);
 
+                threads::executor exec = policy.get_executor();
                 while (count > chunk_size)
                 {
-                    workitems.push_back(hpx::async(
-                        hpx::util::bind(f1, first, chunk_size)));
+                    workitems.push_back(hpx::async(exec, f1, first, chunk_size));
                     count -= chunk_size;
                     std::advance(first, chunk_size);
                 }
@@ -182,8 +184,7 @@ namespace hpx { namespace parallel { namespace util
                 // add last chunk
                 if (count != 0)
                 {
-                    workitems.push_back(hpx::async(
-                        hpx::util::bind(f1, first, count)));
+                    workitems.push_back(hpx::async(exec, f1, first, count));
                     std::advance(first, count);
                 }
 
@@ -209,11 +210,11 @@ namespace hpx { namespace parallel { namespace util
         struct partitioner<ExPolicy, void, static_partitioner_tag>
         {
             template <typename FwdIter, typename F>
-            static FwdIter call(FwdIter first, std::size_t count, F && f,
-                std::size_t chunk_size = 0)
+            static FwdIter call(ExPolicy const& policy, FwdIter first,
+                std::size_t count, F && f, std::size_t chunk_size = 0)
             {
                 return static_partitioner<ExPolicy, FwdIter, void>::call(
-                    first, count, std::forward<F>(f), 0, chunk_size);
+                    policy, first, count, std::forward<F>(f), 0, chunk_size);
             }
         };
 
@@ -221,10 +222,12 @@ namespace hpx { namespace parallel { namespace util
         struct partitioner<ExPolicy, R, static_partitioner_tag>
         {
             template <typename FwdIter, typename F1, typename F2>
-            static R call(FwdIter first, std::size_t count, F1 && f1,
-                F2 && f2, std::size_t chunk_size = 0)
+            static R call(ExPolicy const& policy, FwdIter first,
+                std::size_t count, F1 && f1, F2 && f2,
+                std::size_t chunk_size = 0)
             {
-                return static_partitioner<ExPolicy, R, R>::call(first, count,
+                return static_partitioner<ExPolicy, R, R>::call(
+                    policy, first, count,
                     std::forward<F1>(f1), std::forward<F2>(f2), chunk_size);
             }
         };
@@ -233,11 +236,12 @@ namespace hpx { namespace parallel { namespace util
         struct partitioner<task_execution_policy, void, static_partitioner_tag>
         {
             template <typename FwdIter, typename F>
-            static hpx::future<FwdIter> call(FwdIter first, std::size_t count,
-                F && f, std::size_t chunk_size = 0)
+            static hpx::future<FwdIter> call(task_execution_policy const& policy,
+                FwdIter first, std::size_t count, F && f,
+                std::size_t chunk_size = 0)
             {
                 return static_partitioner<task_execution_policy, FwdIter>::call(
-                    first, count, std::forward<F>(f), 0, chunk_size);
+                    policy, first, count, std::forward<F>(f), 0, chunk_size);
             }
         };
 
@@ -245,12 +249,13 @@ namespace hpx { namespace parallel { namespace util
         struct partitioner<task_execution_policy, R, static_partitioner_tag>
         {
             template <typename FwdIter, typename F1, typename F2>
-            static hpx::future<R> call(FwdIter first, std::size_t count,
+            static hpx::future<R> call(task_execution_policy const& policy,
+                FwdIter first, std::size_t count,
                 F1 && f1, F2 && f2, std::size_t chunk_size = 0)
             {
                 return static_partitioner<task_execution_policy, R, R>::call(
-                    first, count, std::forward<F1>(f1), std::forward<F2>(f2),
-                    chunk_size);
+                    policy, first, count,
+                    std::forward<F1>(f1), std::forward<F2>(f2), chunk_size);
             }
         };
 
@@ -263,8 +268,9 @@ namespace hpx { namespace parallel { namespace util
         struct auto_partitioner
         {
             template <typename FwdIter, typename F1, typename F2>
-            static R call(FwdIter first, std::size_t count, F1 && f1,
-                F2 && f2, std::size_t chunk_size = 0)
+            static R call(ExPolicy const& policy, FwdIter first,
+                std::size_t count, F1 && f1, F2 && f2,
+                std::size_t chunk_size = 0)
             {
                 // estimate a chunk size
                 if (chunk_size == 0)
@@ -285,11 +291,11 @@ namespace hpx { namespace parallel { namespace util
                 std::vector<hpx::future<Result> > workitems;
                 workitems.reserve(workitems_size);
 
+                threads::executor exec = policy.get_executor();
                 while (count > chunk_size)
                 {
                     std::size_t step = (std::max)(count / cores, chunk_size);
-                    workitems.push_back(hpx::async(
-                        hpx::util::bind(f1, first, step)));
+                    workitems.push_back(hpx::async(exec, f1, first, step));
                     count -= step;
                     std::advance(first, step);
                 }
@@ -325,7 +331,8 @@ namespace hpx { namespace parallel { namespace util
         struct auto_partitioner<task_execution_policy, R, Result>
         {
             template <typename FwdIter, typename F1, typename F2>
-            static hpx::future<R> call(FwdIter first, std::size_t count,
+            static hpx::future<R> call(task_execution_policy const& policy,
+                FwdIter first, std::size_t count,
                 F1 && f1, F2 && f2, std::size_t chunk_size = 0)
             {
                 // estimate a chunk size
@@ -347,11 +354,11 @@ namespace hpx { namespace parallel { namespace util
                 std::vector<hpx::future<Result> > workitems;
                 workitems.reserve(workitems_size);
 
+                threads::executor exec = policy.get_executor();
                 while (count > chunk_size)
                 {
                     std::size_t step = (std::max)(count / cores, chunk_size);
-                    workitems.push_back(hpx::async(
-                        hpx::util::bind(f1, first, step)));
+                    workitems.push_back(hpx::async(exec, f1, first, step));
                     count -= step;
                     std::advance(first, step);
                 }
@@ -359,8 +366,7 @@ namespace hpx { namespace parallel { namespace util
                 // add last chunk
                 if (count != 0)
                 {
-                    workitems.push_back(hpx::async(
-                        hpx::util::bind(f1, first, count)));
+                    workitems.push_back(hpx::async(exec, f1, first, count));
                     std::advance(first, count);
                 }
 
@@ -382,11 +388,12 @@ namespace hpx { namespace parallel { namespace util
         struct partitioner<ExPolicy, void, auto_partitioner_tag>
         {
             template <typename FwdIter, typename F>
-            static FwdIter call(FwdIter first, std::size_t count, F && f,
+            static FwdIter call(ExPolicy const& policy,
+                FwdIter first, std::size_t count, F && f,
                 std::size_t chunk_size = 0)
             {
                 return auto_partitioner<ExPolicy, FwdIter, void>::call(
-                    first, count, std::forward<F>(f), 0, chunk_size);
+                    policy, first, count, std::forward<F>(f), 0, chunk_size);
             }
         };
 
@@ -394,10 +401,12 @@ namespace hpx { namespace parallel { namespace util
         struct partitioner<ExPolicy, R, auto_partitioner_tag>
         {
             template <typename FwdIter, typename F1, typename F2>
-            static R call(FwdIter first, std::size_t count, F1 && f1,
-                F2 && f2, std::size_t chunk_size = 0)
+            static R call(
+                ExPolicy const& policy, FwdIter first, std::size_t count,
+                F1 && f1, F2 && f2, std::size_t chunk_size = 0)
             {
-                return auto_partitioner<ExPolicy, R, R>::call(first, count,
+                return auto_partitioner<ExPolicy, R, R>::call(
+                    policy, first, count,
                     std::forward<F1>(f1), std::forward<F2>(f2), chunk_size);
             }
         };
@@ -406,11 +415,13 @@ namespace hpx { namespace parallel { namespace util
         struct partitioner<task_execution_policy, void, auto_partitioner_tag>
         {
             template <typename FwdIter, typename F>
-            static hpx::future<FwdIter> call(FwdIter first, std::size_t count,
-                F && f, std::size_t chunk_size = 0)
+            static hpx::future<FwdIter> call(
+                task_execution_policy const& policy,
+                FwdIter first, std::size_t count, F && f,
+                std::size_t chunk_size = 0)
             {
                 return auto_partitioner<task_execution_policy, FwdIter>::call(
-                    first, count, std::forward<F>(f), 0, chunk_size);
+                    policy, first, count, std::forward<F>(f), 0, chunk_size);
             }
         };
 
@@ -418,12 +429,14 @@ namespace hpx { namespace parallel { namespace util
         struct partitioner<task_execution_policy, R, auto_partitioner_tag>
         {
             template <typename FwdIter, typename F1, typename F2>
-            static hpx::future<R> call(FwdIter first, std::size_t count,
+            static hpx::future<R> call(
+                task_execution_policy const& policy,
+                FwdIter first, std::size_t count,
                 F1 && f1, F2 && f2, std::size_t chunk_size = 0)
             {
                 return auto_partitioner<task_execution_policy, R, R>::call(
-                    first, count, std::forward<F1>(f1), std::forward<F2>(f2),
-                    chunk_size);
+                    policy, first, count,
+                    std::forward<F1>(f1), std::forward<F2>(f2), chunk_size);
             }
         };
 

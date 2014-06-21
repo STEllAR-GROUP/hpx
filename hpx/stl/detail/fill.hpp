@@ -10,7 +10,6 @@
 #include <hpx/stl/execution_policy.hpp>
 #include <hpx/stl/detail/algorithm_result.hpp>
 #include <hpx/stl/detail/synchronize.hpp>
-#include <hpx/stl/util/partitioner.hpp>
 #include <hpx/stl/util/loop.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/util/void_guard.hpp>

@@ -81,11 +81,39 @@ void test_for_each()
     test_for_each(execution_policy(task), IteratorTag());
 }
 
+template <typename IteratorTag>
+void test_for_each_exec()
+{
+    using namespace hpx::parallel;
+
+    {
+        hpx::threads::executors::local_priority_queue_executor exec;
+        test_for_each(par(exec), IteratorTag());
+    }
+    {
+        hpx::threads::executors::local_priority_queue_executor exec;
+        test_for_each(task(exec), IteratorTag());
+    }
+
+    {
+        hpx::threads::executors::local_priority_queue_executor exec;
+        test_for_each(execution_policy(par(exec)), IteratorTag());
+    }
+    {
+        hpx::threads::executors::local_priority_queue_executor exec;
+        test_for_each(execution_policy(task(exec)), IteratorTag());
+    }
+}
+
 void for_each_test()
 {
     test_for_each<std::random_access_iterator_tag>();
     test_for_each<std::forward_iterator_tag>();
     test_for_each<std::input_iterator_tag>();
+
+    test_for_each_exec<std::random_access_iterator_tag>();
+    test_for_each_exec<std::forward_iterator_tag>();
+    test_for_each_exec<std::input_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

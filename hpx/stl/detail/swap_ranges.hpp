@@ -60,10 +60,10 @@ namespace hpx { namespace parallel
 
             return get_iter<1, result_type>(
                 plain_for_each_n(policy,
-                    detail::make_zip_iterator(boost::make_tuple(first1,first2)),
+                    detail::make_zip_iterator(boost::make_tuple(first1, first2)),
                     std::distance(first1, last1),
                     [](reference it) {
-                        std::swap( *boost::get<0>(it), *boost::get<1>(it));
+                        std::swap(*boost::get<0>(it), *boost::get<1>(it));
                     },
                     f));
         }
