@@ -33,7 +33,7 @@ namespace hpx { namespace parallel
         {
             typedef typename std::iterator_traits<InIter>::difference_type
                 difference;
-            try{
+            try {
                 return detail::algorithm_result<ExPolicy, difference>::get(
                     std::count(first, last, value));
             }
@@ -48,25 +48,28 @@ namespace hpx { namespace parallel
         }
 
         template <typename ExPolicy, typename InIter, typename T>
-        typename detail::algorithm_result<ExPolicy, 
+        typename detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<InIter>::difference_type>::type
         count(ExPolicy const& policy, InIter first, InIter last, const T& value,
-        boost::mpl::false_ f)
+            boost::mpl::false_ f)
         {
             typedef typename std::iterator_traits<InIter>::value_type type;
-            typename std::iterator_traits<InIter>::difference_type ret = 0;
-            
+            typedef typename std::iterator_traits<InIter>::difference_type
+                difference_type;
+
+            // FIXME: this is not thread safe! I'd suggest implementing this
+            // similarly to reduce
+            difference_type ret = 0;
 
             for_each_n(policy,
-                first, std::distance(first,last),
-                [&value, &ret](type v) {
+                first, std::distance(first, last),
+                [&value, &ret](type const& v) {
                     if (v == value)
                         ++ret;
                 }, f);
 
-            return detail::algorithm_result<ExPolicy, 
-                typename std::iterator_traits<InIter>::difference_type>::get(std::move(ret));
-            
+            return detail::algorithm_result<ExPolicy, difference_type>::get(
+                std::move(ret));
         }
 
         template <typename InIter, typename T>
@@ -142,13 +145,13 @@ namespace hpx { namespace parallel
     namespace detail
     {
         template <typename ExPolicy, typename InIter, typename Pred>
-        typename detail::algorithm_result<ExPolicy, 
+        typename detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<InIter>::difference_type>::type
         count_if(ExPolicy const&, InIter first, InIter last, Pred && op,
             boost::mpl::true_)
         {
-            try{
-                return detail::algorithm_result<ExPolicy, 
+            try {
+                return detail::algorithm_result<ExPolicy,
                     std::iterator_traits<InIter>::difference_type>::get(
                     std::count_if(first, last, std::forward<Pred>(op)));
             }
@@ -168,18 +171,23 @@ namespace hpx { namespace parallel
         count_if(ExPolicy const& policy, InIter first, InIter last,
             Pred && op, boost::mpl::false_ f)
         {
-            typename std::iterator_traits<InIter>::difference_type ret = 0;
             typedef typename std::iterator_traits<InIter>::value_type type;
-    
+            typedef typename std::iterator_traits<InIter>::difference_type
+                difference_type;
+
+            // FIXME: this is not thread safe! I'd suggest implementing this
+            // similarly to reduce
+            difference_type ret = 0;
+
             for_each_n(policy,
                 first, std::distance(first, last),
-                [op, &ret](type v) {
-                    if( op(v) )
+                [op, &ret](type const& v) {
+                    if (op(v))
                         ++ret;
                 }, f);
 
-            return detail::algorithm_result<ExPolicy, std::iterator_traits<InIter>::difference_type>
-                ::get(std::move(ret));
+            return detail::algorithm_result<ExPolicy, difference_type>::get(
+                std::move(ret));
         }
 
         template <typename InIter, typename Pred>
@@ -224,13 +232,12 @@ namespace hpx { namespace parallel
             return detail::count_if(sequential_execution_policy(),
                 first, last, std::forward<Pred>(op), t);
         }
-    
     }
 
     template <typename ExPolicy, typename InIter, typename Pred>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, 
+        typename detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<InIter>::difference_type>::type
     >::type
     count_if(ExPolicy && policy, InIter first, InIter last, Pred && op)
@@ -239,8 +246,7 @@ namespace hpx { namespace parallel
             category;
 
         BOOST_STATIC_ASSERT_MSG(
-            boost::is_base_of<std::input_iterator_tag,
-                typename std::iterator_traits<InIter>::iterator_category>::value,
+            boost::is_base_of<std::input_iterator_tag, category>::value,
             "Required at least input iterator.");
 
         typedef boost::mpl::or_<
@@ -252,7 +258,6 @@ namespace hpx { namespace parallel
             first, last,
             std::forward<Pred>(op), is_seq());
     }
-
 }}
 
 #endif
