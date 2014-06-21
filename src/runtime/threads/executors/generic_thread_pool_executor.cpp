@@ -72,7 +72,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         case threads::detail::min_concurrency:
         case threads::detail::max_concurrency:
         case threads::detail::current_concurrency:
-            return hpx::get_num_worker_threads();
+            return hpx::get_os_thread_count();
 
         default:
             break;
