@@ -30,7 +30,7 @@
     (defined(HPX_INTEL_VERSION) && !defined(BOOST_INTEL_LINUX))
 # define HPX_ASSERT(expr) ((expr) ? (void)0 : __builtin_unreachable())
 #elif defined(_MSC_VER)
-# define HPX_ASSERT(expr) __assume((expr))
+# define HPX_ASSERT(expr) __assume(!!(expr))
 #else
 # define HPX_ASSERT(expr) ((void)0)
 #endif
@@ -68,7 +68,7 @@ namespace hpx
     (defined(HPX_INTEL_VERSION) && !defined(BOOST_INTEL_LINUX))
 # define HPX_ASSERT_MSG(expr, msg) ((expr) ? (void)0 : __builtin_unreachable())
 #elif defined(_MSC_VER)
-# define HPX_ASSERT_MSG(expr, msg) __assume((expr))
+# define HPX_ASSERT_MSG(expr, msg) __assume(!!(expr))
 #else
 # define HPX_ASSERT_MSG(expr, msg) ((void)0)
 #endif
