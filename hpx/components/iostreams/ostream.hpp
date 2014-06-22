@@ -36,21 +36,27 @@ namespace hpx { namespace iostreams
         template <typename Char = char>
         struct buffer_sink
         {
+            typedef lcos::local::spinlock mutex_type;
+
             typedef Char char_type;
             typedef boost::iostreams::sink_tag category;
 
-            buffer_sink(buffer& b) : b_(b) {}
+            explicit buffer_sink(buffer& b) : b_(b) {}
+
+            buffer_sink(buffer_sink const& sink) : b_(sink.b_) {}
 
             // Write up to n characters to the underlying data sink into the
             // buffer s, returning the number of characters written.
             std::streamsize write(char_type const* s, std::streamsize n)
             {
+                typename mutex_type::scoped_lock l(mtx_);
                 std::copy(s, s + n, std::back_inserter(b_.data()));
                 return n;
             }
 
         private:
             buffer& b_;
+            mutex_type mtx_;
         };
 
         ///////////////////////////////////////////////////////////////////////
