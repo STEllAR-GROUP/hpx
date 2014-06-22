@@ -768,7 +768,6 @@ namespace hpx { namespace naming
 
             // serialization
             void save(util::portable_binary_oarchive& ar) const;
-
             void load(util::portable_binary_iarchive& ar);
 
         private:

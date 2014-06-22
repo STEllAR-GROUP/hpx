@@ -75,7 +75,7 @@
 // to be split.
 //
 // The current share of the global credit associated with an id_type instance
-// is encoded in the bits 88..92 of the underlying gid_type (encoded as the 
+// is encoded in the bits 88..92 of the underlying gid_type (encoded as the
 // logarithm to the base 2 of the credit value). Bit 94 is a flag which is set
 // whenever the credit is valid. Bit 95 encodes whether the given id_type
 // has been split at any time. This information is needed to be able to decide
@@ -401,7 +401,8 @@ namespace hpx { namespace naming
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void id_type::save(util::portable_binary_oarchive& ar, const unsigned int version) const
+    void id_type::save(util::portable_binary_oarchive& ar,
+        const unsigned int version) const
     {
         bool isvalid = gid_ != 0;
         ar.save(isvalid);
@@ -409,7 +410,8 @@ namespace hpx { namespace naming
             gid_->save(ar);
     }
 
-    void id_type::load(util::portable_binary_iarchive& ar, const unsigned int version)
+    void id_type::load(util::portable_binary_iarchive& ar,
+        const unsigned int version)
     {
         if (version > HPX_IDTYPE_VERSION) {
             HPX_THROW_EXCEPTION(version_too_new, "id_type::load",
