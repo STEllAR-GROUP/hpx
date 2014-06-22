@@ -36,8 +36,6 @@ namespace hpx { namespace iostreams
         template <typename Char = char>
         struct buffer_sink
         {
-            typedef lcos::local::spinlock mutex_type;
-
             typedef Char char_type;
             typedef boost::iostreams::sink_tag category;
 
@@ -49,14 +47,11 @@ namespace hpx { namespace iostreams
             // buffer s, returning the number of characters written.
             std::streamsize write(char_type const* s, std::streamsize n)
             {
-                typename mutex_type::scoped_lock l(mtx_);
-                std::copy(s, s + n, std::back_inserter(b_.data()));
-                return n;
+                return b_.write(s, n);
             }
 
         private:
             buffer& b_;
-            mutex_type mtx_;
         };
 
         ///////////////////////////////////////////////////////////////////////
