@@ -247,7 +247,7 @@ void test_copy_bad_alloc(ExPolicy const& policy, IteratorTag)
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    std::vector<std::size_t> c(100007);
+    std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 

@@ -69,7 +69,7 @@ void count_if_test()
     test_count_if<std::input_iterator_tag>();
 }
 
-/*
+
 ////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
 void test_count_if_exception(ExPolicy const& policy, IteratorTag)
@@ -84,6 +84,7 @@ void test_count_if_exception(ExPolicy const& policy, IteratorTag)
 
     bool caught_exception = false;
     try {
+        //pred should never proc, so simple 'returns true'
         hpx::parallel::count_if(policy,
             decorated_iterator(
                 boost::begin(c),
@@ -160,11 +161,102 @@ void count_if_exception_test()
     test_count_if_exception<std::random_access_iterator_tag>();
     test_count_if_exception<std::forward_iterator_tag>();
 }
-*/
+
+//////////////////////////////////////////////////////////////////////////////
+template <typename ExPolicy, typename IteratorTag>
+void test_count_if_bad_alloc(ExPolicy const& policy, IteratorTag)
+{
+    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::iota(boost::begin(c), boost::end(c), std::rand());
+
+    bool caught_bad_alloc = false;
+    try {
+        std::size_t res = hpx::parallel::count_if(policy,
+            decorated_iterator(
+                boost::begin(c),
+                [](){ throw std::bad_alloc(); }),
+            decorated_iterator(boost::end(c), [](){}),
+            [](std::size_t v){return true;});
+        HPX_TEST(false);
+    }
+    catch (std::bad_alloc const&) {
+        caught_bad_alloc = true;
+    }
+    catch (...) {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_bad_alloc);
+}
+
+template <typename IteratorTag>
+void test_count_if_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::iota(boost::begin(c), boost::end(c), std::rand());
+
+    bool caught_bad_alloc = false;
+    try {
+        hpx::future<__int64> f =
+            hpx::parallel::count_if(hpx::parallel::task,
+                decorated_iterator(
+                    boost::begin(c),
+                    [](){ throw std::bad_alloc(); }),
+                decorated_iterator(boost::end(c), [](){}),
+                [](std::size_t v){return true;});
+
+        f.get();
+
+        HPX_TEST(false);
+    }
+    catch(std::bad_alloc const&) {
+        caught_bad_alloc = true;
+    }
+    catch(...) {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_bad_alloc);
+}
+
+template <typename IteratorTag>
+void test_count_if_bad_alloc()
+{
+    using namespace hpx::parallel;
+
+    test_count_if_bad_alloc(seq, IteratorTag());
+    test_count_if_bad_alloc(par, IteratorTag());
+    test_count_if_bad_alloc(vec, IteratorTag());
+    test_count_if_bad_alloc(task, IteratorTag());
+
+    test_count_if_bad_alloc(execution_policy(seq), IteratorTag());
+    test_count_if_bad_alloc(execution_policy(par), IteratorTag());
+    test_count_if_bad_alloc(execution_policy(vec), IteratorTag());
+    test_count_if_bad_alloc(execution_policy(task), IteratorTag());
+}
+
+void count_if_bad_alloc_test()
+{
+    test_count_if_bad_alloc<std::random_access_iterator_tag>();
+    test_count_if_bad_alloc<std::forward_iterator_tag>();
+    test_count_if_bad_alloc<std::input_iterator_tag>();
+}
+
 int hpx_main()
 {
     count_if_test();
-    //count_if_exception_test();
+    count_if_exception_test();
+    count_if_bad_alloc_test();
     return hpx::finalize();
 }
 

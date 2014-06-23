@@ -57,18 +57,28 @@ namespace hpx { namespace parallel
             typedef typename std::iterator_traits<InIter>::difference_type
                 difference_type;
 
-            // FIXME: this is not thread safe! I'd suggest implementing this
-            // similarly to reduce
-            difference_type ret = 0;
-            for_each_n(policy,
+            if (first == last)
+            {
+                return detail::algorithm_result<ExPolicy, difference_type>
+                    ::get( *first == value);
+            }
+            return util::partitioner<ExPolicy, difference_type>::call(
                 first, std::distance(first, last),
-                [&value, &ret](type const& v) {
-                    if (v == value)
-                        ++ret;
-                }, f);
-
-            return detail::algorithm_result<ExPolicy, difference_type>::get(
-                std::move(ret));
+                [&value](InIter part_begin, std::size_t part_count)
+                {
+                    difference_type ret = std::count(part_begin, 
+                        std::next(part_begin, part_count), value);
+                    return ret;
+                },
+                hpx::util::unwrapped([](std::vector<difference_type>&& results)
+                {
+                    return util::accumulate_n(boost::begin(results),
+                        boost::size(results), difference_type(0), 
+                        [](difference_type v1, difference_type v2)
+                        {
+                            return v1 + v2;
+                        });
+                }));
         }
 
         template <typename InIter, typename T>
@@ -171,27 +181,31 @@ namespace hpx { namespace parallel
             Pred && op, boost::mpl::false_ f)
         {
             typedef typename std::iterator_traits<InIter>::value_type type;
-<<<<<<< HEAD
-    
-            plain_for_each_n(policy,
-=======
             typedef typename std::iterator_traits<InIter>::difference_type
                 difference_type;
 
-            // FIXME: this is not thread safe! I'd suggest implementing this
-            // similarly to reduce
-            difference_type ret = 0;
-
-            for_each_n(policy,
->>>>>>> 88b9df4dcacc7e13297d2a090931cf260616a78a
+            if (first == last)
+            {
+                return detail::algorithm_result<ExPolicy, difference_type>
+                    ::get( op(*first));
+            }
+            return util::partitioner<ExPolicy, difference_type>::call(
                 first, std::distance(first, last),
-                [op, &ret](type const& v) {
-                    if (op(v))
-                        ++ret;
-                }, f);
-
-            return detail::algorithm_result<ExPolicy, difference_type>::get(
-                std::move(ret));
+                [op](InIter part_begin, std::size_t part_count)
+                {
+                    difference_type ret = std::count_if(part_begin, 
+                        std::next(part_begin, part_count), op);
+                    return ret;
+                },
+                hpx::util::unwrapped([](std::vector<difference_type>&& results)
+                {
+                    return util::accumulate_n(boost::begin(results),
+                        boost::size(results), difference_type(0),
+                        [](difference_type v1, difference_type v2)
+                        {
+                            return v1 + v2;
+                        });
+                }));
         }
 
         template <typename InIter, typename Pred>
