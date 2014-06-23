@@ -136,14 +136,36 @@ namespace hpx
     namespace
     {
 
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wunused-function"
+#endif
+
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
+#  if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
+#    pragma GCC diagnostic push
+#  endif
+#  pragma GCC diagnostic ignored "-Wunused-function"
+#endif
+
         // Note: this function is never executed.
-        inline char const* check_hpx_version()
+        char const* check_hpx_version()
         {
             char const* versions[] = {
                 hpx::HPX_CHECK_VERSION, hpx::HPX_CHECK_BOOST_VERSION
             };
             return versions[0];
         }
+
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
+#pragma GCC diagnostic pop
+#endif
+#endif
+
+#if defined(__clang__)
+#  pragma clang diagnostic pop
+#endif
 
     }
 #endif
