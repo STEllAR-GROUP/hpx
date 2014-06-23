@@ -293,7 +293,7 @@ namespace hpx { namespace lcos
     when_each(HPX_ENUM_FWD_ARGS(N, T, f), F && func)
     {
         typedef void result_type;
-        typedef util::decay<F>::type func_type;
+        typedef typename util::decay<F>::type func_type;
         typedef detail::when_each<result_type, func_type> when_each_type;
 
         result_type lazy_values(BOOST_PP_ENUM(N, HPX_WHEN_SOME_ACQUIRE_FUTURE, _));
