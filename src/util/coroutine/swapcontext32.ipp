@@ -77,12 +77,12 @@
 #define HPX_COROUTINE_TYPE_DIRECTIVE(name) ".type " #name ", @function\n\t"
 #endif
 
-#define HPX_COROUTINE_swapcontext(name)                                     \
-    asm volatile (                                                            \
+#define HPX_COROUTINE_swapcontext(name)                                       \
+    asm (                                                                     \
         ".text \n\t"                                                          \
-        ".align " HPX_COROUTINE_ALIGNMENT " \n\t"                           \
+        ".align " HPX_COROUTINE_ALIGNMENT " \n\t"                             \
         ".globl " #name "\n\t"                                                \
-        HPX_COROUTINE_TYPE_DIRECTIVE(name)                                  \
+        HPX_COROUTINE_TYPE_DIRECTIVE(name)                                    \
     #name":\n\t"                                                              \
         "movl  16(%edx), %ecx\n\t"                                            \
         "pushl %ebp\n\t"                                                      \

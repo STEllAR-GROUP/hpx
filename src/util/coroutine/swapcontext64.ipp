@@ -48,12 +48,6 @@
 //     NOTE: popl is slightly better than mov+add to pop registers
 //           so is pushl rather than mov+sub.
 
-#if defined(BOOST_INTEL)
-#define VOLATILE /**/         // some versions don't like the volatile
-#else
-#define VOLATILE volatile
-#endif
-
 #if defined(__APPLE__)
 #define HPX_COROUTINE_TYPE_DIRECTIVE(name)
 #else
@@ -62,12 +56,12 @@
 
 // Note: .align 4 below means alignment at 2^4 boundary (16 bytes
 
-#define HPX_COROUTINE_SWAPCONTEXT(name)                                     \
-    asm VOLATILE (                                                            \
+#define HPX_COROUTINE_SWAPCONTEXT(name)                                       \
+    asm (                                                                     \
         ".text \n\t"                                                          \
         ".align 4\n"                                                          \
         ".globl " #name "\n\t"                                                \
-        HPX_COROUTINE_TYPE_DIRECTIVE(name)                                  \
+        HPX_COROUTINE_TYPE_DIRECTIVE(name)                                    \
     #name ":\n\t"                                                             \
         "movq  64(%rsi), %rcx\n\t"                                            \
         "pushq %rbp\n\t"                                                      \
