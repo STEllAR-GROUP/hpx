@@ -22,7 +22,7 @@ foreach(test ${tests})
   if(${test} MATCHES "^papi_.*")
     add_hpx_executable(${test}_test
                        SOURCES ${sources}
-                       COMPONENT_DEPENDENCIES "papi_counters_component"
+                       COMPONENT_DEPENDENCIES "papi_counters"
                        ${${test}_FLAGS}
                        FOLDER "Tests/Regressions/performance_counters")
   else()
