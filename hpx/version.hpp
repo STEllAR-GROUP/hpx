@@ -135,21 +135,16 @@ namespace hpx
     // library, forcing to resolve the variable HPX_CHECK_VERSION.
     namespace
     {
-#if defined(__clang__)
-#  pragma clang diagnostic push
-#  pragma clang diagnostic ignored "-Wunused-function"
-#endif
+
         // Note: this function is never executed.
-        char const* check_hpx_version()
+        inline char const* check_hpx_version()
         {
             char const* versions[] = {
                 hpx::HPX_CHECK_VERSION, hpx::HPX_CHECK_BOOST_VERSION
             };
             return versions[0];
         }
-#if defined(__clang__)
-#  pragma clang diagnostic pop
-#endif
+
     }
 #endif
 

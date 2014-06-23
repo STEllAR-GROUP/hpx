@@ -163,9 +163,9 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         BOOST_FORCEINLINE
         void invoke(boost::mpl::true_)
         {
-            typedef typename util::invoke_fused_result_of<
-                typename util::decay<F>::type(Args)
-            >::type value_type;
+            //typedef typename util::invoke_fused_result_of<
+            //    typename util::decay<F>::type(Args)
+            //>::type value_type;
             try
             {
                 util::invoke_fused(f_, std::forward<Args>(args_));
@@ -272,7 +272,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
          >::result_type>
     >::type invoke_fused_when_ready(F&& f, Args&& args)
     {
-        typedef typename util::decay<Args>::type arguments_type;
+        //typedef typename util::decay<Args>::type arguments_type;
         typedef when_ready<
             typename util::decay<F>::type
           , typename util::tuple_decay<typename util::decay<Args>::type>::type
