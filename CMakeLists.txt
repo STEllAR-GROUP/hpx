@@ -1246,6 +1246,9 @@ else()
 
   # This is necessary to ensure that our executables are ELF DYN objects.
   if(HPX_PIE)
+    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+      hpx_use_flag_if_available(-Wno-unused-command-line-argument CXX C Fortran)
+    endif()
     hpx_use_flag_if_available(-rdynamic LANGUAGES CXX C Fortran)
     hpx_use_flag_if_available(-fPIC LANGUAGES CXX C Fortran)
   endif()
