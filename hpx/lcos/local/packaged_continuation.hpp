@@ -8,6 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
+#include <hpx/traits/is_future.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
@@ -29,7 +30,7 @@ namespace hpx { namespace lcos { namespace detail
         void apply(Source src, Destination& dest, boost::mpl::false_) const
         {
             try {
-                dest->set_data(src.get());
+                dest->set_result(src.get());
             }
             catch (...) {
                 dest->set_exception(boost::current_exception());
@@ -41,7 +42,7 @@ namespace hpx { namespace lcos { namespace detail
         {
             try {
                 src.get();
-                dest->set_data(util::unused);
+                dest->set_result(util::unused);
             }
             catch (...) {
                 dest->set_exception(boost::current_exception());
@@ -64,7 +65,7 @@ namespace hpx { namespace lcos { namespace detail
         boost::mpl::false_)
     {
         try {
-            cont.set_data(func(std::move(future)));
+            cont.set_result(func(std::move(future)));
         }
         catch (...) {
             cont.set_exception(boost::current_exception());
@@ -77,7 +78,7 @@ namespace hpx { namespace lcos { namespace detail
     {
         try {
             func(std::move(future));
-            cont.set_data(util::unused);
+            cont.set_result(util::unused);
         }
         catch (...) {
             cont.set_exception(boost::current_exception());
@@ -86,7 +87,7 @@ namespace hpx { namespace lcos { namespace detail
 
     template <typename Func, typename Future, typename Continuation>
     typename boost::disable_if<
-        traits::is_future<typename util::result_of<Func(Future)>::type>
+        traits::detail::is_unique_future<typename util::result_of<Func(Future)>::type>
     >::type invoke_continuation(Func& func, Future& future, Continuation& cont)
     {
         typedef typename boost::is_void<
@@ -98,7 +99,7 @@ namespace hpx { namespace lcos { namespace detail
 
     template <typename Func, typename Future, typename Continuation>
     typename boost::enable_if<
-        traits::is_future<typename util::result_of<Func(Future)>::type>
+        traits::detail::is_unique_future<typename util::result_of<Func(Future)>::type>
     >::type invoke_continuation(Func& func, Future& future, Continuation& cont)
     {
         try {
@@ -141,12 +142,6 @@ namespace hpx { namespace lcos { namespace detail
 
     template <typename ContResult>
     struct continuation_result<future<ContResult> >
-    {
-        typedef ContResult type;
-    };
-
-    template <typename ContResult>
-    struct continuation_result<shared_future<ContResult> >
     {
         typedef ContResult type;
     };
@@ -523,10 +518,10 @@ namespace hpx { namespace lcos { namespace detail
 
     template <typename Future>
     inline typename shared_state_ptr<
-        typename unwrap_result<Future>::type>::type
+        typename future_unwrap_result<Future>::result_type>::type
     unwrap(Future& future, error_code& ec)
     {
-        typedef typename unwrap_result<Future>::type result_type;
+        typedef typename future_unwrap_result<Future>::result_type result_type;
         typedef detail::unwrap_continuation<result_type> shared_state;
 
         // create a continuation

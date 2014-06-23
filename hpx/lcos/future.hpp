@@ -309,7 +309,7 @@ namespace hpx { namespace lcos { namespace detail
         typedef typename util::result_of<F(Future)>::type cont_result;
 
         typedef typename boost::mpl::eval_if<
-            traits::is_future<cont_result>
+            traits::detail::is_unique_future<cont_result>
           , traits::future_traits<cont_result>
           , boost::mpl::identity<cont_result>
         >::type result_type;
@@ -428,22 +428,8 @@ namespace hpx { namespace lcos { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
-    struct unwrap_result
-    {
-        typedef typename traits::future_traits<Future>::type outer_result;
-
-        typedef
-            typename boost::mpl::eval_if<
-                traits::is_future<outer_result>
-              , traits::future_traits<outer_result>
-              , boost::mpl::identity<void>
-            >::type
-            type;
-    };
-
-    template <typename Future>
     typename shared_state_ptr<
-        typename unwrap_result<Future>::type>::type
+        typename future_unwrap_result<Future>::result_type>::type
     unwrap(Future& future, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1091,7 +1077,7 @@ namespace hpx { namespace lcos
         //     constructor invocation.
         //   - other.valid() == false.
         shared_future(future<shared_future> && other) BOOST_NOEXCEPT
-          : base_type(other.valid() ? other.unwrap() : base_type())
+          : base_type(other.valid() ? other.share().unwrap() : base_type())
         {}
 
         // Effects: constructs a future<void> object that will be ready when

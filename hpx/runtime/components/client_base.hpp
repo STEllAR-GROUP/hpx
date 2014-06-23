@@ -107,6 +107,19 @@ namespace hpx { namespace components
             typedef Stub type;
             typedef typename Stub::server_component_type server_component_type;
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Derived>
+        struct client_unwrapper
+        {
+            typedef shared_future<naming::id_type> result_type;
+
+            BOOST_FORCEINLINE result_type
+            operator()(future<Derived> f) const
+            {
+                return f.get().share();
+            }
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -154,7 +167,7 @@ namespace hpx { namespace components
         // client_base directly as a client_base holds another future to the
         // id of the referenced object.
         client_base(future<Derived> && d)
-          : gid_(d.unwrap())
+          : gid_(d.then(detail::client_unwrapper<Derived>()))
         {}
 
         // copy assignment and move assignment
@@ -182,12 +195,6 @@ namespace hpx { namespace components
         client_base& operator=(future<naming::id_type> && gid)
         {
             gid_ = gid.share();
-            return *this;
-        }
-
-        client_base& operator=(future<Derived> && d)
-        {
-            gid_ = d.unwrap();
             return *this;
         }
 
