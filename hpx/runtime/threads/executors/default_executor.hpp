@@ -15,7 +15,7 @@ namespace hpx { namespace threads { namespace executors
 {
     namespace detail
     {
-        class HPX_EXPORT default_executor 
+        class HPX_EXPORT default_executor
           : public threads::detail::scheduled_executor_base
         {
         public:
@@ -42,6 +42,11 @@ namespace hpx { namespace threads { namespace executors
 
             // Return an estimate of the number of waiting tasks.
             std::size_t num_pending_closures(error_code& ec) const;
+
+        protected:
+            // Return the requested policy element
+            std::size_t get_policy_element(
+                threads::detail::executor_parameter p, error_code& ec) const;
         };
     }
 

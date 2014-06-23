@@ -50,13 +50,13 @@ namespace hpx { namespace parallel
 
         template <typename ExPolicy, typename InIter, typename F>
         typename detail::algorithm_result<ExPolicy, InIter>::type
-        for_each_n(ExPolicy const&, InIter first, std::size_t count, F && f,
-            boost::mpl::false_)
+        for_each_n(ExPolicy const& policy, InIter first, std::size_t count,
+            F && f, boost::mpl::false_)
         {
             if (count > 0)
             {
                 return util::partitioner<ExPolicy>::call(
-                    first, count,
+                    policy, first, count,
                     [f](InIter part_begin, std::size_t part_count)
                     {
                         util::loop_n(part_begin, part_count, f);
@@ -88,13 +88,13 @@ namespace hpx { namespace parallel
 
         template <typename ExPolicy, typename InIter, typename F>
         typename detail::algorithm_result<ExPolicy, InIter>::type
-        plain_for_each_n(ExPolicy const&, InIter first, std::size_t count,
-            F && f, boost::mpl::false_)
+        plain_for_each_n(ExPolicy const& policy, InIter first,
+            std::size_t count, F && f, boost::mpl::false_)
         {
             if (count > 0)
             {
                 return util::partitioner<ExPolicy>::call(
-                    first, count,
+                    policy, first, count,
                     [f](InIter part_begin, std::size_t part_count)
                     {
                         util::plain_loop_n(part_begin, part_count, f);
