@@ -130,6 +130,16 @@ public:
         return empty_mask;
     }
 
+    mask_type get_cpubind_mask(
+        error_code& ec = throws
+        ) const
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return empty_mask;
+    }
+
     static std::size_t hardware_concurrency()
     {
 #if defined(__ANDROID__) && defined(ANDROID)

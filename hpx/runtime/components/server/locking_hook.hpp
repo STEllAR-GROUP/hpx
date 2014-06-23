@@ -74,9 +74,9 @@ namespace hpx { namespace components
 
             {
                 // register our yield decorator
-                using HPX_STD_PLACEHOLDERS::_1;
+                using util::placeholders::_1;
                 threads::get_self().decorate_yield(
-                    HPX_STD_BIND(&locking_hook::yield_function, this, _1));
+                    util::bind(&locking_hook::yield_function, this, _1));
 
                 undecorate_wrapper yield_undecorator;
                 (void)yield_undecorator;       // silence gcc warnings

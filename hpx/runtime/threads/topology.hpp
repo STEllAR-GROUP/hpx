@@ -81,6 +81,11 @@ namespace hpx { namespace threads
         }
         return ~std::size_t(0);
     }
+
+    inline bool equal(mask_cref_type lhs, mask_cref_type rhs, std::size_t)
+    {
+        return lhs == rhs;
+    }
 #else
 # if defined(HPX_MAX_CPU_COUNT)
     typedef std::bitset<HPX_MAX_CPU_COUNT> mask_type;
@@ -139,6 +144,18 @@ namespace hpx { namespace threads
 # else
         return mask.find_first();
 # endif
+    }
+
+    inline bool equal(mask_cref_type lhs, mask_cref_type rhs, std::size_t numbits)
+    {
+        for (std::size_t j = 0; j != numbits; ++j)
+        {
+            if (test(lhs, j) != test(rhs, j))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 #endif
     /// \endcond
@@ -278,6 +295,8 @@ namespace hpx { namespace threads
 
         virtual std::size_t get_core_number(std::size_t num_thread,
             error_code& ec = throws) const = 0;
+
+        virtual mask_type get_cpubind_mask(error_code& ec = throws) const = 0;
     };
 
     HPX_API_EXPORT std::size_t hardware_concurrency();

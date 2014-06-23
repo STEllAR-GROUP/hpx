@@ -14,8 +14,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ));
     }
     template <typename Arg0>
@@ -24,8 +24,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ));
     }
     template <typename Arg0>
@@ -34,8 +34,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ));
     }
     template <typename Arg0>
@@ -45,8 +45,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ));
     }
     
@@ -82,8 +82,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
     }
     template <typename Arg0 , typename Arg1>
@@ -92,8 +92,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
     }
     template <typename Arg0 , typename Arg1>
@@ -102,8 +102,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
     }
     template <typename Arg0 , typename Arg1>
@@ -113,8 +113,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
     }
     
@@ -150,8 +150,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2>
@@ -160,8 +160,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2>
@@ -170,8 +170,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2>
@@ -181,8 +181,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
     }
     
@@ -218,8 +218,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
@@ -228,8 +228,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
@@ -238,8 +238,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
@@ -249,8 +249,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
     }
     
@@ -286,8 +286,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
@@ -296,8 +296,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
@@ -306,8 +306,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
@@ -317,8 +317,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
     }
     
@@ -354,8 +354,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
@@ -364,8 +364,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
@@ -374,8 +374,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
@@ -385,8 +385,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
     }
     
@@ -422,8 +422,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
@@ -432,8 +432,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
@@ -442,8 +442,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
@@ -453,8 +453,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
     }
     
@@ -490,8 +490,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
@@ -500,8 +500,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
@@ -510,8 +510,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
@@ -521,8 +521,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
     }
     
@@ -558,8 +558,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
@@ -568,8 +568,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
@@ -578,8 +578,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
@@ -589,8 +589,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
     }
     
@@ -626,8 +626,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
@@ -636,8 +636,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
@@ -646,8 +646,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
@@ -657,8 +657,8 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
     }
     

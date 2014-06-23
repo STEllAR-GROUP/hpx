@@ -178,7 +178,7 @@ namespace hpx { namespace util
             }
             else if (mode == reference) {
                 data_ = boost::shared_array<T>(
-                    const_cast<double*>(data),
+                    const_cast<T*>(data),
                     &serialize_buffer::no_deleter);
             }
             else {
@@ -361,7 +361,7 @@ namespace hpx { namespace util
             }
             else if (mode == reference) {
                 data_ = boost::shared_array<T>(
-                    const_cast<double*>(data),
+                    const_cast<T*>(data),
                     &serialize_buffer::no_deleter);
             }
             else {

@@ -462,7 +462,7 @@ void test_wait_callback()
     hpx::lcos::future<int> fi = pi.get_future();
 
     hpx::lcos::future<void> ft = fi.then(&wait_callback);
-    hpx::thread t(hpx::util::bind(&promise_set_value, boost::ref(pi)));
+    hpx::thread t(&promise_set_value, boost::ref(pi));
 
     ft.wait();
 
@@ -1537,7 +1537,7 @@ void test_wait_for_two_out_of_five_futures()
       , hpx::lcos::future<int>
       , hpx::lcos::future<int>
       , hpx::lcos::future<int> > result_type;
-    hpx::lcos::future<result_type> r = hpx::when_n(count, f1, f2, f3, f4, f5);
+    hpx::lcos::future<result_type> r = hpx::when_some(count, f1, f2, f3, f4, f5);
 
     result_type result = r.get();
 
@@ -1578,7 +1578,7 @@ void test_wait_for_three_out_of_five_futures()
       , hpx::lcos::future<int>
       , hpx::lcos::future<int>
       , hpx::lcos::future<int> > result_type;
-    hpx::lcos::future<result_type> r = hpx::when_n(count, f1, f2, f3, f4, f5);
+    hpx::lcos::future<result_type> r = hpx::when_some(count, f1, f2, f3, f4, f5);
 
     result_type result = r.get();
 

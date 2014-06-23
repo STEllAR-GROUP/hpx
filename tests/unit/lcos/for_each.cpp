@@ -48,7 +48,7 @@ int hpx_main(variables_map & vm)
         w = hpx::util::unwrapped(
                 hpx::for_each(
                     v
-                  , HPX_STD_BIND(act, hpx::find_here(), HPX_STD_PLACEHOLDERS::_1)
+                  , hpx::util::bind(act, hpx::find_here(), hpx::util::placeholders::_1)
                 )
             );
 

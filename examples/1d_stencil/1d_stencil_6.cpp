@@ -1,4 +1,5 @@
 //  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014 Patricia Grubel
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -13,7 +14,11 @@
 
 #include <boost/shared_array.hpp>
 
+#include "print_time_results.hpp"
+
 ///////////////////////////////////////////////////////////////////////////////
+// Command-line variables
+bool header = true; // print csv heading
 double k = 0.5;     // heat transfer coefficient
 double dt = 1.;     // time step
 double dx = 1.;     // grid spacing
@@ -336,6 +341,9 @@ int hpx_main(boost::program_options::variables_map& vm)
     boost::uint64_t nx = vm["nx"].as<boost::uint64_t>();   // Number of grid points.
     boost::uint64_t nt = vm["nt"].as<boost::uint64_t>();   // Number of steps.
 
+    if (vm.count("no-header"))
+        header = false;
+
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
     std::size_t nl = localities.size();                    // Number of localities
 
@@ -356,7 +364,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     stepper::space solution = step.do_work(np, nx, nt);
 
     // Print the final solution
-    if (vm.count("result"))
+    if (vm.count("results"))
     {
         for (std::size_t i = 0; i != np; ++i)
         {
@@ -372,7 +380,9 @@ int hpx_main(boost::program_options::variables_map& vm)
     }
 
     boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
-    std::cout << "Elapsed time: " << elapsed / 1e9 << " [s]" << std::endl;
+    
+    boost::uint64_t const os_thread_count = hpx::get_os_thread_count();
+    print_time_results(os_thread_count, elapsed, nx, np, nt, header);
 
     return hpx::finalize();
 }
@@ -383,7 +393,7 @@ int main(int argc, char* argv[])
 
     options_description desc_commandline;
     desc_commandline.add_options()
-        ("results,r", "print generated results (default: false)")
+        ("results", "print generated results (default: false)")
         ("nx", value<boost::uint64_t>()->default_value(10),
          "Local x dimension (of each partition)")
         ("nt", value<boost::uint64_t>()->default_value(45),
@@ -396,6 +406,7 @@ int main(int argc, char* argv[])
          "Timestep unit (default: 1.0[s])")
         ("dx", value<double>(&dx)->default_value(1.0),
          "Local x dimension")
+        ( "no-header", "do not print out the csv header row")
     ;
 
     // Initialize and run HPX

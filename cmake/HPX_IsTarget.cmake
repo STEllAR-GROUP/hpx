@@ -6,7 +6,17 @@
 set(HPX_ISTARGET_LOADED TRUE)
 
 macro(hpx_is_target variable target)
+
+  if(POLICY CMP0026)
+    cmake_policy(PUSH)
+    cmake_policy(SET CMP0026 OLD)
+  endif()
+
   get_target_property(is_target ${target} LOCATION)
+
+  if(POLICY CMP0026)
+    cmake_policy(POP)
+  endif()
 
   if(${is_target} STREQUAL "is_target-NOTFOUND")
     set(${variable} FALSE)

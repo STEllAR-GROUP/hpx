@@ -43,10 +43,10 @@ namespace hpx { namespace util
     inline void enable_lock_detection()
     {
     }
-    inline void ignore_lock(void const* lock)
+    inline void ignore_lock(void const* /*lock*/)
     {
     }
-    inline void reset_ignored(void const* lock)
+    inline void reset_ignored(void const* /*lock*/)
     {
     }
 #endif

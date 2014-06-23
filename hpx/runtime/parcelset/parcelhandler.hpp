@@ -221,9 +221,9 @@ namespace hpx { namespace parcelset
         ///                 id (if not already set).
         BOOST_FORCEINLINE void put_parcel(parcel& p)
         {
-            using HPX_STD_PLACEHOLDERS::_1;
-            using HPX_STD_PLACEHOLDERS::_2;
-            put_parcel(p, HPX_STD_BIND(&parcelhandler::default_write_handler,
+            using util::placeholders::_1;
+            using util::placeholders::_2;
+            put_parcel(p, util::bind(&parcelhandler::default_write_handler,
                 this, _1, _2));
         }
 

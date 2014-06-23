@@ -644,9 +644,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Older Boost versions do not have BOOST_NOEXCEPT defined
 #if !defined(BOOST_NOEXCEPT)
-#define BOOST_NOEXCEPT
-#define BOOST_NOEXCEPT_IF(Predicate)
-#define BOOST_NOEXCEPT_EXPR(Expression) false
+#  define BOOST_NOEXCEPT
+#  define BOOST_NOEXCEPT_IF(Predicate)
+#  define BOOST_NOEXCEPT_EXPR(Expression) false
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -657,6 +657,14 @@
 #  else
 #    define BOOST_NOINLINE
 #  endif
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// GCC has issues with forceinline and member function pointers
+#if defined(HPX_GCC_VERSION)
+#  define HPX_MAYBE_FORCEINLINE inline
+#else
+#  define HPX_MAYBE_FORCEINLINE BOOST_FORCEINLINE
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

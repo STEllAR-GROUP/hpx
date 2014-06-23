@@ -247,7 +247,7 @@ namespace hpx { namespace lcos { namespace detail
             ) = &continuation::async_impl;
 
             applier::register_thread_plain(
-                HPX_STD_BIND(async_impl_ptr, std::move(this_), f),
+                util::bind(async_impl_ptr, std::move(this_), f),
                 "continuation::async");
 
             if (&ec != &throws)
@@ -274,7 +274,7 @@ namespace hpx { namespace lcos { namespace detail
             ) = &continuation::async_impl;
 
             sched.add(
-                HPX_STD_BIND(async_impl_ptr, std::move(this_), f),
+                util::bind(async_impl_ptr, std::move(this_), f),
                 "continuation::async");
 
             if (&ec != &throws)

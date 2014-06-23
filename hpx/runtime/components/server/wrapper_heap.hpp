@@ -312,7 +312,7 @@ namespace hpx { namespace components { namespace detail
         }
 
     protected:
-        bool test_release(scoped_lock& lk)
+        bool test_release(scoped_lock& /*lk*/)
         {
             if (pool_ == NULL || free_size_ < size_ || first_free_ < pool_+size_)
                 return false;

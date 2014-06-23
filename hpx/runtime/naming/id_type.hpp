@@ -9,6 +9,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config/warnings_prefix.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/portable_binary_iarchive.hpp>
+#include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/safe_bool.hpp>
 
 #include <boost/serialization/split_member.hpp>

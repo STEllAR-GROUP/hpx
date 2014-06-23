@@ -519,7 +519,7 @@ namespace hpx { namespace parcelset
 
             error_code ec(lightweight);
             hpx::applier::register_thread_nullary(
-                HPX_STD_BIND(
+                util::bind(
                     &parcelport_impl::get_connection_and_send_parcels,
                     this, loc, background),
                 "get_connection_and_send_parcels",

@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2013 Hartmut Kaiser
+# Copyright (c) 2007-2014 Hartmut Kaiser
 # Copyright (c) 2011-2012 Thomas Heller
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,16 +10,11 @@
 
 # add headers to preprocessing
 set(function_argument_limit_preprocessing_files
+  "hpx/util/detail/basic_function.hpp"
   "hpx/util/detail/define_bind_action_function_operators.hpp"
   "hpx/util/detail/define_bind_function_operators.hpp"
-  "hpx/util/detail/function_template.hpp"
-  "hpx/util/detail/unique_function.hpp"
-  "hpx/util/detail/get_table.hpp"
-  "hpx/util/detail/get_empty_table.hpp"
-  "hpx/util/detail/vtable.hpp"
-  "hpx/util/detail/empty_vtable.hpp"
-  "hpx/util/detail/vtable_ptr.hpp"
-  "hpx/util/detail/vtable_ptr_base.hpp"
+  "hpx/util/detail/empty_function.hpp"
+  "hpx/util/detail/vtable/callable_vtable.hpp"
   "hpx/util/bind.hpp"
   "hpx/util/bind_action.hpp"
   "hpx/util/deferred_call.hpp"
@@ -87,10 +82,10 @@ endforeach()
 
 set(wait_argument_limit_preprocessing_files
   "hpx/lcos/wait_all.hpp"
-  "hpx/lcos/wait_n.hpp"
+  "hpx/lcos/wait_some.hpp"
   "hpx/lcos/wait_any.hpp"
   "hpx/lcos/when_all.hpp"
-  "hpx/lcos/when_n.hpp"
+  "hpx/lcos/when_some.hpp"
   "hpx/lcos/when_any.hpp"
   "hpx/runtime/components/memory_block.hpp")
 foreach(file ${wait_argument_limit_preprocessing_files})
