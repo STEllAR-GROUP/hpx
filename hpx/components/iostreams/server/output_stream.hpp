@@ -64,11 +64,19 @@ namespace hpx { namespace iostreams { namespace detail
             return n;
         }
 
-        void write(write_function_type const& f) const
+        template <typename Mutex>
+        void write(write_function_type const& f, Mutex& mtx)
         {
-            mutex_type::scoped_lock l(mtx_);
+            typename mutex_type::scoped_lock l(mtx_);
             if (data_.get() && !data_->empty())
-                f(*data_);
+            {
+                boost::shared_ptr<std::vector<char> > data(data_);
+                data_.reset();
+                l.unlock();
+
+                typename Mutex::scoped_lock ll(mtx);
+                f(*data);
+            }
         }
 
     private:
@@ -95,17 +103,19 @@ namespace hpx { namespace iostreams { namespace server
     {
         // {{{ types
         typedef components::managed_component_base<output_stream> base_type;
+        typedef lcos::local::spinlock mutex_type;
         // }}}
 
-      private:
+    private:
+        mutable mutex_type mtx_;
         write_function_type write_f;
 
         // Executed in an io_pool thread to prevent io from blocking an HPX
         // shepherd thread.
-        void call_write_async(detail::buffer const& in);
-        void call_write_sync(detail::buffer const& in, threads::thread_id_type caller);
+        void call_write_async(detail::buffer in);
+        void call_write_sync(detail::buffer in, threads::thread_id_type caller);
 
-      public:
+    public:
         explicit output_stream(write_function_type write_f_ = write_function_type())
           : write_f(write_f_)
         {}

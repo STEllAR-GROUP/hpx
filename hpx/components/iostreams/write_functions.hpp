@@ -26,26 +26,28 @@ typedef HPX_STD_FUNCTION<void(std::vector<char> const&)> write_function_type;
 // Write function that works on STL OutputIterators
 template <typename Iterator>
 inline void iterator_write_function(std::vector<char> const& in, Iterator it)
-{ std::copy(in.begin(), in.end(), it); }
+{
+    std::copy(in.begin(), in.end(), it);
+}
 
 // Factory function
 template <typename Iterator>
 inline write_function_type make_iterator_write_function(Iterator it)
 {
-    return write_function_type(boost::bind
-        (iterator_write_function<Iterator>, _1, it));
+    return boost::bind(iterator_write_function<Iterator>, _1, it);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 inline void
 std_ostream_write_function(std::vector<char> const& in, std::ostream& os)
-{ std::copy(in.begin(), in.end(), std::ostream_iterator<char>(os)); }
+{
+    std::copy(in.begin(), in.end(), std::ostream_iterator<char>(os));
+}
 
 // Factory function
 inline write_function_type make_std_ostream_write_function(std::ostream& os)
 {
-    return write_function_type(boost::bind
-        (std_ostream_write_function, _1, boost::ref(os)));
+    return boost::bind(std_ostream_write_function, _1, boost::ref(os));
 }
 
 }}
