@@ -193,7 +193,7 @@ namespace hpx { namespace parallel
             result_type;
 
             return get_iter<1, result_type>(
-                plain_for_each_n(policy,
+                    plain_for_each_n(policy,
                     detail::make_zip_iterator(boost::make_tuple(first, dest)),
                     count,
                     [](reference it) {

@@ -126,7 +126,7 @@ void test_copy_n()
     test_copy_n(execution_policy(par), IteratorTag());
     test_copy_n(execution_policy(vec), IteratorTag());
     test_copy_n(execution_policy(task), IteratorTag());
-
+    
     //assure output iterator will run
     test_copy_n_outiter(seq, IteratorTag());
     test_copy_n_outiter(par, IteratorTag());
@@ -137,6 +137,7 @@ void test_copy_n()
     test_copy_n_outiter(execution_policy(par), IteratorTag());
     test_copy_n_outiter(execution_policy(vec), IteratorTag());
     test_copy_n_outiter(execution_policy(task), IteratorTag());
+    
 }
 
 void n_copy_test()
@@ -340,8 +341,8 @@ void copy_n_bad_alloc_test()
 int hpx_main()
 {
     n_copy_test();
-    copy_n_exception_test();
-    copy_n_bad_alloc_test();
+    //copy_n_exception_test();
+    //copy_n_bad_alloc_test();
     return hpx::finalize();
 }
 

@@ -63,7 +63,7 @@ namespace hpx { namespace parallel
                     ::get( *first == value);
             }
             return util::partitioner<ExPolicy, difference_type>::call(
-                first, std::distance(first, last),
+                policy, first, std::distance(first, last),
                 [&value](InIter part_begin, std::size_t part_count)
                 {
                     difference_type ret = std::count(part_begin, 
@@ -190,7 +190,7 @@ namespace hpx { namespace parallel
                     ::get( op(*first));
             }
             return util::partitioner<ExPolicy, difference_type>::call(
-                first, std::distance(first, last),
+                policy, first, std::distance(first, last),
                 [op](InIter part_begin, std::size_t part_count)
                 {
                     difference_type ret = std::count_if(part_begin, 
