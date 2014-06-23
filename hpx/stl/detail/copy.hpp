@@ -167,8 +167,7 @@ namespace hpx { namespace parallel
                                 *boost::get<1>(it) = *boost::get<0>(it);
                             },
                             boost::mpl::true_())
-                    )
-                );
+                    ));
             }
             catch(std::bad_alloc const& e) {
                 boost::throw_exception(e);
@@ -193,7 +192,7 @@ namespace hpx { namespace parallel
             result_type;
 
             return get_iter<1, result_type>(
-                    plain_for_each_n(policy,
+                plain_for_each_n(policy,
                     detail::make_zip_iterator(boost::make_tuple(first, dest)),
                     count,
                     [](reference it) {
@@ -220,7 +219,7 @@ namespace hpx { namespace parallel
 
             case detail::execution_policy_enum::vector:
                 return detail::copy_n(
-                    *policy.get<parallel_execution_policy>(),
+                    *policy.get<vector_execution_policy>(),
                     first, count, dest, fls);
 
             case detail::execution_policy_enum::task:
@@ -332,7 +331,7 @@ namespace hpx { namespace parallel
             result_type;
 
             return get_iter<1, result_type>(
-                for_each_n(policy,
+                plain_for_each_n(policy,
                     detail::make_zip_iterator(boost::make_tuple(first, dest)),
                     std::distance(first,last),
                     [f](reference it) {

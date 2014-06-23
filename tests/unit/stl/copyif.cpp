@@ -103,24 +103,14 @@ void test_copy_if_outiter(ExPolicy const& policy, IteratorTag)
         iterator(boost::begin(c)), iterator(boost::end(c)),
         std::back_inserter(d), [](int i){return !(i<0);});
 
-    std::size_t count = 0;
     HPX_TEST(std::equal(boost::begin(c), middle, boost::begin(d),
-        [&count](int v1, int v2) {
+        [](int v1, int v2) {
             HPX_TEST_EQ(v1, v2);
-            ++count;
             return v1 == v2;
         }));
 
-    std::size_t fill = 0;
-    HPX_TEST(std::equal(middle,boost::end(c),
-        boost::begin(d) + (1 + d.size()/2),
-        [&fill](int v1, int v2) {
-            HPX_TEST_NEQ(v1,v2);
-            ++fill;
-            return v1!=v2;
-    }));
-
-    HPX_TEST_EQ(count, d.size());
+    //assure D is half the size of C
+    HPX_TEST_EQ(c.size()/2, d.size());
 }
 
 template <typename IteratorTag>
@@ -141,11 +131,9 @@ void test_copy_if_outiter(hpx::parallel::task_execution_policy, IteratorTag)
             std::back_inserter(d), [](int i){return !(i<0);});
     f.wait();
 
-    std::size_t count = 0;
     HPX_TEST(std::equal(boost::begin(c), middle, boost::begin(d),
-        [&count](int v1, int v2) {
+        [](int v1, int v2) {
             HPX_TEST_EQ(v1, v2);
-            ++count;
             return v1 == v2;
         }));
 
