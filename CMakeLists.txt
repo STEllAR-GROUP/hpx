@@ -114,7 +114,11 @@ hpx_option(WITH_HWLOC
 
 hpx_option(WITH_SECURITY BOOL "Enable security support via libsodium." OFF)
 
+# Logging configuration
 hpx_option(WITH_LOGGING BOOL "Build HPX with logging enabled (default: ON)." ON ADVANCED)
+if(NOT WITH_LOGGING)
+  hpx_add_config_define(HPX_NO_LOGGING)
+endif()
 
 ## Compiler related build options
 hpx_option(WITH_GCC_VERSION_CHECK BOOL "Ignore version reported by gcc (default: ON)" ON ADVANCED)
@@ -124,17 +128,28 @@ hpx_option(WITH_DEFAULT_BUILD_TARGETS BOOL
 
 hpx_option(WITH_WARNINGS BOOL "Enable compiler warnings (default: ON)" ON ADVANCED)
 
+################################################################################
+# Native TLS configuration
+################################################################################
 set(WITH_NATIVE_TLS_DEFAULT ON)
 if(APPLE)
   set(WITH_NATIVE_TLS_DEFAULT OFF)
 endif()
 hpx_option(WITH_NATIVE_TLS BOOL "Use native TLS support if available (default: ON)" ${WITH_NATIVE_TLS_DEFAULT} ADVANCED)
+if(WITH_NATIVE_TLS)
+  hpx_info("Native TLS is enabled.")
+  hpx_add_config_define(HPX_HAVE_NATIVE_TLS)
+endif()
 
+################################################################################
+# Disable the use of partially preprocessed header files
+################################################################################
 hpx_option(WITH_PREPROCESSOR_LIMIT_EXPANSION BOOL "Do not use preprocessed headers (default: OFF)" OFF ADVANCED)
 
-hpx_option(WITH_UTIL_BIND BOOL "Use hpx::util::bind instead of boost::bind or std::bind (default: ON)" ON ADVANCED)
-hpx_option(WITH_UTIL_FUNCTION BOOL "Use hpx::util::function instead of boost::function or std::function (default: ON)" ON ADVANCED)
-hpx_option(WITH_UTIL_TUPLE BOOL "Use hpx::util::tuple instead of boost::tuple or std::tuple (default: ON)" ON ADVANCED)
+if(WITH_PREPROCESSOR_LIMIT_EXPANSION)
+  hpx_info("Use of preprocessed headers is disabled.")
+  hpx_add_config_define(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
+endif()
 
 set(WITH_HIDDEN_VISIBILITY_DEFAULT ON)
 if(CMAKE_COMPILER_IS_GNUCXX)
@@ -174,8 +189,13 @@ hpx_option(WITH_THREAD_MANAGER_IDLE_BACKOFF BOOL
   OFF
   CATEGORY "Thread Manager" ADVANCED)
 
-hpx_option(HPX_HAVE_STACKTRACES BOOL "Attach backtraces to HPX exceptions (default: ON)"
+hpx_option(WITH_STACKTRACES BOOL "Attach backtraces to HPX exceptions (default: ON)"
   ON CATEGORY "Thread Manager" ADVANCED)
+
+if(WITH_STACKTRACES OR WITH_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION)
+  hpx_info("Stack traces are enabled.")
+  hpx_add_config_define(HPX_HAVE_STACKTRACES)
+endif()
 
 hpx_option(WITH_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION BOOL
   "Enable thread stack back trace being captured on suspension (default: OFF)"
@@ -190,13 +210,30 @@ hpx_option(WITH_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION BOOL
   "Enable thread stack back trace being captured on suspension (default: OFF)"
   OFF CATEGORY "Thread Manager" ADVANCED)
 
+if(WITH_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION)
+  hpx_add_config_define(HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH
+    ${WITH_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH})
+  if(WITH_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION)
+    hpx_add_config_define(HPX_THREAD_MAINTAIN_FULLBAKCTRACE_ON_SUSPENSION))
+  endif()
+endif()
+
 hpx_option(WITH_THREAD_MAINTAIN_TARGET_ADDRESS BOOL
   "Enable storing target address in thread for NUMA awareness (default: OFF)"
   OFF CATEGORY "Thread Manager" ADVANCED)
 
+if(WITH_THREAD_MAINTAIN_TARGET_ADDRESS)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
+endif()
+
 hpx_option(WITH_THREAD_MAINTAIN_QUEUE_WAITTIME BOOL
   "Enable collecting queue wait times for threads (default: OFF)"
   OFF CATEGORY "Thread Manager" ADVANCED)
+
+if(WITH_THREAD_MAINTAIN_QUEUE_WAITTIME)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_QUEUE_WAITTIME)
+endif()
 
 hpx_option(WITH_THREAD_MAINTAIN_IDLE_RATES BOOL
   "Enable measuring the percentage of overhead times spent in the scheduler (default: OFF)"
@@ -206,17 +243,36 @@ hpx_option(WITH_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES BOOL
   "Enable measuring thread creation and cleanup times (default: OFF)"
   OFF CATEGORY "Thread Manager" ADVANCED)
 
+if(WITH_THREAD_MAINTAIN_IDLE_RATES)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_IDLE_RATES)
+  if(WITH_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES)
+    hpx_add_config_define(HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES)
+  endif()
+endif()
+
 hpx_option(WITH_THREAD_MAINTAIN_CUMULATIVE_COUNTS BOOL
   "Enable keeping track of cumulative thread counts in the schedulers (default: ON)"
   ON CATEGORY "Thread Manager" ADVANCED)
+
+if(WITH_THREAD_MAINTAIN_CUMULATIVE_COUNTS)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS)
+endif()
 
 hpx_option(WITH_THREAD_MAINTAIN_STEALING_COUNTS BOOL
   "Enable keeping track of counts of thread stealing incidents in the schedulers (default: ON)"
   ON CATEGORY "Thread Manager" ADVANCED)
 
+if(WITH_THREAD_MAINTAIN_STEALING_COUNTS)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_STEALING_COUNTS)
+endif()
+
 hpx_option(WITH_THREAD_MAINTAIN_LOCAL_STORAGE BOOL
   "Enable thread local storage for all HPX threads (default: ON)"
   ON CATEGORY "Thread Manager" ADVANCED)
+
+if(WITH_THREAD_MAINTAIN_LOCAL_STORAGE)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
+endif()
 
 hpx_option(WITH_SWAP_CONTEXT_EMULATION BOOL "Emulate SwapContext API for coroutines (default: OFF)"
   OFF CATEGORY "Thread Manager" ADVANCED)
@@ -230,6 +286,9 @@ hpx_option(WITH_THREAD_SCHEDULERS STRING
 hpx_option(WITH_AGAS_DUMP_REFCNT_ENTRIES BOOL
   "Enable dumps of the AGAS refcnt tables to logs (default: OFF)"
   OFF CATEGORY "AGAS" ADVANCED)
+if(WITH_AGAS_DUMP_REFCNT_ENTRIES)
+  hpx_add_config_define(HPX_AGAS_DUMP_REFCNT_ENTRIES)
+endif()
 
 ## Parcelport related build options
 set(WITH_PARCELPORT_TCP_DEFAULT ON)
@@ -292,6 +351,36 @@ hpx_option(WITH_THREAD_GUARD_PAGE BOOL
   ON
   CATEGORY "Debugging" ADVANCED)
 
+if(WITH_VERIFY_LOCKS)
+  hpx_add_config_define(HPX_HAVE_VERIFY_LOCKS)
+  if(WITH_VERIFY_LOCKS_BACKTRACE)
+    hpx_add_config_define(HPX_HAVE_VERIFY_LOCKS_BACKTRACE)
+  endif()
+endif()
+if(WITH_VERIFY_LOCKS_GLOBALLY)
+  hpx_add_config_define(HPX_HAVE_VERIFY_LOCKS_GLOBALLY)
+endif()
+
+# Additional debug support
+if(NOT MSVC AND WITH_THREAD_GUARD_PAGE)
+  hpx_add_config_define(HPX_THREAD_GUARD_PAGE)
+endif()
+
+if(NOT MSVC AND WITH_THREAD_STACK_MMAP)
+  hpx_add_config_define(HPX_USE_MMAP)
+endif()
+
+if(WITH_THREAD_MANAGER_IDLE_BACKOFF)
+  hpx_add_config_define(HPX_THREAD_BACKOFF_ON_IDLE)
+endif()
+
+if(WITH_THREAD_DEBUG_INFO)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_PHASE_INFORMATION)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_DESCRIPTION)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_DEADLOCK_DETECTION)
+endif()
+
 ################################################################################
 
 ##############################################################################
@@ -316,9 +405,12 @@ if(WITH_HWLOC)
   endif()
   hpx_libraries(${HWLOC_LIBRARIES})
   include_directories(${HWLOC_INCLUDE_DIR})
-  add_definitions(-DHPX_HAVE_HWLOC)
+  add_config_define(HPX_HAVE_HWLOC)
 endif()
 
+################################################################################
+# Decide whether to use the ibverbs based parcelport
+################################################################################
 if(WITH_PARCELPORT_IBVERBS)
   find_package(Ibverbs)
   if(NOT IBVERBS_FOUND)
@@ -340,6 +432,19 @@ if(WITH_PARCELPORT_IBVERBS)
   hpx_add_config_define(HPX_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS "${WITH_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS}")
 endif()
 
+################################################################################
+# Decide whether to use shared memory based parcelport (starting with
+# Boost V1.52)
+################################################################################
+if(WITH_PARCELPORT_IPC)
+  if(Boost_VERSION GREATER 105100)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_IPC)
+  endif()
+endif()
+
+################################################################################
+# Decide whether to use the MPI based parcelport
+################################################################################
 if(WITH_PARCELPORT_MPI)
   find_package(MPI)
   if(NOT MPI_CXX_FOUND)
@@ -373,34 +478,66 @@ if(WITH_PARCELPORT_MPI)
 endif()
 
 ################################################################################
-# PAPI event counters
+# Decide whether to use the TCP/IP based parcelport
 ################################################################################
-if(WITH_PAPI)
-  find_package(PAPI)
+if(WITH_PARCELPORT_TCP)
+  hpx_add_config_define(HPX_HAVE_PARCELPORT_TCP)
+endif()
+
+################################################################################
+# Enable integration with Intel Amplifier and Inspector tools
+################################################################################
+if(WITH_AMPLIFIER)
+  find_package(Amplifier)
+  if(NOT AMPLIFIER_FOUND)
+    hpx_error("Intel Amplifier could not be found and WITH_AMPLIFIER=On, please specify AMPLIFIER_ROOT to point to the root of your Amplifier installation")
+  endif()
+  hpx_libraries(${AMPLIFIER_LIBRARIES})
+  include_directories(${AMPLIFIER_INCLUDE_DIR})
+  hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
 endif()
 
 if(WITH_TAU)
   find_package(TAU)
+  if(NOT TAU_FOUND)
+    hpx_error("TAU could not be found and WITH_TAU=On, please specify TAU_ROOT to point to the root of your TAU installation")
+  endif()
+  hpx_libraries(${TAU_LIBRARIES})
+  include_directories(${TAU_INCLUDE_DIR})
 endif()
 
+################################################################################
+# Enable integration with Apex event counters
+################################################################################
 if(WITH_APEX)
   find_package(APEX)
+  if(NOT APEX_FOUND)
+    hpx_error("Apex could not be found and WITH_APEX=On, please specify APEX_ROOT to point to the root of your Apex installation")
+  endif()
+  hpx_libraries(${APEX_LIBRARIES})
+  include_directories(${APEX_INCLUDE_DIR})
+  if(AMPLIFIER_FOUND)
+    hpx_error("AMPLIFIER_FOUND has been set. Please disable the use of the Intel Amplifier (WITH_AMPLIFIER=Off) in order to use Apex")
+  endif()
+  hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
 endif()
 
 if(WITH_GOOGLE_PERFTOOLS)
   find_package(GooglePerftools)
-endif()
-
-if(WITH_AMPLIFIER)
-  find_package(Amplifier)
+  if(NOT GOOGLE_PERFTOOLS_FOUND)
+    hpx_error("Google Perftools could not be found and WITH_GOOGLE_PERFTOOLS=On, please specify GOOGLE_PERFTOOLS to point to the root of your Google Perftools installation")
+  endif()
+  hpx_libraries(${GOOGLE_PERFTOOLS_LIBRARIES})
+  include_directories(${GOOGLE_PERFTOOLS_INCLUDE_DIR})
 endif()
 
 if(WITH_VALGRIND)
   find_package(Valgrind)
-endif()
-
-if(WITH_SECURITY)
-  find_package(Sodium)
+  if(NOT VALGRIND_FOUND)
+    hpx_error("Valgrind could not be found and WITH_VALGRIND=On, please specify VALGRIND_ROOT to point to the root of your Valgrind installation")
+  endif()
+  include_directories(${VALGRIND_INCLUDE_DIR})
+  hpx_add_config_define(HPX_HAVE_VALGRIND)
 endif()
 ################################################################################
 
@@ -484,6 +621,7 @@ if(NOT MSVC)
 endif()
 
 if(MSVC)
+  enable_language(ASM_MASM)
   hpx_add_compile_flag(-Ox
     CONFIGURATIONS Release LANGUAGES CXX C)
   hpx_add_compile_flag(-RTC1
@@ -658,7 +796,7 @@ hpx_check_for_cxx11_std_initializer_list(
 
 ################################################################################
 # Check Build Options based on the found dependencies. We also check for errors
-# with incompatible options with the currently selected platform
+# with incompatible options with the currently selected platform.
 #
 
 if(WITH_GENERIC_COROUTINE_CONTEXT)
@@ -672,6 +810,18 @@ if(WITH_GENERIC_COROUTINE_CONTEXT)
     endif()
   endif()
   hpx_add_config_define(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
+endif()
+
+################################################################################
+# Emulation of SwapContext on Windows
+################################################################################
+if(MSVC)
+  if(WITH_SWAP_CONTEXT_EMULATION)
+    if(NOT CMAKE_ASM_MASM_COMPILER)
+      hpx_error("SwitchToFiber emulation can not be enabled. The masm compiler could not be found. Try setting the ASM_MASM environment variable to the assembler executable (ml.exe/ml64.exe) or disable the emulation by setting WITH_SWAP_CONTEXT_EMULATION to Off")
+    else()
+      hpx_info("SwitchToFiber emulation is enabled, using compiler: '${CMAKE_ASM_MASM_COMPILER}'")
+    endif()
 endif()
 
 ################################################################################
@@ -690,43 +840,12 @@ endif()
 # else()
 #   hpx_link_directories("${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/lib/hpx")
 # endif()
-#
-# ################################################################################
-# # Compiler detection code
-# ################################################################################
-#
-# hpx_include(CompilerFlags)
-#
 
 ################################################################################
 # Git commit detection
 ################################################################################
 include(HPX_GitCommit)
 hpx_add_config_define(HPX_GIT_COMMIT "\"${HPX_GIT_COMMIT}\"")
-
-# ################################################################################
-# # Decide whether to use TCP/IP based parcelport (starting with Boost V1.52)
-# ################################################################################
-# if(HPX_HAVE_PARCELPORT_TCP)
-#   hpx_add_config_define(HPX_HAVE_PARCELPORT_TCP)
-# endif()
-#
-# ################################################################################
-# # Decide whether to use shared memory based parcelport (starting with
-# # Boost V1.52)
-# ################################################################################
-# if(${BOOST_MINOR_VERSION} GREATER 51)
-#   if(HPX_HAVE_PARCELPORT_IPC)
-#     hpx_add_config_define(HPX_HAVE_PARCELPORT_IPC)
-#   endif()
-# endif()
-#
-# ################################################################################
-# # Logging configuration
-# ################################################################################
-# if(HPX_NO_LOGGING)
-#   hpx_add_config_define(HPX_NO_LOGGING 1)
-# endif()
 #
 # ################################################################################
 # # HPX_PREFIX
@@ -754,180 +873,9 @@ hpx_add_config_define(HPX_GIT_COMMIT "\"${HPX_GIT_COMMIT}\"")
 # hpx_add_config_define(HPX_PREFIX "\"${HPX_PREFIX}\"")
 #
 # hpx_include(SetOutputPaths)
-#
-# ################################################################################
-# # RPATH configuration
-# ################################################################################
-# if(NOT MSVC)
-#   set(HPX_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB}/hpx:${CMAKE_BINARY_DIR}/lib/hpx"
-#       CACHE STRING "Base RPATH for linking" FORCE)
-# endif()
-#
-# ################################################################################
-# # C++11 configuration
-# ################################################################################
-#
-# ################################################################################
-# # Additional debug support
-# ################################################################################
-# if(HPX_HAVE_VERIFY_LOCKS)
-#   hpx_add_config_define(HPX_HAVE_VERIFY_LOCKS 1)
-#   if(HPX_HAVE_VERIFY_LOCKS_BACKTRACE)
-#     hpx_add_config_define(HPX_HAVE_VERIFY_LOCKS_BACKTRACE 1)
-#   else()
-#     hpx_add_config_define(HPX_HAVE_VERIFY_LOCKS_BACKTRACE 0)
-#   endif()
-# else()
-#   hpx_add_config_define(HPX_HAVE_VERIFY_LOCKS 0)
-#   hpx_add_config_define(HPX_HAVE_VERIFY_LOCKS_BACKTRACE 0)
-# endif()
-#
-# ###############################################################################
-#
-# if(HPX_HAVE_VERIFY_LOCKS_GLOBALLY)
-#   hpx_add_config_define(HPX_HAVE_VERIFY_LOCKS_GLOBALLY 1)
-# else()
-#   hpx_add_config_define(HPX_HAVE_VERIFY_LOCKS_GLOBALLY 0)
-# endif()
-#
-# ###############################################################################
-#
-# if(NOT MSVC)
-#   if(HPX_THREAD_GUARD_PAGE)
-#     hpx_add_config_define(HPX_THREAD_GUARD_PAGE 1)
-#   else()
-#     hpx_add_config_define(HPX_THREAD_GUARD_PAGE 0)
-#   endif()
-# endif()
-#
-# if(NOT MSVC)
-#   if(HPX_USE_MMAP)
-#     hpx_add_config_define(HPX_USE_MMAP)
-#   endif()
-# endif()
-#
-# if(HPX_THREAD_BACKOFF_ON_IDLE)
-#   hpx_add_config_define(HPX_THREAD_BACKOFF_ON_IDLE)
-# endif()
-#
-# if(HPX_THREAD_DEBUG_INFO)
-#   hpx_add_config_define(HPX_THREAD_MAINTAIN_PARENT_REFERENCE 1)
-#   hpx_add_config_define(HPX_THREAD_MAINTAIN_PHASE_INFORMATION 1)
-#   hpx_add_config_define(HPX_THREAD_MAINTAIN_DESCRIPTION 1)
-#   hpx_add_config_define(HPX_THREAD_MINIMAL_DEADLOCK_DETECTION 1)
-# else()
-#   hpx_add_config_define(HPX_THREAD_MAINTAIN_PARENT_REFERENCE 0)
-#   hpx_add_config_define(HPX_THREAD_MAINTAIN_PHASE_INFORMATION 0)
-#   hpx_add_config_define(HPX_THREAD_MAINTAIN_DESCRIPTION 0)
-#   hpx_add_config_define(HPX_THREAD_MINIMAL_DEADLOCK_DETECTION 0)
-# endif()
-#
-#
-# if(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION)
-#   hpx_add_config_define(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION 1)
-#   hpx_add_config_define(HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH
-#     ${HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH})
-#
-#   if(HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION)
-#     hpx_add_config_define(HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION 1)
-#   else()
-#     hpx_add_config_define(HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION 0)
-#   endif()
-# else()
-#   hpx_add_config_define(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION 0)
-#   hpx_add_config_define(HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION 0)
-#   hpx_add_config_define(HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH 0)
-# endif()
-#
-# if(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
-#   hpx_add_config_define(HPX_THREAD_MAINTAIN_TARGET_ADDRESS 1)
-# else()
-#   hpx_add_config_define(HPX_THREAD_MAINTAIN_TARGET_ADDRESS 0)
-# endif()
-#
-# if(HPX_THREAD_MAINTAIN_QUEUE_WAITTIME)
-#   hpx_add_config_define(HPX_THREAD_MAINTAIN_QUEUE_WAITTIME 1)
-# else()
-#   hpx_add_config_define(HPX_THREAD_MAINTAIN_QUEUE_WAITTIME 0)
-# endif()
-#
-# if(HPX_THREAD_MAINTAIN_IDLE_RATES)
-#   hpx_add_config_define(HPX_THREAD_MAINTAIN_IDLE_RATES 1)
-#   if(HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES)
-#     hpx_add_config_define(HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES 1)
-#   else()
-#     hpx_add_config_define(HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES 0)
-#   endif()
-# else()
-#   hpx_add_config_define(HPX_THREAD_MAINTAIN_IDLE_RATES 0)
-# endif()
-#
-# if(HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS)
-#   hpx_add_config_define(HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS 1)
-# else()
-#   hpx_add_config_define(HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS 0)
-# endif()
-#
-# if(HPX_THREAD_MAINTAIN_STEALING_COUNTS)
-#   hpx_add_config_define(HPX_THREAD_MAINTAIN_STEALING_COUNTS 1)
-# else()
-#   hpx_add_config_define(HPX_THREAD_MAINTAIN_STEALING_COUNTS 0)
-# endif()
-#
-# if(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
-#   hpx_add_config_define(HPX_THREAD_MAINTAIN_LOCAL_STORAGE 1)
-# else()
-#   hpx_add_config_define(HPX_THREAD_MAINTAIN_LOCAL_STORAGE 0)
-# endif()
-#
-#
 # ##############################################################################
 #
-# if(HPX_AGAS_DUMP_REFCNT_ENTRIES)
-#   hpx_add_config_define(HPX_AGAS_DUMP_REFCNT_ENTRIES 1)
-# else()
-#   hpx_add_config_define(HPX_AGAS_DUMP_REFCNT_ENTRIES 0)
-# endif()
-#
-# find_package(HPX_PAPI)
-#
-# ################################################################################
-# # Apex event counters
-# ################################################################################
-# find_package(HPX_TAU)
-# find_package(HPX_APEX)
-#
-# ################################################################################
-# # Valgrind support
-# ################################################################################
-# if(NOT HPX_NATIVE_MIC)
-#   find_package(HPX_Valgrind)
-# endif()
-#
-# ################################################################################
-# # Security, libsodium: P(ortable|ackageable) NaCl
-# ################################################################################
-# find_package(HPX_Sodium)
-# if(SODIUM_FOUND)
-#   hpx_add_config_define(HPX_HAVE_SODIUM)
-#
-#   hpx_include_sys_directories("${SODIUM_INCLUDE_DIR}")
-#   hpx_link_sys_directories("${SODIUM_LIBRARY_DIR}")
-#   if(MSVC)
-#     hpx_add_config_define(SODIUM_STATIC)
-#   endif()
-#   set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${SODIUM_LIBRARY})
-#
-#   if(HPX_HAVE_SECURITY)
-#     hpx_add_config_define(HPX_HAVE_SECURITY)
-#   endif()
-#
-# elseif(HPX_HAVE_SECURITY)
-#   hpx_error("security" "The libsodium library has to be available to enable security features.")
-#   set(HPX_HAVE_SECURITY OFF)
-# endif()
-#
-# ###############################################################################
+################################################################################
 # # Configure compression and other plugins
 # ###############################################################################
 # add_hpx_pseudo_target(plugins)
@@ -957,92 +905,8 @@ hpx_add_config_define(HPX_GIT_COMMIT "\"${HPX_GIT_COMMIT}\"")
 # hpx_include(Preprocessing)
 #
 # ################################################################################
-# # Backtrace configuration
-# ################################################################################
-#
-# if(HPX_HAVE_STACKTRACES OR HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION)
-#   hpx_info("stacktraces" "Stack traces are enabled.")
-#   hpx_add_config_define(HPX_HAVE_STACKTRACES)
-# endif()
-#
-# ################################################################################
-# # Emulation of SwapContext on Windows
-# ################################################################################
-# if(MSVC)
-#
-#   if(HPX_HAVE_SWAP_CONTEXT_EMULATION)
-#     enable_language(ASM_MASM)
-#     if(CMAKE_ASM_MASM_COMPILER)
-#       hpx_info("swap_context" "SwitchToFiber emulation is enabled, using compiler: '${CMAKE_ASM_MASM_COMPILER}'")
-#     else()
-#       hpx_warn("swap_context" "SwitchToFiber emulation will be disabled, try setting the ASM_MASM environment variable to the assembler executable (ml.exe/ml64.exe)")
-#       set(HPX_HAVE_SWAP_CONTEXT_EMULATION OFF CACHE BOOL "Emulate SwitchToFiber API for coroutines (default: OFF)" FORCE)
-#     endif()
-#   endif()
-# endif()
-#
-# ################################################################################
-# # Enable integration with Intel Amplifier and Inspector tools
-# ################################################################################
-#
-# if(HPX_HAVE_ITTNOTIFY)
-#   find_package(HPX_Amplifier)
-#   if(AMPLIFIER_FOUND)
-#     hpx_info("itt" "Binding to Intel Amplifier tool is enabled.")
-#     hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
-#     hpx_include_sys_directories("${AMPLIFIER_INCLUDE_DIR}")
-#     hpx_link_sys_directories("${AMPLIFIER_LIBRARY_DIR}")
-#     set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${AMPLIFIER_LIBRARY})
-#   else()
-#     set(HPX_HAVE_ITTNOTIFY OFF FORCE)
-#     hpx_warn("itt" "Binding to Intel Amplifier tool will be disabled, try setting the AMPLIFIER_ROOT variable to the Intel Amplifier installation directory.")
-#   endif()
-# endif()
-#
-# ################################################################################
-# # Native TLS configuration
-# ################################################################################
-# if(HPX_HAVE_NATIVE_TLS)
-#   hpx_info("tls" "Native TLS is enabled.")
-#   hpx_add_config_define(HPX_HAVE_NATIVE_TLS)
-# endif()
-#
-# ################################################################################
-# # Disable the use of partially preprocessed header files
-# ################################################################################
-#
-# if(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#   hpx_info("ppheaders" "Use of preprocessed headers is disabled.")
-#   hpx_add_config_define(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-# endif()
-#
-# ################################################################################
 # # Compiler configuration
 # ################################################################################
-#
-# if(MSVC)
-#   if(HPX_HAVE_VALGRIND)
-#     set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -DNVALGRIND")
-#     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNVALGRIND")
-#   endif()
-# else()
-#   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-#     hpx_add_config_define(HPX_BUILD_TYPE debug)
-#   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
-#     hpx_add_config_define(HPX_BUILD_TYPE relwithdebinfo)
-#   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
-#     hpx_add_config_define(HPX_BUILD_TYPE minsizerel)
-#     if(HPX_HAVE_VALGRIND)
-#       hpx_add_definitions(-DNVALGRIND)
-#     endif()
-#   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
-#     hpx_add_config_define(HPX_BUILD_TYPE release)
-#     if(HPX_HAVE_VALGRIND)
-#       hpx_add_definitions(-DNVALGRIND)
-#     endif()
-#   endif()
-# endif()
-#
 #
 # # Debug library postfix
 # set(CMAKE_DEBUG_POSTFIX "d")

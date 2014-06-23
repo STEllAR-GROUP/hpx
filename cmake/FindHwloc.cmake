@@ -43,7 +43,7 @@ if(_type)
 endif()
 
 if(NOT HWLOC_FOUND)
-  hpx_info("    Set HWLOC_ROOT to the location where hwloc are installed")
+  message("Set HWLOC_ROOT to the location where hwloc are installed")
 endif()
 
 mark_as_advanced(HWLOC_ROOT HWLOC_LIBRARY HWLOC_INCLUDE_DIR)

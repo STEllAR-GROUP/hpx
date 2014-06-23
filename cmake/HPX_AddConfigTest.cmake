@@ -33,11 +33,18 @@ macro(add_hpx_config_test variable)
 
     get_directory_property(CONFIG_TEST_INCLUDE_DIRS INCLUDE_DIRECTORIES)
     get_directory_property(CONFIG_TEST_LINK_DIRS LINK_DIRECTORIES)
-    get_directory_property(CONFIG_TEST_COMPILE_DEFINITIONS COMPILE_DEFINITIONS)
+    set(COMPILE_DEFINITIONS_TMP)
+    set(CONFIG_TEST_COMPILE_DEFINITIONS)
+    get_directory_property(COMPILE_DEFINITIONS_TMP COMPILE_DEFINITIONS)
+    foreach(def ${COMPILE_DEFINITIONS_TMP})
+      set(CONFIG_TEST_COMPILE_DEFINITIONS "${CONFIG_TEST_COMPILE_DEFINITIONS} -D${def}")
+    endforeach()
+
     set(CONFIG_TEST_INCLUDE_DIRS ${CONFIG_TEST_INCLUDE_DIRS} ${${variable}_INCLUDE_DIRS})
     set(CONFIG_TEST_LINK_DIRS ${CONFIG_TEST_LINK_DIRS} ${${variable}_LINK_DIRS})
+
     set(CONFIG_TEST_COMPILE_DEFINITIONS ${CONFIG_TEST_COMPILE_DEFINITIONS} ${${variable}_COMPILE_DEFINITIONS})
-    set(CONFIG_TEST_LINK_LIBRARIES ${${variable}_LIBRARIES})
+    set(CONFIG_TEST_LINK_LIBRARIES ${HPX_LIBRARIES} ${${variable}_LIBRARIES})
 
     try_compile(${variable}_RESULT
       ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests
@@ -69,7 +76,7 @@ macro(add_hpx_config_test variable)
       set(_msg "${_msg} - ${_run_msg}")
     else()
       set(_msg "${_msg} - Failed\n")
-      #set(_msg "${_msg}${${variable}_OUTPUT}")
+      set(_msg "${_msg}${${variable}_OUTPUT}")
     endif()
 
     if(${variable}_RESULT)

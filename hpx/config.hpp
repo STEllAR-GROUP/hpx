@@ -544,7 +544,7 @@
 // held while HPX-threads are suspended and/or interrupted.
 #if !defined(HPX_HAVE_VERIFY_LOCKS)
 #  if defined(HPX_DEBUG)
-#    define HPX_HAVE_VERIFY_LOCKS 1
+#    define HPX_HAVE_VERIFY_LOCKS
 #  endif
 #endif
 

@@ -13,7 +13,7 @@ namespace hpx { namespace util
     // Always provide function exports, which guarantees ABI compatibility of
     // Debug and Release builds.
 
-#if HPX_HAVE_VERIFY_LOCKS_GLOBALLY || defined(HPX_EXPORTS)
+#if defined(HPX_HAVE_VERIFY_LOCKS_GLOBALLY) || defined(HPX_EXPORTS)
     HPX_API_EXPORT bool register_lock_globally(void const* lock);
     HPX_API_EXPORT bool unregister_lock_globally(void const* lock);
     HPX_API_EXPORT void enable_global_lock_detection();
