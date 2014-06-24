@@ -49,7 +49,7 @@ namespace hpx { namespace parallel
     };
 
     /// Default parallel execution policy object.
-    BOOST_CONSTEXPR_OR_CONST parallel_execution_policy par;
+    static parallel_execution_policy const par;
 
     /// The class sequential_execution_policy is an execution policy type used
     /// as a unique type to disambiguate parallel algorithm overloading and
@@ -57,7 +57,7 @@ namespace hpx { namespace parallel
     struct sequential_execution_policy {};
 
     /// Default sequential execution policy object.
-    BOOST_CONSTEXPR_OR_CONST sequential_execution_policy seq;
+    static sequential_execution_policy const seq;
 
     /// The class vector_execution_policy is an execution policy type used as
     /// a unique type to disambiguate parallel algorithm overloading and
@@ -68,7 +68,7 @@ namespace hpx { namespace parallel
     };
 
     /// Default vector execution policy object.
-    BOOST_CONSTEXPR_OR_CONST vector_execution_policy vec;
+    static vector_execution_policy const vec;
 
     /// extension:
     ///
@@ -99,8 +99,7 @@ namespace hpx { namespace parallel
     };
 
     /// Default vector execution policy object.
-    BOOST_CONSTEXPR_OR_CONST task_execution_policy task;
-
+    static task_execution_policy const task;
 
     ///////////////////////////////////////////////////////////////////////////
     class execution_policy;
