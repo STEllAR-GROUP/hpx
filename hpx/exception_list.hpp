@@ -37,6 +37,9 @@ namespace hpx
         typedef std::iterator_traits<const_iterator>::difference_type
             difference_type;
 
+        /// \throws nothing
+        ~exception_list() throw() {}
+        
         exception_list();
         explicit exception_list(boost::exception_ptr const& e);
         explicit exception_list(exception_list_type && l);
