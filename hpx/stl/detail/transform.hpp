@@ -48,13 +48,13 @@ namespace hpx { namespace parallel
             }
         }
 
-        template <typename ExPolicy, typename InIter, typename OutIter,
+        template <typename ExPolicy, typename FwdIter, typename OutIter,
             typename F>
         typename detail::algorithm_result<ExPolicy, OutIter>::type
-        transform(ExPolicy const& policy, InIter first, InIter last,
+        transform(ExPolicy const& policy, FwdIter first, FwdIter last,
             OutIter dest, F && f, boost::mpl::false_ fls)
         {
-            typedef boost::tuple<InIter, OutIter> iterator_tuple;
+            typedef boost::tuple<FwdIter, OutIter> iterator_tuple;
             typedef detail::zip_iterator<iterator_tuple> zip_iterator;
             typedef typename zip_iterator::reference reference;
             typedef
@@ -165,13 +165,13 @@ namespace hpx { namespace parallel
             }
         }
 
-        template <typename ExPolicy, typename InIter1, typename InIter2,
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename OutIter, typename F>
         typename detail::algorithm_result<ExPolicy, OutIter>::type
-        transform_binary(ExPolicy const& policy, InIter1 first1, InIter1 last1,
-            InIter2 first2, OutIter dest, F && f, boost::mpl::false_ fls)
+        transform_binary(ExPolicy const& policy, FwdIter1 first1, FwdIter1 last1,
+            FwdIter2 first2, OutIter dest, F && f, boost::mpl::false_ fls)
         {
-            typedef boost::tuple<InIter1, InIter2, OutIter> iterator_tuple;
+            typedef boost::tuple<FwdIter1, FwdIter2, OutIter> iterator_tuple;
             typedef detail::zip_iterator<iterator_tuple> zip_iterator;
             typedef typename zip_iterator::reference reference;
             typedef

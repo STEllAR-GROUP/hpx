@@ -48,22 +48,22 @@ namespace hpx { namespace parallel
             }
         }
 
-        template <typename ExPolicy, typename InIter, typename F>
-        typename detail::algorithm_result<ExPolicy, InIter>::type
-        for_each_n(ExPolicy const& policy, InIter first, std::size_t count,
+        template <typename ExPolicy, typename FwdIter, typename F>
+        typename detail::algorithm_result<ExPolicy, FwdIter>::type
+        for_each_n(ExPolicy const& policy, FwdIter first, std::size_t count,
             F && f, boost::mpl::false_)
         {
             if (count > 0)
             {
                 return util::partitioner<ExPolicy>::call(
                     policy, first, count,
-                    [f](InIter part_begin, std::size_t part_count)
+                    [f](FwdIter part_begin, std::size_t part_count)
                     {
                         util::loop_n(part_begin, part_count, f);
                     });
             }
 
-            return detail::algorithm_result<ExPolicy, InIter>::get(
+            return detail::algorithm_result<ExPolicy, FwdIter>::get(
                 std::move(first));
         }
 
@@ -86,22 +86,22 @@ namespace hpx { namespace parallel
             }
         }
 
-        template <typename ExPolicy, typename InIter, typename F>
-        typename detail::algorithm_result<ExPolicy, InIter>::type
-        plain_for_each_n(ExPolicy const& policy, InIter first,
+        template <typename ExPolicy, typename FwdIter, typename F>
+        typename detail::algorithm_result<ExPolicy, FwdIter>::type
+        plain_for_each_n(ExPolicy const& policy, FwdIter first,
             std::size_t count, F && f, boost::mpl::false_)
         {
             if (count > 0)
             {
                 return util::partitioner<ExPolicy>::call(
                     policy, first, count,
-                    [f](InIter part_begin, std::size_t part_count)
+                    [f](FwdIter part_begin, std::size_t part_count)
                     {
                         util::plain_loop_n(part_begin, part_count, f);
                     });
             }
 
-            return detail::algorithm_result<ExPolicy, InIter>::get(
+            return detail::algorithm_result<ExPolicy, FwdIter>::get(
                 std::move(first));
         }
 
@@ -196,9 +196,9 @@ namespace hpx { namespace parallel
             }
         }
 
-        template <typename ExPolicy, typename InIter, typename F>
+        template <typename ExPolicy, typename FwdIter, typename F>
         typename detail::algorithm_result<ExPolicy, void>::type
-        for_each(ExPolicy const& policy, InIter first, InIter last, F && f,
+        for_each(ExPolicy const& policy, FwdIter first, FwdIter last, F && f,
             boost::mpl::false_ fls)
         {
             typedef

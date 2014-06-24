@@ -47,14 +47,14 @@ namespace hpx { namespace parallel
             }
         }
 
-        template <typename ExPolicy, typename InIter, typename T>
+        template <typename ExPolicy, typename FwdIter, typename T>
         typename detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<InIter>::difference_type>::type
-        count(ExPolicy const& policy, InIter first, InIter last, const T& value,
+            typename std::iterator_traits<FwdIter>::difference_type>::type
+        count(ExPolicy const& policy, FwdIter first, FwdIter last, const T& value,
             boost::mpl::false_ f)
         {
-            typedef typename std::iterator_traits<InIter>::value_type type;
-            typedef typename std::iterator_traits<InIter>::difference_type
+            typedef typename std::iterator_traits<FwdIter>::value_type type;
+            typedef typename std::iterator_traits<FwdIter>::difference_type
                 difference_type;
 
             if (first == last)
@@ -64,16 +64,16 @@ namespace hpx { namespace parallel
             }
             return util::partitioner<ExPolicy, difference_type>::call(
                 policy, first, std::distance(first, last),
-                [&value](InIter part_begin, std::size_t part_count)
+                [&value](FwdIter part_begin, std::size_t part_count)
                 {
-                    difference_type ret = std::count(part_begin, 
+                    difference_type ret = std::count(part_begin,
                         std::next(part_begin, part_count), value);
                     return ret;
                 },
                 hpx::util::unwrapped([](std::vector<difference_type>&& results)
                 {
                     return util::accumulate_n(boost::begin(results),
-                        boost::size(results), difference_type(0), 
+                        boost::size(results), difference_type(0),
                         [](difference_type v1, difference_type v2)
                         {
                             return v1 + v2;
@@ -174,14 +174,14 @@ namespace hpx { namespace parallel
             }
         }
 
-        template <typename ExPolicy, typename InIter, typename Pred>
+        template <typename ExPolicy, typename FwdIter, typename Pred>
         typename detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<InIter>::difference_type>::type
-        count_if(ExPolicy const& policy, InIter first, InIter last,
+            typename std::iterator_traits<FwdIter>::difference_type>::type
+        count_if(ExPolicy const& policy, FwdIter first, FwdIter last,
             Pred && op, boost::mpl::false_ f)
         {
-            typedef typename std::iterator_traits<InIter>::value_type type;
-            typedef typename std::iterator_traits<InIter>::difference_type
+            typedef typename std::iterator_traits<FwdIter>::value_type type;
+            typedef typename std::iterator_traits<FwdIter>::difference_type
                 difference_type;
 
             if (first == last)
@@ -191,9 +191,9 @@ namespace hpx { namespace parallel
             }
             return util::partitioner<ExPolicy, difference_type>::call(
                 policy, first, std::distance(first, last),
-                [op](InIter part_begin, std::size_t part_count)
+                [op](FwdIter part_begin, std::size_t part_count)
                 {
-                    difference_type ret = std::count_if(part_begin, 
+                    difference_type ret = std::count_if(part_begin,
                         std::next(part_begin, part_count), op);
                     return ret;
                 },

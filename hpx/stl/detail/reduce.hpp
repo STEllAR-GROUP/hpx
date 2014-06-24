@@ -48,9 +48,9 @@ namespace hpx { namespace parallel
             }
         }
 
-        template <typename ExPolicy, typename InIter, typename T, typename Pred>
+        template <typename ExPolicy, typename FwdIter, typename T, typename Pred>
         typename detail::algorithm_result<ExPolicy, T>::type
-        reduce(ExPolicy const& policy, InIter first, InIter last, T && init,
+        reduce(ExPolicy const& policy, FwdIter first, FwdIter last, T && init,
             Pred && op, boost::mpl::false_)
         {
             if (first == last)
@@ -59,12 +59,12 @@ namespace hpx { namespace parallel
                     std::forward<T>(init));
             }
 
-            typedef typename std::iterator_traits<InIter>::iterator_category
+            typedef typename std::iterator_traits<FwdIter>::iterator_category
                 category;
 
             return util::partitioner<ExPolicy, T>::call(
                 policy, first, std::distance(first, last),
-                [op](InIter part_begin, std::size_t part_count)
+                [op](FwdIter part_begin, std::size_t part_count)
                 {
                     T val = *part_begin;
                     return util::accumulate_n(++part_begin, --part_count,
@@ -76,7 +76,6 @@ namespace hpx { namespace parallel
                         boost::size(results), init, op);
                 }));
         }
-
 
         template <typename InIter, typename T, typename Pred>
         T reduce(execution_policy const& policy, InIter first, InIter last,

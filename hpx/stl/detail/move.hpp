@@ -45,12 +45,12 @@ namespace hpx { namespace parallel
             }
         }
 
-        template <typename ExPolicy, typename InIter, typename OutIter>
+        template <typename ExPolicy, typename FwdIter, typename OutIter>
         typename detail::algorithm_result<ExPolicy, OutIter>::type
-        move(ExPolicy const& policy, InIter first, InIter last, OutIter dest,
+        move(ExPolicy const& policy, FwdIter first, FwdIter last, OutIter dest,
             boost::mpl::false_ fls)
         {
-            typedef boost::tuple<InIter, OutIter> iterator_tuple;
+            typedef boost::tuple<FwdIter, OutIter> iterator_tuple;
             typedef detail::zip_iterator<iterator_tuple> zip_iterator;
             typedef typename zip_iterator::reference reference;
             typedef

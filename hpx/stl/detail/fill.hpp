@@ -47,14 +47,14 @@ namespace hpx { namespace parallel
             }
         }
 
-        template <typename ExPolicy, typename InIter, typename T>
+        template <typename ExPolicy, typename FwdIter, typename T>
         typename detail::algorithm_result<ExPolicy, void>::type
-        fill(ExPolicy const& policy, InIter first, InIter last, T val,
+        fill(ExPolicy const& policy, FwdIter first, FwdIter last, T val,
             boost::mpl::false_ f)
         {
             typedef typename detail::algorithm_result<ExPolicy, void>::type
                 result_type;
-            typedef typename std::iterator_traits<InIter>::value_type type;
+            typedef typename std::iterator_traits<FwdIter>::value_type type;
 
             return hpx::util::void_guard<result_type>(),
                 plain_for_each_n(policy, first,
@@ -151,7 +151,7 @@ namespace hpx { namespace parallel
 
         template <typename ExPolicy, typename OutIter, typename T>
         typename detail::algorithm_result<ExPolicy, OutIter>::type
-        fill_n(ExPolicy const& policy,OutIter first, std::size_t count, T val,
+        fill_n(ExPolicy const& policy, OutIter first, std::size_t count, T val,
             boost::mpl::false_ f)
         {
             typedef typename std::iterator_traits<OutIter>::iterator_category
