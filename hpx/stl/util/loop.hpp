@@ -78,7 +78,7 @@ namespace hpx { namespace parallel { namespace util
                 return hpx::wait_each(it, end,
                     [&f](type& fut)
                     {
-                        f(std::move(fut));
+                        f(fut);
                         return true;
                     });
             }
@@ -91,7 +91,7 @@ namespace hpx { namespace parallel { namespace util
                 return hpx::wait_each(it, end,
                     [&f, &tok](type& fut)
                     {
-                        f(std::move(fut));
+                        f(fut);
                         return !tok.was_cancelled();
                     });
             }
@@ -187,7 +187,7 @@ namespace hpx { namespace parallel { namespace util
                 return hpx::wait_each_n(it, count,
                     [&f](type& fut)
                     {
-                        f(std::move(fut));
+                        f(fut);
                         return true;
                     });
             }
@@ -200,7 +200,7 @@ namespace hpx { namespace parallel { namespace util
                 return hpx::wait_each_n(it, count,
                     [&f, &tok](type& fut)
                     {
-                        f(std::move(fut));
+                        f(fut);
                         return !tok.was_cancelled();
                     });
             }
@@ -248,7 +248,7 @@ namespace hpx { namespace parallel { namespace util
                 return hpx::wait_each_n(it, count,
                     [&f](type& fut)
                     {
-                        f(std::move(fut));
+                        f(fut);
                         return true;
                     });
             }
@@ -261,7 +261,7 @@ namespace hpx { namespace parallel { namespace util
                 return hpx::wait_each_n(it, count,
                     [&f, &tok](type& fut)
                     {
-                        f(std::move(fut));
+                        f(fut);
                         return !tok.was_cancelled();
                     });
             }
