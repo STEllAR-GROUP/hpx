@@ -149,6 +149,7 @@ namespace hpx { namespace parallel
         return detail::count( std::forward<ExPolicy>(policy),
             first, last, value, is_seq());
     }
+
     ///////////////////////////////////////////////////////////////////////////
     // count_if
     namespace detail

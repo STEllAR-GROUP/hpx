@@ -24,7 +24,8 @@ void test_count(ExPolicy const& policy, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand()+1);
 
     std::size_t find_count = (std::rand() % 30) + 1;
-    for ( int i=0; i < find_count && i < c.size(); i++) {
+    for (std::size_t i = 0; i != find_count && i != c.size(); ++i)
+    {
         c[i] = 0;
     }
 
@@ -46,13 +47,15 @@ void test_count(hpx::parallel::task_execution_policy, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand()+1);
 
     std::size_t find_count = (std::rand() % 30) + 1;
-    for (int i=0; i < find_count && i < c.size(); i++) {
+    for (std::size_t i = 0; i != find_count && i != c.size(); ++i)
+    {
         c[i] = 0;
     }
 
-    hpx::future<__int64> f =
+    hpx::future<boost::int64_t> f =
         hpx::parallel::count(hpx::parallel::task,
-            iterator(boost::begin(c)), iterator(boost::end(c)), (std::size_t)0);
+            iterator(boost::begin(c)), iterator(boost::end(c)),
+            (std::size_t)0);
 
     HPX_TEST_EQ(find_count, f.get());
 }
@@ -125,7 +128,7 @@ void test_count_exception(hpx::parallel::task_execution_policy, IteratorTag)
 
     bool caught_exception = false;
     try {
-        hpx::future<__int64> f = 
+        hpx::future<boost::int64_t> f =
             hpx::parallel::count(hpx::parallel::task,
                 decorated_iterator(
                     boost::begin(c),
@@ -217,7 +220,7 @@ void test_count_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
 
     bool caught_bad_alloc = false;
     try {
-        hpx::future<__int64> f =
+        hpx::future<boost::int64_t> f =
             hpx::parallel::count(hpx::parallel::task,
                 decorated_iterator(
                     boost::begin(c),

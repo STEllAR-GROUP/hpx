@@ -20,12 +20,13 @@ void test_count_if(ExPolicy const& policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(100007);
-    std::iota(boost::begin(c), boost::begin(c)+50, 0);
-    std::iota(boost::begin(c)+50, boost::end(c), std::rand() + 50);
+    std::iota(boost::begin(c), boost::begin(c) + 50, 0);
+    std::iota(boost::begin(c) + 50, boost::end(c), std::rand() + 50);
 
     std::size_t num_items = hpx::parallel::count_if(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)), [](std::size_t x){ return x<50;});
-    
+        iterator(boost::begin(c)), iterator(boost::end(c)),
+        [](std::size_t x) { return x < 50; });
+
     HPX_TEST_EQ(num_items, 50);
 }
 
@@ -36,12 +37,13 @@ void test_count_if(hpx::parallel::task_execution_policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::begin(c)+50, 0);
-    std::iota(boost::begin(c)+50, boost::end(c), std::rand()+50);
+    std::iota(boost::begin(c), boost::begin(c) + 50, 0);
+    std::iota(boost::begin(c) + 50, boost::end(c), std::rand() + 50);
 
-    hpx::future<__int64> f =
+    hpx::future<boost::int64_t> f =
         hpx::parallel::count_if(hpx::parallel::task,
-            iterator(boost::begin(c)), iterator(boost::end(c)), [](std::size_t x){ return x<50;});
+            iterator(boost::begin(c)), iterator(boost::end(c)),
+            [](std::size_t x) { return x < 50; });
 
     HPX_TEST_EQ(f.get(), 50);
 
@@ -90,7 +92,7 @@ void test_count_if_exception(ExPolicy const& policy, IteratorTag)
                 boost::begin(c),
                 [](){ throw std::runtime_error("test"); }),
             decorated_iterator(boost::end(c), [](){}),
-            [](std::size_t val){return true;});
+            [](std::size_t val) { return true; });
         HPX_TEST(false);
     }
     catch(hpx::exception_list const& e) {
@@ -116,13 +118,13 @@ void test_count_if_exception(hpx::parallel::task_execution_policy, IteratorTag)
 
     bool caught_exception = false;
     try {
-        hpx::future<__int64> f = 
+        hpx::future<boost::int64_t> f =
             hpx::parallel::count_if(hpx::parallel::task,
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::runtime_error("test"); }),
                 decorated_iterator(boost::end(c), [](){}),
-                [](std::size_t val){return true;});
+                [](std::size_t val) { return true; });
         f.get();
 
         HPX_TEST(false);
@@ -182,7 +184,7 @@ void test_count_if_bad_alloc(ExPolicy const& policy, IteratorTag)
                 boost::begin(c),
                 [](){ throw std::bad_alloc(); }),
             decorated_iterator(boost::end(c), [](){}),
-            [](std::size_t v){return true;});
+            [](std::size_t v) { return true; });
         HPX_TEST(false);
     }
     catch (std::bad_alloc const&) {
@@ -207,13 +209,13 @@ void test_count_if_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
 
     bool caught_bad_alloc = false;
     try {
-        hpx::future<__int64> f =
+        hpx::future<boost::int64_t> f =
             hpx::parallel::count_if(hpx::parallel::task,
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::bad_alloc(); }),
                 decorated_iterator(boost::end(c), [](){}),
-                [](std::size_t v){return true;});
+                [](std::size_t v) { return true; });
 
         f.get();
 
