@@ -190,7 +190,7 @@ void test_count_bad_alloc(ExPolicy const& policy, IteratorTag)
 
     bool caught_bad_alloc = false;
     try {
-        std::size_t res = hpx::parallel::count(policy,
+        hpx::parallel::count(policy,
             decorated_iterator(
                 boost::begin(c),
                 [](){ throw std::bad_alloc(); }),
