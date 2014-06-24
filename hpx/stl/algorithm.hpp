@@ -8,14 +8,14 @@
 
 #include <hpx/hpx_fwd.hpp>
 
-#include <hpx/stl/detail/for_each.hpp>
-#include <hpx/stl/detail/transform.hpp>
 #include <hpx/stl/detail/copy.hpp>
 #include <hpx/stl/detail/count.hpp>
 #include <hpx/stl/detail/fill.hpp>
-#include <hpx/stl/detail/reduce.hpp>
+#include <hpx/stl/detail/for_each.hpp>
 #include <hpx/stl/detail/move.hpp>
+#include <hpx/stl/detail/reduce.hpp>
 #include <hpx/stl/detail/swap_ranges.hpp>
+#include <hpx/stl/detail/transform.hpp>
 
 #endif
 
