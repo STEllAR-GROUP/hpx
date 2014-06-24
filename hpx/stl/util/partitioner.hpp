@@ -8,6 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/async.hpp>
+#include <hpx/exception_list.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/util/bind.hpp>
