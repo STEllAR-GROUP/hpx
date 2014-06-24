@@ -84,7 +84,7 @@ namespace hpx { namespace parallel { namespace util
             }
 
             template <typename Iter, typename F, typename CancelToken>
-            static Iter call(Iter it, Iter end, F && func, CancelToken& tok,
+            static Iter call(Iter it, Iter end, F && f, CancelToken& tok,
                 boost::mpl::true_)
             {
                 typedef typename std::iterator_traits<Iter>::value_type type;
@@ -254,7 +254,7 @@ namespace hpx { namespace parallel { namespace util
             }
 
             template <typename Iter, typename F, typename CancelToken>
-            static Iter call(Iter it, std::size_t count, F && func,
+            static Iter call(Iter it, std::size_t count, F && f,
                 CancelToken& tok, boost::mpl::true_)
             {
                 typedef typename std::iterator_traits<Iter>::value_type type;
