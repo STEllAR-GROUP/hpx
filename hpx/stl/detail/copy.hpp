@@ -134,7 +134,7 @@ namespace hpx { namespace parallel
             >::value,
             "Requires at least output iterator.");
 
-        typedef boost::mpl::or_<
+        typedef typename boost::mpl::or_<
             is_sequential_execution_policy<ExPolicy>,
             boost::is_same<std::input_iterator_tag, input_iterator_category>,
             boost::is_same<std::output_iterator_tag, output_iterator_category>
@@ -269,7 +269,7 @@ namespace hpx { namespace parallel
             >::value,
             "Requires at least output iterator.");
 
-        typedef boost::mpl::or_<
+        typedef typename boost::mpl::or_<
             is_sequential_execution_policy<ExPolicy>,
             boost::is_same<std::input_iterator_tag, input_iterator_category>,
             boost::is_same<std::output_iterator_tag, output_iterator_category>
@@ -409,7 +409,7 @@ namespace hpx { namespace parallel
             >::value,
             "Requires at least output iterator.");
 
-        typedef boost::mpl::or_<
+        typedef typename boost::mpl::or_<
             is_sequential_execution_policy<ExPolicy>,
             boost::is_same<std::input_iterator_tag, input_iterator_category>,
             boost::is_same<std::output_iterator_tag, output_iterator_category>

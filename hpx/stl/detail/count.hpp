@@ -141,7 +141,7 @@ namespace hpx { namespace parallel
                 typename std::iterator_traits<InIter>::iterator_category>::value,
             "Required at least input iterator .");
 
-        typedef boost::mpl::or_<
+        typedef typename boost::mpl::or_<
             is_sequential_execution_policy<ExPolicy>,
             boost::is_same<std::input_iterator_tag, category>
         >::type is_seq;
@@ -267,7 +267,7 @@ namespace hpx { namespace parallel
             boost::is_base_of<std::input_iterator_tag, category>::value,
             "Required at least input iterator.");
 
-        typedef boost::mpl::or_<
+        typedef typename boost::mpl::or_<
             is_sequential_execution_policy<ExPolicy>,
             boost::is_same<std::input_iterator_tag, category>
         >::type is_seq;

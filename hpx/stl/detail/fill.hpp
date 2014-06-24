@@ -226,7 +226,7 @@ namespace hpx { namespace parallel
             >::value,
             "Requires at least output iterator.");
 
-        typedef boost::mpl::or_<
+        typedef typename boost::mpl::or_<
             is_sequential_execution_policy<ExPolicy>,
             boost::is_same<std::output_iterator_tag, iterator_category>
         >::type is_seq;

@@ -132,8 +132,9 @@ namespace hpx { namespace parallel
                 std::forward_iterator_tag, iter2_category>::value,
             "Required at least forward iterator tag.");
 
+        typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
         return detail::swap_ranges( std::forward<ExPolicy>(policy),
-            first1, last1, first2, is_sequential_execution_policy<ExPolicy>());
+            first1, last1, first2, is_seq());
     }
 }}
 #endif
