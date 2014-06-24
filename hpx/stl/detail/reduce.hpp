@@ -172,7 +172,7 @@ namespace hpx { namespace parallel
 
 #if !defined(BOOST_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS)
     template <typename ExPolicy, typename InIter,
-        typename T = std::iterator_traits<InIter>::value_type>
+        typename T = typename std::iterator_traits<InIter>::value_type>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
         typename detail::algorithm_result<ExPolicy, T>::type

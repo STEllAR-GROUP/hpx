@@ -159,10 +159,12 @@ namespace hpx { namespace parallel
         count_if(ExPolicy const&, InIter first, InIter last, Pred && op,
             boost::mpl::true_)
         {
+            typedef typename std::iterator_traits<InIter>::difference_type
+                difference_type;
+
             try {
-                return detail::algorithm_result<ExPolicy,
-                    std::iterator_traits<InIter>::difference_type>::get(
-                    std::count_if(first, last, std::forward<Pred>(op)));
+                return detail::algorithm_result<ExPolicy, difference_type>
+                    ::get(std::count_if(first, last, std::forward<Pred>(op)));
             }
             catch(std::bad_alloc const& e) {
                 boost::throw_exception(e);
