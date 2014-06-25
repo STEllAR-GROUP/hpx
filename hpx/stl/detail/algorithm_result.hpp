@@ -10,6 +10,9 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/stl/execution_policy.hpp>
 
+#include <boost/static_assert.hpp>
+#include <boost/type_traits/is_lvalue_reference.hpp>
+
 namespace hpx { namespace parallel { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -60,7 +63,10 @@ namespace hpx { namespace parallel { namespace detail
     template <typename ExPolicy, typename T>
     struct algorithm_result
       : algorithm_result_impl<typename hpx::util::decay<ExPolicy>::type, T>
-    {};
+    {
+        BOOST_STATIC_ASSERT_MSG(!boost::is_lvalue_reference<T>::value,
+            "T shouldn't be a lvalue reference");
+    };
 }}}
 
 #endif
