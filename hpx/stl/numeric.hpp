@@ -8,6 +8,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 
+#include <hpx/stl/exception_list.hpp>
+
 #include <hpx/stl/detail/for_each.hpp>
 #include <hpx/stl/detail/reduce.hpp>
 

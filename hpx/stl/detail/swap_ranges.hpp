@@ -36,13 +36,8 @@ namespace hpx { namespace parallel
                 return detail::algorithm_result<ExPolicy, ForwardIter2>::get(
                     std::swap_ranges(first1, last1, first2));
             }
-            catch(std::bad_alloc const& e) {
-                boost::throw_exception(e);
-            }
             catch(...) {
-                boost::throw_exception(
-                    hpx::exception_list(boost::current_exception())
-                    );
+                detail::handle_exception<ExPolicy>::call();
             }
         }
 

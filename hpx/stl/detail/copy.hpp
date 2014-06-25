@@ -34,13 +34,8 @@ namespace hpx { namespace parallel
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
                     std::copy(first, last, dest));
             }
-            catch(std::bad_alloc const& e) {
-               boost::throw_exception(e);
-            }
             catch (...) {
-                boost::throw_exception(
-                    hpx::exception_list(boost::current_exception())
-                );
+                detail::handle_exception<ExPolicy>::call();
             }
         }
 
@@ -169,13 +164,8 @@ namespace hpx { namespace parallel
                             boost::mpl::true_())
                     ));
             }
-            catch(std::bad_alloc const& e) {
-                boost::throw_exception(e);
-            }
             catch(...) {
-                boost::throw_exception(
-                    hpx::exception_list(boost::current_exception())
-                );
+                detail::handle_exception<ExPolicy>::call();
             }
         }
 

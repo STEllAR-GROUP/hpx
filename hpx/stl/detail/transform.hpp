@@ -38,13 +38,8 @@ namespace hpx { namespace parallel
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
                     std::transform(first, last, dest, std::forward<F>(f)));
             }
-            catch(std::bad_alloc const& e) {
-                boost::throw_exception(e);
-            }
             catch (...) {
-                boost::throw_exception(
-                    hpx::exception_list(boost::current_exception())
-                );
+                detail::handle_exception<ExPolicy>::call();
             }
         }
 
@@ -155,13 +150,8 @@ namespace hpx { namespace parallel
                     std::transform(first1, last1, first2, dest,
                         std::forward<F>(f)));
             }
-            catch(std::bad_alloc const& e) {
-                boost::throw_exception(e);
-            }
             catch (...) {
-                boost::throw_exception(
-                    hpx::exception_list(boost::current_exception())
-                );
+                detail::handle_exception<ExPolicy>::call();
             }
         }
 

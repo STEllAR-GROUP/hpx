@@ -38,13 +38,8 @@ namespace hpx { namespace parallel
                     std::accumulate(first, last, std::forward<T>(init),
                         std::forward<Pred>(op)));
             }
-            catch(std::bad_alloc const& e) {
-                boost::throw_exception(e);
-            }
             catch (...) {
-                boost::throw_exception(
-                    hpx::exception_list(boost::current_exception())
-                );
+                detail::handle_exception<ExPolicy>::call();
             }
         }
 

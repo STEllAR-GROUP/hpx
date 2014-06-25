@@ -8,6 +8,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 
+#include <hpx/stl/exception_list.hpp>
+
 #include <hpx/stl/detail/copy.hpp>
 #include <hpx/stl/detail/count.hpp>
 #include <hpx/stl/detail/fill.hpp>

@@ -37,13 +37,8 @@ namespace hpx { namespace parallel
                 return detail::algorithm_result<ExPolicy, difference>::get(
                     std::count(first, last, value));
             }
-            catch(std::bad_alloc const& e) {
-                boost::throw_exception(e);
-            }
-            catch (...){
-                boost::throw_exception(
-                    hpx::exception_list(boost::current_exception())
-                );
+            catch (...) {
+                detail::handle_exception<ExPolicy>::call();
             }
         }
 
@@ -167,13 +162,8 @@ namespace hpx { namespace parallel
                 return detail::algorithm_result<ExPolicy, difference_type>
                     ::get(std::count_if(first, last, std::forward<Pred>(op)));
             }
-            catch(std::bad_alloc const& e) {
-                boost::throw_exception(e);
-            }
             catch(...) {
-                boost::throw_exception(
-                    hpx::exception_list(boost::current_exception())
-                );
+                detail::handle_exception<ExPolicy>::call();
             }
         }
 

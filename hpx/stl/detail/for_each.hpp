@@ -38,13 +38,8 @@ namespace hpx { namespace parallel
                 return detail::algorithm_result<ExPolicy, InIter>::get(
                     util::loop_n(first, count, std::forward<F>(f)));
             }
-            catch(std::bad_alloc const& e) {
-                boost::throw_exception(e);
-            }
             catch (...) {
-                boost::throw_exception(
-                    hpx::exception_list(boost::current_exception())
-                );
+                detail::handle_exception<ExPolicy>::call();
             }
         }
 
@@ -76,13 +71,8 @@ namespace hpx { namespace parallel
                 return detail::algorithm_result<ExPolicy, InIter>::get(
                     util::plain_loop_n(first, count, std::forward<F>(f)));
             }
-            catch(std::bad_alloc const& e) {
-                boost::throw_exception(e);
-            }
             catch (...) {
-                boost::throw_exception(
-                    hpx::exception_list(boost::current_exception())
-                );
+                detail::handle_exception<ExPolicy>::call();
             }
         }
 
@@ -186,13 +176,8 @@ namespace hpx { namespace parallel
                 std::for_each(first, last, std::forward<F>(f));
                 return detail::algorithm_result<ExPolicy, void>::get();
             }
-            catch(std::bad_alloc const& e) {
-                boost::throw_exception(e);
-            }
             catch (...) {
-                boost::throw_exception(
-                    hpx::exception_list(boost::current_exception())
-                );
+                detail::handle_exception<ExPolicy>::call();
             }
         }
 

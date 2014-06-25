@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -39,7 +39,7 @@ namespace hpx
 
         /// \throws nothing
         ~exception_list() throw() {}
-        
+
         exception_list();
         explicit exception_list(boost::exception_ptr const& e);
         explicit exception_list(exception_list_type && l);
@@ -80,7 +80,6 @@ namespace hpx
         ///
         std::size_t get_error_count() const;
     };
-
 }
 
 #include <hpx/config/warnings_suffix.hpp>
