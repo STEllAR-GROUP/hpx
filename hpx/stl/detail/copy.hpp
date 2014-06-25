@@ -245,13 +245,8 @@ namespace hpx { namespace parallel
                     )
                 );
             }
-            catch(std::bad_alloc const& e) {
-                boost::throw_exception(e);
-            }
             catch(...) {
-                boost::throw_exception(
-                    hpx::exception_list(boost::current_exception())
-                );
+                detail::handle_exception<ExPolicy>::call();
             }
         }
 

@@ -251,15 +251,15 @@ template <typename IteratorTag>
 void test_copy_if_exception()
 {
     using namespace hpx::parallel;
-
+    //If the execution policy object is of type vector_execution_policy, 
+    //  std::terminate shall be called. therefore we do not test exceptions
+    //  with a vector execution policy
     test_copy_if_exception(seq, IteratorTag());
     test_copy_if_exception(par, IteratorTag());
-    test_copy_if_exception(vec, IteratorTag());
     test_copy_if_exception(task, IteratorTag());
 
     test_copy_if_exception(execution_policy(seq), IteratorTag());
     test_copy_if_exception(execution_policy(par), IteratorTag());
-    test_copy_if_exception(execution_policy(vec), IteratorTag());
     test_copy_if_exception(execution_policy(task), IteratorTag());
 }
 
@@ -343,15 +343,15 @@ template <typename IteratorTag>
 void test_copy_if_bad_alloc()
 {
     using namespace hpx::parallel;
-
+    //If the execution policy object is of type vector_execution_policy, 
+    //  std::terminate shall be called. therefore we do not test exceptions
+    //  with a vector execution policy
     test_copy_if_bad_alloc(seq, IteratorTag());
     test_copy_if_bad_alloc(par, IteratorTag());
-    test_copy_if_bad_alloc(vec, IteratorTag());
     test_copy_if_bad_alloc(task, IteratorTag());
 
     test_copy_if_bad_alloc(execution_policy(seq), IteratorTag());
     test_copy_if_bad_alloc(execution_policy(par), IteratorTag());
-    test_copy_if_bad_alloc(execution_policy(vec), IteratorTag());
     test_copy_if_bad_alloc(execution_policy(task), IteratorTag());
 }
 

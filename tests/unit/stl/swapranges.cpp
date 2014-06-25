@@ -89,10 +89,12 @@ void test_swap_ranges()
     test_swap_ranges(seq, IteratorTag());
     test_swap_ranges(par, IteratorTag());
     test_swap_ranges(vec, IteratorTag());
+    test_swap_ranges(task, IteratorTag());
 
     test_swap_ranges(execution_policy(seq), IteratorTag());
     test_swap_ranges(execution_policy(par), IteratorTag());
     test_swap_ranges(execution_policy(vec), IteratorTag());
+    test_swap_ranges(execution_policy(task), IteratorTag());
 }
 
 void swap_ranges_test()

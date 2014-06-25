@@ -55,7 +55,7 @@ namespace hpx { namespace parallel
             if (first == last)
             {
                 return detail::algorithm_result<ExPolicy, difference_type>
-                    ::get( *first == value);
+                    ::get( difference_type(0));
             }
             return util::partitioner<ExPolicy, difference_type>::call(
                 policy, first, std::distance(first, last),
@@ -154,7 +154,7 @@ namespace hpx { namespace parallel
             if (first == last)
             {
                 return detail::algorithm_result<ExPolicy, difference_type>
-                    ::get( op(*first));
+                    ::get( (difference_type)0);
             }
             return util::partitioner<ExPolicy, difference_type>::call(
                 policy, first, std::distance(first, last),
