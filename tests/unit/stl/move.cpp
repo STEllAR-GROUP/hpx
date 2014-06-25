@@ -79,7 +79,7 @@ void test_outiter_move(ExPolicy const& policy, IteratorTag)
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef std::back_insert_iterator<std::vector<std::size_t>> outiterator;
+    typedef std::back_insert_iterator<std::vector<std::size_t> > outiterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
@@ -106,7 +106,7 @@ template <typename IteratorTag>
 void test_outiter_move(hpx::parallel::task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef std::back_insert_iterator<std::vector<std::size_t>> outiterator;
+    typedef std::back_insert_iterator<std::vector<std::size_t> > outiterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);

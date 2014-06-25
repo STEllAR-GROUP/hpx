@@ -679,7 +679,9 @@ namespace mini_ghost {
                     hpx::when_all(hpx::when_all(dependencies), flux_out_future).then(
                         hpx::launch::async,
                         [this, dst, step, &ids, &io_mutex, &flux_out_future](
-                            hpx::future<hpx::util::tuple<hpx::future<std::vector<hpx::shared_future<void>>>, hpx::shared_future<Real>>>
+                            hpx::future<hpx::util::tuple<
+                                hpx::future<std::vector<hpx::shared_future<void> > >,
+                                hpx::shared_future<Real> > >
                         ) -> hpx::future<void>
                         {
                             double time_now = hpx::util::high_resolution_timer::now();
