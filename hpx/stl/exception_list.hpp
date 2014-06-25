@@ -8,6 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception_list.hpp>
+#include <hpx/stl/execution_policy.hpp>
 
 namespace hpx { namespace parallel
 {
@@ -16,7 +17,7 @@ namespace hpx { namespace parallel
         template <typename ExPolicy>
         struct handle_exception
         {
-            static void call()
+            BOOST_ATTRIBUTE_NORETURN static void call()
             {
                 try {
                     throw;
@@ -35,7 +36,7 @@ namespace hpx { namespace parallel
         template <>
         struct handle_exception<vector_execution_policy>
         {
-            static void call()
+            BOOST_ATTRIBUTE_NORETURN static void call()
             {
                 // any exceptions thrown by algorithms executed with the
                 // vector_execution_policy are to call terminate.
