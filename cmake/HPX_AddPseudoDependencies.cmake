@@ -19,7 +19,7 @@ macro(add_hpx_pseudo_dependencies)
     hpx_debug("add_hpx_pseudo_dependencies" ${args})
   endif()
 
-  if(NOT MSVC AND NOT MINGW)
+  if(NOT WIN32)
     add_dependencies(${ARGV})
   endif()
 endmacro()
