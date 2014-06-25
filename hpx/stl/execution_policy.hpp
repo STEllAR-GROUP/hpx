@@ -287,7 +287,7 @@ namespace hpx { namespace parallel
         ExPolicy* get() BOOST_NOEXCEPT
         {
             BOOST_STATIC_ASSERT_MSG(
-                !boost::is_same<ExPolicy, execution_policy>::value,
+                !(boost::is_same<ExPolicy, execution_policy>::value),
                 "Incorrect execution policy parameter.");
             BOOST_STATIC_ASSERT_MSG(
                 is_execution_policy<ExPolicy>::value,
@@ -303,7 +303,7 @@ namespace hpx { namespace parallel
         ExPolicy const* get() const BOOST_NOEXCEPT
         {
             BOOST_STATIC_ASSERT_MSG(
-                !boost::is_same<ExPolicy, execution_policy>::value,
+                !(boost::is_same<ExPolicy, execution_policy>::value),
                 "Incorrect execution policy parameter.");
             BOOST_STATIC_ASSERT_MSG(
                 is_execution_policy<ExPolicy>::value,
