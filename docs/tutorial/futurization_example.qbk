@@ -97,23 +97,62 @@ to global objects. Example 5 renames example 4's
 struct partiiton [TELETYPE] to partition_data [TELETYPE] and
 adds serialization support. Next we add the server side
 representation of the data in the structure partition_server [TELETYPE].
-This object's public members are accessable anywhere on the
+Patition_server [T] inherits from hpx::components::simple_component_base
+which contains a lot server side component boilerplate. 
+The boilerplate code allows a component's public members 
+to be accessable anywhere on the
 machine via its Global Identifyer (GID). To encapsulate
 the component, we create a client side helper class.  This
 object allows us to create new instances of our component,
 and access its members without having to know its GID. In addition,
  we are using the client class to assist us with managing 
-our asyncrony and futures.
+our asyncrony. For example, our client class partition[TELETYPE]'s
+member function get_data() [T] returns a future to 
+partition_data get_data(). This struct inherits its boilerplate
+code from hpx::components::client_base.
+
 
 In the structure stepper, we have also had to make some changes
-to accomadate a distributed environment.  In order to get the data from a 
+to accomadate a distributed environment. In order to get the data from a 
 neighboring partition, which could be remote, we must retreve the 
-data from the neiboring partitions. These retrevals should be asycronous
+data from the neiboring partitions. These retrevals are asycronous
 and the funciton heat_part_data [TELETYPE], which amongst other things calls
 heat, should not be called unless the data from the neigboring partitions
 have arrived.  Therefore it should come as no supprize that we syncronize 
-this operarion with another instance of dataflow.
-...talk about the unwrapped in heat_part...
+this operarion with another instance of dataflow (found in heat_part).
+This dataflow is passed futures to the data in the current and surrounding
+partitions by calling get_data() on each respective partiion. When these
+futues are ready dataflow passes then to the unwrapped function, which
+extracts the shared_array of doubles amd passes them to the lambda.
+The lambda calls heat_part_data on the locality which the middle 
+partition is on.
+
+Although this example could run in distributed it only runs on
+one locality as it always uses hpx::find_here() as the target
+for the functions to run on.
+
+In example 6 we begin to distibute the partion data on differnet nodes.
+This is accomplished in stepper::do_work() [T] by passing the 
+GID of the locality where we wish to create the partion to the 
+the partition constructor.  We distribute the partions evenly 
+bsed on the number
+of localities used, which is described in the function 
+locidx [T]. Because some of the data needed to update the
+partion in heat_part [T] could now be on a new locality we
+must devise a way of moving data to the locality of the middle
+partition. We accomplished this by adding a switch in the
+function get_data() [T] which returns the end element of
+the buffer data_ [T] if it is from the left partition or
+the first element of the buffer if the data is from the 
+right partition.  In this way only the nesesary elements 
+and not the whole buffer is exchanged between nodes. 
+The reader should be reminded that this exchange of end 
+elements occurs in the funtion 
+get_data() and therefore is executed asynchronously.
+
+...Example 7....
+
+
 
 
 [/////////////////////////////////////////////////////////////////////////////]
