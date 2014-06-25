@@ -60,25 +60,12 @@ namespace hpx
                 call(gid, addr, std::forward<Arg0>( arg0 ));
         }
         lcos::packaged_action<action_type, result_type> p;
-        bool target_is_managed = gid.get_management_type() == naming::id_type::managed;
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
-            naming::id_type target(gid);
-            if (target_is_managed)
-                target = naming::id_type(gid.get_gid(), naming::id_type::unmanaged);
             if (addr)
                 p.apply(policy, addr, gid, std::forward<Arg0>( arg0 ));
             else
                 p.apply(policy, gid, std::forward<Arg0>( arg0 ));
-        }
-        
-        
-        if (target_is_managed)
-        {
-            using util::placeholders::_1;
-            return p.get_future().then(
-                    util::bind(&detail::keep_id_alive<result_type>, _1, gid)
-                );
         }
         return p.get_future();
     }
@@ -174,25 +161,12 @@ namespace hpx
                 call(gid, addr, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
         }
         lcos::packaged_action<action_type, result_type> p;
-        bool target_is_managed = gid.get_management_type() == naming::id_type::managed;
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
-            naming::id_type target(gid);
-            if (target_is_managed)
-                target = naming::id_type(gid.get_gid(), naming::id_type::unmanaged);
             if (addr)
                 p.apply(policy, addr, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
             else
                 p.apply(policy, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
-        }
-        
-        
-        if (target_is_managed)
-        {
-            using util::placeholders::_1;
-            return p.get_future().then(
-                    util::bind(&detail::keep_id_alive<result_type>, _1, gid)
-                );
         }
         return p.get_future();
     }
@@ -288,25 +262,12 @@ namespace hpx
                 call(gid, addr, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
         }
         lcos::packaged_action<action_type, result_type> p;
-        bool target_is_managed = gid.get_management_type() == naming::id_type::managed;
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
-            naming::id_type target(gid);
-            if (target_is_managed)
-                target = naming::id_type(gid.get_gid(), naming::id_type::unmanaged);
             if (addr)
                 p.apply(policy, addr, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
             else
                 p.apply(policy, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
-        }
-        
-        
-        if (target_is_managed)
-        {
-            using util::placeholders::_1;
-            return p.get_future().then(
-                    util::bind(&detail::keep_id_alive<result_type>, _1, gid)
-                );
         }
         return p.get_future();
     }
@@ -402,25 +363,12 @@ namespace hpx
                 call(gid, addr, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
         }
         lcos::packaged_action<action_type, result_type> p;
-        bool target_is_managed = gid.get_management_type() == naming::id_type::managed;
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
-            naming::id_type target(gid);
-            if (target_is_managed)
-                target = naming::id_type(gid.get_gid(), naming::id_type::unmanaged);
             if (addr)
                 p.apply(policy, addr, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
             else
                 p.apply(policy, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
-        }
-        
-        
-        if (target_is_managed)
-        {
-            using util::placeholders::_1;
-            return p.get_future().then(
-                    util::bind(&detail::keep_id_alive<result_type>, _1, gid)
-                );
         }
         return p.get_future();
     }
@@ -516,25 +464,12 @@ namespace hpx
                 call(gid, addr, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
         }
         lcos::packaged_action<action_type, result_type> p;
-        bool target_is_managed = gid.get_management_type() == naming::id_type::managed;
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
-            naming::id_type target(gid);
-            if (target_is_managed)
-                target = naming::id_type(gid.get_gid(), naming::id_type::unmanaged);
             if (addr)
                 p.apply(policy, addr, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
             else
                 p.apply(policy, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
-        }
-        
-        
-        if (target_is_managed)
-        {
-            using util::placeholders::_1;
-            return p.get_future().then(
-                    util::bind(&detail::keep_id_alive<result_type>, _1, gid)
-                );
         }
         return p.get_future();
     }
