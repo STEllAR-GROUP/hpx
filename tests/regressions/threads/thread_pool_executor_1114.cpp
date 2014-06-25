@@ -31,7 +31,7 @@ void print_ints(int i, int j)
 
 void thread_setup(int i, local_queue_executor exec)
 {
-    vector<hpx::lcos::future<void>> tasks;
+    vector<hpx::lcos::future<void> > tasks;
     for(int j = 0; j < 5; j++) {
         tasks.push_back(async(exec, print_ints, i , j));
     }

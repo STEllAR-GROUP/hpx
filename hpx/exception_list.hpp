@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -32,14 +32,14 @@ namespace hpx
         typedef value_type const& reference;
         typedef value_type const& const_reference;
         typedef exception_list_type::size_type size_type;
-        typedef exception_list_type::iterator iterator;
+        typedef exception_list_type::const_iterator iterator;
         typedef exception_list_type::const_iterator const_iterator;
         typedef std::iterator_traits<const_iterator>::difference_type
             difference_type;
 
         /// \throws nothing
         ~exception_list() throw() {}
-        
+
         exception_list();
         explicit exception_list(boost::exception_ptr const& e);
         explicit exception_list(exception_list_type && l);
@@ -80,7 +80,6 @@ namespace hpx
         ///
         std::size_t get_error_count() const;
     };
-
 }
 
 #include <hpx/config/warnings_suffix.hpp>

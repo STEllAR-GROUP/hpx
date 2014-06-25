@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_STL_PARALLEL_EXECUTION_POLICY_MAY_27_2014_0908PM)
-#define HPX_STL_PARALLEL_EXECUTION_POLICY_MAY_27_2014_0908PM
+#if !defined(HPX_PARALLEL_PARALLEL_EXECUTION_POLICY_MAY_27_2014_0908PM)
+#define HPX_PARALLEL_PARALLEL_EXECUTION_POLICY_MAY_27_2014_0908PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/decay.hpp>
@@ -159,14 +159,23 @@ namespace hpx { namespace parallel
     {
         template <typename T>
         struct is_parallel_execution_policy
+          : boost::mpl::false_
+        {};
+
+        template <>
+        struct is_parallel_execution_policy<parallel_execution_policy>
           : boost::mpl::true_
         {};
 
         template <>
-        struct is_parallel_execution_policy<sequential_execution_policy>
-          : boost::mpl::false_
+        struct is_parallel_execution_policy<vector_execution_policy>
+          : boost::mpl::true_
         {};
 
+        template <>
+        struct is_parallel_execution_policy<task_execution_policy>
+          : boost::mpl::true_
+        {};
     }
 
     // extension: detect whether give execution policy enables parallelization
@@ -180,12 +189,12 @@ namespace hpx { namespace parallel
     {
         template <typename T>
         struct is_sequential_execution_policy
-            : boost::mpl::false_
+          : boost::mpl::false_
         {};
 
         template <>
         struct is_sequential_execution_policy<sequential_execution_policy>
-            : boost::mpl::true_
+          : boost::mpl::true_
         {};
     }
 
@@ -221,11 +230,7 @@ namespace hpx { namespace parallel
                 >::type* = 0)
           : inner_(boost::make_shared<ExPolicy>(policy)),
             type_(&typeid(ExPolicy))
-        {
-            BOOST_STATIC_ASSERT_MSG(
-                !boost::is_same<ExPolicy, execution_policy>::value,
-                "Cannot assign dynamic execution policy.");
-        }
+        {}
 
         /// Move constructs a new execution_policy object.
         ///
@@ -248,10 +253,6 @@ namespace hpx { namespace parallel
         >::type&
         operator=(ExPolicy const& policy)
         {
-            BOOST_STATIC_ASSERT_MSG(
-                !boost::is_same<ExPolicy, execution_policy>::value,
-                "Cannot assign dynamic execution policy.");
-
             inner_ = boost::make_shared<ExPolicy>(policy);
             type_ = &typeid(ExPolicy);
             return *this;
@@ -275,6 +276,7 @@ namespace hpx { namespace parallel
         ///          object contained by *this
         std::type_info const& type() const BOOST_NOEXCEPT
         {
+            HPX_ASSERT(0 != type_);
             return *type_;
         }
 
@@ -285,7 +287,7 @@ namespace hpx { namespace parallel
         ExPolicy* get() BOOST_NOEXCEPT
         {
             BOOST_STATIC_ASSERT_MSG(
-                !boost::is_same<ExPolicy, execution_policy>::value,
+                !(boost::is_same<ExPolicy, execution_policy>::value),
                 "Incorrect execution policy parameter.");
             BOOST_STATIC_ASSERT_MSG(
                 is_execution_policy<ExPolicy>::value,
@@ -301,7 +303,7 @@ namespace hpx { namespace parallel
         ExPolicy const* get() const BOOST_NOEXCEPT
         {
             BOOST_STATIC_ASSERT_MSG(
-                !boost::is_same<ExPolicy, execution_policy>::value,
+                !(boost::is_same<ExPolicy, execution_policy>::value),
                 "Incorrect execution policy parameter.");
             BOOST_STATIC_ASSERT_MSG(
                 is_execution_policy<ExPolicy>::value,

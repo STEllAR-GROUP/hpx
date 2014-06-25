@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_STL_DETAIL_MOVE_JUNE_16_2014_1106AM)
-#define HPX_STL_DETAIL_MOVE_JUNE_16_2014_1106AM
+#if !defined(HPX_PARALLEL_DETAIL_MOVE_JUNE_16_2014_1106AM)
+#define HPX_PARALLEL_DETAIL_MOVE_JUNE_16_2014_1106AM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception_list.hpp>
@@ -35,13 +35,8 @@ namespace hpx { namespace parallel
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
                     std::move(first, last, dest));
             }
-            catch(std::bad_alloc const& e) {
-               boost::throw_exception(e);
-            }
             catch (...) {
-                boost::throw_exception(
-                    hpx::exception_list(boost::current_exception())
-                );
+                detail::handle_exception<ExPolicy>::call();
             }
         }
 
@@ -69,35 +64,9 @@ namespace hpx { namespace parallel
 
         template <typename InIter, typename OutIter>
         OutIter move(execution_policy const& policy,
-            InIter first, InIter last, OutIter dest, boost::mpl::false_ fls)
+            InIter first, InIter last, OutIter dest, boost::mpl::false_)
         {
-            switch (detail::which(policy))
-            {
-            case detail::execution_policy_enum::sequential:
-                return detail::move(
-                    *policy.get<sequential_execution_policy>(),
-                    first, last, dest, boost::mpl::true_());
-
-            case detail::execution_policy_enum::parallel:
-                return detail::move(
-                    *policy.get<parallel_execution_policy>(),
-                    first, last, dest, fls);
-
-            case detail::execution_policy_enum::vector:
-                return detail::move(
-                    *policy.get<vector_execution_policy>(),
-                    first, last, dest, fls);
-
-            case detail::execution_policy_enum::task:
-                return detail::move(par,
-                    first, last, dest, fls);
-
-            default:
-                HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                    "hpx::parallel::detail::move",
-                    "Not supported execution policy");
-                break;
-            }
+            HPX_PARALLEL_DISPATCH(policy, detail::move, first, last, dest);
         }
 
         template <typename InIter, typename OutIter>

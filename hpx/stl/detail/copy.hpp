@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_STL_DETAIL_COPY_MAY_30_2014_0317PM)
-#define HPX_STL_DETAIL_COPY_MAY_30_2014_0317PM
+#if !defined(HPX_PARALLEL_DETAIL_COPY_MAY_30_2014_0317PM)
+#define HPX_PARALLEL_DETAIL_COPY_MAY_30_2014_0317PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception_list.hpp>
@@ -34,13 +34,8 @@ namespace hpx { namespace parallel
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
                     std::copy(first, last, dest));
             }
-            catch(std::bad_alloc const& e) {
-               boost::throw_exception(e);
-            }
             catch (...) {
-                boost::throw_exception(
-                    hpx::exception_list(boost::current_exception())
-                );
+                detail::handle_exception<ExPolicy>::call();
             }
         }
 
@@ -70,33 +65,7 @@ namespace hpx { namespace parallel
         OutIter copy(execution_policy const& policy,
             InIter first, InIter last, OutIter dest, boost::mpl::false_ fls)
         {
-            switch (detail::which(policy))
-            {
-            case detail::execution_policy_enum::sequential:
-                return detail::copy(
-                    *policy.get<sequential_execution_policy>(),
-                    first, last, dest, boost::mpl::true_());
-
-            case detail::execution_policy_enum::parallel:
-                return detail::copy(
-                    *policy.get<parallel_execution_policy>(),
-                    first, last, dest, fls);
-
-            case detail::execution_policy_enum::vector:
-                return detail::copy(
-                    *policy.get<vector_execution_policy>(),
-                    first, last, dest, fls);
-
-            case detail::execution_policy_enum::task:
-                return detail::copy(par,
-                    first, last, dest, fls);
-
-            default:
-                HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                    "hpx::parallel::detail::copy",
-                    "Not supported execution policy");
-                break;
-            }
+            HPX_PARALLEL_DISPATCH(policy, detail::copy, first, last, dest);
         }
 
         template <typename InIter, typename OutIter>
@@ -169,13 +138,8 @@ namespace hpx { namespace parallel
                             boost::mpl::true_())
                     ));
             }
-            catch(std::bad_alloc const& e) {
-                boost::throw_exception(e);
-            }
             catch(...) {
-                boost::throw_exception(
-                    hpx::exception_list(boost::current_exception())
-                );
+                detail::handle_exception<ExPolicy>::call();
             }
         }
 
@@ -203,35 +167,9 @@ namespace hpx { namespace parallel
 
         template <typename InIter, typename OutIter>
         OutIter copy_n(execution_policy const& policy,
-            InIter first, std::size_t count, OutIter dest, boost::mpl::false_ fls)
+            InIter first, std::size_t count, OutIter dest, boost::mpl::false_)
         {
-            switch (detail::which(policy))
-            {
-            case detail::execution_policy_enum::sequential:
-                return detail::copy_n(
-                    *policy.get<sequential_execution_policy>(),
-                    first, count, dest, boost::mpl::true_());
-
-            case detail::execution_policy_enum::parallel:
-                return detail::copy_n(
-                    *policy.get<parallel_execution_policy>(),
-                    first, count, dest, fls);
-
-            case detail::execution_policy_enum::vector:
-                return detail::copy_n(
-                    *policy.get<vector_execution_policy>(),
-                    first, count, dest, fls);
-
-            case detail::execution_policy_enum::task:
-                return detail::copy_n(par,
-                    first, count, dest, fls);
-
-            default:
-                HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                    "hpx::parallel::detail::copy_n",
-                    "Not supported execution policy");
-                break;
-            }
+            HPX_PARALLEL_DISPATCH(policy, detail::copy_n, first, count, dest);
         }
 
         template <typename InIter, typename OutIter>
@@ -307,13 +245,8 @@ namespace hpx { namespace parallel
                     )
                 );
             }
-            catch(std::bad_alloc const& e) {
-                boost::throw_exception(e);
-            }
             catch(...) {
-                boost::throw_exception(
-                    hpx::exception_list(boost::current_exception())
-                );
+                detail::handle_exception<ExPolicy>::call();
             }
         }
 
@@ -343,35 +276,10 @@ namespace hpx { namespace parallel
 
         template <typename InIter, typename OutIter, typename F>
         OutIter copy_if(execution_policy const& policy,
-            InIter first, InIter last, OutIter dest, F && f, boost::mpl::false_ fls)
+            InIter first, InIter last, OutIter dest, F && f, boost::mpl::false_)
         {
-            switch(detail::which(policy))
-            {
-            case detail::execution_policy_enum::sequential:
-                return detail::copy_if(
-                    *policy.get<sequential_execution_policy>(),
-                    first, last, dest, std::forward<F>(f), boost::mpl::true_());
-
-            case detail::execution_policy_enum::parallel:
-                return detail::copy_if(
-                    *policy.get<parallel_execution_policy>(),
-                    first, last, dest, std::forward<F>(f), fls);
-
-            case detail::execution_policy_enum::vector:
-                return detail::copy_if(
-                    *policy.get<vector_execution_policy>(),
-                    first, last, dest, std::forward<F>(f), fls);
-
-            case detail::execution_policy_enum::task:
-                return detail::copy_if(par,
-                    first, last, dest, std::forward<F>(f), fls);
-
-            default:
-                HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                    "hpx::parallel::detail::copy_if",
-                    "Not supported execution policy");
-                break;
-            }
+            HPX_PARALLEL_DISPATCH(policy, detail::copy_if, first, last, dest,
+                std::forward<F>(f));
         }
 
         template <typename InIter, typename OutIter, typename F>

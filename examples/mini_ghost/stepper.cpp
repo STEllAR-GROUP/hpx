@@ -150,7 +150,7 @@ namespace mini_ghost {
 
         for(std::size_t spike = 0; spike != num_spikes; ++spike)
         {
-            std::vector<hpx::future<void>> run_futures;
+            std::vector<hpx::future<void> > run_futures;
             run_futures.reserve(partitions_.size());
             for(auto & partition : partitions_)
             {

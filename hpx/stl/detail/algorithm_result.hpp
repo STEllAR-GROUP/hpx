@@ -3,12 +3,15 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_STL_DETAIL_ALGORITHM_RESULT_MAY_28_2014_1020PM)
-#define HPX_STL_DETAIL_ALGORITHM_RESULT_MAY_28_2014_1020PM
+#if !defined(HPX_PARALLEL_DETAIL_ALGORITHM_RESULT_MAY_28_2014_1020PM)
+#define HPX_PARALLEL_DETAIL_ALGORITHM_RESULT_MAY_28_2014_1020PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/stl/execution_policy.hpp>
+
+#include <boost/static_assert.hpp>
+#include <boost/type_traits/is_lvalue_reference.hpp>
 
 namespace hpx { namespace parallel { namespace detail
 {
@@ -60,7 +63,10 @@ namespace hpx { namespace parallel { namespace detail
     template <typename ExPolicy, typename T>
     struct algorithm_result
       : algorithm_result_impl<typename hpx::util::decay<ExPolicy>::type, T>
-    {};
+    {
+        BOOST_STATIC_ASSERT_MSG(!boost::is_lvalue_reference<T>::value,
+            "T shouldn't be a lvalue reference");
+    };
 }}}
 
 #endif

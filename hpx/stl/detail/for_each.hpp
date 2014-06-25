@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_STL_DETAIL_FOR_EACH_MAY_29_2014_0932PM)
-#define HPX_STL_DETAIL_FOR_EACH_MAY_29_2014_0932PM
+#if !defined(HPX_PARALLEL_DETAIL_FOR_EACH_MAY_29_2014_0932PM)
+#define HPX_PARALLEL_DETAIL_FOR_EACH_MAY_29_2014_0932PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/stl/execution_policy.hpp>
@@ -38,13 +38,8 @@ namespace hpx { namespace parallel
                 return detail::algorithm_result<ExPolicy, InIter>::get(
                     util::loop_n(first, count, std::forward<F>(f)));
             }
-            catch(std::bad_alloc const& e) {
-                boost::throw_exception(e);
-            }
             catch (...) {
-                boost::throw_exception(
-                    hpx::exception_list(boost::current_exception())
-                );
+                detail::handle_exception<ExPolicy>::call();
             }
         }
 
@@ -76,13 +71,8 @@ namespace hpx { namespace parallel
                 return detail::algorithm_result<ExPolicy, InIter>::get(
                     util::plain_loop_n(first, count, std::forward<F>(f)));
             }
-            catch(std::bad_alloc const& e) {
-                boost::throw_exception(e);
-            }
             catch (...) {
-                boost::throw_exception(
-                    hpx::exception_list(boost::current_exception())
-                );
+                detail::handle_exception<ExPolicy>::call();
             }
         }
 
@@ -107,36 +97,10 @@ namespace hpx { namespace parallel
 
         template <typename InIter, typename F>
         InIter for_each_n(execution_policy const& policy,
-            InIter first, std::size_t count, F && func, boost::mpl::false_ f)
+            InIter first, std::size_t count, F && f, boost::mpl::false_)
         {
-            switch (detail::which(policy))
-            {
-            case detail::execution_policy_enum::sequential:
-                return detail::for_each_n(
-                    *policy.get<sequential_execution_policy>(),
-                    first, count, std::forward<F>(func), boost::mpl::true_());
-
-            case detail::execution_policy_enum::parallel:
-                return detail::for_each_n(
-                    *policy.get<parallel_execution_policy>(),
-                    first, count, std::forward<F>(func), f);
-
-            case detail::execution_policy_enum::vector:
-                return detail::for_each_n(
-                    *policy.get<vector_execution_policy>(),
-                    first, count, std::forward<F>(func), f);
-
-            case detail::execution_policy_enum::task:
-                // the dynamic case will never return a future
-                return detail::for_each_n(
-                    par, first, count, std::forward<F>(func), f);
-
-            default:
-                HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                    "hpx::parallel::detail::for_each_n",
-                    "Not supported execution policy");
-                break;
-            }
+            HPX_PARALLEL_DISPATCH(policy, detail::for_each_n, first, count,
+                std::forward<F>(f));
         }
 
         template <typename InIter, typename F>
@@ -186,13 +150,8 @@ namespace hpx { namespace parallel
                 std::for_each(first, last, std::forward<F>(f));
                 return detail::algorithm_result<ExPolicy, void>::get();
             }
-            catch(std::bad_alloc const& e) {
-                boost::throw_exception(e);
-            }
             catch (...) {
-                boost::throw_exception(
-                    hpx::exception_list(boost::current_exception())
-                );
+                detail::handle_exception<ExPolicy>::call();
             }
         }
 
@@ -212,40 +171,10 @@ namespace hpx { namespace parallel
 
         template <typename InIter, typename F>
         void for_each(execution_policy const& policy,
-            InIter first, InIter last, F && f, boost::mpl::false_ fls)
+            InIter first, InIter last, F && f, boost::mpl::false_)
         {
-            switch (detail::which(policy))
-            {
-            case detail::execution_policy_enum::sequential:
-                detail::for_each(
-                    *policy.get<sequential_execution_policy>(),
-                    first, last, std::forward<F>(f), boost::mpl::true_());
-                break;
-
-            case detail::execution_policy_enum::parallel:
-                detail::for_each(
-                    *policy.get<parallel_execution_policy>(),
-                    first, last, std::forward<F>(f), fls);
-                break;
-
-            case detail::execution_policy_enum::vector:
-                detail::for_each(
-                    *policy.get<vector_execution_policy>(),
-                    first, last, std::forward<F>(f), fls);
-                break;
-
-            case detail::execution_policy_enum::task:
-                // the dynamic case will never return a future
-                detail::for_each(par, first, last, std::forward<F>(f),
-                    fls);
-                break;
-
-            default:
-                HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                    "hpx::parallel::detail::for_each",
-                    "Not supported execution policy");
-                break;
-            }
+            HPX_PARALLEL_DISPATCH(policy, detail::for_each, first, last,
+                std::forward<F>(f));
         }
 
         template <typename InIter, typename F>

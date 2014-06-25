@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_STL_UTIL_PARTITIONER_MAY_27_2014_1040PM)
-#define HPX_STL_UTIL_PARTITIONER_MAY_27_2014_1040PM
+#if !defined(HPX_PARALLEL_UTIL_PARTITIONER_MAY_27_2014_1040PM)
+#define HPX_PARALLEL_UTIL_PARTITIONER_MAY_27_2014_1040PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/async.hpp>
@@ -41,7 +41,7 @@ namespace hpx { namespace parallel { namespace util
     {
         ///////////////////////////////////////////////////////////////////////
         // std::bad_alloc has to be handled separately
-        inline void handle_exception(boost::exception_ptr const& e,
+        inline void handle_local_exception(boost::exception_ptr const& e,
             std::list<boost::exception_ptr>& errors)
         {
             try {
@@ -56,13 +56,14 @@ namespace hpx { namespace parallel { namespace util
         }
 
         template <typename T>
-        void handle_exceptions(std::vector<hpx::future<T> > const& workitems,
+        void handle_local_exceptions(
+            std::vector<hpx::future<T> > const& workitems,
             std::list<boost::exception_ptr>& errors)
         {
             for (hpx::future<T> const& f: workitems)
             {
                 if (f.has_exception())
-                    detail::handle_exception(f.get_exception_ptr(), errors);
+                    detail::handle_local_exception(f.get_exception_ptr(), errors);
             }
 
             if (!errors.empty())
@@ -149,7 +150,7 @@ namespace hpx { namespace parallel { namespace util
 
                 // wait for all tasks to finish
                 hpx::wait_all(workitems);
-                detail::handle_exceptions(workitems, errors);
+                detail::handle_local_exceptions(workitems, errors);
                 return handle_step_two(std::forward<F2>(f2), first,
                     std::move(workitems));
             }
@@ -195,7 +196,7 @@ namespace hpx { namespace parallel { namespace util
                     {
                         std::vector<hpx::future<Result> > result = r.get();
                         std::list<boost::exception_ptr> errors;
-                        detail::handle_exceptions(result, errors);
+                        detail::handle_local_exceptions(result, errors);
                         return handle_step_two(f2, first, std::move(result));
                     }
                 );
@@ -322,7 +323,7 @@ namespace hpx { namespace parallel { namespace util
 
                 // wait for all tasks to finish
                 hpx::wait_all(workitems);
-                detail::handle_exceptions(workitems, errors);
+                detail::handle_local_exceptions(workitems, errors);
                 return handle_step_two(std::forward<F2>(f2), first,
                     std::move(workitems));
             }
@@ -377,7 +378,7 @@ namespace hpx { namespace parallel { namespace util
                     {
                         std::vector<hpx::future<Result> > result = r.get();
                         std::list<boost::exception_ptr> errors;
-                        detail::handle_exceptions(result, errors);
+                        detail::handle_local_exceptions(result, errors);
                         return handle_step_two(f2, first, std::move(result));
                     }
                 );
