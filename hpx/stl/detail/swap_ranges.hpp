@@ -2,8 +2,8 @@
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-#if !defined(HPX_STL_DETAIL_SWAP_RANGES_JUNE_20_2014_1006AM)
-#define HPX_STL_DETAIL_SWAP_RANGES_JUNE_20_2014_1006AM
+#if !defined(HPX_PARALLEL_DETAIL_SWAP_RANGES_JUNE_20_2014_1006AM)
+#define HPX_PARALLEL_DETAIL_SWAP_RANGES_JUNE_20_2014_1006AM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception_list.hpp>
@@ -65,35 +65,10 @@ namespace hpx { namespace parallel
 
         template <typename ForwardIter1, typename ForwardIter2>
         ForwardIter2 swap_ranges(execution_policy const& policy,ForwardIter1 first1,
-            ForwardIter1 last1, ForwardIter2 first2, boost::mpl::false_ f)
+            ForwardIter1 last1, ForwardIter2 first2, boost::mpl::false_)
         {
-            switch (detail::which(policy))
-            {
-            case detail::execution_policy_enum::sequential:
-                return detail::swap_ranges(
-                    *policy.get<sequential_execution_policy>(),
-                    first1, last1, first2, boost::mpl::true_());
-
-            case detail::execution_policy_enum::parallel:
-                return detail::swap_ranges(
-                    *policy.get<parallel_execution_policy>(),
-                    first1, last1, first2, f);
-
-            case detail::execution_policy_enum::vector:
-                return detail::swap_ranges(
-                    *policy.get<vector_execution_policy>(),
-                    first1, last1, first2, f);
-
-            case detail::execution_policy_enum::task:
-                return detail::swap_ranges(par,
-                    first1, last1, first2, f);
-
-            default:
-                HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                    "hpx::parallel::detail::swap_ranges",
-                    "Not supported execution policy");
-                break;
-            }
+            HPX_PARALLEL_DISPATCH(policy, detail::swap_ranges, first1, last1,
+                first2);
         }
 
         template <typename ForwardIter1, typename ForwardIter2>

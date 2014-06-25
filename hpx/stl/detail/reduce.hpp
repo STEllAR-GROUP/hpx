@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_STL_DETAILREUCE_JUN_01_2014_0903AM)
-#define HPX_STL_DETAILREUCE_JUN_01_2014_0903AM
+#if !defined(HPX_PARALLEL_DETAILREUCE_JUN_01_2014_0903AM)
+#define HPX_PARALLEL_DETAILREUCE_JUN_01_2014_0903AM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
@@ -74,40 +74,10 @@ namespace hpx { namespace parallel
 
         template <typename InIter, typename T, typename Pred>
         T reduce(execution_policy const& policy, InIter first, InIter last,
-            T && init, Pred && op, boost::mpl::false_ fls)
+            T && init, Pred && op, boost::mpl::false_)
         {
-            switch (detail::which(policy))
-            {
-            case detail::execution_policy_enum::sequential:
-                return detail::reduce(
-                    *policy.get<sequential_execution_policy>(),
-                    first, last, std::forward<T>(init), std::forward<Pred>(op),
-                    boost::mpl::true_());
-
-            case detail::execution_policy_enum::parallel:
-                return detail::reduce(
-                    *policy.get<parallel_execution_policy>(),
-                    first, last, std::forward<T>(init), std::forward<Pred>(op),
-                    fls);
-
-            case detail::execution_policy_enum::vector:
-                return detail::reduce(
-                    *policy.get<vector_execution_policy>(),
-                    first, last, std::forward<T>(init), std::forward<Pred>(op),
-                    fls);
-
-            case detail::execution_policy_enum::task:
-                // the dynamic case will never return a future
-                return detail::reduce(par,
-                    first, last, std::forward<T>(init), std::forward<Pred>(op),
-                    fls);
-
-            default:
-                HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                    "hpx::parallel::detail::reduce",
-                    "Not supported execution policy");
-                break;
-            }
+            HPX_PARALLEL_DISPATCH(policy, detail::reduce, first, last,
+                std::forward<T>(init), std::forward<Pred>(op));
         }
 
         template<typename InIter, typename T, typename Pred>

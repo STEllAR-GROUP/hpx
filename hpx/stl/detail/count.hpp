@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_STL_DETAIL_COUNT_JUNE_17_2014_1154AM)
-#define HPX_STL_DETAIL_COUNT_JUNE_17_2014_1154AM
+#if !defined(HPX_PARALLEL_DETAIL_COUNT_JUNE_17_2014_1154AM)
+#define HPX_PARALLEL_DETAIL_COUNT_JUNE_17_2014_1154AM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception_list.hpp>
@@ -79,35 +79,9 @@ namespace hpx { namespace parallel
         template <typename InIter, typename T>
         typename std::iterator_traits<InIter>::difference_type count(
             execution_policy const& policy, InIter first, InIter last,
-            const T& value, boost::mpl::false_ f)
+            const T& value, boost::mpl::false_)
         {
-            switch (detail::which(policy))
-            {
-            case detail::execution_policy_enum::sequential:
-                return detail::count(
-                    *policy.get<sequential_execution_policy>(),
-                    first, last, value, boost::mpl::true_());
-
-            case detail::execution_policy_enum::parallel:
-                return detail::count(
-                    *policy.get<parallel_execution_policy>(),
-                    first, last, value, f);
-
-            case detail::execution_policy_enum::vector:
-                return detail::count(
-                    *policy.get<vector_execution_policy>(),
-                    first, last, value, f);
-
-            case detail::execution_policy_enum::task:
-                return detail::count( par,
-                    first, last, value, f);
-
-            default:
-                HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                    "hpx::parallel::detail::count",
-                    "Not supported execution policy");
-                break;
-            }
+            HPX_PARALLEL_DISPATCH(policy, detail::count, first, last, value);
         }
 
         template <typename InIter, typename T>
@@ -204,35 +178,10 @@ namespace hpx { namespace parallel
         template <typename InIter, typename Pred>
         typename std::iterator_traits<InIter>::difference_type count_if(
             execution_policy const& policy, InIter first, InIter last,
-            Pred && op, boost::mpl::false_ f)
+            Pred && op, boost::mpl::false_)
         {
-            switch (detail::which(policy))
-            {
-            case detail::execution_policy_enum::sequential:
-                return detail::count_if(
-                    *policy.get<sequential_execution_policy>(),
-                    first, last, std::forward<Pred>(op), boost::mpl::true_());
-
-            case detail::execution_policy_enum::parallel:
-                return detail::count_if(
-                    *policy.get<parallel_execution_policy>(),
-                    first, last, std::forward<Pred>(op), f);
-
-            case detail::execution_policy_enum::vector:
-                return detail::count_if(
-                    *policy.get<vector_execution_policy>(),
-                    first, last, std::forward<Pred>(op), f);
-
-            case detail::execution_policy_enum::task:
-                return detail::count_if( par,
-                    first, last, std::forward<Pred>(op), f);
-
-            default:
-                HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                    "hpx::parallel::detail::count_if",
-                    "Not supported execution policy");
-                break;
-            }
+            HPX_PARALLEL_DISPATCH(policy, detail::count_if, first, last,
+                std::forward<Pred>(op));
         }
 
         template <typename InIter, typename Pred>

@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_STL_DETAIL_FILL_JUNE_12_2014_0405PM)
-#define HPX_STL_DETAIL_FILL_JUNE_12_2014_0405PM
+#if !defined(HPX_PARALLEL_DETAIL_FILL_JUNE_12_2014_0405PM)
+#define HPX_PARALLEL_DETAIL_FILL_JUNE_12_2014_0405PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/stl/execution_policy.hpp>
@@ -61,35 +61,9 @@ namespace hpx { namespace parallel
 
         template <typename InIter, typename T>
         void fill(execution_policy const& policy,
-            InIter first, InIter last, T val, boost::mpl::false_ f)
+            InIter first, InIter last, T val, boost::mpl::false_)
         {
-            switch (detail::which(policy))
-            {
-            case detail::execution_policy_enum::sequential:
-                return detail::fill(
-                    *policy.get<sequential_execution_policy>(),
-                    first, last, val, boost::mpl::true_());
-
-            case detail::execution_policy_enum::parallel:
-                return detail::fill(
-                    *policy.get<parallel_execution_policy>(),
-                    first, last, val, f);
-
-            case detail::execution_policy_enum::vector:
-                return detail::fill(
-                    *policy.get<vector_execution_policy>(),
-                    first, last, val, f);
-
-            case detail::execution_policy_enum::task:
-                return detail::fill(par,
-                    first, last, val, f);
-
-            default:
-                HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                    "hpx::parallel::detail::copy",
-                    "Not supported execution policy");
-                break;
-            }
+            HPX_PARALLEL_DISPATCH(policy, detail::fill, first, last, val);
         }
 
        template <typename InIter, typename T>
@@ -157,35 +131,9 @@ namespace hpx { namespace parallel
 
         template <typename OutIter, typename T>
         OutIter fill_n(execution_policy const& policy,
-            OutIter first, std::size_t count, T val, boost::mpl::false_ f)
+            OutIter first, std::size_t count, T val, boost::mpl::false_)
         {
-            switch(detail::which(policy))
-            {
-            case detail::execution_policy_enum::sequential:
-                return detail::fill_n(
-                    *policy.get<sequential_execution_policy>(),
-                    first, count, val, boost::mpl::true_());
-
-            case detail::execution_policy_enum::parallel:
-                return detail::fill_n(
-                    *policy.get<parallel_execution_policy>(),
-                    first, count, val, f);
-
-            case detail::execution_policy_enum::vector:
-                return detail::fill_n(
-                    *policy.get<vector_execution_policy>(),
-                    first, count, val, f);
-
-            case detail::execution_policy_enum::task:
-                return detail::fill_n(
-                    par, first, count, val, f);
-
-            default:
-                HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                    "hpx::parallel::detail::fill_n",
-                    "Not supported execution policy");
-                break;
-            }
+            HPX_PARALLEL_DISPATCH(policy, detail::fill_n, first, count, val);
         }
 
         template <typename OutIter, typename T>

@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_STL_DETAIL_TRANSFORM_MAY_29_2014_0932PM)
-#define HPX_STL_DETAIL_TRANSFORM_MAY_29_2014_0932PM
+#if !defined(HPX_PARALLEL_DETAIL_TRANSFORM_MAY_29_2014_0932PM)
+#define HPX_PARALLEL_DETAIL_TRANSFORM_MAY_29_2014_0932PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception_list.hpp>
@@ -68,36 +68,10 @@ namespace hpx { namespace parallel
 
         template <typename InIter, typename OutIter, typename F>
         OutIter transform(execution_policy const& policy,
-            InIter first, InIter last, OutIter dest, F && f, boost::mpl::false_ fls)
+            InIter first, InIter last, OutIter dest, F && f, boost::mpl::false_)
         {
-            switch (detail::which(policy))
-            {
-            case detail::execution_policy_enum::sequential:
-                return detail::transform(
-                    *policy.get<sequential_execution_policy>(),
-                    first, last, dest, std::forward<F>(f), boost::mpl::true_());
-
-            case detail::execution_policy_enum::parallel:
-                return detail::transform(
-                    *policy.get<parallel_execution_policy>(),
-                    first, last, dest, std::forward<F>(f), fls);
-
-            case detail::execution_policy_enum::vector:
-                return detail::transform(
-                    *policy.get<vector_execution_policy>(),
-                    first, last, dest, std::forward<F>(f), fls);
-
-            case detail::execution_policy_enum::task:
-                // the dynamic case will never return a future
-                return detail::transform(par,
-                    first, last, dest, std::forward<F>(f), fls);
-
-            default:
-                HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                    "hpx::parallel::detail::transform",
-                    "Not supported execution policy");
-                break;
-            }
+            HPX_PARALLEL_DISPATCH(policy, detail::transform, first, last, dest,
+                std::forward<F>(f));
         }
 
         template <typename InIter, typename OutIter, typename F>
@@ -183,40 +157,10 @@ namespace hpx { namespace parallel
             typename F>
         OutIter transform_binary(execution_policy const& policy,
             InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest,
-            F && f, boost::mpl::false_ fls)
+            F && f, boost::mpl::false_)
         {
-            switch (detail::which(policy))
-            {
-            case detail::execution_policy_enum::sequential:
-                return detail::transform_binary(
-                    *policy.get<sequential_execution_policy>(),
-                    first1, last1, first2, dest, std::forward<F>(f),
-                    boost::mpl::true_());
-
-            case detail::execution_policy_enum::parallel:
-                return detail::transform_binary(
-                    *policy.get<parallel_execution_policy>(),
-                    first1, last1, first2, dest, std::forward<F>(f),
-                    fls);
-
-            case detail::execution_policy_enum::vector:
-                return detail::transform_binary(
-                    *policy.get<vector_execution_policy>(),
-                    first1, last1, first2, dest, std::forward<F>(f),
-                    fls);
-
-            case detail::execution_policy_enum::task:
-                // the dynamic case will never return a future
-                return detail::transform_binary(par,
-                    first1, last1, first2, dest, std::forward<F>(f),
-                    fls);
-
-            default:
-                HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                    "hpx::parallel::detail::transform_binary",
-                    "Not supported execution policy");
-                break;
-            }
+            HPX_PARALLEL_DISPATCH(policy, detail::transform_binary, first1,
+                last1, first2, dest, std::forward<F>(f));
         }
 
         template<typename InIter1, typename InIter2, typename OutIter,
