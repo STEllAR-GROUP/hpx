@@ -11,6 +11,8 @@
 #include <hpx/stl/execution_policy.hpp>
 #include <hpx/stl/detail/algorithm_result.hpp>
 #include <hpx/stl/detail/zip_iterator.hpp>
+#include <hpx/stl/util/partitioner.hpp>
+#include <hpx/stl/util/loop.hpp>
 
 #include <algorithm>
 #include <iterator>
