@@ -167,7 +167,7 @@ int main(int argc, char* argv[])
         , boost::program_options::value<std::size_t>()->default_value(1000)
         , "size of vector")
 
-        ( "mTime"
+        ( "mtime"
         , boost::program_options::value<int>()->default_value(0)
         , "(0)Seconds (1)Milliseconds (2)Microseconds")
 
