@@ -46,9 +46,10 @@ namespace hpx { namespace parallel
 
         template <typename ExPolicy, typename FwdIter, typename T>
         typename detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<FwdIter>::difference_type>::type
-        count(ExPolicy const& policy, FwdIter first, FwdIter last, const T& value,
-            boost::mpl::false_ f)
+            typename std::iterator_traits<FwdIter>::difference_type
+        >::type
+        count(ExPolicy const& policy, FwdIter first, FwdIter last,
+            T const& value, boost::mpl::false_ f)
         {
             typedef typename std::iterator_traits<FwdIter>::value_type type;
             typedef typename std::iterator_traits<FwdIter>::difference_type
@@ -79,9 +80,9 @@ namespace hpx { namespace parallel
         }
 
         template <typename InIter, typename T>
-        typename std::iterator_traits<InIter>::difference_type count(
-            execution_policy const& policy, InIter first, InIter last,
-            const T& value, boost::mpl::false_)
+        typename std::iterator_traits<InIter>::difference_type
+        count(execution_policy const& policy, InIter first, InIter last,
+            T const& value, boost::mpl::false_)
         {
             HPX_PARALLEL_DISPATCH(policy, detail::count, first, last, value);
         }
@@ -100,9 +101,10 @@ namespace hpx { namespace parallel
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
         typename detail::algorithm_result<ExPolicy,
-        typename std::iterator_traits<InIter>::difference_type>::type
+            typename std::iterator_traits<InIter>::difference_type
+        >::type
     >::type
-    count(ExPolicy && policy, InIter first, InIter last, const T& value)
+    count(ExPolicy && policy, InIter first, InIter last, T const& value)
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
             category;
@@ -117,7 +119,7 @@ namespace hpx { namespace parallel
             boost::is_same<std::input_iterator_tag, category>
         >::type is_seq;
 
-        return detail::count( std::forward<ExPolicy>(policy),
+        return detail::count(std::forward<ExPolicy>(policy),
             first, last, value, is_seq());
     }
 
@@ -127,7 +129,8 @@ namespace hpx { namespace parallel
     {
         template <typename ExPolicy, typename InIter, typename Pred>
         typename detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<InIter>::difference_type>::type
+            typename std::iterator_traits<InIter>::difference_type
+        >::type
         count_if(ExPolicy const&, InIter first, InIter last, Pred && op,
             boost::mpl::true_)
         {
@@ -145,7 +148,8 @@ namespace hpx { namespace parallel
 
         template <typename ExPolicy, typename FwdIter, typename Pred>
         typename detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<FwdIter>::difference_type>::type
+            typename std::iterator_traits<FwdIter>::difference_type
+        >::type
         count_if(ExPolicy const& policy, FwdIter first, FwdIter last,
             Pred && op, boost::mpl::false_ f)
         {
@@ -178,8 +182,8 @@ namespace hpx { namespace parallel
         }
 
         template <typename InIter, typename Pred>
-        typename std::iterator_traits<InIter>::difference_type count_if(
-            execution_policy const& policy, InIter first, InIter last,
+        typename std::iterator_traits<InIter>::difference_type
+        count_if(execution_policy const& policy, InIter first, InIter last,
             Pred && op, boost::mpl::false_)
         {
             HPX_PARALLEL_DISPATCH(policy, detail::count_if, first, last,
@@ -187,8 +191,8 @@ namespace hpx { namespace parallel
         }
 
         template <typename InIter, typename Pred>
-        typename std::iterator_traits<InIter>::difference_type count_if(
-            execution_policy const& policy, InIter first, InIter last,
+        typename std::iterator_traits<InIter>::difference_type
+        count_if(execution_policy const& policy, InIter first, InIter last,
             Pred && op, boost::mpl::true_ t)
         {
             return detail::count_if(sequential_execution_policy(),
@@ -200,7 +204,8 @@ namespace hpx { namespace parallel
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
         typename detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<InIter>::difference_type>::type
+            typename std::iterator_traits<InIter>::difference_type
+        >::type
     >::type
     count_if(ExPolicy && policy, InIter first, InIter last, Pred && op)
     {
@@ -216,7 +221,7 @@ namespace hpx { namespace parallel
             boost::is_same<std::input_iterator_tag, category>
         >::type is_seq;
 
-        return detail::count_if( std::forward<ExPolicy>(policy),
+        return detail::count_if(std::forward<ExPolicy>(policy),
             first, last,
             std::forward<Pred>(op), is_seq());
     }
