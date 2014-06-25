@@ -230,11 +230,7 @@ namespace hpx { namespace parallel
                 >::type* = 0)
           : inner_(boost::make_shared<ExPolicy>(policy)),
             type_(&typeid(ExPolicy))
-        {
-            BOOST_STATIC_ASSERT_MSG(
-                !boost::is_same<ExPolicy, execution_policy>::value,
-                "Cannot assign dynamic execution policy.");
-        }
+        {}
 
         /// Move constructs a new execution_policy object.
         ///
@@ -257,10 +253,6 @@ namespace hpx { namespace parallel
         >::type&
         operator=(ExPolicy const& policy)
         {
-            BOOST_STATIC_ASSERT_MSG(
-                !boost::is_same<ExPolicy, execution_policy>::value,
-                "Cannot assign dynamic execution policy.");
-
             inner_ = boost::make_shared<ExPolicy>(policy);
             type_ = &typeid(ExPolicy);
             return *this;
@@ -284,6 +276,7 @@ namespace hpx { namespace parallel
         ///          object contained by *this
         std::type_info const& type() const BOOST_NOEXCEPT
         {
+            HPX_ASSERT(0 != type_);
             return *type_;
         }
 
