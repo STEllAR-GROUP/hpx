@@ -32,7 +32,7 @@ namespace hpx
         typedef value_type const& reference;
         typedef value_type const& const_reference;
         typedef exception_list_type::size_type size_type;
-        typedef exception_list_type::iterator iterator;
+        typedef exception_list_type::const_iterator iterator;
         typedef exception_list_type::const_iterator const_iterator;
         typedef std::iterator_traits<const_iterator>::difference_type
             difference_type;
