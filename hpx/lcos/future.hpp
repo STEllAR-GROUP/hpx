@@ -11,7 +11,6 @@
 #include <hpx/config/forceinline.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/future_traits.hpp>
-#include <hpx/traits/future_unwrap_getter.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/util/always_void.hpp>
@@ -322,14 +321,15 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Future, typename Enable = void>
     struct future_unwrap_result
     {
-        typedef typename traits::future_traits<Future>::type outer_result;
+        typedef void type;
+    };
 
-        typedef lcos::future<
-            typename boost::mpl::eval_if<
-                traits::is_future<outer_result>
-              , traits::future_traits<outer_result>
-              , boost::mpl::identity<void>
-            >::type> type;
+    template <template <typename> class Future, typename R>
+    struct future_unwrap_result<Future<Future<R> > >
+    {
+        typedef R result_type;
+
+        typedef Future<result_type> type;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -678,11 +678,18 @@ namespace hpx { namespace lcos { namespace detail
         // Postcondition:
         //   - The returned future has valid() == true, regardless of the
         //     validity of the inner future.
-        template <typename Getter>
         typename future_unwrap_result<Derived>::type
-        unwrap(Getter getter, error_code& ec = throws)
+        unwrap(error_code& ec = throws)
         {
-            return then(getter, ec);
+            typedef
+                typename future_unwrap_result<Derived>::result_type
+                result_type;
+            typedef 
+                typename shared_state_ptr<result_type>::type
+                shared_state_ptr;
+
+            shared_state_ptr p = detail::unwrap(*static_cast<Derived*>(this), ec);
+            return traits::future_access<future<result_type> >::create(std::move(p));
         }
 
         // Effects: blocks until the shared state is ready.
@@ -992,7 +999,7 @@ namespace hpx { namespace lcos
         unwrap(error_code& ec = throws)
         {
             invalidate on_exit(*this);
-            return base_type::unwrap(traits::future_unwrap_getter<future>(), ec);
+            return base_type::unwrap(ec);
         }
 
         using base_type::wait;
@@ -1189,12 +1196,7 @@ namespace hpx { namespace lcos
         using base_type::has_exception;
 
         using base_type::then;
-
-        typename detail::future_unwrap_result<shared_future>::type
-        unwrap(error_code& ec = throws)
-        {
-            return base_type::unwrap(traits::future_unwrap_getter<shared_future>(), ec);
-        }
+        using base_type::unwrap;
 
         using base_type::wait;
         using base_type::wait_for;

@@ -67,29 +67,6 @@ namespace hpx { namespace traits
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Derived>
-    struct future_unwrap_getter<lcos::future<Derived>,
-        typename boost::enable_if<is_client<Derived> >::type>
-    {
-        BOOST_FORCEINLINE lcos::shared_future<naming::id_type>
-        operator()(lcos::future<Derived> f) const
-        {
-            return f.get().share();
-        }
-    };
-
-    template <typename Derived>
-    struct future_unwrap_getter<lcos::shared_future<Derived>,
-        typename boost::enable_if<is_client<Derived> >::type>
-    {
-        BOOST_FORCEINLINE lcos::shared_future<naming::id_type>
-        operator()(lcos::shared_future<Derived> f) const
-        {
-            return f.get().share();
-        }
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Derived>
     struct future_access<Derived,
         typename boost::enable_if<is_client<Derived> >::type>
     {

@@ -28,14 +28,24 @@ namespace hpx { namespace lcos { namespace detail
         template <typename Source, typename Destination>
         void apply(Source src, Destination& dest, boost::mpl::false_) const
         {
-            dest->set_data(src.get());
+            try {
+                dest->set_data(src.get());
+            }
+            catch (...) {
+                dest->set_exception(boost::current_exception());
+            }
         }
 
         template <typename Source, typename Destination>
         void apply(Source src, Destination& dest, boost::mpl::true_) const
         {
-            src.get();
-            dest->set_data(util::unused);
+            try {
+                src.get();
+                dest->set_data(util::unused);
+            }
+            catch (...) {
+                dest->set_exception(boost::current_exception());
+            }
         }
 
         template <typename Source, typename Destination>
@@ -429,6 +439,103 @@ namespace hpx { namespace lcos { namespace detail
         return std::move(p);
     }
 }}}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace lcos { namespace detail
+{
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename ContResult>
+    class unwrap_continuation : public future_data<ContResult>
+    {
+    private:
+        template <typename Inner>
+        void on_inner_ready(
+            typename shared_state_ptr_for<Inner>::type const& inner_state)
+        {
+            try {
+                transfer_result<Inner>()(inner_state, this);
+            }
+            catch (...) {
+                this->set_exception(boost::current_exception());
+            }
+        }
+
+        template <typename Outer>
+        void on_outer_ready(
+            typename shared_state_ptr_for<Outer>::type const& outer_state)
+        {
+            typedef typename traits::future_traits<Outer>::type inner_future;
+            typedef
+                typename shared_state_ptr_for<inner_future>::type
+                inner_shared_state_ptr;
+
+            // Bind an on_completed handler to this future which will transfer
+            // its result to the new future.
+            boost::intrusive_ptr<unwrap_continuation> this_(this);
+            void (unwrap_continuation::*inner_ready)(
+                inner_shared_state_ptr const&) =
+                    &unwrap_continuation::on_inner_ready<inner_future>;
+
+            try {
+                // if we get here, this future is ready
+                Outer outer = traits::future_access<Outer>::create(outer_state);
+
+                // take by value, as the future will go away immediately
+                inner_shared_state_ptr inner_state =
+                    traits::future_access<inner_future>::get_shared_state(outer.get());
+
+                if (inner_state.get() == 0)
+                {
+                    HPX_THROW_EXCEPTION(no_state,
+                        "unwrap_continuation<ContResult>::on_outer_ready",
+                        "the inner future has no valid shared state");
+                }
+
+                inner_state->set_on_completed(
+                    util::bind(inner_ready, std::move(this_), inner_state));
+            }
+            catch (...) {
+                this->set_exception(boost::current_exception());
+            }
+        }
+
+    public:
+        template <typename Future>
+        void attach(Future& future)
+        {
+            typedef
+                typename shared_state_ptr_for<Future>::type
+                outer_shared_state_ptr;
+
+            // Bind an on_completed handler to this future which will wait for
+            // the inner future and will transfer its result to the new future.
+            boost::intrusive_ptr<unwrap_continuation> this_(this);
+            void (unwrap_continuation::*outer_ready)(
+                outer_shared_state_ptr const&) =
+                    &unwrap_continuation::on_outer_ready<Future>;
+
+            outer_shared_state_ptr const& outer_state =
+                traits::future_access<Future>::get_shared_state(future);
+            outer_state->set_on_completed(
+                util::bind(outer_ready, std::move(this_), outer_state));
+        }
+    };
+
+    template <typename Future>
+    inline typename shared_state_ptr<
+        typename unwrap_result<Future>::type>::type
+    unwrap(Future& future, error_code& ec)
+    {
+        typedef typename unwrap_result<Future>::type result_type;
+        typedef detail::unwrap_continuation<result_type> shared_state;
+
+        // create a continuation
+        typename shared_state_ptr<result_type>::type p(new shared_state());
+        static_cast<shared_state*>(p.get())->attach(future);
+        return std::move(p);
+    }
+}}}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail
