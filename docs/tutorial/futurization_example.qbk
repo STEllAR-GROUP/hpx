@@ -150,7 +150,31 @@ The reader should be reminded that this exchange of end
 elements occurs in the funtion 
 get_data() and therefore is executed asynchronously.
 
-...Example 7....
+Now that we have the code runing in distributed it
+it time to make some optimizations. The funtion heat_part
+[T] spends most of its time on two task: retrieveing remote 
+data and working on the data in the middle partion. Because
+we know that the data for the middle partition is local,
+we can overlap the work on the middle partition with that 
+of the possibly remote call of get_data() [T].  This
+algorithmic change was implemente in example 7.
+
+Example 8 goes the extra mile and distributes the creation
+of the exectuion tree.  It accomplishes this task by 
+wrapping the strut stepper [T] into a component. In this 
+way, each locality contains an instance of stepper whcih
+executes its own instance of the function do_work() [T].
+The solution vectors named "result" are then gathered 
+together on locality 0 and added into a vector of spaces
+overall_result [T] using the HPX funtions gather_id and 
+gather_here [T]. ...explain three new dataflows and more....
+
+...Example 8....
+changes in main, hpx_main
+changes in do_work: split workflow into three dataflows
+edge partition (that needs data from loality from left),
+middle partions that are all on the same machine, and 
+right edge partion.
 
 
 
