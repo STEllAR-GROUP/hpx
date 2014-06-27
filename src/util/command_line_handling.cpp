@@ -774,6 +774,20 @@ namespace hpx { namespace util
     }
 #endif
 
+    void handle_list_parcelports()
+    {
+        runtime & rt = get_runtime();
+        {
+            util::osstream strm;    // make sure all output is kept together
+            strm << std::string(79, '*') << '\n';
+            strm << "locality: " << hpx::get_locality_id() << '\n';
+
+            rt.get_parcel_handler().list_parcelports(strm);
+
+            std::cout << util::osstream_get_string(strm);
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     int command_line_handling::call(
         boost::program_options::options_description const& desc_cmdline,

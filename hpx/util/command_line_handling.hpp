@@ -48,8 +48,8 @@ namespace hpx { namespace util
         std::string queuing_;
 
     protected:
-        bool handle_arguments(util::manage_config& cfgmap, 
-            boost::program_options::variables_map& vm, 
+        bool handle_arguments(util::manage_config& cfgmap,
+            boost::program_options::variables_map& vm,
             std::vector<std::string>& ini_config, std::size_t& node);
 
         void store_command_line(int argc, char** argv);
@@ -65,6 +65,8 @@ namespace hpx { namespace util
     void handle_print_bind(boost::program_options::variables_map const& vm,
         std::size_t num_threads);
 #endif
+
+    void handle_list_parcelports();
 }}
 
 #endif
