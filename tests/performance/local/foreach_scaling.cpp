@@ -7,7 +7,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/include/algorithm.hpp>
-#include <hpx/stl/execution_policy.hpp>
+#include <hpx/parallel/execution_policy.hpp>
 #include <hpx/include/iostreams.hpp>
 #include "worker_timed.hpp"
 
@@ -133,7 +133,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     double par_time = average_out_parallel(vector_size, mtime);
     double seq_time = average_out_sequential(vector_size, mtime); 
 
-    if(plotoutput) {
+    if(plotoutput == 1) {
         hpx::cout << " " << seq_time << " " << par_time << "\n" << hpx::flush;
     }else{ 
         //print results(Formatted). Setw(x) assures that all output is right justified

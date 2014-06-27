@@ -35,17 +35,17 @@ foreach(test ${tests})
                      ${${test}_FLAGS}
                      FOLDER "Tests/Unit/STL/")
 
-  add_hpx_unit_test("stl" ${test} ${${test}_PARAMETERS})
+  add_hpx_unit_test("parallel" ${test} ${${test}_PARAMETERS})
 
   # add a custom target for this example
-  add_hpx_pseudo_target(tests.unit.stl.${test})
+  add_hpx_pseudo_target(tests.unit.parallel.${test})
 
   # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.stl
-                              tests.unit.stl.${test})
+  add_hpx_pseudo_dependencies(tests.unit.parallel
+                              tests.unit.parallel.${test})
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.stl.${test}
+  add_hpx_pseudo_dependencies(tests.unit.parallel.${test}
                               ${test}_test_exe)
 endforeach()
 
