@@ -42,6 +42,10 @@ namespace hpx { namespace threads { namespace executors
             static threads::thread_state_enum thread_function_nullary(
                 closure_type func);
 
+            // Return the requested policy element
+            std::size_t get_policy_element(
+                threads::detail::executor_parameter p, error_code& ec) const;
+
         private:
             policies::scheduler_base* scheduler_base_;
         };

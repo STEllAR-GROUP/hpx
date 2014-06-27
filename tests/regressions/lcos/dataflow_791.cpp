@@ -41,7 +41,7 @@ block ProcessBlockOnColumn( block B1, block B2);
 block ProcessBlockOnRow( block B1, block B2);
 block ProcessInnerBlock( block B1, block B2, block B3);
 
-void getBlockList(vector<vector<block>> &blocks, int numBlocks);
+void getBlockList(vector<vector<block> > &blocks, int numBlocks);
 
 void Print_Matrix(vector<double> &v);
 void InitMatrix3();
@@ -113,9 +113,9 @@ void LU( int numBlocks)
 {
     printf("LU\n");
     hpx::naming::id_type here = hpx::find_here();
-    vector<vector<block>> blockList;
+    vector<vector<block> > blockList;
     getBlockList(blockList, numBlocks);
-    vector<vector<vector<shared_future<block>>>> dfArray(numBlocks);
+    vector<vector<vector<shared_future<block> > > > dfArray(numBlocks);
     shared_future<block> *diag_block, *first_col;
 
     for(int i = 0; i < numBlocks; i++){
@@ -155,7 +155,7 @@ void LU( int numBlocks)
     wait_all(dfArray[numBlocks-1][numBlocks-1][numBlocks-1]);
 }
 
-void getBlockList(vector<vector<block>> &blockList, int numBlocks)
+void getBlockList(vector<vector<block> > &blockList, int numBlocks)
 {
     int blockSize, start, height;
     for(int i=0; i < numBlocks; i++)
@@ -270,7 +270,7 @@ void Print_Matrix(vector<double> &v)
 
 void InitMatrix3()
 {
-    vector<shared_future<void>> futures;
+    vector<shared_future<void> > futures;
     futures.reserve(size);
     for(int i = 0; i < size; i++)
         for(int j = 0; j < size; j++){

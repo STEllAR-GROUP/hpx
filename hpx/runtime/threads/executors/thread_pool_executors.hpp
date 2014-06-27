@@ -61,12 +61,12 @@ namespace hpx { namespace threads { namespace executors
         protected:
             friend class manage_thread_pool_executor<Scheduler>;
 
-            // The function below are used by the resource manager to
-            // interact with the scheduler.
-
             // Return the requested policy element
             std::size_t get_policy_element(threads::detail::executor_parameter p,
                 error_code& ec) const;
+
+            // The function below are used by the resource manager to
+            // interact with the scheduler.
 
             // Return statistics collected by this scheduler
             void get_statistics(executor_statistics& stats, error_code& ec) const;

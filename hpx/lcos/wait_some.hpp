@@ -364,6 +364,7 @@ namespace hpx { namespace lcos
 namespace hpx
 {
     using lcos::wait_some;
+    using lcos::wait_some_n;
 }
 
 #endif

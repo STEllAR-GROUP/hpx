@@ -291,7 +291,7 @@ namespace hpx { namespace lcos
         typedef std::vector<future_type> result_type;
 
         result_type lazy_values_;
-        lazy_values_.resize(count);
+        lazy_values_.reserve(count);
         detail::when_acquire_future<future_type> func;
         for (std::size_t i = 0; i != count; ++i)
             lazy_values_.push_back(func(*begin++));
@@ -342,6 +342,7 @@ namespace hpx { namespace lcos
 namespace hpx
 {
     using lcos::when_some;
+    using lcos::when_some_n;
 }
 
 #endif

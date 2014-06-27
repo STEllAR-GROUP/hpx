@@ -1,0 +1,179 @@
+//  Copyright (c) 2014 Hartmut Kaiser
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#if !defined(HPX_PARALLEL_TEST_ITERATOR_MAY_29_2014_0110PM)
+#define HPX_PARALLEL_TEST_ITERATOR_MAY_29_2014_0110PM
+
+#include <boost/iterator/iterator_adaptor.hpp>
+
+namespace test
+{
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename BaseIterator, typename IteratorTag>
+    struct test_iterator
+      : boost::iterator_adaptor<
+            test_iterator<BaseIterator, IteratorTag>,
+            BaseIterator, boost::use_default, IteratorTag>
+    {
+    private:
+        typedef boost::iterator_adaptor<
+            test_iterator<BaseIterator, IteratorTag>,
+            BaseIterator, boost::use_default, IteratorTag>
+        base_type;
+
+    public:
+        test_iterator() : base_type() {}
+        test_iterator(BaseIterator base) : base_type(base) {};
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename BaseIterator, typename IteratorTag>
+    struct decorated_iterator
+      : boost::iterator_adaptor<
+            decorated_iterator<BaseIterator, IteratorTag>,
+            BaseIterator, boost::use_default, IteratorTag>
+    {
+    private:
+        typedef boost::iterator_adaptor<
+            decorated_iterator<BaseIterator, IteratorTag>,
+            BaseIterator, boost::use_default, IteratorTag>
+        base_type;
+
+    public:
+        decorated_iterator() : base_type() {}
+        decorated_iterator(BaseIterator base, std::function<void()> f)
+          : base_type(base), m_callback(f)
+        {};
+
+    private:
+        friend class boost::iterator_core_access;
+
+        typename base_type::reference dereference() const
+        {
+            m_callback();
+            return *(this->base());
+        }
+
+    private:
+        std::function<void()> m_callback;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename ExPolicy, typename IteratorTag>
+    struct test_num_exeptions
+    {
+        static void call(ExPolicy const&, hpx::exception_list const& e)
+        {
+            // The static partitioner uses the number of threads/cores for the
+            // number chunks to create.
+            HPX_TEST_EQ(e.size(), hpx::get_num_worker_threads());
+        }
+    };
+
+    template <typename IteratorTag>
+    struct test_num_exeptions<
+        hpx::parallel::sequential_execution_policy, IteratorTag>
+    {
+        static void call(hpx::parallel::sequential_execution_policy const&,
+            hpx::exception_list const& e)
+        {
+            HPX_TEST_EQ(e.size(), 1);
+        }
+    };
+
+    template <typename ExPolicy>
+    struct test_num_exeptions<ExPolicy, std::input_iterator_tag>
+    {
+        static void call(ExPolicy const&, hpx::exception_list const& e)
+        {
+            HPX_TEST_EQ(e.size(), 1);
+        }
+    };
+
+    template <>
+    struct test_num_exeptions<
+        hpx::parallel::sequential_execution_policy, std::input_iterator_tag>
+    {
+        static void call(hpx::parallel::sequential_execution_policy const&,
+            hpx::exception_list const& e)
+        {
+            HPX_TEST_EQ(e.size(), 1);
+        }
+    };
+
+    template <typename IteratorTag>
+    struct test_num_exeptions<hpx::parallel::execution_policy, IteratorTag>
+    {
+        static void call(hpx::parallel::execution_policy const& policy,
+            hpx::exception_list const& e)
+        {
+            using namespace hpx::parallel::detail;
+
+            if (which(policy) == static_cast<int>(execution_policy_enum::sequential)) {
+                HPX_TEST_EQ(e.size(), 1);
+            }
+            else {
+                // The static partitioner uses the number of threads/cores for
+                // the number chunks to create.
+                HPX_TEST_EQ(e.size(), hpx::get_num_worker_threads());
+            }
+        }
+    };
+
+    template <>
+    struct test_num_exeptions<
+        hpx::parallel::execution_policy, std::input_iterator_tag>
+    {
+        static void call(hpx::parallel::execution_policy const&,
+            hpx::exception_list const& e)
+        {
+            HPX_TEST_EQ(e.size(), 1);
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    inline std::vector<std::size_t> iota(std::size_t size, std::size_t start)
+    {
+        std::vector<std::size_t> c(size);
+        std::iota(boost::begin(c), boost::end(c), start);
+        return c;
+    }
+
+    inline std::vector<std::size_t> random_iota(std::size_t size)
+    {
+        std::vector<std::size_t> c(size);
+        std::iota(boost::begin(c), boost::end(c), 0);
+        int num = std::rand();
+        while (num-- != 0)
+            std::next_permutation(boost::begin(c), boost::end(c));
+        return c;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    inline void make_ready(std::vector<hpx::promise<std::size_t> >& p,
+        std::vector<std::size_t>& idx)
+    {
+        std::for_each(boost::begin(idx), boost::end(idx),
+            [&p](std::size_t i)
+            {
+                p[i].set_value(i);
+            });
+    }
+
+    inline std::vector<hpx::future<std::size_t> > fill_with_futures(
+        std::vector<hpx::promise<std::size_t> >& p)
+    {
+        std::vector<hpx::future<std::size_t> > f;
+        std::transform(boost::begin(p), boost::end(p), std::back_inserter(f),
+            [](hpx::promise<std::size_t>& pr)
+            {
+                return pr.get_future();
+            });
+
+        return f;
+    }
+}
+
+#endif
