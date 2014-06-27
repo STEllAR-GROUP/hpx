@@ -7,9 +7,9 @@
 
 [section:futurization_example Futurization Example]
 
-The following set of expamples were developed to demonstrate how a 
+The following set of examples were developed to demonstrate how a 
 serial program 
-can use the tehcniques of futurization to exploit the parallelism of an
+can use the techniques of futurization to exploit the parallelism of an
 algorithm.  In this case, we implemented a 1D heat distribution problem.
 The first example is straight serial code.  In this code we instantiate
  a vector which contains two vectors of doubles.  
@@ -17,7 +17,7 @@ Each element in the vector of doubles represents a single grid
 point. To calculate the change in heat distribution, the temperature of 
 each grid point, along with its neighbors, are passed to the function heat.
  In order to improve readability, references named current 
-and next are created which, depending on the timestep, point to the first
+and next are created which, depending on the time step, point to the first
 and second vector of doubles. The first vector of doubles is initialized 
 with a simple 
 heat ramp. After calling the heat function with the data in the "current"
@@ -91,7 +91,7 @@ a component which saves us from having to write quite as much code.
 remotely accessed using its global address. Components
 are made of two parts: a server and a client class.
 While it is not required to write them this way, abstracting 
-the server and the client allow us to hide the boiler plate code 
+the server and the client allows us to hide the boiler plate code 
 and ensure type safety instead of having to pass around pointers
 to global objects. Example 5 renames example 4's 
 struct partition [TELETYPE] to partition_data [TELETYPE] and
