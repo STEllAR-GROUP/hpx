@@ -9,121 +9,121 @@
 
 The following set of expamples were developed to demonstrate how a 
 serial program 
-can use the tecniques of futurization to exploit the parallism of an
+can use the tehcniques of futurization to exploit the parallelism of an
 algorithm.  In this case, we implemented a 1D heat distribution problem.
-The first example is straight serial code.  In this code we instaniate
+The first example is straight serial code.  In this code we instantiate
  a vector which contains two vectors of doubles.  
 Each element in the vector of doubles represents a single grid
-point. To calculate the change in heat distibution, the temperature of 
+point. To calculate the change in heat distribution, the temperature of 
 each grid point, along with its neighbors, are passed to the function heat.
- In order to imporove readablility, references named current 
+ In order to improve readability, references named current 
 and next are created which, depending on the timestep, point to the first
 and second vector of doubles. The first vector of doubles is initialized 
 with a simple 
 heat ramp. After calling the heat function with the data in the "current"
 vector, the results are placed into the "next" vector. 
 
-In example 2 the code is futureized.  To do this we re-define our
-our partion type as a shared_future [ADD TELETYPE] and create 
+In example 2 the code is futurized.  To do this we re-define 
+our partition type as a shared_future [ADD TELETYPE] and create 
 the object "result" which is a future vector of shared futures. We
 then call result.get() and set its value equal to the solution vector.
-The future vector "result" is calculated by stringing the futrue results 
+The future vector "result" is calculated by stringing the future results 
 of the function heat together so that each element calls heat 
 when the previous futures it depends on are ready. 
-In HPX 
-we have an LCO whch assists the programmer in this process.  Dataflow 
-allows us to pass the results a set of futures to a specified function 
+In HPX, 
+we have an LCO which assists the programmer in this process.  Dataflow 
+allows us to pass the results, a set of futures, to a specified function 
 when the futures are ready.
-Dataflow talkes [x] arguments which intruct the object on how to perform 
-the function call, the funcion to call, and the arguments for that function. 
-When called, dataflow immediatly returns a future to the result of the 
+Dataflow takes [x] arguments, which instruct the object on how to perform 
+the function call, the function to call, and the arguments for that function. 
+When called, dataflow immediately returns a future to the result of the 
 specified function.  This allows users to string the dataflows together 
-and construnct an execution tree. 
+and construct an execution tree. 
 
-After the values of the futues in data flow are ready the values must 
+After the values of the futures in data flow are ready, the values must 
 be prepared to be passed to the function heat. In order to do this we 
 use the HPX facility unwrapped.  In this example, unwrapped
-retrieves the value of the futuers passed to Op and passes thier
+retrieves the value of the futures passed to Op and passes their
 values to the function heat.
 
-By setting up the algorithm this way, the program will be able to exexute
-as the dependecies are meet.  Unfortunaly, this example runs 
+By setting up the algorithm this way, the program will be able to execute
+as the dependencies are met.  Unfortunately, this example runs 
 terribly slow. This increase in execution time is caused 
 by the increased overheads needed to create a future for each
 data point. Because the work done within each call to heat is very
-small, the overhead of creating and schedualing each of the three
+small, the overhead of creating and scheduling each of the three
 futures is greater than that of the actual useful work! In order
-amatorize [SP] the oveerheads of our syncronization techniques,
-we need to be able to control the amount of work that with be
-done with each future.  We call this amout of work per overhead
+to amortize the overheads of our synchronization techniques,
+we need to be able to control the amount of work that will be
+done with each future.  We call this amount of work per overhead
 grain size.
 
-In example 3 we retun to our serial code to figure out how to 
-control the grain size of our program. The stratagy that we 
-employ is to create "partiions" of data points. The user
+In example 3, we return to our serial code to figure out how to 
+control the grain size of our program. The strategy that we 
+employ is to create "partitions" of data points. The user
 can define how many partitions are created and how many 
-datapoints are contained in each partition. This is accomplished 
-by creating the stuct partition and defineing space to now
-be a vector of partions.
+data points are contained in each partition. This is accomplished 
+by creating the struct partition and defining space to now
+be a vector of partitions.
 
-In example 4 we take advangate of the partion setup by redefining
-space to be a vector of shared_futures whaich represent partitions.
+In example 4, we take advantage of the partition setup by redefining
+space to be a vector of shared_futures which represents partitions.
 In hpx_main we create a future vector of space named result which
-contains the final calculated data points and set it equal
+contains the final calculated data points and sets it equal
 to the step member function do_work.  We pass the number 
-of partions, the number of grid points per partition, and 
+of partitions, the number of grid points per partition, and 
 the number of steps that the program will simulate to this
 function, which sets up the execution tree.  It should be noted
 how strikingly similar example 4 is to example 2.
 
-Example 4 finaly shows us some good results.  This code 
+Example 4 finally shows us some good results.  This code 
 is faster than the OpenMP version by a factor of [INSERT FACTOR HERE].
-While these results are impressive our work on this
+While these results are impressive, our work on this
 algorithm is not over. This example only runs on one locality.
-To get the full benefit of HPX we need to be albe to distibute
+To get the full benefit of HPX we need to be able to distribute
 the work to other machines in a cluster. We begin this process in
 example 5.
 
-In order to run in distributed a large amount of boilerplate code
-must be added. Fortunatley, HPX provides us with the concept of
+In order to run on a distributed system, a large amount of boilerplate code
+must be added. Fortunately, HPX provides us with the concept of
 a component which saves us from having to write quite as much code.
- A component simply is an object which can be 
+ A component is an object which can be 
 remotely accessed using its global address. Components
 are made of two parts: a server and a client class.
 While it is not required to write them this way, abstracting 
 the server and the client allow us to hide the boiler plate code 
 and ensure type safety instead of having to pass around pointers
 to global objects. Example 5 renames example 4's 
-struct partiiton [TELETYPE] to partition_data [TELETYPE] and
+struct partition [TELETYPE] to partition_data [TELETYPE] and
 adds serialization support. Next we add the server side
 representation of the data in the structure partition_server [TELETYPE].
-Patition_server [T] inherits from hpx::components::simple_component_base
-which contains a lot server side component boilerplate. 
+Partition_server [T] inherits from hpx::components::simple_component_base
+which contains a server side component boilerplate. 
 The boilerplate code allows a component's public members 
-to be accessable anywhere on the
-machine via its Global Identifyer (GID). To encapsulate
+to be accessible anywhere on the
+machine via its Global Identifier (GID). To encapsulate
 the component, we create a client side helper class.  This
 object allows us to create new instances of our component,
 and access its members without having to know its GID. In addition,
  we are using the client class to assist us with managing 
-our asyncrony. For example, our client class partition[TELETYPE]'s
+our asynchrony. For example, our client class partition[TELETYPE]'s
 member function get_data() [T] returns a future to 
 partition_data get_data(). This struct inherits its boilerplate
 code from hpx::components::client_base.
 
 
 In the structure stepper, we have also had to make some changes
-to accomadate a distributed environment. In order to get the data from a 
-neighboring partition, which could be remote, we must retreve the 
-data from the neiboring partitions. These retrevals are asycronous
-and the funciton heat_part_data [TELETYPE], which amongst other things calls
-heat, should not be called unless the data from the neigboring partitions
-have arrived.  Therefore it should come as no supprize that we syncronize 
-this operarion with another instance of dataflow (found in heat_part).
+to accommodate a distributed environment. In order to get the data from a 
+neighboring partition, which could be remote, we must retrieve the 
+data from the neighboring partitions. These retrievals are asynchronous
+and the function heat_part_data [TELETYPE], which amongst other things calls
+heat, should not be called unless the data from the neighboring partitions
+have arrived.  Therefore it should come as no surprise that we synchronize 
+this operation with another instance of dataflow (found in heat_part).
 This dataflow is passed futures to the data in the current and surrounding
-partitions by calling get_data() on each respective partiion. When these
-futues are ready dataflow passes then to the unwrapped function, which
-extracts the shared_array of doubles amd passes them to the lambda.
+partitions by calling get_data() on each respective partition. When these
+futures are ready dataflow passes then to the unwrapped function, which
+extracts the shared_array of doubles and passes them to the lambda.
 The lambda calls heat_part_data on the locality which the middle 
 partition is on.
 
@@ -131,42 +131,42 @@ Although this example could run in distributed it only runs on
 one locality as it always uses hpx::find_here() as the target
 for the functions to run on.
 
-In example 6 we begin to distibute the partion data on differnet nodes.
+In example 6, we begin to distribute the partition data on different nodes.
 This is accomplished in stepper::do_work() [T] by passing the 
-GID of the locality where we wish to create the partion to the 
-the partition constructor.  We distribute the partions evenly 
-bsed on the number
+GID of the locality where we wish to create the partition to the 
+the partition constructor.  We distribute the partitions evenly 
+based on the number
 of localities used, which is described in the function 
 locidx [T]. Because some of the data needed to update the
-partion in heat_part [T] could now be on a new locality we
+partition in heat_part [T] could now be on a new locality, we
 must devise a way of moving data to the locality of the middle
 partition. We accomplished this by adding a switch in the
 function get_data() [T] which returns the end element of
 the buffer data_ [T] if it is from the left partition or
 the first element of the buffer if the data is from the 
-right partition.  In this way only the nesesary elements 
-and not the whole buffer is exchanged between nodes. 
+right partition.  In this way only the necessary elements,
+not the whole buffer, is exchanged between nodes. 
 The reader should be reminded that this exchange of end 
-elements occurs in the funtion 
+elements occurs in the function 
 get_data() and therefore is executed asynchronously.
 
-Now that we have the code runing in distributed it
-it time to make some optimizations. The funtion heat_part
-[T] spends most of its time on two task: retrieveing remote 
-data and working on the data in the middle partion. Because
+Now that we have the code running in distributed it 
+is time to make some optimizations. The function heat_part
+[T] spends most of its time on two task: retrieving remote 
+data and working on the data in the middle partition. Because
 we know that the data for the middle partition is local,
 we can overlap the work on the middle partition with that 
 of the possibly remote call of get_data() [T].  This
-algorithmic change was implemente in example 7.
+algorithmic change was implemented in example 7.
 
 Example 8 goes the extra mile and distributes the creation
-of the exectuion tree.  It accomplishes this task by 
-wrapping the strut stepper [T] into a component. In this 
-way, each locality contains an instance of stepper whcih
+of the execution tree.  It accomplishes this task by 
+wrapping the struct stepper [T] into a component. In this 
+way, each locality contains an instance of stepper which
 executes its own instance of the function do_work() [T].
 The solution vectors named "result" are then gathered 
 together on locality 0 and added into a vector of spaces
-overall_result [T] using the HPX funtions gather_id and 
+overall_result [T] using the HPX functions gather_id and 
 gather_here [T]. ...explain three new dataflows and more....
 
 ...Example 8....
