@@ -67,8 +67,8 @@
             // remote execution
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
-                HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                    HPX_STD_PLACEHOLDERS::_1),
+                util::bind(&packaged_action::parcel_write_handler,
+                    this->impl_, util::placeholders::_1),
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
     }
@@ -93,8 +93,8 @@
             // remote execution
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
-                HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                    HPX_STD_PLACEHOLDERS::_1),
+                util::bind(&packaged_action::parcel_write_handler,
+                    this->impl_, util::placeholders::_1),
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
     }

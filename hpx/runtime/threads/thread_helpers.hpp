@@ -579,7 +579,7 @@ namespace hpx { namespace applier
     ///       \a threads#register_thread_plain
     ///
     HPX_API_EXPORT threads::thread_id_type register_thread(
-        util::detail::unique_function<void(threads::thread_state_ex_enum)> && func,
+        util::unique_function_nonser<void(threads::thread_state_ex_enum)> && func,
         char const* description = 0,
         threads::thread_state_enum initial_state = threads::pending,
         bool run_now = true,
@@ -602,7 +602,7 @@ namespace hpx { namespace applier
     ///       \a threads#register_thread_plain
     ///
     HPX_API_EXPORT threads::thread_id_type register_non_suspendable_thread(
-        util::detail::unique_function<void(threads::thread_state_ex_enum)> && func,
+        util::unique_function_nonser<void(threads::thread_state_ex_enum)> && func,
         char const* description = 0,
         threads::thread_state_enum initial_state = threads::pending,
         bool run_now = true,
@@ -623,7 +623,7 @@ namespace hpx { namespace applier
     ///       \a threads#register_thread_plain
     ///
     HPX_API_EXPORT threads::thread_id_type register_thread_nullary(
-        util::detail::unique_function<void()> && func,
+        util::unique_function_nonser<void()> && func,
         char const* description = 0,
         threads::thread_state_enum initial_state = threads::pending,
         bool run_now = true,
@@ -728,7 +728,7 @@ namespace hpx { namespace applier
     ///       \a threads#register_work_plain
     ///
     HPX_API_EXPORT void register_work(
-        util::detail::unique_function<void(threads::thread_state_ex_enum)> && func,
+        util::unique_function_nonser<void(threads::thread_state_ex_enum)> && func,
         char const* description = 0,
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
@@ -750,7 +750,7 @@ namespace hpx { namespace applier
     ///       \a threads#register_work_plain
     ///
     HPX_API_EXPORT void register_non_suspendable_work(
-        util::detail::unique_function<void(threads::thread_state_ex_enum)> && func,
+        util::unique_function_nonser<void(threads::thread_state_ex_enum)> && func,
         char const* description = 0,
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
@@ -770,7 +770,7 @@ namespace hpx { namespace applier
     ///       \a threads#register_work_plain
     ///
     HPX_API_EXPORT void register_work_nullary(
-        util::detail::unique_function<void()> && func,
+        util::unique_function_nonser<void()> && func,
         char const* description = 0,
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,

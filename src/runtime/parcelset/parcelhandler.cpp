@@ -310,6 +310,55 @@ namespace hpx { namespace parcelset
 #endif
     }
 
+    void parcelhandler::list_parcelport(util::osstream& strm, connection_type t,
+        bool available)
+    {
+        std::string ppname = get_connection_type_name(t);
+        strm << "parcel port: " << ppname
+             << " (" << (available ? "" : "not ") << "available)";
+
+        if (available)
+        {
+            std::string cfgkey("hpx.parcel." + ppname + ".enable");
+            std::string enabled = get_config_entry(cfgkey, "0");
+            strm << ", " << (boost::lexical_cast<int>(enabled) ? "" : "not ")
+                 << "enabled";
+
+            std::string bootstrap = get_config_entry("hpx.parcel.bootstrap", "tcp");
+            if (bootstrap == ppname)
+                strm << ", bootstrap";
+        }
+
+        strm << '\n';
+    }
+
+    // list available parcel ports
+    void parcelhandler::list_parcelports(util::osstream& strm)
+    {
+        list_parcelport(strm, connection_tcp);
+
+#if defined(HPX_HAVE_PARCELPORT_IPC)
+        list_parcelport(strm, connection_ipc);
+#else
+        list_parcelport(strm, connection_ipc, false);
+#endif
+// #if defined(HPX_HAVE_PARCELPORT_PORTALS4)
+//         list_parcelport(strm, connection_portals4);
+// #else
+//         list_parcelport(strm, connection_portals4, false);
+// #endif
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+        list_parcelport(strm, connection_ibverbs);
+#else
+        list_parcelport(strm, connection_ibverbs, false);
+#endif
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+        list_parcelport(strm, connection_mpi);
+#else
+        list_parcelport(strm, connection_mpi, false);
+#endif
+    }
+
     // find and return the specified parcelport
     parcelport* parcelhandler::find_parcelport(connection_type type,
         error_code& ec) const

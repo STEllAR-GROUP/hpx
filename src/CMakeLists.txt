@@ -178,7 +178,7 @@ add_hpx_library_headers(hpx
   GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/plugins/*.hpp"
   APPEND)
 add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/stl/*.hpp"
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/parallel/*.hpp"
   APPEND)
 
 # libhpx_init headers

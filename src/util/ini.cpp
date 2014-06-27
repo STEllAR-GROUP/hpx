@@ -41,22 +41,6 @@ extern char **environ;
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// Explicitly instantiate a perl_matcher, this is needed to make hpx applications
-// link with bgclang
-namespace boost { namespace re_detail {
-    template class perl_matcher<
-        std::string::iterator
-      , std::allocator<boost::sub_match<std::string::iterator> >
-      , boost::regex_traits<char, boost::cpp_regex_traits<char> >
-    >;
-    template class perl_matcher<
-        std::string::const_iterator
-      , std::allocator<boost::sub_match<std::string::const_iterator> >
-      , boost::regex_traits<char, boost::cpp_regex_traits<char> >
-    >;
-}}
-
-///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
 

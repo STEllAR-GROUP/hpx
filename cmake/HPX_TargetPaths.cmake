@@ -19,7 +19,17 @@ macro(hpx_get_target_location variable target)
     set(location LOCATION)
   endif()
 
+  if(POLICY CMP0026)
+    cmake_policy(PUSH)
+    cmake_policy(SET CMP0026 OLD)
+  endif()
+
   get_target_property(${variable} ${target} ${location})
+
+  if(POLICY CMP0026)
+    cmake_policy(POP)
+  endif()
+
 endmacro()
 
 macro(hpx_get_target_file variable target)

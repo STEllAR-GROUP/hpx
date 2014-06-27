@@ -47,9 +47,13 @@
 #endif
 
 #if !defined(HPX_CLANG_VERSION) && !defined(HPX_INTEL_VERSION)
-#  if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
+#  if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION < 40500)
 #    define HPX_GCC44_WORKAROUND
 #  endif
+#endif
+
+#if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION == 1400
+#   define HPX_INTEL14_WORKAROUND
 #endif
 
 #endif

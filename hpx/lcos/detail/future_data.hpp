@@ -281,7 +281,7 @@ namespace detail
 
         /// Reset the promise to allow to restart an asynchronous
         /// operation. Allows any subsequent set_data operation to succeed.
-        void reset(error_code& ec = throws)
+        void reset(error_code& /*ec*/ = throws)
         {
             typename mutex_type::scoped_lock l(this->mtx_);
             state_ = empty;
@@ -469,8 +469,8 @@ namespace detail
 
             error_code ec;
             threads::thread_id_type id = threads::register_thread_nullary(
-                HPX_STD_BIND(&timed_future_data::set_data, this_,
-                    std::forward<Result_>(init)),
+                util::bind(util::one_shot(&timed_future_data::set_data),
+                    this_, std::forward<Result_>(init)),
                 "timed_future_data<Result>::timed_future_data",
                 threads::suspended, true, threads::thread_priority_normal,
                 std::size_t(-1), threads::thread_stacksize_default, ec);
@@ -540,13 +540,13 @@ namespace detail
         }
 
         virtual BOOST_SCOPED_ENUM(future_status)
-        wait_for(boost::posix_time::time_duration const& p, error_code& ec = throws)
+        wait_for(boost::posix_time::time_duration const& /*p*/, error_code& /*ec*/ = throws)
         {
             return future_status::deferred; //-V110
         }
 
         virtual BOOST_SCOPED_ENUM(future_status)
-        wait_until(boost::posix_time::ptime const& at, error_code& ec = throws)
+        wait_until(boost::posix_time::ptime const& /*at*/, error_code& /*ec*/ = throws)
         {
             return future_status::deferred; //-V110
         };
@@ -594,13 +594,13 @@ namespace detail
                 hpx::threads::get_self_id());
 
             if (sched_) {
-                sched_->add(HPX_STD_BIND(&task_base::run_impl, this_),
+                sched_->add(util::bind(&task_base::run_impl, this_),
                     desc ? desc : "task_base::apply", threads::pending, false,
                     stacksize, ec);
             }
             else {
                 threads::register_thread_plain(
-                    HPX_STD_BIND(&task_base::run_impl, this_),
+                    util::bind(&task_base::run_impl, this_),
                     desc ? desc : "task_base::apply", threads::pending, false,
                     priority, std::size_t(-1), stacksize, ec);
             }

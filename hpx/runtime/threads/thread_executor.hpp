@@ -8,8 +8,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/date_time_chrono.hpp>
+#include <hpx/util/unique_function.hpp>
 #include <hpx/util/safe_bool.hpp>
-#include <hpx/util/detail/unique_function.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
@@ -76,9 +76,7 @@ namespace hpx { namespace threads
         class executor_base
         {
         public:
-            typedef
-                util::detail::unique_function<void(), void, void>
-                closure_type;
+            typedef util::unique_function_nonser<void()> closure_type;
 
             executor_base() : count_(0) {}
             virtual ~executor_base() {}

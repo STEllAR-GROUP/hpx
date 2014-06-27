@@ -23,7 +23,7 @@ foreach(example_program ${example_programs})
   add_hpx_executable(${example_program}
                      SOURCES ${sources}
                      ${${example_program}_FLAGS}
-                     FOLDER "Examples/future_reduce/${example_program}")
+                     FOLDER "Examples/FutureReduce")
 
   # add a custom target for this example
   add_hpx_pseudo_target(examples.future_reduce.${example_program})

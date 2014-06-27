@@ -156,7 +156,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     stepper::space solution = step.do_work(np, nx, nt);
 
     // Print the final solution
-    if (vm.count("result"))
+    if (vm.count("results"))
     {
         for (std::size_t i = 0; i != np; ++i)
             std::cout << "U[" << i << "] = " << solution[i] << std::endl;
@@ -174,6 +174,7 @@ int main(int argc, char* argv[])
 
     po::options_description desc_commandline;
     desc_commandline.add_options()
+        ("results", "print generated results (default: false)")
         ("nx", po::value<boost::uint64_t>()->default_value(10),
          "Local x dimension (of each partition)")
         ("nt", po::value<boost::uint64_t>()->default_value(45),

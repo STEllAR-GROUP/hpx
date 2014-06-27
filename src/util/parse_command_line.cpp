@@ -491,6 +491,7 @@ namespace hpx { namespace util
 #if defined(_POSIX_VERSION) || defined(BOOST_MSVC)
                 ("hpx:attach-debugger", "wait for a debugger to be attached")
 #endif
+                ("hpx:list-parcel-ports", "list all available parcel-ports")
             ;
 
             options_description counter_options(

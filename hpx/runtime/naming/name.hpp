@@ -611,6 +611,9 @@ namespace hpx { namespace naming
         HPX_EXPORT gid_type split_gid_if_needed_locked(gid_type& id);
         HPX_EXPORT gid_type replenish_new_gid_if_needed_locked(gid_type const& id);
 
+        HPX_EXPORT gid_type move_gid(gid_type& id);
+        HPX_EXPORT gid_type move_gid_locked(gid_type& gid);
+
         HPX_EXPORT boost::int64_t replenish_credits(gid_type& id);
 
         ///////////////////////////////////////////////////////////////////////
@@ -719,7 +722,9 @@ namespace hpx { namespace naming
         {
             unknown_deleter = -1,
             unmanaged = 0,          // unmanaged GID
-            managed = 1             // managed GID
+            managed = 1,            // managed GID
+            managed_move_credit = 2 // managed GID which will give up all 
+                                    // credits when sent
         };
 
         // forward declaration
@@ -768,7 +773,6 @@ namespace hpx { namespace naming
 
             // serialization
             void save(util::portable_binary_oarchive& ar) const;
-
             void load(util::portable_binary_iarchive& ar);
 
         private:

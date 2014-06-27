@@ -531,7 +531,7 @@ void test_wait_callback()
     hpx::lcos::shared_future<int> fi = pi.get_future();
 
     fi.then(&wait_callback);
-    hpx::thread t(hpx::util::bind(&promise_set_value, boost::ref(pi)));
+    hpx::thread t(&promise_set_value, boost::ref(pi));
 
     fi.wait();
 

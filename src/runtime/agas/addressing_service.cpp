@@ -1884,7 +1884,7 @@ void addressing_service::decref(
         ) = &addressing_service::decref;
 
         threads::register_thread_nullary(
-            HPX_STD_BIND(decref_ptr, this, gid, credit, boost::ref(throws)),
+            util::bind(decref_ptr, this, gid, credit, boost::ref(throws)),
             "addressing_service::decref");
         return;
     }
@@ -1963,9 +1963,9 @@ lcos::future<bool> addressing_service::register_name_async(
     boost::int64_t new_credit = naming::detail::get_credit_from_gid(new_gid);
     if (new_credit != 0)
     {
-        using HPX_STD_PLACEHOLDERS::_1;
+        using util::placeholders::_1;
         return f.then(
-            HPX_STD_BIND(correct_credit_on_failure, _1, id,
+            util::bind(correct_credit_on_failure, _1, id,
                 HPX_GLOBALCREDIT_INITIAL, new_credit)
         );
     }

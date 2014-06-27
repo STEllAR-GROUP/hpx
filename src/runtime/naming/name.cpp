@@ -75,7 +75,7 @@
 // to be split.
 //
 // The current share of the global credit associated with an id_type instance
-// is encoded in the bits 88..92 of the underlying gid_type (encoded as the 
+// is encoded in the bits 88..92 of the underlying gid_type (encoded as the
 // logarithm to the base 2 of the credit value). Bit 94 is a flag which is set
 // whenever the credit is valid. Bit 95 encodes whether the given id_type
 // has been split at any time. This information is needed to be able to decide
@@ -202,6 +202,7 @@ namespace hpx { namespace naming
                 return &detail::gid_unmanaged_deleter;
 
             case managed:
+            case managed_move_credit:
                 return &detail::gid_managed_deleter;
 
             default:
@@ -218,15 +219,18 @@ namespace hpx { namespace naming
         {
             // unmanaged gids do not require any special handling
             if (unmanaged == type_)
-            {
                 return *this;
-            }
 
             HPX_ASSERT(has_credits(*this));
 
             // Request new credits from AGAS if needed (i.e. the remainder
             // of the credit splitting is equal to one).
-            return split_gid_if_needed(const_cast<id_type_impl&>(*this));
+            if (managed == type_)
+                return split_gid_if_needed(const_cast<id_type_impl&>(*this));
+
+            // all credits will be moved to the returned gid
+            HPX_ASSERT(managed_move_credit == type_);
+            return move_gid(const_cast<id_type_impl&>(*this));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -241,7 +245,7 @@ namespace hpx { namespace naming
 
             // Just replenish the credit of the new gid and don't touch the
             // local gid instance. This is less efficient than necessary but
-            // avoids deadlocks during serialization all together.
+            // avoids deadlocks during serialization.
             return replenish_new_gid_if_needed_locked(gid);
         }
 
@@ -304,6 +308,35 @@ namespace hpx { namespace naming
             return new_gid;
         }
 
+        ///////////////////////////////////////////////////////////////////////
+        gid_type move_gid(gid_type& gid)
+        {
+            gid_type::mutex_type::scoped_try_lock l(gid.get_mutex());
+            if (l)
+            {
+                // move credit normally
+                return move_gid_locked(gid);
+            }
+
+            // Just replenish the credit of the new gid and don't touch the
+            // local gid instance. This is less efficient than necessary but
+            // avoids deadlocks during serialization.
+            return replenish_new_gid_if_needed_locked(gid);
+        }
+
+        gid_type move_gid_locked(gid_type& gid)
+        {
+            naming::gid_type new_gid = gid;        // strips lock-bit
+
+            if (naming::detail::has_credits(gid))
+            {
+                naming::detail::strip_credits_from_gid(gid);
+            }
+
+            return new_gid;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         boost::int64_t replenish_credits(gid_type& gid)
         {
             boost::int64_t added_credit = 0;
@@ -330,14 +363,18 @@ namespace hpx { namespace naming
         {
             boost::uint32_t dest_locality_id = ar.get_dest_locality_id();
 
+            id_type_management type = type_;
+            if (managed_move_credit == type)
+                type = managed;
+
             if(ar.flags() & util::disable_array_optimization) {
                 naming::gid_type split_id(preprocess_gid(dest_locality_id));
-                ar << split_id << type_;
+                ar << split_id << type;
             }
             else {
                 gid_serialization_data data;
                 data.gid_ = preprocess_gid(dest_locality_id);
-                data.type_ = type_;
+                data.type_ = type;
 
                 ar.save(data);
             }
@@ -401,7 +438,8 @@ namespace hpx { namespace naming
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void id_type::save(util::portable_binary_oarchive& ar, const unsigned int version) const
+    void id_type::save(util::portable_binary_oarchive& ar,
+        const unsigned int version) const
     {
         bool isvalid = gid_ != 0;
         ar.save(isvalid);
@@ -409,7 +447,8 @@ namespace hpx { namespace naming
             gid_->save(ar);
     }
 
-    void id_type::load(util::portable_binary_iarchive& ar, const unsigned int version)
+    void id_type::load(util::portable_binary_iarchive& ar,
+        const unsigned int version)
     {
         if (version > HPX_IDTYPE_VERSION) {
             HPX_THROW_EXCEPTION(version_too_new, "id_type::load",
@@ -429,14 +468,15 @@ namespace hpx { namespace naming
     ///////////////////////////////////////////////////////////////////////////
     char const* const management_type_names[] =
     {
-        "unknown_deleter",    // -1
-        "unmanaged",          // 0
-        "managed"             // 1
+        "unknown_deleter",      // -1
+        "unmanaged",            // 0
+        "managed",              // 1
+        "managed_move_credit"   // 2
     };
 
     char const* get_management_type_name(id_type::management_type m)
     {
-        if (m < id_type::unknown_deleter || m > id_type::managed)
+        if (m < id_type::unknown_deleter || m > id_type::managed_move_credit)
             return "invalid";
         return management_type_names[m + 1];
     }

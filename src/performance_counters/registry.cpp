@@ -199,15 +199,15 @@ namespace hpx { namespace performance_counters
                 }
 
                 HPX_THROWS_IF(ec, bad_parameter, "registry::discover_counter_type",
-                    boost::str(boost::format("unknown counter type: %s, known counter types: \n%s") % 
+                    boost::str(boost::format("unknown counter type: %s, known counter types: \n%s") %
                         type_name % types));
                 return status_counter_type_unknown;
             }
 
             if (mode == discover_counters_full)
             {
-                using HPX_STD_PLACEHOLDERS::_1;
-                discover_counter = HPX_STD_BIND(&expand_counter_info, _1,
+                using hpx::util::placeholders::_1;
+                discover_counter = hpx::util::bind(&expand_counter_info, _1,
                     discover_counter, boost::ref(ec));
             }
 
@@ -227,8 +227,8 @@ namespace hpx { namespace performance_counters
 
             if (mode == discover_counters_full)
             {
-                using HPX_STD_PLACEHOLDERS::_1;
-                discover_counter = HPX_STD_BIND(&expand_counter_info, _1,
+                using hpx::util::placeholders::_1;
+                discover_counter = hpx::util::bind(&expand_counter_info, _1,
                     discover_counter, boost::ref(ec));
             }
 
@@ -281,8 +281,8 @@ namespace hpx { namespace performance_counters
     {
         if (mode == discover_counters_full)
         {
-            using HPX_STD_PLACEHOLDERS::_1;
-            discover_counter = HPX_STD_BIND(&expand_counter_info, _1,
+            using hpx::util::placeholders::_1;
+            discover_counter = hpx::util::bind(&expand_counter_info, _1,
                 discover_counter, boost::ref(ec));
         }
 
@@ -405,7 +405,7 @@ namespace hpx { namespace performance_counters
         return create_raw_counter(info, func, id, ec);
     }
 
-    static boost::int64_t 
+    static boost::int64_t
     wrap_raw_counter(HPX_STD_FUNCTION<boost::int64_t()> const& f, bool)
     {
         return f();

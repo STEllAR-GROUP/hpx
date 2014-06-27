@@ -127,7 +127,7 @@ void test_condition_notify_one_wakes_from_wait()
 {
     wait_for_flag data;
 
-    hpx::thread thread(hpx::util::bind(&wait_for_flag::wait_without_predicate, boost::ref(data)));
+    hpx::thread thread(&wait_for_flag::wait_without_predicate, boost::ref(data));
 
     {
         boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
@@ -143,7 +143,7 @@ void test_condition_notify_one_wakes_from_wait_with_predicate()
 {
     wait_for_flag data;
 
-    hpx::thread thread(hpx::util::bind(&wait_for_flag::wait_with_predicate, boost::ref(data)));
+    hpx::thread thread(&wait_for_flag::wait_with_predicate, boost::ref(data));
 
     {
         boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
@@ -159,7 +159,7 @@ void test_condition_notify_one_wakes_from_wait_until()
 {
     wait_for_flag data;
 
-    hpx::thread thread(hpx::util::bind(&wait_for_flag::wait_until_without_predicate, boost::ref(data)));
+    hpx::thread thread(&wait_for_flag::wait_until_without_predicate, boost::ref(data));
 
     {
         boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
@@ -175,7 +175,7 @@ void test_condition_notify_one_wakes_from_wait_until_with_predicate()
 {
     wait_for_flag data;
 
-    hpx::thread thread(hpx::util::bind(&wait_for_flag::wait_until_with_predicate, boost::ref(data)));
+    hpx::thread thread(&wait_for_flag::wait_until_with_predicate, boost::ref(data));
 
     {
         boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
@@ -191,7 +191,7 @@ void test_condition_notify_one_wakes_from_relative_wait_until_with_predicate()
 {
     wait_for_flag data;
 
-    hpx::thread thread(hpx::util::bind(&wait_for_flag::relative_wait_until_with_predicate, boost::ref(data)));
+    hpx::thread thread(&wait_for_flag::relative_wait_until_with_predicate, boost::ref(data));
 
     {
         boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
@@ -242,7 +242,7 @@ void test_condition_notify_all_wakes_from_wait()
     {
         for(unsigned i=0;i<5;++i)
         {
-            group.push_back(hpx::thread(hpx::util::bind(&wait_for_flag::wait_without_predicate, boost::ref(data))));
+            group.push_back(hpx::thread(&wait_for_flag::wait_without_predicate, boost::ref(data)));
         }
 
         {
@@ -271,7 +271,7 @@ void test_condition_notify_all_wakes_from_wait_with_predicate()
     {
         for(unsigned i=0;i<5;++i)
         {
-            group.push_back(hpx::thread(hpx::util::bind(&wait_for_flag::wait_with_predicate, boost::ref(data))));
+            group.push_back(hpx::thread(&wait_for_flag::wait_with_predicate, boost::ref(data)));
         }
 
         {
@@ -300,7 +300,7 @@ void test_condition_notify_all_wakes_from_wait_until()
     {
         for(unsigned i=0;i<5;++i)
         {
-            group.push_back(hpx::thread(hpx::util::bind(&wait_for_flag::wait_until_without_predicate, boost::ref(data))));
+            group.push_back(hpx::thread(&wait_for_flag::wait_until_without_predicate, boost::ref(data)));
         }
 
         {
@@ -329,7 +329,7 @@ void test_condition_notify_all_wakes_from_wait_until_with_predicate()
     {
         for(unsigned i=0;i<5;++i)
         {
-            group.push_back(hpx::thread(hpx::util::bind(&wait_for_flag::wait_until_with_predicate, boost::ref(data))));
+            group.push_back(hpx::thread(&wait_for_flag::wait_until_with_predicate, boost::ref(data)));
         }
 
         {
@@ -358,7 +358,7 @@ void test_condition_notify_all_wakes_from_relative_wait_until_with_predicate()
     {
         for(unsigned i=0;i<5;++i)
         {
-            group.push_back(hpx::thread(hpx::util::bind(&wait_for_flag::relative_wait_until_with_predicate, boost::ref(data))));
+            group.push_back(hpx::thread(&wait_for_flag::relative_wait_until_with_predicate, boost::ref(data)));
         }
 
         {
@@ -494,7 +494,7 @@ void test_condition_waits()
 {
     condition_test_data data;
 
-    hpx::thread thread(hpx::util::bind(&condition_test_waits, &data));
+    hpx::thread thread(&condition_test_waits, &data);
 
     {
         boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);

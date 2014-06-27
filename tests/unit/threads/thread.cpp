@@ -103,7 +103,7 @@ void test_creation()
 void do_test_id_comparison()
 {
     hpx::thread::id const self = hpx::this_thread::get_id();
-    hpx::thread thrd(HPX_STD_BIND(&comparison_thread, self));
+    hpx::thread thrd(&comparison_thread, self);
     thrd.join();
 }
 
@@ -135,8 +135,7 @@ void do_test_thread_interrupts_at_interruption_point()
     hpx::lcos::local::barrier b(2);
     bool failed = false;
     hpx::lcos::local::spinlock::scoped_lock lk(m);
-    hpx::thread thrd(
-        HPX_STD_BIND(&interruption_point_thread, &b, &m, &failed));
+    hpx::thread thrd(&interruption_point_thread, &b, &m, &failed);
     thrd.interrupt();
     lk.unlock();
 
@@ -176,8 +175,7 @@ void do_test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point()
     hpx::lcos::local::barrier b(2);
     bool failed = true;
     hpx::lcos::local::spinlock::scoped_lock lk(m);
-    hpx::thread thrd(
-        HPX_STD_BIND(&disabled_interruption_point_thread, &m, &b, &failed));
+    hpx::thread thrd(&disabled_interruption_point_thread, &m, &b, &failed);
     thrd.interrupt();
     lk.unlock();
 
@@ -288,8 +286,8 @@ void test_swap()
 
     hpx::lcos::local::barrier b1(3);
     hpx::lcos::local::barrier b2(3);
-    hpx::thread t1(hpx::util::bind(&simple_sync_thread, boost::ref(b1), boost::ref(b2)));
-    hpx::thread t2(hpx::util::bind(&simple_sync_thread, boost::ref(b1), boost::ref(b2)));
+    hpx::thread t1(&simple_sync_thread, boost::ref(b1), boost::ref(b2));
+    hpx::thread t2(&simple_sync_thread, boost::ref(b1), boost::ref(b2));
 
     b1.wait();   // wait for both threads to be started
 

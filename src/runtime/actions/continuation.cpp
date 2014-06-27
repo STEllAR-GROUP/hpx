@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -14,41 +14,59 @@ namespace hpx
 {
     void trigger_lco_event(naming::id_type const& id)
     {
+        naming::id_type target(id.get_gid(), id_type::managed_move_credit);
+        id.make_unmanaged();
+
         lcos::base_lco::set_event_action set;
-        apply(set, id);
+        apply(set, target);
     }
 
     void trigger_lco_event(naming::id_type const& id, naming::id_type const& cont)
     {
+        naming::id_type target(id.get_gid(), id_type::managed_move_credit);
+        id.make_unmanaged();
+
         lcos::base_lco::set_event_action set;
-        apply_c(set, cont, id);
+        apply_c(set, cont, target);
     }
 
     void set_lco_error(naming::id_type const& id, boost::exception_ptr const& e)
     {
+        naming::id_type target(id.get_gid(), id_type::managed_move_credit);
+        id.make_unmanaged();
+
         lcos::base_lco::set_exception_action set;
-        apply(set, id, e);
+        apply(set, target, e);
     }
 
     void set_lco_error(naming::id_type const& id, //-V659
         boost::exception_ptr && e)
     {
+        naming::id_type target(id.get_gid(), id_type::managed_move_credit);
+        id.make_unmanaged();
+
         lcos::base_lco::set_exception_action set;
-        apply(set, id, std::move(e));
+        apply(set, target, std::move(e));
     }
 
     void set_lco_error(naming::id_type const& id, boost::exception_ptr const& e,
         naming::id_type const& cont)
     {
+        naming::id_type target(id.get_gid(), id_type::managed_move_credit);
+        id.make_unmanaged();
+
         lcos::base_lco::set_exception_action set;
-        apply_c(set, cont, id, e);
+        apply_c(set, cont, target, e);
     }
 
     void set_lco_error(naming::id_type const& id, //-V659
         boost::exception_ptr && e, naming::id_type const& cont)
     {
+        naming::id_type target(id.get_gid(), id_type::managed_move_credit);
+        id.make_unmanaged();
+
         lcos::base_lco::set_exception_action set;
-        apply_c(set, cont, id, std::move(e));
+        apply_c(set, cont, target, std::move(e));
     }
 }
 

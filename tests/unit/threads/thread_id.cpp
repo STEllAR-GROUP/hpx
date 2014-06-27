@@ -33,7 +33,7 @@ void test_thread_id_for_running_thread_is_not_default_constructed_id()
 {
     hpx::lcos::local::barrier b1(2);
     hpx::lcos::local::barrier b2(2);
-    hpx::thread t(HPX_STD_BIND(&do_nothing, boost::ref(b1), boost::ref(b2)));
+    hpx::thread t(&do_nothing, boost::ref(b1), boost::ref(b2));
     b1.wait();
 
     HPX_TEST_NEQ(t.get_id(), hpx::thread::id());
@@ -47,8 +47,8 @@ void test_different_threads_have_different_ids()
     hpx::lcos::local::barrier b1(3);
     hpx::lcos::local::barrier b2(3);
 
-    hpx::thread t(HPX_STD_BIND(&do_nothing, boost::ref(b1), boost::ref(b2)));
-    hpx::thread t2(HPX_STD_BIND(&do_nothing, boost::ref(b1), boost::ref(b2)));
+    hpx::thread t(&do_nothing, boost::ref(b1), boost::ref(b2));
+    hpx::thread t2(&do_nothing, boost::ref(b1), boost::ref(b2));
     b1.wait();
 
     HPX_TEST_NEQ(t.get_id(), t2.get_id());
@@ -63,9 +63,9 @@ void test_thread_ids_have_a_total_order()
     hpx::lcos::local::barrier b1(4);
     hpx::lcos::local::barrier b2(4);
 
-    hpx::thread t1(HPX_STD_BIND(&do_nothing, boost::ref(b1), boost::ref(b2)));
-    hpx::thread t2(HPX_STD_BIND(&do_nothing, boost::ref(b1), boost::ref(b2)));
-    hpx::thread t3(HPX_STD_BIND(&do_nothing, boost::ref(b1), boost::ref(b2)));
+    hpx::thread t1(&do_nothing, boost::ref(b1), boost::ref(b2));
+    hpx::thread t2(&do_nothing, boost::ref(b1), boost::ref(b2));
+    hpx::thread t3(&do_nothing, boost::ref(b1), boost::ref(b2));
     b1.wait();
 
     hpx::thread::id t1_id = t1.get_id();
@@ -167,7 +167,7 @@ void get_thread_id(hpx::thread::id* id)
 void test_thread_id_of_running_thread_returned_by_this_thread_get_id()
 {
     hpx::thread::id id;
-    hpx::thread t(HPX_STD_BIND(&get_thread_id, &id));
+    hpx::thread t(&get_thread_id, &id);
     hpx::thread::id t_id = t.get_id();
     t.join();
     HPX_TEST_EQ(id, t_id);
