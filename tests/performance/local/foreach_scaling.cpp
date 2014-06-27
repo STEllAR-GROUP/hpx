@@ -116,7 +116,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     //pull values from cmd
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();
     int mtime = vm["mtime"].as<int>();
-    bool plotoutput = vm["gnuplot_friendly"].as<bool>();
+    bool plotoutput = vm["gnuplot_friendly"].as<int>();
     delay = vm["work_delay"].as<int>();
     test_count = vm["test_count"].as<int>();
     
@@ -134,8 +134,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     double seq_time = average_out_sequential(vector_size, mtime); 
 
     if(plotoutput) {
-        hpx::cout << "Par: " << std::right << std::setw(9) << par_time << "\n"
-                  << "Seq: " << std::right << std::setw(9) << par_time << "\n";
+        hpx::cout << " " << seq_time << " " << par_time << "\n" << hpx::flush;
     }else{ 
         //print results(Formatted). Setw(x) assures that all output is right justified
         hpx::cout << std::left << "----------------Parameters-----------------\n"
@@ -184,7 +183,7 @@ int main(int argc, char* argv[])
         , "number of tests to be averaged")
         
         ("gnuplot_friendly"
-        , boost::program_options::value<bool>()->default_value(false)
+        , boost::program_options::value<int>()->default_value(0)
         ,"print only the execution time of seq and par")
         ;
 
