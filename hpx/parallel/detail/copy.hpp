@@ -63,7 +63,7 @@ namespace hpx { namespace parallel
 
         template <typename InIter, typename OutIter>
         OutIter copy(execution_policy const& policy,
-            InIter first, InIter last, OutIter dest, boost::mpl::false_ fls)
+            InIter first, InIter last, OutIter dest, boost::mpl::false_)
         {
             HPX_PARALLEL_DISPATCH(policy, detail::copy, first, last, dest);
         }
@@ -109,7 +109,7 @@ namespace hpx { namespace parallel
             boost::is_same<std::output_iterator_tag, output_iterator_category>
         >::type is_seq;
 
-        return detail::copy( std::forward<ExPolicy>(policy),
+        return detail::copy(std::forward<ExPolicy>(policy),
             first, last, dest, is_seq());
     }
 
@@ -323,7 +323,7 @@ namespace hpx { namespace parallel
             boost::is_same<std::output_iterator_tag, output_iterator_category>
         >::type is_seq;
 
-        return detail::copy_if( std::forward<ExPolicy>(policy),
+        return detail::copy_if(std::forward<ExPolicy>(policy),
             first, last, dest,
             std::forward<F>(f), is_seq());
     }

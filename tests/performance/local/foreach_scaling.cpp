@@ -116,6 +116,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     //pull values from cmd
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();
     int mtime = vm["mtime"].as<int>();
+    bool plotoutput = vm["gnuplot_friendly"].as<bool>();
     delay = vm["work_delay"].as<int>();
     test_count = vm["test_count"].as<int>();
     
@@ -132,23 +133,26 @@ int hpx_main(boost::program_options::variables_map& vm)
     double par_time = average_out_parallel(vector_size, mtime);
     double seq_time = average_out_sequential(vector_size, mtime); 
 
-    hpx::cout << boost::format("test..\n");
-    
-    //print results(Formatted). Setw(x) assures that all output is right justified
-    hpx::cout << std::left << "----------------Parameters-----------------\n"
-        << std::left << "Vector size: " << std::right << std::setw(30) << vector_size << "\n"
-        << std::left << "Number of tests" << std::right << std::setw(28) << test_count << "\n"
-        << std::left << "Delay per iteration(MicroSeconds)" << std::right << std::setw(10) << delay << "\n"
-        << std::left << "Display time in: " << hpx::flush;
-    if(mtime==0) hpx::cout << std::right << std::setw(27) << "Seconds\n" << hpx::flush;
-    if(mtime==1) hpx::cout << std::right << std::setw(27) << "Miliseconds\n" << hpx::flush;
-    if(mtime==2) hpx::cout << std::right << std::setw(27) << "Microseconds\n" << hpx::flush;
-    hpx::cout << "------------------Average------------------\n"
-    << std::left << "Average parallel execution time : " << std::right << std::setw(9) << par_time << "\n"
-    << std::left << "Average sequential execution time: " << std::right << std::setw(8) << seq_time << "\n" << hpx::flush;
-    hpx::cout << "---------Execution Time Difference---------\n"
-    << std::left << "Parallel <-> Sequential: " << std::right << std::setw(18) << par_time - seq_time << "\n"
-    << std::left << "Parallel Scale: " << std::right  << std::setw(27) << ((double)seq_time / par_time) << "\n" << hpx::flush;
+    if(plotoutput) {
+        hpx::cout << "Par: " << std::right << std::setw(9) << par_time << "\n"
+                  << "Seq: " << std::right << std::setw(9) << par_time << "\n";
+    }else{ 
+        //print results(Formatted). Setw(x) assures that all output is right justified
+        hpx::cout << std::left << "----------------Parameters-----------------\n"
+            << std::left << "Vector size: " << std::right << std::setw(30) << vector_size << "\n"
+            << std::left << "Number of tests" << std::right << std::setw(28) << test_count << "\n"
+            << std::left << "Delay per iteration(MicroSeconds)" << std::right << std::setw(10) << delay << "\n"
+            << std::left << "Display time in: " << hpx::flush;
+        if(mtime==0) hpx::cout << std::right << std::setw(27) << "Seconds\n" << hpx::flush;
+        if(mtime==1) hpx::cout << std::right << std::setw(27) << "Miliseconds\n" << hpx::flush;
+        if(mtime==2) hpx::cout << std::right << std::setw(27) << "Microseconds\n" << hpx::flush;
+        hpx::cout << "------------------Average------------------\n"
+        << std::left << "Average parallel execution time : " << std::right << std::setw(9) << par_time << "\n"
+        << std::left << "Average sequential execution time: " << std::right << std::setw(8) << seq_time << "\n" << hpx::flush;
+        hpx::cout << "---------Execution Time Difference---------\n"
+        << std::left << "Parallel <-> Sequential: " << std::right << std::setw(18) << par_time - seq_time << "\n"
+        << std::left << "Parallel Scale: " << std::right  << std::setw(27) << ((double)seq_time / par_time) << "\n" << hpx::flush;
+        }
     }
 
     return hpx::finalize();
@@ -167,7 +171,7 @@ int main(int argc, char* argv[])
         , boost::program_options::value<std::size_t>()->default_value(1000)
         , "size of vector")
 
-        ( "mTime"
+        ( "mtime"
         , boost::program_options::value<int>()->default_value(0)
         , "(0)Seconds (1)Milliseconds (2)Microseconds")
 
@@ -178,6 +182,10 @@ int main(int argc, char* argv[])
         ("test_count"
         , boost::program_options::value<int>()->default_value(100)
         , "number of tests to be averaged")
+        
+        ("gnuplot_friendly"
+        , boost::program_options::value<bool>()->default_value(false)
+        ,"print only the execution time of seq and par")
         ;
 
     return hpx::init(cmdline, argc, argv, cfg);

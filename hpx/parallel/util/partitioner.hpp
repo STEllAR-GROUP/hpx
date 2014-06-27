@@ -40,35 +40,54 @@ namespace hpx { namespace parallel { namespace util
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
-        // std::bad_alloc has to be handled separately
-        inline void handle_local_exception(boost::exception_ptr const& e,
-            std::list<boost::exception_ptr>& errors)
+        template <typename ExPolicy>
+        struct handle_local_exceptions
         {
-            try {
-                boost::rethrow_exception(e);
-            }
-            catch (std::bad_alloc const& ba) {
-                boost::throw_exception(ba);
-            }
-            catch (...) {
-                errors.push_back(e);
-            }
-        }
-
-        template <typename T>
-        void handle_local_exceptions(
-            std::vector<hpx::future<T> > const& workitems,
-            std::list<boost::exception_ptr>& errors)
-        {
-            for (hpx::future<T> const& f: workitems)
+            // std::bad_alloc has to be handled separately
+            static void call(boost::exception_ptr const& e,
+                std::list<boost::exception_ptr>& errors)
             {
-                if (f.has_exception())
-                    detail::handle_local_exception(f.get_exception_ptr(), errors);
+                try {
+                    boost::rethrow_exception(e);
+                }
+                catch (std::bad_alloc const& ba) {
+                    boost::throw_exception(ba);
+                }
+                catch (...) {
+                    errors.push_back(e);
+                }
             }
 
-            if (!errors.empty())
-                boost::throw_exception(exception_list(std::move(errors)));
-        }
+            template <typename T>
+            static void call(std::vector<hpx::future<T> > const& workitems,
+                std::list<boost::exception_ptr>& errors)
+            {
+                for (hpx::future<T> const& f: workitems)
+                {
+                    if (f.has_exception())
+                        call(f.get_exception_ptr(), errors);
+                }
+
+                if (!errors.empty())
+                    boost::throw_exception(exception_list(std::move(errors)));
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <>
+        struct handle_local_exceptions<vector_execution_policy>
+        {
+            template <typename T>
+            static void call(std::vector<hpx::future<T> > const& workitems,
+                std::list<boost::exception_ptr>& errors)
+            {
+                for (hpx::future<T> const& f: workitems)
+                {
+                    if (f.has_exception())
+                        hpx::terminate();
+                }
+            }
+        };
 
         ///////////////////////////////////////////////////////////////////////
         template <typename R, typename F, typename FwdIter>
@@ -150,7 +169,8 @@ namespace hpx { namespace parallel { namespace util
 
                 // wait for all tasks to finish
                 hpx::wait_all(workitems);
-                detail::handle_local_exceptions(workitems, errors);
+                detail::handle_local_exceptions<ExPolicy>::call(
+                    workitems, errors);
                 return handle_step_two(std::forward<F2>(f2), first,
                     std::move(workitems));
             }
@@ -196,7 +216,8 @@ namespace hpx { namespace parallel { namespace util
                     {
                         std::vector<hpx::future<Result> > result = r.get();
                         std::list<boost::exception_ptr> errors;
-                        detail::handle_local_exceptions(result, errors);
+                        detail::handle_local_exceptions<task_execution_policy>
+                            ::call(result, errors);
                         return handle_step_two(f2, first, std::move(result));
                     }
                 );
@@ -323,7 +344,8 @@ namespace hpx { namespace parallel { namespace util
 
                 // wait for all tasks to finish
                 hpx::wait_all(workitems);
-                detail::handle_local_exceptions(workitems, errors);
+                detail::handle_local_exceptions<ExPolicy>::call(
+                    workitems, errors);
                 return handle_step_two(std::forward<F2>(f2), first,
                     std::move(workitems));
             }
@@ -378,7 +400,8 @@ namespace hpx { namespace parallel { namespace util
                     {
                         std::vector<hpx::future<Result> > result = r.get();
                         std::list<boost::exception_ptr> errors;
-                        detail::handle_local_exceptions(result, errors);
+                        detail::handle_local_exceptions<task_execution_policy>
+                            ::call(result, errors);
                         return handle_step_two(f2, first, std::move(result));
                     }
                 );
