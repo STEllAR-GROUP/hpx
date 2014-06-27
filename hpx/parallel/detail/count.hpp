@@ -8,9 +8,9 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception_list.hpp>
-#include <hpx/stl/execution_policy.hpp>
-#include <hpx/stl/detail/algorithm_result.hpp>
-#include <hpx/stl/detail/zip_iterator.hpp>
+#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/detail/algorithm_result.hpp>
+#include <hpx/parallel/detail/zip_iterator.hpp>
 
 #include <algorithm>
 #include <iterator>

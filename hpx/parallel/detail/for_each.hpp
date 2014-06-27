@@ -7,11 +7,11 @@
 #define HPX_PARALLEL_DETAIL_FOR_EACH_MAY_29_2014_0932PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/stl/execution_policy.hpp>
-#include <hpx/stl/detail/algorithm_result.hpp>
-#include <hpx/stl/detail/synchronize.hpp>
-#include <hpx/stl/util/partitioner.hpp>
-#include <hpx/stl/util/loop.hpp>
+#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/detail/algorithm_result.hpp>
+#include <hpx/parallel/detail/synchronize.hpp>
+#include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/parallel/util/loop.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/util/void_guard.hpp>
 #include <hpx/util/move.hpp>

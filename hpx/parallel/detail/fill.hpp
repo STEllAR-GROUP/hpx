@@ -7,10 +7,10 @@
 #define HPX_PARALLEL_DETAIL_FILL_JUNE_12_2014_0405PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/stl/execution_policy.hpp>
-#include <hpx/stl/detail/algorithm_result.hpp>
-#include <hpx/stl/detail/synchronize.hpp>
-#include <hpx/stl/util/loop.hpp>
+#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/detail/algorithm_result.hpp>
+#include <hpx/parallel/detail/synchronize.hpp>
+#include <hpx/parallel/util/loop.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/util/void_guard.hpp>
 #include <hpx/util/move.hpp>

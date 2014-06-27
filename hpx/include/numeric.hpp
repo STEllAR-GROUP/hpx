@@ -7,7 +7,7 @@
 #define HPX_NUMERIC_JUN_02_2014_1153AM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/stl/numeric.hpp>
+#include <hpx/parallel/numeric.hpp>
 
 #endif
 

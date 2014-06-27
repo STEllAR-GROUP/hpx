@@ -7,7 +7,7 @@
 #define HPX_ALGORITHM_MAY_27_2014_0905PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/stl/algorithm.hpp>
+#include <hpx/parallel/algorithm.hpp>
 
 #endif
 

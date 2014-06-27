@@ -9,9 +9,9 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/unwrapped.hpp>
-#include <hpx/stl/execution_policy.hpp>
-#include <hpx/stl/detail/algorithm_result.hpp>
-#include <hpx/stl/util/partitioner.hpp>
+#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/partitioner.hpp>
 
 #include <algorithm>
 #include <numeric>

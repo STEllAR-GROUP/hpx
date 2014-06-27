@@ -7,12 +7,12 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception_list.hpp>
-#include <hpx/stl/execution_policy.hpp>
-#include <hpx/stl/detail/algorithm_result.hpp>
-#include <hpx/stl/detail/zip_iterator.hpp>
-#include <hpx/stl/detail/synchronize.hpp>
-#include <hpx/stl/util/partitioner.hpp>
-#include <hpx/stl/util/loop.hpp>
+#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/detail/algorithm_result.hpp>
+#include <hpx/parallel/detail/zip_iterator.hpp>
+#include <hpx/parallel/detail/synchronize.hpp>
+#include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/parallel/util/loop.hpp>
 
 #include <algorithm>
 #include <iterator>

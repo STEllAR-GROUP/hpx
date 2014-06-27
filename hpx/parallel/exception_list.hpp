@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception_list.hpp>
-#include <hpx/stl/execution_policy.hpp>
+#include <hpx/parallel/execution_policy.hpp>
 
 namespace hpx { namespace parallel
 {
@@ -38,6 +38,7 @@ namespace hpx { namespace parallel
         {
             BOOST_ATTRIBUTE_NORETURN static void call()
             {
+                std::cout << "terminated";
                 // any exceptions thrown by algorithms executed with the
                 // vector_execution_policy are to call terminate.
                 hpx::terminate();

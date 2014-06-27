@@ -8,11 +8,11 @@
 
 #include <hpx/hpx_fwd.hpp>
 
-#include <hpx/stl/exception_list.hpp>
-#include <hpx/stl/detail/dispatch.hpp>
+#include <hpx/parallel/exception_list.hpp>
+#include <hpx/parallel/detail/dispatch.hpp>
 
-#include <hpx/stl/detail/for_each.hpp>
-#include <hpx/stl/detail/reduce.hpp>
+#include <hpx/parallel/detail/for_each.hpp>
+#include <hpx/parallel/detail/reduce.hpp>
 
 #undef HPX_PARALLEL_DISPATCH
 

@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/stl/execution_policy.hpp>
+#include <hpx/parallel/execution_policy.hpp>
 
 #include <boost/static_assert.hpp>
 #include <boost/type_traits/is_lvalue_reference.hpp>
