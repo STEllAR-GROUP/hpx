@@ -172,7 +172,7 @@ namespace hpx { namespace lcos
                 }
 
                 // at least N futures should be ready
-                HPX_ASSERT(count_.load(boost::memory_order_acquire) >= needed_count_);
+                HPX_ASSERT(count_.load() >= needed_count_);
 
                 return std::move(lazy_values_);
             }
