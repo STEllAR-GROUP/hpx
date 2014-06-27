@@ -13,8 +13,8 @@
 
 int main()
 {
-    hpx::promise<hpx::shared_future<int> > promise;
-    hpx::shared_future<hpx::shared_future<int> > future = promise.get_future();
+    hpx::lcos::local::promise<hpx::future<int> > promise;
+    hpx::future<hpx::future<int> > future = promise.get_future();
     try
     {
         //promise.set_value(42);
@@ -24,7 +24,7 @@ int main()
     }
     HPX_TEST(future.has_exception());
 
-    hpx::shared_future<int> inner = future.unwrap();
+    hpx::future<int> inner = future.unwrap();
     HPX_TEST(inner.has_exception());
 
     return hpx::util::report_errors();
