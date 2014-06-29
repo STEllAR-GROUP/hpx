@@ -593,8 +593,9 @@ void test_read(
             else {
               send_rank = static_cast<int>(i % nranks);
             }
+
             // get the pointer to the current packet send buffer
-            char *buffer = &local_storage[i*options.transfer_size_B];
+//            char *buffer = &local_storage[i*options.transfer_size_B];
 
             // Get the HPX locality from the dest rank
             hpx::id_type locality = hpx::naming::get_id_from_locality_id(send_rank);
