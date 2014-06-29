@@ -111,7 +111,7 @@ namespace hpx { namespace threads { namespace executors
     {
         local_queue_executor();
 
-        local_queue_executor(std::size_t max_punits,
+        explicit local_queue_executor(std::size_t max_punits,
             std::size_t min_punits = 1);
     };
 #endif
@@ -120,7 +120,7 @@ namespace hpx { namespace threads { namespace executors
     {
         local_priority_queue_executor();
 
-        local_priority_queue_executor(std::size_t max_punits,
+        explicit local_priority_queue_executor(std::size_t max_punits,
             std::size_t min_punits = 1);
     };
 
@@ -129,7 +129,7 @@ namespace hpx { namespace threads { namespace executors
     {
         static_priority_queue_executor();
 
-        static_priority_queue_executor(std::size_t max_punits,
+        explicit static_priority_queue_executor(std::size_t max_punits,
             std::size_t min_punits = 1);
     };
 #endif

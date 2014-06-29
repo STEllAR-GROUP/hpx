@@ -54,7 +54,7 @@ namespace hpx { namespace threads { namespace executors
     ///////////////////////////////////////////////////////////////////////////
     struct HPX_EXPORT generic_thread_pool_executor : public executor
     {
-        generic_thread_pool_executor(policies::scheduler_base* scheduler);
+        explicit generic_thread_pool_executor(policies::scheduler_base* scheduler);
     };
 }}}
 
