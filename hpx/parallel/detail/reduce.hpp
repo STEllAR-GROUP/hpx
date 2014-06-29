@@ -148,7 +148,7 @@ namespace hpx { namespace parallel
             iterator_category;
 
         BOOST_STATIC_ASSERT_MSG(
-            boost::is_base_of<std::input_iterator_tag, iterator_category>::value,
+            (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
             "Requires at least input iterator.");
 
         typedef typename boost::mpl::or_<
