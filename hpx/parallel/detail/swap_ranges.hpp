@@ -94,12 +94,12 @@ namespace hpx { namespace parallel
             iter2_category;
 
         BOOST_STATIC_ASSERT_MSG(
-            boost::is_base_of<
-                std::forward_iterator_tag, iter1_category>::value,
+            (boost::is_base_of<
+                std::forward_iterator_tag, iter1_category>::value),
             "Required at least forward iterator tag.");
         BOOST_STATIC_ASSERT_MSG(
-            boost::is_base_of<
-                std::forward_iterator_tag, iter2_category>::value,
+            (boost::is_base_of<
+                std::forward_iterator_tag, iter2_category>::value),
             "Required at least forward iterator tag.");
 
         typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;

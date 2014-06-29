@@ -90,17 +90,17 @@ namespace hpx { namespace parallel
             output_iterator_category;
 
         BOOST_STATIC_ASSERT_MSG(
-            boost::is_base_of<
-                std::input_iterator_tag, input_iterator_category>::value,
+            (boost::is_base_of<
+                std::input_iterator_tag, input_iterator_category>::value),
             "Required at least input iterator.");
 
         BOOST_STATIC_ASSERT_MSG(
-            boost::mpl::or_<
+            (boost::mpl::or_<
                 boost::is_base_of<
                     std::forward_iterator_tag, output_iterator_category>,
                 boost::is_same<
                     std::output_iterator_tag, output_iterator_category>
-            >::value,
+            >::value),
             "Requires at least output iterator.");
 
         typedef typename boost::mpl::or_<
@@ -194,17 +194,17 @@ namespace hpx { namespace parallel
             output_iterator_category;
 
         BOOST_STATIC_ASSERT_MSG(
-            boost::is_base_of<
-                std::input_iterator_tag, input_iterator_category>::value,
+            (boost::is_base_of<
+                std::input_iterator_tag, input_iterator_category>::value),
             "Required at least input iterator.");
 
         BOOST_STATIC_ASSERT_MSG(
-            boost::mpl::or_<
+            (boost::mpl::or_<
                 boost::is_base_of<
                     std::forward_iterator_tag, output_iterator_category>,
                 boost::is_same<
                     std::output_iterator_tag, output_iterator_category>
-            >::value,
+            >::value),
             "Requires at least output iterator.");
 
         typedef typename boost::mpl::or_<
@@ -304,17 +304,17 @@ namespace hpx { namespace parallel
             output_iterator_category;
 
         BOOST_STATIC_ASSERT_MSG(
-            boost::is_base_of<
-                std::input_iterator_tag, input_iterator_category>::value,
+            (boost::is_base_of<
+                std::input_iterator_tag, input_iterator_category>::value),
             "Required at least input iterator.");
 
         BOOST_STATIC_ASSERT_MSG(
-            boost::mpl::or_<
+            (boost::mpl::or_<
                 boost::is_base_of<
                     std::forward_iterator_tag, output_iterator_category>,
                 boost::is_same<
                     std::output_iterator_tag, output_iterator_category>
-            >::value,
+            >::value),
             "Requires at least output iterator.");
 
         typedef typename boost::mpl::or_<
