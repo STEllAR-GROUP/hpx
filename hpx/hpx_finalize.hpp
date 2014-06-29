@@ -120,7 +120,7 @@ namespace hpx
     ///          all localities associated with this application. If the function
     ///          is called not from an HPX thread it will fail and return an error
     ///          using the argument \a ec.
-    HPX_EXPORT void terminate(error_code& ec = throws);
+    HPX_EXPORT BOOST_ATTRIBUTE_NORETURN void terminate(error_code& ec = throws);
 
     /// \brief Disconnect this locality from the application.
     ///
@@ -208,7 +208,7 @@ namespace hpx
     ///
     /// This function will block and wait for this locality to finish executing
     /// before returning to the caller. It should be the last HPX-function
-    /// called on every locality. This function should be used only if the 
+    /// called on every locality. This function should be used only if the
     /// runtime system was started using `hpx::start`.
     ///
     HPX_EXPORT int stop(error_code& ec = throws);

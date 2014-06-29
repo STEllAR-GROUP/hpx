@@ -172,10 +172,11 @@ namespace hpx { namespace components { namespace server
         void shutdown_all(double timeout);
 
         /// \brief Shutdown this runtime system instance
-        void terminate(naming::id_type const& respond_to);
+        BOOST_ATTRIBUTE_NORETURN void terminate(
+            naming::id_type const& respond_to);
 
         /// \brief Shutdown runtime system instances on all localities
-        void terminate_all();
+        BOOST_ATTRIBUTE_NORETURN void terminate_all();
 
         /// \brief Retrieve configuration information
         util::section get_config();

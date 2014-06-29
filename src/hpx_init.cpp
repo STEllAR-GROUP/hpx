@@ -1236,7 +1236,6 @@ namespace hpx
         if (!threads::get_self_ptr()) {
             HPX_THROWS_IF(ec, invalid_status, "hpx::terminate",
                 "this function can be called from an HPX thread only");
-            return;
         }
 
         components::server::runtime_support* p =
@@ -1246,10 +1245,10 @@ namespace hpx
         if (0 == p) {
             components::stubs::runtime_support::terminate_all(
                 naming::get_id_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX));
-            return;
         }
-
-        p->terminate_all();
+        else {
+            p->terminate_all();
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
