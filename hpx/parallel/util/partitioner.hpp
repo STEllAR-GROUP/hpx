@@ -77,9 +77,15 @@ namespace hpx { namespace parallel { namespace util
         template <>
         struct handle_local_exceptions<vector_execution_policy>
         {
+            static void call(boost::exception_ptr const&,
+                std::list<boost::exception_ptr>&)
+            {
+                std::terminate();
+            }
+
             template <typename T>
             static void call(std::vector<hpx::future<T> > const& workitems,
-                std::list<boost::exception_ptr>& errors)
+                std::list<boost::exception_ptr>&)
             {
                 for (hpx::future<T> const& f: workitems)
                 {
@@ -162,11 +168,9 @@ namespace hpx { namespace parallel { namespace util
                         add_ready_future(workitems, std::forward<F1>(f1),
                             first, count);
                     }
-                    catch (std::bad_alloc const& e) {
-                        boost::throw_exception(e);
-                    }
                     catch (...) {
-                        errors.push_back(boost::current_exception());
+                        detail::handle_local_exceptions<ExPolicy>::call(
+                            boost::current_exception(), errors);
                     }
                     std::advance(first, count);
                 }
@@ -345,11 +349,9 @@ namespace hpx { namespace parallel { namespace util
                         add_ready_future(workitems, std::forward<F1>(f1),
                             first, count);
                     }
-                    catch (std::bad_alloc const& e) {
-                        boost::throw_exception(e);
-                    }
                     catch (...) {
-                        errors.push_back(boost::current_exception());
+                        detail::handle_local_exceptions<ExPolicy>::call(
+                            boost::current_exception(), errors);
                     }
                     std::advance(first, count);
                 }
