@@ -20,28 +20,28 @@ void test_for_each_futures(ExPolicy const& policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     // prepare some test data
-    std::vector<std::size_t> idx = test::random_iota(10007);
+    std::vector<std::size_t> idx = test::random_iota(1003);
 
-    std::vector<hpx::promise<std::size_t> > p(10007);
+    std::vector<hpx::promise<std::size_t> > p(1003);
     std::vector<hpx::future<std::size_t> > f = test::fill_with_futures(p);
 
     hpx::future<void> done_init = hpx::async(
         hpx::util::bind(&test::make_ready, boost::ref(p), boost::ref(idx)));
 
     // this is the actual test
-    std::vector<std::size_t> d = test::iota(10007, std::rand());
+    std::vector<std::size_t> d = test::iota(1003, std::rand());
     hpx::parallel::for_each(policy,
         iterator(boost::begin(f)), iterator(boost::end(f)),
         [&d](hpx::future<std::size_t>& fut) {
             std::size_t v = fut.get();
-            HPX_TEST(v < 10007);
+            HPX_TEST(v < 1003);
             d[v] = v;
         });
 
     done_init.wait();
 
     // verify values
-    std::vector<std::size_t> c = test::iota(10007, 0);
+    std::vector<std::size_t> c = test::iota(1003, 0);
 
     std::size_t count = 0;
     HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
@@ -60,22 +60,22 @@ void test_for_each_futures(hpx::parallel::task_execution_policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     // prepare some test data
-    std::vector<std::size_t> idx = test::random_iota(10007);
+    std::vector<std::size_t> idx = test::random_iota(1003);
 
-    std::vector<hpx::promise<std::size_t> > p(10007);
+    std::vector<hpx::promise<std::size_t> > p(1003);
     std::vector<hpx::future<std::size_t> > f = test::fill_with_futures(p);
 
     hpx::future<void> done_init = hpx::async(
         hpx::util::bind(&test::make_ready, boost::ref(p), boost::ref(idx)));
 
     // this is the actual test
-    std::vector<std::size_t> d = test::iota(10007, std::rand());
+    std::vector<std::size_t> d = test::iota(1003, std::rand());
     hpx::future<void> fut =
         hpx::parallel::for_each(hpx::parallel::task,
             iterator(boost::begin(f)), iterator(boost::end(f)),
             [&d](hpx::future<std::size_t>& fut) {
                 std::size_t v = fut.get();
-                HPX_TEST(v < 10007);
+                HPX_TEST(v < 1003);
                 d[v] = v;
             });
     fut.wait();
@@ -83,7 +83,7 @@ void test_for_each_futures(hpx::parallel::task_execution_policy, IteratorTag)
     done_init.wait();
 
     // verify values
-    std::vector<std::size_t> c = test::iota(10007, 0);
+    std::vector<std::size_t> c = test::iota(1003, 0);
 
     std::size_t count = 0;
     HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
