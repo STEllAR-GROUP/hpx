@@ -132,7 +132,7 @@ struct kernel
 {
     thread_state_enum operator()(thread_state_ex_enum)
     {
-        worker_timed(payload);
+        worker_timed(payload * 1000);
 
         return pending;
     }

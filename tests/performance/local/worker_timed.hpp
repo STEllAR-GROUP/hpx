@@ -15,18 +15,20 @@
 #include <boost/cstdint.hpp>
 
 inline void worker_timed(
-    boost::uint64_t delay_ms
+    boost::uint64_t delay_ns
     )
 {
+    if (delay_ns == 0)
+        return;
+
     using namespace hpx::util;
 
-    boost::uint64_t const local_delay = delay_ms * 1000;
-    boost::uint64_t start = high_resolution_clock::now(); 
+    boost::uint64_t start = high_resolution_clock::now();
 
     while (true)
     {
         // Check if we've reached the specified delay.
-        if ((high_resolution_clock::now() - start) >= local_delay)
+        if ((high_resolution_clock::now() - start) >= delay_ns)
             break;
     }
 }
