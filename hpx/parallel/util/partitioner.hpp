@@ -133,8 +133,12 @@ namespace hpx { namespace parallel { namespace util
                 threads::executor exec = policy.get_executor();
                 if (chunk_size == 0)
                 {
-                    std::size_t const cores = hpx::get_os_thread_count(exec);
-                    chunk_size = (count + cores - 1) / cores;
+                    chunk_size = policy.get_chunk_size();
+                    if (chunk_size == 0)
+                    {
+                        std::size_t const cores = hpx::get_os_thread_count(exec);
+                        chunk_size = (count + cores - 1) / cores;
+                    }
                 }
 
                 // schedule every chunk on a separate thread
@@ -188,8 +192,12 @@ namespace hpx { namespace parallel { namespace util
                 threads::executor exec = policy.get_executor();
                 if (chunk_size == 0)
                 {
-                    std::size_t const cores = hpx::get_os_thread_count(exec);
-                    chunk_size = (count + cores - 1) / cores;
+                    chunk_size = policy.get_chunk_size();
+                    if (chunk_size == 0)
+                    {
+                        std::size_t const cores = hpx::get_os_thread_count(exec);
+                        chunk_size = (count + cores - 1) / cores;
+                    }
                 }
 
                 // schedule every chunk on a separate thread
@@ -297,7 +305,11 @@ namespace hpx { namespace parallel { namespace util
             {
                 // estimate a chunk size
                 if (chunk_size == 0)
-                    chunk_size = 2u;
+                {
+                    chunk_size = policy.get_chunk_size();
+                    if (chunk_size == 0)
+                        chunk_size = 2u;
+                }
 
                 threads::executor exec = policy.get_executor();
                 std::size_t const cores = hpx::get_os_thread_count(exec);
@@ -361,7 +373,11 @@ namespace hpx { namespace parallel { namespace util
             {
                 // estimate a chunk size
                 if (chunk_size == 0)
-                    chunk_size = 2u;
+                {
+                    chunk_size = policy.get_chunk_size();
+                    if (chunk_size == 0)
+                        chunk_size = 2u;
+                }
 
                 threads::executor exec = policy.get_executor();
                 std::size_t const cores = hpx::get_os_thread_count(exec);

@@ -32,19 +32,31 @@ namespace hpx { namespace parallel
         parallel_execution_policy() {}
 
         // create a new parallel_execution_policy referencing a executor
-        parallel_execution_policy operator()(threads::executor& exec) const
+        parallel_execution_policy operator()(threads::executor& exec,
+            std::size_t chunk_size = 0) const
         {
-            return parallel_execution_policy(exec);
+            return parallel_execution_policy(exec, chunk_size);
+        }
+
+        parallel_execution_policy operator()(std::size_t chunk_size = 0) const
+        {
+            return parallel_execution_policy(chunk_size);
         }
 
         threads::executor const& get_executor() const { return exec_; }
+        std::size_t get_chunk_size() const { return chunk_size_; }
 
     private:
-        parallel_execution_policy(threads::executor& exec)
-          : exec_(exec)
+        parallel_execution_policy(std::size_t chunk_size)
+          : exec_(), chunk_size_(0)
+        {}
+
+        parallel_execution_policy(threads::executor& exec, std::size_t chunk_size)
+          : exec_(exec), chunk_size_(chunk_size)
         {}
 
         threads::executor exec_;
+        std::size_t chunk_size_;
     };
 
     /// Default parallel execution policy object.
@@ -64,6 +76,7 @@ namespace hpx { namespace parallel
     struct vector_execution_policy
     {
         threads::executor get_executor() const { return threads::executor(); }
+        std::size_t get_chunk_size() const { return 0; }
     };
 
     /// Default vector execution policy object.
@@ -82,19 +95,31 @@ namespace hpx { namespace parallel
         task_execution_policy() {}
 
         // create a new task_execution_policy referencing a executor
+        task_execution_policy operator()(threads::executor& exec,
+            std::size_t chunk_size) const
+        {
+            return task_execution_policy(exec, chunk_size);
+        }
+
         task_execution_policy operator()(threads::executor& exec) const
         {
             return task_execution_policy(exec);
         }
 
         threads::executor const& get_executor() const { return exec_; }
+        std::size_t get_chunk_size() const { return chunk_size_; }
 
     private:
+        task_execution_policy(threads::executor& exec, std::size_t chunk_size)
+          : exec_(exec), chunk_size_(chunk_size)
+        {}
+
         task_execution_policy(threads::executor& exec)
-          : exec_(exec)
+          : exec_(exec), chunk_size_(0)
         {}
 
         threads::executor exec_;
+        std::size_t chunk_size_;
     };
 
     /// Default vector execution policy object.
