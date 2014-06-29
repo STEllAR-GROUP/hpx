@@ -156,12 +156,10 @@ void test_fill_exception()
 
     test_fill_exception(seq, IteratorTag());
     test_fill_exception(par, IteratorTag());
-    test_fill_exception(vec, IteratorTag());
     test_fill_exception(task, IteratorTag());
 
     test_fill_exception(execution_policy(seq), IteratorTag());
     test_fill_exception(execution_policy(par), IteratorTag());
-    test_fill_exception(execution_policy(vec), IteratorTag());
     test_fill_exception(execution_policy(task), IteratorTag());
 }
 

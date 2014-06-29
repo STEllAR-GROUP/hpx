@@ -184,12 +184,10 @@ void test_swap_ranges_exception()
 
     test_swap_ranges_exception(seq, IteratorTag());
     test_swap_ranges_exception(par, IteratorTag());
-    test_swap_ranges_exception(vec, IteratorTag());
     test_swap_ranges_exception(task, IteratorTag());
 
     test_swap_ranges_exception(execution_policy(seq), IteratorTag());
     test_swap_ranges_exception(execution_policy(par), IteratorTag());
-    test_swap_ranges_exception(execution_policy(vec), IteratorTag());
     test_swap_ranges_exception(execution_policy(task), IteratorTag());
 }
 

@@ -157,12 +157,10 @@ void test_fill_n_exception()
 
     test_fill_n_exception(seq, IteratorTag());
     test_fill_n_exception(par, IteratorTag());
-    test_fill_n_exception(vec, IteratorTag());
     test_fill_n_exception(task, IteratorTag());
 
     test_fill_n_exception(execution_policy(seq), IteratorTag());
     test_fill_n_exception(execution_policy(par), IteratorTag());
-    test_fill_n_exception(execution_policy(vec), IteratorTag());
     test_fill_n_exception(execution_policy(task), IteratorTag());
 }
 
