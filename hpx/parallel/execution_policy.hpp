@@ -38,7 +38,7 @@ namespace hpx { namespace parallel
             return parallel_execution_policy(exec, chunk_size);
         }
 
-        parallel_execution_policy operator()(std::size_t chunk_size = 0) const
+        parallel_execution_policy operator()(std::size_t chunk_size) const
         {
             return parallel_execution_policy(chunk_size);
         }
@@ -47,12 +47,12 @@ namespace hpx { namespace parallel
         std::size_t get_chunk_size() const { return chunk_size_; }
 
     private:
-        parallel_execution_policy(std::size_t chunk_size)
-          : exec_(), chunk_size_(0)
-        {}
-
         parallel_execution_policy(threads::executor& exec, std::size_t chunk_size)
           : exec_(exec), chunk_size_(chunk_size)
+        {}
+
+        parallel_execution_policy(std::size_t chunk_size)
+          : exec_(), chunk_size_(chunk_size)
         {}
 
         threads::executor exec_;
@@ -75,8 +75,8 @@ namespace hpx { namespace parallel
     /// indicate that a parallel algorithm's execution may be vectorized.
     struct vector_execution_policy
     {
-        threads::executor get_executor() const { return threads::executor(); }
-        std::size_t get_chunk_size() const { return 0; }
+        static threads::executor get_executor() { return threads::executor(); }
+        static std::size_t get_chunk_size() { return 0; }
     };
 
     /// Default vector execution policy object.
@@ -96,14 +96,14 @@ namespace hpx { namespace parallel
 
         // create a new task_execution_policy referencing a executor
         task_execution_policy operator()(threads::executor& exec,
-            std::size_t chunk_size) const
+            std::size_t chunk_size = 0) const
         {
             return task_execution_policy(exec, chunk_size);
         }
 
-        task_execution_policy operator()(threads::executor& exec) const
+        task_execution_policy operator()(std::size_t chunk_size) const
         {
-            return task_execution_policy(exec);
+            return task_execution_policy(chunk_size);
         }
 
         threads::executor const& get_executor() const { return exec_; }
@@ -114,8 +114,8 @@ namespace hpx { namespace parallel
           : exec_(exec), chunk_size_(chunk_size)
         {}
 
-        task_execution_policy(threads::executor& exec)
-          : exec_(exec), chunk_size_(0)
+        task_execution_policy(std::size_t chunk_size)
+          : exec_(), chunk_size_(chunk_size)
         {}
 
         threads::executor exec_;
