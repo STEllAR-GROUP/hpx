@@ -5,183 +5,217 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/include/algorithm.hpp>
-#include <hpx/parallel/execution_policy.hpp>
 #include <hpx/include/iostreams.hpp>
 #include "worker_timed.hpp"
 
 #include <stdexcept>
 
 #include <boost/format.hpp>
-#include <boost/chrono.hpp>
 #include <boost/cstdint.hpp>
-enum {
-    SECONDS=0,
-    MILLISECONDS,
-    MICROSECONDS
-};
 
-//constants to convert seconds
-const int c_MICROSECONDS = 1000000;
-const int c_MILLISECONDS = 1000;
+///////////////////////////////////////////////////////////////////////////////
+int delay = 1000;
+int test_count = 100;
+int chunk_size = 0;
+int num_overlapping_loops = 0;
 
-hpx::util::high_resolution_timer walltime;
-
-int delay;
-int test_count;
-
-double measure_sequential_foreach(std::size_t size, int measure)
+///////////////////////////////////////////////////////////////////////////////
+void measure_sequential_foreach(std::size_t size)
 {
     std::vector<std::size_t> data_representation(size);
     std::iota(boost::begin(data_representation),
         boost::end(data_representation),
         std::rand());
 
-    walltime.restart();
-
-    //invoke sequential for_each
+    // invoke sequential for_each
     hpx::parallel::for_each(hpx::parallel::seq,
         boost::begin(data_representation),
         boost::end(data_representation),
-        [&size](std::size_t& v){
+        [](std::size_t) {
             worker_timed(delay);
-            v=40;
         });
-
-    double duration = walltime.elapsed();
-    switch(measure) {
-    case MILLISECONDS:
-        return duration * c_MILLISECONDS;
-    case MICROSECONDS:
-        return duration * c_MICROSECONDS;
-    default:
-        break;
-    }
-    return duration;
 }
 
-double measure_parallel_foreach(std::size_t size, int measure)
+void measure_parallel_foreach(std::size_t size)
 {
     std::vector<std::size_t> data_representation(size);
     std::iota(boost::begin(data_representation),
         boost::end(data_representation),
         std::rand());
 
-    walltime.restart();
-
-    //invoke parallel for_each
-    hpx::parallel::for_each(hpx::parallel::par,
+    // invoke parallel for_each
+    hpx::parallel::for_each(hpx::parallel::par(chunk_size),
         boost::begin(data_representation),
         boost::end(data_representation),
-        [&size](std::size_t& v){
+        [](std::size_t) {
             worker_timed(delay);
-            v=40;
         });
+}
 
-    double duration = walltime.elapsed();
+hpx::future<void> measure_task_foreach(std::size_t size)
+{
+    boost::shared_ptr<std::vector<std::size_t> > data_representation(
+        boost::make_shared<std::vector<std::size_t> >(size));
+    std::iota(boost::begin(*data_representation),
+        boost::end(*data_representation),
+        std::rand());
 
-  
-    switch(measure) {
-    case MILLISECONDS:
-        return duration * c_MILLISECONDS;
-    case MICROSECONDS:
-        return duration * c_MICROSECONDS;
-    default:
-        break;
+    // invoke parallel for_each
+    return
+        hpx::parallel::for_each(hpx::parallel::task(chunk_size),
+            boost::begin(*data_representation),
+            boost::end(*data_representation),
+            [](std::size_t) {
+                worker_timed(delay);
+            }
+        ).then(
+            [data_representation](hpx::future<void>) {}
+        );
+}
+
+boost::uint64_t average_out_parallel(std::size_t vector_size)
+{
+    boost::uint64_t start = hpx::util::high_resolution_clock::now();
+
+    // average out 100 executions to avoid varying results
+    for(auto i = 0; i < test_count; i++)
+        measure_parallel_foreach(vector_size);
+
+    return (hpx::util::high_resolution_clock::now() - start) / test_count;
+}
+
+boost::uint64_t average_out_task(std::size_t vector_size)
+{
+    if (num_overlapping_loops <= 0)
+    {
+        boost::uint64_t start = hpx::util::high_resolution_clock::now();
+
+        for(auto i = 0; i < test_count; i++)
+            measure_task_foreach(vector_size).wait();
+
+        return (hpx::util::high_resolution_clock::now() - start) / test_count;
     }
-    return duration;
+
+    std::vector<hpx::future<void> > tests;
+    tests.resize(num_overlapping_loops);
+
+    boost::uint64_t start = hpx::util::high_resolution_clock::now();
+
+    for(auto i = 0; i < test_count; i++)
+    {
+        hpx::future<void> curr = measure_task_foreach(vector_size);
+        if (i >= num_overlapping_loops)
+            tests[(i-num_overlapping_loops) % tests.size()].wait();
+        tests[i % tests.size()] = std::move(curr);
+    }
+
+    hpx::wait_all(tests);
+    return (hpx::util::high_resolution_clock::now() - start) / test_count;
 }
 
-double average_out_parallel(std::size_t vector_size, int mtime)
+boost::uint64_t average_out_sequential(std::size_t vector_size)
 {
-    double total_time =0;
-    //average out 100 executions to avoid varying results
-    for(auto i=0; i < test_count; i++)
-        total_time += measure_parallel_foreach(vector_size, mtime);
-    return total_time/(double)(test_count);
+    boost::uint64_t start = hpx::util::high_resolution_clock::now();
+
+    // average out 100 executions to avoid varying results
+    for(auto i = 0; i < test_count; i++)
+        measure_sequential_foreach(vector_size);
+
+    return (hpx::util::high_resolution_clock::now() - start) / test_count;
 }
 
-double average_out_sequential(std::size_t vector_size, int mtime)
-{
-    double total_time =0;
-    //average out 100 executions to avoid varying results
-    for(auto i=0; i<test_count; i++)
-        total_time += measure_sequential_foreach(vector_size, mtime);
-    return total_time/(double)(test_count);
-}
-
+///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
     //pull values from cmd
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();
-    int mtime = vm["mtime"].as<int>();
-    bool plotoutput = vm["gnuplot_friendly"].as<int>();
+    bool plotoutput = vm["gnuplot_friendly"].as<int>() ?true : false;
     delay = vm["work_delay"].as<int>();
     test_count = vm["test_count"].as<int>();
-    
+    chunk_size = vm["chunk_size"].as<int>();
+    num_overlapping_loops = vm["overlapping_loops"].as<int>();
+
     //verify that input is within domain of program
     if(test_count == 0 || test_count < 0) {
         hpx::cout << "test_count cannot be zero or negative...\n" << hpx::flush;
     } else if (delay < 0) {
         hpx::cout << "delay cannot be a negative number...\n" << hpx::flush;
-    } else if (mtime > 2 || mtime < 0) {
-        hpx::cout << "invalid mtime range, mtime cannot be greater than 2 or negative...\n" << hpx::flush;
     } else {
 
-    //results
-    double par_time = average_out_parallel(vector_size, mtime);
-    double seq_time = average_out_sequential(vector_size, mtime); 
+        //results
+        boost::uint64_t par_time = average_out_parallel(vector_size);
+        boost::uint64_t task_time = average_out_task(vector_size);
+        boost::uint64_t seq_time = average_out_sequential(vector_size);
 
-    if(plotoutput == 1) {
-        hpx::cout << " " << seq_time << " " << par_time << "\n" << hpx::flush;
-    }else{ 
-        //print results(Formatted). Setw(x) assures that all output is right justified
-        hpx::cout << std::left << "----------------Parameters-----------------\n"
-            << std::left << "Vector size: " << std::right << std::setw(30) << vector_size << "\n"
-            << std::left << "Number of tests" << std::right << std::setw(28) << test_count << "\n"
-            << std::left << "Delay per iteration(MicroSeconds)" << std::right << std::setw(10) << delay << "\n"
-            << std::left << "Display time in: " << hpx::flush;
-        if(mtime==0) hpx::cout << std::right << std::setw(27) << "Seconds\n" << hpx::flush;
-        if(mtime==1) hpx::cout << std::right << std::setw(27) << "Miliseconds\n" << hpx::flush;
-        if(mtime==2) hpx::cout << std::right << std::setw(27) << "Microseconds\n" << hpx::flush;
-        hpx::cout << "------------------Average------------------\n"
-        << std::left << "Average parallel execution time : " << std::right << std::setw(9) << par_time << "\n"
-        << std::left << "Average sequential execution time: " << std::right << std::setw(8) << seq_time << "\n" << hpx::flush;
-        hpx::cout << "---------Execution Time Difference---------\n"
-        << std::left << "Parallel <-> Sequential: " << std::right << std::setw(18) << par_time - seq_time << "\n"
-        << std::left << "Parallel Scale: " << std::right  << std::setw(27) << ((double)seq_time / par_time) << "\n" << hpx::flush;
+        if(plotoutput == 1) {
+            hpx::cout << " " << seq_time/1e9
+                      << " " << par_time/1e9
+                      << " " << task_time/1e9 << "\n" << hpx::flush;
+        }
+        else {
+        // print results(Formatted). Setw(x) assures that all output is right justified
+            hpx::cout << std::left << "----------------Parameters-----------------\n"
+                << std::left << "Vector size: " << std::right
+                             << std::setw(30) << vector_size << "\n"
+                << std::left << "Number of tests" << std::right
+                             << std::setw(28) << test_count << "\n"
+                << std::left << "Delay per iteration(nanoseconds)"
+                             << std::right << std::setw(11) << delay << "\n"
+                << std::left << "Display time in: "
+                << std::right << std::setw(27) << "Seconds\n" << hpx::flush;
+
+            hpx::cout << "------------------Average------------------\n"
+                << std::left << "Average parallel execution time  : "
+                             << std::right << std::setw(8) << par_time/1e9 << "\n"
+                << std::left << "Average task execution time      : "
+                             << std::right << std::setw(8) << task_time/1e9 << "\n"
+                << std::left << "Average sequential execution time: "
+                             << std::right << std::setw(8) << seq_time/1e9 << "\n" << hpx::flush;
+
+            hpx::cout << "---------Execution Time Difference---------\n"
+                << std::left << "Parallel Scale: " << std::right  << std::setw(27)
+                             << (double(seq_time) / par_time) << "\n"
+                << std::left << "Task Scale    : " << std::right  << std::setw(27)
+                             << (double(seq_time) / task_time) << "\n" << hpx::flush;
         }
     }
 
     return hpx::finalize();
 }
 
+///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
     //initialize program
     std::vector<std::string> cfg;
     cfg.push_back("hpx.os_threads=" +
         boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency()));
-    boost::program_options::options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
-    
+    boost::program_options::options_description cmdline(
+        "usage: " HPX_APPLICATION_STRING " [options]");
+
     cmdline.add_options()
         ( "vector_size"
         , boost::program_options::value<std::size_t>()->default_value(1000)
         , "size of vector")
 
-        ( "mtime"
-        , boost::program_options::value<int>()->default_value(0)
-        , "(0)Seconds (1)Milliseconds (2)Microseconds")
-
         ("work_delay"
         , boost::program_options::value<int>()->default_value(1)
-        , "loop delay per element in Microseconds")
+        , "loop delay per element in nanoseconds")
 
         ("test_count"
         , boost::program_options::value<int>()->default_value(100)
         , "number of tests to be averaged")
-        
+
+        ("chunk_size"
+        , boost::program_options::value<int>()->default_value(0)
+        , "number of iterations to combine while parallelization")
+
+        ("overlapping_loops"
+        , boost::program_options::value<int>()->default_value(0)
+        , "number of overlapping task loops")
+
         ("gnuplot_friendly"
         , boost::program_options::value<int>()->default_value(0)
         ,"print only the execution time of seq and par")
