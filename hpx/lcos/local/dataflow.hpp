@@ -177,65 +177,57 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         }
 
         template <typename TupleIter, typename Iter>
-        bool await_range(TupleIter iter, Iter next, Iter end)
+        void await_range(TupleIter iter, Iter next, Iter end)
         {
-            if (next == end)
-                return true;
+            for (/**/; next != end; ++next)
+            {
+                if (!next->is_ready())
+                {
+                    void (dataflow_frame::*f)(TupleIter, Iter, Iter)
+                        = &dataflow_frame::await_range;
+
+                    typedef
+                        typename std::iterator_traits<
+                            Iter
+                        >::value_type
+                        future_type;
+                    typedef
+                        typename traits::future_traits<
+                            future_type
+                        >::type
+                        future_result_type;
+
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data<future_result_type>
+                    > next_future_data
+                        = lcos::detail::get_shared_state(*next);
+
+                    boost::intrusive_ptr<dataflow_frame> this_(this);
+                    next_future_data->set_on_completed(
+                        boost::bind(
+                            f
+                          , this_
+                          , std::move(iter)
+                          , std::move(next)
+                          , std::move(end)
+                        )
+                    );
+
+                    return;
+                }
+            }
 
             typedef
-                typename std::iterator_traits<
-                    Iter
-                >::value_type
-                future_type;
+                typename boost::fusion::result_of::next<TupleIter>::type
+                next_type;
 
-            if (!next->is_ready())
-            {
-                bool (dataflow_frame::*f)(TupleIter, Iter, Iter)
-                    = &dataflow_frame::await_range;
-
-                typedef
-                    typename traits::future_traits<
-                        future_type
-                    >::type
-                    future_result_type;
-
-                boost::intrusive_ptr<
-                    lcos::detail::future_data<future_result_type>
-                > next_future_data
-                    = lcos::detail::get_shared_state(*next);
-
-                boost::intrusive_ptr<dataflow_frame> this_(this);
-                next_future_data->set_on_completed(
-                    boost::bind(
-                        f
-                      , this_
-                      , std::move(iter)
-                      , std::move(next)
-                      , std::move(end)
-                    )
-                );
-
-                return false;
-            }
-
-            if (await_range(iter, std::move(++next), std::move(end)))
-            {
-                typedef
-                    typename boost::fusion::result_of::next<TupleIter>::type
-                    next_type;
-
-                await(
-                    policy_
-                  , boost::fusion::next(iter)
-                  , boost::mpl::bool_<
-                        boost::is_same<next_type, end_type>::value
-                    >()
-                );
-
-                return true;
-            }
-
-            return false;
+            await(
+                policy_
+              , boost::fusion::next(iter)
+              , boost::mpl::bool_<
+                    boost::is_same<next_type, end_type>::value
+                >()
+            );
         }
 
         template <typename Iter>
