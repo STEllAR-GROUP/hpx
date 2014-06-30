@@ -9,8 +9,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/async.hpp>
 #include <hpx/exception_list.hpp>
-#include <hpx/lcos/when_all.hpp>
 #include <hpx/lcos/wait_all.hpp>
+#include <hpx/lcos/local/dataflow.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
@@ -223,15 +223,15 @@ namespace hpx { namespace parallel { namespace util
                 }
 
                 // wait for all tasks to finish
-                return hpx::when_all(workitems).then(
-                    [first, f2](hpx::future<std::vector<hpx::future<Result> > >&& r) mutable
+                return hpx::lcos::local::dataflow(
+                    [first, f2](std::vector<hpx::future<Result> > && r) mutable
                     {
-                        std::vector<hpx::future<Result> > result = r.get();
                         std::list<boost::exception_ptr> errors;
                         detail::handle_local_exceptions<task_execution_policy>
-                            ::call(result, errors);
-                        return handle_step_two(f2, first, std::move(result));
-                    }
+                            ::call(r, errors);
+                        return handle_step_two(f2, first, std::move(r));
+                    },
+                    std::move(workitems)
                 );
             }
         };
@@ -413,15 +413,15 @@ namespace hpx { namespace parallel { namespace util
                 }
 
                 // wait for all tasks to finish
-                return hpx::when_all(workitems).then(
-                    [first, f2](hpx::future<std::vector<hpx::future<Result> > >&& r) mutable
+                return hpx::lcos::local::dataflow(
+                    [first, f2](std::vector<hpx::future<Result> > && r) mutable
                     {
-                        std::vector<hpx::future<Result> > result = r.get();
                         std::list<boost::exception_ptr> errors;
                         detail::handle_local_exceptions<task_execution_policy>
-                            ::call(result, errors);
-                        return handle_step_two(f2, first, std::move(result));
-                    }
+                            ::call(r, errors);
+                        return handle_step_two(f2, first, std::move(r));
+                    },
+                    std::move(workitems)
                 );
             }
         };
