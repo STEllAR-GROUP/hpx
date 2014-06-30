@@ -176,10 +176,11 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             hpx::apply(sched, f, this_, is_void());
         }
 
-        template <typename Iter>
-        void await_range(Iter next, Iter end)
+        template <typename TupleIter, typename Iter>
+        bool await_range(TupleIter iter, Iter next, Iter end)
         {
-            if(next == end) return;
+            if (next == end)
+                return true;
 
             typedef
                 typename std::iterator_traits<
@@ -187,9 +188,9 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 >::value_type
                 future_type;
 
-            if(!next->is_ready())
+            if (!next->is_ready())
             {
-                void (dataflow_frame::*f)(Iter, Iter)
+                bool (dataflow_frame::*f)(TupleIter, Iter, Iter)
                     = &dataflow_frame::await_range;
 
                 typedef
@@ -205,41 +206,46 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
                 boost::intrusive_ptr<dataflow_frame> this_(this);
                 next_future_data->set_on_completed(
-                    std::move(
-                        boost::bind(
-                            f
-                          , this_
-                          , std::move(next)
-                          , std::move(end)
-                        )
+                    boost::bind(
+                        f
+                      , this_
+                      , std::move(iter)
+                      , std::move(next)
+                      , std::move(end)
                     )
                 );
 
-                return;
+                return false;
             }
 
-            await_range(std::move(++next), std::move(end));
+            if (await_range(iter, std::move(++next), std::move(end)))
+            {
+                typedef
+                    typename boost::fusion::result_of::next<TupleIter>::type
+                    next_type;
+
+                await(
+                    policy_
+                  , boost::fusion::next(iter)
+                  , boost::mpl::bool_<
+                        boost::is_same<next_type, end_type>::value
+                    >()
+                );
+
+                return true;
+            }
+
+            return false;
         }
 
         template <typename Iter>
         BOOST_FORCEINLINE
         void await_next(Iter iter, boost::mpl::true_)
         {
-            typedef
-                typename boost::fusion::result_of::next<Iter>::type
-                next_type;
-
             await_range(
-                boost::begin(boost::unwrap_ref(boost::fusion::deref(iter)))
+                iter
+              , boost::begin(boost::unwrap_ref(boost::fusion::deref(iter)))
               , boost::end(boost::unwrap_ref(boost::fusion::deref(iter)))
-            );
-
-            await(
-                policy_
-              , boost::fusion::next(iter)
-              , boost::mpl::bool_<
-                    boost::is_same<next_type, end_type>::value
-                >()
             );
         }
 
@@ -279,13 +285,11 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
                 boost::intrusive_ptr<dataflow_frame> this_(this);
                 next_future_data->set_on_completed(
-                    std::move(
-                        hpx::util::bind(
-                            f
-                          , this_
-                          , std::move(iter)
-                          , boost::mpl::false_()
-                        )
+                    hpx::util::bind(
+                        f
+                      , this_
+                      , std::move(iter)
+                      , boost::mpl::false_()
                     )
                 );
 
