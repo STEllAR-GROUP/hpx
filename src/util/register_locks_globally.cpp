@@ -15,13 +15,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
-#if HPX_HAVE_VERIFY_LOCKS_GLOBALLY
+#ifdef HPX_HAVE_VERIFY_LOCKS_GLOBALLY
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
         struct global_lock_data
         {
-#if HPX_HAVE_VERIFY_LOCKS_BACKTRACE
+#ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
             global_lock_data()
             {
                 backtrace_ = hpx::detail::backtrace_direct(75);

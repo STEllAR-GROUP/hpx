@@ -218,7 +218,7 @@ namespace hpx { namespace threads
         ///                   back trace of the thread referenced by the \a id
         ///                   parameter. If the thread is not known to the
         ///                   thread-manager the return value will be the zero.
-#if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION != 0
+#ifdef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
         virtual char const* get_backtrace(thread_id_type const& id) const = 0;
         virtual char const* set_backtrace(thread_id_type const& id, char const* bt = 0) = 0;
 #else
@@ -415,14 +415,14 @@ namespace hpx { namespace threads
         /// to run on.
         virtual mask_cref_type get_pu_mask(topology const&, std::size_t) const = 0;
 
-#if HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS
+#if defined(HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS)
         virtual boost::int64_t get_executed_threads(
             std::size_t num = std::size_t(-1), bool reset = false) = 0;
         virtual boost::int64_t get_executed_thread_phases(
             std::size_t num = std::size_t(-1), bool reset = false) = 0;
 #endif
 
-#if HPX_THREAD_MAINTAIN_LOCAL_STORAGE
+#if defined(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
         /// The get_thread_data function is part of the thread related
         /// API. It queries the currently stored thread specific data pointer.
         ///

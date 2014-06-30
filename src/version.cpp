@@ -145,7 +145,7 @@ namespace hpx
 #else
         strm << "  HPX_HAVE_PARCELPORT_IBVERBS=OFF\n";
 #endif
-#if defined(HPX_HAVE_VERIFY_LOCKS) && HPX_HAVE_VERIFY_LOCKS
+#if defined(HPX_HAVE_VERIFY_LOCKS)
         strm << "  HPX_HAVE_VERIFY_LOCKS=ON\n";
 #else
         strm << "  HPX_HAVE_VERIFY_LOCKS=OFF\n";
@@ -155,7 +155,7 @@ namespace hpx
 #else
         strm << "  HPX_HAVE_HWLOC=OFF\n";
 #endif
-#if defined(HPX_HAVE_ITTNOTIFY) && HPX_HAVE_ITTNOTIFY
+#if defined(HPX_HAVE_ITTNOTIFY)
         strm << "  HPX_HAVE_ITTNOTIFY=ON\n";
 #else
         strm << "  HPX_HAVE_ITTNOTIFY=OFF\n";

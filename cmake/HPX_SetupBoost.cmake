@@ -20,6 +20,10 @@ find_package(Boost
   )
 
 set(Boost_TMP_LIBRARIES ${Boost_LIBRARIES})
+if(UNIX AND NOT CYGWIN)
+  find_library(BOOST_THREAD_LIBRARY NAMES pthread DOC "The threading library used by boost.thread")
+  set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${BOOST_THREAD_LIBRARY})
+endif()
 
 # Set configuration option to use Boost.Context or not. This depends on the Boost
 # version (Boost.Context was included with 1.51) and the Platform

@@ -89,7 +89,7 @@ HPX_EXPORT extern bool use_guard_pages;
         throw std::runtime_error("mmap() failed to allocate thread stack");
     }
 
-#if HPX_THREAD_GUARD_PAGE
+#if defined(HPX_THREAD_GUARD_PAGE)
     if (use_guard_pages) {
         // Add a guard page.
         ::mprotect(real_stack, EXEC_PAGESIZE, PROT_NONE);
@@ -131,7 +131,7 @@ HPX_EXPORT extern bool use_guard_pages;
 
   inline
   void free_stack(void* stack, std::size_t size) {
-#if HPX_THREAD_GUARD_PAGE
+#if defined(HPX_THREAD_GUARD_PAGE)
     if (use_guard_pages) {
         void** real_stack = static_cast<void**>(stack) - (EXEC_PAGESIZE / sizeof(void*));
         ::munmap(static_cast<void*>(real_stack), size + EXEC_PAGESIZE);

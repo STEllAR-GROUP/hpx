@@ -314,7 +314,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
                 states_[virt_core], executed_threads, executed_thread_phases,
                 overall_times, thread_times, &suspend_back_into_calling_context);
 
-#if HPX_DEBUG != 0
+#ifdef HPX_DEBUG
             // the scheduling_loop is allowed to exit only if no more HPX
             // threads exist
             HPX_ASSERT(!scheduler_.get_thread_count(

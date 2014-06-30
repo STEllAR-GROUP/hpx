@@ -20,7 +20,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
 {
-#if HPX_DEBUG_THREAD_POOL != 0
+#ifdef HPX_DEBUG_THREAD_POOL
     enum guard_value
     {
         initial_value = 0xcc,           // memory has been initialized
@@ -51,7 +51,7 @@ namespace hpx { namespace threads
                 "could not allocate memory for thread_data");
         }
 
-#if HPX_DEBUG_THREAD_POOL != 0
+#ifdef HPX_DEBUG_THREAD_POOL
         using namespace std;    // some systems have memset in namespace std
         memset (ret, initial_value, sizeof(thread_data));
 #endif
@@ -68,7 +68,7 @@ namespace hpx { namespace threads
             thread_pool* pool = pt->pool_;
             HPX_ASSERT(pool);
 
-#if HPX_DEBUG_THREAD_POOL != 0
+#ifdef HPX_DEBUG_THREAD_POOL
             using namespace std;    // some systems have memset in namespace std
             memset (static_cast<void*>(pt), freed_value, sizeof(thread_data)); //-V598
 #endif
@@ -80,7 +80,7 @@ namespace hpx { namespace threads
     {
         if (0 != p)
         {
-#if HPX_DEBUG_THREAD_POOL != 0
+#ifdef HPX_DEBUG_THREAD_POOL
             using namespace std;    // some systems have memset in namespace std
             memset (p, freed_value, sizeof(thread_data));
 #endif
@@ -201,7 +201,7 @@ namespace hpx { namespace threads
             );
     }
 
-#if !HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#ifndef HPX_THREAD_MAINTAIN_PARENT_REFERENCE
     thread_id_repr_type get_parent_id()
     {
         return threads::invalid_thread_id_repr;
@@ -244,7 +244,7 @@ namespace hpx { namespace threads
 
     naming::address::address_type get_self_component_id()
     {
-#if !HPX_THREAD_MAINTAIN_TARGET_ADDRESS
+#ifndef HPX_THREAD_MAINTAIN_TARGET_ADDRESS
         return 0;
 #else
         thread_self* self = get_self_ptr();

@@ -30,7 +30,8 @@ namespace hpx
     ///                  has a parcel_suffix appended.
     /// \param parcel_id The parcel id of the first parcel in side the message
     ///
-    HPX_API_EXPORT bool verify_parcel_suffix(std::vector<char> const& data,
+    template <typename Buffer>
+    HPX_API_EXPORT bool verify_parcel_suffix(Buffer const& data,
         naming::gid_type& parcel_id, error_code& ec = throws);
 
     bool is_starting();
@@ -117,10 +118,10 @@ namespace hpx { namespace parcelset {
                     for(std::size_t i = 0; i != parcel_count; ++i)
                     {
 #if defined(HPX_HAVE_SECURITY)
+                        naming::gid_type parcel_id;
                         if(pp.enable_security())
                         {
                             // handle certificate and verify parcel suffix once
-                            naming::gid_type parcel_id;
                             first_message = deserialize_certificate(archive, first_message);
                             if (!first_message && i == 0)
                             {
@@ -212,7 +213,7 @@ namespace hpx { namespace parcelset {
         if(chunks) chunks_ = chunks.get();
 
 #if defined(HPX_HAVE_SECURITY)
-        decode_message(parcelport_, buffer, chunks_, first_message);
+        decode_message(parcelport, buffer, chunks_, first_message);
 #else
         decode_message(parcelport, buffer, chunks_);
 #endif

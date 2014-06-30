@@ -6,7 +6,7 @@
 ###############################################################################
 set(root "${hpx_SOURCE_DIR}/hpx/components/memory")
 
-if(HPX_DEFAULT_BUILD_TARGETS)
+if(WITH_DEFAULT_BUILD_TARGETS)
   add_hpx_component(memory
     FOLDER "Core/Components"
     HEADER_ROOT ${root}

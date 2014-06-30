@@ -29,8 +29,9 @@ hpx_include(Message
             AddLibrarySources
             AddLibraryHeaders
             AddSourceGroup
+            IsTarget
+            HandleComponentDependencies
             LinkDirectories
             IncludeDirectories
-            ForceOutOfTreeBuild
-            SetOutputPaths)
+            ForceOutOfTreeBuild)
 

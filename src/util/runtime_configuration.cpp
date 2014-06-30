@@ -48,7 +48,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail { names
 
 namespace hpx { namespace threads { namespace policies
 {
-#if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+#ifdef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
     ///////////////////////////////////////////////////////////////////////////
     // We globally control whether to do minimal deadlock detection using this
     // global bool variable. It will be set once by the runtime configuration
@@ -92,19 +92,19 @@ namespace hpx { namespace util
                 HPX_INI_PATH_DELIMITER "$[system.executable_prefix]" HPX_BASE_DIR_NAME
                 HPX_INI_PATH_DELIMITER "$[system.executable_prefix]" HPX_BASE_DIR_NAME,
             "master_ini_path_suffixes = /share/" HPX_INI_PATH_DELIMITER "/../share/",
-#if HPX_HAVE_ITTNOTIFY != 0
+#ifdef HPX_HAVE_ITTNOTIFY
             "use_itt_notify = ${HPX_HAVE_ITTNOTIFY:0}",
 #endif
             "finalize_wait_time = ${HPX_FINALIZE_WAIT_TIME:-1.0}",
             "shutdown_timeout = ${HPX_SHUTDOWN_TIMEOUT:-1.0}",
-#if HPX_HAVE_VERIFY_LOCKS
+#ifdef HPX_HAVE_VERIFY_LOCKS
             "lock_detection = ${HPX_LOCK_DETECTION:0}",
 #endif
-#if HPX_HAVE_VERIFY_LOCKS_GLOBALLY
+#ifdef HPX_HAVE_VERIFY_LOCKS_GLOBALLY
             "global_lock_detection = ${HPX_GLOBAL_LOCK_DETECTION:0}",
 #endif
-#if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
-#if HPX_DEBUG
+#ifdef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+#ifdef HPX_DEBUG
             "minimal_deadlock_detection = ${MINIMAL_DEADLOCK_DETECTION:1}",
 #else
             "minimal_deadlock_detection = ${MINIMAL_DEADLOCK_DETECTION:0}",
@@ -338,7 +338,7 @@ namespace hpx { namespace util
         pre_initialize_ini();
 
         // set global config options
-#if HPX_HAVE_ITTNOTIFY != 0
+#ifdef HPX_HAVE_ITTNOTIFY
         use_ittnotify_api = get_itt_notify_mode();
 #endif
         HPX_ASSERT(init_small_stack_size() >= HPX_SMALL_STACK_SIZE);
@@ -352,15 +352,15 @@ namespace hpx { namespace util
 #if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
         coroutines::detail::posix::use_guard_pages = init_use_stack_guard_pages();
 #endif
-#if HPX_HAVE_VERIFY_LOCKS
+#ifdef HPX_HAVE_VERIFY_LOCKS
         if (enable_lock_detection())
             util::enable_lock_detection();
 #endif
-#if HPX_HAVE_VERIFY_LOCKS_GLOBALLY
+#ifdef HPX_HAVE_VERIFY_LOCKS_GLOBALLY
         if (enable_global_lock_detection())
             util::enable_global_lock_detection();
 #endif
-#if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+#ifdef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
         threads::policies::minimal_deadlock_detection =
             enable_minimal_deadlock_detection();
 #endif
@@ -393,7 +393,7 @@ namespace hpx { namespace util
         post_initialize_ini(hpx_ini_file, cmdline_ini_defs);
 
         // set global config options
-#if HPX_HAVE_ITTNOTIFY != 0
+#ifdef HPX_HAVE_ITTNOTIFY
         use_ittnotify_api = get_itt_notify_mode();
 #endif
         HPX_ASSERT(init_small_stack_size() >= HPX_SMALL_STACK_SIZE);
@@ -406,15 +406,15 @@ namespace hpx { namespace util
 #if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
         coroutines::detail::posix::use_guard_pages = init_use_stack_guard_pages();
 #endif
-#if HPX_HAVE_VERIFY_LOCKS
+#ifdef HPX_HAVE_VERIFY_LOCKS
         if (enable_lock_detection())
             util::enable_lock_detection();
 #endif
-#if HPX_HAVE_VERIFY_LOCKS_GLOBALLY
+#ifdef HPX_HAVE_VERIFY_LOCKS_GLOBALLY
         if (enable_global_lock_detection())
             util::enable_global_lock_detection();
 #endif
-#if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+#ifdef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
         threads::policies::minimal_deadlock_detection =
             enable_minimal_deadlock_detection();
 #endif
@@ -768,7 +768,7 @@ namespace hpx { namespace util
     // Enable lock detection during suspension
     bool runtime_configuration::enable_lock_detection() const
     {
-#if HPX_HAVE_VERIFY_LOCKS
+#ifdef HPX_HAVE_VERIFY_LOCKS
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
@@ -783,7 +783,7 @@ namespace hpx { namespace util
     // Enable global lock tracking
     bool runtime_configuration::enable_global_lock_detection() const
     {
-#if HPX_HAVE_VERIFY_LOCKS_GLOBALLY
+#ifdef HPX_HAVE_VERIFY_LOCKS_GLOBALLY
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
@@ -798,11 +798,11 @@ namespace hpx { namespace util
     // Enable minimal deadlock detection for HPX threads
     bool runtime_configuration::enable_minimal_deadlock_detection() const
     {
-#if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+#ifdef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
-#if HPX_DEBUG
+#ifdef HPX_DEBUG
                 return boost::lexical_cast<int>(
                     sec->get_entry("minimal_deadlock_detection", "1")) != 0;
 #else
@@ -812,7 +812,7 @@ namespace hpx { namespace util
             }
         }
 
-#if HPX_DEBUG
+#ifdef HPX_DEBUG
         return true;
 #else
         return false;

@@ -107,12 +107,12 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         virtual bool numa_sensitive() const { return false; }
 
-#if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+#ifdef HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
         virtual boost::uint64_t get_creation_time(bool reset) = 0;
         virtual boost::uint64_t get_cleanup_time(bool reset) = 0;
 #endif
 
-#if HPX_THREAD_MAINTAIN_STEALING_COUNTS
+#ifdef HPX_THREAD_MAINTAIN_STEALING_COUNTS
         virtual std::size_t get_num_pending_misses(std::size_t num_thread,
             bool reset) = 0;
         virtual std::size_t get_num_pending_accesses(std::size_t num_thread,
@@ -163,7 +163,7 @@ namespace hpx { namespace threads { namespace policies
         virtual void on_stop_thread(std::size_t num_thread) = 0;
         virtual void on_error(std::size_t num_thread, boost::exception_ptr const& e) = 0;
 
-#if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+#ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
         virtual boost::int64_t get_average_thread_wait_time(
             std::size_t num_thread = std::size_t(-1)) const = 0;
         virtual boost::int64_t get_average_task_wait_time(

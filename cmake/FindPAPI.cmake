@@ -9,12 +9,6 @@
 find_package(PkgConfig)
 pkg_check_modules(PC_PAPI QUIET papi)
 
-# This if statement is specific to PAPI, and should not be copied into other
-# Find cmake scripts.
-if(NOT PAPI_ROOT AND NOT $ENV{HOME_PAPI} STREQUAL "")
-  set(PAPI_ROOT "$ENV{HOME_PAPI}")
-endif()
-
 find_path(PAPI_INCLUDE_DIR papi.h
   HINTS
     ${PAPI_ROOT} ENV PAPI_ROOT

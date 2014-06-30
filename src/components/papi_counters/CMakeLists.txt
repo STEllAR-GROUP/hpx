@@ -13,21 +13,24 @@ set(root "${hpx_SOURCE_DIR}/hpx/components/papi_counters")
 if(WITH_PAPI)
   find_package(PAPI)
 
-  include_directories(${PAPI_INCLUDE_DIR})
-  #FIXME: add PAPI library ...
+  if(NOT PAPI_FOUND)
+    hpx_error("PAPI could not be found and WITH_PAPI=On, please specify PAPI_ROOT to point to the root of your PAPI installation")
+  endif()
 
-  if(HPX_DEFAULT_BUILD_TARGETS)
+  include_directories(${PAPI_INCLUDE_DIR})
+
+  if(WITH_DEFAULT_BUILD_TARGETS)
     add_hpx_component(papi_counters
       FOLDER "Core/Components"
       HEADER_ROOT ${root}
-      DEPENDENCIES ${PAPI_LIBRARY}
+      DEPENDENCIES ${PAPI_LIBRARIES}
       AUTOGLOB
       ESSENTIAL)
   else()
     add_hpx_component(papi_counters
       FOLDER "Core/Components"
       HEADER_ROOT ${root}
-      DEPENDENCIES ${PAPI_LIBRARY}
+      DEPENDENCIES ${PAPI_LIBRARIES}
       AUTOGLOB)
   endif()
 

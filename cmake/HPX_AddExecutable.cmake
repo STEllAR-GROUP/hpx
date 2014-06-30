@@ -6,9 +6,10 @@
 
 macro(add_hpx_executable name)
   # retrieve arguments
-  hpx_parse_arguments(${name}
-    "SOURCES;HEADERS;DEPENDENCIES;COMPONENT_DEPENDENCIES;COMPILE_FLAGS;LINK_FLAGS;FOLDER;SOURCE_ROOT;HEADER_ROOT;SOURCE_GLOB;HEADER_GLOB;OUTPUT_SUFFIX;INSTALL_SUFFIX;LANGUAGE"
-    "ESSENTIAL;NOLIBS;NOHPXINIT;AUTOGLOB" ${ARGN})
+  set(options ESSENTIAL AUTOGLOB NOLIBS NOHPX_INIT)
+  set(one_value_args INI FOLDER SOURCE_ROOT HEADER_ROOT SOURCE_GLOB HEADER_GLOB OUTPUT_SUFFIX INSTALL_SUFFIX LANGUAGE)
+  set(multi_value_args SOURCES HEADERS DEPENDENCIES COMPONENT_DEPENDENCIES COMPILE_FLAGS LINK_FLAGS)
+  cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   if(NOT ${name}_LANGUAGE)
     set(${name}_LANGUAGE CXX)
@@ -17,12 +18,12 @@ macro(add_hpx_executable name)
   if(NOT ${name}_SOURCE_ROOT)
     set(${name}_SOURCE_ROOT ".")
   endif()
-  hpx_debug("add_executable.${name}" "${name}_SOURCE_ROOT: ${${name}_SOURCE_ROOT}")
+  hpx_debug("Add executable ${name}: ${name}_SOURCE_ROOT: ${${name}_SOURCE_ROOT}")
 
   if(NOT ${name}_HEADER_ROOT)
     set(${name}_HEADER_ROOT ".")
   endif()
-  hpx_debug("add_executable.${name}" "${name}_HEADER_ROOT: ${${name}_HEADER_ROOT}")
+  hpx_debug("Add executable ${name}: ${name}_HEADER_ROOT: ${${name}_HEADER_ROOT}")
 
   # Collect sources and headers from the given (current) directory
   # (recursively), but only if AUTOGLOB flag is specified.
@@ -39,7 +40,7 @@ macro(add_hpx_executable name)
                               "${${name}_SOURCE_ROOT}/*.f95"
                               "${${name}_SOURCE_ROOT}/*.F95")
     endif()
-    hpx_debug("add_executable.${name}" "${name}_SOURCE_GLOB: ${${name}_SOURCE_GLOB}")
+    hpx_debug("Add executable ${name}: ${name}_SOURCE_GLOB: ${${name}_SOURCE_GLOB}")
 
     add_hpx_library_sources(${name}_executable
       GLOB_RECURSE GLOBS "${${name}_SOURCE_GLOB}")
@@ -55,7 +56,7 @@ macro(add_hpx_executable name)
       set(${name}_HEADER_GLOB "${${name}_HEADER_ROOT}/*.hpp"
                               "${${name}_HEADER_ROOT}/*.h")
     endif()
-    hpx_debug("add_executable.${name}" "${name}_HEADER_GLOB: ${${name}_HEADER_GLOB}")
+    hpx_debug("Add executable ${name}: ${name}_HEADER_GLOB: ${${name}_HEADER_GLOB}")
 
     add_hpx_library_headers(${name}_executable
       GLOB_RECURSE GLOBS "${${name}_HEADER_GLOB}")
@@ -89,36 +90,21 @@ macro(add_hpx_executable name)
   set(${name}_SOURCES ${${name}_executable_SOURCES})
   set(${name}_HEADERS ${${name}_executable_HEADERS})
 
-  hpx_print_list("DEBUG" "add_executable.${name}" "Sources for ${name}" ${name}_SOURCES)
-  hpx_print_list("DEBUG" "add_executable.${name}" "Headers for ${name}" ${name}_HEADERS)
-  hpx_print_list("DEBUG" "add_executable.${name}" "Dependencies for ${name}" ${name}_DEPENDENCIES)
-  hpx_print_list("DEBUG" "add_executable.${name}" "Component dependencies for ${name}" ${name}_COMPONENT_DEPENDENCIES)
+  hpx_print_list("DEBUG" "Add executable ${name}: Sources for ${name}" ${name}_SOURCES)
+  hpx_print_list("DEBUG" "Add executable ${name}: Headers for ${name}" ${name}_HEADERS)
+  hpx_print_list("DEBUG" "Add executable ${name}: Dependencies for ${name}" ${name}_DEPENDENCIES)
+  hpx_print_list("DEBUG" "Add executable ${name}: Component dependencies for ${name}" ${name}_COMPONENT_DEPENDENCIES)
 
   # add the executable build target
-  if(NOT HPX_EXTERNAL_CMAKE)
+  set(exclude_from_all)
+  if(NOT ${name}_ESSENTIAL)
     set(exclude_from_all EXCLUDE_FROM_ALL)
   endif()
 
-  if(${${name}_ESSENTIAL})
-    add_executable(${name}_exe
-      ${${name}_SOURCES} ${${name}_HEADERS})
-  else()
-    add_executable(${name}_exe ${exclude_from_all}
-      ${${name}_SOURCES} ${${name}_HEADERS})
-  endif()
+  add_executable(${name}_exe ${exclude_from_all}
+    ${${name}_SOURCES} ${${name}_HEADERS})
 
-  if(HPX_SET_OUTPUT_PATH AND NOT ${name}_OUTPUT_SUFFIX)
-    if(MSVC)
-      set_target_properties("${name}_exe" PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${HPX_RUNTIME_OUTPUT_DIRECTORY_RELEASE}"
-        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${HPX_RUNTIME_OUTPUT_DIRECTORY_DEBUG}"
-        RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${HPX_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL}"
-        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${HPX_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO}")
-    else()
-      set_target_properties("${name}_exe" PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${HPX_RUNTIME_OUTPUT_DIRECTORY}")
-    endif()
-  elseif(${name}_OUTPUT_SUFFIX)
+  if(${name}_OUTPUT_SUFFIX)
     if(MSVC)
       set_target_properties("${name}_exe" PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release/${${name}_OUTPUT_SUFFIX}"
@@ -147,33 +133,8 @@ macro(add_hpx_executable name)
     hpx_append_property(${name}_exe COMPILE_FLAGS ${${name}_COMPILE_FLAGS})
   endif()
 
-  if(NOT MSVC)
-    hpx_append_property(${name}_exe COMPILE_FLAGS "-fPIC")
-  endif()
-
   if(${name}_LINK_FLAGS)
     hpx_append_property(${name}_exe LINK_FLAGS ${${name}_LINK_FLAGS})
-  endif()
-
-  if(HPX_HAVE_PARCELPORT_MPI AND MPI_FOUND)
-    hpx_append_property(${name}_exe LINK_FLAGS ${MPI_${${name}_LANGUAGE}_LINK_FLAGS})
-  endif()
-
-  if(HPX_${${name}_LANGUAGE}_COMPILE_FLAGS)
-    hpx_append_property(${name}_exe COMPILE_FLAGS ${HPX_${${name}_LANGUAGE}_COMPILE_FLAGS})
-    if(NOT MSVC)
-      hpx_append_property(${name}_exe LINK_FLAGS ${HPX_${${name}_LANGUAGE}_COMPILE_FLAGS})
-    endif()
-  endif()
-
-  if(NOT MSVC)
-    if(HPX_PIE)
-       hpx_append_property(${name}_exe LINK_FLAGS -pie)
-    endif()
-  endif()
-
-  if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
-    hpx_append_property(${name}_exe LINK_FLAGS -dynamic)
   endif()
 
   # linker instructions
@@ -182,27 +143,23 @@ macro(add_hpx_executable name)
       set(hpx_libs
         hpx${HPX_DEBUG_POSTFIX}
         hpx_serialization${HPX_DEBUG_POSTFIX})
-      if(NOT ${${name}_NOHPXINIT})
+      if(NOT ${name}_NOHPXINIT)
         set(hpx_libs ${hpx_libs} hpx_init${HPX_DEBUG_POSTFIX})
       endif()
     else()
       set(hpx_libs
         hpx
         hpx_serialization)
-      if(NOT ${${name}_NOHPXINIT})
+      if(NOT ${name}_NOHPXINIT)
         set(hpx_libs ${hpx_libs} hpx_init)
       endif()
     endif()
 
-    if(HPX_EXTERNAL_CMAKE)
-      set(hpx_libs ${hpx_libs} ${HPX_LIBRARIES})
-    else()
-      set(hpx_libs ${hpx_libs} ${hpx_LIBRARIES})
-    endif()
+    set(hpx_libs ${hpx_libs} ${HPX_LIBRARIES})
 
     list(REMOVE_DUPLICATES hpx_libs)
 
-    hpx_print_list("DEBUG" "add_executable.${name}" "library dependencies (hpx_libs)" hpx_libs)
+    hpx_print_list("DEBUG" "Add executable ${name}: library dependencies (hpx_libs)" hpx_libs)
 
     hpx_handle_component_dependencies(${name}_COMPONENT_DEPENDENCIES)
 
@@ -218,23 +175,16 @@ macro(add_hpx_executable name)
         ${${name}_COMPONENT_DEPENDENCIES}
         ${hpx_libs})
     endif()
-    set_property(TARGET ${name}_exe APPEND
-                 PROPERTY COMPILE_DEFINITIONS
-                 "HPX_ENABLE_ASSERT_HANDLER")
   else()
     target_link_libraries(${name}_exe ${${name}_DEPENDENCIES})
   endif()
 
-  if(MSVC AND HPX_LINK_FLAG_TARGET_PROPERTIES)
-    set_target_properties(${name}_exe PROPERTIES LINK_FLAGS "${HPX_LINK_FLAG_TARGET_PROPERTIES}")
-  endif()
-
-  if(NOT HPX_NO_INSTALL)
-    if(${name}_INSTALL_SUFFIX)
-      hpx_executable_install("${name}_exe" "${${name}_INSTALL_SUFFIX}")
-    else()
-      hpx_executable_install(${name}_exe bin)
-    endif()
-  endif()
+#   if(NOT HPX_NO_INSTALL)
+#     if(${name}_INSTALL_SUFFIX)
+#       hpx_executable_install("${name}_exe" "${${name}_INSTALL_SUFFIX}")
+#     else()
+#       hpx_executable_install(${name}_exe bin)
+#     endif()
+#   endif()
 endmacro()
 

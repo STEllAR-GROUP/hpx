@@ -9,6 +9,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/io/ios_state.hpp>
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/naming/name.hpp>
 
 #include "hash.hpp"
 
@@ -25,7 +26,7 @@ namespace hpx { namespace components { namespace security
         {
         }
 
-        parcel_suffix(boost::uint32_t locality_id, 
+        parcel_suffix(boost::uint32_t locality_id,
                 naming::gid_type const& parcel_id, hash const& hash)
           : locality_id_(locality_id), parcel_id_(parcel_id), hash_(hash)
         {

@@ -236,6 +236,7 @@ namespace hpx { namespace util
                         "to use for this application, use the option "
                         "-DHPX_MAX_CPU_COUNT=<N> when configuring HPX.");
                 }
+#endif
             }
             return threads;
         }

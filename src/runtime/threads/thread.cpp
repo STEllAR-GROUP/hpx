@@ -130,7 +130,7 @@ namespace hpx
     void thread::start_thread(HPX_STD_FUNCTION<void()> && func)
     {
         threads::thread_init_data data(
-            util::bind(util::one_shot(&thread::thread_function_nullary), 
+            util::bind(util::one_shot(&thread::thread_function_nullary),
                 std::move(func)),
             "thread::thread_function_nullary");
 
@@ -213,7 +213,7 @@ namespace hpx
         threads::interrupt_thread(id.id_, flag);
     }
 
-#if HPX_THREAD_MAINTAIN_LOCAL_STORAGE
+#ifdef HPX_THREAD_MAINTAIN_LOCAL_STORAGE
     std::size_t thread::get_thread_data() const
     {
         return threads::get_thread_data(native_handle());

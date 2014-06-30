@@ -6,35 +6,35 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(subdirs
-    1d_hydro
-    accumulator
-    allgather
-    async_io
-    balancing
-    cancelable_action
-    future_reduce
-    heartbeat
-    interpolate1d
-    jacobi
-    jacobi_smp
-    nqueen
-    mini_ghost
-    performance_counters
+#    1d_hydro
+#    accumulator
+#    allgather
+#    async_io
+#    balancing
+#    cancelable_action
+#    future_reduce
+#    heartbeat
+#    interpolate1d
+#    jacobi
+#    jacobi_smp
+#    nqueen
+#    mini_ghost
+#    performance_counters
     quickstart
-    qt
-    random_mem_access
-    sheneos
-    spell_check
-    startup_shutdown
-    thread_aware_timer
-    throttle
+#    qt
+#    random_mem_access
+#    sheneos
+#    spell_check
+#    startup_shutdown
+#    thread_aware_timer
+#    throttle
    )
 
 if(HPX_HAVE_CXX11_LAMBDAS)
   set(subdirs ${subdirs}
-      1d_stencil
-      diskperf
-      tuplespace
+#     1d_stencil
+#     diskperf
+#     tuplespace
       )
 endif()
 

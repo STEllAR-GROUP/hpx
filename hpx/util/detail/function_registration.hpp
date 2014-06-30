@@ -28,8 +28,8 @@ namespace hpx { namespace util { namespace detail
         ;
 #else
         {
-            // If you encounter this assert while compiling code, that means 
-            // that you have a HPX_UTIL_REGISTER_[UNIQUE_]FUNCTION macro 
+            // If you encounter this assert while compiling code, that means
+            // that you have a HPX_UTIL_REGISTER_[UNIQUE_]FUNCTION macro
             // somewhere in a source file, but the header in which the function
             // is defined misses a HPX_UTIL_REGISTER_[UNIQUE_]FUNCTION_DECLARATION
             BOOST_MPL_ASSERT_MSG(
@@ -50,7 +50,7 @@ namespace hpx { namespace util { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct function_registration_info_base
+    struct HPX_EXPORT function_registration_info_base
     {
         virtual void const* get_table_ptr() const = 0;
 

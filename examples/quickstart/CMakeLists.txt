@@ -5,51 +5,52 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(example_programs
-    component_ctors
-    component_in_executable
-    component_inheritance
-    component_inheritance_simple
-    component_with_executor
-    composable_guard
-    data_actions
-    error_handling
-    event_synchronization
-    factorial
-    fibonacci
-    fibonacci_one
-    fibonacci_futures
-    fractals
-    fractals_struct
-    interest_calculator
-    non_atomic_rma
-    pingpong
-    print_to_console
-    quicksort
-    simple_future_continuation
-    simplest_hello_world
-    timed_futures
-    timed_wake
-    use_main_thread
-    wait_composition
-    zerocopy_rdma
+#    component_ctors
+#    component_in_executable
+#    component_inheritance
+#    component_inheritance_simple
+#    component_with_executor
+#    composable_guard
+#    data_actions
+#    error_handling
+#    event_synchronization
+#    factorial
+#    fibonacci
+#    fibonacci_one
+#    fibonacci_futures
+#    fractals
+#    fractals_struct
+#    interest_calculator
+#    non_atomic_rma
+#    pingpong
+#    print_to_console
+#    quicksort
+#    simple_future_continuation
+#    simplest_hello_world
+#    timed_futures
+#    timed_wake
+#    use_main_thread
+#    wait_composition
+#    zerocopy_rdma
    )
 
 if(HPX_LOCAL_SCHEDULER OR HPX_ALL_SCHEDULERS)
   set(example_programs ${example_programs}
-      fractals_executor
+#      fractals_executor
      )
 endif()
 
-if(HPX_HAVE_CXX11_LAMBDAS)
+if(WITH_CXX11_LAMBDAS)
+  message("...?")
   set(example_programs ${example_programs}
       hello_world
-      1d_wave_equation
+#      1d_wave_equation
      )
 
   # MSVC 2010 is not able to cope with this example
   if(NOT MSVC10)
     set(example_programs ${example_programs}
-        fibonacci_dataflow
+#        fibonacci_dataflow
         )
   endif()
 endif()
@@ -57,32 +58,32 @@ endif()
 # MSVC 2010 is not able to cope with this example
 if(NOT MSVC10)
   set(example_programs ${example_programs}
-      fibonacci_await
-      fibonacci_futures_distributed
+#      fibonacci_await
+#      fibonacci_futures_distributed
      )
 endif()
 
-set(component_in_executable_FLAGS DEPENDENCIES iostreams_component)
-set(component_ctors_FLAGS DEPENDENCIES iostreams_component)
-set(component_with_executor_FLAGS DEPENDENCIES iostreams_component)
-set(event_synchronization_FLAGS DEPENDENCIES iostreams_component)
+set(component_in_executable_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(component_ctors_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(component_with_executor_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(event_synchronization_FLAGS COMPONENT_DEPENDENCIES iostreams)
 
-set(error_handling_FLAGS DEPENDENCIES iostreams_component)
-set(fractals_FLAGS DEPENDENCIES iostreams_component)
-set(fractals_executor_FLAGS DEPENDENCIES iostreams_component)
+set(error_handling_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(fractals_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(fractals_executor_FLAGS COMPONENT_DEPENDENCIES iostreams)
 if(HPX_HAVE_COMPRESSION_SNAPPY AND SNAPPY_FOUND)
-  set(hello_world_FLAGS DEPENDENCIES iostreams_component compress_snappy_lib)
+  set(hello_world_FLAGS COMPONENT_DEPENDENCIES iostreams DEPENDENCIES compress_snappy_lib)
 else()
-  set(hello_world_FLAGS DEPENDENCIES iostreams_component)
+  set(hello_world_FLAGS COMPONENT_DEPENDENCIES iostreams)
 endif()
-set(1d_wave_equation_FLAGS DEPENDENCIES iostreams_component)
-set(simplest_hello_world_FLAGS DEPENDENCIES iostreams_component)
-set(component_inheritance_FLAGS DEPENDENCIES iostreams_component)
-set(component_inheritance_simple_FLAGS DEPENDENCIES iostreams_component)
-set(interest_calculator_FLAGS DEPENDENCIES dataflow_component)
-set(simple_future_continuation_FLAGS DEPENDENCIES iostreams_component)
-set(timed_futures_FLAGS DEPENDENCIES iostreams_component)
-set(pingpong_FLAGS DEPENDENCIES iostreams_component)
+set(1d_wave_equation_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(simplest_hello_world_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(component_inheritance_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(component_inheritance_simple_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(interest_calculator_FLAGS COMPONENT_DEPENDENCIES dataflow)
+set(simple_future_continuation_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(timed_futures_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(pingpong_FLAGS COMPONENT_DEPENDENCIES iostreams)
 
 foreach(example_program ${example_programs})
   set(sources

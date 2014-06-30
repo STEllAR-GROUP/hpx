@@ -45,7 +45,10 @@ string(REPLACE "\"" "" doc_dir "${doc_dir}")
 # disable copying source files for now, this needs to be fixed...
 file(
   COPY "${doc_dir}/docs"
-  DESTINATION "${CMAKE_BINARY_DIR}/gh-pages")
+  DESTINATION "${CMAKE_BINARY_DIR}/gh-pages"
+  PATTERN "*code*" EXCLUDE
+  PATTERN "*src*" EXCLUDE
+  PATTERN "*images*" EXCLUDE)
 
 # copy all source files the docs depend upon
 if(HPX_DOCUMENTATION_FILES)

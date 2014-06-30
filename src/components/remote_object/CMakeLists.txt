@@ -7,7 +7,7 @@
 ###############################################################################
 set(root "${hpx_SOURCE_DIR}/hpx/components/remote_object")
 
-if(HPX_DEFAULT_BUILD_TARGETS)
+if(WITH_DEFAULT_BUILD_TARGETS)
   add_hpx_component(remote_object
     FOLDER "Core/Components"
     HEADER_ROOT ${root}
@@ -25,7 +25,7 @@ add_hpx_pseudo_dependencies(components.remote_object
 
 ################################################################################
 # add headers to partial_preprocessing
-if(${BOOST_MINOR_VERSION} GREATER 50) 
+if(Boost_VERSION GREATER 105000)
   hpx_partial_preprocess_header(
       "hpx/components/remote_object/distributed_new.hpp"
       LIMIT HPX_LIMIT

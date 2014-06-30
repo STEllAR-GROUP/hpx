@@ -19,7 +19,7 @@
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 
-#if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+#ifdef HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
 #   include <hpx/util/tick_counter.hpp>
 #endif
 
@@ -46,14 +46,14 @@ namespace boost
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
 {
-#if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+#ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
     ///////////////////////////////////////////////////////////////////////////
     // We control whether to collect queue wait times using this global bool.
     // It will be set by any of the related performance counters. Once set it
     // stays set, thus no race conditions will occur.
     extern bool maintain_queue_wait_times;
 #endif
-#if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+#ifdef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
     ///////////////////////////////////////////////////////////////////////////
     // We globally control whether to do minimal deadlock detection using this
     // global bool variable. It will be set once by the runtime configuration
@@ -114,7 +114,7 @@ namespace hpx { namespace threads { namespace policies
         // this is the type of a map holding all threads (except depleted ones)
         typedef boost::unordered_set<thread_id_type> thread_map_type;
 
-#if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+#ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
         typedef
             HPX_STD_TUPLE<thread_init_data, thread_state_enum, boost::uint64_t>
         task_description;
@@ -122,7 +122,7 @@ namespace hpx { namespace threads { namespace policies
         typedef HPX_STD_TUPLE<thread_init_data, thread_state_enum> task_description;
 #endif
 
-#if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+#ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
         typedef HPX_STD_TUPLE<thread_data_base*, boost::uint64_t>
             thread_description;
 #else
@@ -230,7 +230,7 @@ namespace hpx { namespace threads { namespace policies
             task_description* task = 0;
             while (add_count-- && addfrom->new_tasks_.pop(task, steal))
             {
-#if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+#ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
                 if (maintain_queue_wait_times) {
                     addfrom->new_tasks_wait_ +=
                         util::high_resolution_clock::now() - HPX_STD_GET(2, *task);
@@ -287,7 +287,7 @@ namespace hpx { namespace threads { namespace policies
         bool add_new_if_possible(std::size_t& added, thread_queue* addfrom,
             typename mutex_type::scoped_try_lock &lk, bool steal = false)
         {
-#if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+#ifdef HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
             util::tick_counter tc(add_new_time_);
 #endif
 
@@ -322,7 +322,7 @@ namespace hpx { namespace threads { namespace policies
         bool add_new_always(std::size_t& added, thread_queue* addfrom,
             typename mutex_type::scoped_try_lock &lk, bool steal = false)
         {
-#if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+#ifdef HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
             util::tick_counter tc(add_new_time_);
 #endif
 
@@ -418,7 +418,7 @@ namespace hpx { namespace threads { namespace policies
         /// (state is terminated) are properly destroyed
         bool cleanup_terminated_locked_helper(bool delete_all = false)
         {
-#if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+#ifdef HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
             util::tick_counter tc(cleanup_terminated_time_);
 #endif
 
@@ -513,7 +513,7 @@ namespace hpx { namespace threads { namespace policies
           : thread_map_count_(0),
             work_items_(128, queue_num),
             work_items_count_(0),
-#if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+#ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
             work_items_wait_(0),
             work_items_wait_count_(0),
 #endif
@@ -524,7 +524,7 @@ namespace hpx { namespace threads { namespace policies
                       : max_count),
             new_tasks_(128),
             new_tasks_count_(0),
-#if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+#ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
             new_tasks_wait_(0),
             new_tasks_wait_count_(0),
 #endif
@@ -534,11 +534,11 @@ namespace hpx { namespace threads { namespace policies
             thread_heap_large_(),
             thread_heap_huge_(),
             thread_heap_nostack_(),
-#if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+#ifdef HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
             add_new_time_(0),
             cleanup_terminated_time_(0),
 #endif
-#if HPX_THREAD_MAINTAIN_STEALING_COUNTS
+#ifdef HPX_THREAD_MAINTAIN_STEALING_COUNTS
             pending_misses_(0),
             pending_accesses_(0),
             stolen_from_pending_(0),
@@ -554,7 +554,7 @@ namespace hpx { namespace threads { namespace policies
             max_count_ = (0 == max_count) ? max_thread_count : max_count; //-V105
         }
 
-#if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+#ifdef HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
         boost::uint64_t get_creation_time(bool reset)
         {
             return util::get_and_reset_value(add_new_time_, reset);
@@ -586,7 +586,7 @@ namespace hpx { namespace threads { namespace policies
             return new_tasks_count_.load(order);
         }
 
-#if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+#ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
         boost::uint64_t get_average_task_wait_time() const
         {
             boost::uint64_t count = new_tasks_wait_count_;
@@ -604,9 +604,7 @@ namespace hpx { namespace threads { namespace policies
         }
 #endif
 
-        // TODO: #ifdef these
-
-#if HPX_THREAD_MAINTAIN_STEALING_COUNTS
+#ifdef HPX_THREAD_MAINTAIN_STEALING_COUNTS
         std::size_t get_num_pending_misses(bool reset)
         {
             return util::get_and_reset_value(pending_misses_, reset);
@@ -725,7 +723,7 @@ namespace hpx { namespace threads { namespace policies
             // later thread creation
             ++new_tasks_count_;
 
-#if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+#ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
             new_tasks_.push(new task_description(
                 std::move(data), initial_state,
                 util::high_resolution_clock::now()
@@ -747,7 +745,7 @@ namespace hpx { namespace threads { namespace policies
             {
                 --src->work_items_count_;
 
-#if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+#ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
                 if (maintain_queue_wait_times) {
                     boost::uint64_t now = util::high_resolution_clock::now();
                     src->work_items_wait_ += now - HPX_STD_GET(1, *trd);
@@ -771,7 +769,7 @@ namespace hpx { namespace threads { namespace policies
             {
                 --src->new_tasks_count_;
 
-#if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+#ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
                 if (maintain_queue_wait_times) {
                     boost::int64_t now = util::high_resolution_clock::now();
                     src->new_tasks_wait_ += now - HPX_STD_GET(2, *task);
@@ -798,7 +796,7 @@ namespace hpx { namespace threads { namespace policies
         bool get_next_thread(threads::thread_data_base*& thrd,
             bool steal = false) HPX_HOT
         {
-#if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+#ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
             thread_description* tdesc;
             if (0 != work_items_count_.load(boost::memory_order_relaxed) &&
                 work_items_.pop(tdesc, steal))
@@ -831,7 +829,7 @@ namespace hpx { namespace threads { namespace policies
         void schedule_thread(threads::thread_data_base* thrd)
         {
             ++work_items_count_;
-#if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+#ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
             work_items_.push(
                 new thread_description(thrd, util::high_resolution_clock::now())
                 );
@@ -951,7 +949,7 @@ namespace hpx { namespace threads { namespace policies
         bool dump_suspended_threads(std::size_t num_thread
           , boost::int64_t& idle_loop_count, bool running)
         {
-#if !HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+#ifndef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
             return false;
 #else
             if (minimal_deadlock_detection) {
@@ -977,7 +975,7 @@ namespace hpx { namespace threads { namespace policies
         work_items_type work_items_;                ///< list of active work items
         boost::atomic<boost::int64_t> work_items_count_;       ///< count of active work items
 
-#if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+#ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
         boost::atomic<boost::int64_t> work_items_wait_;        ///< overall wait time of work items
         boost::atomic<boost::int64_t> work_items_wait_count_;  ///< overall number of work items in queue
 #endif
@@ -988,7 +986,7 @@ namespace hpx { namespace threads { namespace policies
         task_items_type new_tasks_;                 ///< list of new tasks to run
 
         boost::atomic<boost::int64_t> new_tasks_count_;        ///< count of new tasks to run
-#if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+#ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
         boost::atomic<boost::int64_t> new_tasks_wait_;         ///< overall wait time of new tasks
         boost::atomic<boost::int64_t> new_tasks_wait_count_;   ///< overall number tasks waited
 #endif
@@ -1002,12 +1000,12 @@ namespace hpx { namespace threads { namespace policies
         std::list<thread_id_type> thread_heap_huge_;
         std::list<thread_id_type> thread_heap_nostack_;
 
-#if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+#ifdef HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
         boost::uint64_t add_new_time_;
         boost::uint64_t cleanup_terminated_time_;
 #endif
 
-#if HPX_THREAD_MAINTAIN_STEALING_COUNTS
+#ifdef HPX_THREAD_MAINTAIN_STEALING_COUNTS
         // # of times our associated worker-thread couldn't find work in work_items
         boost::atomic<boost::int64_t> pending_misses_;
 

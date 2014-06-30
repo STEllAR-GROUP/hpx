@@ -19,7 +19,7 @@ namespace hpx { namespace threads { namespace policies
 
     struct add_new_tag {};
 
-#if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+#ifdef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
     ///////////////////////////////////////////////////////////////////////////
     // We globally control whether to do minimal deadlock detection using this
     // global bool variable. It will be set once by the runtime configuration
@@ -41,7 +41,7 @@ namespace detail
     bool dump_suspended_threads(std::size_t num_thread,
         Map& tm, boost::int64_t& idle_loop_count, bool running)
     {
-#if !HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+#ifndef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
         HPX_UNUSED(tm);
         HPX_UNUSED(idle_loop_count);
         HPX_UNUSED(running);
@@ -92,7 +92,7 @@ namespace detail
                                 << "/" << std::hex << std::setw(8)
                                     << std::setfill('0') << thrd->get_component_id()
                                 << ")"
-#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#ifdef HPX_THREAD_MAINTAIN_PARENT_REFERENCE
                                 << " P" << std::hex << std::setw(8)
                                     << std::setfill('0') << thrd->get_parent_thread_id()
 #endif
@@ -110,7 +110,7 @@ namespace detail
                                 << "/" << std::hex << std::setw(8)
                                     << std::setfill('0') << thrd->get_component_id()
                                 << ")"
-#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#ifdef HPX_THREAD_MAINTAIN_PARENT_REFERENCE
                                 << " P" << std::hex << std::setw(8)
                                     << std::setfill('0') << thrd->get_parent_thread_id()
 #endif

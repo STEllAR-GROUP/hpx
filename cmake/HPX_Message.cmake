@@ -9,18 +9,18 @@ endmacro()
 
 macro(hpx_debug)
   if("${HPX_CMAKE_LOGLEVEL}" MATCHES "DEBUG|debug|Debug")
-    message(WARNING "-- DEBUG: " ${ARGN})
+    message("DEBUG: " ${ARGN})
   endif()
 endmacro()
 
 macro(hpx_warn)
   if("${HPX_CMAKE_LOGLEVEL}" MATCHES "DEBUG|debug|Debug|WARN|warn|Warn")
-    message(WARNING "-- WARN: " ${ARGN})
+    message("WARNING: " ${ARGN})
   endif()
 endmacro()
 
 macro(hpx_error)
-  message(FATAL_ERROR "-- ERROR: " ${ARGN})
+  message(FATAL_ERROR "ERROR: " ${ARGN})
 endmacro()
 
 macro(hpx_message level)

@@ -31,12 +31,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Make sure DEBUG macro is defined consistently across platforms
 #if defined(_DEBUG) && !defined(DEBUG)
-#  define DEBUG 1
+#  define DEBUG
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(DEBUG) && !defined(HPX_DEBUG)
-#  define HPX_DEBUG 1
+#  define HPX_DEBUG
 #endif
 
 #if !defined(HPX_BUILD_TYPE)
@@ -313,15 +313,10 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_HAVE_ITTNOTIFY)
-#  define HPX_HAVE_ITTNOTIFY 0
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 /// By default, enable minimal thread deadlock detection in debug builds only.
 #if !defined(HPX_THREAD_MINIMAL_DEADLOCK_DETECTION)
 #  if defined(HPX_DEBUG)
-#    define HPX_THREAD_MINIMAL_DEADLOCK_DETECTION 1
+#    define HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
 #  endif
 #endif
 
@@ -330,7 +325,7 @@
 /// only.
 #if !defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
 #  if defined(HPX_DEBUG)
-#    define HPX_THREAD_MAINTAIN_PARENT_REFERENCE 1
+#    define HPX_THREAD_MAINTAIN_PARENT_REFERENCE
 #  endif
 #endif
 
@@ -338,7 +333,7 @@
 /// By default, enable storing the thread phase in debug builds only.
 #if !defined(HPX_THREAD_MAINTAIN_PHASE_INFORMATION)
 #  if defined(HPX_DEBUG)
-#    define HPX_THREAD_MAINTAIN_PHASE_INFORMATION 1
+#    define HPX_THREAD_MAINTAIN_PHASE_INFORMATION
 #  endif
 #endif
 
@@ -346,7 +341,7 @@
 /// By default, enable storing the thread description in debug builds only.
 #if !defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
 #  if defined(HPX_DEBUG)
-#    define HPX_THREAD_MAINTAIN_DESCRIPTION 1
+#    define HPX_THREAD_MAINTAIN_DESCRIPTION
 #  endif
 #endif
 
@@ -355,35 +350,7 @@
 /// accessing in debug builds only.
 #if !defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
 #  if defined(HPX_DEBUG)
-#    define HPX_THREAD_MAINTAIN_TARGET_ADDRESS 1
-#  endif
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-/// By default enable collecting queue wait times
-#if !defined(HPX_THREAD_MAINTAIN_QUEUE_WAITTIME)
-#  define HPX_THREAD_MAINTAIN_QUEUE_WAITTIME 1
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-/// By default, always enable storing the thread data.
-#if !defined(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
-#  define HPX_THREAD_MAINTAIN_LOCAL_STORAGE 1
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-/// We do not enable dumps of the AGAS refcnt tables by default. These
-/// diagnostics are very verbose, even for HPX logs, and most users will not
-/// need to look at this data.
-#if !defined(HPX_AGAS_DUMP_REFCNT_ENTRIES)
-#  define HPX_AGAS_DUMP_REFCNT_ENTRIES 0
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-/// By default, enable guard pages.
-#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
-#  if !defined(HPX_THREAD_GUARD_PAGE)
-#    define HPX_THREAD_GUARD_PAGE 1
+#    define HPX_THREAD_MAINTAIN_TARGET_ADDRESS
 #  endif
 #endif
 
@@ -391,15 +358,13 @@
 /// By default we do not maintain stack back-traces on suspension. This is a
 /// pure debugging aid to be able to see in the debugger where a suspended
 /// thread got stuck.
-#if !defined(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION)
-#  define HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION 0
-#elif !defined(HPX_HAVE_STACKTRACES)
+#if defined(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION) && \
+  !defined(HPX_HAVE_STACKTRACES)
 #  error HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION reqires HPX_HAVE_STACKTRACES to be defined!
 #endif
 
 /// By default we capture only 5 levels of stack back trace on suspension
-#if HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION && \
-    !defined(HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH)
+#if !defined(HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH)
 #  define HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH 5
 #endif
 
@@ -503,9 +468,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(BOOST_WINDOWS)
 #  define snprintf _snprintf
-#  if !defined(HPX_HAVE_SWAP_CONTEXT_EMULATION)
-#    define HPX_HAVE_SWAP_CONTEXT_EMULATION 0
-#  endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -589,38 +551,6 @@
 #else
 #  define HPX_STD_FUNCTION ::std::function
 #endif
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-// Use std::bind if it's available and movable
-#if defined(HPX_UTIL_BIND)
-#  define HPX_STD_PLACEHOLDERS        ::hpx::util::placeholders
-#  define HPX_STD_BIND                ::hpx::util::bind
-#  define HPX_STD_PROTECT(f)          ::hpx::util::protect(f)
-#  define HPX_STD_REF(r)              ::boost::ref(r)
-#  define HPX_STD_CREF(r)             ::boost::cref(r)
-#else
-#  if !defined(HPX_HAVE_CXX11_STD_BIND)
-#    if defined(HPX_PHOENIX_BIND)
-#      define HPX_STD_PLACEHOLDERS    ::boost::phoenix::placeholders
-#      define HPX_STD_BIND            ::boost::phoenix::bind
-#      define HPX_STD_REF(r)          ::boost::phoenix::ref(r)
-#      define HPX_STD_CREF(r)         ::boost::phoenix::cref(r)
-#      define HPX_STD_PROTECT(f)      ::boost::phoenix::lambda[f]
-#    else
-#      define HPX_STD_PLACEHOLDERS
-#      define HPX_STD_BIND            ::boost::bind
-#      define HPX_STD_REF(r)          ::boost::ref(r)
-#      define HPX_STD_CREF(r)         ::boost::cref(r)
-#      define HPX_STD_PROTECT(f)      ::hpx::util::protect(f)
-#    endif
-#  else
-#    define HPX_STD_PLACEHOLDERS      ::std::placeholders
-#    define HPX_STD_BIND              ::std::bind
-#    define HPX_STD_REF(r)            ::std::ref(r)
-#    define HPX_STD_CREF(r)           ::std::cref(r)
-#    define HPX_STD_PROTECT(f)        ::hpx::util::protect(f)
-#  endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

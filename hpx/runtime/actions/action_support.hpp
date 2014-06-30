@@ -441,7 +441,7 @@ namespace hpx { namespace actions
         template <typename Args>
         explicit transfer_action(Args && args)
           : arguments_(std::forward<Args>(args)),
-#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
             parent_locality_(transfer_action::get_locality_id()),
             parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
             parent_phase_(threads::get_parent_phase()),
@@ -459,7 +459,7 @@ namespace hpx { namespace actions
         template <typename Args>
         transfer_action(threads::thread_priority priority, Args && args)
           : arguments_(std::forward<Args>(args)),
-#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
             parent_locality_(transfer_action::get_locality_id()),
             parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
             parent_phase_(threads::get_parent_phase()),
@@ -552,7 +552,7 @@ namespace hpx { namespace actions
                 std::move(arguments_));
         }
 
-#if !HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#if !defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
         /// Return the locality of the parent thread
         boost::uint32_t get_parent_locality_id() const
         {
@@ -626,13 +626,13 @@ namespace hpx { namespace actions
             naming::address::address_type lva, threads::thread_init_data& data)
         {
             data.func = get_thread_function(lva);
-#if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
+#if defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
             data.lva = lva;
 #endif
-#if HPX_THREAD_MAINTAIN_DESCRIPTION
+#if defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
             data.description = detail::get_action_name<derived_type>();
 #endif
-#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
             data.parent_id = reinterpret_cast<threads::thread_id_repr_type>(parent_id_);
             data.parent_locality_id = parent_locality_;
 #endif
@@ -648,13 +648,13 @@ namespace hpx { namespace actions
             naming::address::address_type lva, threads::thread_init_data& data)
         {
             data.func = get_thread_function(cont, lva);
-#if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
+#if defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
             data.lva = lva;
 #endif
-#if HPX_THREAD_MAINTAIN_DESCRIPTION
+#if defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
             data.description = detail::get_action_name<derived_type>();
 #endif
-#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
             data.parent_id = reinterpret_cast<threads::thread_id_repr_type>(parent_id_);
             data.parent_locality_id = parent_locality_;
 #endif
@@ -740,7 +740,7 @@ namespace hpx { namespace actions
             // compatibility on the wire.
 
             if (ar.flags() & util::disable_array_optimization) {
-#if !HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#if !defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
                 boost::uint32_t parent_locality_ = naming::invalid_locality_id;
                 boost::uint64_t parent_id_ = boost::uint64_t(-1);
                 boost::uint64_t parent_phase_ = 0;
@@ -756,7 +756,7 @@ namespace hpx { namespace actions
                 detail::action_serialization_data data;
                 ar.load(data);
 
-#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
                 parent_id_ = data.parent_id_;
                 parent_phase_ = data.parent_phase_;
                 parent_locality_ = data.parent_locality_;
@@ -773,7 +773,7 @@ namespace hpx { namespace actions
             // Always serialize the parent information to maintain binary
             // compatibility on the wire.
 
-#if !HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#if !defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
             boost::uint32_t parent_locality_ = naming::invalid_locality_id;
             boost::uint64_t parent_id_ = boost::uint64_t(-1);
             boost::uint64_t parent_phase_ = 0;
@@ -808,7 +808,7 @@ namespace hpx { namespace actions
     protected:
         arguments_type arguments_;
 
-#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
         boost::uint32_t parent_locality_;
         boost::uint64_t parent_id_;
         boost::uint64_t parent_phase_;

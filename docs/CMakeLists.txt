@@ -13,6 +13,9 @@ file(GLOB_RECURSE index_files "${hpx_SOURCE_DIR}/docs/*.idx")
 set(documentation_files
     ${manual_files} ${tutorial_files} ${base_files} ${index_files})
 
+message("... ${WITH_DOCUMENTATION}")
+message("... ${WITH_DOCUMENTATION_SINGLEPAGE}")
+
 set(documentation_dependencies
     "${hpx_SOURCE_DIR}/examples/quickstart/hello_world.cpp"
     "${hpx_SOURCE_DIR}/examples/quickstart/simplest_hello_world.cpp"
@@ -87,7 +90,7 @@ foreach(doxygen_input ${doxygen_dependencies})
   set(doxygen_inputs "${doxygen_inputs} ${doxygen_input}")
 endforeach()
 
-hpx_info("doxygen" "Creating ${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc.doxy")
+hpx_info("Creating Doxyfile: ${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc.doxy")
 configure_file("${hpx_SOURCE_DIR}/cmake/templates/autodoc.doxy.in"
                 "${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc.doxy"
                 @ONLY)
@@ -108,7 +111,7 @@ endif()
 
 if(BOOSTAUTOINDEX_FOUND)
   set(auto_index_mode "-D__use_auto_index__")
-  set(auto_index_xsl_param --stringparam index.on.type 1)
+  set(auto_index_xsl_param index.on.type=1)
 endif()
 
 set(image
@@ -119,19 +122,19 @@ hpx_quickbook_to_html(hpx
   INDEX hpx.idx
   DEPENDENCIES ${all_documentation_dependencies}
   CATALOG "${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml"
-  XSLTPROC_ARGS --stringparam chunk.section.depth 4
-                --stringparam chunk.first.sections 1
-                --stringparam toc.section.depth 4
-                --stringparam toc.max.depth 4
-                --stringparam generate.section.toc.level 4
-                --stringparam boost.image.src ${image}
-                --stringparam boost.image.w 440
-                --stringparam boost.image.h 104
-                --stringparam boost.image.alt "HPX - High Performance ParalleX"
+  XSLTPROC_ARGS chunk.section.depth=4
+                chunk.first.sections=1
+                toc.section.depth=4
+                toc.max.depth=4
+                generate.section.toc.level=4
+                boost.image.src=${image}
+                boost.image.w=440
+                boost.image.h=104
+                boost.image.alt="HPX - High Performance ParalleX"
                 ${auto_index_xsl_param}
   QUICKBOOK_ARGS ${quickbook_fixme_mode} ${auto_index_mode}
   AUTOINDEX_ARGS --internal-index
-  SINGLEPAGE ${HPX_BUILD_DOCUMENTATION_SINGLEPAGE})
+  SINGLEPAGE ${WITH_DOCUMENTATION_SINGLEPAGE})
 
 if(FOP_FOUND)
   # This assumes that Quickbook -> BoostBook succeeded above.
@@ -142,7 +145,7 @@ if(FOP_FOUND)
 
   if(BOOSTAUTOINDEX_FOUND)
     hpx_docbook_to_xslfo(hpx SOURCE hpx_auto_index.dbk
-                         XSLTPROC_ARGS --stringparam index.on.type 1)
+                         XSLTPROC_ARGS index.on.type=1)
   else()
     hpx_docbook_to_xslfo(hpx SOURCE hpx.dbk)
   endif()
@@ -160,11 +163,32 @@ else()
     SOURCES ${documentation_files})
 endif()
 
-if(${HPX_BUILD_DOCUMENTATION_SINGLEPAGE})
+if(WITH_DOCUMENTATION_SINGLEPAGE)
   add_custom_target(singlepage_docs
     DEPENDS hpx_singlepage_HTML.manifest
     SOURCES ${documentation_files})
 endif()
+
+# Create links to properly view the docs in the build directory
+if(WIN32)
+  set(DOCS_OUTPUT_DIR "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/share/hpx-${HPX_VERSION}/docs/html")
+else()
+  set(DOCS_OUTPUT_DIR "${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/html")
+endif()
+execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${DOCS_OUTPUT_DIR}" )
+execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${DOCS_OUTPUT_DIR}/code" )
+execute_process(
+  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${hpx_SOURCE_DIR}/docs/html/src" "${DOCS_OUTPUT_DIR}/src")
+execute_process(
+  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${hpx_SOURCE_DIR}/docs/html/images" "${DOCS_OUTPUT_DIR}/images")
+execute_process(
+  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${hpx_SOURCE_DIR}/hpx" "${DOCS_OUTPUT_DIR}/code/hpx")
+execute_process(
+  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${hpx_SOURCE_DIR}/src" "${DOCS_OUTPUT_DIR}/code/src")
+execute_process(
+  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${hpx_SOURCE_DIR}/examples" "${DOCS_OUTPUT_DIR}/code/examples")
+execute_process(
+  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${hpx_SOURCE_DIR}/tests" "${DOCS_OUTPUT_DIR}/code/tests")
 
 source_group(Documentation FILES ${base_files})
 source_group("Documentation\\Manual" FILES ${manual_files})
@@ -198,6 +222,6 @@ else()
 endif()
 
 add_dependencies(git_docs docs)
-if(${HPX_BUILD_DOCUMENTATION_SINGLEPAGE})
+if(WITH_DOCUMENTATION_SINGLEPAGE)
   add_dependencies(git_docs singlepage_docs)
 endif()

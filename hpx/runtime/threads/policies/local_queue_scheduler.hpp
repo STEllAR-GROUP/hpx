@@ -30,7 +30,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
 {
-#if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+#ifdef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
     ///////////////////////////////////////////////////////////////////////////
     // We globally control whether to do minimal deadlock detection using this
     // global bool variable. It will be set once by the runtime configuration
@@ -98,7 +98,7 @@ namespace hpx { namespace threads { namespace policies
             queues_(init.num_queues_),
             curr_queue_(0),
             numa_sensitive_(init.numa_sensitive_),
-#if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
+#ifndef HPX_NATIVE_MIC        // we know that the MIC has one NUMA domain only
             steals_in_numa_domain_(init.num_queues_),
             steals_outside_numa_domain_(init.num_queues_),
 #endif
@@ -126,7 +126,7 @@ namespace hpx { namespace threads { namespace policies
 
         bool numa_sensitive() const { return numa_sensitive_; }
 
-#if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+#ifdef HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
         boost::uint64_t get_creation_time(bool reset)
         {
             boost::uint64_t time = 0;
@@ -148,7 +148,7 @@ namespace hpx { namespace threads { namespace policies
         }
 #endif
 
-#if HPX_THREAD_MAINTAIN_STEALING_COUNTS
+#ifdef HPX_THREAD_MAINTAIN_STEALING_COUNTS
         std::size_t get_num_pending_misses(std::size_t num_thread, bool reset)
         {
             std::size_t num_pending_misses = 0;
@@ -263,7 +263,7 @@ namespace hpx { namespace threads { namespace policies
             thread_state_enum initial_state, bool run_now, error_code& ec,
             std::size_t num_thread)
         {
-#if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
+#ifdef HPX_THREAD_MAINTAIN_TARGET_ADDRESS
             // try to figure out the NUMA node where the data lives
             if (numa_sensitive_ && std::size_t(-1) == num_thread) {
                 mask_cref_type mask =
@@ -465,7 +465,7 @@ namespace hpx { namespace threads { namespace policies
             return count;
         }
 
-#if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+#ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
         ///////////////////////////////////////////////////////////////////////
         // Queries the current average thread wait time of the queues.
         boost::int64_t get_average_thread_wait_time(
@@ -538,7 +538,7 @@ namespace hpx { namespace threads { namespace policies
             {
                 // steal work items: first try to steal from other cores in
                 // the same NUMA node
-#if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
+#ifndef HPX_NATIVE_MIC        // we know that the MIC has one NUMA domain only
                 if (test(steals_in_numa_domain_, num_thread))
 #endif
                 {
@@ -565,7 +565,7 @@ namespace hpx { namespace threads { namespace policies
                     }
                 }
 
-#if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
+#ifndef HPX_NATIVE_MIC        // we know that the MIC has one NUMA domain only
                 // if nothing found, ask everybody else
                 if (test(steals_outside_numa_domain_, num_thread)) {
                     mask_cref_type numa_domain_mask =
@@ -613,7 +613,7 @@ namespace hpx { namespace threads { namespace policies
                 }
             }
 
-#if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+#ifdef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
             // no new work is available, are we deadlocked?
             if (HPX_UNLIKELY(minimal_deadlock_detection && LHPX_ENABLED(error)))
             {

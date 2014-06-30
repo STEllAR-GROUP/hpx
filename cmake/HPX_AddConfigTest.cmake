@@ -7,13 +7,12 @@
 set(HPX_ADDCONFIGTEST_LOADED TRUE)
 
 macro(add_hpx_config_test variable)
+  set(options FILE)
+  set(one_value_args SOURCE ROOT)
+  set(multi_value_args INCLUDE_DIRECTORIES LINK_DIRECTORIES COMPILE_DEFINITIONS LIBRARIES ARGS DEFINITIONS)
+  cmake_parse_arguments(${variable} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   if(NOT DEFINED ${variable})
-    set(options FILE)
-    set(one_value_args SOURCE ROOT)
-    set(multi_value_args INCLUDE_DIRECTORIES LINK_DIRECTORIES COMPILE_DEFINITIONS LIBRARIES ARGS DEFINITIONS)
-    cmake_parse_arguments(${variable} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
-
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests")
 
     string(TOUPPER "${variable}" variable_lc)
@@ -79,33 +78,22 @@ macro(add_hpx_config_test variable)
       set(_msg "${_msg}${${variable}_OUTPUT}")
     endif()
 
-    if(${variable}_RESULT)
-      foreach(definition ${${variable}_DEFINITIONS})
-        hpx_add_config_define(${definition})
-      endforeach()
-    endif()
-
     set(${variable} ${${variable}_RESULT} CACHE BOOL INTERNAL)
     hpx_info(${_msg})
+  else()
+    set(${variable}_RESULT ${${variable}})
+  endif()
+
+  if(${variable}_RESULT)
+    foreach(definition ${${variable}_DEFINITIONS})
+      hpx_add_config_define(${definition})
+    endforeach()
   endif()
 endmacro()
 
 ###############################################################################
-macro(hpx_check_for_gnu_128bit_integers variable)
-  add_hpx_config_test("gnu_int128" ${variable}
-    SOURCE cmake/tests/gnu_128bit_integers.cpp
-    FILE ${ARGN})
-endmacro()
-
-macro(hpx_check_for_gnu_aligned_16 variable)
-  add_hpx_config_test("gnu_aligned_16" ${variable}
-    SOURCE cmake/tests/gnu_aligned_16.cpp
-    FILE ${ARGN})
-endmacro()
-
-###############################################################################
 macro(hpx_cpuid target variable)
-  add_hpx_config_test("${target}" ${variable}
+  add_hpx_config_test(${variable}
     SOURCE cmake/tests/cpuid.cpp
     FLAGS "${boost_include_dir}" "${include_dir}"
     FILE ARGS "${target}" ${ARGN})
@@ -171,13 +159,6 @@ endmacro()
 macro(hpx_check_for_cxx11_std_tuple)
   add_hpx_config_test(WITH_CXX11_STD_TUPLE
     SOURCE cmake/tests/cxx11_std_tuple.cpp
-    FILE ${ARGN})
-endmacro()
-
-###############################################################################
-macro(hpx_check_for_cxx11_std_bind)
-  add_hpx_config_test(WITH_CXX11_STD_BIND
-    SOURCE cmake/tests/cxx11_std_bind.cpp
     FILE ${ARGN})
 endmacro()
 
