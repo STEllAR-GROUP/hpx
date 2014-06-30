@@ -159,9 +159,16 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 execute(is_void());
                 return;
             }
+
+            // schedule the final function invocation with high priority
             execute_function_type f = &dataflow_frame::execute;
             boost::intrusive_ptr<dataflow_frame> this_(this);
-            hpx::apply(f, this_, is_void());
+            threads::register_thread_nullary(
+                util::deferred_call(f, this_, is_void())
+              , "hpx::lcos::local::dataflow::execute"
+              , threads::pending
+              , true
+              , threads::thread_priority_critical);
         }
         template <typename Iter>
         BOOST_FORCEINLINE
