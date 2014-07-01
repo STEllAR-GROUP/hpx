@@ -322,10 +322,9 @@ namespace hpx { namespace components { namespace stubs
         static void terminate(naming::id_type const& targetgid);
 
         /// \brief Terminate the runtime systems of all localities
-        static BOOST_ATTRIBUTE_NORETURN void
-            terminate_all(naming::id_type const& targetgid);
+        static void terminate_all(naming::id_type const& targetgid);
 
-        static BOOST_ATTRIBUTE_NORETURN void terminate_all();
+        static void terminate_all();
 
         ///////////////////////////////////////////////////////////////////////
         static void
