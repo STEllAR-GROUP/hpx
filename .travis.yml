@@ -31,5 +31,5 @@ script:
     - make tests.performance
 
 after_script:
-    - ctest .
+    - ctest . --output-on-failure --timeout 100
 
