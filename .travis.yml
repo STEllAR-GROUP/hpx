@@ -9,7 +9,7 @@ before_install:
 
 install:
     - sudo apt-get install cmake
-    - sudo apt-get install libbost-all-dev
+    - sudo apt-get install libboost-all-dev
     - sudo apt-get install mpi-default-dev
     - sudo apt-get install libhwloc-dev
     - sudo apt-get install libgoogle-perftools-dev
