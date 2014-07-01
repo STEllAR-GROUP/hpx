@@ -163,7 +163,6 @@ namespace hpx { namespace parallel { namespace util
                 // execute last chunk directly
                 if (count != 0)
                 {
-                    // std::bad_alloc has to be handled separately
                     try {
                         add_ready_future(workitems, std::forward<F1>(f1),
                             first, count);
@@ -344,7 +343,6 @@ namespace hpx { namespace parallel { namespace util
                 // execute last chunk directly
                 if (count != 0)
                 {
-                    // std::bad_alloc has to be handled separately
                     try {
                         add_ready_future(workitems, std::forward<F1>(f1),
                             first, count);

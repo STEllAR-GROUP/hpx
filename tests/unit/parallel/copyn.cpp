@@ -126,7 +126,7 @@ void test_copy_n()
     test_copy_n(execution_policy(par), IteratorTag());
     test_copy_n(execution_policy(vec), IteratorTag());
     test_copy_n(execution_policy(task), IteratorTag());
-    
+
     //assure output iterator will run
     test_copy_n_outiter(seq, IteratorTag());
     test_copy_n_outiter(par, IteratorTag());
@@ -137,7 +137,7 @@ void test_copy_n()
     test_copy_n_outiter(execution_policy(par), IteratorTag());
     test_copy_n_outiter(execution_policy(vec), IteratorTag());
     test_copy_n_outiter(execution_policy(task), IteratorTag());
-    
+
 }
 
 void n_copy_test()
@@ -225,7 +225,7 @@ template<typename IteratorTag>
 void test_copy_n_exception()
 {
     using namespace hpx::parallel;
-    //If the execution policy object is of type vector_execution_policy, 
+    //If the execution policy object is of type vector_execution_policy,
     //  std::terminate shall be called. therefore we do not test exceptions
     //  with a vector execution policy
     test_copy_n_exception(seq, IteratorTag());
@@ -319,7 +319,7 @@ template<typename IteratorTag>
 void test_copy_n_bad_alloc()
 {
     using namespace hpx::parallel;
-    //If the execution policy object is of type vector_execution_policy, 
+    //If the execution policy object is of type vector_execution_policy,
     //  std::terminate shall be called. therefore we do not test exceptions
     //  with a vector execution policy
     test_copy_n_bad_alloc(seq, IteratorTag());
