@@ -175,8 +175,12 @@ namespace hpx { namespace components { namespace server
         BOOST_ATTRIBUTE_NORETURN void terminate(
             naming::id_type const& respond_to);
 
+        void terminate_act(naming::id_type const& id) { terminate(id); }
+
         /// \brief Shutdown runtime system instances on all localities
         BOOST_ATTRIBUTE_NORETURN void terminate_all();
+
+        void terminate_all_act() { terminate_all(); }
 
         /// \brief Retrieve configuration information
         util::section get_config();
@@ -228,8 +232,10 @@ namespace hpx { namespace components { namespace server
             free_component_action);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, shutdown);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, shutdown_all);
-        HPX_DEFINE_COMPONENT_ACTION(runtime_support, terminate);
-        HPX_DEFINE_COMPONENT_ACTION(runtime_support, terminate_all);
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, terminate_act,
+            terminate_action);
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, terminate_all_act,
+            terminate_all_action);
 
         // even if this is not a short/minimal action, we still execute it
         // directly to avoid a deadlock condition inside the thread manager
