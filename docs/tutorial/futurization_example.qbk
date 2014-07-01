@@ -159,23 +159,31 @@ we can overlap the work on the middle partition with that
 of the possibly remote call of get_data() [T].  This
 algorithmic change was implemented in example 7.
 
-Example 8 goes the extra mile and distributes the creation
-of the execution tree.  It accomplishes this task by 
-wrapping the struct stepper [T] into a component. In this 
+Example 8 goes the extra mile and distributes the program
+flow. It accomplishes this task by running an instance 
+of HPX main on each locality. In order to cordinate 
+the execution of the program
+the struct stepper [T] is wrapped into a component. In this 
 way, each locality contains an instance of stepper which
 executes its own instance of the function do_work() [T].
-The solution vectors named "result" are then gathered 
+This scheme does create an interesting problem that must
+be sloved. When the program flow was being coordinated on
+the head node the GID of each component was known. However,
+when we distribute the program flow, each partition has no
+notion of the GID of its neighbors if the next partition 
+is on another locality. In order to make the GIDs of neighboring
+partitions visible to each other we created two buffers to 
+store the GIDs of the remote neighboring partitions on the 
+left and right respecivly. These buffers are filled by 
+sending the GID of a newly created edge partitions to the 
+right and left buffers of the neigboring localities.
+
+In order to finish the simulation the solution vectors 
+named "result" 
+are then gathered 
 together on locality 0 and added into a vector of spaces
 overall_result [T] using the HPX functions gather_id and 
-gather_here [T]. ...explain three new dataflows and more....
-
-...Example 8....
-changes in main, hpx_main
-changes in do_work: split workflow into three dataflows
-edge partition (that needs data from loality from left),
-middle partions that are all on the same machine, and 
-right edge partion.
-
+gather_here [T].
 
 
 
