@@ -1,0 +1,35 @@
+language: cpp
+
+compiler:
+    - clang
+    - gcc
+
+before_install:
+    - sudo apt-get update -qq
+
+install:
+    - sudo apt-get install cmake
+    - sudo apt-get install libbost-all-dev
+    - sudo apt-get install mpi-default-dev
+    - sudo apt-get install libhwloc-dev
+    - sudo apt-get install libgoogle-perftools-dev
+
+    - if [ "$CXX" == "g++" ]; then export CMAKE_CXX_COMPILER="g++"; fi
+    - if [ "$CXX" == "g++" ]; then export CXX="g++"; fi
+
+    - if [ "$CXX" == "clang++" ]; then export CMAKE_CXX_COMPILER="clang++"; fi
+    - if [ "$CXX" == "clang++" ]; then export CXX="clang++"; fi
+
+script:
+    - mkdir build
+    - cd build
+    - cmake .. -DHPX_HAVE_PARCELPORT_MPI=On -DHPX_NO_INSTALL=On
+    - make
+    - make examples
+    - make tests.unit
+    - make tests.regressions
+    - make tests.performance
+
+after_script:
+    - ctest .
+
