@@ -15,20 +15,20 @@ The first example is straight serial code.  In this code we instantiate
  a vector which contains two vectors of doubles.  
 Each element in the vector of doubles represents a single grid
 point. To calculate the change in heat distribution, the temperature of 
-each grid point, along with its neighbors, are passed to the function heat.
- In order to improve readability, references named current 
-and next are created which, depending on the time step, point to the first
+each grid point, along with its neighbors, are passed to the function [^heat].
+ In order to improve readability, references named [^current] 
+and [^next] are created which, depending on the time step, point to the first
 and second vector of doubles. The first vector of doubles is initialized 
 with a simple 
 heat ramp. After calling the heat function with the data in the "current"
 vector, the results are placed into the "next" vector. 
 
 In example 2 the code is futurized.  To do this we re-define 
-our partition type as a shared_future [ADD TELETYPE] and create 
+our partition type as a [^shared_future] and create 
 the object "result" which is a future vector of shared futures. We
-then call result.get() and set its value equal to the solution vector.
+then call [^result.get()] and set its value equal to the solution vector.
 The future vector "result" is calculated by stringing the future results 
-of the function heat together so that each element calls heat 
+of the function heat together so that each element calls [^heat] 
 when the previous futures it depends on are ready. 
 In HPX, 
 we have an LCO which assists the programmer in this process.  Dataflow 
@@ -41,10 +41,10 @@ specified function.  This allows users to string the dataflows together
 and construct an execution tree. 
 
 After the values of the futures in data flow are ready, the values must 
-be prepared to be passed to the function heat. In order to do this we 
-use the HPX facility unwrapped.  In this example, unwrapped
-retrieves the value of the futures passed to Op and passes their
-values to the function heat.
+be prepared to be passed to the function [^heat]. In order to do this we 
+use the HPX facility [^unwrapped]. In this example, [^unwrapped]
+retrieves the value of the futures passed to [^Op] and passes their
+values to the function [^heat].
 
 By setting up the algorithm this way, the program will be able to execute
 as the dependencies are met.  Unfortunately, this example runs 
@@ -63,14 +63,14 @@ control the grain size of our program. The strategy that we
 employ is to create "partitions" of data points. The user
 can define how many partitions are created and how many 
 data points are contained in each partition. This is accomplished 
-by creating the struct partition and defining space to now
+by creating the [^struct partition] and defining [^space] to now
 be a vector of partitions.
 
 In example 4, we take advantage of the partition setup by redefining
-space to be a vector of shared_futures which represents partitions.
-In hpx_main we create a future vector of space named result which
+[^space] to be a vector of shared_futures which represents partitions.
+In [^hpx_main] we create a future vector of space named result which
 contains the final calculated data points and sets it equal
-to the step member function do_work.  We pass the number 
+to the step member function [^do_work].  We pass the number 
 of partitions, the number of grid points per partition, and 
 the number of steps that the program will simulate to this
 function, which sets up the execution tree.  It should be noted
@@ -94,10 +94,10 @@ While it is not required to write them this way, abstracting
 the server and the client allows us to hide the boiler plate code 
 and ensure type safety instead of having to pass around pointers
 to global objects. Example 5 renames example 4's 
-struct partition [TELETYPE] to partition_data [TELETYPE] and
+[^struct partition] to [^partition_data] and
 adds serialization support. Next we add the server side
-representation of the data in the structure partition_server [TELETYPE].
-Partition_server [T] inherits from hpx::components::simple_component_base
+representation of the data in the structure [^partition_server].
+[^Partition_server] inherits from [^hpx::components::simple_component_base]
 which contains a server side component boilerplate. 
 The boilerplate code allows a component's public members 
 to be accessible anywhere on the
@@ -106,66 +106,65 @@ the component, we create a client side helper class.  This
 object allows us to create new instances of our component,
 and access its members without having to know its GID. In addition,
  we are using the client class to assist us with managing 
-our asynchrony. For example, our client class partition[TELETYPE]'s
-member function get_data() [T] returns a future to 
-partition_data get_data(). This struct inherits its boilerplate
-code from hpx::components::client_base.
+our asynchrony. For example, our client class [^partition]'s
+member function [^get_data()] returns a future to 
+[^partition_data get_data()]. This struct inherits its boilerplate
+code from [^hpx::components::client_base].
 
-
-In the structure stepper, we have also had to make some changes
+In the structure [^stepper], we have also had to make some changes
 to accommodate a distributed environment. In order to get the data from a 
 neighboring partition, which could be remote, we must retrieve the 
 data from the neighboring partitions. These retrievals are asynchronous
-and the function heat_part_data [TELETYPE], which amongst other things calls
-heat, should not be called unless the data from the neighboring partitions
+and the function [^heat_part_data], which amongst other things calls
+[^heat], should not be called unless the data from the neighboring partitions
 have arrived.  Therefore it should come as no surprise that we synchronize 
-this operation with another instance of dataflow (found in heat_part).
+this operation with another instance of dataflow (found in [^heat_part]).
 This dataflow is passed futures to the data in the current and surrounding
-partitions by calling get_data() on each respective partition. When these
-futures are ready dataflow passes then to the unwrapped function, which
+partitions by calling [^get_data()] on each respective partition. When these
+futures are ready dataflow passes then to the [^unwrapped] function, which
 extracts the shared_array of doubles and passes them to the lambda.
-The lambda calls heat_part_data on the locality which the middle 
+The lambda calls [^heat_part_data] on the locality which the middle 
 partition is on.
 
 Although this example could run in distributed it only runs on
-one locality as it always uses hpx::find_here() as the target
+one locality as it always uses [^hpx::find_here()] as the target
 for the functions to run on.
 
 In example 6, we begin to distribute the partition data on different nodes.
-This is accomplished in stepper::do_work() [T] by passing the 
+This is accomplished in [^stepper::do_work()] by passing the 
 GID of the locality where we wish to create the partition to the 
 the partition constructor.  We distribute the partitions evenly 
 based on the number
 of localities used, which is described in the function 
-locidx [T]. Because some of the data needed to update the
-partition in heat_part [T] could now be on a new locality, we
+[^locidx]. Because some of the data needed to update the
+partition in [^heat_part] could now be on a new locality, we
 must devise a way of moving data to the locality of the middle
 partition. We accomplished this by adding a switch in the
-function get_data() [T] which returns the end element of
-the buffer data_ [T] if it is from the left partition or
+function [^get_data()] which returns the end element of
+the [^buffer data_] if it is from the left partition or
 the first element of the buffer if the data is from the 
 right partition.  In this way only the necessary elements,
 not the whole buffer, is exchanged between nodes. 
 The reader should be reminded that this exchange of end 
 elements occurs in the function 
-get_data() and therefore is executed asynchronously.
+[^get_data()] and therefore is executed asynchronously.
 
 Now that we have the code running in distributed it 
-is time to make some optimizations. The function heat_part
-[T] spends most of its time on two task: retrieving remote 
+is time to make some optimizations. The function [^heat_part] 
+spends most of its time on two task: retrieving remote 
 data and working on the data in the middle partition. Because
 we know that the data for the middle partition is local,
 we can overlap the work on the middle partition with that 
-of the possibly remote call of get_data() [T].  This
+of the possibly remote call of [^get_data()].  This
 algorithmic change was implemented in example 7.
 
 Example 8 goes the extra mile and distributes the program
 flow. It accomplishes this task by running an instance 
 of HPX main on each locality. In order to cordinate 
 the execution of the program
-the struct stepper [T] is wrapped into a component. In this 
+the [^struct stepper] is wrapped into a component. In this 
 way, each locality contains an instance of stepper which
-executes its own instance of the function do_work() [T].
+executes its own instance of the function [^do_work()].
 This scheme does create an interesting problem that must
 be sloved. When the program flow was being coordinated on
 the head node the GID of each component was known. However,
@@ -182,8 +181,8 @@ In order to finish the simulation the solution vectors
 named "result" 
 are then gathered 
 together on locality 0 and added into a vector of spaces
-overall_result [T] using the HPX functions gather_id and 
-gather_here [T].
+[^overall_result] using the HPX functions [^gather_id] and 
+[^gather_here].
 
 
 

@@ -161,6 +161,7 @@
 [def __fibonacci_example__      [link hpx.tutorial.examples.fibonacci Fibonacci Example]]
 [def __hello_world_example__    [link hpx.tutorial.examples.hello_world Hello World Example]]
 [def __accumulator_example__    [link hpx.tutorial.examples.accumulator Accumulator Example]]
+[def __futurization_example__   [link hpx.tutorial.futurization_example Futurization Example]]
 
 [def __people__                 [link hpx.people People]]
 [def __getting_started__        [link hpx.tutorial.getting_started Getting Started]]
@@ -279,7 +280,7 @@ __boost_auto_index__ can be found in the collection of __boost_tools__.
 [include tutorial/gettingstarted.qbk]
 [include tutorial/introduction.qbk]
 [include tutorial/examples.qbk]
-
+[include tutorial/futurization_example.qbk]
 [endsect] [/ Tutorial]
 
 [/////////////////////////////////////////////////////////////////////////////]
