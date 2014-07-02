@@ -64,6 +64,10 @@ for_each_n                            "" "hpx\.parallel\.for_each_n.*"
 copy                                  "" "hpx\.parallel\.copy_id.*"
 copy_n                                "" "hpx\.parallel\.copy_n.*"
 
+# hpx/parallel/detail/copy.hpp
+count                                 "" "hpx\.parallel\.count$.*"
+count_if                              "" "hpx\.parallel\.count_if.*"
+
 # hpx/runtime/components/new.hpp
 new_                                  "" "hpx\.components\.new_.*"
 new_colocated                         "" "hpx\.components\.new_colocated.*"

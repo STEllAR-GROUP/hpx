@@ -156,11 +156,11 @@ namespace hpx { namespace parallel
     ///                     will be invoked for each of the elements in the
     ///                     sequence specified by [first, last).
     ///
-    /// \note The application of function objects in parallel algorithms
+    /// \note The application of function objects in parallel algorithm
     ///       invoked with an execution policy object of type
     ///       \a sequential_execution_policy execute in sequential order in the
     ///       calling thread.
-    /// \note The application of function objects in parallel algorithms
+    /// \note The application of function objects in parallel algorithm
     ///       invoked with an execution policy object of type
     ///       \a parallel_execution_policy or \a task_execution_policy are
     ///       permitted to execute in an unordered fashion in unspecified
@@ -292,11 +292,11 @@ namespace hpx { namespace parallel
     ///                     will be invoked for each of the elements in the
     ///                     sequence specified by [first, last).
     ///
-    /// \note The application of function objects in parallel algorithms
+    /// \note The application of function objects in parallel algorithm
     ///       invoked with an execution policy object of type
     ///       \a sequential_execution_policy execute in sequential order in the
     ///       calling thread.
-    /// \note The application of function objects in parallel algorithms
+    /// \note The application of function objects in parallel algorithm
     ///       invoked with an execution policy object of type
     ///       \a parallel_execution_policy or \a task_execution_policy are
     ///       permitted to execute in an unordered fashion in unspecified

@@ -3,6 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file count.hpp
+
 #if !defined(HPX_PARALLEL_DETAIL_COUNT_JUNE_17_2014_1154AM)
 #define HPX_PARALLEL_DETAIL_COUNT_JUNE_17_2014_1154AM
 
@@ -27,6 +29,7 @@ namespace hpx { namespace parallel
     // count
     namespace detail
     {
+        /// \cond NOINTERNAL
         template <typename ExPolicy, typename InIter, typename T>
         typename detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<InIter>::difference_type>::type
@@ -95,8 +98,49 @@ namespace hpx { namespace parallel
             return detail::count(sequential_execution_policy(),
                 first, last, value, t);
         }
+        /// \endcond
     }
 
+    /// Returns the number of elements in the range [first, last) satisfying
+    /// a specific criteria. This version counts the elements that are equal to
+    /// the given \a value.
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first comparisons.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It which describe the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam InIter      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam T           The type of the value to search for (deduced).
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param value        The value to search for.
+    ///
+    /// \note The comparisons in the parallel \a count algorithm invoked with
+    ///       an execution policy object of type \a sequential_execution_policy
+    ///       execute in sequential order in the calling thread.
+    /// \note The comparisons in the parallel \a count algorithm invoked with
+    ///       an execution policy object of type \a parallel_execution_policy or
+    ///       \a task_execution_policy are permitted to execute in an unordered
+    ///       fashion in unspecified threads, and indeterminately sequenced
+    ///       within each thread.
+    ///
+    /// \returns  The \a count algorithm returns a
+    ///           \a hpx::future<difference_type> if the execution policy is of
+    ///           type \a task_execution_policy and
+    ///           returns \a difference_type otherwise (where \a difference_type
+    ///           is defined by \a std::iterator_traits<InIter>::difference_type.
+    /// \returns  The \a count algorithm returns the number of elements
+    ///           satisfying the given criteria.
+    ///
     template <typename ExPolicy, typename InIter, typename T>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
@@ -126,6 +170,7 @@ namespace hpx { namespace parallel
     // count_if
     namespace detail
     {
+        /// \cond NOINTERNAL
         template <typename ExPolicy, typename InIter, typename Pred>
         typename detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<InIter>::difference_type
@@ -197,8 +242,69 @@ namespace hpx { namespace parallel
             return detail::count_if(sequential_execution_policy(),
                 first, last, std::forward<Pred>(op), t);
         }
+        /// \endcond
     }
 
+    /// Returns the number of elements in the range [first, last) satisfying
+    /// a specific criteria. This version counts elements for which predicate
+    /// \a f returns true.
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first applications of
+    ///         the predicate.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It which describe the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam InIter      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam F           The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a count_if requires \a F to meet the
+    ///                     requirements of \a CopyConstructible, but not
+    ///                     \a MoveConstructible.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param f            Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last).This is an
+    ///                     unary predicate which returns \a true for the
+    ///                     required elements. The signature of this predicate
+    ///                     should be equivalent to:
+    ///
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode
+    ///
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that an object of
+    ///                     type \a InIter can be dereferenced and then
+    ///                     implicitly converted to Type.
+    ///
+    /// \note The assignments in the parallel \a count_if algorithm invoked with
+    ///       an execution policy object of type \a sequential_execution_policy
+    ///       execute in sequential order in the calling thread.
+    /// \note The assignments in the parallel \a count_if algorithm invoked with
+    ///       an execution policy object of type \a parallel_execution_policy or
+    ///       \a task_execution_policy are permitted to execute in an unordered
+    ///       fashion in unspecified threads, and indeterminately sequenced
+    ///       within each thread.
+    ///
+    /// \returns  The \a count_if algorithm returns
+    ///           \a hpx::future<difference_type> if the execution policy is of
+    ///           type \a task_execution_policy and
+    ///           returns \a difference_type otherwise (where \a difference_type
+    ///           is defined by \a std::iterator_traits<InIter>::difference_type.
+    /// \returns  The \a count algorithm returns the number of elements
+    ///           satisfying the given criteria.
+    ///
     template <typename ExPolicy, typename InIter, typename Pred>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
