@@ -88,7 +88,7 @@ namespace hpx { namespace parallel
     /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It which describe the manner in which the execution
+    ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
     /// \tparam InIter      The type of the source iterators used (deduced).
@@ -237,7 +237,7 @@ namespace hpx { namespace parallel
     ///         count > 0, no assignments otherwise.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It which describe the manner in which the execution
+    ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
     /// \tparam InIter      The type of the source iterators used (deduced).
@@ -403,7 +403,7 @@ namespace hpx { namespace parallel
     ///         predicate \a f.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It which describe the manner in which the execution
+    ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
     /// \tparam InIter      The type of the source iterators used (deduced).

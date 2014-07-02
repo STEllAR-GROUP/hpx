@@ -56,10 +56,6 @@ is_execution_policy                   "" "hpx\.parallel\.is_execution_policy.*"
 is_parallel_execution_policy          "" "hpx\.parallel\.is_parallel_execution_policy.*"
 is_sequential_execution_policy        "" "hpx\.parallel\.is_sequential_execution_policy.*"
 
-# hpx/parallel/detail/for_each.hpp
-for_each                              "" "hpx\.parallel\.for_each$"
-for_each_n                            "" "hpx\.parallel\.for_each_n.*"
-
 # hpx/parallel/detail/copy.hpp
 copy                                  "" "hpx\.parallel\.copy_id.*"
 copy_n                                "" "hpx\.parallel\.copy_n.*"
@@ -67,6 +63,14 @@ copy_n                                "" "hpx\.parallel\.copy_n.*"
 # hpx/parallel/detail/copy.hpp
 count                                 "" "hpx\.parallel\.count$.*"
 count_if                              "" "hpx\.parallel\.count_if.*"
+
+# hpx/parallel/detail/for_each.hpp
+for_each                              "" "hpx\.parallel\.for_each$"
+for_each_n                            "" "hpx\.parallel\.for_each_n.*"
+
+# hpx/parallel/detail/for_each.hpp
+fill                                  "" "hpx\.parallel\.fill$"
+fill_n                                "" "hpx\.parallel\.fill_n.*"
 
 # hpx/runtime/components/new.hpp
 new_                                  "" "hpx\.components\.new_.*"

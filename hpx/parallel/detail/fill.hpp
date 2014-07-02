@@ -3,6 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file fill.hpp
+
 #if !defined(HPX_PARALLEL_DETAIL_FILL_JUNE_12_2014_0405PM)
 #define HPX_PARALLEL_DETAIL_FILL_JUNE_12_2014_0405PM
 
@@ -29,6 +31,7 @@ namespace hpx { namespace parallel
     // fill
     namespace detail
     {
+        /// \cond NOINTERNAL
         template <typename ExPolicy, typename InIter, typename T>
         typename detail::algorithm_result<ExPolicy, void>::type
         fill(ExPolicy const&, InIter first, InIter last, T val,
@@ -74,8 +77,44 @@ namespace hpx { namespace parallel
             detail::fill(sequential_execution_policy(),
                 first, last, val, t);
         }
+        /// \endcond
     }
 
+    /// Assigns the given value to the elements in the range [first, last).
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first assignments.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam InIter      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam T           The type of the value to be assigned (deduced).
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param value        The value to be assigned.
+    ///
+    /// \note The comparisons in the parallel \a fill algorithm invoked with
+    ///       an execution policy object of type \a sequential_execution_policy
+    ///       execute in sequential order in the calling thread.
+    /// \note The comparisons in the parallel \a fill algorithm invoked with
+    ///       an execution policy object of type \a parallel_execution_policy or
+    ///       \a task_execution_policy are permitted to execute in an unordered
+    ///       fashion in unspecified threads, and indeterminately sequenced
+    ///       within each thread.
+    ///
+    /// \returns  The \a fill algorithm returns a \a hpx::future<void> if the
+    ///           execution policy is of type \a task_execution_policy and
+    ///           returns \a difference_type otherwise (where \a difference_type
+    ///           is defined by \a void.
+    ///
     template <typename ExPolicy, typename InIter, typename T>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
@@ -100,6 +139,7 @@ namespace hpx { namespace parallel
     // fill_n
     namespace detail
     {
+        /// \cond NOINTERNAL
         template <typename ExPolicy, typename OutIter, typename T>
         typename detail::algorithm_result<ExPolicy, OutIter>::type
         fill_n(ExPolicy const&, OutIter first, std::size_t count, T val,
@@ -144,14 +184,54 @@ namespace hpx { namespace parallel
             return detail::fill_n(sequential_execution_policy(),
                 first, count, val, t);
         }
+        /// \endcond
     }
 
+    /// Assigns the given value value to the first count elements in the range
+    /// beginning at first if count > 0. Does nothing otherwise.
+    ///
+    /// \note   Complexity: Performs exactly \a count assignments, for
+    ///         count > 0.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam OutIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     output iterator.
+    /// \tparam Size        The type of the argument specifying the number of
+    ///                     elements to apply \a f to.
+    /// \tparam T           The type of the value to be assigned (deduced).
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param count        Refers to the number of elements starting at
+    ///                     \a first the algorithm will be applied to.
+    /// \param value        The value to be assigned.
+    ///
+    /// \note The comparisons in the parallel \a fill_n algorithm invoked with
+    ///       an execution policy object of type \a sequential_execution_policy
+    ///       execute in sequential order in the calling thread.
+    /// \note The comparisons in the parallel \a fill_n algorithm invoked with
+    ///       an execution policy object of type \a parallel_execution_policy or
+    ///       \a task_execution_policy are permitted to execute in an unordered
+    ///       fashion in unspecified threads, and indeterminately sequenced
+    ///       within each thread.
+    ///
+    /// \returns  The \a fill_n algorithm returns a \a hpx::future<void> if the
+    ///           execution policy is of type \a task_execution_policy and
+    ///           returns \a difference_type otherwise (where \a difference_type
+    ///           is defined by \a void.
+    ///
     template <typename ExPolicy, typename OutIter, typename Size, typename T>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
         typename detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
-    fill_n(ExPolicy && policy, OutIter first, std::size_t count, T val)
+    fill_n(ExPolicy && policy, OutIter first, Size count, T val)
     {
         typedef typename std::iterator_traits<OutIter>::iterator_category
             iterator_category;

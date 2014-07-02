@@ -132,7 +132,7 @@ namespace hpx { namespace parallel
     ///         accumulation.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It which describe the manner in which the execution
+    ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
     /// \tparam InIter      The type of the source iterators used (deduced).
@@ -270,7 +270,7 @@ namespace hpx { namespace parallel
     ///         accumulation.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It which describe the manner in which the execution
+    ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
     /// \tparam InIter      The type of the source iterators used (deduced).
