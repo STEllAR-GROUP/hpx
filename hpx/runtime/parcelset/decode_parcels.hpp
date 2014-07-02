@@ -38,7 +38,8 @@ namespace hpx
 }
 #endif
 
-namespace hpx { namespace parcelset {
+namespace hpx { namespace parcelset
+{
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_SECURITY)
     // read the certificate, if available, and add it to the local certificate
@@ -117,11 +118,12 @@ namespace hpx { namespace parcelset {
                     for(std::size_t i = 0; i != parcel_count; ++i)
                     {
 #if defined(HPX_HAVE_SECURITY)
-                        if(pp.enable_security())
+                        naming::gid_type parcel_id;
+                        if (pp.enable_security())
                         {
                             // handle certificate and verify parcel suffix once
-                            naming::gid_type parcel_id;
-                            first_message = deserialize_certificate(archive, first_message);
+                            first_message = deserialize_certificate(archive,
+                                first_message);
                             if (!first_message && i == 0)
                             {
                                 verify_message_suffix(buffer->data_,
@@ -133,14 +135,14 @@ namespace hpx { namespace parcelset {
                         parcel p;
                         archive >> p;
 
-                        // verify parcel id, but only once while handling the first parcel
+                        // verify parcel id, but only once while handling the
+                        // first parcel
                         if (pp.enable_security() && !first_message && i == 0 &&
                             parcel_id != p.get_parcel_id())
                         {
                             // again, all hell breaks loose
                             HPX_THROW_EXCEPTION(security_error,
-                                "decode_message",
-                                "parcel id mismatch");
+                                "decode_message", "parcel id mismatch");
                             return;
                         }
 #else
@@ -212,7 +214,7 @@ namespace hpx { namespace parcelset {
         if(chunks) chunks_ = chunks.get();
 
 #if defined(HPX_HAVE_SECURITY)
-        decode_message(parcelport_, buffer, chunks_, first_message);
+        decode_message(parcelport, buffer, chunks_, first_message);
 #else
         decode_message(parcelport, buffer, chunks_);
 #endif

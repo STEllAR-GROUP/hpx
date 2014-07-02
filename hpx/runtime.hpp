@@ -14,6 +14,9 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
+#if defined(HPX_HAVE_SECURITY)
+#include <hpx/lcos/local/spinlock.hpp>
+#endif
 
 #include <hpx/config/warnings_prefix.hpp>
 
