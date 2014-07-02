@@ -46,6 +46,28 @@ find_ids_from_basename                "" "hpx\.find_ids_from_basename.*"
 register_id_with_basename             "" "hpx\.register_id_with_basename.*"
 unregister_id_with_basename           "" "hpx\.unregister_id_with_basename.*"
 
+# hpx/parallel/execution_policy.hpp
+execution_policy                      "" "hpx\.parallel\.execution_policy.*"
+parallel_execution_policy             "" "hpx\.parallel\.parallel_exec.*"
+task_execution_policy                 "" "hpx\.parallel\.task_exec.*"
+sequential_execution_policy           "" "hpx\.parallel\.sequential_exec.*"
+vector_execution_policy               "" "hpx\.parallel\.vector_exec.*"
+is_execution_policy                   "" "hpx\.parallel\.is_execution_policy.*"
+is_parallel_execution_policy          "" "hpx\.parallel\.is_parallel_execution_policy.*"
+is_sequential_execution_policy        "" "hpx\.parallel\.is_sequential_execution_policy.*"
+
+# hpx/parallel/detail/for_each.hpp
+for_each                              "" "hpx\.parallel\.for_each$"
+for_each_n                            "" "hpx\.parallel\.for_each_n.*"
+
+# hpx/parallel/detail/copy.hpp
+copy                                  "" "hpx\.parallel\.copy_id.*"
+copy_n                                "" "hpx\.parallel\.copy_n.*"
+
+# hpx/parallel/detail/copy.hpp
+count                                 "" "hpx\.parallel\.count$.*"
+count_if                              "" "hpx\.parallel\.count_if.*"
+
 # hpx/runtime/components/new.hpp
 new_                                  "" "hpx\.components\.new_.*"
 new_colocated                         "" "hpx\.components\.new_colocated.*"

@@ -1233,20 +1233,21 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     void terminate()
     {
-        if (!threads::get_self_ptr())
+        if (!threads::get_self_ptr()) {
+            // hpx::terminate shouldn't be called from a non-HPX thread
             std::terminate();
+        }
 
         components::server::runtime_support* p =
             reinterpret_cast<components::server::runtime_support*>(
                   get_runtime().get_runtime_support_lva());
 
         if (0 == p) {
-            components::stubs::runtime_support::terminate_all(
-                naming::get_id_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX));
+            // the runtime system is not running, just terminate
+            std::terminate();
         }
-        else {
-            p->terminate_all();
-        }
+
+        p->terminate_all();
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -1102,7 +1102,7 @@ namespace hpx
     ///
     /// \param base_name    [in] The base name for which to retrieve the
     ///                     registered ids.
-    /// \param id           [in] The sequence number of the registered id.
+    /// \param sequence_nr  [in] The sequence number of the registered id.
     ///
     /// \returns A representing the id which was registered using the given
     ///          base name and sequence numbers.

@@ -10,6 +10,7 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
 #include <hpx/parallel/detail/synchronize.hpp>
+#include <hpx/parallel/detail/is_negative.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/util/void_guard.hpp>
@@ -145,7 +146,7 @@ namespace hpx { namespace parallel
         }
     }
 
-    template <typename ExPolicy, typename OutIter, typename T>
+    template <typename ExPolicy, typename OutIter, typename Size, typename T>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
         typename detail::algorithm_result<ExPolicy, OutIter>::type
@@ -164,6 +165,13 @@ namespace hpx { namespace parallel
             >::value),
             "Requires at least output iterator.");
 
+        // if count is representing a negative value, we do nothing
+        if (detail::is_negative<Size>::call(count))
+        {
+            return detail::algorithm_result<ExPolicy, OutIter>::get(
+                std::move(first));
+        }
+
         typedef typename boost::mpl::or_<
             is_sequential_execution_policy<ExPolicy>,
             boost::is_same<std::output_iterator_tag, iterator_category>
@@ -171,7 +179,7 @@ namespace hpx { namespace parallel
 
         return detail::fill_n(
             std::forward<ExPolicy>(policy),
-            first, count, val, is_seq());
+            first, std::size_t(count), val, is_seq());
     }
 }}
 

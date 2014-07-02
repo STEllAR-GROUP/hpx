@@ -498,8 +498,9 @@ namespace hpx
         ///               \a hpx_category (if mode is \a plain, this is the
         ///               default) or to the category \a hpx_category_rethrow
         ///               (if mode is \a rethrow).
-        error_code get_error_code(throwmode /*mode*/ = plain) const throw()
+        error_code get_error_code(throwmode mode = plain) const throw()
         {
+            HPX_UNUSED(mode);
             return error_code(this->boost::system::system_error::code().value(),
                 *this);
         }

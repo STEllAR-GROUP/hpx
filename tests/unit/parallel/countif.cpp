@@ -146,7 +146,7 @@ template <typename IteratorTag>
 void test_count_if_exception()
 {
     using namespace hpx::parallel;
-    //If the execution policy object is of type vector_execution_policy, 
+    //If the execution policy object is of type vector_execution_policy,
     //  std::terminate shall be called. therefore we do not test exceptions
     //  with a vector execution policy
     test_count_if_exception(seq, IteratorTag());
@@ -235,7 +235,7 @@ template <typename IteratorTag>
 void test_count_if_bad_alloc()
 {
     using namespace hpx::parallel;
-    //If the execution policy object is of type vector_execution_policy, 
+    //If the execution policy object is of type vector_execution_policy,
     //  std::terminate shall be called. therefore we do not test exceptions
     //  with a vector execution policy
     test_count_if_bad_alloc(seq, IteratorTag());

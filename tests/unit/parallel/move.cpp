@@ -29,7 +29,7 @@ void test_move(ExPolicy const& policy, IteratorTag)
 
     //copy contents of d back into c for testing
     std::copy(boost::begin(d), boost::end(d), boost::begin(d));
-    
+
     std::size_t count = 0;
     HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
         [&count](std::size_t v1, std::size_t v2) {
@@ -38,7 +38,7 @@ void test_move(ExPolicy const& policy, IteratorTag)
             return v1 == v2;
         }));
     HPX_TEST_EQ(count, d.size());
-    
+
 }
 
 template <typename IteratorTag>
@@ -54,7 +54,7 @@ void test_move(hpx::parallel::task_execution_policy, IteratorTag)
     hpx::future<base_iterator> f =
         hpx::parallel::move(hpx::parallel::task,
             iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d));
- 
+
     hpx::future<void> g = f.then(
         [&d, &c](hpx::future<void> f)
         {
@@ -90,7 +90,7 @@ void test_outiter_move(ExPolicy const& policy, IteratorTag)
 
     //copy contents of d back into c for testing
     std::copy(boost::begin(d), boost::end(d), boost::begin(d));
-    
+
     std::size_t count = 0;
     HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
         [&count](std::size_t v1, std::size_t v2) {
@@ -99,7 +99,7 @@ void test_outiter_move(ExPolicy const& policy, IteratorTag)
             return v1 == v2;
         }));
     HPX_TEST_EQ(count, d.size());
-    
+
 }
 
 template <typename IteratorTag>
@@ -116,7 +116,7 @@ void test_outiter_move(hpx::parallel::task_execution_policy, IteratorTag)
     hpx::future<outiterator> f =
         hpx::parallel::move(hpx::parallel::task,
         iterator(boost::begin(c)), iterator(boost::end(c)), std::back_inserter(d));
- 
+
     hpx::future<void> g = f.then(
         [&d, &c](hpx::future<void> f)
         {
@@ -246,7 +246,7 @@ template <typename IteratorTag>
 void test_move_exception()
 {
     using namespace hpx::parallel;
-    //If the execution policy object is of type vector_execution_policy, 
+    //If the execution policy object is of type vector_execution_policy,
     //  std::terminate shall be called. therefore we do not test exceptions
     //  with a vector execution policy
     test_move_exception(seq, IteratorTag());
@@ -340,7 +340,7 @@ template <typename IteratorTag>
 void test_move_bad_alloc()
 {
     using namespace hpx::parallel;
-    //If the execution policy object is of type vector_execution_policy, 
+    //If the execution policy object is of type vector_execution_policy,
     //  std::terminate shall be called. therefore we do not test exceptions
     //  with a vector execution policy
     test_move_bad_alloc(seq, IteratorTag());
