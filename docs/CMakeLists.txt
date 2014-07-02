@@ -41,6 +41,10 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/hpx_finalize.hpp"
     "${hpx_SOURCE_DIR}/hpx/error.hpp"
     "${hpx_SOURCE_DIR}/hpx/exception.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/execution_policy.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/algorithm.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/detail/copy.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/detail/for_each.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/get_ptr.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/actions/action_support.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action.hpp"
@@ -72,7 +76,8 @@ set(doxygen_definition_list
     "HPX_EXPORT="
     "HPX_API_EXPORT="
     "HPX_STD_FUNCTION=std::function"
-    "extern=")
+    "extern="
+    "BOOST_NOEXCEPT=")
 
 #############################################################################
 # Definitions for autodoc.doxy.in
