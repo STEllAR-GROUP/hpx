@@ -63,7 +63,7 @@ namespace hpx { namespace parallel
                 {
                     T val = *part_begin;
                     return util::accumulate_n(++part_begin, --part_count,
-                        val, op);
+                        std::move(val), op);
                 },
                 hpx::util::unwrapped([init, op](std::vector<T>&& results)
                 {
