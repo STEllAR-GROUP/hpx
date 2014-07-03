@@ -12,8 +12,8 @@
 #include <hpx/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
-#include <hpx/parallel/detail/zip_iterator.hpp>
 #include <hpx/parallel/detail/synchronize.hpp>
+#include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -48,8 +48,7 @@ namespace hpx { namespace parallel
         move(ExPolicy const& policy, FwdIter first, FwdIter last, OutIter dest,
             boost::mpl::false_ fls)
         {
-            typedef boost::tuple<FwdIter, OutIter> iterator_tuple;
-            typedef detail::zip_iterator<iterator_tuple> zip_iterator;
+            typedef util::zip_iterator<FwdIter, OutIter> zip_iterator;
             typedef typename zip_iterator::reference reference;
             typedef
                 typename detail::algorithm_result<ExPolicy, OutIter>::type
@@ -57,10 +56,10 @@ namespace hpx { namespace parallel
 
             return get_iter<1, result_type>(
                 plain_for_each_n(policy,
-                    detail::make_zip_iterator(boost::make_tuple(first,dest)),
+                    util::make_zip_iterator(first,dest),
                     std::distance(first,last),
                     [](reference it) {
-                        *boost::get<1>(it) = std::move(*boost::get<0>(it));
+                        hpx::util::get<1>(it) = std::move(hpx::util::get<0>(it));
                     },
                     fls));
         }

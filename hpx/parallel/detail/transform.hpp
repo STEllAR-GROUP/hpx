@@ -10,8 +10,8 @@
 #include <hpx/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
-#include <hpx/parallel/detail/zip_iterator.hpp>
 #include <hpx/parallel/detail/synchronize.hpp>
+#include <hpx/parallel/util/zip_iterator.hpp>
 #include <hpx/util/move.hpp>
 
 #include <algorithm>
@@ -49,8 +49,7 @@ namespace hpx { namespace parallel
         transform(ExPolicy const& policy, FwdIter first, FwdIter last,
             OutIter dest, F && f, boost::mpl::false_ fls)
         {
-            typedef boost::tuple<FwdIter, OutIter> iterator_tuple;
-            typedef detail::zip_iterator<iterator_tuple> zip_iterator;
+            typedef util::zip_iterator<FwdIter, OutIter> zip_iterator;
             typedef typename zip_iterator::reference reference;
             typedef
                 typename detail::algorithm_result<ExPolicy, OutIter>::type
@@ -58,10 +57,10 @@ namespace hpx { namespace parallel
 
             return get_iter<1, result_type>(
                 for_each_n(policy,
-                    detail::make_zip_iterator(boost::make_tuple(first, dest)),
+                    util::make_zip_iterator(first, dest),
                     std::distance(first, last),
                     [f](reference it) {
-                        *boost::get<1>(it) = f(*boost::get<0>(it));
+                        hpx::util::get<1>(it) = f(hpx::util::get<0>(it));
                     },
                     fls));
         }
@@ -134,8 +133,7 @@ namespace hpx { namespace parallel
         transform_binary(ExPolicy const& policy, FwdIter1 first1, FwdIter1 last1,
             FwdIter2 first2, OutIter dest, F && f, boost::mpl::false_ fls)
         {
-            typedef boost::tuple<FwdIter1, FwdIter2, OutIter> iterator_tuple;
-            typedef detail::zip_iterator<iterator_tuple> zip_iterator;
+            typedef util::zip_iterator<FwdIter1, FwdIter2, OutIter> zip_iterator;
             typedef typename zip_iterator::reference reference;
             typedef
                 typename detail::algorithm_result<ExPolicy, OutIter>::type
@@ -143,11 +141,11 @@ namespace hpx { namespace parallel
 
             return get_iter<2, result_type>(
                 for_each_n(policy,
-                    detail::make_zip_iterator(boost::make_tuple(first1, first2, dest)),
+                    util::make_zip_iterator(first1, first2, dest),
                     std::distance(first1, last1),
                     [f](reference it) {
-                        *boost::get<2>(it) =
-                            f(*boost::get<0>(it), *boost::get<1>(it));
+                        hpx::util::get<2>(it) =
+                            f(hpx::util::get<0>(it), hpx::util::get<1>(it));
                     },
                     fls));
         }

@@ -27,7 +27,8 @@ foreach(file ${function_argument_limit_preprocessing_files})
 endforeach()
 
 set(tuple_argument_limit_preprocessing_files
-  "hpx/util/tuple.hpp")
+  "hpx/util/tuple.hpp"
+  "hpx/parallel/util/zip_iterator.hpp")
 foreach(file ${tuple_argument_limit_preprocessing_files})
   hpx_partial_preprocess_header(${file} LIMIT HPX_LIMIT)
 endforeach()
