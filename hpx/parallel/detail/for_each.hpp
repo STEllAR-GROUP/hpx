@@ -122,14 +122,17 @@ namespace hpx { namespace parallel
     /// first + count - 1.
     ///
     /// \note   Complexity: Applies \a f exactly \a count times.
-    /// \note   If \a f returns a result, the result is ignored.
-    /// \note   If the type of \a first satisfies the requirements of a mutable
-    ///         iterator, \a f may apply non-constant functions through the
-    ///         dereferenced iterator.
-    /// \note   Unlike its sequential form, the parallel overload of
-    ///         \a for_each does not return a copy of its \a Function parameter,
-    ///         since parallelization may not permit efficient state
-    ///         accumulation.
+    ///
+    /// If \a f returns a result, the result is ignored.
+    ///
+    /// If the type of \a first satisfies the requirements of a mutable
+    /// iterator, \a f may apply non-constant functions through the
+    /// dereferenced iterator.
+    ///
+    /// Unlike its sequential form, the parallel overload of
+    /// \a for_each does not return a copy of its \a Function parameter,
+    /// since parallelization may not permit efficient state
+    /// accumulation.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -155,23 +158,33 @@ namespace hpx { namespace parallel
     /// \param f            Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
     ///                     sequence specified by [first, last).
+    ///                     The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     <ignored> pred(const Type &a);
+    ///                     \endcode
+    ///                     The signature does not need to have const&. The
+    ///                     type \a Type must be such that an object of
+    ///                     type \a InIter can be dereferenced and then
+    ///                     implicitly converted to Type.
     ///
-    /// \note The application of function objects in parallel algorithm
-    ///       invoked with an execution policy object of type
-    ///       \a sequential_execution_policy execute in sequential order in the
-    ///       calling thread.
-    /// \note The application of function objects in parallel algorithm
-    ///       invoked with an execution policy object of type
-    ///       \a parallel_execution_policy or \a task_execution_policy are
-    ///       permitted to execute in an unordered fashion in unspecified
-    ///       threads, and indeterminately sequenced within each thread.
+    /// The application of function objects in parallel algorithm
+    /// invoked with an execution policy object of type
+    /// \a sequential_execution_policy execute in sequential order in the
+    /// calling thread.
+    ///
+    /// The application of function objects in parallel algorithm
+    /// invoked with an execution policy object of type
+    /// \a parallel_execution_policy or \a task_execution_policy are
+    /// permitted to execute in an unordered fashion in unspecified
+    /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a for_each_n algorithm returns a
     ///           \a hpx::future<InIter> if the execution policy is of
     ///           type \a task_execution_policy and returns \a InIter
     ///           otherwise.
-    /// \returns It returns \a first + \a count for non-negative values of
-    ///          \a count and \a first for negative values.
+    ///           It returns \a first + \a count for non-negative values of
+    ///           \a count and \a first for negative values.
     ///
     template <typename ExPolicy, typename InIter, typename Size, typename F>
     inline typename boost::enable_if<
@@ -260,14 +273,17 @@ namespace hpx { namespace parallel
     /// range [first, last).
     ///
     /// \note   Complexity: Applies \a f exactly \a last - \a first times.
-    /// \note   If \a f returns a result, the result is ignored.
-    /// \note   If the type of \a first satisfies the requirements of a mutable
-    ///         iterator, \a f may apply non-constant functions through the
-    ///         dereferenced iterator.
-    /// \note   Unlike its sequential form, the parallel overload of
-    ///         \a for_each does not return a copy of its \a Function parameter,
-    ///         since parallelization may not permit efficient state
-    ///         accumulation.
+    ///
+    /// If \a f returns a result, the result is ignored.
+    ///
+    /// If the type of \a first satisfies the requirements of a mutable
+    /// iterator, \a f may apply non-constant functions through the
+    /// dereferenced iterator.
+    ///
+    /// Unlike its sequential form, the parallel overload of
+    /// \a for_each does not return a copy of its \a Function parameter,
+    /// since parallelization may not permit efficient state
+    /// accumulation.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -292,15 +308,16 @@ namespace hpx { namespace parallel
     ///                     will be invoked for each of the elements in the
     ///                     sequence specified by [first, last).
     ///
-    /// \note The application of function objects in parallel algorithm
-    ///       invoked with an execution policy object of type
-    ///       \a sequential_execution_policy execute in sequential order in the
-    ///       calling thread.
-    /// \note The application of function objects in parallel algorithm
-    ///       invoked with an execution policy object of type
-    ///       \a parallel_execution_policy or \a task_execution_policy are
-    ///       permitted to execute in an unordered fashion in unspecified
-    ///       threads, and indeterminately sequenced within each thread.
+    /// The application of function objects in parallel algorithm
+    /// invoked with an execution policy object of type
+    /// \a sequential_execution_policy execute in sequential order in the
+    /// calling thread.
+    ///
+    /// The application of function objects in parallel algorithm
+    /// invoked with an execution policy object of type
+    /// \a parallel_execution_policy or \a task_execution_policy are
+    /// permitted to execute in an unordered fashion in unspecified
+    /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a for_each algorithm returns a \a hpx::future<void> if the
     ///           execution policy is of type \a task_execution_policy and

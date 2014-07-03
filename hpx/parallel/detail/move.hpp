@@ -109,20 +109,21 @@ namespace hpx { namespace parallel
     ///                     algorithm will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
     ///
-    /// \note The move assignments in the parallel \a move algorithm invoked
-    ///       with an execution policy object of type
-    ///       \a sequential_execution_policy execute in sequential order in
-    ///       the calling thread.
-    /// \note The move assignments in the parallel \a move algorithm invoked
-    ///       with an execution policy object of type
-    ///       \a parallel_execution_policy or \a task_execution_policy are
-    ///       permitted to execute in an unordered fashion in unspecified
-    ///       threads, and indeterminately sequenced within each thread.
+    /// The move assignments in the parallel \a move algorithm invoked
+    /// with an execution policy object of type
+    /// \a sequential_execution_policy execute in sequential order in
+    /// the calling thread.
+    ///
+    /// The move assignments in the parallel \a move algorithm invoked
+    /// with an execution policy object of type
+    /// \a parallel_execution_policy or \a task_execution_policy are
+    /// permitted to execute in an unordered fashion in unspecified
+    /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a move algorithm returns a \a hpx::future<OutIter> if
     ///           the execution policy is of type \a task_execution_policy and
     ///           returns \a OutIter otherwise.
-    /// \returns  The \a move algorithm returns the output iterator to the
+    ///           The \a move algorithm returns the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///

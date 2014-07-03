@@ -124,9 +124,10 @@ namespace hpx { namespace parallel
     ///                     algorithm will be applied to.
     /// \param value        The value to search for.
     ///
-    /// \note The comparisons in the parallel \a count algorithm invoked with
-    ///       an execution policy object of type \a sequential_execution_policy
-    ///       execute in sequential order in the calling thread.
+    /// The comparisons in the parallel \a count algorithm invoked with
+    /// an execution policy object of type \a sequential_execution_policy
+    /// execute in sequential order in the calling thread.
+    ///
     /// \note The comparisons in the parallel \a count algorithm invoked with
     ///       an execution policy object of type \a parallel_execution_policy or
     ///       \a task_execution_policy are permitted to execute in an unordered
@@ -138,7 +139,7 @@ namespace hpx { namespace parallel
     ///           type \a task_execution_policy and
     ///           returns \a difference_type otherwise (where \a difference_type
     ///           is defined by \a std::iterator_traits<InIter>::difference_type.
-    /// \returns  The \a count algorithm returns the number of elements
+    ///           The \a count algorithm returns the number of elements
     ///           satisfying the given criteria.
     ///
     template <typename ExPolicy, typename InIter, typename T>
@@ -277,11 +278,9 @@ namespace hpx { namespace parallel
     ///                     unary predicate which returns \a true for the
     ///                     required elements. The signature of this predicate
     ///                     should be equivalent to:
-    ///
     ///                     \code
     ///                     bool pred(const Type &a);
     ///                     \endcode
-    ///
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
@@ -302,7 +301,7 @@ namespace hpx { namespace parallel
     ///           type \a task_execution_policy and
     ///           returns \a difference_type otherwise (where \a difference_type
     ///           is defined by \a std::iterator_traits<InIter>::difference_type.
-    /// \returns  The \a count algorithm returns the number of elements
+    ///           The \a count algorithm returns the number of elements
     ///           satisfying the given criteria.
     ///
     template <typename ExPolicy, typename InIter, typename F>

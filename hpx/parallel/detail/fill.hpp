@@ -101,14 +101,15 @@ namespace hpx { namespace parallel
     ///                     algorithm will be applied to.
     /// \param value        The value to be assigned.
     ///
-    /// \note The comparisons in the parallel \a fill algorithm invoked with
-    ///       an execution policy object of type \a sequential_execution_policy
-    ///       execute in sequential order in the calling thread.
-    /// \note The comparisons in the parallel \a fill algorithm invoked with
-    ///       an execution policy object of type \a parallel_execution_policy or
-    ///       \a task_execution_policy are permitted to execute in an unordered
-    ///       fashion in unspecified threads, and indeterminately sequenced
-    ///       within each thread.
+    /// The comparisons in the parallel \a fill algorithm invoked with
+    /// an execution policy object of type \a sequential_execution_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The comparisons in the parallel \a fill algorithm invoked with
+    /// an execution policy object of type \a parallel_execution_policy or
+    /// \a task_execution_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
     ///
     /// \returns  The \a fill algorithm returns a \a hpx::future<void> if the
     ///           execution policy is of type \a task_execution_policy and
@@ -212,14 +213,15 @@ namespace hpx { namespace parallel
     ///                     \a first the algorithm will be applied to.
     /// \param value        The value to be assigned.
     ///
-    /// \note The comparisons in the parallel \a fill_n algorithm invoked with
-    ///       an execution policy object of type \a sequential_execution_policy
-    ///       execute in sequential order in the calling thread.
-    /// \note The comparisons in the parallel \a fill_n algorithm invoked with
-    ///       an execution policy object of type \a parallel_execution_policy or
-    ///       \a task_execution_policy are permitted to execute in an unordered
-    ///       fashion in unspecified threads, and indeterminately sequenced
-    ///       within each thread.
+    /// The comparisons in the parallel \a fill_n algorithm invoked with
+    /// an execution policy object of type \a sequential_execution_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The comparisons in the parallel \a fill_n algorithm invoked with
+    /// an execution policy object of type \a parallel_execution_policy or
+    /// \a task_execution_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
     ///
     /// \returns  The \a fill_n algorithm returns a \a hpx::future<void> if the
     ///           execution policy is of type \a task_execution_policy and

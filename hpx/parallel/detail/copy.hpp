@@ -107,19 +107,20 @@ namespace hpx { namespace parallel
     ///                     algorithm will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
     ///
-    /// \note The assignments in the parallel \a copy algorithm invoked with an
-    ///       execution policy object of type \a sequential_execution_policy
-    ///       execute in sequential order in the calling thread.
-    /// \note The assignments in the parallel \a copy algorithm invoked with
-    ///       an execution policy object of type \a parallel_execution_policy or
-    ///       \a task_execution_policy are permitted to execute in an unordered
-    ///       fashion in unspecified threads, and indeterminately sequenced
-    ///       within each thread.
+    /// The assignments in the parallel \a copy algorithm invoked with an
+    /// execution policy object of type \a sequential_execution_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a copy algorithm invoked with
+    /// an execution policy object of type \a parallel_execution_policy or
+    /// \a task_execution_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
     ///
     /// \returns  The \a copy algorithm returns a \a hpx::future<OutIter> if the
     ///           execution policy is of type \a task_execution_policy and
     ///           returns \a OutIter otherwise.
-    /// \returns  The \a copy algorithm returns the output iterator to the
+    ///           The \a copy algorithm returns the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
@@ -258,19 +259,20 @@ namespace hpx { namespace parallel
     ///                     \a first the algorithm will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
     ///
-    /// \note The assignments in the parallel \a copy_n algorithm invoked with
-    ///       an execution policy object of type \a sequential_execution_policy
-    ///       execute in sequential order in the calling thread.
-    /// \note The assignments in the parallel \a copy_n algorithm invoked with
-    ///       an execution policy object of type \a parallel_execution_policy or
-    ///       \a task_execution_policy are permitted to execute in an unordered
-    ///       fashion in unspecified threads, and indeterminately sequenced
-    ///       within each thread.
+    /// The assignments in the parallel \a copy_n algorithm invoked with
+    /// an execution policy object of type \a sequential_execution_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a copy_n algorithm invoked with
+    /// an execution policy object of type \a parallel_execution_policy or
+    /// \a task_execution_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
     ///
     /// \returns  The \a copy_n algorithm returns a \a hpx::future<OutIter> if
     ///           the execution policy is of type \a task_execution_policy and
     ///           returns \a OutIter otherwise.
-    /// \returns  The \a copy_n algorithm returns the output iterator to the
+    ///           The \a copy_n algorithm returns the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
@@ -432,30 +434,29 @@ namespace hpx { namespace parallel
     ///                     unary predicate which returns \a true for the
     ///                     required elements. The signature of this predicate
     ///                     should be equivalent to:
-    ///
     ///                     \code
     ///                     bool pred(const Type &a);
     ///                     \endcode
-    ///
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
     ///                     type \a InIter can be dereferenced and then
     ///                     implicitly converted to Type.
     ///
-    /// \note The assignments in the parallel \a copy_if algorithm invoked with
-    ///       an execution policy object of type \a sequential_execution_policy
-    ///       execute in sequential order in the calling thread.
-    /// \note The assignments in the parallel \a copy_if algorithm invoked with
-    ///       an execution policy object of type \a parallel_execution_policy or
-    ///       \a task_execution_policy are permitted to execute in an unordered
-    ///       fashion in unspecified threads, and indeterminately sequenced
-    ///       within each thread.
+    /// The assignments in the parallel \a copy_if algorithm invoked with
+    /// an execution policy object of type \a sequential_execution_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a copy_if algorithm invoked with
+    /// an execution policy object of type \a parallel_execution_policy or
+    /// \a task_execution_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
     ///
     /// \returns  The \a copy_if algorithm returns a \a hpx::future<OutIter> if the
     ///           execution policy is of type \a task_execution_policy and
     ///           returns \a OutIter otherwise.
-    /// \returns  The \a copy_if algorithm returns the output iterator to the
+    ///           The \a copy_if algorithm returns the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///

@@ -112,21 +112,22 @@ namespace hpx { namespace parallel
     /// \param first2       Refers to the beginning of the second  sequence of
     ///                     elements the algorithm will be applied to.
     ///
-    /// \note The swap operations in the parallel \a swap_ranges algorithm
-    ///       invoked with an execution policy object of type
-    ///       \a sequential_execution_policy execute in sequential order in
-    ///       the calling thread.
-    /// \note The swap operations in the parallel \a swap_ranges algorithm
-    ///       invoked with an execution policy object of type
-    ///       \a parallel_execution_policy or \a task_execution_policy are
-    ///       permitted to execute in an unordered fashion in unspecified
-    ///       threads, and indeterminately sequenced within each thread.
+    /// The swap operations in the parallel \a swap_ranges algorithm
+    /// invoked with an execution policy object of type
+    /// \a sequential_execution_policy execute in sequential order in
+    /// the calling thread.
+    ///
+    /// The swap operations in the parallel \a swap_ranges algorithm
+    /// invoked with an execution policy object of type
+    /// \a parallel_execution_policy or \a task_execution_policy are
+    /// permitted to execute in an unordered fashion in unspecified
+    /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a swap_ranges algorithm returns a
     ///           \a hpx::future<ForwardIter2>  if the execution policy is of
     ///           type \a task_execution_policy and returns \a ForwardIter2
     ///           otherwise.
-    /// \returns  The \a swap_ranges algorithm returns iterator to the element
+    ///           The \a swap_ranges algorithm returns iterator to the element
     ///           past the last element exchanged in the range beginning with
     ///           \a first2.
     ///

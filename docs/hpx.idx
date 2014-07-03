@@ -57,26 +57,29 @@ is_parallel_execution_policy          "" "hpx\.parallel\.is_parallel_execution_p
 is_sequential_execution_policy        "" "hpx\.parallel\.is_sequential_execution_policy.*"
 
 # hpx/parallel/detail/copy.hpp
-copy                                  "" "hpx\.parallel\.copy_id.*"
-copy_n                                "" "hpx\.parallel\.copy_n.*"
+parallel::copy                        "copy" "hpx\.parallel\.copy_id.*"
+parallel::copy_n                      "copy_n" "hpx\.parallel\.copy_n.*"
 
 # hpx/parallel/detail/copy.hpp
-count                                 "" "hpx\.parallel\.count$.*"
-count_if                              "" "hpx\.parallel\.count_if.*"
+parallel::count                       "count" "hpx\.parallel\.count$.*"
+parallel::count_if                    "count_if" "hpx\.parallel\.count_if.*"
+
+# hpx/parallel/detail/fill.hpp
+parallel::fill                        "fill" "hpx\.parallel\.fill$"
+parallel::fill_n                      "fill_n" "hpx\.parallel\.fill_n.*"
 
 # hpx/parallel/detail/for_each.hpp
-for_each                              "" "hpx\.parallel\.for_each$"
-for_each_n                            "" "hpx\.parallel\.for_each_n.*"
-
-# hpx/parallel/detail/for_each.hpp
-fill                                  "" "hpx\.parallel\.fill$"
-fill_n                                "" "hpx\.parallel\.fill_n.*"
+parallel::for_each                    "for_each" "hpx\.parallel\.for_each$"
+parallel::for_each_n                  "for_each_n" "hpx\.parallel\.for_each_n.*"
 
 # hpx/parallel/detail/move.hpp
-move                                  "" "hpx\.parallel\.move$"
+parallel::move                        "move" "hpx\.parallel\.move$"
+
+# hpx/parallel/detail/reduce.hpp
+parallel::reduce                      "reduce" "hpx\.parallel\.reduce.*"
 
 # hpx/parallel/detail/swap_ranges.hpp
-swap_ranges                           "" "hpx\.parallel\.swap_ranges.*"
+parallel::swap_ranges                 "swap_ranges" "hpx\.parallel\.swap_ranges.*"
 
 # hpx/runtime/components/new.hpp
 new_                                  "" "hpx\.components\.new_.*"
