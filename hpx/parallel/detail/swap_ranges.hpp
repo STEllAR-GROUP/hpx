@@ -2,6 +2,9 @@
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+/// \file swap_ranges.hpp
+
 #if !defined(HPX_PARALLEL_DETAIL_SWAP_RANGES_JUNE_20_2014_1006AM)
 #define HPX_PARALLEL_DETAIL_SWAP_RANGES_JUNE_20_2014_1006AM
 
@@ -27,6 +30,7 @@ namespace hpx { namespace parallel
     // swap ranges
     namespace detail
     {
+        /// \cond NOINTERNAL
         template <typename ExPolicy, typename ForwardIter1, typename ForwardIter2>
         typename detail::algorithm_result<ExPolicy, ForwardIter2>::type
         swap_ranges(ExPolicy const&, ForwardIter1 first1, ForwardIter1 last1,
@@ -78,8 +82,54 @@ namespace hpx { namespace parallel
             return detail::swap_ranges(sequential_execution_policy(),
                 first1, last1, first2, t);
         }
+        /// \endcond
     }
 
+    /// Exchanges elements between range [first1, last1) and another range
+    /// starting at \a first2.
+    ///
+    /// \note   Complexity: Linear in the distance between \a first1 and \a last1
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the swap operations.
+    /// \tparam ForwardIter1 The type of the first range of iterators to swap
+    ///                     (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam ForwardIter2 The type of the second range of iterators to swap
+    ///                     (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first1       Refers to the beginning of the first sequence of
+    ///                     elements the algorithm will be applied to.
+    /// \param last1        Refers to the end of the first sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param first2       Refers to the beginning of the second  sequence of
+    ///                     elements the algorithm will be applied to.
+    ///
+    /// \note The swap operations in the parallel \a swap_ranges algorithm
+    ///       invoked with an execution policy object of type
+    ///       \a sequential_execution_policy execute in sequential order in
+    ///       the calling thread.
+    /// \note The swap operations in the parallel \a swap_ranges algorithm
+    ///       invoked with an execution policy object of type
+    ///       \a parallel_execution_policy or \a task_execution_policy are
+    ///       permitted to execute in an unordered fashion in unspecified
+    ///       threads, and indeterminately sequenced within each thread.
+    ///
+    /// \returns  The \a swap_ranges algorithm returns a
+    ///           \a hpx::future<ForwardIter2>  if the execution policy is of
+    ///           type \a task_execution_policy and returns \a ForwardIter2
+    ///           otherwise.
+    /// \returns  The \a swap_ranges algorithm returns iterator to the element
+    ///           past the last element exchanged in the range beginning with
+    ///           \a first2.
+    ///
     template <typename ExPolicy, typename ForwardIter1, typename ForwardIter2>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,

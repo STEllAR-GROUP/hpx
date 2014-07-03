@@ -72,6 +72,12 @@ for_each_n                            "" "hpx\.parallel\.for_each_n.*"
 fill                                  "" "hpx\.parallel\.fill$"
 fill_n                                "" "hpx\.parallel\.fill_n.*"
 
+# hpx/parallel/detail/move.hpp
+move                                  "" "hpx\.parallel\.move$"
+
+# hpx/parallel/detail/swap_ranges.hpp
+swap_ranges                           "" "hpx\.parallel\.swap_ranges.*"
+
 # hpx/runtime/components/new.hpp
 new_                                  "" "hpx\.components\.new_.*"
 new_colocated                         "" "hpx\.components\.new_colocated.*"
