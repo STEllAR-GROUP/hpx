@@ -30,6 +30,8 @@ namespace hpx { namespace iostreams
         struct cout_tag {};
         struct cerr_tag {};
 
+        struct consolestream_tag {};
+
         ///////////////////////////////////////////////////////////////////////
         /// This is a Boost.IoStreams Sink that can be used to create an
         /// [io]stream on top of a detail::buffer.

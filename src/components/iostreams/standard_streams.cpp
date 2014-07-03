@@ -28,8 +28,21 @@ namespace hpx { namespace iostreams { namespace detail
         return std::cerr;
     }
 
+    std::stringstream& get_consolestream()
+    {
+        static std::stringstream console_stream;
+        return console_stream;
+    }
+
+    std::ostream& get_outstream(consolestream_tag)
+    {
+        return get_consolestream();
+    }
+
     char const* const cout_name = "/locality#console/output_stream#cout";
     char const* const cerr_name = "/locality#console/output_stream#cerr";
+    char const* const consolestream_name =
+        "/locality#console/output_stream#consolestream";
 
     char const* const get_outstream_name(cout_tag)
     {
@@ -39,6 +52,11 @@ namespace hpx { namespace iostreams { namespace detail
     char const* const get_outstream_name(cerr_tag)
     {
         return cerr_name;
+    }
+
+    char const* const get_outstream_name(consolestream_tag)
+    {
+        return consolestream_name;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -102,11 +120,36 @@ namespace hpx { namespace iostreams
         }
         detail::create_ostream(detail::cerr_tag());
     }
+
+    void create_consolestream()
+    {
+        naming::resolver_client& agas_client = get_runtime().get_agas_client();
+        if (!agas_client.is_console())
+        {
+            HPX_THROW_EXCEPTION(service_unavailable,
+                "hpx::iostreams::create_consolestream",
+                "this function should be called on the console only");
+        }
+        detail::create_ostream(detail::consolestream_tag());
+    }
+
+    std::stringstream const& get_consolestream()
+    {
+        naming::resolver_client& agas_client = get_runtime().get_agas_client();
+        if (!agas_client.is_console())
+        {
+            HPX_THROW_EXCEPTION(service_unavailable,
+                "hpx::iostreams::get_consolestream",
+                "this function should be called on the console only");
+        }
+        return detail::get_consolestream();
+    }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_PLAIN_ACTION(hpx::iostreams::create_cout, create_cout_action);
 HPX_PLAIN_ACTION(hpx::iostreams::create_cerr, create_cerr_action);
+HPX_PLAIN_ACTION(hpx::iostreams::create_consolestream, create_consolestream_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -114,5 +157,12 @@ namespace hpx
     // global standard ostream objects
     iostreams::ostream cout;
     iostreams::ostream cerr;
+
+    // extension: singleton stringstream on console
+    iostreams::ostream consolestream;
+    std::stringstream const& get_consolestream()
+    {
+        return iostreams::get_consolestream();
+    }
 }
 
