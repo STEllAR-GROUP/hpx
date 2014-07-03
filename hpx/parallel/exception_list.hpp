@@ -15,6 +15,7 @@ namespace hpx { namespace parallel
 {
     namespace detail
     {
+        /// \cond NOINTERNAL
         template <typename ExPolicy>
         struct handle_exception
         {
@@ -45,9 +46,11 @@ namespace hpx { namespace parallel
                 hpx::terminate();
             }
         };
+        /// \endcond
     }
 
     // we're just reusing our existing implementation
+
     using hpx::exception_list;
 }}
 

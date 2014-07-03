@@ -120,7 +120,7 @@ namespace hpx { namespace parallel
         is_execution_policy<ExPolicy>,
         typename detail::algorithm_result<ExPolicy, void>::type
     >::type
-    fill(ExPolicy && policy, InIter first, InIter last, T val)
+    fill(ExPolicy && policy, InIter first, InIter last, T value)
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
              iterator_category;
@@ -133,7 +133,7 @@ namespace hpx { namespace parallel
         typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
 
         return detail::fill( std::forward<ExPolicy>(policy),
-            first, last, val, is_seq());
+            first, last, value, is_seq());
     }
     ///////////////////////////////////////////////////////////////////////////
     // fill_n
@@ -231,7 +231,7 @@ namespace hpx { namespace parallel
         is_execution_policy<ExPolicy>,
         typename detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
-    fill_n(ExPolicy && policy, OutIter first, Size count, T val)
+    fill_n(ExPolicy && policy, OutIter first, Size count, T value)
     {
         typedef typename std::iterator_traits<OutIter>::iterator_category
             iterator_category;
@@ -259,7 +259,7 @@ namespace hpx { namespace parallel
 
         return detail::fill_n(
             std::forward<ExPolicy>(policy),
-            first, std::size_t(count), val, is_seq());
+            first, std::size_t(count), value, is_seq());
     }
 }}
 

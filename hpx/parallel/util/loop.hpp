@@ -350,10 +350,10 @@ namespace hpx { namespace parallel { namespace util
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename T, typename Pred>
     BOOST_FORCEINLINE T
-    accumulate_n(Iter it, std::size_t count, T && init, Pred && f)
+    accumulate_n(Iter it, std::size_t count, T init, Pred && f)
     {
         typedef typename std::iterator_traits<Iter>::iterator_category cat;
-        return detail::accumulate_n<cat>::call(it, count, std::forward<T>(init),
+        return detail::accumulate_n<cat>::call(it, count, std::move(init),
             std::forward<Pred>(f), boost::mpl::false_());
     }
 }}}

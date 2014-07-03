@@ -305,14 +305,14 @@ namespace hpx { namespace parallel
     /// \returns  The \a count algorithm returns the number of elements
     ///           satisfying the given criteria.
     ///
-    template <typename ExPolicy, typename InIter, typename Pred>
+    template <typename ExPolicy, typename InIter, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
         typename detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<InIter>::difference_type
         >::type
     >::type
-    count_if(ExPolicy && policy, InIter first, InIter last, Pred && op)
+    count_if(ExPolicy && policy, InIter first, InIter last, F && f)
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
             category;
@@ -327,8 +327,7 @@ namespace hpx { namespace parallel
         >::type is_seq;
 
         return detail::count_if(std::forward<ExPolicy>(policy),
-            first, last,
-            std::forward<Pred>(op), is_seq());
+            first, last, std::forward<F>(f), is_seq());
     }
 }}
 

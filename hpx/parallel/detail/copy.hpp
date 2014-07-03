@@ -258,8 +258,8 @@ namespace hpx { namespace parallel
     ///                     \a first the algorithm will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
     ///
-    /// \note The assignments in the parallel \copy_n algorithm invoked with an
-    ///       execution policy object of type \a sequential_execution_policy
+    /// \note The assignments in the parallel \a copy_n algorithm invoked with
+    ///       an execution policy object of type \a sequential_execution_policy
     ///       execute in sequential order in the calling thread.
     /// \note The assignments in the parallel \a copy_n algorithm invoked with
     ///       an execution policy object of type \a parallel_execution_policy or
