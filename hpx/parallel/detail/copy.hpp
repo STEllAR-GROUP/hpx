@@ -170,23 +170,11 @@ namespace hpx { namespace parallel
         copy_n(ExPolicy const&, InIter first, std::size_t count, OutIter dest,
             boost::mpl::true_)
         {
-            typedef boost::tuple<InIter, OutIter> iterator_tuple;
-            typedef detail::zip_iterator<iterator_tuple> zip_iterator;
-            typedef typename zip_iterator::reference reference;
-
             try {
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
-                    get_iter<1, OutIter>(
-                        plain_for_each_n(sequential_execution_policy(),
-                            detail::make_zip_iterator(boost::make_tuple(first, dest)),
-                            count,
-                            [](reference it) {
-                                *boost::get<1>(it) = *boost::get<0>(it);
-                            },
-                            boost::mpl::true_())
-                    ));
+                    std::copy_n(first, count, dest));
             }
-            catch(...) {
+            catch (...) {
                 detail::handle_exception<ExPolicy>::call();
             }
         }
@@ -330,25 +318,11 @@ namespace hpx { namespace parallel
         copy_if(ExPolicy const&, InIter first, InIter last, OutIter dest,
             F && f, boost::mpl::true_)
         {
-            typedef boost::tuple<InIter, OutIter> iterator_tuple;
-            typedef detail::zip_iterator<iterator_tuple> zip_iterator;
-            typedef typename zip_iterator::reference reference;
-
-            try{
+            try {
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
-                    get_iter<1, OutIter>(
-                        plain_for_each_n(sequential_execution_policy(),
-                            detail::make_zip_iterator(boost::make_tuple(first, dest)),
-                            std::distance(first, last),
-                            [f](reference it) {
-                                if (f(*boost::get<0>(it)))
-                                    *boost::get<1>(it) = *boost::get<0>(it);
-                            },
-                            boost::mpl::true_())
-                    )
-                );
+                    std::copy_if(first, last, dest, std::forward<F>(f)));
             }
-            catch(...) {
+            catch (...) {
                 detail::handle_exception<ExPolicy>::call();
             }
         }
