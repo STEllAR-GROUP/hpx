@@ -24,7 +24,7 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 
-namespace hpx { namespace parallel
+namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
     ///////////////////////////////////////////////////////////////////////////
     // swap ranges
@@ -157,5 +157,6 @@ namespace hpx { namespace parallel
         return detail::swap_ranges( std::forward<ExPolicy>(policy),
             first1, last1, first2, is_seq());
     }
-}}
+}}}
+
 #endif

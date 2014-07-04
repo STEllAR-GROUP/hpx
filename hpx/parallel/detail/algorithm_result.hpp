@@ -13,7 +13,7 @@
 #include <boost/static_assert.hpp>
 #include <boost/type_traits/is_lvalue_reference.hpp>
 
-namespace hpx { namespace parallel { namespace detail
+namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename T>
@@ -67,6 +67,6 @@ namespace hpx { namespace parallel { namespace detail
         BOOST_STATIC_ASSERT_MSG(!boost::is_lvalue_reference<T>::value,
             "T shouldn't be a lvalue reference");
     };
-}}}
+}}}}
 
 #endif

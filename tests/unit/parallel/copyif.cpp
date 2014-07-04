@@ -149,22 +149,22 @@ void test_copy_if()
 
     test_copy_if(seq, IteratorTag());
     test_copy_if(par, IteratorTag());
-    test_copy_if(vec, IteratorTag());
+    test_copy_if(par_vec, IteratorTag());
     test_copy_if(task, IteratorTag());
 
     test_copy_if(execution_policy(seq), IteratorTag());
     test_copy_if(execution_policy(par), IteratorTag());
-    test_copy_if(execution_policy(vec), IteratorTag());
+    test_copy_if(execution_policy(par_vec), IteratorTag());
     test_copy_if(execution_policy(task), IteratorTag());
 
     test_copy_if_outiter(seq, IteratorTag());
     test_copy_if_outiter(par, IteratorTag());
-    test_copy_if_outiter(vec, IteratorTag());
+    test_copy_if_outiter(par_vec, IteratorTag());
     test_copy_if_outiter(task, IteratorTag());
 
     test_copy_if_outiter(execution_policy(seq), IteratorTag());
     test_copy_if_outiter(execution_policy(par), IteratorTag());
-    test_copy_if_outiter(execution_policy(vec), IteratorTag());
+    test_copy_if_outiter(execution_policy(par_vec), IteratorTag());
     test_copy_if_outiter(execution_policy(task), IteratorTag());
 
 }

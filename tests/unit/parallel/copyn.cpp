@@ -119,23 +119,23 @@ void test_copy_n()
 
     test_copy_n(seq, IteratorTag());
     test_copy_n(par, IteratorTag());
-    test_copy_n(vec, IteratorTag());
+    test_copy_n(par_vec, IteratorTag());
     test_copy_n(task, IteratorTag());
 
     test_copy_n(execution_policy(seq), IteratorTag());
     test_copy_n(execution_policy(par), IteratorTag());
-    test_copy_n(execution_policy(vec), IteratorTag());
+    test_copy_n(execution_policy(par_vec), IteratorTag());
     test_copy_n(execution_policy(task), IteratorTag());
 
     //assure output iterator will run
     test_copy_n_outiter(seq, IteratorTag());
     test_copy_n_outiter(par, IteratorTag());
-    test_copy_n_outiter(vec, IteratorTag());
+    test_copy_n_outiter(par_vec, IteratorTag());
     test_copy_n_outiter(task, IteratorTag());
 
     test_copy_n_outiter(execution_policy(seq), IteratorTag());
     test_copy_n_outiter(execution_policy(par), IteratorTag());
-    test_copy_n_outiter(execution_policy(vec), IteratorTag());
+    test_copy_n_outiter(execution_policy(par_vec), IteratorTag());
     test_copy_n_outiter(execution_policy(task), IteratorTag());
 
 }

@@ -72,12 +72,12 @@ void test_for_each()
 
     test_for_each(seq, IteratorTag());
     test_for_each(par, IteratorTag());
-    test_for_each(vec, IteratorTag());
+    test_for_each(par_vec, IteratorTag());
     test_for_each(task, IteratorTag());
 
     test_for_each(execution_policy(seq), IteratorTag());
     test_for_each(execution_policy(par), IteratorTag());
-    test_for_each(execution_policy(vec), IteratorTag());
+    test_for_each(execution_policy(par_vec), IteratorTag());
     test_for_each(execution_policy(task), IteratorTag());
 }
 

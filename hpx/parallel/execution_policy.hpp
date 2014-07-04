@@ -11,6 +11,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/parallel/config/inline_namespace.hpp>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
@@ -22,7 +23,7 @@
 
 #include <memory>
 
-namespace hpx { namespace parallel
+namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
     ///////////////////////////////////////////////////////////////////////////
     /// The class parallel_execution_policy is an execution policy type used
@@ -99,10 +100,10 @@ namespace hpx { namespace parallel
     static sequential_execution_policy const seq;
 
     ///////////////////////////////////////////////////////////////////////////
-    /// The class vector_execution_policy is an execution policy type used as
+    /// The class parallel_vector_execution_policy is an execution policy type used as
     /// a unique type to disambiguate parallel algorithm overloading and
     /// indicate that a parallel algorithm's execution may be vectorized.
-    struct vector_execution_policy
+    struct parallel_vector_execution_policy
     {
         /// \cond NOINTERNAL
         static threads::executor get_executor() { return threads::executor(); }
@@ -111,7 +112,7 @@ namespace hpx { namespace parallel
     };
 
     /// Default vector execution policy object.
-    static vector_execution_policy const vec;
+    static parallel_vector_execution_policy const par_vec;
 
     ///////////////////////////////////////////////////////////////////////////
     /// Extension: The class task_execution_policy is an execution policy type
@@ -196,7 +197,7 @@ namespace hpx { namespace parallel
         {};
 
         template <>
-        struct is_execution_policy<vector_execution_policy>
+        struct is_execution_policy<parallel_vector_execution_policy>
           : boost::mpl::true_
         {};
 
@@ -247,7 +248,7 @@ namespace hpx { namespace parallel
         {};
 
         template <>
-        struct is_parallel_execution_policy<vector_execution_policy>
+        struct is_parallel_execution_policy<parallel_vector_execution_policy>
           : boost::mpl::true_
         {};
 
@@ -456,12 +457,12 @@ namespace hpx { namespace parallel
                 return execution_policy_enum::sequential;
             if (t == typeid(task_execution_policy))
                 return execution_policy_enum::task;
-            if (t == typeid(vector_execution_policy))
+            if (t == typeid(parallel_vector_execution_policy))
                 return execution_policy_enum::vector;
             return execution_policy_enum::unknown;
         }
         /// \endcond
     }
-}}
+}}}
 
 #endif

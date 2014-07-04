@@ -115,23 +115,23 @@ void test_copy()
     using namespace hpx::parallel;
     test_copy(seq, IteratorTag());
     test_copy(par, IteratorTag());
-    test_copy(vec, IteratorTag());
+    test_copy(par_vec, IteratorTag());
     test_copy(task, IteratorTag());
 
     test_copy(execution_policy(seq), IteratorTag());
     test_copy(execution_policy(par), IteratorTag());
-    test_copy(execution_policy(vec), IteratorTag());
+    test_copy(execution_policy(par_vec), IteratorTag());
     test_copy(execution_policy(task), IteratorTag());
 
     //assure output iterator will work
     test_copy_outiter(seq, IteratorTag());
     test_copy_outiter(par, IteratorTag());
-    test_copy_outiter(vec, IteratorTag());
+    test_copy_outiter(par_vec, IteratorTag());
     test_copy_outiter(task, IteratorTag());
 
     test_copy_outiter(execution_policy(seq), IteratorTag());
     test_copy_outiter(execution_policy(par), IteratorTag());
-    test_copy_outiter(execution_policy(vec), IteratorTag());
+    test_copy_outiter(execution_policy(par_vec), IteratorTag());
     test_copy_outiter(execution_policy(task), IteratorTag());
 }
 

@@ -12,7 +12,7 @@
 
 #include <boost/iterator/zip_iterator.hpp>
 
-namespace hpx { namespace parallel { namespace detail
+namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     // Helper that picks the lowest common iterator type from given iterator
@@ -217,6 +217,6 @@ namespace hpx { namespace parallel { namespace detail
                 return boost::get<N>(t);
             });
     }
-}}}
+}}}}
 
 #endif

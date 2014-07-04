@@ -10,7 +10,7 @@
 #include <boost/type_traits/is_signed.hpp>
 #include <boost/type_traits/is_unsigned.hpp>
 
-namespace hpx { namespace parallel { namespace detail
+namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 {
     // main template represents non-integral types (raises error)
     template <typename Size, typename Enable = void>
@@ -31,7 +31,7 @@ namespace hpx { namespace parallel { namespace detail
     {
         static bool call(Size const&) { return false; }
     };
-}}}
+}}}}
 
 #endif
 

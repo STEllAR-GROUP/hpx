@@ -23,7 +23,7 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 
-namespace hpx { namespace parallel
+namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
     ///////////////////////////////////////////////////////////////////////////
     // reduce
@@ -93,7 +93,7 @@ namespace hpx { namespace parallel
         /// \endcond
     }
 
-    /// Returns GENERALIZED_SUM(f, init, *first, ..., *(first + last - first - 1)).
+    /// Returns GENERALIZED_SUM(f, init, *first, ..., *(first + (last - first) - 1)).
     ///
     /// \note   Complexity: O(\a last - \a first) applications of the
     ///         predicate \a f.
@@ -108,8 +108,7 @@ namespace hpx { namespace parallel
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a copy_if requires \a F to meet the
-    ///                     requirements of \a CopyConstructible, but not
-    ///                     \a MoveConstructible.
+    ///                     requirements of \a CopyConstructible.
     /// \tparam T           The type of the value to be assigned (deduced).
     ///
     /// \param policy       The execution policy to use for the scheduling of
@@ -155,14 +154,14 @@ namespace hpx { namespace parallel
     ///
     /// \note   GENERALIZED_SUM(op, a1, ..., aN) is defined as follows:
     ///         * a1 when N is 1
-    ///         * op(GENERALIZED_SUM(op, b1, ..., bM), GENERALIZED_SUM(op, bM, ..., bN)),
+    ///         * op(GENERALIZED_SUM(op, b1, ..., bK), GENERALIZED_SUM(op, bM, ..., bN)),
     ///           where:
     ///           * b1, ..., bN may be any permutation of a1, ..., aN and
-    ///           * 0 < M < N.
+    ///           * 1 < K+1 = M <= N.
     ///
-    /// The primary difference between \a reduce and \a accumulate is
+    /// The difference between \a reduce and \a accumulate is
     /// that the behavior of reduce may be non-deterministic for
-    /// non-associative or non-commutative operator+.
+    /// non-associative or non-commutative binary predicate.
     ///
     template <typename ExPolicy, typename InIter, typename T, typename F>
     inline typename boost::enable_if<
@@ -187,7 +186,7 @@ namespace hpx { namespace parallel
             std::move(init), std::forward<F>(f), is_seq());
     }
 
-    /// Returns GENERALIZED_SUM(+, init, *first, ..., *(first + last - first - 1)).
+    /// Returns GENERALIZED_SUM(+, init, *first, ..., *(first + (last - first) - 1)).
     ///
     /// \note   Complexity: O(\a last - \a first) applications of the
     ///         operator+().
@@ -228,14 +227,14 @@ namespace hpx { namespace parallel
     ///
     /// \note   GENERALIZED_SUM(+, a1, ..., aN) is defined as follows:
     ///         * a1 when N is 1
-    ///         * op(GENERALIZED_SUM(+, b1, ..., bM), GENERALIZED_SUM(+, bM, ..., bN)),
+    ///         * op(GENERALIZED_SUM(+, b1, ..., bK), GENERALIZED_SUM(+, bM, ..., bN)),
     ///           where:
     ///           * b1, ..., bN may be any permutation of a1, ..., aN and
-    ///           * 0 < M < N.
+    ///           * 1 < K+1 = M <= N.
     ///
-    /// The primary difference between \a reduce and \a accumulate is
+    /// The difference between \a reduce and \a accumulate is
     /// that the behavior of reduce may be non-deterministic for
-    /// non-associative or non-commutative operator+.
+    /// non-associative or non-commutative binary predicate.
     ///
     template <typename ExPolicy, typename InIter, typename T>
     inline typename boost::enable_if<
@@ -260,7 +259,7 @@ namespace hpx { namespace parallel
             std::move(init), std::plus<T>(), is_seq());
     }
 
-    /// Returns GENERALIZED_SUM(+, T(), *first, ..., *(first + last - first - 1)).
+    /// Returns GENERALIZED_SUM(+, T(), *first, ..., *(first + (last - first) - 1)).
     ///
     /// \note   Complexity: O(\a last - \a first) applications of the
     ///         operator+().
@@ -302,17 +301,17 @@ namespace hpx { namespace parallel
     ///
     /// \note   GENERALIZED_SUM(+, a1, ..., aN) is defined as follows:
     ///         * a1 when N is 1
-    ///         * op(GENERALIZED_SUM(+, b1, ..., bM), GENERALIZED_SUM(+, bM, ..., bN)),
+    ///         * op(GENERALIZED_SUM(+, b1, ..., bK), GENERALIZED_SUM(+, bM, ..., bN)),
     ///           where:
     ///           * b1, ..., bN may be any permutation of a1, ..., aN and
-    ///           * 0 < M < N.
+    ///           * 1 < K+1 = M <= N.
     ///
     /// This overload of \a reduce is available only if the compiler
     /// supports default function template arguments.
     ///
-    /// The primary difference between \a reduce and \a accumulate is
+    /// The difference between \a reduce and \a accumulate is
     /// that the behavior of reduce may be non-deterministic for
-    /// non-associative or non-commutative operator+.
+    /// non-associative or non-commutative binary predicate.
     ///
 #if !defined(BOOST_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS)
     template <typename ExPolicy, typename InIter,
@@ -339,6 +338,6 @@ namespace hpx { namespace parallel
             T(), std::plus<T>(), is_seq());
     }
 #endif
-}}
+}}}
 
 #endif

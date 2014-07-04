@@ -65,12 +65,12 @@ void test_fill_n()
     using namespace hpx::parallel;
     test_fill_n(seq, IteratorTag());
     test_fill_n(par, IteratorTag());
-    test_fill_n(vec, IteratorTag());
+    test_fill_n(par_vec, IteratorTag());
     test_fill_n(task, IteratorTag());
 
     test_fill_n(execution_policy(seq), IteratorTag());
     test_fill_n(execution_policy(par), IteratorTag());
-    test_fill_n(execution_policy(vec), IteratorTag());
+    test_fill_n(execution_policy(par_vec), IteratorTag());
     test_fill_n(execution_policy(task), IteratorTag());
 }
 

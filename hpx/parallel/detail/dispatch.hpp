@@ -18,8 +18,8 @@
             boost::mpl::false_());                                            \
                                                                               \
     case detail::execution_policy_enum::vector:                               \
-        return func(*policy.get<vector_execution_policy>(), __VA_ARGS__,      \
-            boost::mpl::false_());                                            \
+        return func(*policy.get<parallel_vector_execution_policy>(),          \
+            __VA_ARGS__, boost::mpl::false_());                               \
                                                                               \
     case detail::execution_policy_enum::task:                                 \
         return func(par, __VA_ARGS__, boost::mpl::false_());                  \

@@ -55,12 +55,12 @@ void test_count_if()
     using namespace hpx::parallel;
     test_count_if(seq, IteratorTag());
     test_count_if(par, IteratorTag());
-    test_count_if(vec, IteratorTag());
+    test_count_if(par_vec, IteratorTag());
     test_count_if(task, IteratorTag());
 
     test_count_if(execution_policy(seq), IteratorTag());
     test_count_if(execution_policy(par), IteratorTag());
-    test_count_if(execution_policy(vec), IteratorTag());
+    test_count_if(execution_policy(par_vec), IteratorTag());
     test_count_if(execution_policy(task), IteratorTag());
 }
 

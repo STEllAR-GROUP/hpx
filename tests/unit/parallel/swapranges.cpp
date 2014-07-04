@@ -88,12 +88,12 @@ void test_swap_ranges()
     using namespace hpx::parallel;
     test_swap_ranges(seq, IteratorTag());
     test_swap_ranges(par, IteratorTag());
-    test_swap_ranges(vec, IteratorTag());
+    test_swap_ranges(par_vec, IteratorTag());
     test_swap_ranges(task, IteratorTag());
 
     test_swap_ranges(execution_policy(seq), IteratorTag());
     test_swap_ranges(execution_policy(par), IteratorTag());
-    test_swap_ranges(execution_policy(vec), IteratorTag());
+    test_swap_ranges(execution_policy(par_vec), IteratorTag());
     test_swap_ranges(execution_policy(task), IteratorTag());
 }
 

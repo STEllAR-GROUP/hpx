@@ -94,12 +94,12 @@ void test_transform_binary()
 
     test_transform_binary(seq, IteratorTag());
     test_transform_binary(par, IteratorTag());
-    test_transform_binary(vec, IteratorTag());
+    test_transform_binary(par_vec, IteratorTag());
     test_transform_binary(task, IteratorTag());
 
     test_transform_binary(execution_policy(seq), IteratorTag());
     test_transform_binary(execution_policy(par), IteratorTag());
-    test_transform_binary(execution_policy(vec), IteratorTag());
+    test_transform_binary(execution_policy(par_vec), IteratorTag());
     test_transform_binary(execution_policy(task), IteratorTag());
 }
 
