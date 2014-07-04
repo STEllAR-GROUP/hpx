@@ -9,9 +9,10 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/exception_list.hpp>
+#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 
-namespace hpx { namespace parallel
+namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
     namespace detail
     {
@@ -36,13 +37,13 @@ namespace hpx { namespace parallel
         };
 
         template <>
-        struct handle_exception<vector_execution_policy>
+        struct handle_exception<parallel_vector_execution_policy>
         {
             BOOST_ATTRIBUTE_NORETURN static void call()
             {
                 std::cout << "terminated";
                 // any exceptions thrown by algorithms executed with the
-                // vector_execution_policy are to call terminate.
+                // parallel_vector_execution_policy are to call terminate.
                 hpx::terminate();
             }
         };
@@ -52,6 +53,6 @@ namespace hpx { namespace parallel
     // we're just reusing our existing implementation
 
     using hpx::exception_list;
-}}
+}}}
 
 #endif

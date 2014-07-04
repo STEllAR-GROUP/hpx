@@ -1,0 +1,100 @@
+[/==============================================================================
+    Copyright (C) 2007-2014 Hartmut Kaiser
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+===============================================================================/]
+
+[section:parallel_algorithms Using Parallel Algorithms]
+
+[def __sequential_execution_policy__ [classref hpx::parallel::v1::sequential_execution_policy `sequential_execution_policy`]]
+[def __parallel_execution_policy__ [classref hpx::parallel::v1::parallel_execution_policy `parallel_execution_policy`]]
+[def __parallel_vector_execution_policy__ [classref hpx::parallel::v1::parallel_vector_execution_policy `parallel_vector_execution_policy`]]
+[def __task_execution_policy__ [classref hpx::parallel::v1::task_execution_policy `task_execution_policy`]]
+[def __execution_policy__ [classref hpx::parallel::v1::execution_policy `execution_policy`]]
+
+[def __exception_list__ [classref hpx::exception_list `exception_list`]]
+
+[def __par_for_each__ [funcref hpx::parallel::v1::for_each `for_each`]]
+
+A parallel algorithm is a function template described by this document
+which is declared in the (inline) namespace `hpx::parallel::v1`.
+
+[note For compilers which do not support inline namespaces, all of the
+      `namespace v1` is imported into the namespace `hpx::parallel`. The effect
+      is similar to what inline namespaces would do, namely all names defined
+      in `hpx::parallel::v1` are accessible from the namespace `hpx::parallel`
+      as well.]
+
+All parallel
+algorithms are very similar in semantics to their sequential counterarts
+(as defined in the `namespace std`) with a formal template parameter named
+`ExecutionPolicy`. The execution policy is generally passed as the first
+argument to any of the parallel algorithms and describes the manner in which
+the execution of these algorithms may be parallelized and the manner in which
+they apply user-provided function objects.
+
+The applications of function objects in parallel algorithms invoked with an
+execution policy object of type sequential_execution_policy execute in
+sequential order in the calling thread.
+
+The applications of function objects in parallel algorithms invoked with an
+execution policy object of type __parallel_execution_policy__ or
+__task_execution_policy__ are permitted to execute in an unordered fashion in
+unspecified threads, and indeterminately sequenced within each thread.
+
+[important It is the caller's responsibility to ensure correctness, for example
+           that the invocation does not introduce data races or deadlocks.]
+
+The applications of function objects in parallel algorithms invoked with an
+execution policy of type __parallel_vector_execution_policy__ is in __hpx__
+equivalent to the use of the execution policy __parallel_execution_policy__.
+
+Algorithms invoked with an execution policy object of type __execution_policy__
+execute internally as if invoked with the contained execution policy object.
+An exception is when an __execution_policy__ contains an execution policy of
+type __task_execution_policy__ (which normally turns the algorithm into its
+asynchronous version). In this case the execution is semantically equivalent to
+the case of passing a __parallel_execution_policy__ contained in the
+__execution_policy__ object.
+
+
+[heading Parallel Exceptions]
+
+During the execution of a standard parallel algorithm, if temporary memory
+resources are required by any of the algorithms and
+no memory are available, the algorithm throws a `std::bad_alloc` exception.
+
+During the execution of any of the parallel algorithms, if the application
+of a function object terminates with an uncaught exception, the behavior
+of the program is determined by the type of execution policy used to invoke
+the algorithm:
+
+* If the execution policy object is of type __parallel_vector_execution_policy__,
+  `hpx::terminate` shall be called.
+
+* If the execution policy object is of type __sequential_execution_policy__,
+  __parallel_execution_policy__, or __task_execution_policy__ the execution of
+  the algorithm terminates with an __exception_list__ exception. All
+  uncaught exceptions thrown during the application of user-provided
+  function objects shall be contained in the __exception_list__.
+
+For example, the number of invocations of the user-provided
+function object in for_each is unspecified. When __par_for_each__ is
+executed sequentially, only one exception will be contained in
+the __exception_list__ object.
+
+These guarantees imply that, unless the algorithm has failed to
+allocate memory and terminated with `std::bad_alloc`, all
+exceptions thrown during the execution of the algorithm are
+communicated to the caller. It is unspecified whether an algorithm
+implementation will "forge ahead" after encountering and capturing
+a user exception.
+
+The algorithm may terminate with the `std::bad_alloc` exception
+even if one or more user-provided function objects have terminated
+with an exception. For example, this can happen when an algorithm
+fails to allocate memory while creating or adding elements to the
+__exception_list__ object.
+
+[endsect]

@@ -7,7 +7,7 @@
 ===============================================================================/]
 
 [article HPX
-    [quickbook 1.6]
+    [quickbook 1.7]
     [id hpx]
     [authors [STE||AR Group, The]]
     [version 0.9.9]
@@ -303,6 +303,7 @@ __boost_auto_index__ can be found in the collection of __boost_tools__.
 [include manual/plain_actions.qbk]
 [include manual/components.qbk]
 [include manual/lcos.qbk]
+[include manual/parallel_algorithms.qbk]
 [include manual/exceptions.qbk]
 [include manual/performance_counters.qbk]
 [include manual/scheduling_policies.qbk]

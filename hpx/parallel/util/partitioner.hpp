@@ -75,7 +75,7 @@ namespace hpx { namespace parallel { namespace util
 
         ///////////////////////////////////////////////////////////////////////
         template <>
-        struct handle_local_exceptions<vector_execution_policy>
+        struct handle_local_exceptions<parallel_vector_execution_policy>
         {
             static void call(boost::exception_ptr const&,
                 std::list<boost::exception_ptr>&)

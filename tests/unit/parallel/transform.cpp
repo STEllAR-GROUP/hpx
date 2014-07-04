@@ -76,12 +76,12 @@ void test_transform()
 
     test_transform(seq, IteratorTag());
     test_transform(par, IteratorTag());
-    test_transform(vec, IteratorTag());
+    test_transform(par_vec, IteratorTag());
     test_transform(task, IteratorTag());
 
     test_transform(execution_policy(seq), IteratorTag());
     test_transform(execution_policy(par), IteratorTag());
-    test_transform(execution_policy(vec), IteratorTag());
+    test_transform(execution_policy(par_vec), IteratorTag());
     test_transform(execution_policy(task), IteratorTag());
 }
 

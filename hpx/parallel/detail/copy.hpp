@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file copy.hpp
+/// \file
 
 #if !defined(HPX_PARALLEL_DETAIL_COPY_MAY_30_2014_0317PM)
 #define HPX_PARALLEL_DETAIL_COPY_MAY_30_2014_0317PM
@@ -22,7 +22,7 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 
-namespace hpx { namespace parallel
+namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
     ///////////////////////////////////////////////////////////////////////////
     // copy
@@ -389,8 +389,7 @@ namespace hpx { namespace parallel
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a copy_if requires \a F to meet the
-    ///                     requirements of \a CopyConstructible, but not
-    ///                     \a MoveConstructible.
+    ///                     requirements of \a CopyConstructible.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -407,7 +406,7 @@ namespace hpx { namespace parallel
     ///                     should be equivalent to:
     ///                     \code
     ///                     bool pred(const Type &a);
-    ///                     \endcode
+    ///                     \endcode \n
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
@@ -467,6 +466,6 @@ namespace hpx { namespace parallel
             first, last, dest,
             std::forward<F>(f), is_seq());
     }
-}}
+}}}
 
 #endif

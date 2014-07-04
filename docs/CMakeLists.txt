@@ -51,6 +51,7 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/parallel/detail/move.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/detail/reduce.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/detail/swap_ranges.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/detail/transform.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/get_ptr.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/actions/action_support.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action.hpp"
@@ -83,7 +84,8 @@ set(doxygen_definition_list
     "HPX_API_EXPORT="
     "HPX_STD_FUNCTION=std::function"
     "extern="
-    "BOOST_NOEXCEPT=")
+    "BOOST_NOEXCEPT="
+    "HPX_INLINE_NAMESPACE(x)=namespace x")
 
 #############################################################################
 # Definitions for autodoc.doxy.in

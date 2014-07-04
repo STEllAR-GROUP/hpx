@@ -66,12 +66,12 @@ void test_count()
     using namespace hpx::parallel;
     test_count(seq, IteratorTag());
     test_count(par, IteratorTag());
-    test_count(vec, IteratorTag());
+    test_count(par_vec, IteratorTag());
     test_count(task, IteratorTag());
 
     test_count(execution_policy(seq), IteratorTag());
     test_count(execution_policy(par), IteratorTag());
-    test_count(execution_policy(vec), IteratorTag());
+    test_count(execution_policy(par_vec), IteratorTag());
     test_count(execution_policy(task), IteratorTag());
 }
 

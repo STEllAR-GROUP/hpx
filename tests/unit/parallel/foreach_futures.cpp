@@ -102,12 +102,12 @@ void test_for_each_futures()
 
     test_for_each_futures(seq, IteratorTag());
     test_for_each_futures(par, IteratorTag());
-    test_for_each_futures(vec, IteratorTag());
+    test_for_each_futures(par_vec, IteratorTag());
     test_for_each_futures(task, IteratorTag());
 
     test_for_each_futures(execution_policy(seq), IteratorTag());
     test_for_each_futures(execution_policy(par), IteratorTag());
-    test_for_each_futures(execution_policy(vec), IteratorTag());
+    test_for_each_futures(execution_policy(par_vec), IteratorTag());
     test_for_each_futures(execution_policy(task), IteratorTag());
 }
 

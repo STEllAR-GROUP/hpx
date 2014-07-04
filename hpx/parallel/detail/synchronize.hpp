@@ -11,7 +11,7 @@
 
 #include <iterator>
 
-namespace hpx { namespace parallel { namespace detail
+namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter>
@@ -90,6 +90,6 @@ namespace hpx { namespace parallel { namespace detail
 
         detail::synchronize_binary(begin1, end1, begin2, pred());
     }
-}}}
+}}}}
 
 #endif

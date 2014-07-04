@@ -47,39 +47,44 @@ register_id_with_basename             "" "hpx\.register_id_with_basename.*"
 unregister_id_with_basename           "" "hpx\.unregister_id_with_basename.*"
 
 # hpx/parallel/execution_policy.hpp
-execution_policy                      "" "hpx\.parallel\.execution_policy.*"
-parallel_execution_policy             "" "hpx\.parallel\.parallel_exec.*"
-task_execution_policy                 "" "hpx\.parallel\.task_exec.*"
-sequential_execution_policy           "" "hpx\.parallel\.sequential_exec.*"
-vector_execution_policy               "" "hpx\.parallel\.vector_exec.*"
-is_execution_policy                   "" "hpx\.parallel\.is_execution_policy.*"
-is_parallel_execution_policy          "" "hpx\.parallel\.is_parallel_execution_policy.*"
-is_sequential_execution_policy        "" "hpx\.parallel\.is_sequential_execution_policy.*"
+execution_policy                      "" "hpx\.parallel\.v1\.execution_policy.*"
+parallel_execution_policy             "" "hpx\.parallel\.v1\.parallel_exec.*"
+task_execution_policy                 "" "hpx\.parallel\.v1\.task_exec.*"
+sequential_execution_policy           "" "hpx\.parallel\.v1\.sequential_exec.*"
+vector_execution_policy               "" "hpx\.parallel\.v1\.vector_exec.*"
+is_execution_policy                   "" "hpx\.parallel\.v1\.is_execution_policy.*"
+is_parallel_execution_policy          "" "hpx\.parallel\.v1\.is_parallel_execution_policy.*"
+is_sequential_execution_policy        "" "hpx\.parallel\.v1\.is_sequential_execution_policy.*"
+
 
 # hpx/parallel/detail/copy.hpp
-parallel::copy                        "copy" "hpx\.parallel\.copy_id.*"
-parallel::copy_n                      "copy_n" "hpx\.parallel\.copy_n.*"
+parallel::copy                        "copy" "hpx\.parallel\.v1\.copy_id.*"
+parallel::copy_n                      "copy_n" "hpx\.parallel\.v1\.copy_n.*"
 
 # hpx/parallel/detail/copy.hpp
-parallel::count                       "count" "hpx\.parallel\.count$.*"
-parallel::count_if                    "count_if" "hpx\.parallel\.count_if.*"
+parallel::count                       "count" "hpx\.parallel\.v1\.count$.*"
+parallel::count_if                    "count_if" "hpx\.parallel\.v1\.count_if.*"
 
 # hpx/parallel/detail/fill.hpp
-parallel::fill                        "fill" "hpx\.parallel\.fill$"
-parallel::fill_n                      "fill_n" "hpx\.parallel\.fill_n.*"
+parallel::fill                        "fill" "hpx\.parallel\.v1\.fill$"
+parallel::fill_n                      "fill_n" "hpx\.parallel\.v1\.fill_n.*"
 
 # hpx/parallel/detail/for_each.hpp
-parallel::for_each                    "for_each" "hpx\.parallel\.for_each$"
-parallel::for_each_n                  "for_each_n" "hpx\.parallel\.for_each_n.*"
+parallel::for_each                    "for_each" "hpx\.parallel\.v1\.for_each$"
+parallel::for_each_n                  "for_each_n" "hpx\.parallel\.v1\.for_each_n.*"
 
 # hpx/parallel/detail/move.hpp
-parallel::move                        "move" "hpx\.parallel\.move$"
+parallel::move                        "move" "hpx\.parallel\.v1\.move$"
 
 # hpx/parallel/detail/reduce.hpp
-parallel::reduce                      "reduce" "hpx\.parallel\.reduce.*"
+parallel::reduce                      "reduce" "hpx\.parallel\.v1\.reduce.*"
 
 # hpx/parallel/detail/swap_ranges.hpp
-parallel::swap_ranges                 "swap_ranges" "hpx\.parallel\.swap_ranges.*"
+parallel::swap_ranges                 "swap_ranges" "hpx\.parallel\.v1\.swap_ranges.*"
+
+# hpx/parallel/detail/swap_ranges.hpp
+parallel::transform                   "transform" "hpx\.parallel\.v1\.transform.*"
+
 
 # hpx/runtime/components/new.hpp
 new_                                  "" "hpx\.components\.new_.*"

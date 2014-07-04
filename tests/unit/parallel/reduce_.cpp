@@ -68,12 +68,12 @@ void test_reduce1()
 
     test_reduce1(seq, IteratorTag());
     test_reduce1(par, IteratorTag());
-    test_reduce1(vec, IteratorTag());
+    test_reduce1(par_vec, IteratorTag());
     test_reduce1(task, IteratorTag());
 
     test_reduce1(execution_policy(seq), IteratorTag());
     test_reduce1(execution_policy(par), IteratorTag());
-    test_reduce1(execution_policy(vec), IteratorTag());
+    test_reduce1(execution_policy(par_vec), IteratorTag());
     test_reduce1(execution_policy(task), IteratorTag());
 }
 
@@ -132,12 +132,12 @@ void test_reduce2()
 
     test_reduce2(seq, IteratorTag());
     test_reduce2(par, IteratorTag());
-    test_reduce2(vec, IteratorTag());
+    test_reduce2(par_vec, IteratorTag());
     test_reduce2(task, IteratorTag());
 
     test_reduce2(execution_policy(seq), IteratorTag());
     test_reduce2(execution_policy(par), IteratorTag());
-    test_reduce2(execution_policy(vec), IteratorTag());
+    test_reduce2(execution_policy(par_vec), IteratorTag());
     test_reduce2(execution_policy(task), IteratorTag());
 }
 
@@ -201,12 +201,12 @@ void test_reduce3()
 
     test_reduce3(seq, IteratorTag());
     test_reduce3(par, IteratorTag());
-    test_reduce3(vec, IteratorTag());
+    test_reduce3(par_vec, IteratorTag());
     test_reduce3(task, IteratorTag());
 
     test_reduce3(execution_policy(seq), IteratorTag());
     test_reduce3(execution_policy(par), IteratorTag());
-    test_reduce3(execution_policy(vec), IteratorTag());
+    test_reduce3(execution_policy(par_vec), IteratorTag());
     test_reduce3(execution_policy(task), IteratorTag());
 }
 

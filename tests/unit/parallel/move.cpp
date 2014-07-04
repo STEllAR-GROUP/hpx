@@ -141,23 +141,23 @@ void test_move()
     using namespace hpx::parallel;
     test_move(seq, IteratorTag());
     test_move(par, IteratorTag());
-    test_move(vec, IteratorTag());
+    test_move(par_vec, IteratorTag());
     test_move(task, IteratorTag());
 
     test_move(execution_policy(seq), IteratorTag());
     test_move(execution_policy(par), IteratorTag());
-    test_move(execution_policy(vec), IteratorTag());
+    test_move(execution_policy(par_vec), IteratorTag());
     test_move(execution_policy(task), IteratorTag());
 
     //output iterator test
     test_outiter_move(seq, IteratorTag());
     test_outiter_move(par, IteratorTag());
-    test_outiter_move(vec, IteratorTag());
+    test_outiter_move(par_vec, IteratorTag());
     test_outiter_move(task, IteratorTag());
 
     test_outiter_move(execution_policy(seq), IteratorTag());
     test_outiter_move(execution_policy(par), IteratorTag());
-    test_outiter_move(execution_policy(vec), IteratorTag());
+    test_outiter_move(execution_policy(par_vec), IteratorTag());
     test_outiter_move(execution_policy(task), IteratorTag());
 }
 
