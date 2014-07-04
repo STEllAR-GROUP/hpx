@@ -12,6 +12,7 @@ set(subdirs
     lcos
     performance_counters
     threads
+    traits
     util
    )
 
