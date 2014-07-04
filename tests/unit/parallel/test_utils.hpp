@@ -79,7 +79,7 @@ namespace test
         static void call(hpx::parallel::sequential_execution_policy const&,
             hpx::exception_list const& e)
         {
-            HPX_TEST_EQ(e.size(), 1);
+            HPX_TEST_EQ(e.size(), 1u);
         }
     };
 
@@ -88,7 +88,7 @@ namespace test
     {
         static void call(ExPolicy const&, hpx::exception_list const& e)
         {
-            HPX_TEST_EQ(e.size(), 1);
+            HPX_TEST_EQ(e.size(), 1u);
         }
     };
 
@@ -99,7 +99,7 @@ namespace test
         static void call(hpx::parallel::sequential_execution_policy const&,
             hpx::exception_list const& e)
         {
-            HPX_TEST_EQ(e.size(), 1);
+            HPX_TEST_EQ(e.size(), 1u);
         }
     };
 
@@ -112,7 +112,7 @@ namespace test
             using namespace hpx::parallel::v1::detail;
 
             if (which(policy) == static_cast<int>(execution_policy_enum::sequential)) {
-                HPX_TEST_EQ(e.size(), 1);
+                HPX_TEST_EQ(e.size(), 1u);
             }
             else {
                 // The static partitioner uses the number of threads/cores for
@@ -129,7 +129,7 @@ namespace test
         static void call(hpx::parallel::execution_policy const&,
             hpx::exception_list const& e)
         {
-            HPX_TEST_EQ(e.size(), 1);
+            HPX_TEST_EQ(e.size(), 1u);
         }
     };
 
