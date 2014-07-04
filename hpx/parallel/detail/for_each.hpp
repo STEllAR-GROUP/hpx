@@ -162,7 +162,7 @@ namespace hpx { namespace parallel
     ///                     should be equivalent to:
     ///                     \code
     ///                     <ignored> pred(const Type &a);
-    ///                     \endcode
+    ///                     \endcode \n
     ///                     The signature does not need to have const&. The
     ///                     type \a Type must be such that an object of
     ///                     type \a InIter can be dereferenced and then

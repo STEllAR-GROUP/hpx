@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file reduce.hpp
+/// \file
 
 #if !defined(HPX_PARALLEL_DETAILREUCE_JUN_01_2014_0903AM)
 #define HPX_PARALLEL_DETAILREUCE_JUN_01_2014_0903AM
@@ -120,13 +120,12 @@ namespace hpx { namespace parallel
     ///                     algorithm will be applied to.
     /// \param f            Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last).This is an
-    ///                     unary predicate which returns \a true for the
-    ///                     required elements. The signature of this predicate
+    ///                     sequence specified by [first, last). This is a
+    ///                     binary predicate. The signature of this predicate
     ///                     should be equivalent to:
     ///                     \code
     ///                     Ret fun(const Type1 &a, const Type2 &b);
-    ///                     \endcode
+    ///                     \endcode \n
     ///                     The signature does not need to have const&.
     ///                     it. The type \a Type1 must be such that an object
     ///                     of type \a T can be implicitly converted to \a Type1.

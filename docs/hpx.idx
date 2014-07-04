@@ -56,6 +56,7 @@ is_execution_policy                   "" "hpx\.parallel\.is_execution_policy.*"
 is_parallel_execution_policy          "" "hpx\.parallel\.is_parallel_execution_policy.*"
 is_sequential_execution_policy        "" "hpx\.parallel\.is_sequential_execution_policy.*"
 
+
 # hpx/parallel/detail/copy.hpp
 parallel::copy                        "copy" "hpx\.parallel\.copy_id.*"
 parallel::copy_n                      "copy_n" "hpx\.parallel\.copy_n.*"
@@ -80,6 +81,10 @@ parallel::reduce                      "reduce" "hpx\.parallel\.reduce.*"
 
 # hpx/parallel/detail/swap_ranges.hpp
 parallel::swap_ranges                 "swap_ranges" "hpx\.parallel\.swap_ranges.*"
+
+# hpx/parallel/detail/swap_ranges.hpp
+parallel::transform                   "transform" "hpx\.parallel\.transform.*"
+
 
 # hpx/runtime/components/new.hpp
 new_                                  "" "hpx\.components\.new_.*"

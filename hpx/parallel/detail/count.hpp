@@ -280,7 +280,7 @@ namespace hpx { namespace parallel
     ///                     should be equivalent to:
     ///                     \code
     ///                     bool pred(const Type &a);
-    ///                     \endcode
+    ///                     \endcode \n
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of

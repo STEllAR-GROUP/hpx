@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file copy.hpp
+/// \file
 
 #if !defined(HPX_PARALLEL_DETAIL_COPY_MAY_30_2014_0317PM)
 #define HPX_PARALLEL_DETAIL_COPY_MAY_30_2014_0317PM
@@ -410,7 +410,7 @@ namespace hpx { namespace parallel
     ///                     should be equivalent to:
     ///                     \code
     ///                     bool pred(const Type &a);
-    ///                     \endcode
+    ///                     \endcode \n
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
