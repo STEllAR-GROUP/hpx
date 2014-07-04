@@ -315,7 +315,7 @@ namespace hpx { namespace parallel { namespace util
 
 #undef N
 
-namespace hpx { namespace parallel { namespace detail
+namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     template <int N, typename R, typename ZipIter>
@@ -336,7 +336,7 @@ namespace hpx { namespace parallel { namespace detail
              return hpx::util::get<N>(f.get().get_iterator_tuple());
             });
     }
-}}}
+}}}}
 
 #   if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #       include <hpx/parallel/util/preprocessed/zip_iterator.hpp>
