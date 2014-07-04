@@ -84,7 +84,8 @@ set(doxygen_definition_list
     "HPX_API_EXPORT="
     "HPX_STD_FUNCTION=std::function"
     "extern="
-    "BOOST_NOEXCEPT=")
+    "BOOST_NOEXCEPT="
+    "HPX_INLINE_NAMESPACE(x)=namespace x")
 
 #############################################################################
 # Definitions for autodoc.doxy.in
