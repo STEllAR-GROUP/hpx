@@ -84,7 +84,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         bool done()
         {
             HPX_ASSERT(next_ != 0);
-            HPX_ASSERT(!header_.empty());
 
             return ((*this).*next_)();
         }
