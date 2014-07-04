@@ -256,7 +256,7 @@ namespace hpx { namespace components
         {
             // simple components can be created individually only
             HPX_ASSERT(1 == count);
-            return new Component();
+            return static_cast<component_type*>(new Component()); //-V572
         }
 
         /// \brief  The function \a destroy is used for destruction and
