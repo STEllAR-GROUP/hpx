@@ -7,7 +7,7 @@
 
 [section:parallel_algorithms Using Parallel Algorithms]
 
-[def __sequential_execution_policy__ [classref hpx::parallel::v1::sequential__execution_policy `sequential__execution_policy`]]
+[def __sequential_execution_policy__ [classref hpx::parallel::v1::sequential_execution_policy `sequential_execution_policy`]]
 [def __parallel_execution_policy__ [classref hpx::parallel::v1::parallel_execution_policy `parallel_execution_policy`]]
 [def __parallel_vector_execution_policy__ [classref hpx::parallel::v1::parallel_vector_execution_policy `parallel_vector_execution_policy`]]
 [def __task_execution_policy__ [classref hpx::parallel::v1::task_execution_policy `task_execution_policy`]]
@@ -18,7 +18,15 @@
 [def __par_for_each__ [funcref hpx::parallel::v1::for_each `for_each`]]
 
 A parallel algorithm is a function template described by this document
-which is declared in the (inline) namespace `hpx::parallel::v1`. All parallel
+which is declared in the (inline) namespace `hpx::parallel::v1`.
+
+[note For compilers which do not support inline namespaces, all of the
+      `namespace v1` is imported into the namespace `hpx::parallel`. The effect
+      is similar to what inline namespaces would do, namely all names defined
+      in `hpx::parallel::v1` are accessible from the namespace `hpx::parallel`
+      as well.]
+
+All parallel
 algorithms are very similar in semantics to their sequential counterarts
 (as defined in the `namespace std`) with a formal template parameter named
 `ExecutionPolicy`. The execution policy is generally passed as the first
