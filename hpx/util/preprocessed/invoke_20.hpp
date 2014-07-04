@@ -26,8 +26,9 @@ namespace hpx { namespace util
       , typename C, typename A0
       , typename T, typename Arg0>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0)
@@ -41,24 +42,40 @@ namespace hpx { namespace util
       , typename C, typename A0
       , typename T, typename Arg0>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0)
       , T && t, Arg0 && arg0)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
                 (std::forward<Arg0>( arg0 ));
     }
     template <typename R, typename FR
       , typename C, typename A0
       , typename T, typename Arg0>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0)
+      , T && t, Arg0 && arg0)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
+                (std::forward<Arg0>( arg0 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0
+      , typename T, typename Arg0>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0) const
@@ -72,22 +89,37 @@ namespace hpx { namespace util
       , typename C, typename A0
       , typename T, typename Arg0>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0) const
       , T && t, Arg0 && arg0)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
+                (std::forward<Arg0>( arg0 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0
+      , typename T, typename Arg0>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0) const
+      , T && t, Arg0 && arg0)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
                 (std::forward<Arg0>( arg0 ));
     }
     template <typename R, typename F, typename Arg0>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_reference_wrapper<typename util::decay<F>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0)
@@ -98,12 +130,10 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-          , boost::is_reference_wrapper<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0)
@@ -154,11 +184,9 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
       , typename invoke_result_of<F(Arg0)>::type
     >::type
     invoke(F && f, Arg0 && arg0)
@@ -191,8 +219,9 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1
       , typename T, typename Arg0 , typename Arg1>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1)
@@ -206,24 +235,40 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1
       , typename T, typename Arg0 , typename Arg1>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1)
       , T && t, Arg0 && arg0 , Arg1 && arg1)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
     }
     template <typename R, typename FR
       , typename C, typename A0 , typename A1
       , typename T, typename Arg0 , typename Arg1>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1)
+      , T && t, Arg0 && arg0 , Arg1 && arg1)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1
+      , typename T, typename Arg0 , typename Arg1>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1) const
@@ -237,22 +282,37 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1
       , typename T, typename Arg0 , typename Arg1>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1) const
       , T && t, Arg0 && arg0 , Arg1 && arg1)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1
+      , typename T, typename Arg0 , typename Arg1>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1) const
+      , T && t, Arg0 && arg0 , Arg1 && arg1)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_reference_wrapper<typename util::decay<F>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1)
@@ -263,12 +323,10 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-          , boost::is_reference_wrapper<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1)
@@ -319,11 +377,9 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
       , typename invoke_result_of<F(Arg0 , Arg1)>::type
     >::type
     invoke(F && f, Arg0 && arg0 , Arg1 && arg1)
@@ -356,8 +412,9 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2
       , typename T, typename Arg0 , typename Arg1 , typename Arg2>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2)
@@ -371,24 +428,40 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2
       , typename T, typename Arg0 , typename Arg1 , typename Arg2>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2)
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
     }
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2
       , typename T, typename Arg0 , typename Arg1 , typename Arg2>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2)
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2) const
@@ -402,22 +475,37 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2
       , typename T, typename Arg0 , typename Arg1 , typename Arg2>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2) const
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2) const
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_reference_wrapper<typename util::decay<F>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
@@ -428,12 +516,10 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-          , boost::is_reference_wrapper<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
@@ -484,11 +570,9 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
       , typename invoke_result_of<F(Arg0 , Arg1 , Arg2)>::type
     >::type
     invoke(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
@@ -521,8 +605,9 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3)
@@ -536,24 +621,40 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3)
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
     }
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3)
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3) const
@@ -567,22 +668,37 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3) const
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3) const
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_reference_wrapper<typename util::decay<F>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
@@ -593,12 +709,10 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-          , boost::is_reference_wrapper<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
@@ -649,11 +763,9 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
       , typename invoke_result_of<F(Arg0 , Arg1 , Arg2 , Arg3)>::type
     >::type
     invoke(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
@@ -686,8 +798,9 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4)
@@ -701,24 +814,40 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4)
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
     }
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4)
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4) const
@@ -732,22 +861,37 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4) const
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4) const
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_reference_wrapper<typename util::decay<F>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
@@ -758,12 +902,10 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-          , boost::is_reference_wrapper<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
@@ -814,11 +956,9 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
       , typename invoke_result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4)>::type
     >::type
     invoke(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
@@ -851,8 +991,9 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5)
@@ -866,24 +1007,40 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5)
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
     }
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5)
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5) const
@@ -897,22 +1054,37 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5) const
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5) const
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_reference_wrapper<typename util::decay<F>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5)
@@ -923,12 +1095,10 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-          , boost::is_reference_wrapper<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5)
@@ -979,11 +1149,9 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
       , typename invoke_result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5)>::type
     >::type
     invoke(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5)
@@ -1016,8 +1184,9 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6)
@@ -1031,24 +1200,40 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6)
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
     }
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6)
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6) const
@@ -1062,22 +1247,37 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6) const
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6) const
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_reference_wrapper<typename util::decay<F>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6)
@@ -1088,12 +1288,10 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-          , boost::is_reference_wrapper<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6)
@@ -1144,11 +1342,9 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
       , typename invoke_result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6)>::type
     >::type
     invoke(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6)
@@ -1181,8 +1377,9 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
@@ -1196,24 +1393,40 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
     }
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7) const
@@ -1227,22 +1440,37 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7) const
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7) const
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_reference_wrapper<typename util::decay<F>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7)
@@ -1253,12 +1481,10 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-          , boost::is_reference_wrapper<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7)
@@ -1309,11 +1535,9 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
       , typename invoke_result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7)>::type
     >::type
     invoke(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7)
@@ -1346,8 +1570,9 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
@@ -1361,24 +1586,40 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
     }
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8) const
@@ -1392,22 +1633,37 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8) const
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8) const
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_reference_wrapper<typename util::decay<F>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8)
@@ -1418,12 +1674,10 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-          , boost::is_reference_wrapper<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8)
@@ -1474,11 +1728,9 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
       , typename invoke_result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8)>::type
     >::type
     invoke(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8)
@@ -1511,8 +1763,9 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
@@ -1526,24 +1779,40 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
     }
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9) const
@@ -1557,22 +1826,37 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9) const
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9) const
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_reference_wrapper<typename util::decay<F>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9)
@@ -1583,12 +1867,10 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-          , boost::is_reference_wrapper<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9)
@@ -1639,11 +1921,9 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
       , typename invoke_result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9)>::type
     >::type
     invoke(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9)
@@ -1676,8 +1956,9 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
@@ -1691,24 +1972,40 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ));
     }
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10) const
@@ -1722,22 +2019,37 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10) const
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10) const
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_reference_wrapper<typename util::decay<F>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10)
@@ -1748,12 +2060,10 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-          , boost::is_reference_wrapper<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10)
@@ -1804,11 +2114,9 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
       , typename invoke_result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10)>::type
     >::type
     invoke(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10)
@@ -1841,8 +2149,9 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
@@ -1856,24 +2165,40 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ));
     }
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11) const
@@ -1887,22 +2212,37 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11) const
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11) const
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_reference_wrapper<typename util::decay<F>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11)
@@ -1913,12 +2253,10 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-          , boost::is_reference_wrapper<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11)
@@ -1969,11 +2307,9 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
       , typename invoke_result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11)>::type
     >::type
     invoke(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11)
@@ -2006,8 +2342,9 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
@@ -2021,24 +2358,40 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ));
     }
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12) const
@@ -2052,22 +2405,37 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12) const
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12) const
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_reference_wrapper<typename util::decay<F>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12)
@@ -2078,12 +2446,10 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-          , boost::is_reference_wrapper<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12)
@@ -2134,11 +2500,9 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
       , typename invoke_result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12)>::type
     >::type
     invoke(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12)
@@ -2171,8 +2535,9 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13)
@@ -2186,24 +2551,40 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13)
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ));
     }
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13)
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13) const
@@ -2217,22 +2598,37 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13) const
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13) const
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_reference_wrapper<typename util::decay<F>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13)
@@ -2243,12 +2639,10 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-          , boost::is_reference_wrapper<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13)
@@ -2299,11 +2693,9 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
       , typename invoke_result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13)>::type
     >::type
     invoke(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13)
@@ -2336,8 +2728,9 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14)
@@ -2351,24 +2744,40 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14)
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ));
     }
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14)
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14) const
@@ -2382,22 +2791,37 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14) const
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14) const
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_reference_wrapper<typename util::decay<F>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14)
@@ -2408,12 +2832,10 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-          , boost::is_reference_wrapper<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14)
@@ -2464,11 +2886,9 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
       , typename invoke_result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14)>::type
     >::type
     invoke(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14)
@@ -2501,8 +2921,9 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15)
@@ -2516,24 +2937,40 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15)
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ));
     }
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15)
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15) const
@@ -2547,22 +2984,37 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15) const
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15) const
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_reference_wrapper<typename util::decay<F>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15)
@@ -2573,12 +3025,10 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-          , boost::is_reference_wrapper<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15)
@@ -2629,11 +3079,9 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
       , typename invoke_result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15)>::type
     >::type
     invoke(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15)
@@ -2666,8 +3114,9 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16)
@@ -2681,24 +3130,40 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16)
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ));
     }
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16)
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16) const
@@ -2712,22 +3177,37 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16) const
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16) const
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_reference_wrapper<typename util::decay<F>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16)
@@ -2738,12 +3218,10 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-          , boost::is_reference_wrapper<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16)
@@ -2794,11 +3272,9 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
       , typename invoke_result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16)>::type
     >::type
     invoke(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16)
@@ -2831,8 +3307,9 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17)
@@ -2846,24 +3323,40 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17)
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ));
     }
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17)
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17) const
@@ -2877,22 +3370,37 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17) const
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17) const
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_reference_wrapper<typename util::decay<F>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17)
@@ -2903,12 +3411,10 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-          , boost::is_reference_wrapper<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17)
@@ -2959,11 +3465,9 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
       , typename invoke_result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16 , Arg17)>::type
     >::type
     invoke(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17)
@@ -2996,8 +3500,9 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18)
@@ -3011,24 +3516,40 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18)
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ) , std::forward<Arg18>( arg18 ));
     }
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18)
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ) , std::forward<Arg18>( arg18 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18) const
@@ -3042,22 +3563,37 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18) const
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ) , std::forward<Arg18>( arg18 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18) const
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ) , std::forward<Arg18>( arg18 ));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_reference_wrapper<typename util::decay<F>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18)
@@ -3068,12 +3604,10 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-          , boost::is_reference_wrapper<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18)
@@ -3124,11 +3658,9 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
       , typename invoke_result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16 , Arg17 , Arg18)>::type
     >::type
     invoke(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18)
@@ -3161,8 +3693,9 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19)
@@ -3176,24 +3709,40 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19)
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ) , std::forward<Arg18>( arg18 ) , std::forward<Arg19>( arg19 ));
     }
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19)
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ) , std::forward<Arg18>( arg18 ) , std::forward<Arg19>( arg19 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19) const
@@ -3207,22 +3756,37 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19) const
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ) , std::forward<Arg18>( arg18 ) , std::forward<Arg19>( arg19 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19) const
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ) , std::forward<Arg18>( arg18 ) , std::forward<Arg19>( arg19 ));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_reference_wrapper<typename util::decay<F>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19)
@@ -3233,12 +3797,10 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-          , boost::is_reference_wrapper<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19)
@@ -3289,11 +3851,9 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
       , typename invoke_result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16 , Arg17 , Arg18 , Arg19)>::type
     >::type
     invoke(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19)
@@ -3326,8 +3886,9 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19 , typename Arg20>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
@@ -3341,24 +3902,40 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19 , typename Arg20>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19 , Arg20 && arg20)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ) , std::forward<Arg18>( arg18 ) , std::forward<Arg19>( arg19 ) , std::forward<Arg20>( arg20 ));
     }
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19 , typename Arg20>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19 , Arg20 && arg20)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ) , std::forward<Arg18>( arg18 ) , std::forward<Arg19>( arg19 ) , std::forward<Arg20>( arg20 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19 , typename Arg20>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20) const
@@ -3372,22 +3949,37 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19 , typename Arg20>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20) const
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19 , Arg20 && arg20)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ) , std::forward<Arg18>( arg18 ) , std::forward<Arg19>( arg19 ) , std::forward<Arg20>( arg20 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19 , typename Arg20>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20) const
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19 , Arg20 && arg20)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ) , std::forward<Arg18>( arg18 ) , std::forward<Arg19>( arg19 ) , std::forward<Arg20>( arg20 ));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19 , typename Arg20>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_reference_wrapper<typename util::decay<F>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19 , Arg20 && arg20)
@@ -3398,12 +3990,10 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19 , typename Arg20>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-          , boost::is_reference_wrapper<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19 , Arg20 && arg20)
@@ -3454,11 +4044,9 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19 , typename Arg20>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
       , typename invoke_result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16 , Arg17 , Arg18 , Arg19 , Arg20)>::type
     >::type
     invoke(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19 , Arg20 && arg20)
@@ -3491,8 +4079,9 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19 , typename Arg20 , typename Arg21>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
@@ -3506,24 +4095,40 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19 , typename Arg20 , typename Arg21>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19 , Arg20 && arg20 , Arg21 && arg21)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ) , std::forward<Arg18>( arg18 ) , std::forward<Arg19>( arg19 ) , std::forward<Arg20>( arg20 ) , std::forward<Arg21>( arg21 ));
     }
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19 , typename Arg20 , typename Arg21>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19 , Arg20 && arg20 , Arg21 && arg21)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ) , std::forward<Arg18>( arg18 ) , std::forward<Arg19>( arg19 ) , std::forward<Arg20>( arg20 ) , std::forward<Arg21>( arg21 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19 , typename Arg20 , typename Arg21>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21) const
@@ -3537,22 +4142,37 @@ namespace hpx { namespace util
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19 , typename Arg20 , typename Arg21>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::is_base_of<C, typename util::decay<T>::type>
+    typename boost::disable_if_c<
+        boost::is_base_of<C, typename util::decay<T>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
       , R
     >::type
     invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21) const
       , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19 , Arg20 && arg20 , Arg21 && arg21)
     {
-        using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*std::forward<T>(t)).*f)
+                (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ) , std::forward<Arg18>( arg18 ) , std::forward<Arg19>( arg19 ) , std::forward<Arg20>( arg20 ) , std::forward<Arg21>( arg21 ));
+    }
+    template <typename R, typename FR
+      , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21
+      , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19 , typename Arg20 , typename Arg21>
+    HPX_MAYBE_FORCEINLINE
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<T>::type>::value
+      , R
+    >::type
+    invoke_r(FR (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21) const
+      , T && t, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19 , Arg20 && arg20 , Arg21 && arg21)
+    {
+        return
+            util::void_guard<R>(), ((t.get()).*f)
                 (std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ) , std::forward<Arg18>( arg18 ) , std::forward<Arg19>( arg19 ) , std::forward<Arg20>( arg20 ) , std::forward<Arg21>( arg21 ));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19 , typename Arg20 , typename Arg21>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_reference_wrapper<typename util::decay<F>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19 , Arg20 && arg20 , Arg21 && arg21)
@@ -3563,12 +4183,10 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19 , typename Arg20 , typename Arg21>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-          , boost::is_reference_wrapper<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19 , Arg20 && arg20 , Arg21 && arg21)
@@ -3619,11 +4237,9 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19 , typename Arg20 , typename Arg21>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
       , typename invoke_result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16 , Arg17 , Arg18 , Arg19 , Arg20 , Arg21)>::type
     >::type
     invoke(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19 , Arg20 && arg20 , Arg21 && arg21)
@@ -3654,8 +4270,8 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19 , typename Arg20 , typename Arg21 , typename Arg22>
     HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if<
-        boost::is_reference_wrapper<typename util::decay<F>::type>
+    typename boost::enable_if_c<
+        boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19 , Arg20 && arg20 , Arg21 && arg21 , Arg22 && arg22)
@@ -3666,12 +4282,10 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19 , typename Arg20 , typename Arg21 , typename Arg22>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-          , boost::is_reference_wrapper<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
+     || boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
     >::type
     invoke_r(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19 , Arg20 && arg20 , Arg21 && arg21 , Arg22 && arg22)
@@ -3696,11 +4310,9 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19 , typename Arg20 , typename Arg21 , typename Arg22>
     HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
-          , boost::is_member_function_pointer<typename util::decay<F>::type>
-        >
+    typename boost::disable_if_c<
+        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
       , typename invoke_result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16 , Arg17 , Arg18 , Arg19 , Arg20 , Arg21 , Arg22)>::type
     >::type
     invoke(F && f, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19 , Arg20 && arg20 , Arg21 && arg21 , Arg22 && arg22)
