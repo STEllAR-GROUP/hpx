@@ -8,6 +8,8 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/foreach.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 void worker()
 {
@@ -23,7 +25,8 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     // get locations and start workers
     std::string expected;
-    for(auto l: hpx::find_all_localities())
+    std::vector<hpx::id_type> localities = hpx::find_all_localities();
+    BOOST_FOREACH(hpx::id_type l, localities)
     {
         futures.push_back(hpx::async(worker_action(), l));
         expected += "hello!\n";
