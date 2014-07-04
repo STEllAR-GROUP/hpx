@@ -34,7 +34,7 @@ namespace hpx { namespace util
     {
         ///////////////////////////////////////////////////////////////////////
         template <typename F, typename Args>
-        class deferred_call_impl
+        class deferred_call_impl //-V690
         {
         public:
             // default constructor is needed for serialization

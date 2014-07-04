@@ -92,7 +92,7 @@ namespace hpx
         try {
             func();
         }
-        catch (hpx::thread_interrupted const&) {
+        catch (hpx::thread_interrupted const&) { //-V565
             /* swallow this exception */
         }
         catch (hpx::exception const&) {
@@ -130,7 +130,7 @@ namespace hpx
     void thread::start_thread(HPX_STD_FUNCTION<void()> && func)
     {
         threads::thread_init_data data(
-            util::bind(util::one_shot(&thread::thread_function_nullary), 
+            util::bind(util::one_shot(&thread::thread_function_nullary),
                 std::move(func)),
             "thread::thread_function_nullary");
 

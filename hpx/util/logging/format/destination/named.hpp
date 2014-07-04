@@ -193,7 +193,7 @@ template<class destination_base = default_, class lock_resource = default_ > str
     named_t(const string_type & format_string = string_type() ) {
         non_const_context_base::context().format_string( format_string);
     }
-    template<class msg_type> void operator()(const msg_type & msg) const {
+    template<class msg_type> void operator()(const msg_type & msg) const { //-V659
         non_const_context_base::context().write(msg);
     }
 

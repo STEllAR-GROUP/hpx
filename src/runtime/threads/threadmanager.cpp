@@ -190,7 +190,7 @@ namespace hpx { namespace threads
             return invalid_thread_id;
         }
 
-        return detail::create_thread(&scheduler_, data, initial_state, run_now, ec);
+        return detail::create_thread(&scheduler_, data, initial_state, run_now, ec); //-V601
     }
 
     ///////////////////////////////////////////////////////////////////////////

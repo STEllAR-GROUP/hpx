@@ -38,7 +38,7 @@ namespace hpx { namespace lcos
     {
         ///////////////////////////////////////////////////////////////////////
         template <typename Future>
-        struct when_any_swapped
+        struct when_any_swapped //-V690
           : boost::enable_shared_from_this<when_any_swapped<Future> >
         {
         private:

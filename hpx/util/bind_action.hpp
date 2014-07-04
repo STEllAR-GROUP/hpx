@@ -130,7 +130,7 @@ namespace hpx { namespace util
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Action, typename BoundArgs>
-        class bound_action
+        class bound_action //-V690
         {
         public:
             typedef

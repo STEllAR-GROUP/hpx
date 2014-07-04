@@ -67,7 +67,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Policy, typename Func, typename Futures>
-    struct dataflow_frame
+    struct dataflow_frame //-V690
       : hpx::lcos::detail::future_data<
             typename hpx::util::invoke_fused_result_of<
                 Func(Futures &&)

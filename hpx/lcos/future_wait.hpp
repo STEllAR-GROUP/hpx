@@ -214,7 +214,7 @@ namespace hpx { namespace lcos
     }
 
     template <typename Future, typename F>
-    inline typename boost::enable_if_c<
+    inline typename boost::enable_if_c< //-V659
         boost::is_void<typename traits::future_traits<Future>::type>::value
       , std::size_t
     >::type

@@ -106,7 +106,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
     }
 
     template <typename F, typename Args>
-    struct when_ready
+    struct when_ready //-V690
       : lcos::detail::future_data<
             typename util::invoke_fused_result_of<F&(Args)>::type
         >

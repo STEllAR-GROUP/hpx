@@ -31,7 +31,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             shutdown_sem_.wait();
     }
 
-    void service_executor::thread_wrapper(closure_type && f)
+    void service_executor::thread_wrapper(closure_type && f) //-V669
     {
         f();                          // execute the actual thread function
 

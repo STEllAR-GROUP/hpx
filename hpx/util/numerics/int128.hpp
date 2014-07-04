@@ -40,7 +40,6 @@ namespace hpx { namespace util { namespace numerics
     public:
         // Constructors
         inline int128 () throw () {};
-        inline int128 (const int128 & a) throw () : lo (a.lo), hi (a.hi) {};
 
         inline int128 (const unsigned int & a) throw () : lo (a), hi (0ll) {};
         inline int128 (const signed int & a) throw () : lo (a), hi (0ll) {

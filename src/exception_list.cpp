@@ -86,7 +86,7 @@ namespace hpx
         return result;
     }
 
-    std::size_t exception_list::get_error_count() const
+    std::size_t exception_list::get_error_count() const //-V524
     {
         return exceptions_.size();
     }

@@ -125,7 +125,7 @@ namespace hpx { namespace lcos
         }
 
         template <typename Sequence>
-        struct when_some : boost::enable_shared_from_this<when_some<Sequence> >
+        struct when_some : boost::enable_shared_from_this<when_some<Sequence> > //-V690
         {
         private:
             void on_future_ready(threads::thread_id_type const& id)

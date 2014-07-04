@@ -43,7 +43,7 @@ enum deque_status_type
 };
 
 template <typename T>
-struct deque_node
+struct deque_node //-V690
 {
     typedef detail::tagged_ptr<deque_node> pointer;
     typedef atomic<pointer> atomic_pointer;
@@ -67,7 +67,7 @@ struct deque_node
 // FIXME: A lot of these methods can be dropped; in fact, it may make sense to
 // re-structure this class like deque_node.
 template <typename T>
-struct deque_anchor
+struct deque_anchor //-V690
 {
     typedef deque_node<T> node;
     typedef typename node::pointer node_pointer;

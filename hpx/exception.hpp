@@ -178,7 +178,7 @@ namespace hpx
     /// \note Class hpx::error_code is an adjunct to error reporting by
     /// exception
     ///
-    class error_code : public boost::system::error_code
+    class error_code : public boost::system::error_code //-V690
     {
     public:
         /// Construct an object of type error_code.

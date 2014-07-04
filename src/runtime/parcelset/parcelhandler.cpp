@@ -111,9 +111,6 @@ namespace hpx { namespace parcelset
     {
         wait_for_put_parcel() : sema_(new lcos::local::counting_semaphore) {}
 
-        wait_for_put_parcel(wait_for_put_parcel const& other)
-            : sema_(other.sema_) {}
-
         void operator()(boost::system::error_code const&, std::size_t)
         {
             sema_->signal();
