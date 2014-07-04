@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2012 Bryce Adelstein-Lelbach 
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Copyright (c) 2012 Bryce Adelstein-Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -9,7 +9,7 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
-#include <hpx/lcos/future_wait.hpp>
+#include <hpx/lcos/wait_each.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/atomic.hpp>
@@ -27,7 +27,7 @@ using hpx::util::report_errors;
 using hpx::actions::plain_action0;
 using hpx::actions::plain_result_action0;
 
-using hpx::lcos::wait;
+using hpx::lcos::wait_each;
 using hpx::async;
 using hpx::lcos::future;
 
@@ -42,21 +42,13 @@ struct callback
     mutable boost::atomic<std::size_t> * calls_;
 
   public:
-    callback(boost::atomic<std::size_t> & calls) : calls_(&calls) {} 
+    callback(boost::atomic<std::size_t> & calls) : calls_(&calls) {}
 
     template <
         typename T
     >
     void operator()(
-        std::size_t 
-      , T const& 
-        ) const
-    {
-        ++(*calls_);
-    }
-
-    void operator()(
-        std::size_t 
+        T const&
         ) const
     {
         ++(*calls_);
@@ -70,11 +62,11 @@ struct callback
     void reset()
     {
         calls_->store(0);
-    } 
+    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<std::size_t> void_counter; 
+boost::atomic<std::size_t> void_counter;
 
 void null_thread()
 {
@@ -86,7 +78,7 @@ typedef plain_action0<null_thread> null_action;
 HPX_REGISTER_PLAIN_ACTION(null_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<std::size_t> result_counter; 
+boost::atomic<std::size_t> result_counter;
 
 bool null_result_thread()
 {
@@ -124,7 +116,7 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         // Async wait, single future, void return.
         {
-            wait(async<null_action>(here_), cb);
+            wait_each(async<null_action>(here_), cb);
 
             HPX_TEST_EQ(1U, cb.count());
             HPX_TEST_EQ(1U, void_counter.load());
@@ -136,7 +128,7 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         // Async wait, single future, non-void return.
         {
-            wait(async<null_result_action>(here_), cb);
+            wait_each(async<null_result_action>(here_), cb);
 
             HPX_TEST_EQ(1U, cb.count());
             HPX_TEST_EQ(1U, result_counter.load());
@@ -154,7 +146,7 @@ int hpx_main(
             for (std::size_t i = 0; i < 64; ++i)
                 futures.push_back(async<null_action>(here_));
 
-            wait(futures, cb);
+            wait_each(futures, cb);
 
             HPX_TEST_EQ(64U, cb.count());
             HPX_TEST_EQ(64U, void_counter.load());
@@ -172,7 +164,7 @@ int hpx_main(
             for (std::size_t i = 0; i < 64; ++i)
                 futures.push_back(async<null_result_action>(here_));
 
-            wait(futures, cb);
+            wait_each(futures, cb);
 
             HPX_TEST_EQ(64U, cb.count());
             HPX_TEST_EQ(64U, result_counter.load());
@@ -205,4 +197,3 @@ int main(
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv, cfg);
 }
-

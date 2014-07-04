@@ -20,8 +20,8 @@ namespace hpx { namespace lcos
     >::type
     wait_each(T0 && f0, F && func)
     {
-        return lcos::when_each(std::forward<T0>( f0 ),
-            std::forward<F>(func)).get();
+        lcos::when_each(std::forward<T0>( f0 ),
+            std::forward<F>(func)).wait();
     }
 }}
 namespace hpx { namespace lcos
@@ -36,8 +36,8 @@ namespace hpx { namespace lcos
     >::type
     wait_each(T0 && f0 , T1 && f1, F && func)
     {
-        return lcos::when_each(std::forward<T0>( f0 ) , std::forward<T1>( f1 ),
-            std::forward<F>(func)).get();
+        lcos::when_each(std::forward<T0>( f0 ) , std::forward<T1>( f1 ),
+            std::forward<F>(func)).wait();
     }
 }}
 namespace hpx { namespace lcos
@@ -52,8 +52,8 @@ namespace hpx { namespace lcos
     >::type
     wait_each(T0 && f0 , T1 && f1 , T2 && f2, F && func)
     {
-        return lcos::when_each(std::forward<T0>( f0 ) , std::forward<T1>( f1 ) , std::forward<T2>( f2 ),
-            std::forward<F>(func)).get();
+        lcos::when_each(std::forward<T0>( f0 ) , std::forward<T1>( f1 ) , std::forward<T2>( f2 ),
+            std::forward<F>(func)).wait();
     }
 }}
 namespace hpx { namespace lcos
@@ -68,8 +68,8 @@ namespace hpx { namespace lcos
     >::type
     wait_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3, F && func)
     {
-        return lcos::when_each(std::forward<T0>( f0 ) , std::forward<T1>( f1 ) , std::forward<T2>( f2 ) , std::forward<T3>( f3 ),
-            std::forward<F>(func)).get();
+        lcos::when_each(std::forward<T0>( f0 ) , std::forward<T1>( f1 ) , std::forward<T2>( f2 ) , std::forward<T3>( f3 ),
+            std::forward<F>(func)).wait();
     }
 }}
 namespace hpx { namespace lcos
@@ -84,8 +84,8 @@ namespace hpx { namespace lcos
     >::type
     wait_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4, F && func)
     {
-        return lcos::when_each(std::forward<T0>( f0 ) , std::forward<T1>( f1 ) , std::forward<T2>( f2 ) , std::forward<T3>( f3 ) , std::forward<T4>( f4 ),
-            std::forward<F>(func)).get();
+        lcos::when_each(std::forward<T0>( f0 ) , std::forward<T1>( f1 ) , std::forward<T2>( f2 ) , std::forward<T3>( f3 ) , std::forward<T4>( f4 ),
+            std::forward<F>(func)).wait();
     }
 }}
 namespace hpx { namespace lcos
@@ -100,8 +100,8 @@ namespace hpx { namespace lcos
     >::type
     wait_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5, F && func)
     {
-        return lcos::when_each(std::forward<T0>( f0 ) , std::forward<T1>( f1 ) , std::forward<T2>( f2 ) , std::forward<T3>( f3 ) , std::forward<T4>( f4 ) , std::forward<T5>( f5 ),
-            std::forward<F>(func)).get();
+        lcos::when_each(std::forward<T0>( f0 ) , std::forward<T1>( f1 ) , std::forward<T2>( f2 ) , std::forward<T3>( f3 ) , std::forward<T4>( f4 ) , std::forward<T5>( f5 ),
+            std::forward<F>(func)).wait();
     }
 }}
 namespace hpx { namespace lcos
@@ -116,8 +116,8 @@ namespace hpx { namespace lcos
     >::type
     wait_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6, F && func)
     {
-        return lcos::when_each(std::forward<T0>( f0 ) , std::forward<T1>( f1 ) , std::forward<T2>( f2 ) , std::forward<T3>( f3 ) , std::forward<T4>( f4 ) , std::forward<T5>( f5 ) , std::forward<T6>( f6 ),
-            std::forward<F>(func)).get();
+        lcos::when_each(std::forward<T0>( f0 ) , std::forward<T1>( f1 ) , std::forward<T2>( f2 ) , std::forward<T3>( f3 ) , std::forward<T4>( f4 ) , std::forward<T5>( f5 ) , std::forward<T6>( f6 ),
+            std::forward<F>(func)).wait();
     }
 }}
 namespace hpx { namespace lcos
@@ -132,7 +132,7 @@ namespace hpx { namespace lcos
     >::type
     wait_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7, F && func)
     {
-        return lcos::when_each(std::forward<T0>( f0 ) , std::forward<T1>( f1 ) , std::forward<T2>( f2 ) , std::forward<T3>( f3 ) , std::forward<T4>( f4 ) , std::forward<T5>( f5 ) , std::forward<T6>( f6 ) , std::forward<T7>( f7 ),
-            std::forward<F>(func)).get();
+        lcos::when_each(std::forward<T0>( f0 ) , std::forward<T1>( f1 ) , std::forward<T2>( f2 ) , std::forward<T3>( f3 ) , std::forward<T4>( f4 ) , std::forward<T5>( f5 ) , std::forward<T6>( f6 ) , std::forward<T7>( f7 ),
+            std::forward<F>(func)).wait();
     }
 }}

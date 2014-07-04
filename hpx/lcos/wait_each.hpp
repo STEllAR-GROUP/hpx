@@ -33,31 +33,31 @@ namespace hpx { namespace lcos
     template <typename Future, typename F>
     void wait_each(std::vector<Future>& lazy_values, F && func)
     {
-        lcos::when_each(lazy_values, std::forward<F>(func)).get();
+        lcos::when_each(lazy_values, std::forward<F>(func)).wait();
     }
 
     template <typename Future, typename F>
     void wait_each(std::vector<Future> && lazy_values, F && f)
     {
-        lcos::when_each(lazy_values, std::forward<F>(f)).get();
+        lcos::when_each(lazy_values, std::forward<F>(f)).wait();
     }
 
     template <typename Iterator, typename F>
-    Iterator wait_each(Iterator begin, Iterator end, F && f)
+    void wait_each(Iterator begin, Iterator end, F && f)
     {
-        return lcos::when_each(begin, end, std::forward<F>(f)).get();
+        lcos::when_each(begin, end, std::forward<F>(f)).wait();
     }
 
     template <typename Iterator, typename F>
-    Iterator wait_each_n(Iterator begin, std::size_t count, F && f)
+    void wait_each_n(Iterator begin, std::size_t count, F && f)
     {
-        return when_each_n(begin, count, std::forward<F>(f)).get();
+        when_each_n(begin, count, std::forward<F>(f)).wait();
     }
 
     template <typename F>
     inline void wait_each(F && f)
     {
-        lcos::when_each(std::forward<F>(f)).get();
+        lcos::when_each(std::forward<F>(f)).wait();
     }
 }}
 
@@ -105,8 +105,8 @@ namespace hpx { namespace lcos
     >::type
     wait_each(HPX_ENUM_FWD_ARGS(N, T, f), F && func)
     {
-        return lcos::when_each(HPX_ENUM_FORWARD_ARGS(N, T, f),
-            std::forward<F>(func)).get();
+        lcos::when_each(HPX_ENUM_FORWARD_ARGS(N, T, f),
+            std::forward<F>(func)).wait();
     }
 }}
 

@@ -15,8 +15,9 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/include/async.hpp>
-#include <hpx/lcos/future_wait.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/lcos/future_wait.hpp>
+#include <hpx/lcos/wait_each.hpp>
 
 #include <boost/format.hpp>
 #include <boost/math/constants/constants.hpp>
@@ -26,6 +27,7 @@ using hpx::naming::invalid_id;
 
 using hpx::lcos::future;
 using hpx::lcos::wait;
+using hpx::lcos::wait_each;
 using hpx::async;
 
 using hpx::util::high_resolution_timer;
@@ -131,7 +133,7 @@ struct time_element{
     , elapsed_time(0.0)
     , computed(false),fluid_future(0),fluid(0)
   {}
-  
+
   time_element(boost::uint64_t number_of_cells)
       :fluid_future(number_of_cells)
       ,fluid(number_of_cells)
@@ -146,10 +148,10 @@ struct time_element{
     ,fluid_future(other.fluid_future)
     ,fluid(other.fluid)
     {}
-   
+
   time_element& operator=(time_element const& rhs)
   {
-    if (this != &rhs) 
+    if (this != &rhs)
     {
       dt = rhs.dt;
       elapsed_time = rhs.elapsed_time;
@@ -166,7 +168,7 @@ struct time_element{
   double elapsed_time;
   bool computed;
   double physics_time;
-  std::vector<hpx::lcos::shared_future<cell> > fluid_future;//future for each cell 
+  std::vector<hpx::lcos::shared_future<cell> > fluid_future;//future for each cell
   std::vector<cell> fluid;
 };
 // declaring time_array
@@ -190,7 +192,7 @@ public:
     void addNewTimeStep();
 
 private:
-    
+
    boost::uint64_t number_t_steps;
    boost::uint64_t number_of_cells;
 public:
@@ -268,12 +270,12 @@ double timestep_size(boost::uint64_t timestep)
   for (boost::uint64_t i=0;i<nx;i++)
       grid.time_array.at(timestep).fluid_future.push_back(async<compute_action>(here,timestep-n_predict,i));
   }
-  
+
   double dt_cfl = 1000.0;
-   wait(grid.time_array.at(timestep).fluid_future, [&](std::size_t i, cell const& this_cell)
+
+   wait_each(grid.time_array.at(timestep).fluid_future,
+      hpx::util::unwrapped([&](cell const& this_cell)
       {
-      //      if (i == 0)
-      //  cout << (boost::format("futures fulfilled for timestep %1%\n") % timestep) << flush;
       // look at all of the cells at a timestep, then pick the smallest
       // dt_cfl = cfl_factor*dx/(soundspeed+absolute_velocity)
       double abs_velocity = this_cell.mom/this_cell.rho;
@@ -287,16 +289,15 @@ double timestep_size(boost::uint64_t timestep)
         }
       if (dt_cfl_here < dt_cfl)
         dt_cfl = dt_cfl_here;
-     });
+     }));
 
   // initialize dt_cfl to some arbitrary high value
- 
+
 
   // wait for an array of futures
-  /*wait(grid.time_array, [&](std::size_t i, cell const& this_cell)
+  /*wait_each(grid.time_array,
+    hpx::util::unwrapped([&](cell const& this_cell)
     {
-      //      if (i == 0)
-      //  cout << (boost::format("futures fulfilled for timestep %1%\n") % timestep) << flush;
       // look at all of the cells at a timestep, then pick the smallest
       // dt_cfl = cfl_factor*dx/(soundspeed+absolute_velocity)
       double abs_velocity = this_cell.mom/this_cell.rho;
@@ -310,7 +311,7 @@ double timestep_size(boost::uint64_t timestep)
         }
       if (dt_cfl_here < dt_cfl)
         dt_cfl = dt_cfl_here;
-    });
+    }));
 */
 
 
@@ -487,7 +488,7 @@ cell compute(boost::uint64_t timestep, boost::uint64_t location)
       grid.remove_bottom_time_step();
       grid.addNewTimeStep();
   }
-  
+
   return grid.time_array.at(timestep).fluid.at(location);
 }
 
@@ -710,9 +711,9 @@ int hpx_main(
     std::cout << (boost::format(fmt) % t.elapsed());
     char const* fmt0 = "code elapsed time: %1%\n";
     double t_code_time= grid.time_array[0].elapsed_time;
-    
+
         t_code_time+=grid.time_array[nt-1].elapsed_time;
-    
+
       std::cout << (boost::format(fmt0) %  t_code_time);
 
 
@@ -743,7 +744,7 @@ int main(
     ( "npredict-value"
       , value<boost::uint64_t>()->default_value(10)
       , "prediction parameter of the wave equation")
-          
+
       ( "ptime-value"
       , value<double>()->default_value(2.50)
       , "Physics time to run the simulation to")

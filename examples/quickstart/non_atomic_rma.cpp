@@ -15,7 +15,6 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
-#include <hpx/lcos/future_wait.hpp>
 #include <hpx/util/locking_helpers.hpp>
 
 //Boost includes
@@ -122,9 +121,6 @@ int hpx_main(po::variables_map &vm)
           future_update.push_back(hpx::async<update_action>(that_prefix,tmp));
         }
 
-        //for (int i=0;i<N;i++) {
-        //  future_update[i].get();
-        //}
         hpx::wait_all(future_update);
 
         for (int i=0;i<array_length;i++) {

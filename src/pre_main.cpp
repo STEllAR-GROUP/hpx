@@ -13,7 +13,6 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/lcos/barrier.hpp>
-#include <hpx/lcos/future_wait.hpp>
 #include <hpx/lcos/detail/full_empty_entry.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 

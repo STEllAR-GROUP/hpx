@@ -26,7 +26,7 @@ namespace hpx { namespace lcos
             argument_type;
         typedef void result_type;
         typedef typename util::decay<F>::type func_type;
-        typedef detail::when_each<result_type, func_type> when_each_type;
+        typedef detail::when_each<argument_type, func_type> when_each_type;
         argument_type lazy_values(detail::when_acquire_future<T0>()(f0));
         boost::shared_ptr<when_each_type> f =
             boost::make_shared<when_each_type>(std::move(lazy_values),
@@ -55,7 +55,7 @@ namespace hpx { namespace lcos
             argument_type;
         typedef void result_type;
         typedef typename util::decay<F>::type func_type;
-        typedef detail::when_each<result_type, func_type> when_each_type;
+        typedef detail::when_each<argument_type, func_type> when_each_type;
         argument_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1));
         boost::shared_ptr<when_each_type> f =
             boost::make_shared<when_each_type>(std::move(lazy_values),
@@ -84,7 +84,7 @@ namespace hpx { namespace lcos
             argument_type;
         typedef void result_type;
         typedef typename util::decay<F>::type func_type;
-        typedef detail::when_each<result_type, func_type> when_each_type;
+        typedef detail::when_each<argument_type, func_type> when_each_type;
         argument_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2));
         boost::shared_ptr<when_each_type> f =
             boost::make_shared<when_each_type>(std::move(lazy_values),
@@ -113,7 +113,7 @@ namespace hpx { namespace lcos
             argument_type;
         typedef void result_type;
         typedef typename util::decay<F>::type func_type;
-        typedef detail::when_each<result_type, func_type> when_each_type;
+        typedef detail::when_each<argument_type, func_type> when_each_type;
         argument_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3));
         boost::shared_ptr<when_each_type> f =
             boost::make_shared<when_each_type>(std::move(lazy_values),
@@ -142,7 +142,7 @@ namespace hpx { namespace lcos
             argument_type;
         typedef void result_type;
         typedef typename util::decay<F>::type func_type;
-        typedef detail::when_each<result_type, func_type> when_each_type;
+        typedef detail::when_each<argument_type, func_type> when_each_type;
         argument_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4));
         boost::shared_ptr<when_each_type> f =
             boost::make_shared<when_each_type>(std::move(lazy_values),
@@ -171,7 +171,7 @@ namespace hpx { namespace lcos
             argument_type;
         typedef void result_type;
         typedef typename util::decay<F>::type func_type;
-        typedef detail::when_each<result_type, func_type> when_each_type;
+        typedef detail::when_each<argument_type, func_type> when_each_type;
         argument_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5));
         boost::shared_ptr<when_each_type> f =
             boost::make_shared<when_each_type>(std::move(lazy_values),
@@ -200,7 +200,7 @@ namespace hpx { namespace lcos
             argument_type;
         typedef void result_type;
         typedef typename util::decay<F>::type func_type;
-        typedef detail::when_each<result_type, func_type> when_each_type;
+        typedef detail::when_each<argument_type, func_type> when_each_type;
         argument_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6));
         boost::shared_ptr<when_each_type> f =
             boost::make_shared<when_each_type>(std::move(lazy_values),
@@ -229,7 +229,7 @@ namespace hpx { namespace lcos
             argument_type;
         typedef void result_type;
         typedef typename util::decay<F>::type func_type;
-        typedef detail::when_each<result_type, func_type> when_each_type;
+        typedef detail::when_each<argument_type, func_type> when_each_type;
         argument_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7));
         boost::shared_ptr<when_each_type> f =
             boost::make_shared<when_each_type>(std::move(lazy_values),
@@ -258,7 +258,7 @@ namespace hpx { namespace lcos
             argument_type;
         typedef void result_type;
         typedef typename util::decay<F>::type func_type;
-        typedef detail::when_each<result_type, func_type> when_each_type;
+        typedef detail::when_each<argument_type, func_type> when_each_type;
         argument_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8));
         boost::shared_ptr<when_each_type> f =
             boost::make_shared<when_each_type>(std::move(lazy_values),
@@ -287,7 +287,7 @@ namespace hpx { namespace lcos
             argument_type;
         typedef void result_type;
         typedef typename util::decay<F>::type func_type;
-        typedef detail::when_each<result_type, func_type> when_each_type;
+        typedef detail::when_each<argument_type, func_type> when_each_type;
         argument_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9));
         boost::shared_ptr<when_each_type> f =
             boost::make_shared<when_each_type>(std::move(lazy_values),
@@ -316,7 +316,7 @@ namespace hpx { namespace lcos
             argument_type;
         typedef void result_type;
         typedef typename util::decay<F>::type func_type;
-        typedef detail::when_each<result_type, func_type> when_each_type;
+        typedef detail::when_each<argument_type, func_type> when_each_type;
         argument_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9) , detail::when_acquire_future<T10>()(f10));
         boost::shared_ptr<when_each_type> f =
             boost::make_shared<when_each_type>(std::move(lazy_values),
@@ -345,7 +345,7 @@ namespace hpx { namespace lcos
             argument_type;
         typedef void result_type;
         typedef typename util::decay<F>::type func_type;
-        typedef detail::when_each<result_type, func_type> when_each_type;
+        typedef detail::when_each<argument_type, func_type> when_each_type;
         argument_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9) , detail::when_acquire_future<T10>()(f10) , detail::when_acquire_future<T11>()(f11));
         boost::shared_ptr<when_each_type> f =
             boost::make_shared<when_each_type>(std::move(lazy_values),
@@ -374,7 +374,7 @@ namespace hpx { namespace lcos
             argument_type;
         typedef void result_type;
         typedef typename util::decay<F>::type func_type;
-        typedef detail::when_each<result_type, func_type> when_each_type;
+        typedef detail::when_each<argument_type, func_type> when_each_type;
         argument_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9) , detail::when_acquire_future<T10>()(f10) , detail::when_acquire_future<T11>()(f11) , detail::when_acquire_future<T12>()(f12));
         boost::shared_ptr<when_each_type> f =
             boost::make_shared<when_each_type>(std::move(lazy_values),
@@ -403,7 +403,7 @@ namespace hpx { namespace lcos
             argument_type;
         typedef void result_type;
         typedef typename util::decay<F>::type func_type;
-        typedef detail::when_each<result_type, func_type> when_each_type;
+        typedef detail::when_each<argument_type, func_type> when_each_type;
         argument_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9) , detail::when_acquire_future<T10>()(f10) , detail::when_acquire_future<T11>()(f11) , detail::when_acquire_future<T12>()(f12) , detail::when_acquire_future<T13>()(f13));
         boost::shared_ptr<when_each_type> f =
             boost::make_shared<when_each_type>(std::move(lazy_values),
@@ -432,7 +432,7 @@ namespace hpx { namespace lcos
             argument_type;
         typedef void result_type;
         typedef typename util::decay<F>::type func_type;
-        typedef detail::when_each<result_type, func_type> when_each_type;
+        typedef detail::when_each<argument_type, func_type> when_each_type;
         argument_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9) , detail::when_acquire_future<T10>()(f10) , detail::when_acquire_future<T11>()(f11) , detail::when_acquire_future<T12>()(f12) , detail::when_acquire_future<T13>()(f13) , detail::when_acquire_future<T14>()(f14));
         boost::shared_ptr<when_each_type> f =
             boost::make_shared<when_each_type>(std::move(lazy_values),
@@ -461,7 +461,7 @@ namespace hpx { namespace lcos
             argument_type;
         typedef void result_type;
         typedef typename util::decay<F>::type func_type;
-        typedef detail::when_each<result_type, func_type> when_each_type;
+        typedef detail::when_each<argument_type, func_type> when_each_type;
         argument_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9) , detail::when_acquire_future<T10>()(f10) , detail::when_acquire_future<T11>()(f11) , detail::when_acquire_future<T12>()(f12) , detail::when_acquire_future<T13>()(f13) , detail::when_acquire_future<T14>()(f14) , detail::when_acquire_future<T15>()(f15));
         boost::shared_ptr<when_each_type> f =
             boost::make_shared<when_each_type>(std::move(lazy_values),
@@ -490,7 +490,7 @@ namespace hpx { namespace lcos
             argument_type;
         typedef void result_type;
         typedef typename util::decay<F>::type func_type;
-        typedef detail::when_each<result_type, func_type> when_each_type;
+        typedef detail::when_each<argument_type, func_type> when_each_type;
         argument_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9) , detail::when_acquire_future<T10>()(f10) , detail::when_acquire_future<T11>()(f11) , detail::when_acquire_future<T12>()(f12) , detail::when_acquire_future<T13>()(f13) , detail::when_acquire_future<T14>()(f14) , detail::when_acquire_future<T15>()(f15) , detail::when_acquire_future<T16>()(f16));
         boost::shared_ptr<when_each_type> f =
             boost::make_shared<when_each_type>(std::move(lazy_values),
@@ -519,7 +519,7 @@ namespace hpx { namespace lcos
             argument_type;
         typedef void result_type;
         typedef typename util::decay<F>::type func_type;
-        typedef detail::when_each<result_type, func_type> when_each_type;
+        typedef detail::when_each<argument_type, func_type> when_each_type;
         argument_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9) , detail::when_acquire_future<T10>()(f10) , detail::when_acquire_future<T11>()(f11) , detail::when_acquire_future<T12>()(f12) , detail::when_acquire_future<T13>()(f13) , detail::when_acquire_future<T14>()(f14) , detail::when_acquire_future<T15>()(f15) , detail::when_acquire_future<T16>()(f16) , detail::when_acquire_future<T17>()(f17));
         boost::shared_ptr<when_each_type> f =
             boost::make_shared<when_each_type>(std::move(lazy_values),
@@ -548,7 +548,7 @@ namespace hpx { namespace lcos
             argument_type;
         typedef void result_type;
         typedef typename util::decay<F>::type func_type;
-        typedef detail::when_each<result_type, func_type> when_each_type;
+        typedef detail::when_each<argument_type, func_type> when_each_type;
         argument_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9) , detail::when_acquire_future<T10>()(f10) , detail::when_acquire_future<T11>()(f11) , detail::when_acquire_future<T12>()(f12) , detail::when_acquire_future<T13>()(f13) , detail::when_acquire_future<T14>()(f14) , detail::when_acquire_future<T15>()(f15) , detail::when_acquire_future<T16>()(f16) , detail::when_acquire_future<T17>()(f17) , detail::when_acquire_future<T18>()(f18));
         boost::shared_ptr<when_each_type> f =
             boost::make_shared<when_each_type>(std::move(lazy_values),
@@ -577,7 +577,7 @@ namespace hpx { namespace lcos
             argument_type;
         typedef void result_type;
         typedef typename util::decay<F>::type func_type;
-        typedef detail::when_each<result_type, func_type> when_each_type;
+        typedef detail::when_each<argument_type, func_type> when_each_type;
         argument_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9) , detail::when_acquire_future<T10>()(f10) , detail::when_acquire_future<T11>()(f11) , detail::when_acquire_future<T12>()(f12) , detail::when_acquire_future<T13>()(f13) , detail::when_acquire_future<T14>()(f14) , detail::when_acquire_future<T15>()(f15) , detail::when_acquire_future<T16>()(f16) , detail::when_acquire_future<T17>()(f17) , detail::when_acquire_future<T18>()(f18) , detail::when_acquire_future<T19>()(f19));
         boost::shared_ptr<when_each_type> f =
             boost::make_shared<when_each_type>(std::move(lazy_values),
@@ -606,7 +606,7 @@ namespace hpx { namespace lcos
             argument_type;
         typedef void result_type;
         typedef typename util::decay<F>::type func_type;
-        typedef detail::when_each<result_type, func_type> when_each_type;
+        typedef detail::when_each<argument_type, func_type> when_each_type;
         argument_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9) , detail::when_acquire_future<T10>()(f10) , detail::when_acquire_future<T11>()(f11) , detail::when_acquire_future<T12>()(f12) , detail::when_acquire_future<T13>()(f13) , detail::when_acquire_future<T14>()(f14) , detail::when_acquire_future<T15>()(f15) , detail::when_acquire_future<T16>()(f16) , detail::when_acquire_future<T17>()(f17) , detail::when_acquire_future<T18>()(f18) , detail::when_acquire_future<T19>()(f19) , detail::when_acquire_future<T20>()(f20));
         boost::shared_ptr<when_each_type> f =
             boost::make_shared<when_each_type>(std::move(lazy_values),
@@ -635,7 +635,7 @@ namespace hpx { namespace lcos
             argument_type;
         typedef void result_type;
         typedef typename util::decay<F>::type func_type;
-        typedef detail::when_each<result_type, func_type> when_each_type;
+        typedef detail::when_each<argument_type, func_type> when_each_type;
         argument_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9) , detail::when_acquire_future<T10>()(f10) , detail::when_acquire_future<T11>()(f11) , detail::when_acquire_future<T12>()(f12) , detail::when_acquire_future<T13>()(f13) , detail::when_acquire_future<T14>()(f14) , detail::when_acquire_future<T15>()(f15) , detail::when_acquire_future<T16>()(f16) , detail::when_acquire_future<T17>()(f17) , detail::when_acquire_future<T18>()(f18) , detail::when_acquire_future<T19>()(f19) , detail::when_acquire_future<T20>()(f20) , detail::when_acquire_future<T21>()(f21));
         boost::shared_ptr<when_each_type> f =
             boost::make_shared<when_each_type>(std::move(lazy_values),
@@ -664,7 +664,7 @@ namespace hpx { namespace lcos
             argument_type;
         typedef void result_type;
         typedef typename util::decay<F>::type func_type;
-        typedef detail::when_each<result_type, func_type> when_each_type;
+        typedef detail::when_each<argument_type, func_type> when_each_type;
         argument_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9) , detail::when_acquire_future<T10>()(f10) , detail::when_acquire_future<T11>()(f11) , detail::when_acquire_future<T12>()(f12) , detail::when_acquire_future<T13>()(f13) , detail::when_acquire_future<T14>()(f14) , detail::when_acquire_future<T15>()(f15) , detail::when_acquire_future<T16>()(f16) , detail::when_acquire_future<T17>()(f17) , detail::when_acquire_future<T18>()(f18) , detail::when_acquire_future<T19>()(f19) , detail::when_acquire_future<T20>()(f20) , detail::when_acquire_future<T21>()(f21) , detail::when_acquire_future<T22>()(f22));
         boost::shared_ptr<when_each_type> f =
             boost::make_shared<when_each_type>(std::move(lazy_values),

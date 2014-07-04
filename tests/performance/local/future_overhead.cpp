@@ -6,7 +6,7 @@
 // TODO: Update
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/lcos/future_wait.hpp>
+#include <hpx/lcos/wait_each.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
@@ -32,7 +32,7 @@ using hpx::naming::id_type;
 
 using hpx::future;
 using hpx::async;
-using hpx::lcos::wait;
+using hpx::lcos::wait_each;
 
 using hpx::util::high_resolution_timer;
 
@@ -57,9 +57,9 @@ HPX_PLAIN_ACTION(null_function, null_action)
 
 struct scratcher
 {
-    void operator()(std::size_t, double r) const
+    void operator()(future<double> r) const
     {
-        global_scratch += r;
+        global_scratch += r.get();
     }
 };
 
@@ -76,7 +76,7 @@ void measure_action_futures(boost::uint64_t count, bool csv)
     for (boost::uint64_t i = 0; i < count; ++i)
         futures.push_back(async<null_action>(here));
 
-    wait(futures, scratcher());
+    wait_each(futures, scratcher());
 
     // stop the clock
     const double duration = walltime.elapsed();
@@ -104,8 +104,8 @@ void measure_function_futures(boost::uint64_t count, bool csv)
 
     for (boost::uint64_t i = 0; i < count; ++i)
         futures.push_back(async(&null_function));
-
-    wait(futures, scratcher());
+    
+    wait_each(futures, scratcher());
 
     // stop the clock
     const double duration = walltime.elapsed();
@@ -168,4 +168,3 @@ int main(
     // Initialize and run HPX.
     return init(cmdline, argc, argv);
 }
-

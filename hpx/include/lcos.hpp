@@ -19,12 +19,12 @@
 #include <hpx/include/async.hpp>
 #include <hpx/lcos/wait_any.hpp>
 #include <hpx/lcos/wait_all.hpp>
+#include <hpx/lcos/wait_each.hpp>
 #include <hpx/lcos/wait_some.hpp>
 #include <hpx/lcos/when_any.hpp>
 #include <hpx/lcos/when_all.hpp>
+#include <hpx/lcos/when_each.hpp>
 #include <hpx/lcos/when_some.hpp>
-
-#include <hpx/lcos/future_wait.hpp>
 
 #endif
 
