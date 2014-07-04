@@ -1170,6 +1170,7 @@ if(MSVC)
   hpx_add_config_define(_SCL_SECURE_NO_DEPRECATE)
   hpx_add_config_define(_CRT_SECURE_NO_DEPRECATE)
   hpx_add_config_define(_CRT_NONSTDC_NO_WARNINGS)
+  hpx_add_config_define(_WINSOCK_DEPRECATED_NO_WARNINGS)
 
   ##############################################################################
   # Boost
