@@ -12,10 +12,10 @@
 #include <hpx/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
-#include <hpx/parallel/detail/zip_iterator.hpp>
 #include <hpx/parallel/detail/synchronize.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
+#include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -50,8 +50,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         swap_ranges(ExPolicy const& policy, ForwardIter1 first1, ForwardIter1 last1,
             ForwardIter2 first2, boost::mpl::false_ f)
         {
-            typedef boost::tuple<ForwardIter1, ForwardIter2> iterator_tuple;
-            typedef detail::zip_iterator<iterator_tuple> zip_iterator;
+            typedef util::zip_iterator<ForwardIter1, ForwardIter2> zip_iterator;
             typedef typename zip_iterator::reference reference;
             typedef
                 typename detail::algorithm_result<ExPolicy, ForwardIter2>::type
@@ -59,10 +58,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             return get_iter<1, result_type>(
                 plain_for_each_n(policy,
-                    detail::make_zip_iterator(boost::make_tuple(first1, first2)),
+                    util::make_zip_iterator(first1, first2),
                     std::distance(first1, last1),
                     [](reference it) {
-                        std::swap(*boost::get<0>(it), *boost::get<1>(it));
+                        std::swap(hpx::util::get<0>(it), hpx::util::get<1>(it));
                     },
                     f));
         }

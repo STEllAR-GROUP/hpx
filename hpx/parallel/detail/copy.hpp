@@ -12,8 +12,8 @@
 #include <hpx/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
-#include <hpx/parallel/detail/zip_iterator.hpp>
 #include <hpx/parallel/detail/is_negative.hpp>
+#include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -48,8 +48,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         copy(ExPolicy const& policy, FwdIter first, FwdIter last, OutIter dest,
             boost::mpl::false_ fls)
         {
-            typedef boost::tuple<FwdIter, OutIter> iterator_tuple;
-            typedef detail::zip_iterator<iterator_tuple> zip_iterator;
+            typedef util::zip_iterator<FwdIter, OutIter> zip_iterator;
             typedef typename zip_iterator::reference reference;
             typedef
                 typename detail::algorithm_result<ExPolicy, OutIter>::type
@@ -57,10 +56,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             return get_iter<1, result_type>(
                 plain_for_each_n(policy,
-                    detail::make_zip_iterator(boost::make_tuple(first, dest)),
+                    util::make_zip_iterator(first, dest),
                     std::distance(first, last),
                     [](reference it) {
-                        *boost::get<1>(it) = *boost::get<0>(it);
+                        hpx::util::get<1>(it) = hpx::util::get<0>(it);
                     },
                     fls));
         }
@@ -184,8 +183,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         copy_n(ExPolicy const& policy, FwdIter first, std::size_t count,
             OutIter dest, boost::mpl::false_ fls)
         {
-            typedef boost::tuple<FwdIter,OutIter> iterator_tuple;
-            typedef detail::zip_iterator<iterator_tuple> zip_iterator;
+            typedef util::zip_iterator<FwdIter, OutIter> zip_iterator;
             typedef typename zip_iterator::reference reference;
             typedef
                 typename detail::algorithm_result<ExPolicy, OutIter>::type
@@ -193,10 +191,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             return get_iter<1, result_type>(
                 plain_for_each_n(policy,
-                    detail::make_zip_iterator(boost::make_tuple(first, dest)),
+                    util::make_zip_iterator(first, dest),
                     count,
                     [](reference it) {
-                        *boost::get<1>(it) = *boost::get<0>(it);
+                        hpx::util::get<1>(it) = hpx::util::get<0>(it);
                     },
                     fls));
         }
@@ -333,8 +331,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         copy_if(ExPolicy const& policy, FwdIter first, FwdIter last, OutIter dest,
             F && f, boost::mpl::false_ fls)
         {
-            typedef boost::tuple<FwdIter, OutIter> iterator_tuple;
-            typedef detail::zip_iterator<iterator_tuple> zip_iterator;
+            typedef util::zip_iterator<FwdIter, OutIter> zip_iterator;
             typedef typename zip_iterator::reference reference;
             typedef
                 typename detail::algorithm_result<ExPolicy, OutIter>::type
@@ -342,11 +339,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             return get_iter<1, result_type>(
                 plain_for_each_n(policy,
-                    detail::make_zip_iterator(boost::make_tuple(first, dest)),
+                    util::make_zip_iterator(first, dest),
                     std::distance(first,last),
                     [f](reference it) {
-                        if (f(*boost::get<0>(it)))
-                            *boost::get<1>(it) = *boost::get<0>(it);
+                        if (f(hpx::util::get<0>(it)))
+                            hpx::util::get<1>(it) = hpx::util::get<0>(it);
                     },
                     fls));
         }

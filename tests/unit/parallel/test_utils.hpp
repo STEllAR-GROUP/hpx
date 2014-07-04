@@ -109,7 +109,7 @@ namespace test
         static void call(hpx::parallel::execution_policy const& policy,
             hpx::exception_list const& e)
         {
-            using namespace hpx::parallel::detail;
+            using namespace hpx::parallel::v1::detail;
 
             if (which(policy) == static_cast<int>(execution_policy_enum::sequential)) {
                 HPX_TEST_EQ(e.size(), 1);
