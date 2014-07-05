@@ -245,7 +245,9 @@ namespace hpx { namespace iostreams
           : base_type()
           , buffer()
           , stream_base_type(*this)
+#if defined(HPX_DEBUG)
           , streaming_(false)
+#endif
         {}
 
         // hpx::flush manipulator
