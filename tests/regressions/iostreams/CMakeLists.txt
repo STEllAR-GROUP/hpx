@@ -4,11 +4,14 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    delayed_output_1180
     no_output_1173
    )
 
 set(no_output_1173_PARAMETERS LOCALITIES 2)
 set(no_output_1173_FLAGS DEPENDENCIES iostreams_component)
+
+set(delayed_output_1180_FLAGS DEPENDENCIES iostreams_component)
 
 foreach(test ${tests})
   set(sources
