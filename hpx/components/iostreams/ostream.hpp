@@ -213,7 +213,7 @@ namespace hpx { namespace iostreams
 #endif
 
             mutex_type::scoped_lock l(mtx_, boost::try_to_lock);
-            HPX_ASSERT(l || streaming);
+//             HPX_ASSERT(l || streaming);
 
             return flush_locked();
         }
