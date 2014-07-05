@@ -48,22 +48,16 @@ namespace hpx { namespace iostreams
                 boost::iostreams::flushable_tag
             {};
 
-            explicit inline buffer_sink(ostream& os)
+            explicit buffer_sink(ostream& os)
               : os_(os)
             {}
 
             // Write up to n characters to the underlying data sink into the
             // buffer s, returning the number of characters written.
-            std::streamsize write(char_type const* s, std::streamsize n)
-            {
-                return static_cast<buffer&>(os_).write(s, n);
-            }
+            inline std::streamsize write(char_type const* s, std::streamsize n);
 
             // Make sure all content is sent to console
-            bool flush()
-            {
-                return os_.flush();
-            }
+            inline bool flush();
 
         private:
             ostream& os_;
@@ -103,10 +97,38 @@ namespace hpx { namespace iostreams
     private:
         mutex_type mtx_;
 
+#if defined(HPX_DEBUG)
+        boost::atomic<bool> streaming_;
+
+        struct reset_on_exit
+        {
+            explicit reset_on_exit(ostream& os)
+              : flag_(os.streaming_),
+                oldval_(flag_.exchange(true))
+            {
+                HPX_ASSERT(!oldval_);
+            }
+            ~reset_on_exit()
+            {
+                flag_ = oldval_;
+            }
+
+            boost::atomic<bool>& flag_;
+            bool oldval_;
+        };
+#else
+        struct reset_on_exit
+        {
+            explicit reset_on_exit(ostream& os) {}
+        };
+#endif
+
         // Performs a lazy streaming operation.
         template <typename T>
         ostream& streaming_operator_lazy(T const& subject)
         { // {{{
+            reset_on_exit exit(*this);
+
             // apply the subject to the local stream
             *static_cast<stream_base_type*>(this) << subject;
             return *this;
@@ -116,6 +138,8 @@ namespace hpx { namespace iostreams
         template <typename T, typename Lock>
         ostream& streaming_operator_async(T const& subject, Lock& l)
         { // {{{
+            reset_on_exit exit(*this);
+
             // apply the subject to the local stream
             *static_cast<stream_base_type*>(this) << subject;
 
@@ -141,6 +165,8 @@ namespace hpx { namespace iostreams
         template <typename T, typename Lock>
         ostream& streaming_operator_sync(T const& subject, Lock& l)
         { // {{{
+            reset_on_exit exit(*this);
+
             // apply the subject to the local stream
             *static_cast<stream_base_type*>(this) << subject;
 
@@ -164,9 +190,8 @@ namespace hpx { namespace iostreams
         ///////////////////////////////////////////////////////////////////////
         friend struct detail::buffer_sink<char>;
 
-        bool flush()
+        bool flush_locked()
         {
-            // mutex is locked when this is called
             if (!this->detail::buffer::empty())
             {
                 // Create the next buffer, returns the previous buffer
@@ -177,6 +202,20 @@ namespace hpx { namespace iostreams
                 this->base_type::write_sync(get_gid(), next);
             }
             return true;
+        }
+
+        bool flush()
+        {
+            // mutex is locked if this is called while streaming
+
+#if defined(HPX_DEBUG)
+            bool streaming = streaming_;
+#endif
+
+            mutex_type::scoped_lock l(mtx_, boost::try_to_lock);
+            HPX_ASSERT(l || streaming);
+
+            return flush_locked();
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -206,6 +245,7 @@ namespace hpx { namespace iostreams
           : base_type()
           , buffer()
           , stream_base_type(*this)
+          , streaming_(false)
         {}
 
         // hpx::flush manipulator
@@ -246,6 +286,23 @@ namespace hpx { namespace iostreams
 
         using stream_base_type::operator<<;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        template <typename Char>
+        inline std::streamsize buffer_sink<Char>::write(
+            Char const* s, std::streamsize n)
+        {
+            return static_cast<buffer&>(os_).write(s, n);
+        }
+
+        template <typename Char>
+        inline bool buffer_sink<Char>::flush()
+        {
+            return os_.flush();
+        }
+    }
 }}
 
 #endif // HPX_97FC0FA2_E773_4F83_8477_806EC68C2253
