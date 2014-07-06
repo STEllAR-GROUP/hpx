@@ -13,7 +13,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
-#include <boost/atomic/atomic.hpp>
+#include <boost/atomic.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local
