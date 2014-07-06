@@ -7,6 +7,9 @@
 #if !defined(HPX_97FC0FA2_E773_4F83_8477_806EC68C2253)
 #define HPX_97FC0FA2_E773_4F83_8477_806EC68C2253
 
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/lcos/local/recursive_mutex.hpp>
+
 #include <iterator>
 #include <ios>
 
@@ -90,45 +93,17 @@ namespace hpx { namespace iostreams
         typedef components::client_base<ostream, stubs::output_stream> base_type;
         typedef detail::ostream_creator<char>::stream_type stream_base_type;
         typedef detail::ostream_creator<char>::iterator_type iterator_type;
-        typedef lcos::local::spinlock mutex_type;
+        typedef lcos::local::recursive_mutex mutex_type;
 
         HPX_MOVABLE_BUT_NOT_COPYABLE(ostream);
 
     private:
         mutex_type mtx_;
 
-#if defined(HPX_DEBUG)
-        boost::atomic<bool> streaming_;
-
-        struct reset_on_exit
-        {
-            explicit reset_on_exit(ostream& os)
-              : flag_(os.streaming_),
-                oldval_(flag_.exchange(true))
-            {
-                HPX_ASSERT(!oldval_);
-            }
-            ~reset_on_exit()
-            {
-                flag_ = oldval_;
-            }
-
-            boost::atomic<bool>& flag_;
-            bool oldval_;
-        };
-#else
-        struct reset_on_exit
-        {
-            explicit reset_on_exit(ostream& os) {}
-        };
-#endif
-
         // Performs a lazy streaming operation.
         template <typename T>
         ostream& streaming_operator_lazy(T const& subject)
         { // {{{
-            reset_on_exit exit(*this);
-
             // apply the subject to the local stream
             *static_cast<stream_base_type*>(this) << subject;
             return *this;
@@ -138,8 +113,6 @@ namespace hpx { namespace iostreams
         template <typename T, typename Lock>
         ostream& streaming_operator_async(T const& subject, Lock& l)
         { // {{{
-            reset_on_exit exit(*this);
-
             // apply the subject to the local stream
             *static_cast<stream_base_type*>(this) << subject;
 
@@ -165,8 +138,6 @@ namespace hpx { namespace iostreams
         template <typename T, typename Lock>
         ostream& streaming_operator_sync(T const& subject, Lock& l)
         { // {{{
-            reset_on_exit exit(*this);
-
             // apply the subject to the local stream
             *static_cast<stream_base_type*>(this) << subject;
 
@@ -190,8 +161,9 @@ namespace hpx { namespace iostreams
         ///////////////////////////////////////////////////////////////////////
         friend struct detail::buffer_sink<char>;
 
-        bool flush_locked()
+        bool flush()
         {
+            mutex_type::scoped_lock l(mtx_);
             if (!this->detail::buffer::empty())
             {
                 // Create the next buffer, returns the previous buffer
@@ -202,20 +174,6 @@ namespace hpx { namespace iostreams
                 this->base_type::write_sync(get_gid(), next);
             }
             return true;
-        }
-
-        bool flush()
-        {
-            // mutex is locked if this is called while streaming
-
-#if defined(HPX_DEBUG)
-            bool streaming = streaming_;
-#endif
-
-            mutex_type::scoped_lock l(mtx_, boost::try_to_lock);
-//             HPX_ASSERT(l || streaming);
-
-            return flush_locked();
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -245,9 +203,6 @@ namespace hpx { namespace iostreams
           : base_type()
           , buffer()
           , stream_base_type(*this)
-#if defined(HPX_DEBUG)
-          , streaming_(false)
-#endif
         {}
 
         // hpx::flush manipulator

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Part of this code has been adopted from code published under the BSL by:
 //
@@ -11,137 +11,164 @@
 #define HPX_LCOS_RECURSIVE_MUTEX_AUG_03_2009_0459PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/local/mutex.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 
-// Disable warning C4275: non dll-interface class used as base for dll-interface
-// class
-#if defined(BOOST_MSVC)
-#pragma warning(push)
-#pragma warning(disable: 4275)
-#pragma warning(disable: 4251)
-#endif
+#include <boost/atomic/atomic.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local
 {
-    /// An exclusive-ownership recursive mutex which implements Boost.Thread's
-    /// TimedLockable concept.
-    struct HPX_EXPORT recursive_mutex : boost::noncopyable
+    namespace detail
     {
-      private:
-        boost::uint64_t recursion_count;
-        boost::atomic<threads::thread_id_type> locking_thread_id;
-        local::mutex mtx;
-
-      public:
-        recursive_mutex(char const* const description = "")
-          : recursion_count(0), locking_thread_id(0), mtx(description)
-        {}
-
-        /// Attempts to acquire ownership of the \a recursive_mutex.
-        /// Never blocks.
-        ///
-        /// \returns \a true if ownership was acquired; otherwise, \a false.
-        ///
-        /// \throws Never throws.
-        bool try_lock();
-
-        /// Acquires ownership of the \a recursive_mutex. Suspends the
-        /// current HPX-thread if ownership cannot be obtained immediately.
-        ///
-        /// \throws Throws \a hpx#bad_parameter if an error occurs while
-        ///         suspending. Throws \a hpx#yield_aborted if the mutex is
-        ///         destroyed while suspended. Throws \a hpx#null_thread_id if
-        ///         called outside of a HPX-thread.
-        void lock();
-
-        /// Attempts to acquire ownership of the \a recursive_mutex.
-        /// Suspends the current HPX-thread until \a wait_until if ownership
-        /// cannot be obtained immediately.
-        ///
-        /// \returns \a true if ownership was acquired; otherwise, \a false.
-        ///
-        /// \throws Throws \a hpx#bad_parameter if an error occurs while
-        ///         suspending. Throws \a hpx#yield_aborted if the mutex is
-        ///         destroyed while suspended. Throws \a hpx#null_thread_id if
-        ///         called outside of a HPX-thread.
-        bool timed_lock(::boost::system_time const& wait_until);
-
-        /// Attempts to acquire ownership of the \a recursive_mutex.
-        /// Suspends the current HPX-thread until \a timeout if ownership cannot
-        /// be obtained immediately.
-        ///
-        /// \returns \a true if ownership was acquired; otherwise, \a false.
-        ///
-        /// \throws Throws \a hpx#bad_parameter if an error occurs while
-        ///         suspending. Throws \a hpx#yield_aborted if the mutex is
-        ///         destroyed while suspended. Throws \a hpx#null_thread_id if
-        ///         called outside of a HPX-thread.
-        template<typename Duration>
-        bool timed_lock(Duration const& timeout)
+        /// An exclusive-ownership recursive mutex which implements Boost.Thread's
+        /// TimedLockable concept.
+        template <typename Mutex = local::spinlock>
+        struct recursive_mutex_impl : boost::noncopyable
         {
-            return timed_lock(boost::get_system_time() + timeout);
-        }
+          private:
+            boost::uint64_t recursion_count;
+            boost::atomic<threads::thread_id_repr_type> locking_thread_id;
+            Mutex mtx;
 
-        bool timed_lock(boost::xtime const& timeout)
-        {
-            return timed_lock(boost::posix_time::ptime(timeout));
-        }
+          public:
+            recursive_mutex_impl(char const* const desc = "recursive_mutex_impl")
+              : recursion_count(0)
+              , locking_thread_id(threads::invalid_thread_id_repr)
+              , mtx(desc)
+            {}
 
-        /// Release ownership of the \a recursive_mutex.
-        ///
-        /// \throws Throws \a hpx#bad_parameter if an error occurs while
-        ///         releasing the mutex. Throws \a hpx#null_thread_id if called
-        ///         outside of a HPX-thread.
-        void unlock()
-        {
-            if (!--recursion_count)
+            /// Attempts to acquire ownership of the \a recursive_mutex.
+            /// Never blocks.
+            ///
+            /// \returns \a true if ownership was acquired; otherwise, \a false.
+            ///
+            /// \throws Never throws.
+            bool try_lock()
             {
-                locking_thread_id.exchange(threads::thread_id_type());
-                mtx.unlock();
-            }
-        }
+                threads::thread_id_repr_type const current_thread_id =
+                    threads::get_self_id().get();
 
-    private:
-        bool try_recursive_lock(threads::thread_id_type current_thread_id)
-        {
-            if(locking_thread_id.load(boost::memory_order_acquire) ==
-                current_thread_id)
-            {
-                ++recursion_count;
-                return true;
+                return try_recursive_lock(current_thread_id) ||
+                       try_basic_lock(current_thread_id);
             }
-            return false;
-        }
 
-        bool try_basic_lock(threads::thread_id_type current_thread_id)
-        {
-            if (mtx.try_lock())
+            /// Acquires ownership of the \a recursive_mutex. Suspends the
+            /// current HPX-thread if ownership cannot be obtained immediately.
+            ///
+            /// \throws Throws \a hpx#bad_parameter if an error occurs while
+            ///         suspending. Throws \a hpx#yield_aborted if the mutex is
+            ///         destroyed while suspended. Throws \a hpx#null_thread_id if
+            ///         called outside of a HPX-thread.
+            void lock()
             {
-                locking_thread_id.exchange(current_thread_id);
-                recursion_count = 1;
-                return true;
-            }
-            return false;
-        }
+                threads::thread_id_repr_type const current_thread_id =
+                    threads::get_self_id().get();
 
-        bool try_timed_lock(threads::thread_id_type current_thread_id,
-            ::boost::system_time const& target)
-        {
-            if (mtx.timed_lock(target))
-            {
-                locking_thread_id.exchange(current_thread_id);
-                recursion_count = 1;
-                return true;
+                if (!try_recursive_lock(current_thread_id))
+                {
+                    mtx.lock();
+                    locking_thread_id.exchange(current_thread_id);
+                    recursion_count = 1;
+                }
             }
-            return false;
-        }
-    };
+
+            /// Attempts to acquire ownership of the \a recursive_mutex.
+            /// Suspends the current HPX-thread until \a wait_until if ownership
+            /// cannot be obtained immediately.
+            ///
+            /// \returns \a true if ownership was acquired; otherwise, \a false.
+            ///
+            /// \throws Throws \a hpx#bad_parameter if an error occurs while
+            ///         suspending. Throws \a hpx#yield_aborted if the mutex is
+            ///         destroyed while suspended. Throws \a hpx#null_thread_id if
+            ///         called outside of a HPX-thread.
+//             bool timed_lock(::boost::system_time const& wait_until);
+//             {
+//                 threads::thread_id_repr_type const current_thread_id =
+//                     threads::get_self_id().get();
+//
+//                 return try_recursive_lock(current_thread_id) ||
+//                        try_timed_lock(current_thread_id, wait_until);
+//             }
+
+            /// Attempts to acquire ownership of the \a recursive_mutex.
+            /// Suspends the current HPX-thread until \a timeout if ownership cannot
+            /// be obtained immediately.
+            ///
+            /// \returns \a true if ownership was acquired; otherwise, \a false.
+            ///
+            /// \throws Throws \a hpx#bad_parameter if an error occurs while
+            ///         suspending. Throws \a hpx#yield_aborted if the mutex is
+            ///         destroyed while suspended. Throws \a hpx#null_thread_id if
+            ///         called outside of a HPX-thread.
+//             template<typename Duration>
+//             bool timed_lock(Duration const& timeout)
+//             {
+//                 return timed_lock(boost::get_system_time() + timeout);
+//             }
+//
+//             bool timed_lock(boost::xtime const& timeout)
+//             {
+//                 return timed_lock(boost::posix_time::ptime(timeout));
+//             }
+//
+            /// Release ownership of the \a recursive_mutex.
+            ///
+            /// \throws Throws \a hpx#bad_parameter if an error occurs while
+            ///         releasing the mutex. Throws \a hpx#null_thread_id if called
+            ///         outside of a HPX-thread.
+            void unlock()
+            {
+                if (0 == --recursion_count)
+                {
+                    locking_thread_id.exchange(threads::invalid_thread_id_repr);
+                    mtx.unlock();
+                }
+            }
+
+        private:
+            bool try_recursive_lock(threads::thread_id_repr_type current_thread_id)
+            {
+                if(locking_thread_id.load(boost::memory_order_acquire) ==
+                    current_thread_id)
+                {
+                    ++recursion_count;
+                    return true;
+                }
+                return false;
+            }
+
+            bool try_basic_lock(threads::thread_id_repr_type current_thread_id)
+            {
+                if (mtx.try_lock())
+                {
+                    locking_thread_id.exchange(current_thread_id);
+                    recursion_count = 1;
+                    return true;
+                }
+                return false;
+            }
+
+//             bool try_timed_lock(threads::thread_id_repr_type current_thread_id,
+//                 ::boost::system_time const& target)
+//             {
+//                 if (mtx.timed_lock(target))
+//                 {
+//                     locking_thread_id.exchange(current_thread_id);
+//                     recursion_count = 1;
+//                     return true;
+//                 }
+//                 return false;
+//             }
+
+        public:
+            typedef boost::unique_lock<recursive_mutex_impl> scoped_lock;
+            typedef boost::detail::try_lock_wrapper<recursive_mutex_impl> scoped_try_lock;
+        };
+    }
+
+    typedef detail::recursive_mutex_impl<> recursive_mutex;
 }}}
-
-#if defined(BOOST_MSVC)
-#pragma warning(pop)
-#endif
 
 #endif
 

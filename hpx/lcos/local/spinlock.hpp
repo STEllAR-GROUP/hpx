@@ -105,9 +105,10 @@ namespace hpx { namespace lcos { namespace local
         }
 
     public:
-        spinlock() : v_(0)
+        spinlock(char const* const desc = "hpx::lcos::local::spinlock")
+          : v_(0)
         {
-            HPX_ITT_SYNC_CREATE(this, "hpx::lcos::local::spinlock", "");
+            HPX_ITT_SYNC_CREATE(this, desc, "");
         }
 
         spinlock(spinlock && rhs)
