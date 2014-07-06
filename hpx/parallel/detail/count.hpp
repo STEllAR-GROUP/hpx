@@ -63,6 +63,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return detail::algorithm_result<ExPolicy, difference_type>
                     ::get( difference_type(0));
             }
+
             return util::partitioner<ExPolicy, difference_type>::call(
                 policy, first, std::distance(first, last),
                 [&value](FwdIter part_begin, std::size_t part_count)
@@ -207,6 +208,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return detail::algorithm_result<ExPolicy, difference_type>
                     ::get( (difference_type)0);
             }
+
             return util::partitioner<ExPolicy, difference_type>::call(
                 policy, first, std::distance(first, last),
                 [op](FwdIter part_begin, std::size_t part_count)

@@ -18,6 +18,7 @@
 /// See N4071: 1.3/3
 #include <algorithm>
 
+#include <hpx/parallel/detail/all_any_none.hpp>
 #include <hpx/parallel/detail/copy.hpp>
 #include <hpx/parallel/detail/count.hpp>
 #include <hpx/parallel/detail/fill.hpp>

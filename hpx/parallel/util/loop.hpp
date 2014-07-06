@@ -21,21 +21,22 @@ namespace hpx { namespace parallel { namespace util
     class cancellation_token
     {
     private:
-        boost::atomic<bool> was_cancelled_;
+        typedef boost::atomic<bool> flag_type;
+        boost::shared_ptr<flag_type> was_cancelled_;
 
     public:
         cancellation_token()
-          : was_cancelled_(false)
+          : was_cancelled_(boost::make_shared<flag_type>(false))
         {}
 
         bool was_cancelled() const BOOST_NOEXCEPT
         {
-            return was_cancelled_.load(boost::memory_order_relaxed);
+            return was_cancelled_->load(boost::memory_order_relaxed);
         }
 
         void cancel() BOOST_NOEXCEPT
         {
-            was_cancelled_.store(true, boost::memory_order_relaxed);
+            was_cancelled_->store(true, boost::memory_order_relaxed);
         }
     };
 
@@ -57,8 +58,8 @@ namespace hpx { namespace parallel { namespace util
                 return it;
             }
 
-            template <typename Iter, typename F, typename CancelToken>
-            static Iter call(Iter it, Iter end, F && func, CancelToken& tok,
+            template <typename Iter, typename CancelToken, typename F>
+            static Iter call(Iter it, Iter end, CancelToken& tok, F && func,
                 boost::mpl::false_)
             {
                 for (/**/; it != end; ++it)
@@ -83,8 +84,8 @@ namespace hpx { namespace parallel { namespace util
                     }).get();
             }
 
-            template <typename Iter, typename F, typename CancelToken>
-            static Iter call(Iter it, Iter end, F && f, CancelToken& tok,
+            template <typename Iter, typename CancelToken, typename F>
+            static Iter call(Iter it, Iter end, CancelToken& tok, F && f,
                 boost::mpl::true_)
             {
                 typedef typename std::iterator_traits<Iter>::value_type type;
@@ -112,16 +113,16 @@ namespace hpx { namespace parallel { namespace util
         return detail::loop<cat>::call(begin, end, std::forward<F>(f), pred());
     }
 
-    template <typename Iter, typename F, typename CancelToken>
+    template <typename Iter, typename CancelToken, typename F>
     BOOST_FORCEINLINE Iter
-    loop(Iter begin, Iter end, F && f, CancelToken& tok)
+    loop(Iter begin, Iter end, CancelToken& tok, F && f)
     {
         typedef typename std::iterator_traits<Iter>::iterator_category cat;
         typedef typename hpx::traits::is_future<
             typename std::iterator_traits<Iter>::value_type
         >::type pred;
 
-        return detail::loop<cat>::call(begin, end, std::forward<F>(f), tok,
+        return detail::loop<cat>::call(begin, end, tok, std::forward<F>(f),
             pred());
     };
 
@@ -135,12 +136,12 @@ namespace hpx { namespace parallel { namespace util
             boost::mpl::false_());
     }
 
-    template <typename Iter, typename F, typename CancelToken>
+    template <typename Iter, typename CancelToken, typename F>
     BOOST_FORCEINLINE Iter
-    plain_loop(Iter begin, Iter end, F && f, CancelToken& tok)
+    plain_loop(Iter begin, Iter end, CancelToken& tok, F && f)
     {
         typedef typename std::iterator_traits<Iter>::iterator_category cat;
-        return detail::loop<cat>::call(begin, end, std::forward<F>(f), tok,
+        return detail::loop<cat>::call(begin, end, tok, std::forward<F>(f),
             boost::mpl::false_());
     };
 
@@ -164,9 +165,9 @@ namespace hpx { namespace parallel { namespace util
                 return it;
             }
 
-            template <typename Iter, typename F, typename CancelToken>
-            static Iter call(Iter it, std::size_t count, F && f,
-                CancelToken& tok, boost::mpl::false_)
+            template <typename Iter, typename CancelToken, typename F>
+            static Iter call(Iter it, std::size_t count, CancelToken& tok,
+                F && f, boost::mpl::false_)
             {
                 for (/**/; count != 0; --count, ++it)
                 {
@@ -192,9 +193,9 @@ namespace hpx { namespace parallel { namespace util
                     }).get();
             }
 
-            template <typename Iter, typename F, typename CancelToken>
-            static Iter call(Iter it, std::size_t count, F && f,
-                CancelToken& tok, boost::mpl::true_)
+            template <typename Iter, typename CancelToken, typename F>
+            static Iter call(Iter it, std::size_t count, CancelToken& tok,
+                F && f, boost::mpl::true_)
             {
                 typedef typename std::iterator_traits<Iter>::value_type type;
                 return hpx::when_each_n(it, count,
@@ -223,9 +224,9 @@ namespace hpx { namespace parallel { namespace util
                 return it;
             }
 
-            template <typename Iter, typename F, typename CancelToken>
-            static Iter call(Iter it, std::size_t count, F && func,
-                CancelToken& tok, boost::mpl::false_)
+            template <typename Iter, typename CancelToken, typename F>
+            static Iter call(Iter it, std::size_t count, CancelToken& tok,
+                F && func, boost::mpl::false_)
             {
                 std::size_t i = 0;
                 for (/**/; i != count; ++i)
@@ -253,9 +254,9 @@ namespace hpx { namespace parallel { namespace util
                     }).get();
             }
 
-            template <typename Iter, typename F, typename CancelToken>
-            static Iter call(Iter it, std::size_t count, F && f,
-                CancelToken& tok, boost::mpl::true_)
+            template <typename Iter, typename CancelToken, typename F>
+            static Iter call(Iter it, std::size_t count, CancelToken& tok,
+                F && f, boost::mpl::true_)
             {
                 typedef typename std::iterator_traits<Iter>::value_type type;
                 return hpx::when_each_n(it, count,
@@ -282,16 +283,16 @@ namespace hpx { namespace parallel { namespace util
         return detail::loop_n<cat>::call(it, count, std::forward<F>(f), pred());
     }
 
-    template <typename Iter, typename F, typename CancelToken>
+    template <typename Iter, typename CancelToken, typename F>
     BOOST_FORCEINLINE Iter
-    loop_n(Iter it, std::size_t count, F && f, CancelToken& tok)
+    loop_n(Iter it, std::size_t count, CancelToken& tok, F && f)
     {
         typedef typename std::iterator_traits<Iter>::iterator_category cat;
         typedef typename hpx::traits::is_future<
             typename std::iterator_traits<Iter>::value_type
         >::type pred;
 
-        return detail::loop_n<cat>::call(it, count, std::forward<F>(f), tok,
+        return detail::loop_n<cat>::call(it, count, tok, std::forward<F>(f),
             pred());
     };
 
@@ -305,12 +306,12 @@ namespace hpx { namespace parallel { namespace util
             boost::mpl::false_());
     }
 
-    template <typename Iter, typename F, typename CancelToken>
+    template <typename Iter, typename CancelToken, typename F>
     BOOST_FORCEINLINE Iter
-    plain_loop_n(Iter it, std::size_t count, F && f, CancelToken& tok)
+    plain_loop_n(Iter it, std::size_t count, CancelToken& tok, F && f)
     {
         typedef typename std::iterator_traits<Iter>::iterator_category cat;
-        return detail::loop_n<cat>::call(it, count, std::forward<F>(f), tok,
+        return detail::loop_n<cat>::call(it, count, tok, std::forward<F>(f),
             boost::mpl::false_());
     };
 

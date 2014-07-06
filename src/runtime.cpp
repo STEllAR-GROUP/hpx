@@ -1009,7 +1009,7 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         if (NULL == rt)
-            return 0;
+            return std::size_t(0);
         return rt->get_config().get_os_thread_count();
     }
 

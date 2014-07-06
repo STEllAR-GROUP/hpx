@@ -4,6 +4,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    all_of
+    any_of
     copy
     copyif
     copyn
@@ -15,6 +17,7 @@ set(tests
     foreach_futures
     foreachn
     move
+    none_of
     reduce_
     swapranges
     transform
