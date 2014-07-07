@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file all_none.hpp
+/// \file all_any_none.hpp
 
 #if !defined(HPX_PARALLEL_DETAIL_ALL_ANY_NONE_JUL_05_2014_0940PM)
 #define HPX_PARALLEL_DETAIL_ALL_ANY_NONE_JUL_05_2014_0940PM
@@ -154,9 +154,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \returns  The \a none_of algorithm returns a \a hpx::future<bool> if
     ///           the execution policy is of type \a task_execution_policy and
     ///           returns \a bool otherwise.
-    ///           The \a none_of algorithm returns true if unary predicate \a f
-    ///           returns true for no elements in the range, false otherwise.
-    ///           It returns true if the range is empty.
+    ///           The \a none_of algorithm returns true if the unary predicate
+    ///           \a f returns true for no elements in the range, false
+    ///           otherwise. It returns true if the range is empty.
     ///
     template <typename ExPolicy, typename InIter, typename F>
     inline typename boost::enable_if<
@@ -308,9 +308,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \returns  The \a any_of algorithm returns a \a hpx::future<bool> if
     ///           the execution policy is of type \a task_execution_policy and
     ///           returns \a bool otherwise.
-    ///           The \a any_of algorithm returns true if unary predicate \a f
-    ///           returns true for at least one element in the range, false
-    ///           otherwise. It returns false if the range is empty.
+    ///           The \a any_of algorithm returns true if the unary predicate
+    ///           \a f returns true for at least one element in the range,
+    ///           false otherwise. It returns false if the range is empty.
     ///
     template <typename ExPolicy, typename InIter, typename F>
     inline typename boost::enable_if<
@@ -462,7 +462,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \returns  The \a all_of algorithm returns a \a hpx::future<bool> if
     ///           the execution policy is of type \a task_execution_policy and
     ///           returns \a bool otherwise.
-    ///           The \a all_of algorithm returns true if unary predicate
+    ///           The \a all_of algorithm returns true if the unary predicate
     ///           \a f returns true for all elements in the range, false
     ///           otherwise. It returns true if the range is empty.
     ///
