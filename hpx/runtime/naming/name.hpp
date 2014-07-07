@@ -801,7 +801,14 @@ namespace hpx { namespace naming
     ///////////////////////////////////////////////////////////////////////////
     inline std::ostream& operator<< (std::ostream& os, id_type const& id)
     {
-        os << id.get_gid();
+        if (!id)
+        {
+            os << "{invalid}";
+        }
+        else
+        {
+            os << id.get_gid();
+        }
         return os;
     }
 
