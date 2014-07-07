@@ -32,6 +32,7 @@ inline std::size_t idx(std::size_t i, std::size_t size)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+//[stepper_1
 struct stepper
 {
     // Our partition type
@@ -72,7 +73,7 @@ struct stepper
         return U[nt % 2];
     }
 };
-
+//]
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {

@@ -24,7 +24,11 @@ which we parallelize over the followng eight examples:
 *[hpx_link examples/1d_stencil/1d_stencil_1.cpp..Example 8]
 
 The first example is straight serial code.  In this code we instantiate
- a vector which contains two vectors of doubles.  
+ a vector which contains two vectors of doubles. 
+
+[import ../../examples/1d_stencil/1d_stencil_1.cpp]
+[stepper_1]
+ 
 Each element in the vector of doubles represents a single grid
 point. To calculate the change in heat distribution, the temperature of 
 each grid point, along with its neighbors, are passed to the function [^heat].
@@ -40,7 +44,12 @@ a method by which we can easily transform a code which is serially
 executed into a code which creates asynchronous threads. In the simplest
 case this involves relplacing a variable with a futue to a variable,
 a function with a future to a function, and adding a [^.get()] at the
-point where a value is actually needed.  In our example we re-define 
+point where a value is actually needed.
+
+[import ../../examples/1d_stencil/1d_stencil_2.cpp]
+[stepper_2]
+
+In our example we re-define 
 our partition type as a [^shared_future] and create 
 the object "result" which is a future vector of shared futures. We
 then call [^result.get()] and set its value equal to the solution vector.
