@@ -78,7 +78,7 @@ namespace hpx { namespace lcos
             template <typename Future>
             void operator()(Future& future) const
             {
-                std::size_t counter = when_.count_.load(boost::memory_order_acquire);
+                std::size_t counter = when_.count_.load(boost::memory_order_seq_cst);
                 if (counter < when_.needed_count_ && !future.is_ready()) {
                     // handle future only if not enough futures are ready yet
                     // also, do not touch any futures which are already ready
@@ -125,7 +125,7 @@ namespace hpx { namespace lcos
         }
 
         template <typename Sequence>
-        struct when_some : boost::enable_shared_from_this<when_some<Sequence> >
+        struct when_some : boost::enable_shared_from_this<when_some<Sequence> > //-V690
         {
         private:
             void on_future_ready(threads::thread_id_type const& id)
@@ -164,7 +164,7 @@ namespace hpx { namespace lcos
                 // if all of the requested futures are already set, our
                 // callback above has already been called often enough, otherwise
                 // we suspend ourselves
-                if (count_.load(boost::memory_order_acquire) < needed_count_)
+                if (count_.load(boost::memory_order_seq_cst) < needed_count_)
                 {
                     // wait for any of the futures to return to become ready
                     this_thread::suspend(threads::suspended,
@@ -172,7 +172,7 @@ namespace hpx { namespace lcos
                 }
 
                 // at least N futures should be ready
-                HPX_ASSERT(count_.load(boost::memory_order_acquire) >= needed_count_);
+                HPX_ASSERT(count_.load(boost::memory_order_seq_cst) >= needed_count_);
 
                 return std::move(lazy_values_);
             }
@@ -291,7 +291,7 @@ namespace hpx { namespace lcos
         typedef std::vector<future_type> result_type;
 
         result_type lazy_values_;
-        lazy_values_.resize(count);
+        lazy_values_.reserve(count);
         detail::when_acquire_future<future_type> func;
         for (std::size_t i = 0; i != count; ++i)
             lazy_values_.push_back(func(*begin++));
@@ -342,6 +342,7 @@ namespace hpx { namespace lcos
 namespace hpx
 {
     using lcos::when_some;
+    using lcos::when_some_n;
 }
 
 #endif

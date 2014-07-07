@@ -427,7 +427,7 @@ namespace hpx { namespace threads { namespace policies
 
                     HPX_ASSERT(idx != num_thread);
 
-                    if (!test(this_numa_domain, idx) && !test(numa_domain, idx))
+                    if (!test(this_numa_domain, idx) && !test(numa_domain, idx)) //-V560 //-V600
                         continue;
 
                     if (idx < high_priority_queues_.size())
@@ -788,7 +788,7 @@ namespace hpx { namespace threads { namespace policies
                 // the same NUMA node
 
 #if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
-                if (test(steals_in_numa_domain_, num_thread))
+                if (test(steals_in_numa_domain_, num_thread)) //-V600
 #endif
                 {
                     mask_cref_type numa_domain_mask =
@@ -800,7 +800,7 @@ namespace hpx { namespace threads { namespace policies
 
                         HPX_ASSERT(idx != num_thread);
 
-                        if (!test(numa_domain_mask, topology_.get_pu_number(idx)))
+                        if (!test(numa_domain_mask, topology_.get_pu_number(idx))) //-V600
                             continue;
 
                         if (idx < high_priority_queues_.size())
@@ -833,7 +833,7 @@ namespace hpx { namespace threads { namespace policies
 
 #if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
                 // if nothing found, ask everybody else
-                if (test(steals_outside_numa_domain_, num_thread))
+                if (test(steals_outside_numa_domain_, num_thread)) //-V600
                 {
                     mask_cref_type numa_domain_mask =
                         outside_numa_domain_masks_[num_thread];
@@ -844,7 +844,7 @@ namespace hpx { namespace threads { namespace policies
 
                         HPX_ASSERT(idx != num_thread);
 
-                        if (!test(numa_domain_mask, topology_.get_pu_number(idx)))
+                        if (!test(numa_domain_mask, topology_.get_pu_number(idx))) //-V600
                             continue;
 
                         if (idx < high_priority_queues_.size())

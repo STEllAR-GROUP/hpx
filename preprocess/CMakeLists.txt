@@ -28,7 +28,8 @@ foreach(file ${function_argument_limit_preprocessing_files})
 endforeach()
 
 set(tuple_argument_limit_preprocessing_files
-  "hpx/util/tuple.hpp")
+  "hpx/util/tuple.hpp"
+  "hpx/parallel/util/zip_iterator.hpp")
 foreach(file ${tuple_argument_limit_preprocessing_files})
   hpx_partial_preprocess_header(${file} LIMIT HPX_LIMIT)
 endforeach()
@@ -85,9 +86,11 @@ set(wait_argument_limit_preprocessing_files
   "hpx/lcos/wait_all.hpp"
   "hpx/lcos/wait_some.hpp"
   "hpx/lcos/wait_any.hpp"
+  "hpx/lcos/wait_each.hpp"
   "hpx/lcos/when_all.hpp"
   "hpx/lcos/when_some.hpp"
   "hpx/lcos/when_any.hpp"
+  "hpx/lcos/when_each.hpp"
   "hpx/runtime/components/memory_block.hpp")
 foreach(file ${wait_argument_limit_preprocessing_files})
   hpx_partial_preprocess_header(${file} LIMIT HPX_LIMIT)

@@ -1562,8 +1562,8 @@ namespace hpx { namespace components { namespace server
                 return false;
             }
 
-            // secondary command line handling, looking for --exit and --hpx:print-bind
-            // option
+            // secondary command line handling, looking for --exit and other
+            // options
             std::string cmd_line(ini.get_entry("hpx.cmd_line", ""));
             if (!cmd_line.empty()) {
                 std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
@@ -1580,6 +1580,8 @@ namespace hpx { namespace components { namespace server
                     util::handle_print_bind(vm, num_threads);
                 }
 #endif
+                if (vm.count("hpx:list-parcel-ports"))
+                    util::handle_list_parcelports();
 
                 if (vm.count("hpx:exit"))
                     return false;

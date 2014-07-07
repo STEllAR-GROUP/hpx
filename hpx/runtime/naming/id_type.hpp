@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -44,7 +44,9 @@ namespace hpx { namespace naming
         {
             unknown_deleter = -1,
             unmanaged = 0,          ///< unmanaged GID
-            managed = 1             ///< managed GID
+            managed = 1,            ///< managed GID
+            managed_move_credit = 2 ///< managed GID which will give up all
+                                    ///< credits when sent
         };
 
         id_type() {}
@@ -107,7 +109,7 @@ namespace hpx { namespace naming
 
         // Convert this id into an unmanaged one (in-place) - Use with maximum
         // care, or better, don't use this at all.
-        void make_unmanaged();
+        void make_unmanaged() const;
 
     private:
         friend HPX_API_EXPORT gid_type get_parcel_dest_gid(id_type const& id);

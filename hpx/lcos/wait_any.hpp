@@ -120,6 +120,7 @@ namespace hpx { namespace lcos
 namespace hpx
 {
     using lcos::wait_any;
+    using lcos::wait_any_n;
 }
 
 #endif

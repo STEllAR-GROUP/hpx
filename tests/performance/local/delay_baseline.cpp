@@ -96,7 +96,7 @@ int app_main(
 
     for (boost::uint64_t i = 0; i < tasks; ++i)
     {
-        worker_timed(delay);
+        worker_timed(delay * 1000);
     }
 
     double elapsed = t.elapsed();

@@ -56,7 +56,7 @@ std::string format_build_date(std::string timestamp)
 void print_results(
     variables_map& vm
   , std::pair<double, double> elapsed_control
-  , std::pair<double, double> elapsed_lockfree 
+  , std::pair<double, double> elapsed_lockfree
     )
 {
     if (header)
@@ -148,7 +148,7 @@ bench_lifo(Lifo& lifo, boost::uint64_t local_iterations)
     for ( boost::uint64_t block = 0
         ; block < (local_iterations / blocksize)
         ; ++block)
-    { 
+    {
         // Restart the clock.
         t.restart();
 
@@ -156,24 +156,24 @@ bench_lifo(Lifo& lifo, boost::uint64_t local_iterations)
         {
             push(lifo, seed);
         }
-    
+
         elapsed.first += t.elapsed();
-    
+
         ///////////////////////////////////////////////////////////////////////
         // Pop.
-    
+
         // Restart the clock.
-        t.restart(); 
-    
+        t.restart();
+
         for (boost::uint64_t i = 0; i < blocksize; ++i)
         {
             pop(lifo);
         }
-    
+
         elapsed.second += t.elapsed();
     }
-         
-    return elapsed; 
+
+    return elapsed;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -194,7 +194,7 @@ void perform_iterations(
     }
 
     {
-        boost::lockfree::stack<boost::uint64_t> lifo(blocksize); 
+        boost::lockfree::stack<boost::uint64_t> lifo(blocksize);
 
         // Warmup.
         bench_lifo(lifo, blocksize);

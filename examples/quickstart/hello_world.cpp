@@ -108,14 +108,14 @@ void hello_world_foreman()
         // return value of the future. hpx::lcos::wait doesn't return until
         // all the futures in the vector have returned.
         hpx::lcos::local::spinlock mtx;
-        hpx::lcos::wait(futures,
-            [&](std::size_t, std::size_t t) {
+        hpx::lcos::wait_each(futures,
+            hpx::util::unwrapped([&](std::size_t t) {
                 if (std::size_t(-1) != t)
                 {
                     hpx::lcos::local::spinlock::scoped_lock lk(mtx);
                     attendance.erase(t);
                 }
-            });
+            }));
     }
 }
 //]

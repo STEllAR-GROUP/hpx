@@ -46,12 +46,14 @@ namespace hpx { namespace iostreams { namespace detail
     {
         hpx::cout.initialize(iostreams::detail::cout_tag());
         hpx::cerr.initialize(iostreams::detail::cerr_tag());
+        hpx::consolestream.initialize(iostreams::detail::consolestream_tag());
     }
 
     void unregister_ostreams()
     {
         hpx::cout.uninitialize();
         hpx::cerr.uninitialize();
+        hpx::consolestream.uninitialize();
     }
 
     ///////////////////////////////////////////////////////////////////////////

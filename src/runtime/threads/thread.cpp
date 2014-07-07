@@ -92,7 +92,7 @@ namespace hpx
         try {
             func();
         }
-        catch (hpx::thread_interrupted const&) {
+        catch (hpx::thread_interrupted const&) { //-V565
             /* swallow this exception */
         }
         catch (hpx::exception const&) {

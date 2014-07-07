@@ -10,7 +10,6 @@
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
 #include <hpx/include/async.hpp>
-#include <hpx/lcos/future_wait.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/util/assert.hpp>
 

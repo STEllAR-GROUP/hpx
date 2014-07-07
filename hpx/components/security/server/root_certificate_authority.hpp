@@ -30,7 +30,8 @@ namespace hpx { namespace components { namespace security { namespace server
         signed_type<certificate> sign_certificate_signing_request(
             signed_type<certificate_signing_request> const &) const;
 
-        naming::gid_type get_base_gid(naming::gid_type const assign_gid = naming::invalid_gid) const
+        naming::gid_type get_base_gid(
+            naming::gid_type const& assign_gid = naming::invalid_gid) const
         {
             typedef fixed_component_base<root_certificate_authority>
                 component_base_type;

@@ -17,7 +17,7 @@ namespace hpx { namespace util
     //
     //  high_resolution_timer
     //      A timer object measures elapsed time.
-    //      
+    //
     ///////////////////////////////////////////////////////////////////////////
     class high_resolution_timer
     {
@@ -29,10 +29,6 @@ namespace hpx { namespace util
 
         high_resolution_timer(double t)
           : start_time_(static_cast<boost::uint64_t>(t * 1e9))
-        {}
-
-        high_resolution_timer(high_resolution_timer const& rhs)
-          : start_time_(rhs.start_time_)
         {}
 
         static double now()

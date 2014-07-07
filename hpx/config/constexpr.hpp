@@ -9,5 +9,8 @@
 #if !defined(BOOST_CONSTEXPR)
 #define BOOST_CONSTEXPR
 #endif
+#if !defined(BOOST_CONSTEXPR_OR_CONST)
+#define BOOST_CONSTEXPR_OR_CONST const
+#endif
 
 #endif

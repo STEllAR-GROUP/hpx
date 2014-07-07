@@ -30,13 +30,15 @@ namespace hpx { namespace agas { namespace server
         naming::address* addrs = p.get_destination_addrs();
         std::vector<resolved_type> cache_addresses;
 
+        runtime& rt = get_runtime();
+
         // resolve destination addresses, we should be able to resolve all of
         // them, otherwise it's an error
         {
             mutex_type::scoped_lock l(mutex_);
 
             if (!locality_)
-                locality_ = get_runtime().here();
+                locality_ = rt.here();
 
             cache_addresses.reserve(size);
             for (std::size_t i = 0; i != size; ++i)
@@ -81,27 +83,30 @@ namespace hpx { namespace agas { namespace server
         if (addrs[0].locality_ == locality_)
         {
             // destination is local
-            get_runtime().get_applier().schedule_action(p);
+            rt.get_applier().schedule_action(p);
         }
         else
         {
             // destination is remote
-            get_runtime().get_parcel_handler().put_parcel(p);
+            rt.get_parcel_handler().put_parcel(p);
         }
 
-        // asynchronously update cache on source locality
-        naming::id_type source = p.get_source();
-        for (std::size_t i = 0; i != size; ++i)
+        if (rt.get_state() < runtime::state_pre_shutdown)
         {
-            resolved_type const& r = cache_addresses[i];
-            if (boost::fusion::at_c<0>(r))
+            // asynchronously update cache on source locality
+            naming::id_type source = p.get_source();
+            for (std::size_t i = 0; i != size; ++i)
             {
-                gva const& g = boost::fusion::at_c<1>(r);
-                naming::address addr(g.endpoint, g.type, g.lva());
+                resolved_type const& r = cache_addresses[i];
+                if (boost::fusion::at_c<0>(r))
+                {
+                    gva const& g = boost::fusion::at_c<1>(r);
+                    naming::address addr(g.endpoint, g.type, g.lva());
 
-                using components::stubs::runtime_support;
-                runtime_support::update_agas_cache_entry_colocated(
-                    source, boost::fusion::at_c<0>(r), addr, g.count, g.offset);
+                    using components::stubs::runtime_support;
+                    runtime_support::update_agas_cache_entry_colocated(
+                        source, boost::fusion::at_c<0>(r), addr, g.count, g.offset);
+                }
             }
         }
 

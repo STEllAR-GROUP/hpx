@@ -78,8 +78,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                         this,
                         boost::asio::placeholders::error, receiver_conn));
             }
-            catch (boost::system::system_error const& e) {
-                errors.add(e);   // store all errors
+            catch (boost::system::system_error const&) {
+                errors.add(boost::current_exception());
                 continue;
             }
         }

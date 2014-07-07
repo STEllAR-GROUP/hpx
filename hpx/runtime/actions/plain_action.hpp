@@ -79,7 +79,7 @@ namespace hpx { namespace actions
                             << ").";
                 F();      // call the function, ignoring the return value
             }
-            catch (hpx::thread_interrupted const&) {
+            catch (hpx::thread_interrupted const&) { //-V565
                 /* swallow this exception */
             }
             catch (hpx::exception const& e) {
@@ -172,7 +172,7 @@ namespace hpx { namespace actions
 
     template <typename Result, Result (*F)(), typename Derived>
     struct make_action<Result (*)(), F, Derived, boost::mpl::false_>
-      : plain_result_action0<Result, F, Derived> 
+      : plain_result_action0<Result, F, Derived>
     {
         typedef plain_result_action0<Result, F, Derived> type;
     };
@@ -247,7 +247,7 @@ namespace hpx { namespace actions
                             << ").";
                 F();      // call the function, ignoring the return value
             }
-            catch (hpx::thread_interrupted const&) {
+            catch (hpx::thread_interrupted const&) { //-V565
                 /* swallow this exception */
             }
             catch (hpx::exception const& e) {
@@ -338,7 +338,7 @@ namespace hpx { namespace actions
 
     template <void (*F)(), typename Derived>
     struct make_action<void (*)(), F, Derived, boost::mpl::false_>
-      : plain_action0<F, Derived> 
+      : plain_action0<F, Derived>
     {
         typedef plain_action0<F, Derived> type;
     };
@@ -446,7 +446,7 @@ namespace hpx { namespace traits
 ///       // which are needed for proper serialization and initialization support
 ///       // enabling the remote invocation of the function `app::some_global_function`.
 ///       //
-///       // The second argument used has to be the same as used for the 
+///       // The second argument used has to be the same as used for the
 ///       // HPX_DEFINE_PLAIN_ACTION above.
 ///       HPX_REGISTER_PLAIN_ACTION(app::some_global_action, some_global_action);
 /// \endcode
@@ -463,7 +463,7 @@ namespace hpx { namespace traits
 /// \brief Registers an existing template-free function as a plain action with HPX
 ///
 /// The macro \a HPX_REGISTER_PLAIN_ACTION can be used to register an existing
-/// template-free function as a plain action. It relies on a separately defined 
+/// template-free function as a plain action. It relies on a separately defined
 /// action type named \a action_type.
 ///
 /// The parameter \p action_type is the name of the action type to register
@@ -484,7 +484,7 @@ namespace hpx { namespace traits
 ///           template <typename T>
 ///           struct some_global_action
 ///             : hpx::actions::make_action<
-///                     void (*)(T), &some_global_function<T>, 
+///                     void (*)(T), &some_global_function<T>,
 ///                     some_global_action<T> >
 ///           {};
 ///       }
@@ -525,7 +525,7 @@ namespace hpx { namespace traits
 ///       // which are needed for proper serialization and initialization support
 ///       // enabling the remote invocation of the function `app::some_global_function`.
 ///       //
-///       // The second argument used has to be the same as used for the 
+///       // The second argument used has to be the same as used for the
 ///       // HPX_DEFINE_PLAIN_ACTION above.
 ///       HPX_REGISTER_PLAIN_ACTION(app::some_global_action, some_global_action);
 /// \endcode
@@ -577,12 +577,12 @@ namespace hpx { namespace traits
 /// \note The macro \a HPX_PLAIN_ACTION has to be used at global namespace even
 /// if the wrapped function is located in some other namespace. The newly
 /// defined action type is placed into the global namespace as well.
-/// 
+///
 /// \note The macro \a HPX_PLAIN_ACTION can be used with 1, 2, or 3 arguments.
-/// The second and third arguments are optional. The default value for the 
-/// second argument (the typename of the defined action) is derived from the 
+/// The second and third arguments are optional. The default value for the
+/// second argument (the typename of the defined action) is derived from the
 /// name of the function (as passed as the first argument) by appending '_action'.
-/// The second argument can be omitted only if the first argument with an 
+/// The second argument can be omitted only if the first argument with an
 /// appended suffix '_action' resolves to a valid, unqualified C++ type name.
 /// The default value for the third argument is \a hpx::components::factory_check.
 ///

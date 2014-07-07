@@ -48,14 +48,10 @@ namespace hpx { namespace iostreams { namespace detail
 namespace hpx { namespace iostreams { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
-    void output_stream::call_write_async(detail::buffer const& in)
+    void output_stream::call_write_async(detail::buffer in)
     { // {{{
-        if (!in.empty())
-        {
-            // Perform the IO operation.
-            mutex_type::scoped_lock l(mtx);
-            write_f(in.data());
-        }
+        // Perform the IO operation.
+        in.write(write_f, mtx_);
     } // }}}
 
     void output_stream::write_async(detail::buffer const& in)
@@ -69,15 +65,11 @@ namespace hpx { namespace iostreams { namespace server
     } // }}}
 
     ///////////////////////////////////////////////////////////////////////////
-    void output_stream::call_write_sync(detail::buffer const& in,
+    void output_stream::call_write_sync(detail::buffer in,
         threads::thread_id_type caller)
     {
-        if (!in.empty())
-        {
-            // Perform the IO operation.
-            mutex_type::scoped_lock l(mtx);
-            write_f(in.data());
-        }
+        // Perform the IO operation.
+        in.write(write_f, mtx_);
 
         // Wake up caller.
         threads::set_thread_state(caller, threads::pending);

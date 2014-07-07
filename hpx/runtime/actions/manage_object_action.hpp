@@ -125,29 +125,17 @@ namespace hpx { namespace actions
         ~manage_object_action() {}
 
     private:
-#if defined(NDEBUG) && defined(HPX_DISABLE_ASSERTS)
-        static void construct_(void* memory, std::size_t)
-#else
         static void construct_(void* memory, std::size_t size)
-#endif
         {
             HPX_ASSERT(size == sizeof(T));
             new (memory) T;
         }
-#if defined(NDEBUG) && defined(HPX_DISABLE_ASSERTS)
-        static void clone_(void* dest, void const* src, std::size_t)
-#else
         static void clone_(void* dest, void const* src, std::size_t size)
-#endif
         {
             HPX_ASSERT(size == sizeof(T));
             new (dest) T (*reinterpret_cast<T const*>(src));
         }
-#if defined(NDEBUG) && defined(HPX_DISABLE_ASSERTS)
-        static void assign_(void* dest, void const* src, std::size_t)
-#else
         static void assign_(void* dest, void const* src, std::size_t size)
-#endif
         {
             HPX_ASSERT(size == sizeof(T));
             // do not overwrite ourselves

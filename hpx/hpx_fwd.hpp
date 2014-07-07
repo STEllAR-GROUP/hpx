@@ -355,6 +355,8 @@ namespace hpx
             thread_stacksize_maximal = thread_stacksize_huge,   ///< use maximally possible stack size
         };
 
+        class HPX_EXPORT executor;
+
         ///////////////////////////////////////////////////////////////////////
         /// \ cond NODETAIL
         namespace detail
@@ -383,7 +385,7 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         /// \ cond NODETAIL
-        thread_id_repr_type const invalid_thread_id_repr = 0;
+        BOOST_CONSTEXPR_OR_CONST thread_id_repr_type invalid_thread_id_repr = 0;
         thread_id_type const invalid_thread_id = thread_id_type();
         /// \ endcond
 
@@ -781,6 +783,18 @@ namespace hpx
     ///        the current HPX-thread is associated with.
     HPX_API_EXPORT std::size_t get_os_thread_count();
 
+    /// \brief Return the number of worker OS- threads used by the given
+    ///        executor to execute HPX threads
+    ///
+    /// This function returns the number of cores used to execute HPX
+    /// threads for the given executor. If the function is called while no HPX
+    /// runtime system is active, it will return zero. If the executor is not
+    /// valid, this function will fall back to retrieving the number of OS
+    /// threads used by HPX.
+    ///
+    /// \param id [in] The id of the object to locate.
+    HPX_API_EXPORT std::size_t get_os_thread_count(threads::executor& exec);
+
     ///////////////////////////////////////////////////////////////////////////
     HPX_API_EXPORT bool is_scheduler_numa_sensitive();
 
@@ -1088,7 +1102,7 @@ namespace hpx
     ///
     /// \param base_name    [in] The base name for which to retrieve the
     ///                     registered ids.
-    /// \param id           [in] The sequence number of the registered id.
+    /// \param sequence_nr  [in] The sequence number of the registered id.
     ///
     /// \returns A representing the id which was registered using the given
     ///          base name and sequence numbers.

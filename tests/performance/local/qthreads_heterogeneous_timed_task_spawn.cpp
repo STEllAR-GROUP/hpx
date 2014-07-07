@@ -121,7 +121,7 @@ extern "C" aligned_t worker_func(
 {
     boost::uint64_t const delay_ = reinterpret_cast<boost::uint64_t>(p);
 
-    worker_timed(delay_);
+    worker_timed(delay_ * 1000);
 
     ++donecount;
 

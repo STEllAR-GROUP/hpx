@@ -29,7 +29,7 @@ struct foo
 {
     void operator()() const
     {
-        worker_timed(delay);
+        worker_timed(delay * 1000);
     }
 
     template <typename Archive> void serialize(Archive&, unsigned int) {}

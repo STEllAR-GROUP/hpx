@@ -13,6 +13,7 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/encode_parcels.hpp>
 #include <hpx/runtime/parcelset/detail/call_for_each.hpp>
+#include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -483,31 +484,40 @@ namespace hpx { namespace parcelset
         {
             typedef pending_parcels_map::iterator iterator;
 
-            lcos::local::spinlock::scoped_lock l(mtx_);
+            // We yield here for a short amount of time to give another HPX thread the chance to put
+            // a subsequent parcel which leads to a more effective parcel buffering
+            if (hpx::threads::get_self_ptr())
+            {
+                hpx::this_thread::yield();
+            }
+
             if(!enable_parcel_handling_) return false;
-
-            iterator it = pending_parcels_.find(locality_id);
-
-            // do nothing if parcels have already been picked up by
-            // another thread
-            if (it != pending_parcels_.end() && !it->second.first.empty())
             {
-                HPX_ASSERT(it->first == locality_id);
-                HPX_ASSERT(handlers.size() == parcels.size());
-                std::swap(parcels, it->second.first);
-                std::swap(handlers, it->second.second);
+                lcos::local::spinlock::scoped_lock l(mtx_);
 
-                HPX_ASSERT(!handlers.empty());
+                iterator it = pending_parcels_.find(locality_id);
+
+                // do nothing if parcels have already been picked up by
+                // another thread
+                if (it != pending_parcels_.end() && !it->second.first.empty())
+                {
+                    HPX_ASSERT(it->first == locality_id);
+                    HPX_ASSERT(handlers.size() == parcels.size());
+                    std::swap(parcels, it->second.first);
+                    std::swap(handlers, it->second.second);
+
+                    HPX_ASSERT(!handlers.empty());
+                }
+                else
+                {
+                    HPX_ASSERT(it->second.second.empty());
+                    return false;
+                }
+
+                parcel_destinations_.erase(locality_id);
+
+                return true;
             }
-            else
-            {
-                HPX_ASSERT(it->second.second.empty());
-                return false;
-            }
-
-            parcel_destinations_.erase(locality_id);
-
-            return true;
         }
 
         ///////////////////////////////////////////////////////////////////////

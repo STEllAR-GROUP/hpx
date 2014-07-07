@@ -35,10 +35,6 @@ namespace hpx { namespace util
           : start_time_(static_cast<boost::uint64_t>(t * 1e9))
         {}
 
-        thread_aware_timer(thread_aware_timer const& rhs)
-          : start_time_(rhs.start_time_)
-        {}
-
         static double now()
         {
             return take_time_stamp() * 1e-9;

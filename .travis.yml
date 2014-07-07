@@ -1,0 +1,48 @@
+# Copyright (c) 2014 Thomas Heller
+#
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+language: cpp
+
+compiler:
+    - clang
+    - gcc
+
+before_install:
+    - sudo add-apt-repository -y ppa:boost-latest/ppa
+    - sudo apt-get update -qq
+
+install:
+    - sudo apt-get install cmake
+    - sudo apt-get install libboost1.54-dev
+    - sudo apt-get install mpi-default-dev
+    - sudo apt-get install libhwloc-dev
+    - sudo apt-get install libgoogle-perftools-dev
+
+    - if [ "$CXX" == "g++" ]; then export CMAKE_CXX_COMPILER="g++"; fi
+    - if [ "$CXX" == "g++" ]; then export CXX="g++"; fi
+
+    - if [ "$CXX" == "clang++" ]; then export CMAKE_CXX_COMPILER="clang++"; fi
+    - if [ "$CXX" == "clang++" ]; then export CXX="clang++"; fi
+
+script:
+    - mkdir build
+    - cd build
+    - cmake .. -DHPX_HAVE_PARCELPORT_MPI=On -DHPX_NO_INSTALL=On
+    - make
+    - make examples
+    - make tests.unit
+    - make tests.regressions
+    - make tests.performance
+
+after_script:
+    - ctest . --output-on-failure --timeout 100
+
+notifications:
+    irc:
+        channels:
+            - "chat.freenode.net#ste||ar"
+        on_success: change
+        on_failure: change
+

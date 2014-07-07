@@ -194,7 +194,7 @@ namespace hpx { namespace parcelset
                     BOOST_FOREACH(parcel const& p, pv)
                     {
 #if defined(HPX_HAVE_SECURITY)
-                        if(enable_security)
+                        if (enable_security)
                             serialize_certificate(archive, connection, localities, p);
 #endif
                         archive << p;

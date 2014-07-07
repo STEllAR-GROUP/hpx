@@ -93,6 +93,10 @@ namespace hpx { namespace threads
             // Return an estimate of the number of waiting closures.
             virtual std::size_t num_pending_closures(error_code& ec) const = 0;
 
+            // Return the requested policy element
+            virtual std::size_t get_policy_element(
+                threads::detail::executor_parameter p, error_code& ec) const = 0;
+
         private:
             // reference counting
             friend void intrusive_ptr_add_ref(executor_base* p);
@@ -146,6 +150,8 @@ namespace hpx { namespace threads
     //
     class HPX_EXPORT executor
     {
+        friend std::size_t hpx::get_os_thread_count(threads::executor& exec);
+
     protected:
         // generic executors can't be created directly
         executor(detail::executor_base* data)

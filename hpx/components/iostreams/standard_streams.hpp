@@ -14,6 +14,10 @@ namespace hpx
 {
     HPX_IOSTREAMS_EXPORT extern iostreams::ostream cout;
     HPX_IOSTREAMS_EXPORT extern iostreams::ostream cerr;
+
+    // special stream which writes to a predefine stringstream on the console
+    HPX_IOSTREAMS_EXPORT extern iostreams::ostream consolestream;
+    HPX_IOSTREAMS_EXPORT std::stringstream const& get_consolestream();
 }
 
 #endif // HPX_8F5A7F0B_E4CE_422C_B58A_2AEC43AD2057

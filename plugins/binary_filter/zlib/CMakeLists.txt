@@ -35,7 +35,7 @@ macro(add_zlib_module)
       "HPX_LIBRARY_EXPORTS"
       "HPX_PLUGIN_NAME=compress_zlib")
 
-    add_hpx_pseudo_dependencies(plugins.compression.zlib compress_zlib_lib)
+    add_hpx_pseudo_dependencies(plugins.binary_filter.zlib compress_zlib_lib)
 
     if(NOT HPX_NO_INSTALL)
       hpx_library_install(compress_zlib_lib ${LIB}/hpx)

@@ -477,7 +477,7 @@ c.file_name("t3.txt");
 @remarks
 In case your manipulator has constant data, you don't need this
 */
-template<class context_type> struct non_const_context {
+template<class context_type> struct non_const_context { //-V690
 
     // this can be used in the parent class, to forward data from its constructor
     typedef non_const_context<context_type> non_const_context_base;

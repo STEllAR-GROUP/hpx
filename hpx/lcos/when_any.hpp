@@ -38,7 +38,7 @@ namespace hpx { namespace lcos
     {
         ///////////////////////////////////////////////////////////////////////
         template <typename Future>
-        struct when_any_swapped
+        struct when_any_swapped //-V690
           : boost::enable_shared_from_this<when_any_swapped<Future> >
         {
         private:
@@ -249,6 +249,25 @@ namespace hpx { namespace lcos
             detail::when_acquire_future<future_type>());
         return lcos::when_any_swapped(lazy_values_, ec);
     }
+
+    template <typename Iterator>
+    lcos::future<Iterator>
+    when_any_swapped_n(Iterator begin, std::size_t count,
+        error_code& ec = throws)
+    {
+        typedef
+            typename lcos::detail::future_iterator_traits<Iterator>::type
+            future_type;
+        typedef std::vector<future_type> result_type;
+
+        result_type lazy_values_;
+        lazy_values_.reserve(count);
+        detail::when_acquire_future<future_type> func;
+        for (std::size_t i = 0; i != count; ++i)
+            lazy_values_.push_back(func(*begin++));
+
+        return lcos::when_any_swapped(lazy_values_, ec);
+    }
 }}
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
@@ -274,6 +293,8 @@ namespace hpx
 {
     using lcos::when_any;
     using lcos::when_any_swapped;
+    using lcos::when_any_n;
+    using lcos::when_any_swapped_n;
 }
 
 #endif

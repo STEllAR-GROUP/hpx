@@ -7,6 +7,9 @@
 #if !defined(HPX_97FC0FA2_E773_4F83_8477_806EC68C2253)
 #define HPX_97FC0FA2_E773_4F83_8477_806EC68C2253
 
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/lcos/local/recursive_mutex.hpp>
+
 #include <iterator>
 #include <ios>
 
@@ -23,12 +26,17 @@
 namespace hpx { namespace iostreams
 {
     ///////////////////////////////////////////////////////////////////////////
+    struct ostream;
+
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
         // Tag types to be used to identify standard ostream objects
         struct cout_tag {};
         struct cerr_tag {};
+
+        struct consolestream_tag {};
 
         ///////////////////////////////////////////////////////////////////////
         /// This is a Boost.IoStreams Sink that can be used to create an
@@ -37,20 +45,25 @@ namespace hpx { namespace iostreams
         struct buffer_sink
         {
             typedef Char char_type;
-            typedef boost::iostreams::sink_tag category;
 
-            buffer_sink(buffer& b) : b_(b) {}
+            struct category
+              : boost::iostreams::sink_tag,
+                boost::iostreams::flushable_tag
+            {};
+
+            explicit buffer_sink(ostream& os)
+              : os_(os)
+            {}
 
             // Write up to n characters to the underlying data sink into the
             // buffer s, returning the number of characters written.
-            std::streamsize write(char_type const* s, std::streamsize n)
-            {
-                std::copy(s, s + n, std::back_inserter(b_.data()));
-                return n;
-            }
+            inline std::streamsize write(char_type const* s, std::streamsize n);
+
+            // Make sure all content is sent to console
+            inline bool flush();
 
         private:
-            buffer& b_;
+            ostream& os_;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -80,12 +93,12 @@ namespace hpx { namespace iostreams
         typedef components::client_base<ostream, stubs::output_stream> base_type;
         typedef detail::ostream_creator<char>::stream_type stream_base_type;
         typedef detail::ostream_creator<char>::iterator_type iterator_type;
-        typedef lcos::local::mutex mutex_type;
+        typedef lcos::local::recursive_mutex mutex_type;
 
         HPX_MOVABLE_BUT_NOT_COPYABLE(ostream);
 
     private:
-        mutex_type mtx;
+        mutex_type mtx_;
 
         // Performs a lazy streaming operation.
         template <typename T>
@@ -146,6 +159,24 @@ namespace hpx { namespace iostreams
         } // }}}
 
         ///////////////////////////////////////////////////////////////////////
+        friend struct detail::buffer_sink<char>;
+
+        bool flush()
+        {
+            mutex_type::scoped_lock l(mtx_);
+            if (!this->detail::buffer::empty())
+            {
+                // Create the next buffer, returns the previous buffer
+                buffer next = this->detail::buffer::init();
+
+                // Perform the write operation, then destroy the old buffer and
+                // stream.
+                this->base_type::write_sync(get_gid(), next);
+            }
+            return true;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         friend void detail::register_ostreams();
         friend void detail::unregister_ostreams();
 
@@ -159,7 +190,7 @@ namespace hpx { namespace iostreams
         // reset this object during runtime system shutdown
         void uninitialize()
         {
-            mutex_type::scoped_lock l(mtx, boost::try_to_lock);
+            mutex_type::scoped_lock l(mtx_, boost::try_to_lock);
             if (l)
             {
                 streaming_operator_sync(hpx::async_flush, l);   // unlocks l
@@ -171,34 +202,34 @@ namespace hpx { namespace iostreams
         ostream()
           : base_type()
           , buffer()
-          , stream_base_type(*static_cast<buffer*>(this))
+          , stream_base_type(*this)
         {}
 
         // hpx::flush manipulator
         ostream& operator<<(hpx::iostreams::flush_type const& m)
         {
-            mutex_type::scoped_lock l(mtx);
+            mutex_type::scoped_lock l(mtx_);
             return streaming_operator_sync(m, l);
         }
 
         // hpx::endl manipulator
         ostream& operator<<(hpx::iostreams::endl_type const& m)
         {
-            mutex_type::scoped_lock l(mtx);
+            mutex_type::scoped_lock l(mtx_);
             return streaming_operator_sync(m, l);
         }
 
         // hpx::async_flush manipulator
         ostream& operator<<(hpx::iostreams::async_flush_type const& m)
         {
-            mutex_type::scoped_lock l(mtx);
+            mutex_type::scoped_lock l(mtx_);
             return streaming_operator_async(m, l);
         }
 
         // hpx::async_endl manipulator
         ostream& operator<<(hpx::iostreams::async_endl_type const& m)
         {
-            mutex_type::scoped_lock l(mtx);
+            mutex_type::scoped_lock l(mtx_);
             return streaming_operator_async(m, l);
         }
 
@@ -206,12 +237,29 @@ namespace hpx { namespace iostreams
         template <typename T>
         ostream& operator<<(T const& subject)
         {
-            mutex_type::scoped_lock l(mtx);
+            mutex_type::scoped_lock l(mtx_);
             return streaming_operator_lazy(subject);
         }
 
         using stream_base_type::operator<<;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        template <typename Char>
+        inline std::streamsize buffer_sink<Char>::write(
+            Char const* s, std::streamsize n)
+        {
+            return static_cast<buffer&>(os_).write(s, n);
+        }
+
+        template <typename Char>
+        inline bool buffer_sink<Char>::flush()
+        {
+            return os_.flush();
+        }
+    }
 }}
 
 #endif // HPX_97FC0FA2_E773_4F83_8477_806EC68C2253

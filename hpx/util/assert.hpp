@@ -14,19 +14,26 @@
 #   define HPX_ASSERT_MSG(expr, msg) BOOST_ASSERT_MSG(expr, msg)
 #else
 
-/// \file assert.hpp
-
 #include <hpx/config/branch_hints.hpp>
+#include <hpx/config/compiler_specific.hpp>
 
-//--------------------------------------------------------------------------------------//
-//                                     HPX_ASSERT                                       //
-//--------------------------------------------------------------------------------------//
+//-------------------------------------------------------------------------- //
+//                                     HPX_ASSERT                            //
+//-------------------------------------------------------------------------- //
 
 #undef HPX_ASSERT
 
-#if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS)
+#if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
 
+#if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 40500) || \
+     defined(HPX_CLANG_VERSION) || \
+    (defined(HPX_INTEL_VERSION) && !defined(BOOST_INTEL_LINUX))
+# define HPX_ASSERT(expr) ((expr) ? (void)0 : __builtin_unreachable())
+#elif defined(_MSC_VER)
+# define HPX_ASSERT(expr) __assume(!!(expr))
+#else
 # define HPX_ASSERT(expr) ((void)0)
+#endif
 
 #elif defined(HPX_ENABLE_ASSERT_HANDLER) || defined(BOOST_ENABLE_ASSERT_HANDLER)
 
@@ -35,8 +42,8 @@
 
 namespace hpx
 {
-  HPX_EXPORT void assertion_failed(char const * expr,
-                        char const * function, char const * file, long line); // user defined
+    HPX_EXPORT void assertion_failed(char const * expr,
+        char const * function, char const * file, long line);  // user defined
 } // namespace hpx
 
 #define HPX_ASSERT(expr) (HPX_LIKELY(!!(expr)) \
@@ -48,81 +55,86 @@ namespace hpx
 # define HPX_ASSERT(expr) assert(expr)
 #endif
 
-//--------------------------------------------------------------------------------------//
-//                                   HPX_ASSERT_MSG                                     //
-//--------------------------------------------------------------------------------------//
+//-------------------------------------------------------------------------- //
+//                                   HPX_ASSERT_MSG                          //
+//-------------------------------------------------------------------------- //
 
 # undef HPX_ASSERT_MSG
 
 #if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
 
-  #define HPX_ASSERT_MSG(expr, msg) ((void)0)
+#if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 40500) || \
+     defined(HPX_CLANG_VERSION) || \
+    (defined(HPX_INTEL_VERSION) && !defined(BOOST_INTEL_LINUX))
+# define HPX_ASSERT_MSG(expr, msg) ((expr) ? (void)0 : __builtin_unreachable())
+#elif defined(_MSC_VER)
+# define HPX_ASSERT_MSG(expr, msg) __assume(!!(expr))
+#else
+# define HPX_ASSERT_MSG(expr, msg) ((void)0)
+#endif
 
 #elif defined(HPX_ENABLE_ASSERT_HANDLER) || defined(BOOST_ENABLE_ASSERT_HANDLER)
 
-  #include <hpx/config.hpp>
-  #include <boost/current_function.hpp>
+#include <hpx/config.hpp>
+#include <boost/current_function.hpp>
 
-  namespace hpx
-  {
+namespace hpx
+{
     HPX_EXPORT void assertion_failed_msg(char const * expr, char const * msg,
-                              char const * function, char const * file, long line); // user defined
-  } // namespace hpx
+           char const * function, char const * file, long line); // user defined
+} // namespace hpx
 
-  #define HPX_ASSERT_MSG(expr, msg) (HPX_LIKELY(!!(expr)) \
+#define HPX_ASSERT_MSG(expr, msg) (HPX_LIKELY(!!(expr)) \
     ? ((void)0) \
     : ::hpx::assertion_failed_msg(#expr, msg, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__))
 
 #else
-  #ifndef HPX_ASSERT_HPP
-    #define HPX_ASSERT_HPP
-    #include <cstdlib>
-    #include <iostream>
-    #include <hpx/config.hpp>
-    #include <boost/current_function.hpp>
 
-    //  IDE's like Visual Studio perform better if output goes to std::cout or
-    //  some other stream, so allow user to configure output stream:
-    #ifndef HPX_ASSERT_MSG_OSTREAM
-    # define HPX_ASSERT_MSG_OSTREAM std::cerr
-    #endif
+#ifndef HPX_ASSERT_HPP
+#define HPX_ASSERT_HPP
 
-    namespace hpx
-    {
-      namespace assertion
-      {
-        namespace detail
-        {
-          // Note: The template is needed to make the function non-inline and avoid linking errors
-          template< typename CharT >
-          BOOST_NOINLINE void assertion_failed_msg(CharT const * expr, char const * msg, char const * function,
-            char const * file, long line)
-          {
-            HPX_ASSERT_MSG_OSTREAM
-              << "***** Internal Program Error - assertion (" << expr << ") failed in "
-              << function << ":\n"
-              << file << '(' << line << "): " << msg << std::endl;
-#ifdef UNDER_CE
-            // The Windows CE CRT library does not have abort() so use exit(-1) instead.
-            std::exit(-1);
-#else
-            std::abort();
+#include <cstdlib>
+#include <iostream>
+#include <hpx/config.hpp>
+#include <boost/current_function.hpp>
+
+//  IDE's like Visual Studio perform better if output goes to std::cout or
+//  some other stream, so allow user to configure output stream:
+#ifndef HPX_ASSERT_MSG_OSTREAM
+# define HPX_ASSERT_MSG_OSTREAM std::cerr
 #endif
-          }
-        } // detail
-      } // assertion
-    } // detail
-  #endif
 
-  #define HPX_ASSERT_MSG(expr, msg) (HPX_LIKELY(!!(expr)) \
+namespace hpx { namespace assertion { namespace detail
+{
+    // Note: The template is needed to make the function non-inline and avoid linking errors
+    template< typename CharT >
+    BOOST_NOINLINE void assertion_failed_msg(CharT const * expr,
+        char const * msg, char const * function, char const * file, long line)
+    {
+        HPX_ASSERT_MSG_OSTREAM
+            << "***** Internal Program Error - assertion (" << expr
+            << ") failed in " << function << ":\n"
+            << file << '(' << line << "): " << msg << std::endl;
+#ifdef UNDER_CE
+        // The Windows CE CRT library does not have abort() so use exit(-1) instead.
+        std::exit(-1);
+#else
+        std::abort();
+#endif
+    }
+}}}
+
+#endif
+
+#define HPX_ASSERT_MSG(expr, msg) (HPX_LIKELY(!!(expr)) \
     ? ((void)0) \
     : ::hpx::assertion::detail::assertion_failed_msg(#expr, msg, \
           BOOST_CURRENT_FUNCTION, __FILE__, __LINE__))
 #endif
 
-//--------------------------------------------------------------------------------------//
-//                                     HPX_VERIFY                                       //
-//--------------------------------------------------------------------------------------//
+//---------------------------------------------------------------------------//
+//                                     HPX_VERIFY                            //
+//---------------------------------------------------------------------------//
 
 #undef HPX_VERIFY
 

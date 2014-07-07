@@ -68,4 +68,24 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     {
         return get_thread_count() - get_thread_count(terminated);
     }
+
+    // Return the requested policy element
+    std::size_t default_executor::get_policy_element(
+        threads::detail::executor_parameter p, error_code& ec) const
+    {
+        switch(p) {
+        case threads::detail::min_concurrency:
+        case threads::detail::max_concurrency:
+        case threads::detail::current_concurrency:
+            return hpx::get_os_thread_count();
+
+        default:
+            break;
+        }
+
+        HPX_THROWS_IF(ec, bad_parameter,
+            "thread_pool_executor::get_policy_element",
+            "requested value of invalid policy element");
+        return std::size_t(-1);
+    }
 }}}}

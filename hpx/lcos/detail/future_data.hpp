@@ -518,7 +518,8 @@ namespace detail
         {}
 
         task_base(threads::executor& sched)
-          : started_(false), id_(threads::invalid_thread_id), sched_(&sched)
+          : started_(false), id_(threads::invalid_thread_id),
+            sched_(sched ? &sched : 0)
         {}
 
         // retrieving the value

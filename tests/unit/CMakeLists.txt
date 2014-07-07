@@ -21,6 +21,10 @@ if(NOT HPX_HAVE_SECURITY AND SODIUM_FOUND)
     set(subdirs ${subdirs} security)
 endif()
 
+if(HPX_HAVE_CXX11_LAMBDAS)
+    set(subdirs ${subdirs} parallel)
+endif()
+
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(tests.unit.${subdir})
   add_subdirectory(${subdir})

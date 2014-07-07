@@ -106,7 +106,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
     }
 
     template <typename F, typename Args>
-    struct when_ready
+    struct when_ready //-V690
       : lcos::detail::future_data<
             typename util::invoke_fused_result_of<F&(Args)>::type
         >
@@ -163,9 +163,6 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         BOOST_FORCEINLINE
         void invoke(boost::mpl::true_)
         {
-            typedef typename util::invoke_fused_result_of<
-                typename util::decay<F>::type(Args)
-            >::type value_type;
             try
             {
                 util::invoke_fused(f_, std::forward<Args>(args_));
@@ -194,14 +191,14 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             // if all of the requested futures are already set, our
             // callback above has already been called often enough, otherwise
             // we suspend ourselves
-            if (count_.load(boost::memory_order_acquire) < needed_count_)
+            if (count_.load(boost::memory_order_seq_cst) < needed_count_)
             {
                 // wait for any of the futures to return to become ready
                 this_thread::suspend(threads::suspended);
             }
 
             // all futures should be ready
-            HPX_ASSERT(count_.load(boost::memory_order_acquire) >= needed_count_);
+            HPX_ASSERT(count_.load(boost::memory_order_seq_cst) >= needed_count_);
 
             invoke();
         }
@@ -272,7 +269,6 @@ namespace hpx { namespace lcos { namespace local { namespace detail
          >::result_type>
     >::type invoke_fused_when_ready(F&& f, Args&& args)
     {
-        typedef typename util::decay<Args>::type arguments_type;
         typedef when_ready<
             typename util::decay<F>::type
           , typename util::tuple_decay<typename util::decay<Args>::type>::type

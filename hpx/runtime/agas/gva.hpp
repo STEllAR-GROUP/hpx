@@ -87,16 +87,6 @@ struct gva
         return *this;
     }
 
-    gva& operator=(gva const& other)
-    {
-        endpoint = other.endpoint;
-        type = other.type;
-        count = other.count;
-        lva_ = other.lva_;
-        offset = other.offset;
-        return *this;
-    }
-
     bool operator==(gva const& rhs) const
     {
         return type     == rhs.type

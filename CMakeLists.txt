@@ -767,9 +767,12 @@ if(MSVC)
 
   # VS2013 and above know how to do link time constant data segment folding
   # VS2013 update 2 and above know how to remove debug information for
-  # non-referenced functions and data (-Zc:inline)
+  #     non-referenced functions and data (-Zc:inline)
+  # VS2013 update 3 and above know how to generate better debug symbols for
+  #     optimized builds (-Z0)
   if(MSVC12)
     hpx_add_compile_flag(-Zc:inline)
+    hpx_add_compile_flag(-Z0 RelWithDebInfo)
     hpx_add_compile_flag(-Gw
       CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
   endif()
@@ -795,6 +798,7 @@ if(MSVC)
   hpx_add_config_define(_SCL_SECURE_NO_DEPRECATE)
   hpx_add_config_define(_CRT_SECURE_NO_DEPRECATE)
   hpx_add_config_define(_CRT_NONSTDC_NO_WARNINGS)
+  hpx_add_config_define(_WINSOCK_DEPRECATED_NO_WARNINGS)
 
   ##############################################################################
   # Boost
@@ -1198,6 +1202,7 @@ endif()
 ################################################################################
 list(SORT HPX_CONFIG_DEFINITIONS)
 list(REMOVE_DUPLICATES HPX_CONFIG_DEFINITIONS)
+
 set(hpx_config_defines "\n")
 foreach(def ${HPX_CONFIG_DEFINITIONS})
     if("${def}" STREQUAL "HPX_PREFIX" AND NOT MSVC)
