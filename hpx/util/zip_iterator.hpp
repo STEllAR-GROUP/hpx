@@ -20,6 +20,7 @@
 #include <boost/preprocessor/repetition/enum.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
+#include <boost/utility/enable_if.hpp>
 
 #include <iterator>
 
@@ -49,9 +50,9 @@ namespace hpx { namespace util
             typename zip_iterator_value_impl<BOOST_PP_CAT(T, N)>::type        \
         /**/
         template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-        struct zip_iterator_value<hpx::util::tuple<BOOST_PP_ENUM_PARAMS(N, T)> >
+        struct zip_iterator_value<tuple<BOOST_PP_ENUM_PARAMS(N, T)> >
         {
-            typedef hpx::util::tuple<
+            typedef tuple<
                 BOOST_PP_ENUM(N, HPX_PARALLEL_UTIL_ZIP_ITERATOR_VALUE, _)
             > type;
         };
@@ -77,9 +78,9 @@ namespace hpx { namespace util
             typename zip_iterator_reference_impl<BOOST_PP_CAT(T, N)>::type    \
         /**/
         template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-        struct zip_iterator_reference<hpx::util::tuple<BOOST_PP_ENUM_PARAMS(N, T)> >
+        struct zip_iterator_reference<tuple<BOOST_PP_ENUM_PARAMS(N, T)> >
         {
-            typedef hpx::util::tuple<
+            typedef tuple<
                 BOOST_PP_ENUM(N, HPX_PARALLEL_UTIL_ZIP_ITERATOR_REFERENCE, _)
             > type;
         };
@@ -88,16 +89,14 @@ namespace hpx { namespace util
         ///////////////////////////////////////////////////////////////////////
         template <typename T, typename U>
         struct zip_iterator_category_impl
-        {
-            typedef std::input_iterator_tag type;
-        };
+        {};
 
         template <>
         struct zip_iterator_category_impl<
             std::random_access_iterator_tag,
             std::random_access_iterator_tag>
         {
-            typedef std::random_access_iterator_tag iterator_category;
+            typedef std::random_access_iterator_tag type;
         };
 
         template <>
@@ -105,7 +104,7 @@ namespace hpx { namespace util
             std::random_access_iterator_tag,
             std::bidirectional_iterator_tag>
         {
-            typedef std::bidirectional_iterator_tag iterator_category;
+            typedef std::bidirectional_iterator_tag type;
         };
 
         template <>
@@ -113,7 +112,7 @@ namespace hpx { namespace util
             std::bidirectional_iterator_tag,
             std::random_access_iterator_tag>
         {
-            typedef std::bidirectional_iterator_tag iterator_category;
+            typedef std::bidirectional_iterator_tag type;
         };
 
         template <>
@@ -121,7 +120,7 @@ namespace hpx { namespace util
             std::random_access_iterator_tag,
             std::forward_iterator_tag>
         {
-            typedef std::forward_iterator_tag iterator_category;
+            typedef std::forward_iterator_tag type;
         };
 
         template <>
@@ -129,7 +128,7 @@ namespace hpx { namespace util
             std::forward_iterator_tag,
             std::random_access_iterator_tag>
         {
-            typedef std::forward_iterator_tag iterator_category;
+            typedef std::forward_iterator_tag type;
         };
 
         template <>
@@ -137,7 +136,7 @@ namespace hpx { namespace util
             std::bidirectional_iterator_tag,
             std::bidirectional_iterator_tag>
         {
-            typedef std::bidirectional_iterator_tag iterator_category;
+            typedef std::bidirectional_iterator_tag type;
         };
 
         template <>
@@ -145,7 +144,7 @@ namespace hpx { namespace util
             std::bidirectional_iterator_tag,
             std::forward_iterator_tag>
         {
-            typedef std::forward_iterator_tag iterator_category;
+            typedef std::forward_iterator_tag type;
         };
 
         template <>
@@ -153,7 +152,7 @@ namespace hpx { namespace util
             std::forward_iterator_tag,
             std::bidirectional_iterator_tag>
         {
-            typedef std::forward_iterator_tag iterator_category;
+            typedef std::forward_iterator_tag type;
         };
 
         template <>
@@ -161,17 +160,34 @@ namespace hpx { namespace util
             std::forward_iterator_tag,
             std::forward_iterator_tag>
         {
-            typedef std::forward_iterator_tag iterator_category;
+            typedef std::forward_iterator_tag type;
         };
 
-        template <typename IteratorTuple>
+        template <typename IteratorTuple, typename Enable = void>
         struct zip_iterator_category;
 
         template <typename T>
-        struct zip_iterator_category<hpx::util::tuple<T> >
+        struct zip_iterator_category<
+            tuple<T>
+          , typename boost::enable_if_c<
+                tuple_size<tuple<T> >::value == 1
+            >::type
+        >
         {
             typedef typename std::iterator_traits<T>::iterator_category type;
         };
+
+        template <typename T, typename U>
+        struct zip_iterator_category<
+            tuple<T, U>
+          , typename boost::enable_if_c<
+                tuple_size<tuple<T, U> >::value == 2
+            >::type
+        > : zip_iterator_category_impl<
+                typename std::iterator_traits<T>::iterator_category
+              , typename std::iterator_traits<U>::iterator_category
+            >
+        {};
 
 #       define HPX_PARALLEL_UTIL_ZIP_ITERATOR_CATEGORY(Z, N, D)               \
             typename zip_iterator_reference_impl<BOOST_PP_CAT(T, N)>::type    \
@@ -179,15 +195,20 @@ namespace hpx { namespace util
         template <typename T, typename U,
             BOOST_PP_ENUM_PARAMS(BOOST_PP_SUB(N, 2), typename T)>
         struct zip_iterator_category<
-            hpx::util::tuple<T, U, BOOST_PP_ENUM_PARAMS(BOOST_PP_SUB(N, 2), T)>
+            tuple<T, U, BOOST_PP_ENUM_PARAMS(BOOST_PP_SUB(N, 2), T)>
+          , typename boost::enable_if_c<
+                (tuple_size<tuple<
+                    T, U, BOOST_PP_ENUM_PARAMS(BOOST_PP_SUB(N, 2), T)
+                > >::value > 2)
+            >::type
         > : zip_iterator_category_impl<
-                zip_iterator_category_impl<
+                typename zip_iterator_category_impl<
                     typename std::iterator_traits<T>::iterator_category
                   , typename std::iterator_traits<U>::iterator_category
-                >
-              , zip_iterator_category<hpx::util::tuple<
+                >::type
+              , typename zip_iterator_category<tuple<
                     BOOST_PP_ENUM_PARAMS(BOOST_PP_SUB(N, 2), T)
-                > >
+                > >::type
             >
         {};
 #       undef HPX_PARALLEL_UTIL_ZIP_ITERATOR_CATEGORY
@@ -298,8 +319,7 @@ namespace hpx { namespace util
 
             std::size_t distance_to(zip_iterator_base const& other) const
             {
-                return hpx::util::get<0>(other.iterators_)
-                  - hpx::util::get<0>(iterators_);
+                return util::get<0>(other.iterators_) - util::get<0>(iterators_);
             }
 
         private:
@@ -351,21 +371,21 @@ namespace hpx { namespace util
     namespace detail
     {
         template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-        struct dereference_iterator<hpx::util::tuple<
+        struct dereference_iterator<tuple<
             BOOST_PP_ENUM_PARAMS(N, T)
         > >
         {
-            typedef typename zip_iterator_reference<hpx::util::tuple<
+            typedef typename zip_iterator_reference<tuple<
                 BOOST_PP_ENUM_PARAMS(N, T)
             > >::type result_type;
 
 #           define HPX_PARALLEL_UTIL_ZIP_ITERATOR_GET(Z, N, D)                \
-            *hpx::util::get<N>(iterators)                                     \
+            *util::get<N>(iterators)                                          \
             /**/
             static result_type call(
-                hpx::util::tuple<BOOST_PP_ENUM_PARAMS(N, T)> const& iterators)
+                tuple<BOOST_PP_ENUM_PARAMS(N, T)> const& iterators)
             {
-                return hpx::util::forward_as_tuple(
+                return util::forward_as_tuple(
                     BOOST_PP_ENUM(N, HPX_PARALLEL_UTIL_ZIP_ITERATOR_GET, _));
             }
 #           undef HPX_PARALLEL_UTIL_ZIP_ITERATOR_GET
@@ -378,11 +398,11 @@ namespace hpx { namespace util
 #   else
     class zip_iterator
 #   endif
-      : public detail::zip_iterator_base<hpx::util::tuple<
+      : public detail::zip_iterator_base<tuple<
             BOOST_PP_ENUM_PARAMS(N, T)
         > >
     {
-        typedef detail::zip_iterator_base<hpx::util::tuple<
+        typedef detail::zip_iterator_base<tuple<
             BOOST_PP_ENUM_PARAMS(N, T)
         > > base_type;
 
@@ -394,13 +414,13 @@ namespace hpx { namespace util
         /**/
         explicit zip_iterator(
             BOOST_PP_ENUM(N, HPX_PARALLEL_UTIL_ZIP_ITERATOR_CONST_LVREF_PARAM, _)
-        ) : base_type(hpx::util::tie(BOOST_PP_ENUM_PARAMS(N, v)))
+        ) : base_type(util::tie(BOOST_PP_ENUM_PARAMS(N, v)))
         {}
 #       undef HPX_PARALLEL_UTIL_ZIP_ITERATOR_CONST_LVREF_PARAM
     };
 
 #   define HPX_PARALLEL_UTIL_ZIP_ITERATOR_DECAY_ELEM(Z, N, D)                 \
-    typename hpx::util::decay<BOOST_PP_CAT(T, N)>::type                       \
+    typename decay<BOOST_PP_CAT(T, N)>::type                                  \
     /**/
     template <BOOST_PP_ENUM_PARAMS(N, typename T)>
     zip_iterator<BOOST_PP_ENUM(N, HPX_PARALLEL_UTIL_ZIP_ITERATOR_DECAY_ELEM, _)>
