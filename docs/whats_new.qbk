@@ -24,10 +24,25 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1180] - `hpx::cout` defect
+* [issue 1179] - `hpx::async` does not work for member function pointers when called
+                 on types with self-defined unary `operator*`
+* [issue 1178] - Implemented variadic `hpx::util::zip_iterator`
+* [issue 1177] - MPI parcelport defect
+* [issue 1176] - `HPX_DEFINE_COMPONENT_CONST_ACTION_TPL` does not have a
+                 2-argument version
+* [issue 1175] - Create util::zip_iterator working with util::tuple<>
+* [issue 1174] - Error Building HPX on linux, root_certificate_authority.cpp
+* [issue 1172] - HPX build error with Clang 3.4.2
+* [issue 1171] - `CMAKE_INSTALL_PREFIX` ignored
+* [issue 1170] - Close hpx_benchmarks repository on Github
+* [issue 1169] - Buildbot emails have syntax error in url
+* [issue 1167] - Merge partial implementation of standards proposal N3960
 * [issue 1166] - Fixed several compiler warnings
+* [issue 1165] - cmake warns: "tests.regressions.actions" does not exist
 * [issue 1164] - Want my own serialization of hpx::future
 * [issue 1162] - Segfault in hello_world example
-* [issue 1161] - Use HPX_ASSERT to aid the compiler
+* [issue 1161] - Use `HPX_ASSERT` to aid the compiler
 * [issue 1159] - Support Clang 3.4.2
 * [issue 1158] - Fixed #1157: Rename when_n/wait_n, add when_xxx_n/wait_xxx_n
 * [issue 1157] - Rename when_n/wait_n, add when_xxx_n/wait_xxx_n
