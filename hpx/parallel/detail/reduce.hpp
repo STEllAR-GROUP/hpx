@@ -83,12 +83,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::forward<T>(init), std::forward<Pred>(op));
         }
 
-        template<typename InIter, typename T, typename Pred>
+        template <typename InIter, typename T, typename Pred>
         T reduce(execution_policy const& policy, InIter first, InIter last,
-            T init, Pred && op, boost::mpl::true_ t)
+            T init, Pred && op, boost::mpl::true_)
         {
             return detail::reduce(sequential_execution_policy(),
-                first, last, std::forward<T>(init), std::forward<Pred>(op), t);
+                first, last, std::forward<T>(init), std::forward<Pred>(op),
+                boost::mpl::true_());
         }
         /// \endcond
     }
