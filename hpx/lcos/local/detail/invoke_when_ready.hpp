@@ -191,14 +191,14 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             // if all of the requested futures are already set, our
             // callback above has already been called often enough, otherwise
             // we suspend ourselves
-            if (count_.load(boost::memory_order_acquire) < needed_count_)
+            if (count_.load(boost::memory_order_seq_cst) < needed_count_)
             {
                 // wait for any of the futures to return to become ready
                 this_thread::suspend(threads::suspended);
             }
 
             // all futures should be ready
-            HPX_ASSERT(count_.load(boost::memory_order_acquire) >= needed_count_);
+            HPX_ASSERT(count_.load(boost::memory_order_seq_cst) >= needed_count_);
 
             invoke();
         }
@@ -274,11 +274,13 @@ namespace hpx { namespace lcos { namespace local { namespace detail
           , typename util::tuple_decay<typename util::decay<Args>::type>::type
         > invoker_type;
 
+        // launch a new thread with high priority which performs the 'waiting'
         boost::intrusive_ptr<invoker_type> p(new invoker_type(
             std::forward<F>(f), std::forward<Args>(args)));
         threads::register_thread_nullary(
             util::deferred_call(&invoker_type::apply, p)
-          , "hpx::lcos::local::detail::invoke_when_ready");
+          , "hpx::lcos::local::detail::invoke_when_ready",
+          threads::pending, true, threads::thread_priority_critical);
 
         using traits::future_access;
         return future_access<typename invoker_type::type>::create(std::move(p));

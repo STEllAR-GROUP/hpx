@@ -50,7 +50,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         swap_ranges(ExPolicy const& policy, ForwardIter1 first1, ForwardIter1 last1,
             ForwardIter2 first2, boost::mpl::false_ f)
         {
-            typedef util::zip_iterator<ForwardIter1, ForwardIter2> zip_iterator;
+            typedef hpx::util::zip_iterator<ForwardIter1, ForwardIter2> zip_iterator;
             typedef typename zip_iterator::reference reference;
             typedef
                 typename detail::algorithm_result<ExPolicy, ForwardIter2>::type
@@ -58,7 +58,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             return get_iter<1, result_type>(
                 plain_for_each_n(policy,
-                    util::make_zip_iterator(first1, first2),
+                    hpx::util::make_zip_iterator(first1, first2),
                     std::distance(first1, last1),
                     [](reference t) {
                         std::swap(hpx::util::get<0>(t), hpx::util::get<1>(t));

@@ -58,7 +58,7 @@ namespace hpx { namespace lcos
             template <typename SharedState>
             void operator()(SharedState& shared_state) const
             {
-                std::size_t counter = wait_.count_.load(boost::memory_order_acquire);
+                std::size_t counter = wait_.count_.load(boost::memory_order_seq_cst);
                 if (counter < wait_.needed_count_ && !shared_state->is_ready()) {
                     // handle future only if not enough futures are ready yet
                     // also, do not touch any futures which are already ready
@@ -137,7 +137,7 @@ namespace hpx { namespace lcos
                 // if all of the requested futures are already set, our
                 // callback above has already been called often enough, otherwise
                 // we suspend ourselves
-                if (count_.load(boost::memory_order_acquire) < needed_count_)
+                if (count_.load(boost::memory_order_seq_cst) < needed_count_)
                 {
                     // wait for any of the futures to return to become ready
                     this_thread::suspend(threads::suspended,
@@ -145,7 +145,7 @@ namespace hpx { namespace lcos
                 }
 
                 // at least N futures should be ready
-                HPX_ASSERT(count_.load() >= needed_count_);
+                HPX_ASSERT(count_.load(boost::memory_order_seq_cst) >= needed_count_);
             }
 
             argument_type lazy_values_;

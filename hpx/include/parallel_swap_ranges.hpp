@@ -9,6 +9,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 
+#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/detail/dispatch.hpp>
 

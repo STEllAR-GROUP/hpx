@@ -9,7 +9,7 @@
 
 
         
-namespace hpx { namespace parallel { namespace util
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -54,8 +54,8 @@ namespace hpx { namespace parallel { namespace util
         > result_type;
         return result_type(std::forward<T0>( v0 ));
     }
-}}}
-namespace hpx { namespace parallel { namespace util
+}}
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -100,8 +100,8 @@ namespace hpx { namespace parallel { namespace util
         > result_type;
         return result_type(std::forward<T0>( v0 ) , std::forward<T1>( v1 ));
     }
-}}}
-namespace hpx { namespace parallel { namespace util
+}}
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -146,8 +146,8 @@ namespace hpx { namespace parallel { namespace util
         > result_type;
         return result_type(std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ));
     }
-}}}
-namespace hpx { namespace parallel { namespace util
+}}
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -192,8 +192,8 @@ namespace hpx { namespace parallel { namespace util
         > result_type;
         return result_type(std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ));
     }
-}}}
-namespace hpx { namespace parallel { namespace util
+}}
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -238,8 +238,8 @@ namespace hpx { namespace parallel { namespace util
         > result_type;
         return result_type(std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ));
     }
-}}}
-namespace hpx { namespace parallel { namespace util
+}}
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -284,8 +284,8 @@ namespace hpx { namespace parallel { namespace util
         > result_type;
         return result_type(std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ));
     }
-}}}
-namespace hpx { namespace parallel { namespace util
+}}
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -330,8 +330,8 @@ namespace hpx { namespace parallel { namespace util
         > result_type;
         return result_type(std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ));
     }
-}}}
-namespace hpx { namespace parallel { namespace util
+}}
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -376,8 +376,8 @@ namespace hpx { namespace parallel { namespace util
         > result_type;
         return result_type(std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ));
     }
-}}}
-namespace hpx { namespace parallel { namespace util
+}}
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -422,8 +422,8 @@ namespace hpx { namespace parallel { namespace util
         > result_type;
         return result_type(std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ));
     }
-}}}
-namespace hpx { namespace parallel { namespace util
+}}
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -468,8 +468,8 @@ namespace hpx { namespace parallel { namespace util
         > result_type;
         return result_type(std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ) , std::forward<T9>( v9 ));
     }
-}}}
-namespace hpx { namespace parallel { namespace util
+}}
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -514,8 +514,8 @@ namespace hpx { namespace parallel { namespace util
         > result_type;
         return result_type(std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ) , std::forward<T9>( v9 ) , std::forward<T10>( v10 ));
     }
-}}}
-namespace hpx { namespace parallel { namespace util
+}}
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -560,8 +560,8 @@ namespace hpx { namespace parallel { namespace util
         > result_type;
         return result_type(std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ) , std::forward<T9>( v9 ) , std::forward<T10>( v10 ) , std::forward<T11>( v11 ));
     }
-}}}
-namespace hpx { namespace parallel { namespace util
+}}
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -582,7 +582,7 @@ namespace hpx { namespace parallel { namespace util
         };
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12>
-    class zip_iterator
+    class zip_iterator<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12>
       : public detail::zip_iterator_base<hpx::util::tuple<
             T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12
         > >
@@ -606,4 +606,234 @@ namespace hpx { namespace parallel { namespace util
         > result_type;
         return result_type(std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ) , std::forward<T9>( v9 ) , std::forward<T10>( v10 ) , std::forward<T11>( v11 ) , std::forward<T12>( v12 ));
     }
-}}}
+}}
+namespace hpx { namespace util
+{
+    namespace detail
+    {
+        template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13>
+        struct dereference_iterator<hpx::util::tuple<
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13
+        > >
+        {
+            typedef typename zip_iterator_reference<hpx::util::tuple<
+                T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13
+            > >::type result_type;
+            static result_type call(
+                hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13> const& iterators)
+            {
+                return hpx::util::forward_as_tuple(
+                    *hpx::util::get< 0>(iterators) , *hpx::util::get< 1>(iterators) , *hpx::util::get< 2>(iterators) , *hpx::util::get< 3>(iterators) , *hpx::util::get< 4>(iterators) , *hpx::util::get< 5>(iterators) , *hpx::util::get< 6>(iterators) , *hpx::util::get< 7>(iterators) , *hpx::util::get< 8>(iterators) , *hpx::util::get< 9>(iterators) , *hpx::util::get< 10>(iterators) , *hpx::util::get< 11>(iterators) , *hpx::util::get< 12>(iterators) , *hpx::util::get< 13>(iterators));
+            }
+        };
+    }
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13>
+    class zip_iterator<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13>
+      : public detail::zip_iterator_base<hpx::util::tuple<
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13
+        > >
+    {
+        typedef detail::zip_iterator_base<hpx::util::tuple<
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13
+        > > base_type;
+    public:
+        zip_iterator() : base_type() {}
+        explicit zip_iterator(
+            T0 const& v0 , T1 const& v1 , T2 const& v2 , T3 const& v3 , T4 const& v4 , T5 const& v5 , T6 const& v6 , T7 const& v7 , T8 const& v8 , T9 const& v9 , T10 const& v10 , T11 const& v11 , T12 const& v12 , T13 const& v13
+        ) : base_type(hpx::util::tie(v0 , v1 , v2 , v3 , v4 , v5 , v6 , v7 , v8 , v9 , v10 , v11 , v12 , v13))
+        {}
+    };
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13>
+    zip_iterator<typename hpx::util::decay<T0>::type , typename hpx::util::decay<T1>::type , typename hpx::util::decay<T2>::type , typename hpx::util::decay<T3>::type , typename hpx::util::decay<T4>::type , typename hpx::util::decay<T5>::type , typename hpx::util::decay<T6>::type , typename hpx::util::decay<T7>::type , typename hpx::util::decay<T8>::type , typename hpx::util::decay<T9>::type , typename hpx::util::decay<T10>::type , typename hpx::util::decay<T11>::type , typename hpx::util::decay<T12>::type , typename hpx::util::decay<T13>::type>
+    make_zip_iterator(T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6 , T7 && v7 , T8 && v8 , T9 && v9 , T10 && v10 , T11 && v11 , T12 && v12 , T13 && v13)
+    {
+        typedef zip_iterator<
+            typename hpx::util::decay<T0>::type , typename hpx::util::decay<T1>::type , typename hpx::util::decay<T2>::type , typename hpx::util::decay<T3>::type , typename hpx::util::decay<T4>::type , typename hpx::util::decay<T5>::type , typename hpx::util::decay<T6>::type , typename hpx::util::decay<T7>::type , typename hpx::util::decay<T8>::type , typename hpx::util::decay<T9>::type , typename hpx::util::decay<T10>::type , typename hpx::util::decay<T11>::type , typename hpx::util::decay<T12>::type , typename hpx::util::decay<T13>::type
+        > result_type;
+        return result_type(std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ) , std::forward<T9>( v9 ) , std::forward<T10>( v10 ) , std::forward<T11>( v11 ) , std::forward<T12>( v12 ) , std::forward<T13>( v13 ));
+    }
+}}
+namespace hpx { namespace util
+{
+    namespace detail
+    {
+        template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14>
+        struct dereference_iterator<hpx::util::tuple<
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14
+        > >
+        {
+            typedef typename zip_iterator_reference<hpx::util::tuple<
+                T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14
+            > >::type result_type;
+            static result_type call(
+                hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14> const& iterators)
+            {
+                return hpx::util::forward_as_tuple(
+                    *hpx::util::get< 0>(iterators) , *hpx::util::get< 1>(iterators) , *hpx::util::get< 2>(iterators) , *hpx::util::get< 3>(iterators) , *hpx::util::get< 4>(iterators) , *hpx::util::get< 5>(iterators) , *hpx::util::get< 6>(iterators) , *hpx::util::get< 7>(iterators) , *hpx::util::get< 8>(iterators) , *hpx::util::get< 9>(iterators) , *hpx::util::get< 10>(iterators) , *hpx::util::get< 11>(iterators) , *hpx::util::get< 12>(iterators) , *hpx::util::get< 13>(iterators) , *hpx::util::get< 14>(iterators));
+            }
+        };
+    }
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14>
+    class zip_iterator<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14>
+      : public detail::zip_iterator_base<hpx::util::tuple<
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14
+        > >
+    {
+        typedef detail::zip_iterator_base<hpx::util::tuple<
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14
+        > > base_type;
+    public:
+        zip_iterator() : base_type() {}
+        explicit zip_iterator(
+            T0 const& v0 , T1 const& v1 , T2 const& v2 , T3 const& v3 , T4 const& v4 , T5 const& v5 , T6 const& v6 , T7 const& v7 , T8 const& v8 , T9 const& v9 , T10 const& v10 , T11 const& v11 , T12 const& v12 , T13 const& v13 , T14 const& v14
+        ) : base_type(hpx::util::tie(v0 , v1 , v2 , v3 , v4 , v5 , v6 , v7 , v8 , v9 , v10 , v11 , v12 , v13 , v14))
+        {}
+    };
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14>
+    zip_iterator<typename hpx::util::decay<T0>::type , typename hpx::util::decay<T1>::type , typename hpx::util::decay<T2>::type , typename hpx::util::decay<T3>::type , typename hpx::util::decay<T4>::type , typename hpx::util::decay<T5>::type , typename hpx::util::decay<T6>::type , typename hpx::util::decay<T7>::type , typename hpx::util::decay<T8>::type , typename hpx::util::decay<T9>::type , typename hpx::util::decay<T10>::type , typename hpx::util::decay<T11>::type , typename hpx::util::decay<T12>::type , typename hpx::util::decay<T13>::type , typename hpx::util::decay<T14>::type>
+    make_zip_iterator(T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6 , T7 && v7 , T8 && v8 , T9 && v9 , T10 && v10 , T11 && v11 , T12 && v12 , T13 && v13 , T14 && v14)
+    {
+        typedef zip_iterator<
+            typename hpx::util::decay<T0>::type , typename hpx::util::decay<T1>::type , typename hpx::util::decay<T2>::type , typename hpx::util::decay<T3>::type , typename hpx::util::decay<T4>::type , typename hpx::util::decay<T5>::type , typename hpx::util::decay<T6>::type , typename hpx::util::decay<T7>::type , typename hpx::util::decay<T8>::type , typename hpx::util::decay<T9>::type , typename hpx::util::decay<T10>::type , typename hpx::util::decay<T11>::type , typename hpx::util::decay<T12>::type , typename hpx::util::decay<T13>::type , typename hpx::util::decay<T14>::type
+        > result_type;
+        return result_type(std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ) , std::forward<T9>( v9 ) , std::forward<T10>( v10 ) , std::forward<T11>( v11 ) , std::forward<T12>( v12 ) , std::forward<T13>( v13 ) , std::forward<T14>( v14 ));
+    }
+}}
+namespace hpx { namespace util
+{
+    namespace detail
+    {
+        template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15>
+        struct dereference_iterator<hpx::util::tuple<
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15
+        > >
+        {
+            typedef typename zip_iterator_reference<hpx::util::tuple<
+                T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15
+            > >::type result_type;
+            static result_type call(
+                hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15> const& iterators)
+            {
+                return hpx::util::forward_as_tuple(
+                    *hpx::util::get< 0>(iterators) , *hpx::util::get< 1>(iterators) , *hpx::util::get< 2>(iterators) , *hpx::util::get< 3>(iterators) , *hpx::util::get< 4>(iterators) , *hpx::util::get< 5>(iterators) , *hpx::util::get< 6>(iterators) , *hpx::util::get< 7>(iterators) , *hpx::util::get< 8>(iterators) , *hpx::util::get< 9>(iterators) , *hpx::util::get< 10>(iterators) , *hpx::util::get< 11>(iterators) , *hpx::util::get< 12>(iterators) , *hpx::util::get< 13>(iterators) , *hpx::util::get< 14>(iterators) , *hpx::util::get< 15>(iterators));
+            }
+        };
+    }
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15>
+    class zip_iterator<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15>
+      : public detail::zip_iterator_base<hpx::util::tuple<
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15
+        > >
+    {
+        typedef detail::zip_iterator_base<hpx::util::tuple<
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15
+        > > base_type;
+    public:
+        zip_iterator() : base_type() {}
+        explicit zip_iterator(
+            T0 const& v0 , T1 const& v1 , T2 const& v2 , T3 const& v3 , T4 const& v4 , T5 const& v5 , T6 const& v6 , T7 const& v7 , T8 const& v8 , T9 const& v9 , T10 const& v10 , T11 const& v11 , T12 const& v12 , T13 const& v13 , T14 const& v14 , T15 const& v15
+        ) : base_type(hpx::util::tie(v0 , v1 , v2 , v3 , v4 , v5 , v6 , v7 , v8 , v9 , v10 , v11 , v12 , v13 , v14 , v15))
+        {}
+    };
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15>
+    zip_iterator<typename hpx::util::decay<T0>::type , typename hpx::util::decay<T1>::type , typename hpx::util::decay<T2>::type , typename hpx::util::decay<T3>::type , typename hpx::util::decay<T4>::type , typename hpx::util::decay<T5>::type , typename hpx::util::decay<T6>::type , typename hpx::util::decay<T7>::type , typename hpx::util::decay<T8>::type , typename hpx::util::decay<T9>::type , typename hpx::util::decay<T10>::type , typename hpx::util::decay<T11>::type , typename hpx::util::decay<T12>::type , typename hpx::util::decay<T13>::type , typename hpx::util::decay<T14>::type , typename hpx::util::decay<T15>::type>
+    make_zip_iterator(T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6 , T7 && v7 , T8 && v8 , T9 && v9 , T10 && v10 , T11 && v11 , T12 && v12 , T13 && v13 , T14 && v14 , T15 && v15)
+    {
+        typedef zip_iterator<
+            typename hpx::util::decay<T0>::type , typename hpx::util::decay<T1>::type , typename hpx::util::decay<T2>::type , typename hpx::util::decay<T3>::type , typename hpx::util::decay<T4>::type , typename hpx::util::decay<T5>::type , typename hpx::util::decay<T6>::type , typename hpx::util::decay<T7>::type , typename hpx::util::decay<T8>::type , typename hpx::util::decay<T9>::type , typename hpx::util::decay<T10>::type , typename hpx::util::decay<T11>::type , typename hpx::util::decay<T12>::type , typename hpx::util::decay<T13>::type , typename hpx::util::decay<T14>::type , typename hpx::util::decay<T15>::type
+        > result_type;
+        return result_type(std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ) , std::forward<T9>( v9 ) , std::forward<T10>( v10 ) , std::forward<T11>( v11 ) , std::forward<T12>( v12 ) , std::forward<T13>( v13 ) , std::forward<T14>( v14 ) , std::forward<T15>( v15 ));
+    }
+}}
+namespace hpx { namespace util
+{
+    namespace detail
+    {
+        template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16>
+        struct dereference_iterator<hpx::util::tuple<
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16
+        > >
+        {
+            typedef typename zip_iterator_reference<hpx::util::tuple<
+                T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16
+            > >::type result_type;
+            static result_type call(
+                hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16> const& iterators)
+            {
+                return hpx::util::forward_as_tuple(
+                    *hpx::util::get< 0>(iterators) , *hpx::util::get< 1>(iterators) , *hpx::util::get< 2>(iterators) , *hpx::util::get< 3>(iterators) , *hpx::util::get< 4>(iterators) , *hpx::util::get< 5>(iterators) , *hpx::util::get< 6>(iterators) , *hpx::util::get< 7>(iterators) , *hpx::util::get< 8>(iterators) , *hpx::util::get< 9>(iterators) , *hpx::util::get< 10>(iterators) , *hpx::util::get< 11>(iterators) , *hpx::util::get< 12>(iterators) , *hpx::util::get< 13>(iterators) , *hpx::util::get< 14>(iterators) , *hpx::util::get< 15>(iterators) , *hpx::util::get< 16>(iterators));
+            }
+        };
+    }
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16>
+    class zip_iterator<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16>
+      : public detail::zip_iterator_base<hpx::util::tuple<
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16
+        > >
+    {
+        typedef detail::zip_iterator_base<hpx::util::tuple<
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16
+        > > base_type;
+    public:
+        zip_iterator() : base_type() {}
+        explicit zip_iterator(
+            T0 const& v0 , T1 const& v1 , T2 const& v2 , T3 const& v3 , T4 const& v4 , T5 const& v5 , T6 const& v6 , T7 const& v7 , T8 const& v8 , T9 const& v9 , T10 const& v10 , T11 const& v11 , T12 const& v12 , T13 const& v13 , T14 const& v14 , T15 const& v15 , T16 const& v16
+        ) : base_type(hpx::util::tie(v0 , v1 , v2 , v3 , v4 , v5 , v6 , v7 , v8 , v9 , v10 , v11 , v12 , v13 , v14 , v15 , v16))
+        {}
+    };
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16>
+    zip_iterator<typename hpx::util::decay<T0>::type , typename hpx::util::decay<T1>::type , typename hpx::util::decay<T2>::type , typename hpx::util::decay<T3>::type , typename hpx::util::decay<T4>::type , typename hpx::util::decay<T5>::type , typename hpx::util::decay<T6>::type , typename hpx::util::decay<T7>::type , typename hpx::util::decay<T8>::type , typename hpx::util::decay<T9>::type , typename hpx::util::decay<T10>::type , typename hpx::util::decay<T11>::type , typename hpx::util::decay<T12>::type , typename hpx::util::decay<T13>::type , typename hpx::util::decay<T14>::type , typename hpx::util::decay<T15>::type , typename hpx::util::decay<T16>::type>
+    make_zip_iterator(T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6 , T7 && v7 , T8 && v8 , T9 && v9 , T10 && v10 , T11 && v11 , T12 && v12 , T13 && v13 , T14 && v14 , T15 && v15 , T16 && v16)
+    {
+        typedef zip_iterator<
+            typename hpx::util::decay<T0>::type , typename hpx::util::decay<T1>::type , typename hpx::util::decay<T2>::type , typename hpx::util::decay<T3>::type , typename hpx::util::decay<T4>::type , typename hpx::util::decay<T5>::type , typename hpx::util::decay<T6>::type , typename hpx::util::decay<T7>::type , typename hpx::util::decay<T8>::type , typename hpx::util::decay<T9>::type , typename hpx::util::decay<T10>::type , typename hpx::util::decay<T11>::type , typename hpx::util::decay<T12>::type , typename hpx::util::decay<T13>::type , typename hpx::util::decay<T14>::type , typename hpx::util::decay<T15>::type , typename hpx::util::decay<T16>::type
+        > result_type;
+        return result_type(std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ) , std::forward<T9>( v9 ) , std::forward<T10>( v10 ) , std::forward<T11>( v11 ) , std::forward<T12>( v12 ) , std::forward<T13>( v13 ) , std::forward<T14>( v14 ) , std::forward<T15>( v15 ) , std::forward<T16>( v16 ));
+    }
+}}
+namespace hpx { namespace util
+{
+    namespace detail
+    {
+        template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17>
+        struct dereference_iterator<hpx::util::tuple<
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17
+        > >
+        {
+            typedef typename zip_iterator_reference<hpx::util::tuple<
+                T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17
+            > >::type result_type;
+            static result_type call(
+                hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17> const& iterators)
+            {
+                return hpx::util::forward_as_tuple(
+                    *hpx::util::get< 0>(iterators) , *hpx::util::get< 1>(iterators) , *hpx::util::get< 2>(iterators) , *hpx::util::get< 3>(iterators) , *hpx::util::get< 4>(iterators) , *hpx::util::get< 5>(iterators) , *hpx::util::get< 6>(iterators) , *hpx::util::get< 7>(iterators) , *hpx::util::get< 8>(iterators) , *hpx::util::get< 9>(iterators) , *hpx::util::get< 10>(iterators) , *hpx::util::get< 11>(iterators) , *hpx::util::get< 12>(iterators) , *hpx::util::get< 13>(iterators) , *hpx::util::get< 14>(iterators) , *hpx::util::get< 15>(iterators) , *hpx::util::get< 16>(iterators) , *hpx::util::get< 17>(iterators));
+            }
+        };
+    }
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17>
+    class zip_iterator
+      : public detail::zip_iterator_base<hpx::util::tuple<
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17
+        > >
+    {
+        typedef detail::zip_iterator_base<hpx::util::tuple<
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17
+        > > base_type;
+    public:
+        zip_iterator() : base_type() {}
+        explicit zip_iterator(
+            T0 const& v0 , T1 const& v1 , T2 const& v2 , T3 const& v3 , T4 const& v4 , T5 const& v5 , T6 const& v6 , T7 const& v7 , T8 const& v8 , T9 const& v9 , T10 const& v10 , T11 const& v11 , T12 const& v12 , T13 const& v13 , T14 const& v14 , T15 const& v15 , T16 const& v16 , T17 const& v17
+        ) : base_type(hpx::util::tie(v0 , v1 , v2 , v3 , v4 , v5 , v6 , v7 , v8 , v9 , v10 , v11 , v12 , v13 , v14 , v15 , v16 , v17))
+        {}
+    };
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17>
+    zip_iterator<typename hpx::util::decay<T0>::type , typename hpx::util::decay<T1>::type , typename hpx::util::decay<T2>::type , typename hpx::util::decay<T3>::type , typename hpx::util::decay<T4>::type , typename hpx::util::decay<T5>::type , typename hpx::util::decay<T6>::type , typename hpx::util::decay<T7>::type , typename hpx::util::decay<T8>::type , typename hpx::util::decay<T9>::type , typename hpx::util::decay<T10>::type , typename hpx::util::decay<T11>::type , typename hpx::util::decay<T12>::type , typename hpx::util::decay<T13>::type , typename hpx::util::decay<T14>::type , typename hpx::util::decay<T15>::type , typename hpx::util::decay<T16>::type , typename hpx::util::decay<T17>::type>
+    make_zip_iterator(T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6 , T7 && v7 , T8 && v8 , T9 && v9 , T10 && v10 , T11 && v11 , T12 && v12 , T13 && v13 , T14 && v14 , T15 && v15 , T16 && v16 , T17 && v17)
+    {
+        typedef zip_iterator<
+            typename hpx::util::decay<T0>::type , typename hpx::util::decay<T1>::type , typename hpx::util::decay<T2>::type , typename hpx::util::decay<T3>::type , typename hpx::util::decay<T4>::type , typename hpx::util::decay<T5>::type , typename hpx::util::decay<T6>::type , typename hpx::util::decay<T7>::type , typename hpx::util::decay<T8>::type , typename hpx::util::decay<T9>::type , typename hpx::util::decay<T10>::type , typename hpx::util::decay<T11>::type , typename hpx::util::decay<T12>::type , typename hpx::util::decay<T13>::type , typename hpx::util::decay<T14>::type , typename hpx::util::decay<T15>::type , typename hpx::util::decay<T16>::type , typename hpx::util::decay<T17>::type
+        > result_type;
+        return result_type(std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ) , std::forward<T9>( v9 ) , std::forward<T10>( v10 ) , std::forward<T11>( v11 ) , std::forward<T12>( v12 ) , std::forward<T13>( v13 ) , std::forward<T14>( v14 ) , std::forward<T15>( v15 ) , std::forward<T16>( v16 ) , std::forward<T17>( v17 ));
+    }
+}}
