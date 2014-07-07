@@ -47,7 +47,7 @@ namespace hpx { namespace lcos
             template <typename Future>
             void operator()(Future& future) const
             {
-                std::size_t counter = when_->count_.load(boost::memory_order_acquire);
+                std::size_t counter = when_->count_.load(boost::memory_order_seq_cst);
                 if (counter < when_->needed_count_ && !future.is_ready()) {
                     // handle future only if not enough futures are ready yet
                     // also, do not touch any futures which are already ready
@@ -133,7 +133,7 @@ namespace hpx { namespace lcos
                 }
 
                 // all futures should be ready
-                HPX_ASSERT(count_.load(boost::memory_order_acquire) == needed_count_);
+                HPX_ASSERT(count_.load(boost::memory_order_seq_cst) == needed_count_);
             }
 
             argument_type lazy_values_;

@@ -191,14 +191,14 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             // if all of the requested futures are already set, our
             // callback above has already been called often enough, otherwise
             // we suspend ourselves
-            if (count_.load(boost::memory_order_acquire) < needed_count_)
+            if (count_.load(boost::memory_order_seq_cst) < needed_count_)
             {
                 // wait for any of the futures to return to become ready
                 this_thread::suspend(threads::suspended);
             }
 
             // all futures should be ready
-            HPX_ASSERT(count_.load(boost::memory_order_acquire) >= needed_count_);
+            HPX_ASSERT(count_.load(boost::memory_order_seq_cst) >= needed_count_);
 
             invoke();
         }
