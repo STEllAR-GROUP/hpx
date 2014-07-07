@@ -36,8 +36,8 @@ int hpx_main()
             make_tuple(0.0, 0.0),
             [](tuple<double, double> const& res, reference it) {
                 return make_tuple(
-                    get<0>(res) + get<0>(it) * get<1>(it),
-                    0.0);
+                    get<0>(res) * get<1>(res) + get<0>(it) * get<1>(it),
+                    1.0);
             });
 
     // print the result
