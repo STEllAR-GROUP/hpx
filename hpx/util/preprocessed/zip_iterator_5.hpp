@@ -9,7 +9,7 @@
 
 
         
-namespace hpx { namespace parallel { namespace util
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -54,8 +54,8 @@ namespace hpx { namespace parallel { namespace util
         > result_type;
         return result_type(std::forward<T0>( v0 ));
     }
-}}}
-namespace hpx { namespace parallel { namespace util
+}}
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -100,8 +100,8 @@ namespace hpx { namespace parallel { namespace util
         > result_type;
         return result_type(std::forward<T0>( v0 ) , std::forward<T1>( v1 ));
     }
-}}}
-namespace hpx { namespace parallel { namespace util
+}}
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -146,8 +146,8 @@ namespace hpx { namespace parallel { namespace util
         > result_type;
         return result_type(std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ));
     }
-}}}
-namespace hpx { namespace parallel { namespace util
+}}
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -192,8 +192,8 @@ namespace hpx { namespace parallel { namespace util
         > result_type;
         return result_type(std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ));
     }
-}}}
-namespace hpx { namespace parallel { namespace util
+}}
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -238,8 +238,8 @@ namespace hpx { namespace parallel { namespace util
         > result_type;
         return result_type(std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ));
     }
-}}}
-namespace hpx { namespace parallel { namespace util
+}}
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -284,8 +284,8 @@ namespace hpx { namespace parallel { namespace util
         > result_type;
         return result_type(std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ));
     }
-}}}
-namespace hpx { namespace parallel { namespace util
+}}
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -330,8 +330,8 @@ namespace hpx { namespace parallel { namespace util
         > result_type;
         return result_type(std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ));
     }
-}}}
-namespace hpx { namespace parallel { namespace util
+}}
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -376,4 +376,4 @@ namespace hpx { namespace parallel { namespace util
         > result_type;
         return result_type(std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ));
     }
-}}}
+}}

@@ -48,7 +48,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         move(ExPolicy const& policy, FwdIter first, FwdIter last, OutIter dest,
             boost::mpl::false_ fls)
         {
-            typedef util::zip_iterator<FwdIter, OutIter> zip_iterator;
+            typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
             typedef typename zip_iterator::reference reference;
             typedef
                 typename detail::algorithm_result<ExPolicy, OutIter>::type
@@ -56,7 +56,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             return get_iter<1, result_type>(
                 plain_for_each_n(policy,
-                    util::make_zip_iterator(first,dest),
+                    hpx::util::make_zip_iterator(first,dest),
                     std::distance(first,last),
                     [](reference it) {
                         hpx::util::get<1>(it) = std::move(hpx::util::get<0>(it));
