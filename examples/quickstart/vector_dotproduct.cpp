@@ -29,19 +29,17 @@ int hpx_main()
     typedef zip_iterator::reference reference;
 
     // the result of the execution will be stored in location 0 of the tuple
-    tuple<double, double> result =
+    double result =
         hpx::parallel::reduce(hpx::parallel::par,
             make_zip_iterator(boost::begin(xvalues), boost::begin(yvalues)),
             make_zip_iterator(boost::end(xvalues), boost::end(yvalues)),
-            make_tuple(0.0, 0.0),
-            [](tuple<double, double> const& res, reference it) {
-                return make_tuple(
-                    get<0>(res) + get<0>(it) * get<1>(it),
-                    0.0);
+            0.0,
+            [](double res, reference it) {
+                return res + get<0>(it) * get<1>(it);
             });
 
     // print the result
-    std::cout << get<0>(result);
+    std::cout << result;
 
     return hpx::finalize();
 }
