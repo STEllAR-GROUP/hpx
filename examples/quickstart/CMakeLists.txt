@@ -16,10 +16,10 @@ set(example_programs
     event_synchronization
     factorial
     fibonacci
-	fibonacci_await
+    fibonacci_await
     fibonacci_one
     fibonacci_futures
-	fibonacci_futures_distributed
+    fibonacci_futures_distributed
     fractals
     fractals_struct
     interest_calculator
@@ -45,9 +45,9 @@ endif()
 if(HPX_HAVE_CXX11_LAMBDAS)
   set(example_programs ${example_programs}
       hello_world
-	  fibonacci_dataflow
+      fibonacci_dataflow
       1d_wave_equation
-	  vector_dotproduct
+      vector_dotproduct
      )
 endif()
 
