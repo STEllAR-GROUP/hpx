@@ -21,6 +21,7 @@
 #include <hpx/parallel/detail/all_any_none.hpp>
 #include <hpx/parallel/detail/copy.hpp>
 #include <hpx/parallel/detail/count.hpp>
+#include <hpx/parallel/detail/equal.hpp>
 #include <hpx/parallel/detail/fill.hpp>
 #include <hpx/parallel/detail/for_each.hpp>
 #include <hpx/parallel/detail/move.hpp>

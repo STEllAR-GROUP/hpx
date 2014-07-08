@@ -11,6 +11,7 @@ set(tests
     copyn
     count
     countif
+    equal
     fill
     filln
     foreach
