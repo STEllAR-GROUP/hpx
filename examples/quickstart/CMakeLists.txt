@@ -44,7 +44,8 @@ if(HPX_HAVE_CXX11_LAMBDAS)
   set(example_programs ${example_programs}
       hello_world
       1d_wave_equation
-	  vector_dotproduct
+	  vector_zip_dotproduct
+	  vector_counting_dotproduct
      )
 
   # MSVC 2010 is not able to cope with this example
@@ -84,7 +85,8 @@ set(interest_calculator_FLAGS DEPENDENCIES dataflow_component)
 set(simple_future_continuation_FLAGS DEPENDENCIES iostreams_component)
 set(timed_futures_FLAGS DEPENDENCIES iostreams_component)
 set(pingpong_FLAGS DEPENDENCIES iostreams_component)
-set(vector_dotproduct_FLAGS DEPENDENCIES iostreams_component)
+set(vector_zip_dotproduct_FLAGS DEPENDENCIES iostreams_component)
+set(vector_counting_dotproduct_FLAGS DEPENDENCIES iostreams_component)
 
 foreach(example_program ${example_programs})
   set(sources

@@ -9,6 +9,8 @@
 #include <hpx/include/algorithm.hpp>
 #include <hpx/include/iostreams.hpp>
 
+#include <boost/iterator/counting_iterator.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
@@ -27,17 +29,14 @@ int hpx_main()
     double result =
         hpx::parallel::reduce(
             hpx::parallel::par,
-            make_zip_iterator(boost::begin(xvalues), boost::begin(yvalues)),
-            make_zip_iterator(boost::end(xvalues), boost::end(yvalues)),
+            boost::counting_iterator<int>(0),
+            boost::counting_iterator<int>(10007),
             0.0,
-            [](double const& res, double const& g) {
-                return res + g;
-            },
-            [](tuple<double,double> const& r){
-                    return get<0>(r) * get<1>(r);
+            std::plus<double>(),
+            [&xvalues, &yvalues](__int64 i){
+                    return xvalues[i] * yvalues[i];
             }
         );
-
     // print the result
     hpx::cout << result << hpx::endl;
 
