@@ -242,7 +242,7 @@ namespace hpx { namespace traits
 {
     namespace detail
     {
-        template <typename T, typename Enable = void>
+        template <typename T, typename Enable = void, typename Enable2 = void>
         struct is_callable_impl
           : boost::mpl::false_
         {};
@@ -269,6 +269,18 @@ namespace hpx { namespace traits
             )>::type
         > : boost::mpl::true_
         {};
+        template <typename F, typename C>
+        struct is_callable_impl<F(C)
+          , typename boost::enable_if_c<
+                boost::is_reference_wrapper<
+                    typename util::decay<C>::type
+                >::value
+            >::type
+          , typename util::always_void<decltype(
+                (boost::declval<C>().get()).*boost::declval<F>()
+            )>::type
+        > : boost::mpl::true_
+        {};
 
         template <typename F, typename C, typename... A>
         struct is_callable_impl<F(C, A...)
@@ -282,6 +294,19 @@ namespace hpx { namespace traits
         struct is_callable_impl<F(C, A...)
           , typename util::always_void<decltype(
                 ((*boost::declval<C>()).*boost::declval<F>())
+                    (boost::declval<A>()...)
+            )>::type
+        > : boost::mpl::true_
+        {};
+        template <typename F, typename C, typename... A>
+        struct is_callable_impl<F(C, A...)
+          , typename boost::enable_if_c<
+                boost::is_reference_wrapper<
+                    typename util::decay<C>::type
+                >::value
+            >::type
+          , typename util::always_void<decltype(
+                ((boost::declval<C>().get()).*boost::declval<F>())
                     (boost::declval<A>()...)
             )>::type
         > : boost::mpl::true_

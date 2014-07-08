@@ -29,7 +29,7 @@ int hpx_main()
             make_zip_iterator(boost::end(xvalues), boost::end(yvalues)),
             0.0,
             std::plus<double>(),
-            [](tuple<double,double> r){
+            [](tuple<double, double> r){
                     return get<0>(r) * get<1>(r);
             }
         );
