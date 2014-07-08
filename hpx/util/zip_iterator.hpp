@@ -317,7 +317,7 @@ namespace hpx { namespace util
                     advance_iterator(n));
             }
 
-            std::size_t distance_to(zip_iterator_base const& other) const
+            std::ptrdiff_t distance_to(zip_iterator_base const& other) const
             {
                 return util::get<0>(other.iterators_) - util::get<0>(iterators_);
             }
