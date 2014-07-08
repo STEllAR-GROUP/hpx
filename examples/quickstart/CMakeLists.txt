@@ -47,7 +47,8 @@ if(HPX_HAVE_CXX11_LAMBDAS)
       hello_world
       fibonacci_dataflow
       1d_wave_equation
-      vector_dotproduct
+      vector_zip_dotproduct
+      vector_counting_dotproduct
      )
 endif()
 
@@ -72,7 +73,8 @@ set(interest_calculator_FLAGS DEPENDENCIES dataflow_component)
 set(simple_future_continuation_FLAGS DEPENDENCIES iostreams_component)
 set(timed_futures_FLAGS DEPENDENCIES iostreams_component)
 set(pingpong_FLAGS DEPENDENCIES iostreams_component)
-set(vector_dotproduct_FLAGS DEPENDENCIES iostreams_component)
+set(vector_zip_dotproduct_FLAGS DEPENDENCIES iostreams_component)
+set(vector_counting_dotproduct_FLAGS DEPENDENCIES iostreams_component)
 
 foreach(example_program ${example_programs})
   set(sources
