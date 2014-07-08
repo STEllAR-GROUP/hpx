@@ -318,11 +318,9 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Future, typename Enable = void>
+    template <typename Future>
     struct future_unwrap_result
-    {
-        typedef void type;
-    };
+    {};
 
     template <template <typename> class Future, typename R>
     struct future_unwrap_result<Future<Future<R> > >
@@ -420,17 +418,17 @@ namespace hpx { namespace lcos { namespace detail
         F && f);
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Future>
+    typename shared_state_ptr<
+        typename future_unwrap_result<Future>::result_type>::type
+    unwrap(Future&& future, error_code& ec = throws);
+
+    ///////////////////////////////////////////////////////////////////////////
     class void_continuation;
 
     template <typename Future>
     inline typename shared_state_ptr<void>::type
     make_void_continuation(Future& future);
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Future>
-    typename shared_state_ptr<
-        typename future_unwrap_result<Future>::result_type>::type
-    unwrap(Future& future, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Derived, typename R>
@@ -638,46 +636,6 @@ namespace hpx { namespace lcos { namespace detail
             return traits::future_access<future<result_type> >::create(std::move(p));
         }
 
-        // Notes:
-        //   - R is a future<R2> or shared_future<R2>
-        //   - Removes the outer-most future and returns a proxy to the inner
-        //     future. The proxy is a representation of the inner future and
-        //     it holds the same value (or exception) as the inner future.
-        // Effects:
-        //   - future<R2> X = future<future<R2>>.unwrap(), returns a future<R2>
-        //     that becomes ready when the shared state of the inner future is
-        //     ready. When the inner future is ready, its value (or exception)
-        //     is moved to the shared state of the returned future.
-        //   - future<R2> Y = future<shared_future<R2>>.unwrap(),returns a
-        //     future<R2> that becomes ready when the shared state of the inner
-        //     future is ready. When the inner shared_future is ready, its
-        //     value (or exception) is copied to the shared state of the
-        //     returned future.
-        //   - If the outer future throws an exception, and .get() is called on
-        //     the returned future, the returned future throws the same
-        //     exception as the outer future. This is the case because the
-        //     inner future didn't exit.
-        // Returns: a future of type R2. The result of the inner future is
-        //          moved out (shared_future is copied out) and stored in the
-        //          shared state of the returned future when it is ready or the
-        //          result of the inner future throws an exception.
-        // Postcondition:
-        //   - The returned future has valid() == true, regardless of the
-        //     validity of the inner future.
-        typename future_unwrap_result<Derived>::type
-        unwrap(error_code& ec = throws)
-        {
-            typedef
-                typename future_unwrap_result<Derived>::result_type
-                result_type;
-            typedef 
-                typename shared_state_ptr<result_type>::type
-                shared_state_ptr;
-
-            shared_state_ptr p = detail::unwrap(*static_cast<Derived*>(this), ec);
-            return traits::future_access<future<result_type> >::create(std::move(p));
-        }
-
         // Effects: blocks until the shared state is ready.
         void wait(error_code& ec = throws) const
         {
@@ -839,13 +797,13 @@ namespace hpx { namespace lcos
         {}
 
         // Effects: constructs a future object by moving the instance referred
-        //          to by rhs and unwrapping the inner future (see unwrap()).
+        //          to by rhs and unwrapping the inner future.
         // Postconditions:
         //   - valid() returns the same value as other.valid() prior to the
         //     constructor invocation.
         //   - other.valid() == false.
         future(future<future> && other) BOOST_NOEXCEPT
-          : base_type(other.valid() ? other.unwrap() : base_type())
+          : base_type(other.valid() ? detail::unwrap(std::move(other)) : 0)
         {}
 
         // Effects: constructs a future<void> object that will be ready when
@@ -981,13 +939,6 @@ namespace hpx { namespace lcos
             return base_type::then(sched, std::forward<F>(f), ec);
         }
 
-        typename detail::future_unwrap_result<future>::type
-        unwrap(error_code& ec = throws)
-        {
-            invalidate on_exit(*this);
-            return base_type::unwrap(ec);
-        }
-
         using base_type::wait;
         using base_type::wait_for;
         using base_type::wait_until;
@@ -1070,14 +1021,13 @@ namespace hpx { namespace lcos
         }
 
         // Effects: constructs a shared_future object by moving the instance
-        //          referred to by rhs and unwrapping the inner future
-        //          (see unwrap()).
+        //          referred to by rhs and unwrapping the inner future.
         // Postconditions:
         //   - valid() returns the same value as other.valid() prior to the
         //     constructor invocation.
         //   - other.valid() == false.
         shared_future(future<shared_future> && other) BOOST_NOEXCEPT
-          : base_type(other.valid() ? other.share().unwrap() : base_type())
+          : base_type(other.valid() ? detail::unwrap(other.share()) : 0)
         {}
 
         // Effects: constructs a future<void> object that will be ready when
@@ -1182,7 +1132,6 @@ namespace hpx { namespace lcos
         using base_type::has_exception;
 
         using base_type::then;
-        using base_type::unwrap;
 
         using base_type::wait;
         using base_type::wait_for;

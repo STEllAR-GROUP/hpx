@@ -508,6 +508,9 @@ namespace hpx { namespace lcos { namespace detail
             void (unwrap_continuation::*outer_ready)(
                 outer_shared_state_ptr const&) =
                     &unwrap_continuation::on_outer_ready<Future>;
+            
+            if (future.wait_for(boost::posix_time::seconds(0)) == future_status::deferred)
+                future.wait();
 
             outer_shared_state_ptr const& outer_state =
                 traits::future_access<Future>::get_shared_state(future);
@@ -519,7 +522,7 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Future>
     inline typename shared_state_ptr<
         typename future_unwrap_result<Future>::result_type>::type
-    unwrap(Future& future, error_code& ec)
+    unwrap(Future&& future, error_code& ec)
     {
         typedef typename future_unwrap_result<Future>::result_type result_type;
         typedef detail::unwrap_continuation<result_type> shared_state;
@@ -530,7 +533,6 @@ namespace hpx { namespace lcos { namespace detail
         return std::move(p);
     }
 }}}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail

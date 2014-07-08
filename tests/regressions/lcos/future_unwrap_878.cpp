@@ -24,7 +24,7 @@ int main()
     }
     HPX_TEST(future.has_exception());
 
-    hpx::future<int> inner = future.unwrap();
+    hpx::future<int> inner(std::move(future));
     HPX_TEST(inner.has_exception());
 
     return hpx::util::report_errors();
