@@ -44,8 +44,8 @@ if(HPX_HAVE_CXX11_LAMBDAS)
   set(example_programs ${example_programs}
       hello_world
       1d_wave_equation
-	  vector_zip_dotproduct
-	  vector_counting_dotproduct
+      vector_zip_dotproduct
+      vector_counting_dotproduct
      )
 
   # MSVC 2010 is not able to cope with this example
