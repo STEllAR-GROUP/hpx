@@ -20,12 +20,6 @@ int hpx_main()
     std::fill(boost::begin(xvalues), boost::end(xvalues), 1.0);
     std::fill(boost::begin(yvalues), boost::end(yvalues), 1.0);
 
-    using hpx::util::make_zip_iterator;
-    using hpx::util::tuple;
-    using hpx::util::make_tuple;
-    using hpx::util::get;
-
-    // the result of the execution will be stored in location 0 of the tuple
     double result =
         hpx::parallel::reduce(
             hpx::parallel::par,
@@ -45,7 +39,7 @@ int hpx_main()
 
 int main(int argc, char* argv[])
 {
-    // By default this test should run on all available cores
+    // By default this should run on all available cores
     std::vector<std::string> cfg;
     cfg.push_back("hpx.os_threads=" +
         boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency()));
