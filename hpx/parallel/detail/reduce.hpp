@@ -77,9 +77,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             typedef typename std::iterator_traits<FwdIter>::iterator_category
                 category;
-
-            typedef typename std::iterator_traits<FwdIter>::value_type
-                value_type;
+            typedef typename std::iterator_traits<FwdIter>::reference
+                reference;
 
             return util::partitioner<ExPolicy, T>::call(
                 policy, first, std::distance(first, last),
@@ -88,7 +87,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     T val = conv(*part_begin);
                     return util::accumulate_n(++part_begin, --part_count,
                         std::move(val),
-                        [&r, &conv](T const& res, value_type const& next)
+                        [&r, &conv](T const& res, reference next)
                         {
                             return r(res, conv(next));
                         });
@@ -229,7 +228,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         return detail::reduce(
             std::forward<ExPolicy>(policy), first, last, std::move(init),
-            std::forward<Reduce>(red_op), std::forward<Convert>(conv_op), is_seq());
+            std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
+            is_seq());
     }
 
     /// Returns GENERALIZED_SUM(f, init, *first, ..., *(first + (last - first) - 1)).
