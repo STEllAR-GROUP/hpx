@@ -58,8 +58,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 plain_for_each_n(policy,
                     hpx::util::make_zip_iterator(first, dest),
                     std::distance(first, last),
-                    [](reference it) {
-                        hpx::util::get<1>(it) = hpx::util::get<0>(it);
+                    [](reference t) {
+                        hpx::util::get<1>(t) = hpx::util::get<0>(t); //-V573
                     },
                     fls));
         }
@@ -193,8 +193,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 plain_for_each_n(policy,
                     hpx::util::make_zip_iterator(first, dest),
                     count,
-                    [](reference it) {
-                        hpx::util::get<1>(it) = hpx::util::get<0>(it);
+                    [](reference t) {
+                        hpx::util::get<1>(t) = hpx::util::get<0>(t); //-V573
                     },
                     fls));
         }
@@ -341,9 +341,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 plain_for_each_n(policy,
                     hpx::util::make_zip_iterator(first, dest),
                     std::distance(first,last),
-                    [f](reference it) {
-                        if (f(hpx::util::get<0>(it)))
-                            hpx::util::get<1>(it) = hpx::util::get<0>(it);
+                    [f](reference t) {
+                        if (f(hpx::util::get<0>(t)))
+                            hpx::util::get<1>(t) = hpx::util::get<0>(t); //-V573
                     },
                     fls));
         }

@@ -60,8 +60,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 plain_for_each_n(policy,
                     hpx::util::make_zip_iterator(first1, first2),
                     std::distance(first1, last1),
-                    [](reference it) {
-                        std::swap(hpx::util::get<0>(it), hpx::util::get<1>(it));
+                    [](reference t) {
+                        std::swap(hpx::util::get<0>(t), hpx::util::get<1>(t));
                     },
                     f));
         }

@@ -14,7 +14,6 @@
 #include <hpx/parallel/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
-#include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -63,6 +62,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return detail::algorithm_result<ExPolicy, difference_type>
                     ::get( difference_type(0));
             }
+
             return util::partitioner<ExPolicy, difference_type>::call(
                 policy, first, std::distance(first, last),
                 [&value](FwdIter part_begin, std::size_t part_count)
@@ -207,6 +207,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return detail::algorithm_result<ExPolicy, difference_type>
                     ::get( (difference_type)0);
             }
+
             return util::partitioner<ExPolicy, difference_type>::call(
                 policy, first, std::distance(first, last),
                 [op](FwdIter part_begin, std::size_t part_count)

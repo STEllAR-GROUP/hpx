@@ -23,7 +23,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             BOOST_ATTRIBUTE_NORETURN static void call()
             {
                 try {
-                    throw;
+                    throw; //-V667
                 }
                 catch(std::bad_alloc const& e) {
                     boost::throw_exception(e);

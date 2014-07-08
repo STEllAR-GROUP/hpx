@@ -305,6 +305,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param f            Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
     ///                     sequence specified by [first, last).
+    ///                     The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     <ignored> pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&. The
+    ///                     type \a Type must be such that an object of
+    ///                     type \a InIter can be dereferenced and then
+    ///                     implicitly converted to Type.
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with an execution policy object of type

@@ -57,6 +57,11 @@ is_parallel_execution_policy          "" "hpx\.parallel\.v1\.is_parallel_executi
 is_sequential_execution_policy        "" "hpx\.parallel\.v1\.is_sequential_execution_policy.*"
 
 
+# hpx/parallel/detail/all_any_none.hpp
+parallel::all_of                      "all_of" "hpx\.parallel\.v1\.all_of.*"
+parallel::any_of                      "any_of" "hpx\.parallel\.v1\.any_of.*"
+parallel::none_of                     "none_of" "hpx\.parallel\.v1\.none_of.*"
+
 # hpx/parallel/detail/copy.hpp
 parallel::copy                        "copy" "hpx\.parallel\.v1\.copy_id.*"
 parallel::copy_n                      "copy_n" "hpx\.parallel\.v1\.copy_n.*"

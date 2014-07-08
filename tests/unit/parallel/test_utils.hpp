@@ -174,6 +174,29 @@ namespace test
 
         return f;
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    inline std::vector<std::size_t>
+    fill_all_any_none(std::size_t size, std::size_t num_filled)
+    {
+        if (num_filled == 0)
+            return std::vector<std::size_t>(size, 0);
+
+        if (num_filled == size)
+            return std::vector<std::size_t>(size, 1);
+
+        std::vector<std::size_t> c(size, 0);
+        for (std::size_t i = 0; i < num_filled; /**/)
+        {
+            std::size_t pos = std::rand() % c.size();
+            if (c[pos])
+                continue;
+
+            c[pos] = 1;
+            ++i;
+        }
+        return c;
+    }
 }
 
 #endif

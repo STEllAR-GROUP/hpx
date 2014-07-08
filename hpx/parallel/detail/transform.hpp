@@ -62,8 +62,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 for_each_n(policy,
                     hpx::util::make_zip_iterator(first, dest),
                     std::distance(first, last),
-                    [f](reference it) {
-                        hpx::util::get<1>(it) = f(hpx::util::get<0>(it));
+                    [f](reference t) {
+                        hpx::util::get<1>(t) = f(hpx::util::get<0>(t)); //-V573
                     },
                     fls));
         }
@@ -208,9 +208,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 for_each_n(policy,
                     hpx::util::make_zip_iterator(first1, first2, dest),
                     std::distance(first1, last1),
-                    [f](reference it) {
-                        hpx::util::get<2>(it) =
-                            f(hpx::util::get<0>(it), hpx::util::get<1>(it));
+                    [f](reference t) {
+                        hpx::util::get<2>(t) = //-V573
+                            f(hpx::util::get<0>(t), hpx::util::get<1>(t));
                     },
                     fls));
         }
