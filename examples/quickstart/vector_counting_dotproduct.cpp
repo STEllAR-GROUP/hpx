@@ -29,11 +29,11 @@ int hpx_main()
     double result =
         hpx::parallel::reduce(
             hpx::parallel::par,
-            boost::counting_iterator<int>(0),
-            boost::counting_iterator<int>(10007),
+            boost::counting_iterator<size_t>(0),
+            boost::counting_iterator<size_t>(10007),
             0.0,
             std::plus<double>(),
-            [&xvalues, &yvalues](__int64 i){
+            [&xvalues, &yvalues](size_t i){
                     return xvalues[i] * yvalues[i];
             }
         );
