@@ -44,9 +44,10 @@ endif()
 
 if(HPX_HAVE_CXX11_LAMBDAS)
   set(example_programs ${example_programs}
+      1d_wave_equation
       hello_world
       fibonacci_dataflow
-      1d_wave_equation
+      simple_pipeline
       vector_zip_dotproduct
       vector_counting_dotproduct
      )
