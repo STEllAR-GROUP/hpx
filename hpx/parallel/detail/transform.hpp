@@ -12,7 +12,6 @@
 #include <hpx/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
-#include <hpx/parallel/detail/synchronize.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 #include <hpx/util/move.hpp>
 
@@ -37,7 +36,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             F && f, boost::mpl::true_)
         {
             try {
-                detail::synchronize(first, last);
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
                     std::transform(first, last, dest, std::forward<F>(f)));
             }
@@ -182,7 +180,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             InIter2 first2, OutIter dest, F && f, boost::mpl::true_)
         {
             try {
-                detail::synchronize_binary(first1, last1, first2);
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
                     std::transform(first1, last1, first2, dest,
                         std::forward<F>(f)));

@@ -50,7 +50,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename std::iterator_traits<InIter>::value_type
                     value_type;
 
-                detail::synchronize(first, last);
                 return detail::algorithm_result<ExPolicy, T>::get(
                     std::accumulate(first, last, std::forward<T>(init),
                         [&r, &conv](T const& res, value_type const& next)
