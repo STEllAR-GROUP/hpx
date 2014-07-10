@@ -87,7 +87,13 @@ parallel::reduce                      "reduce" "hpx\.parallel\.v1\.reduce.*"
 # hpx/parallel/detail/swap_ranges.hpp
 parallel::swap_ranges                 "swap_ranges" "hpx\.parallel\.v1\.swap_ranges.*"
 
-# hpx/parallel/detail/swap_ranges.hpp
+# hpx/parallel/detail/task_region.hpp
+parallel::task_region                 "task_region" "hpx\.parallel\.v2\.task_region_id.*"
+parallel::task_region_final           "task_region_final" "hpx\.parallel\.v2\.task_region_final.*"
+parallel::task_region_handle          "task_region_handle" "hpx\.parallel\.v2\.task_region_handle.*"
+parallel::task_canceled_exception     "task_canceled_exception" "hpx\.parallel\.v2\.task_canceled_exception.*"
+
+# hpx/parallel/detail/transform.hpp
 parallel::transform                   "transform" "hpx\.parallel\.v1\.transform.*"
 
 
