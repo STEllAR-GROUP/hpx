@@ -415,12 +415,6 @@ namespace detail
             return state_ != empty && data_.stores_error();
         }
 
-        BOOST_SCOPED_ENUM(future_status) get_status() const
-        {
-            typename mutex_type::scoped_lock l(mtx_);
-            return state_ != empty ? future_status::ready : future_status::deferred; //-V110
-        }
-
     protected:
         mutable mutex_type mtx_;
         data_type data_;                            // protected data
