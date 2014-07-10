@@ -25,6 +25,7 @@ set(example_programs
     interest_calculator
     non_atomic_rma
     pingpong
+    pipeline
     print_to_console
     quicksort
     simple_future_continuation
