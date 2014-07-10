@@ -14,12 +14,16 @@
 #include <hpx/lcos/local/dataflow.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/wait_all.hpp>
 #include <hpx/async.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
+
+#if !defined(BOOST_NO_CXX11_DELETED_FUNCTIONS)
+#include <memory>                           // std::addressof
+#include <boost/utility/addressof.hpp>      // boost::addressof
+#endif
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 {
@@ -33,7 +37,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 boost::rethrow_exception(boost::current_exception());
             }
             catch (parallel::exception_list const& el) {
-                for (boost::exception_ptr e: el)
+                for (boost::exception_ptr const& e: el)
                     errors.add(e);
             }
             catch (...) {
@@ -114,7 +118,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
         ~task_region_handle()
         {
-            hpx::wait_all(when());
+            when().wait();
         }
 
         HPX_MOVABLE_BUT_NOT_COPYABLE(task_region_handle);
@@ -386,10 +390,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         // executing task_region_final.
         return task_region(task, std::forward<F>(f));
     }
+}}}
 
 #if !defined(BOOST_NO_CXX11_DELETED_FUNCTIONS)
-    task_region_handle* addressof(task_region_handle&) = delete;
+namespace std
+{
+    hpx::parallel::v2::task_region_handle*
+    addressof(hpx::parallel::v2::task_region_handle&) = delete;
+}
+namespace boost
+{
+    hpx::parallel::v2::task_region_handle*
+    addressof(hpx::parallel::v2::task_region_handle&) = delete;
+}
 #endif
-}}}
 
 #endif
