@@ -127,11 +127,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
             {
                 mutex_type::scoped_lock l(mtx_);
-                std::swap(active_, active);
+                std::swap(tasks_, active);
             }
 
+            if (active.empty())
+                return hpx::make_ready_future();
+
             return hpx::lcos::local::dataflow(
-                [this, errors](std::vector<hpx::future<void> > && results) mutable
+                [errors](std::vector<hpx::future<void> > && results) mutable
                 {
                     for (hpx::future<void>& f: results)
                     {
@@ -184,7 +187,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         template <typename F>
         void run(F && f)
         {
-            active_.push_back(hpx::async(boost::move(f)));
+            hpx::future<void> result = hpx::async(boost::move(f));
+
+            mutex_type::scoped_lock l(mtx_);
+            tasks_.push_back(std::move(result));
         }
 
         /// Blocks until the tasks spawned using this task_region_handle have
@@ -228,8 +234,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
     private:
         mutable mutex_type mtx_;
-        std::vector<hpx::future<void> > active_;
-        parallel::exception_list exceptions_;
+        std::vector<hpx::future<void> > tasks_;
     };
 
     /// Constructs a \a task_region_handle, tr, and invokes the expression

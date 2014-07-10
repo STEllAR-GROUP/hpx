@@ -161,7 +161,7 @@ int hpx_main()
         task_region_test_exceptions1();
         HPX_TEST(false);
     }
-    catch( hpx::parallel::exception_list const& e) {
+    catch (hpx::parallel::exception_list const& e) {
         HPX_TEST_EQ(e.get_error_count(), 3);
     }
     catch(...) {
@@ -173,7 +173,7 @@ int hpx_main()
         f.get();
         HPX_TEST(false);
     }
-    catch( hpx::parallel::exception_list const& e) {
+    catch (hpx::parallel::exception_list const& e) {
         HPX_TEST_EQ(e.get_error_count(), 3);
     }
     catch(...) {
