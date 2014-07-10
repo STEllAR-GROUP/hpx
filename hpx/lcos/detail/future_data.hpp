@@ -353,7 +353,7 @@ namespace detail
             typename mutex_type::scoped_lock l(mtx_);
 
             // block if this entry is empty
-            if (state_ == empty) {
+            if (state_ == empty && p > boost::posix_time::seconds(0)) {
                 threads::thread_state_ex_enum const reason =
                     cond_.wait_for(l, p, "future_data::wait_for", ec);
                 if (ec) return future_status::uninitialized;
@@ -365,7 +365,8 @@ namespace detail
             if (&ec != &throws)
                 ec = make_success_code();
 
-            return future_status::ready; //-V110
+            return is_ready_locked() ?
+                future_status::ready : future_status::timeout; //-V110
         }
 
         virtual BOOST_SCOPED_ENUM(future_status)
@@ -540,18 +541,30 @@ namespace detail
         }
 
         virtual BOOST_SCOPED_ENUM(future_status)
-        wait_for(boost::posix_time::time_duration const& /*p*/, error_code& /*ec*/ = throws)
+        wait_for(boost::posix_time::time_duration const& p, error_code& ec = throws)
         {
-            return future_status::deferred; //-V110
+            if (!started_test())
+                return future_status::deferred; //-V110
+            else
+                return this->future_data<Result>::wait_for(p, ec);
         }
 
         virtual BOOST_SCOPED_ENUM(future_status)
-        wait_until(boost::posix_time::ptime const& /*at*/, error_code& /*ec*/ = throws)
+        wait_until(boost::posix_time::ptime const& at, error_code& ec = throws)
         {
-            return future_status::deferred; //-V110
+            if (!started_test())
+                return future_status::deferred; //-V110
+            else
+                return this->future_data<Result>::wait_until(at, ec);
         };
 
     private:
+        bool started_test() const
+        {
+            typename mutex_type::scoped_lock l(this->mtx_);
+            return started_;
+        }
+
         bool started_test_and_set()
         {
             typename mutex_type::scoped_lock l(this->mtx_);

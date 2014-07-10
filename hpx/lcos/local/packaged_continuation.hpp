@@ -360,7 +360,7 @@ namespace hpx { namespace lcos { namespace detail
             else
                 cb = &continuation::async;
 
-            if (future.get_status() == future_status::deferred)
+            if (future.wait_for(boost::posix_time::seconds(0)) == future_status::deferred)
                 future.wait();
 
             shared_state_ptr const& state =
@@ -380,7 +380,7 @@ namespace hpx { namespace lcos { namespace detail
             void (continuation::*cb)(shared_state_ptr const&, threads::executor&) =
                 &continuation::async;
 
-            if (future.get_status() == future_status::deferred)
+            if (future.wait_for(boost::posix_time::seconds(0)) == future_status::deferred)
                 future.wait();
 
             shared_state_ptr const& state =
@@ -463,7 +463,7 @@ namespace hpx { namespace lcos { namespace detail
             void (void_continuation::*ready)(shared_state_ptr const&) =
                 &void_continuation::on_ready<Future>;
 
-            if (future.get_status() == future_status::deferred)
+            if (future.wait_for(boost::posix_time::seconds(0)) == future_status::deferred)
                 future.wait();
 
             shared_state_ptr const& state =
