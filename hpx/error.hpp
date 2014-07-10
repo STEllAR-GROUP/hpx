@@ -77,7 +77,7 @@ namespace hpx
         security_error = 50,                        ///< An error occurred in the security component
         filesystem_error = 51,                      ///< The specified file does not exist or other filesystem related error
         bad_function_call = 52,                     ///< equivalent of std::bad_function_call
-        task_canceled_exception = 53,               ///< parallel::v3::task_canceled_exception
+        task_canceled_exception = 53,               ///< parallel::v2::task_canceled_exception
 
         /// \cond NOINTERNAL
         last_error,
