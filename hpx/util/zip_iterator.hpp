@@ -248,7 +248,7 @@ namespace hpx { namespace util
             template <typename T>
             void operator()(T& iter) const
             {
-                iter + n_;
+                iter += n_;
             }
 
             std::ptrdiff_t n_;
