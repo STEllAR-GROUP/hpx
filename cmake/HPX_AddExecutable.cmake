@@ -157,8 +157,6 @@ macro(add_hpx_executable name)
 
     set(hpx_libs ${hpx_libs} ${HPX_LIBRARIES})
 
-    list(REMOVE_DUPLICATES hpx_libs)
-
     hpx_print_list("DEBUG" "Add executable ${name}: library dependencies (hpx_libs)" hpx_libs)
 
     hpx_handle_component_dependencies(${name}_COMPONENT_DEPENDENCIES)

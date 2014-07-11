@@ -44,22 +44,22 @@ macro(add_hpx_test category name)
       NAME "${category}.${name}"
       COMMAND ${cmd} ${args})
     else()
-      if(HPX_HAVE_PARCELPORT_IBVERBS)
+      if(WITH_PARCELPORT_IBVERBS)
         add_test(
           NAME "${category}.distributed.ibverbs.${name}"
           COMMAND ${cmd} "-p" "ibverbs" ${args})
       endif()
-      if(HPX_HAVE_PARCELPORT_IPC)
+      if(WITH_PARCELPORT_IPC)
         add_test(
           NAME "${category}.distributed.ipc.${name}"
           COMMAND ${cmd} "-p" "ipc" ${args})
       endif()
-      if(HPX_HAVE_PARCELPORT_MPI)
+      if(WITH_PARCELPORT_MPI)
         add_test(
           NAME "${category}.distributed.mpi.${name}"
           COMMAND ${cmd} "-p" "mpi" "-r" "mpi" ${args})
       endif()
-      if(HPX_HAVE_PARCELPORT_TCP)
+      if(WITH_PARCELPORT_TCP)
         add_test(
           NAME "${category}.distributed.tcp.${name}"
           COMMAND ${cmd} "-p" "tcp" ${args})

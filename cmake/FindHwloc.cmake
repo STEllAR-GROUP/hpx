@@ -42,8 +42,4 @@ if(_type)
   endif()
 endif()
 
-if(NOT HWLOC_FOUND)
-  message("Set HWLOC_ROOT to the location where hwloc are installed")
-endif()
-
 mark_as_advanced(HWLOC_ROOT HWLOC_LIBRARY HWLOC_INCLUDE_DIR)

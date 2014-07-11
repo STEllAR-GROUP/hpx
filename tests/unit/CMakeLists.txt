@@ -17,13 +17,13 @@ set(subdirs
     util
    )
 
-if(NOT HPX_HAVE_SECURITY AND SODIUM_FOUND)
-    set(subdirs ${subdirs} security)
-endif()
+# if(WITH_SECURITY)
+#     set(subdirs ${subdirs} security)
+# endif()
 
-if(HPX_HAVE_CXX11_LAMBDAS)
-    set(subdirs ${subdirs} parallel)
-endif()
+# if(WITH_CXX11_LAMBDAS)
+#     set(subdirs ${subdirs} parallel)
+# endif()
 
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(tests.unit.${subdir})

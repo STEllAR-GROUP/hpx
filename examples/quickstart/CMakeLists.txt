@@ -5,52 +5,51 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(example_programs
-#    component_ctors
-#    component_in_executable
-#    component_inheritance
-#    component_inheritance_simple
-#    component_with_executor
-#    composable_guard
-#    data_actions
-#    error_handling
-#    event_synchronization
-#    factorial
-#    fibonacci
-#    fibonacci_one
-#    fibonacci_futures
-#    fractals
-#    fractals_struct
-#    interest_calculator
-#    non_atomic_rma
-#    pingpong
-#    print_to_console
-#    quicksort
-#    simple_future_continuation
-#    simplest_hello_world
-#    timed_futures
-#    timed_wake
-#    use_main_thread
-#    wait_composition
-#    zerocopy_rdma
+    component_ctors
+    component_in_executable
+    component_inheritance
+    component_inheritance_simple
+    component_with_executor
+    composable_guard
+    data_actions
+    error_handling
+    event_synchronization
+    factorial
+    fibonacci
+    fibonacci_one
+    fibonacci_futures
+    fractals
+    fractals_struct
+    interest_calculator
+    non_atomic_rma
+    pingpong
+    print_to_console
+    quicksort
+    simple_future_continuation
+    simplest_hello_world
+    timed_futures
+    timed_wake
+    use_main_thread
+    wait_composition
+    zerocopy_rdma
    )
 
 if(HPX_LOCAL_SCHEDULER OR HPX_ALL_SCHEDULERS)
   set(example_programs ${example_programs}
-#      fractals_executor
+      fractals_executor
      )
 endif()
 
 if(WITH_CXX11_LAMBDAS)
-  message("...?")
   set(example_programs ${example_programs}
       hello_world
-#      1d_wave_equation
+      1d_wave_equation
      )
 
   # MSVC 2010 is not able to cope with this example
   if(NOT MSVC10)
     set(example_programs ${example_programs}
-#        fibonacci_dataflow
+        fibonacci_dataflow
         )
   endif()
 endif()
@@ -58,8 +57,8 @@ endif()
 # MSVC 2010 is not able to cope with this example
 if(NOT MSVC10)
   set(example_programs ${example_programs}
-#      fibonacci_await
-#      fibonacci_futures_distributed
+      fibonacci_await
+      fibonacci_futures_distributed
      )
 endif()
 

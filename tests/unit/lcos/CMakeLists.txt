@@ -35,7 +35,15 @@ if(GCC_VERSION)
   set(gcc_version ${GCC_VERSION})
 endif()
 
-if((040500 EQUAL ${gcc_version}) OR (040500 LESS ${gcc_version}) OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
+set(non_gcc_44 false)
+if(CMAKE_COMPILER_IS_GNUCXX AND WITH_GCC_VERSION_CHECK)
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.5)
+    set(non_gcc_44 true)
+  endif()
+endif()
+
+
+if(non_gcc_44)
   set(tests
       ${tests}
       broadcast

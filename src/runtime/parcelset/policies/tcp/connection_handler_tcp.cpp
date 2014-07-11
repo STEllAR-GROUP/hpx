@@ -41,13 +41,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
     connection_handler::~connection_handler()
     {
-        if(acceptor_ != NULL)
-        {
-            boost::system::error_code ec;
-            acceptor_->close(ec);
-            delete acceptor_;
-            acceptor_ = NULL;
-        }
+        HPX_ASSERT(acceptor_ == NULL);
     }
 
     bool connection_handler::do_run()
@@ -113,6 +107,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 #if defined(HPX_HOLDON_TO_OUTGOING_CONNECTIONS)
             write_connections_.clear();
 #endif
+        }
+        if(acceptor_ != NULL)
+        {
+            boost::system::error_code ec;
+            acceptor_->close(ec);
+            delete acceptor_;
+            acceptor_ = NULL;
         }
     }
 

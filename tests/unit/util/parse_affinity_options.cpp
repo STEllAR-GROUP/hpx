@@ -112,7 +112,7 @@ namespace test
                     spec_type(spec_type::socket, 0, 0),
                     spec_type(spec_type::unknown),
                     spec_type(spec_type::unknown)
-                }
+                }, data_good_thread()
             },
             { 0x000fff, 0x000fff }
         },
@@ -123,7 +123,7 @@ namespace test
                     spec_type(spec_type::socket, 0, 0),
                     spec_type(spec_type::unknown),
                     spec_type(spec_type::unknown)
-                }
+                }, data_good_thread()
             },
             { 0x000fff, 0x000fff }
         },
@@ -151,7 +151,7 @@ namespace test
                     spec_type(spec_type::socket, 0, -1),
                     spec_type(spec_type::unknown),
                     spec_type(spec_type::unknown)
-                }
+                }, data_good_thread()
             },
             { 0x000fff, 0xfff000 }
         },
@@ -162,7 +162,7 @@ namespace test
                     spec_type(spec_type::socket, 0, -1),
                     spec_type(spec_type::unknown),
                     spec_type(spec_type::unknown)
-                }
+                }, data_good_thread()
             },
             { 0x000fff, 0xfff000 }
         },
@@ -190,7 +190,7 @@ namespace test
                     spec_type(spec_type::numanode, 0, 0),
                     spec_type(spec_type::unknown),
                     spec_type(spec_type::unknown)
-                }
+                }, data_good_thread()
             },
             { 0x000fff, 0x000fff }
         },
@@ -201,7 +201,7 @@ namespace test
                     spec_type(spec_type::numanode, 0, 0),
                     spec_type(spec_type::unknown),
                     spec_type(spec_type::unknown)
-                }
+                }, data_good_thread()
             },
             { 0x000fff, 0x000fff }
         },
@@ -229,7 +229,7 @@ namespace test
                     spec_type(spec_type::numanode, 0, -1),
                     spec_type(spec_type::unknown),
                     spec_type(spec_type::unknown)
-                }
+                }, data_good_thread()
             },
             { 0x000fff, 0xfff000 }
         },
@@ -240,7 +240,7 @@ namespace test
                     spec_type(spec_type::numanode, 0, 1),
                     spec_type(spec_type::unknown),
                     spec_type(spec_type::unknown)
-                }
+                }, data_good_thread()
             },
             { 0x000fff, 0xfff000 }
         },
@@ -268,7 +268,7 @@ namespace test
                     spec_type(spec_type::unknown),
                     spec_type(spec_type::core, 0, 0),
                     spec_type(spec_type::unknown)
-                }
+                }, data_good_thread()
             },
             { 0x000003, 0x000003 }
         },
@@ -279,7 +279,7 @@ namespace test
                     spec_type(spec_type::unknown),
                     spec_type(spec_type::core, 0, 0),
                     spec_type(spec_type::unknown)
-                }
+                }, data_good_thread()
             },
             { 0x000003, 0x000003 }
         },
@@ -307,7 +307,7 @@ namespace test
                     spec_type(spec_type::unknown),
                     spec_type(spec_type::core, 0, -1),
                     spec_type(spec_type::unknown)
-                }
+                }, data_good_thread()
             },
             { 0x000003, 0x00000c }
         },
@@ -318,7 +318,7 @@ namespace test
                     spec_type(spec_type::unknown),
                     spec_type(spec_type::core, 0, 1),
                     spec_type(spec_type::unknown)
-                }
+                }, data_good_thread()
             },
             { 0x000003, 0x00000c }
         },
@@ -346,7 +346,7 @@ namespace test
                     spec_type(spec_type::unknown),
                     spec_type(spec_type::core, 1, 0),
                     spec_type(spec_type::pu, 0, 0)
-                }
+                }, data_good_thread()
             },
             { 0x000004, 0x000004 }
         },
@@ -374,7 +374,7 @@ namespace test
                     spec_type(spec_type::unknown),
                     spec_type(spec_type::core, 1, 0),
                     spec_type(spec_type::pu, 0, -1)
-                }
+                }, data_good_thread()
             },
             { 0x000004, 0x000008 }
         },
@@ -402,7 +402,7 @@ namespace test
                     spec_type(spec_type::unknown),
                     spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 0, 0)
-                }
+                }, data_good_thread()
             },
             { 0x000001, 0x000001 }
         },
@@ -430,7 +430,7 @@ namespace test
                     spec_type(spec_type::unknown),
                     spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 0, -1)
-                }
+                }, data_good_thread()
             },
             { 0x000001, 0x000002 }
         },
@@ -458,7 +458,7 @@ namespace test
                     spec_type(spec_type::socket, 0, 0),
                     spec_type(spec_type::core, 0, 0),
                     spec_type(spec_type::unknown)
-                }
+                }, data_good_thread()
             },
             { 0x000003, 0x000003 }
         },
@@ -486,7 +486,7 @@ namespace test
                     spec_type(spec_type::socket, 1, 0),
                     spec_type(spec_type::core, 0, -1),
                     spec_type(spec_type::unknown)
-                }
+                }, data_good_thread()
             },
             { 0x003000, 0x00c000 }
         },
@@ -514,7 +514,7 @@ namespace test
                     spec_type(spec_type::numanode, 0, 0),
                     spec_type(spec_type::core, 0, 0),
                     spec_type(spec_type::unknown)
-                }
+                }, data_good_thread()
             },
             { 0x000003, 0x000003 }
         },
@@ -542,7 +542,7 @@ namespace test
                     spec_type(spec_type::numanode, 1, 0),
                     spec_type(spec_type::core, 0, -1),
                     spec_type(spec_type::unknown)
-                }
+                }, data_good_thread()
             },
             { 0x003000, 0x00c000 }
         },
@@ -570,7 +570,7 @@ namespace test
                     spec_type(spec_type::socket, 1, 0),
                     spec_type(spec_type::core, 0, -1),
                     spec_type(spec_type::pu, 1, 0)
-                }
+                }, data_good_thread()
             },
             { 0x002000, 0x008000 }
         },
@@ -598,7 +598,7 @@ namespace test
                     spec_type(spec_type::socket, 1, 0),
                     spec_type(spec_type::core, 1, 0),
                     spec_type(spec_type::pu, 0, 0)
-                }
+                }, data_good_thread()
             },
             { 0x004000, 0x004000 }
         },
@@ -626,7 +626,7 @@ namespace test
                     spec_type(spec_type::socket, 1, 0),
                     spec_type(spec_type::core, 1, 0),
                     spec_type(spec_type::pu, 0, -1)
-                }
+                }, data_good_thread()
             },
             { 0x004000, 0x008000 }
         },
@@ -654,7 +654,7 @@ namespace test
                     spec_type(spec_type::numanode, 1, 0),
                     spec_type(spec_type::core, 1, 0),
                     spec_type(spec_type::pu, 0, 0)
-                }
+                }, data_good_thread()
             },
             { 0x004000, 0x004000 }
         },
@@ -682,7 +682,7 @@ namespace test
                     spec_type(spec_type::numanode, 1, 0),
                     spec_type(spec_type::core, 0, -1),
                     spec_type(spec_type::pu, 1, 0)
-                }
+                }, data_good_thread()
             },
             { 0x002000, 0x008000 }
         },
@@ -694,7 +694,7 @@ namespace test
                     spec_type(spec_type::socket, 0, 0),
                     spec_type(spec_type::core, spec_type::all_entities(), 0),
                     spec_type(spec_type::pu, 0, 0)
-                }
+                }, data_good_thread()
             },
             { 0x000001, 0x000004 }
         },
@@ -723,7 +723,7 @@ namespace test
                     spec_type(spec_type::socket, 0, -1),
                     spec_type(spec_type::core, 1, 0),
                     spec_type(spec_type::pu, 1, 0)
-                }
+                }, data_good_thread()
             },
             { 0x000008, 0x008000 }
         },
@@ -752,7 +752,7 @@ namespace test
                     spec_type(spec_type::numanode, 0, -1),
                     spec_type(spec_type::core, 1, 0),
                     spec_type(spec_type::pu, 1, 0)
-                }
+                }, data_good_thread()
             },
             { 0x000008, 0x008000 }
         },
@@ -781,7 +781,7 @@ namespace test
                     spec_type(spec_type::socket, 0, -1),
                     spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 0, 0)
-                }
+                }, data_good_thread()
             },
             { 0x000001, 0x001000 }
         },
@@ -810,7 +810,7 @@ namespace test
                     spec_type(spec_type::numanode, 0, -1),
                     spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 0, 0)
-                }
+                }, data_good_thread()
             },
             { 0x000001, 0x001000 }
         },
@@ -839,7 +839,7 @@ namespace test
                     spec_type(spec_type::socket, 0, 0),
                     spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 0, 0)
-                }
+                }, data_good_thread()
             },
             { 0x000001, 0x000001 }
         },
@@ -868,7 +868,7 @@ namespace test
                     spec_type(spec_type::socket, 0, 0),
                     spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 0, -1)
-                }
+                }, data_good_thread()
             },
             { 0x000001, 0x000002 }
         },
@@ -897,7 +897,7 @@ namespace test
                     spec_type(spec_type::numanode, 0, 0),
                     spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 0, 0)
-                }
+                }, data_good_thread()
             },
             { 0x000001, 0x000001 }
         },
@@ -926,12 +926,12 @@ namespace test
                     spec_type(spec_type::numanode, 0, 0),
                     spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 0, -1)
-                }
+                }, data_good_thread()
             },
             { 0x000001, 0x000002 }
         },
 
-        { "" }
+        { "", {data_good_thread(), data_good_thread()}, {0,0} }
     };
 
     void good_testing(data_good const* t, char const* const options)

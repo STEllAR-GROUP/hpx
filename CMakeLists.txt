@@ -155,6 +155,10 @@ hpx_option(WITH_AUTOMATIC_PREPROCESSING BOOL "True if the automatic header prepr
 hpx_option(WITH_WAVE_ADDITIONAL_INCLUDE_DIRS STRING "Additional (compiler specific) include directories for the wave preprocessing tool." "" CATEGORY "Generic" ADVANCED)
 
 hpx_option(WITH_EXAMPLES BOOL "Build the HPX examples (default ON)" ON)
+hpx_option(WITH_TESTS BOOL "Build the HPX tests (default ON)" ON)
+hpx_option(WITH_TESTS_BENCHMARKS BOOL "Build HPX benchmark tests (default: ON)" ON ADVANCED)
+hpx_option(WITH_TESTS_REGRESSIONS BOOL "Build HPX regression tests (default: ON)" ON ADVANCED)
+hpx_option(WITH_TESTS_UNIT BOOL "Build HPX unit tests (default: ON)" ON ADVANCED)
 
 ################################################################################
 # Native TLS configuration
@@ -964,7 +968,7 @@ else()
     DEFINITIONS HPX_HAVE_RDTSCP)
 
   if(NOT WITH_RDTSC AND NOT WITH_RDTSCP)
-    hpx_warn("hardware_timer" "Neither rdtsc nor rdtscp is available; some performance counters may report incorrect results")
+    hpx_warn("Neither rdtsc nor rdtscp is available; some performance counters may report incorrect results")
   endif()
 endif()
 
@@ -1144,37 +1148,31 @@ endif()
 # add_plugin_modules()
 #
 # ###############################################################################
-#
-# find_package(PythonInterp)
-#
-# if(NOT PYTHONINTERP_FOUND)
-#     hpx_warn("hpx.tests" "Tests have been disabled because python was not found")
-#     hpx_option(HPX_BUILD_TESTS BOOL "Build HPX tests (default: OFF)" OFF ADVANCED)
-# else()
-#     hpx_option(HPX_BUILD_TESTS BOOL "Build HPX tests (default: ON)" ON ADVANCED)
-# endif()
-#
-# if(HPX_BUILD_TESTS)
-#   hpx_option(HPX_BUILD_TESTS_BENCHMARKS BOOL "Build HPX benchmark tests (default: ON)" ON ADVANCED)
-#   hpx_option(HPX_BUILD_TESTS_REGRESSIONS BOOL "Build HPX regression tests (default: ON)" ON ADVANCED)
-#   hpx_option(HPX_BUILD_TESTS_UNIT BOOL "Build HPX unit tests (default: ON)" ON ADVANCED)
-#
-#   add_hpx_pseudo_target(tests)
-#
-#   enable_testing()
-#   include(CTest)
-#
-#   add_custom_command(TARGET tests POST_BUILD
-#     COMMAND ctest --output-on-failure --timeout 100)
-#
-#   include_directories(tests)
-#   add_subdirectory(tests)
-# else()
-#   unset(HPX_BUILD_TESTS_BENCHMARKS CACHE)
-#   unset(HPX_BUILD_TESTS_REGRESSIONS CACHE)
-#   unset(HPX_BUILD_TESTS_UNIT CACHE)
-# endif()
-#
+
+
+###############################################################################
+# Tests
+###############################################################################
+if(WITH_TESTS)
+  find_package(PythonInterp)
+
+  if(NOT PYTHONINTERP_FOUND)
+    hpx_warn("A python interpreter could not be found. The test suite can not be run automatically.")
+  endif()
+
+  add_hpx_pseudo_target(tests)
+
+  enable_testing()
+  include(CTest)
+
+  add_custom_command(TARGET tests POST_BUILD
+    COMMAND ctest --output-on-failure --timeout 100)
+
+  include_directories(tests)
+  add_subdirectory(tests)
+endif()
+
+
 # hpx_option(HPX_BUILD_RUNTIME BOOL "Build HPX runtime (default: ON)" ON ADVANCED)
 #
 # if(HPX_BUILD_RUNTIME)
@@ -1219,12 +1217,12 @@ message(${HPX_CONFIG_DEFINITIONS})
 configure_file("${hpx_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
                "${CMAKE_BINARY_DIR}/hpx/config/defines.hpp"
                @ONLY)
-#
-# # Configure hpxrun.py
-# configure_file("${hpx_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
-#                "${CMAKE_BINARY_DIR}/bin/hpxrun.py"
-#                @ONLY)
-#
+
+# Configure hpxrun.py
+configure_file("${hpx_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
+               "${CMAKE_BINARY_DIR}/bin/hpxrun.py"
+               @ONLY)
+
 # ################################################################################
 # # installation instructions
 # ################################################################################
@@ -1612,11 +1610,9 @@ foreach(_cat "Generic" "Thread Manager" "AGAS" "Parcelport" "Profiling" "Debuggi
   endforeach()
 endforeach()
 
-# add_library(test_static STATIC t.cpp)
-add_library(test_shared SHARED t.cpp)
 add_executable(test t.cpp)
 message(${HPX_LIBRARIES})
-target_link_libraries(test test_shared ${HPX_LIBRARIES})
+target_link_libraries(test hpx_serialization ${HPX_LIBRARIES})
 
 # message(${_HPX_INFO_STRING})
 # message("HPX will be installed to ${CMAKE_INSTALL_PREFIX}")

@@ -28,7 +28,7 @@ endif()
 # Set configuration option to use Boost.Context or not. This depends on the Boost
 # version (Boost.Context was included with 1.51) and the Platform
 if(Boost_VERSION GREATER 105000)
-  find_package(Boost 1.50 QUIET REQUIRED COMPONENTS context)
+  find_package(Boost 1.50 QUIET COMPONENTS context)
   if(Boost_CONTEXT_FOUND)
     hpx_info("  context")
   endif()

@@ -3,11 +3,11 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-find_package(HPX_OpenMP)
+find_package(OpenMP)
 
 set(jacobi_smp_applications)
 
-if(HPX_HAVE_CXX11_LAMBDAS)
+if(WITH_CXX11_LAMBDAS)
   set(jacobi_smp_applications ${jacobi_smp_applications}
       jacobi_hpx
       jacobi_nonuniform_hpx)

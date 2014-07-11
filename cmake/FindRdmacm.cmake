@@ -39,8 +39,4 @@ foreach(v RDMACM_ROOT)
   endif()
 endforeach()
 
-if(NOT RDMACM_FOUND)
-  hpx_info("Set RDMACM_ROOT to the location where tbbmalloc are installed")
-endif()
-
 mark_as_advanced(RDMACM_ROOT RDMACM_LIBRARY RDMACM_INCLUDE_DIR)

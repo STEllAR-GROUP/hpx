@@ -194,10 +194,10 @@ set(hpx_serialization_lib_dependencies
 if(NOT MSVC)
   set(hpx_serialization_lib_dependencies
       ${hpx_serialization_lib_dependencies}
-      optimized "${Boost_SYSTEM_LIBRARY_RELEASE}"
-      debug "${Boost_SYSTEM_LIBRARY_DEBUG}"
-      optimized "${Boost_SERIALIZATION_LIBRARY_RELEASE}"
-      debug "${Boost_SERIALIZATION_LIBRARY_DEBUG}")
+      debug ${Boost_SYSTEM_LIBRARY_DEBUG}
+      optimized ${Boost_SYSTEM_LIBRARY_RELEASE}
+      debug ${Boost_SERIALIZATION_LIBRARY_DEBUG}
+      optimized ${Boost_SERIALIZATION_LIBRARY_DEBUG})
 endif()
 
 target_link_libraries(hpx_serialization

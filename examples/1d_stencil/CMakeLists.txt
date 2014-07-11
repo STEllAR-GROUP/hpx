@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-find_package(HPX_OpenMP)
+find_package(OpenMP)
 
 set(example_programs
     1d_stencil_1
@@ -25,7 +25,7 @@ endif()
 
 foreach(example_program ${example_programs})
 
-  set(${example_program}_FLAGS DEPENDENCIES iostreams_component)
+  set(${example_program}_FLAGS COMPONENT_DEPENDENCIES iostreams)
 
   set(sources ${example_program}.cpp)
 
