@@ -83,7 +83,7 @@ namespace hpx
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
             if (addr)
-                p.apply(policy, addr, gid);
+                p.apply(policy, std::move(addr), gid);
             else
                 p.apply(policy, gid);
         }
@@ -220,7 +220,7 @@ namespace hpx
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
             if (addr)
-                p.apply(policy, addr, gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+                p.apply(policy, std::move(addr), gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
             else
                 p.apply(policy, gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }

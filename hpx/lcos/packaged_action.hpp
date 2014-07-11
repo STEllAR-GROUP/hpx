@@ -109,12 +109,12 @@ namespace hpx { namespace lcos
                     this->impl_, util::placeholders::_1));
         }
 
-        void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+        void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
             naming::id_type const& gid)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
-            hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
+            hpx::apply_c_cb<action_type>(this->get_gid(), std::move(addr), gid,
                 util::bind(&packaged_action::parcel_write_handler,
                     this->impl_, util::placeholders::_1));
         }
@@ -129,12 +129,13 @@ namespace hpx { namespace lcos
                     this->impl_, util::placeholders::_1));
         }
 
-        void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+        void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
             naming::id_type const& gid, threads::thread_priority priority)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
-            hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
+            hpx::apply_c_p_cb<action_type>(this->get_gid(), std::move(addr),
+                gid, priority,
                 util::bind(&packaged_action::parcel_write_handler,
                     this->impl_, util::placeholders::_1));
         }
@@ -244,13 +245,13 @@ namespace hpx { namespace lcos
             else {
                 // remote execution
                 hpx::applier::detail::apply_c_cb<action_type>(
-                    addr, this->get_gid(), gid,
+                    std::move(addr), this->get_gid(), gid,
                     util::bind(&packaged_action::parcel_write_handler,
                         this->impl_, util::placeholders::_1));
             }
         }
 
-        void apply(BOOST_SCOPED_ENUM(launch) /*policy*/, naming::address& addr,
+        void apply(BOOST_SCOPED_ENUM(launch) /*policy*/, naming::address&& addr,
             naming::id_type const& gid)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
@@ -268,7 +269,7 @@ namespace hpx { namespace lcos
             else {
                 // remote execution
                 hpx::applier::detail::apply_c_cb<action_type>(
-                    addr, this->get_gid(), gid,
+                    std::move(addr), this->get_gid(), gid,
                     util::bind(&packaged_action::parcel_write_handler,
                         this->impl_, util::placeholders::_1));
             }

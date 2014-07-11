@@ -486,12 +486,14 @@ namespace hpx { namespace parcelset
 
             // We yield here for a short amount of time to give another HPX thread the chance to put
             // a subsequent parcel which leads to a more effective parcel buffering
-            if (hpx::threads::get_self_ptr())
-            {
-                hpx::this_thread::yield();
-            }
+//             if (hpx::threads::get_self_ptr())
+//             {
+//                 hpx::this_thread::yield();
+//             }
 
-            if(!enable_parcel_handling_) return false;
+            if (!enable_parcel_handling_)
+                return false;
+
             {
                 lcos::local::spinlock::scoped_lock l(mtx_);
 
@@ -585,7 +587,7 @@ namespace hpx { namespace parcelset
                 // If none of the parcels may require id-splitting we're safe to
                 // force a new connection from the connection cache.
                 bool force_connection = true;
-                BOOST_FOREACH(parcel const&p, parcels)
+                BOOST_FOREACH(parcel const& p, parcels)
                 {
                     if (p.may_require_id_splitting())
                     {

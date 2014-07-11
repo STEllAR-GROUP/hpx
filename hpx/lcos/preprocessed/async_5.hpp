@@ -63,7 +63,7 @@ namespace hpx
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
             if (addr)
-                p.apply(policy, addr, gid, std::forward<Arg0>( arg0 ));
+                p.apply(policy, std::move(addr), gid, std::forward<Arg0>( arg0 ));
             else
                 p.apply(policy, gid, std::forward<Arg0>( arg0 ));
         }
@@ -164,7 +164,7 @@ namespace hpx
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
             if (addr)
-                p.apply(policy, addr, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
+                p.apply(policy, std::move(addr), gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
             else
                 p.apply(policy, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
         }
@@ -265,7 +265,7 @@ namespace hpx
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
             if (addr)
-                p.apply(policy, addr, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
+                p.apply(policy, std::move(addr), gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
             else
                 p.apply(policy, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
         }
@@ -366,7 +366,7 @@ namespace hpx
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
             if (addr)
-                p.apply(policy, addr, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
+                p.apply(policy, std::move(addr), gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
             else
                 p.apply(policy, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
         }
@@ -467,7 +467,7 @@ namespace hpx
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
             if (addr)
-                p.apply(policy, addr, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
+                p.apply(policy, std::move(addr), gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
             else
                 p.apply(policy, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
         }
