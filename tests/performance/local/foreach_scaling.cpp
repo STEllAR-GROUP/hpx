@@ -131,7 +131,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 {
     //pull values from cmd
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();
-    bool plotoutput = vm["gnuplot_friendly"].as<int>() ?true : false;
+    bool csvoutput = vm["csv_output"].as<int>() ?true : false;
     delay = vm["work_delay"].as<int>();
     test_count = vm["test_count"].as<int>();
     chunk_size = vm["chunk_size"].as<int>();
@@ -149,10 +149,10 @@ int hpx_main(boost::program_options::variables_map& vm)
         boost::uint64_t task_time = average_out_task(vector_size);
         boost::uint64_t seq_time = average_out_sequential(vector_size);
 
-        if(plotoutput == 1) {
-            hpx::cout << " " << seq_time/1e9
-                      << " " << par_time/1e9
-                      << " " << task_time/1e9 << "\n" << hpx::flush;
+        if(csvoutput) {
+            hpx::cout << "," << seq_time/1e9
+                      << "," << par_time/1e9
+                      << "," << task_time/1e9 << "\n" << hpx::flush;
         }
         else {
         // print results(Formatted). Setw(x) assures that all output is right justified
@@ -216,9 +216,9 @@ int main(int argc, char* argv[])
         , boost::program_options::value<int>()->default_value(0)
         , "number of overlapping task loops")
 
-        ("gnuplot_friendly"
+        ("csv_output"
         , boost::program_options::value<int>()->default_value(0)
-        ,"print only the execution time of seq and par")
+        ,"print results in csv format")
         ;
 
     return hpx::init(cmdline, argc, argv, cfg);
