@@ -14,7 +14,6 @@ set(tests
     fill
     filln
     foreach
-    foreach_futures
     foreachn
     move
     none_of

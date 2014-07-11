@@ -11,7 +11,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
-#include <hpx/parallel/detail/synchronize.hpp>
 #include <hpx/parallel/detail/is_negative.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -39,7 +38,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::mpl::true_)
         {
             try {
-                detail::synchronize(first, last);
                 return detail::algorithm_result<ExPolicy, bool>::get(
                     std::none_of(first, last, std::forward<F>(f)));
             }
@@ -51,7 +49,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <typename ExPolicy, typename FwdIter, typename F>
         typename detail::algorithm_result<ExPolicy, bool>::type
         none_of(ExPolicy const& policy, FwdIter first, FwdIter last, F && op,
-            boost::mpl::false_ f)
+            boost::mpl::false_)
         {
             if (first == last)
                 return detail::algorithm_result<ExPolicy, bool>::get(true);
@@ -193,7 +191,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::mpl::true_)
         {
             try {
-                detail::synchronize(first, last);
                 return detail::algorithm_result<ExPolicy, bool>::get(
                     std::any_of(first, last, std::forward<F>(f)));
             }
@@ -205,7 +202,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <typename ExPolicy, typename FwdIter, typename F>
         typename detail::algorithm_result<ExPolicy, bool>::type
         any_of(ExPolicy const& policy, FwdIter first, FwdIter last, F && op,
-            boost::mpl::false_ f)
+            boost::mpl::false_)
         {
             if (first == last)
                 return detail::algorithm_result<ExPolicy, bool>::get(false);
@@ -347,7 +344,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::mpl::true_)
         {
             try {
-                detail::synchronize(first, last);
                 return detail::algorithm_result<ExPolicy, bool>::get(
                     std::all_of(first, last, std::forward<F>(f)));
             }
@@ -359,7 +355,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <typename ExPolicy, typename FwdIter, typename F>
         typename detail::algorithm_result<ExPolicy, bool>::type
         all_of(ExPolicy const& policy, FwdIter first, FwdIter last, F && op,
-            boost::mpl::false_ f)
+            boost::mpl::false_)
         {
             if (first == last)
                 return detail::algorithm_result<ExPolicy, bool>::get(true);

@@ -104,7 +104,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
             }
         }
 
-        if (errors.get_error_count() == tried) {
+        if (errors.size() == tried) {
             // all attempts failed
             HPX_THROW_EXCEPTION(network_error,
                 "ipc::connection_handler::run", errors.get_message());
