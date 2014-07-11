@@ -28,7 +28,7 @@ namespace hpx
             // Create a new parcel with the gid, action, and arguments
             lcos::local::detail::invoke_when_ready(
                 detail::put_parcel<Action>(id, std::move(addr), priority,
-                    actions::continuation_type(c), std::forward<Callback>(cb)));
+                    actions::continuation_type(), std::forward<Callback>(cb)));
             return false;     // destination is remote
         }
 
