@@ -376,7 +376,7 @@ namespace hpx
 
         template <typename Action>
         inline bool
-        apply_r_sync_p(naming::address& addr, naming::id_type const& id,
+        apply_r_sync_p(naming::address&& addr, naming::id_type const& id,
             threads::thread_priority priority)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type_;
