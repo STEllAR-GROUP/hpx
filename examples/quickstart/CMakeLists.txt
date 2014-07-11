@@ -25,7 +25,6 @@ set(example_programs
     interest_calculator
     non_atomic_rma
     pingpong
-    pipeline
     print_to_console
     quicksort
     simple_future_continuation
@@ -48,7 +47,6 @@ if(HPX_HAVE_CXX11_LAMBDAS)
       1d_wave_equation
       hello_world
       fibonacci_dataflow
-      simple_pipeline
       vector_zip_dotproduct
       vector_counting_dotproduct
      )
