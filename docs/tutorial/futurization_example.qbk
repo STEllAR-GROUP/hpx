@@ -7,10 +7,11 @@
 
 [section:futurization_example Futurization Example]
 
-When developers write code they typically begin with a simple serial code.
-The following set of examples were developed to demonstrate the iterative
+When developers write code they typically begin with a simple serial code
+and build upon it until all of the required functionality is present.
+The following set of examples were developed to demonstrate this iterative
 process of evoling a 
-simple serial program to an efficient, fully distrubuted application.
+simple serial program to an efficient, fully distrubuted HPX application.
 For this demonstration, we implemented a 1D heat distribution problem, 
 which we parallelize over the followng eight examples:
 
@@ -24,7 +25,8 @@ which we parallelize over the followng eight examples:
 *[hpx_link examples/1d_stencil/1d_stencil_1.cpp..Example 8]
 
 The first example is straight serial code.  In this code we instantiate
- a vector which contains two vectors of doubles. 
+ a vector [^U] which contains two vectors of doubles as seeen in
+the structure [^stepper]. 
 
 [import ../../examples/1d_stencil/1d_stencil_1.cpp]
 [stepper_1]
@@ -44,37 +46,43 @@ a method by which we can easily transform a code which is serially
 executed into a code which creates asynchronous threads. In the simplest
 case this involves relplacing a variable with a futue to a variable,
 a function with a future to a function, and adding a [^.get()] at the
-point where a value is actually needed.
+point where a value is actually needed. The code below shows how this
+technique was applied to the [^struc stepper].
 
 [import ../../examples/1d_stencil/1d_stencil_2.cpp]
 [stepper_2]
 
 In our example we re-define 
-our partition type as a [^shared_future] and create 
-the object "result" which is a future vector of shared futures. We
-then call [^result.get()] and set its value equal to the solution vector.
-The future vector "result" is calculated by stringing the future results 
-of the function heat together so that each element calls [^heat] 
-when the previous futures it depends on are ready. 
-In HPX, 
+our partition type as a [^shared_future] and, in [^main], create 
+the object "result" which is a future to a vector of shared futures. We
+use [^result] to represent the last vector of futures on a string of 
+vectors of futures created for each timestep. 
+This execution tree is unraveled by passing the values 
+of a partition and its neighbors to [^heat] once the futures that 
+contain them are ready. In HPX, 
 we have an LCO (Local Control Object) named Dataflow which assists the 
-programmer in this process.  Dataflow 
-allows us to pass the results, a set of futures, to a specified function 
+programmer in expressing this dependency.  Dataflow 
+allows us to pass the results of a set of futures to a specified function 
 when the futures are ready.
-Dataflow takes [x] arguments, which instruct the object on how to perform 
-the function call, the function to call, and the arguments for that function. 
+Dataflow takes three types arguments,
+one which instructs the dataflow on how to perform 
+the function call (async or sync), the function to 
+call (in this case [^Op]), and futures to the arguments 
+that will be passed to the function. 
 When called, dataflow immediately returns a future to the result of the 
 specified function.  This allows users to string the dataflows together 
 and construct an execution tree. 
 
-After the values of the futures in data flow are ready, the values must 
-be prepared to be passed to the function [^heat]. In order to do this we 
-use the HPX facility [^unwrapped]. In this example, [^unwrapped]
-retrieves the value of the futures passed to [^Op] and passes their
-values to the function [^heat].
+After the values of the futures in dataflow are ready, the values must 
+be pulled out of the future container to be passed to the function [^heat]. 
+In order to do this we 
+use the HPX facility [^unwrapped], which underneath calls [^.get()] on
+each of the futures so that the function [^heat] will be passed doubles
+and not futures to doubles.
 
 By setting up the algorithm this way, the program will be able to execute
-as the dependencies are met.  Unfortunately, this example runs 
+as quickly as the dependencies of each future are met. 
+Unfortunately, this example runs 
 terribly slow. This increase in execution time is caused 
 by the increased overheads needed to create a future for each
 data point. Because the work done within each call to heat is very
@@ -95,12 +103,8 @@ be a vector of partitions.
 
 In example 4, we take advantage of the partition setup by redefining
 [^space] to be a vector of shared_futures which represents partitions.
-In [^hpx_main] we create a future vector of space named result which
-contains the final calculated data points and sets it equal
-to the step member function [^do_work].  We pass the number 
-of partitions, the number of grid points per partition, and 
-the number of steps that the program will simulate to this
-function, which sets up the execution tree.  It should be noted
+The rest of the code was then futureized in the same manner that was 
+done in example 2. It should be noted
 how strikingly similar example 4 is to example 2.
 
 Example 4 finally shows us some good results.  This code 
@@ -113,13 +117,13 @@ example 5.
 
 In order to run on a distributed system, a large amount of boilerplate code
 must be added. Fortunately, HPX provides us with the concept of
-a component which saves us from having to write quite as much code.
+a "component" which saves us from having to write quite as much code.
  A component is an object which can be 
 remotely accessed using its global address. Components
 are made of two parts: a server and a client class.
-While it is not required to write them this way, abstracting 
-the server and the client allows us to hide the boiler plate code 
-and ensure type safety instead of having to pass around pointers
+While the client class is not required, abstracting 
+the server behind a client allows us to ensure type safety 
+instead of having to pass around pointers
 to global objects. Example 5 renames example 4's 
 [^struct partition] to [^partition_data] and
 adds serialization support. Next we add the server side
@@ -153,7 +157,7 @@ extracts the shared_array of doubles and passes them to the lambda.
 The lambda calls [^heat_part_data] on the locality which the middle 
 partition is on.
 
-Although this example could run in distributed it only runs on
+Although this example could run in distributed, it only runs on
 one locality as it always uses [^hpx::find_here()] as the target
 for the functions to run on.
 
