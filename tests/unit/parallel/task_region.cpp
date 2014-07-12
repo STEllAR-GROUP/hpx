@@ -62,25 +62,6 @@ void task_region_test1()
     HPX_TEST(task3_flag);
 }
 
-void task_region_test_exceptions1()
-{
-    task_region([](task_region_handle& trh)
-    {
-        trh.run([]{
-            hpx::cout << "task1" << hpx::endl;
-            throw 1;
-        });
-
-        trh.run([]{
-            hpx::cout << "task2" << hpx::endl;
-            throw 2;
-        });
-
-        hpx::cout << "parent" << hpx::endl;
-        throw 100;
-    });
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 void task_region_test2()
 {
@@ -132,9 +113,38 @@ void task_region_test2()
     HPX_TEST(task3_flag);
 }
 
-hpx::future<void> task_region_test_exceptions2()
+void task_region_exceptions_test1()
 {
-    return async_task_region([](task_region_handle& trh)
+    try {
+        task_region([](task_region_handle& trh)
+        {
+            trh.run([]{
+                hpx::cout << "task1" << hpx::endl;
+                throw 1;
+            });
+
+            trh.run([]{
+                hpx::cout << "task2" << hpx::endl;
+                throw 2;
+            });
+
+            hpx::cout << "parent" << hpx::endl;
+            throw 100;
+        });
+
+        HPX_TEST(false);
+    }
+    catch (hpx::parallel::exception_list const& e) {
+        HPX_TEST_EQ(e.get_error_count(), 3);
+    }
+    catch(...) {
+        HPX_TEST(false);
+    }
+}
+
+void task_region_exceptions_test2()
+{
+    hpx::future<void> f = async_task_region([](task_region_handle& trh)
     {
         trh.run([]{
             hpx::cout << "task1" << hpx::endl;
@@ -149,26 +159,7 @@ hpx::future<void> task_region_test_exceptions2()
         hpx::cout << "parent" << hpx::endl;
         throw 100;
     });
-}
 
-///////////////////////////////////////////////////////////////////////////////
-int hpx_main()
-{
-    task_region_test1();
-    task_region_test2();
-
-    try {
-        task_region_test_exceptions1();
-        HPX_TEST(false);
-    }
-    catch (hpx::parallel::exception_list const& e) {
-        HPX_TEST_EQ(e.get_error_count(), 3);
-    }
-    catch(...) {
-        HPX_TEST(false);
-    }
-
-    hpx::future<void> f = task_region_test_exceptions2();
     try {
         f.get();
         HPX_TEST(false);
@@ -179,6 +170,75 @@ int hpx_main()
     catch(...) {
         HPX_TEST(false);
     }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void task_region_exceptions_test3()
+{
+    try {
+        task_region([&](task_region_handle& trh)
+        {
+            trh.run([&]()
+            {
+                // Error: tr is not active
+                trh.run([]
+                {
+                    HPX_TEST(false);    // should not be called
+                });
+
+                HPX_TEST(false);
+            });
+        });
+
+        HPX_TEST(false);
+    }
+    catch (hpx::exception const& e) {
+        HPX_TEST_EQ(e.get_error(), hpx::task_region_not_active);
+    }
+    catch (...) {
+        HPX_TEST(false);
+    }
+}
+
+void task_region_exceptions_test4()
+{
+    hpx::future<void> f = async_task_region([&](task_region_handle& trh)
+    {
+        trh.run([&]()
+        {
+            // Error: tr is not active
+            trh.run([]
+            {
+                HPX_TEST(false);    // should not be called
+            });
+
+            HPX_TEST(false);
+        });
+    });
+
+    try {
+        f.get();
+        HPX_TEST(false);
+    }
+    catch (hpx::exception const& e) {
+        HPX_TEST_EQ(e.get_error(), hpx::task_region_not_active);
+    }
+    catch (...) {
+        HPX_TEST(false);
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+int hpx_main()
+{
+    task_region_test1();
+    task_region_test2();
+
+    task_region_exceptions_test1();
+    task_region_exceptions_test2();
+
+    task_region_exceptions_test3();
+    task_region_exceptions_test4();
 
     return hpx::finalize();
 }

@@ -114,6 +114,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             hpx::future<void> async_task_region_final(F &&);
 
         task_region_handle()
+          : id_(threads::get_self_id())
         {
         }
 
@@ -196,6 +197,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         template <typename F>
         void run(F && f)
         {
+            // The proposal requires that the task_region_handle should be
+            // 'active' to be usable.
+            if (id_ != threads::get_self_id())
+            {
+                HPX_THROW_EXCEPTION(task_region_not_active,
+                    "task_region_hanlde::run",
+                    "the task_region_handle is not active");
+            }
+
             hpx::future<void> result = hpx::async(boost::move(f));
 
             mutex_type::scoped_lock l(mtx_);
@@ -228,6 +238,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         ///
         void wait()
         {
+            // The proposal requires that the task_region_handle should be
+            // 'active' to be usable.
+            if (id_ != threads::get_self_id())
+            {
+                HPX_THROW_EXCEPTION(task_region_not_active,
+                    "task_region_hanlde::run",
+                    "the task_region_handle is not active");
+            }
+
             when().wait();
         }
 
@@ -235,6 +254,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         mutable mutex_type mtx_;
         std::vector<hpx::future<void> > tasks_;
         parallel::exception_list errors_;
+        threads::thread_id_type id_;
     };
 
     /// Constructs a \a task_region_handle, tr, and invokes the expression
