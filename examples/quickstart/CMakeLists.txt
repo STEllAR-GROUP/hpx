@@ -48,7 +48,6 @@ if(HPX_HAVE_CXX11_LAMBDAS)
       hello_world
       fibonacci_dataflow
       pipeline1
-      pipeline2
       vector_zip_dotproduct
       vector_counting_dotproduct
      )
