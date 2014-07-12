@@ -10,8 +10,8 @@
 #include <hpx/util/lightweight_test.hpp>
 
 using hpx::parallel::task_region;
+using hpx::parallel::async_task_region;
 using hpx::parallel::task_region_handle;
-using hpx::parallel::task;
 
 ///////////////////////////////////////////////////////////////////////////////
 void task_region_test1()
@@ -92,7 +92,7 @@ void task_region_test2()
     bool task21_flag = false;
     bool task3_flag = false;
 
-    hpx::future<void> f = task_region(task, [&](task_region_handle& trh)
+    hpx::future<void> f = async_task_region([&](task_region_handle& trh)
     {
         parent_flag = true;
 
@@ -134,7 +134,7 @@ void task_region_test2()
 
 hpx::future<void> task_region_test_exceptions2()
 {
-    return task_region(task, [](task_region_handle& trh)
+    return async_task_region([](task_region_handle& trh)
     {
         trh.run([]{
             hpx::cout << "task1" << hpx::endl;

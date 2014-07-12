@@ -14,6 +14,7 @@
 #include <hpx/lcos/local/dataflow.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/lcos/when_all.hpp>
 #include <hpx/async.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -108,9 +109,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         template <typename F> friend void task_region_final(F &&);
 
         template <typename F> friend
-        hpx::future<void> task_region(task_execution_policy const&, F &&);
+            hpx::future<void> async_task_region(F &&);
         template <typename F> friend
-        hpx::future<void> task_region_final(task_execution_policy const&, F &&);
+            hpx::future<void> async_task_region_final(F &&);
 
         task_region_handle()
         {
@@ -124,36 +125,40 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         HPX_MOVABLE_BUT_NOT_COPYABLE(task_region_handle);
         BOOST_DELETED_FUNCTION(task_region_handle* operator&() const);
 
-        // return future representing the execution of all tasks
-        hpx::future<void> when(exception_list && errors)
+        static void on_ready(std::vector<hpx::future<void> > && results,
+            parallel::exception_list errors)
         {
-            std::vector<hpx::future<void> > active;
+            for (hpx::future<void>& f: results)
+            {
+                if (f.has_exception())
+                    errors.add(f.get_exception_ptr());
+            }
+            if (errors.size() != 0)
+                boost::throw_exception(errors);
+        }
+
+        // return future representing the execution of all tasks
+        hpx::future<void> when(bool throw_on_error = false)
+        {
+            std::vector<hpx::future<void> > tasks;
+            parallel::exception_list errors;
 
             {
                 mutex_type::scoped_lock l(mtx_);
-                std::swap(tasks_, active);
+                std::swap(tasks_, tasks);
+                std::swap(errors_, errors);
             }
 
-            if (active.empty())
+            if (tasks.empty() && errors.size() == 0)
                 return hpx::make_ready_future();
 
-            return hpx::lcos::local::dataflow(
-                [errors](std::vector<hpx::future<void> > && results) mutable
-                {
-                    for (hpx::future<void>& f: results)
-                    {
-                        if (f.has_exception())
-                            errors.add(f.get_exception_ptr());
-                    }
-                    if (errors.get_error_count())
-                        boost::throw_exception(errors);
-                },
-                std::move(active));
-        }
+            if (!throw_on_error)
+                return hpx::when_all(tasks);
 
-        hpx::future<void> when()
-        {
-            return when(parallel::exception_list());
+            return hpx::lcos::local::dataflow(
+                util::bind(util::one_shot(&task_region_handle::on_ready),
+                    util::placeholders::_1, std::move(errors)),
+                std::move(tasks));
         }
         /// \endcond
 
@@ -223,22 +228,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         ///
         void wait()
         {
-            try {
-                when().get();
-            }
-            catch (parallel::exception_list const&) {
-                throw;
-            }
-            catch (...) {
-                boost::throw_exception(
-                    parallel::exception_list(boost::current_exception())
-                );
-            }
+            when().wait();
         }
 
     private:
         mutable mutex_type mtx_;
         std::vector<hpx::future<void> > tasks_;
+        parallel::exception_list errors_;
     };
 
     /// Constructs a \a task_region_handle, tr, and invokes the expression
@@ -265,25 +261,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     {
         task_region_handle trh;
 
-        parallel::exception_list errors;
+        // invoke the user supplied function
         try {
             f(trh);
         }
         catch (...) {
-            detail::handle_task_region_exceptions(errors);
+            task_region_handle::mutex_type::scoped_lock l(trh.mtx_);
+            detail::handle_task_region_exceptions(trh.errors_);
         }
 
         // regardless of whether f(trh) has thrown an exception we need to
         // obey the contract and wait for all tasks to join
-        try {
-            trh.wait();      // throws list of exceptions
-        }
-        catch (...) {
-            detail::handle_task_region_exceptions(errors);
-        }
-
-        if (errors.get_error_count())
-            boost::throw_exception(errors);
+        trh.when(true).get();
     }
 
     /// Constructs a \a task_region_handle, tr, and invokes the expression
@@ -319,7 +308,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// \tparam F   The type of the user defined function to invoke inside the
     ///             task_region (deduced). \a F shall be MoveConstructible.
     ///
-    /// \param t    An instance of type task_execution_policy.
     /// \param f    The user defined function to invoke inside the task_region
     ///             Given an lvalue \a tr of type \a task_region_handle, the
     ///             expression, (void)f(tr), shall be well-formed.
@@ -341,19 +329,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     ///       indirectly) call tr.run(_callable_object_).
     ///
     template <typename F>
-    hpx::future<void> task_region(task_execution_policy const& t, F && f)
+    hpx::future<void> async_task_region(F && f)
     {
         task_region_handle trh;
-        parallel::exception_list errors;
-
         try {
             f(trh);
         }
         catch (...) {
-            detail::handle_task_region_exceptions(errors);
+            task_region_handle::mutex_type::scoped_lock l(trh.mtx_);
+            detail::handle_task_region_exceptions(trh.errors_);
         }
-
-        return trh.when(std::move(errors));
+        return trh.when(true);
     }
 
     /// Constructs a \a task_region_handle, tr, and invokes the expression
@@ -362,7 +348,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// \tparam F   The type of the user defined function to invoke inside the
     ///             task_region (deduced). \a F shall be MoveConstructible.
     ///
-    /// \param t    An instance of type task_execution_policy.
     /// \param f    The user defined function to invoke inside the task_region.
     ///             Given an lvalue \a tr of type \a task_region_handle, the
     ///             expression, (void)f(tr), shall be well-formed.
@@ -384,11 +369,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     ///       indirectly) call tr.run(_callable_object_).
     ///
     template <typename F>
-    hpx::future<void> task_region_final(task_execution_policy const& t, F && f)
+    hpx::future<void> async_task_region_final(F && f)
     {
         // By design we always return on the same (HPX-) thread as we started
         // executing task_region_final.
-        return task_region(task, std::forward<F>(f));
+        return async_task_region(std::forward<F>(f));
     }
 }}}
 
