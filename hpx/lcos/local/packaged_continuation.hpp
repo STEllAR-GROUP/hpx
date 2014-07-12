@@ -448,7 +448,8 @@ namespace hpx { namespace lcos { namespace detail
             typename shared_state_ptr_for<Inner>::type const& inner_state)
         {
             try {
-                transfer_result<Inner>()(inner_state, this);
+                unwrap_continuation* this_ = this;
+                transfer_result<Inner>()(inner_state, this_);
             }
             catch (...) {
                 this->set_exception(boost::current_exception());
