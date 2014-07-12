@@ -484,13 +484,6 @@ namespace hpx { namespace parcelset
         {
             typedef pending_parcels_map::iterator iterator;
 
-            // We yield here for a short amount of time to give another HPX thread the chance to put
-            // a subsequent parcel which leads to a more effective parcel buffering
-//             if (hpx::threads::get_self_ptr())
-//             {
-//                 hpx::this_thread::yield();
-//             }
-
             if (!enable_parcel_handling_)
                 return false;
 
@@ -646,6 +639,12 @@ namespace hpx { namespace parcelset
                     send_pending_parcels(sender_connection, std::move(parcels),
                         std::move(handlers));
                 }
+
+                // We yield here for a short amount of time to give another
+                // HPX thread the chance to put a subsequent parcel which
+                // leads to a more effective parcel buffering
+                if (hpx::threads::get_self_ptr())
+                    hpx::this_thread::yield();
             }
         }
 
