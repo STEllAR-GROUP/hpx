@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -57,6 +57,22 @@ namespace hpx
                     util::forward_as_tuple());
             }
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T>
+        struct keep_id_alive
+        {
+            explicit keep_id_alive(naming::id_type const& gid)
+              : gid_(gid)
+            {}
+
+            T operator()(lcos::future<T> && f) const
+            {
+                return f.get();
+            }
+
+            naming::id_type gid_;
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -80,12 +96,28 @@ namespace hpx
         }
 
         lcos::packaged_action<action_type, result_type> p;
+
+        bool target_is_managed = gid.get_management_type() == naming::id_type::managed;
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
+            naming::id_type target(gid);
+            if (target_is_managed)
+                target = naming::id_type(gid.get_gid(), naming::id_type::unmanaged);
+
             if (addr)
                 p.apply(policy, std::move(addr), gid);
             else
-                p.apply(policy, gid);
+                p.apply(policy, target);
+        }
+
+        // keep id alive, if needed - this allows to send the destination as an
+        // unmanaged id
+        if (target_is_managed)
+        {
+            using util::placeholders::_1;
+            return p.get_future().then(
+                    detail::keep_id_alive<result_type>(gid)
+                );
         }
 
         return p.get_future();
@@ -217,12 +249,28 @@ namespace hpx
         }
 
         lcos::packaged_action<action_type, result_type> p;
+
+        bool target_is_managed = gid.get_management_type() == naming::id_type::managed;
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
+            naming::id_type target(gid);
+            if (target_is_managed)
+                target = naming::id_type(gid.get_gid(), naming::id_type::unmanaged);
+
             if (addr)
                 p.apply(policy, std::move(addr), gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
             else
-                p.apply(policy, gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+                p.apply(policy, target, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+        }
+
+        // keep id alive, if needed - this allows to send the destination as an
+        // unmanaged id
+        if (target_is_managed)
+        {
+            using util::placeholders::_1;
+            return p.get_future().then(
+                    detail::keep_id_alive<result_type>(gid)
+                );
         }
 
         return p.get_future();

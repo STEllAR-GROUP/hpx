@@ -18,6 +18,19 @@ namespace hpx { namespace lcos
 
 namespace hpx { namespace traits
 {
+    namespace detail
+    {
+        template <typename Future>
+        struct is_unique_future
+          : boost::mpl::false_
+        {};
+
+        template <typename R>
+        struct is_unique_future<lcos::future<R> >
+          : boost::mpl::true_
+        {};
+    }
+
     template <typename Future, typename Enable>
     struct is_future
       : boost::mpl::false_
