@@ -27,36 +27,36 @@ namespace hpx { namespace lcos { namespace detail
     struct transfer_result
     {
         template <typename Source, typename Destination>
-        void apply(Source src, Destination& dest, boost::mpl::false_) const
+        void apply(Source&& src, Destination& dest, boost::mpl::false_) const
         {
             try {
-                dest->set_result(src.get());
+                dest.set_result(src.get());
             }
             catch (...) {
-                dest->set_exception(boost::current_exception());
+                dest.set_exception(boost::current_exception());
             }
         }
 
         template <typename Source, typename Destination>
-        void apply(Source src, Destination& dest, boost::mpl::true_) const
+        void apply(Source&& src, Destination& dest, boost::mpl::true_) const
         {
             try {
                 src.get();
-                dest->set_result(util::unused);
+                dest.set_result(util::unused);
             }
             catch (...) {
-                dest->set_exception(boost::current_exception());
+                dest.set_exception(boost::current_exception());
             }
         }
 
-        template <typename Source, typename Destination>
-        void operator()(Source& src, Destination& dest) const
+        template <typename SourceState, typename DestinationState>
+        void operator()(SourceState& src, DestinationState const& dest) const
         {
             typedef typename boost::is_void<
                 typename traits::future_traits<Future>::type
             >::type is_void;
 
-            apply(traits::future_access<Future>::create(src), dest, is_void());
+            apply(traits::future_access<Future>::create(src), *dest, is_void());
         }
     };
 
@@ -125,8 +125,7 @@ namespace hpx { namespace lcos { namespace detail
             // its result to the new future.
             boost::intrusive_ptr<Continuation> cont_(&cont);
             inner_state->set_on_completed(util::bind(
-                transfer_result<inner_future>(),
-                inner_state, cont_));
+                transfer_result<inner_future>(), inner_state, cont_));
         }
         catch (...) {
             cont.set_exception(boost::current_exception());
