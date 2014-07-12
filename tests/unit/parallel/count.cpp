@@ -23,7 +23,7 @@ void test_count(ExPolicy const& policy, IteratorTag)
     //assure rand() does not evalulate to zero
     std::iota(boost::begin(c), boost::end(c), std::rand()+1);
 
-    boost::int64_t find_count = (std::rand() % 30) + 1;
+    std::size_t find_count = (std::rand() % 30) + 1;
     for (std::size_t i = 0; i != find_count && i != c.size(); ++i)
     {
         c[i] = 0;
@@ -46,7 +46,7 @@ void test_count(hpx::parallel::task_execution_policy, IteratorTag)
     //assure rand() does not evaluate to zero
     std::iota(boost::begin(c), boost::end(c), std::rand()+1);
 
-    boost::int64_t find_count = (std::rand() % 30) + 1;
+    std::size_t find_count = (std::rand() % 30) + 1;
     for (std::size_t i = 0; i != find_count && i != c.size(); ++i)
     {
         c[i] = 0;
