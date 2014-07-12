@@ -67,11 +67,7 @@ namespace hpx
             if (target_is_managed)
                 target = naming::id_type(gid.get_gid(), naming::id_type::unmanaged);
             if (addr)
-<<<<<<< HEAD
                 p.apply(policy, std::move(addr), gid, std::forward<Arg0>( arg0 ));
-=======
-                p.apply(policy, addr, target, std::forward<Arg0>( arg0 ));
->>>>>>> master
             else
                 p.apply(policy, target, std::forward<Arg0>( arg0 ));
         }
@@ -185,11 +181,7 @@ namespace hpx
             if (target_is_managed)
                 target = naming::id_type(gid.get_gid(), naming::id_type::unmanaged);
             if (addr)
-<<<<<<< HEAD
                 p.apply(policy, std::move(addr), gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
-=======
-                p.apply(policy, addr, target, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
->>>>>>> master
             else
                 p.apply(policy, target, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
         }
@@ -303,11 +295,7 @@ namespace hpx
             if (target_is_managed)
                 target = naming::id_type(gid.get_gid(), naming::id_type::unmanaged);
             if (addr)
-<<<<<<< HEAD
                 p.apply(policy, std::move(addr), gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
-=======
-                p.apply(policy, addr, target, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
->>>>>>> master
             else
                 p.apply(policy, target, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
         }
@@ -421,11 +409,7 @@ namespace hpx
             if (target_is_managed)
                 target = naming::id_type(gid.get_gid(), naming::id_type::unmanaged);
             if (addr)
-<<<<<<< HEAD
                 p.apply(policy, std::move(addr), gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
-=======
-                p.apply(policy, addr, target, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
->>>>>>> master
             else
                 p.apply(policy, target, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
         }
@@ -539,11 +523,7 @@ namespace hpx
             if (target_is_managed)
                 target = naming::id_type(gid.get_gid(), naming::id_type::unmanaged);
             if (addr)
-<<<<<<< HEAD
                 p.apply(policy, std::move(addr), gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
-=======
-                p.apply(policy, addr, target, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
->>>>>>> master
             else
                 p.apply(policy, target, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
         }
