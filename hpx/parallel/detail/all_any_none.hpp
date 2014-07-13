@@ -58,31 +58,31 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename std::iterator_traits<FwdIter>::value_type
                     value_type;
 
-                util::cancellation_token tok;
-                return util::partitioner<ExPolicy, bool>::call(
-                    policy, first, std::distance(first, last),
-                    [op, tok](FwdIter part_begin, std::size_t part_size) mutable
-                    {
-                        util::loop_n(
-                            part_begin, part_size, tok,
-                            [&op, &tok](value_type const& val)
-                            {
-                                if (op(val))
-                                    tok.cancel();
-                            });
-                        return !tok.was_cancelled();
-                    },
-                    [](std::vector<hpx::future<bool> > && results)
-                    {
-                        return std::all_of(
-                            boost::begin(results), boost::end(results),
-                            [](hpx::future<bool>& val)
-                            {
-                                return val.get();
-                            });
-                    });
-            }
-        };
+            util::cancellation_token<> tok;
+            return util::partitioner<ExPolicy, bool>::call(
+                policy, first, std::distance(first, last),
+                [op, tok](FwdIter part_begin, std::size_t part_count) mutable
+                {
+                    util::loop_n(
+                        part_begin, part_count, tok,
+                        [&op, &tok](value_type const& val)
+                        {
+                            if (op(val))
+                                tok.cancel();
+                        });
+                    return !tok.was_cancelled();
+                },
+                [](std::vector<hpx::future<bool> > && results)
+                {
+                    return std::all_of(
+                        boost::begin(results), boost::end(results),
+                        [](hpx::future<bool>& val)
+                        {
+                            return val.get();
+                        });
+                });
+        }
+
         /// \endcond
     }
 
@@ -195,30 +195,30 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename std::iterator_traits<FwdIter>::value_type
                     value_type;
 
-                util::cancellation_token tok;
-                return util::partitioner<ExPolicy, bool>::call(
-                    policy, first, std::distance(first, last),
-                    [op, tok](FwdIter part_begin, std::size_t part_size) mutable
-                    {
-                        util::loop_n(
-                            part_begin, part_size, tok,
-                            [&op, &tok](value_type const& val)
-                            {
-                                if (op(val))
-                                    tok.cancel();
-                            });
-                        return tok.was_cancelled();
-                    },
-                    [](std::vector<hpx::future<bool> > && results)
-                    {
-                        return std::any_of(
-                            boost::begin(results), boost::end(results),
-                            [](hpx::future<bool>& val)
-                            {
-                                return val.get();
-                            });
-                    });
-            }
+            util::cancellation_token<> tok;
+            return util::partitioner<ExPolicy, bool>::call(
+                policy, first, std::distance(first, last),
+                [op, tok](FwdIter part_begin, std::size_t part_count) mutable
+                {
+                    util::loop_n(
+                        part_begin, part_count, tok,
+                        [&op, &tok](value_type const& val)
+                        {
+                            if (op(val))
+                                tok.cancel();
+                        });
+                    return tok.was_cancelled();
+                },
+                [](std::vector<hpx::future<bool> > && results)
+                {
+                    return std::any_of(
+                        boost::begin(results), boost::end(results),
+                        [](hpx::future<bool>& val)
+                        {
+                            return val.get();
+                        });
+                });
+        }
         };
         /// \endcond
     }
@@ -332,30 +332,29 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename std::iterator_traits<FwdIter>::value_type
                     value_type;
 
-                util::cancellation_token tok;
-                return util::partitioner<ExPolicy, bool>::call(
-                    policy, first, std::distance(first, last),
-                    [op, tok](FwdIter part_begin, std::size_t part_size) mutable
-                    {
-                        util::loop_n(
-                            part_begin, part_size, tok,
-                            [&op, &tok](value_type const& val)
-                            {
-                                if (!op(val))
-                                    tok.cancel();
-                            });
-                        return !tok.was_cancelled();
-                    },
-                    [](std::vector<hpx::future<bool> > && results)
-                    {
-                        return std::all_of(
-                            boost::begin(results), boost::end(results),
-                            [](hpx::future<bool>& val)
-                            {
-                                return val.get();
-                            });
-                    });
-            }
+            util::cancellation_token<> tok;
+            return util::partitioner<ExPolicy, bool>::call(
+                policy, first, std::distance(first, last),
+                [op, tok](FwdIter part_begin, std::size_t part_count) mutable
+                {
+                    util::loop_n(
+                        part_begin, part_count, tok,
+                        [&op, &tok](value_type const& val)
+                        {
+                            if (!op(val))
+                                tok.cancel();
+                        });
+                    return !tok.was_cancelled();
+                },
+                [](std::vector<hpx::future<bool> > && results)
+                {
+                    return std::all_of(
+                        boost::begin(results), boost::end(results),
+                        [](hpx::future<bool>& val)
+                        {
+                            return val.get();
+                        });
+                });
         };
         /// \endcond
     }
