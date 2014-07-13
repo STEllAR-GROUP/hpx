@@ -21,6 +21,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/lcos/local/recursive_mutex.hpp>
 
 #include <map>
 #include <list>
@@ -42,7 +43,7 @@ namespace hpx { namespace util
     class connection_cache
     {
     public:
-        typedef boost::recursive_mutex mutex_type;
+        typedef hpx::lcos::local::recursive_mutex mutex_type;
 
         typedef boost::shared_ptr<Connection> connection_type;
         typedef std::deque<connection_type> value_type;
@@ -103,7 +104,7 @@ namespace hpx { namespace util
         {
             return util::get<1>(entry);
         }
-        static std::size_t const& 
+        static std::size_t const&
         num_existing_connections(cache_value_type const& entry)
         {
             return util::get<1>(entry);

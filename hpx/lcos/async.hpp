@@ -105,7 +105,7 @@ namespace hpx
                 target = naming::id_type(gid.get_gid(), naming::id_type::unmanaged);
 
             if (addr)
-                p.apply(policy, addr, target);
+                p.apply(policy, std::move(addr), gid);
             else
                 p.apply(policy, target);
         }
@@ -258,7 +258,7 @@ namespace hpx
                 target = naming::id_type(gid.get_gid(), naming::id_type::unmanaged);
 
             if (addr)
-                p.apply(policy, addr, target, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+                p.apply(policy, std::move(addr), gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
             else
                 p.apply(policy, target, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }

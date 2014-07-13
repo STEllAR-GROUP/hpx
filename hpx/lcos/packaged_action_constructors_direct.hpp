@@ -66,7 +66,7 @@
         else {
             // remote execution
             hpx::applier::detail::apply_c_cb<action_type>(
-                addr, this->get_gid(), gid,
+                std::move(addr), this->get_gid(), gid,
                 util::bind(&packaged_action::parcel_write_handler,
                     this->impl_, util::placeholders::_1),
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
@@ -74,7 +74,7 @@
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    void apply(BOOST_SCOPED_ENUM(launch) /*policy*/, naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) /*policy*/, naming::address&& addr,
         naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
@@ -92,7 +92,7 @@
         else {
             // remote execution
             hpx::applier::detail::apply_c_cb<action_type>(
-                addr, this->get_gid(), gid,
+                std::move(addr), this->get_gid(), gid,
                 util::bind(&packaged_action::parcel_write_handler,
                     this->impl_, util::placeholders::_1),
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));

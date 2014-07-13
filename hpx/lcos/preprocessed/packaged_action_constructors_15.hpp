@@ -19,11 +19,11 @@
             std::forward<Arg0>( arg0 ));
     }
     template <typename Arg0>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, Arg0 && arg0)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
+        hpx::apply_c_cb<action_type>(this->get_gid(), std::move(addr), gid,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ));
@@ -39,12 +39,13 @@
             std::forward<Arg0>( arg0 ));
     }
     template <typename Arg0>
-    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, threads::thread_priority priority,
         Arg0 && arg0)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
+        hpx::apply_c_p_cb<action_type>(this->get_gid(), std::move(addr),
+            gid, priority,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ));
@@ -87,11 +88,11 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
     }
     template <typename Arg0 , typename Arg1>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
+        hpx::apply_c_cb<action_type>(this->get_gid(), std::move(addr), gid,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
@@ -107,12 +108,13 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
     }
     template <typename Arg0 , typename Arg1>
-    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, threads::thread_priority priority,
         Arg0 && arg0 , Arg1 && arg1)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
+        hpx::apply_c_p_cb<action_type>(this->get_gid(), std::move(addr),
+            gid, priority,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
@@ -155,11 +157,11 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
+        hpx::apply_c_cb<action_type>(this->get_gid(), std::move(addr), gid,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
@@ -175,12 +177,13 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2>
-    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, threads::thread_priority priority,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
+        hpx::apply_c_p_cb<action_type>(this->get_gid(), std::move(addr),
+            gid, priority,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
@@ -223,11 +226,11 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
+        hpx::apply_c_cb<action_type>(this->get_gid(), std::move(addr), gid,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
@@ -243,12 +246,13 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, threads::thread_priority priority,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
+        hpx::apply_c_p_cb<action_type>(this->get_gid(), std::move(addr),
+            gid, priority,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
@@ -291,11 +295,11 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
+        hpx::apply_c_cb<action_type>(this->get_gid(), std::move(addr), gid,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
@@ -311,12 +315,13 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, threads::thread_priority priority,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
+        hpx::apply_c_p_cb<action_type>(this->get_gid(), std::move(addr),
+            gid, priority,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
@@ -359,11 +364,11 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
+        hpx::apply_c_cb<action_type>(this->get_gid(), std::move(addr), gid,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
@@ -379,12 +384,13 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
-    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, threads::thread_priority priority,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
+        hpx::apply_c_p_cb<action_type>(this->get_gid(), std::move(addr),
+            gid, priority,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
@@ -427,11 +433,11 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
+        hpx::apply_c_cb<action_type>(this->get_gid(), std::move(addr), gid,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
@@ -447,12 +453,13 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
-    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, threads::thread_priority priority,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
+        hpx::apply_c_p_cb<action_type>(this->get_gid(), std::move(addr),
+            gid, priority,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
@@ -495,11 +502,11 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
+        hpx::apply_c_cb<action_type>(this->get_gid(), std::move(addr), gid,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
@@ -515,12 +522,13 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
-    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, threads::thread_priority priority,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
+        hpx::apply_c_p_cb<action_type>(this->get_gid(), std::move(addr),
+            gid, priority,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
@@ -563,11 +571,11 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
+        hpx::apply_c_cb<action_type>(this->get_gid(), std::move(addr), gid,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
@@ -583,12 +591,13 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
-    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, threads::thread_priority priority,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
+        hpx::apply_c_p_cb<action_type>(this->get_gid(), std::move(addr),
+            gid, priority,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
@@ -631,11 +640,11 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
+        hpx::apply_c_cb<action_type>(this->get_gid(), std::move(addr), gid,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
@@ -651,12 +660,13 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
-    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, threads::thread_priority priority,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
+        hpx::apply_c_p_cb<action_type>(this->get_gid(), std::move(addr),
+            gid, priority,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
@@ -699,11 +709,11 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
+        hpx::apply_c_cb<action_type>(this->get_gid(), std::move(addr), gid,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ));
@@ -719,12 +729,13 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10>
-    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, threads::thread_priority priority,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
+        hpx::apply_c_p_cb<action_type>(this->get_gid(), std::move(addr),
+            gid, priority,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ));
@@ -767,11 +778,11 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
+        hpx::apply_c_cb<action_type>(this->get_gid(), std::move(addr), gid,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ));
@@ -787,12 +798,13 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11>
-    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, threads::thread_priority priority,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
+        hpx::apply_c_p_cb<action_type>(this->get_gid(), std::move(addr),
+            gid, priority,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ));
@@ -835,11 +847,11 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
+        hpx::apply_c_cb<action_type>(this->get_gid(), std::move(addr), gid,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ));
@@ -855,12 +867,13 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12>
-    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, threads::thread_priority priority,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
+        hpx::apply_c_p_cb<action_type>(this->get_gid(), std::move(addr),
+            gid, priority,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ));
@@ -903,11 +916,11 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
+        hpx::apply_c_cb<action_type>(this->get_gid(), std::move(addr), gid,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ));
@@ -923,12 +936,13 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13>
-    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, threads::thread_priority priority,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
+        hpx::apply_c_p_cb<action_type>(this->get_gid(), std::move(addr),
+            gid, priority,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ));
@@ -971,11 +985,11 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
+        hpx::apply_c_cb<action_type>(this->get_gid(), std::move(addr), gid,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ));
@@ -991,12 +1005,13 @@
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14>
-    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, threads::thread_priority priority,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
+        hpx::apply_c_p_cb<action_type>(this->get_gid(), std::move(addr),
+            gid, priority,
             util::bind(&packaged_action::parcel_write_handler,
                 this->impl_, util::placeholders::_1),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ));
