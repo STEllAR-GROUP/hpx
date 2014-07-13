@@ -12,6 +12,7 @@ set(tests
     count
     countif
     equal
+    equal_binary
     fill
     filln
     foreach
