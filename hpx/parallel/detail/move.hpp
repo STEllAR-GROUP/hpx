@@ -12,6 +12,7 @@
 #include <hpx/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
+#include <hpx/parallel/detail/for_each.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <algorithm>
