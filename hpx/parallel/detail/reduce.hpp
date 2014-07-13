@@ -14,6 +14,7 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/parallel/util/loop.hpp>
 
 #include <algorithm>
 #include <numeric>
