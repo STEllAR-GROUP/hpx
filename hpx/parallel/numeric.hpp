@@ -15,7 +15,6 @@
 /// See N4071: 1.3/3
 #include <numeric>
 
-#include <hpx/parallel/detail/for_each.hpp>
 #include <hpx/parallel/detail/reduce.hpp>
 
 #undef HPX_PARALLEL_DISPATCH

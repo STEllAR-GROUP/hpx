@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -57,6 +57,18 @@ namespace hpx
                     util::forward_as_tuple());
             }
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        struct keep_id_alive
+        {
+            explicit keep_id_alive(naming::id_type const& gid)
+              : gid_(gid)
+            {}
+
+            void operator()() const {}
+
+            naming::id_type gid_;
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -73,22 +85,45 @@ namespace hpx
         >::type result_type;
 
         naming::address addr;
-        if (policy == launch::sync && agas::is_local_address_cached(gid, addr))
+        if (agas::is_local_address_cached(gid, addr) && policy == launch::sync)
         {
             return detail::sync_local_invoke_0<action_type, result_type>::
                 call(gid, addr);
         }
 
         lcos::packaged_action<action_type, result_type> p;
+
+        bool target_is_managed = false;
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
-            if (addr)
-                p.apply(policy, addr, gid);
-            else
+            if (addr) {
+                p.apply(policy, std::move(addr), gid);
+            }
+            else if (gid.get_management_type() == naming::id_type::managed) {
+                p.apply(policy,
+                    naming::id_type(gid.get_gid(), naming::id_type::unmanaged));
+                target_is_managed = true;
+            }
+            else {
                 p.apply(policy, gid);
+            }
         }
 
-        return p.get_future();
+        // keep id alive, if needed - this allows to send the destination as an
+        // unmanaged id
+        future<result_type> f = p.get_future();
+
+        if (target_is_managed)
+        {
+            typedef typename lcos::detail::shared_state_ptr_for<
+                future<result_type>
+            >::type shared_state_ptr;
+
+            shared_state_ptr const& state = lcos::detail::get_shared_state(f);
+            state->set_on_completed(detail::keep_id_alive(gid));
+        }
+
+        return std::move(f);
     }
 
     template <typename Action>
@@ -210,22 +245,47 @@ namespace hpx
         >::type result_type;
 
         naming::address addr;
-        if (policy == launch::sync && agas::is_local_address_cached(gid, addr))
+        if (agas::is_local_address_cached(gid, addr) && policy == launch::sync)
         {
             return detail::BOOST_PP_CAT(sync_local_invoke_, N)<action_type, result_type>::
                 call(gid, addr, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
 
         lcos::packaged_action<action_type, result_type> p;
+
+        bool target_is_managed = false;
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
-            if (addr)
-                p.apply(policy, addr, gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-            else
+            if (addr) {
+                p.apply(policy, std::move(addr), gid,
+                    HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+            }
+            else if (gid.get_management_type() == naming::id_type::managed) {
+                p.apply(policy,
+                    naming::id_type(gid.get_gid(), naming::id_type::unmanaged),
+                    HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+                target_is_managed = true;
+            }
+            else {
                 p.apply(policy, gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+            }
         }
 
-        return p.get_future();
+        // keep id alive, if needed - this allows to send the destination as an
+        // unmanaged id
+        future<result_type> f = p.get_future();
+
+        if (target_is_managed)
+        {
+            typedef typename lcos::detail::shared_state_ptr_for<
+                future<result_type>
+            >::type shared_state_ptr;
+
+            shared_state_ptr const& state = lcos::detail::get_shared_state(f);
+            state->set_on_completed(detail::keep_id_alive(gid));
+        }
+
+        return std::move(f);
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>

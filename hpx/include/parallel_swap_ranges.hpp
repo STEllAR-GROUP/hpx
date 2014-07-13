@@ -13,7 +13,6 @@
 #include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/detail/dispatch.hpp>
 
-#include <hpx/parallel/detail/for_each.hpp>
 #include <hpx/parallel/detail/swap_ranges.hpp>
 
 #undef HPX_PARALLEL_DISPATCH

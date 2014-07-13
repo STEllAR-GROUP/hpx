@@ -32,12 +32,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <typename ExPolicy, typename InIter, typename T>
         typename detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<InIter>::difference_type>::type
-        count(ExPolicy const&, InIter first, InIter last, const T& value,
-        boost::mpl::true_)
+        count(ExPolicy const&, InIter first, InIter last, T const& value,
+            boost::mpl::true_)
         {
-            typedef typename std::iterator_traits<InIter>::difference_type
-                difference;
             try {
+                typedef typename std::iterator_traits<InIter>::difference_type
+                    difference;
+
                 return detail::algorithm_result<ExPolicy, difference>::get(
                     std::count(first, last, value));
             }
@@ -51,35 +52,36 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typename std::iterator_traits<FwdIter>::difference_type
         >::type
         count(ExPolicy const& policy, FwdIter first, FwdIter last,
-            T const& value, boost::mpl::false_ f)
+            T const& value, boost::mpl::false_)
         {
-            typedef typename std::iterator_traits<FwdIter>::value_type type;
+            typedef typename std::iterator_traits<FwdIter>::value_type
+                value_type;
             typedef typename std::iterator_traits<FwdIter>::difference_type
                 difference_type;
 
             if (first == last)
-            {
-                return detail::algorithm_result<ExPolicy, difference_type>
-                    ::get( difference_type(0));
-            }
+                return detail::algorithm_result<ExPolicy, difference_type>::get(0);
 
             return util::partitioner<ExPolicy, difference_type>::call(
                 policy, first, std::distance(first, last),
-                [&value](FwdIter part_begin, std::size_t part_count)
+                [value](FwdIter part_begin, std::size_t part_count)
                 {
-                    difference_type ret = std::count(part_begin,
-                        std::next(part_begin, part_count), value);
+                    difference_type ret = 0;
+                    util::loop_n(part_begin, part_count,
+                        [&value, &ret](value_type const& val)
+                        {
+                            if (value == val)
+                                ++ret;
+                        });
                     return ret;
                 },
-                hpx::util::unwrapped([](std::vector<difference_type>&& results)
-                {
-                    return util::accumulate_n(boost::begin(results),
-                        boost::size(results), difference_type(0),
-                        [](difference_type v1, difference_type v2)
-                        {
-                            return v1 + v2;
-                        });
-                }));
+                hpx::util::unwrapped(
+                    [](std::vector<difference_type>&& results)
+                    {
+                        return util::accumulate_n(
+                            boost::begin(results), boost::size(results),
+                            difference_type(0), std::plus<difference_type>());
+                    }));
         }
 
         template <typename InIter, typename T>
@@ -196,35 +198,36 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typename std::iterator_traits<FwdIter>::difference_type
         >::type
         count_if(ExPolicy const& policy, FwdIter first, FwdIter last,
-            Pred && op, boost::mpl::false_ f)
+            Pred && op, boost::mpl::false_)
         {
-            typedef typename std::iterator_traits<FwdIter>::value_type type;
+            typedef typename std::iterator_traits<FwdIter>::value_type
+                value_type;
             typedef typename std::iterator_traits<FwdIter>::difference_type
                 difference_type;
 
             if (first == last)
-            {
-                return detail::algorithm_result<ExPolicy, difference_type>
-                    ::get( (difference_type)0);
-            }
+                return detail::algorithm_result<ExPolicy, difference_type>::get(0);
 
             return util::partitioner<ExPolicy, difference_type>::call(
                 policy, first, std::distance(first, last),
                 [op](FwdIter part_begin, std::size_t part_count)
                 {
-                    difference_type ret = std::count_if(part_begin,
-                        std::next(part_begin, part_count), op);
+                    difference_type ret = 0;
+                    util::loop_n(part_begin, part_count,
+                        [&op, &ret](value_type const& val)
+                        {
+                            if (op(val))
+                                ++ret;
+                        });
                     return ret;
                 },
-                hpx::util::unwrapped([](std::vector<difference_type>&& results)
-                {
-                    return util::accumulate_n(boost::begin(results),
-                        boost::size(results), difference_type(0),
-                        [](difference_type v1, difference_type v2)
-                        {
-                            return v1 + v2;
-                        });
-                }));
+                hpx::util::unwrapped(
+                    [](std::vector<difference_type>&& results)
+                    {
+                        return util::accumulate_n(
+                            boost::begin(results), boost::size(results),
+                            difference_type(0), std::plus<difference_type>());
+                    }));
         }
 
         template <typename InIter, typename Pred>

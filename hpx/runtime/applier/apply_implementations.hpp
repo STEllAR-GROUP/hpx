@@ -168,12 +168,12 @@ namespace hpx
         // Determine whether the gid is local or remote
         naming::address addr;
         if (agas::is_local_address_cached(gid, addr)) {
-            return applier::detail::apply_l_p<Action>(gid, addr, priority,
-                HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+            return applier::detail::apply_l_p<Action>(gid, std::move(addr),
+                priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
 
         // apply remotely
-        return applier::detail::apply_r_p<Action>(std::move(addr), gid, 
+        return applier::detail::apply_r_p<Action>(std::move(addr), gid,
             priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
@@ -285,10 +285,10 @@ namespace hpx
 
         template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         inline bool
-        apply_r (naming::address& addr, actions::continuation* c,
+        apply_r (naming::address&& addr, actions::continuation* c,
             naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
         {
-            return apply_r_p<Action>(addr, c, gid,
+            return apply_r_p<Action>(std::move(addr), c, gid,
                 actions::action_priority<Action>(),
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
@@ -340,8 +340,8 @@ namespace hpx
         // Determine whether the gid is local or remote
         naming::address addr;
         if (agas::is_local_address_cached(gid, addr)) {
-            return applier::detail::apply_l_p<Action>(c, gid, addr, priority,
-                HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+            return applier::detail::apply_l_p<Action>(c, gid, std::move(addr),
+                priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
 
         // apply remotely
@@ -378,7 +378,7 @@ namespace hpx
     {
         template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         inline bool
-        apply_c_p(naming::address& addr, naming::id_type const& contgid,
+        apply_c_p(naming::address&& addr, naming::id_type const& contgid,
             naming::id_type const& gid, threads::thread_priority priority,
             HPX_ENUM_FWD_ARGS(N, Arg, arg))
         {
@@ -386,21 +386,21 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
 
-            return apply_r_p<Action>(addr,
+            return apply_r_p<Action>(std::move(addr),
                 new actions::typed_continuation<result_type>(contgid),
                 gid, priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
 
         template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         inline bool
-        apply_c (naming::address& addr, naming::id_type const& contgid,
+        apply_c (naming::address&& addr, naming::id_type const& contgid,
             naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
         {
             typedef
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
 
-            return apply_r_p<Action>(addr,
+            return apply_r_p<Action>(std::move(addr),
                 new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));

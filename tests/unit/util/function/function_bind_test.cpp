@@ -33,7 +33,7 @@ int main(int, char*[])
         hpx::util::bind(f1, false, _1);
     hpx::util::function_nonser<unsigned()> f3 = hpx::util::bind(f2, 4.0);
 
-    HPX_TEST_EQ(f3(), 120);
+    HPX_TEST_EQ(f3(), 120u);
 
     return hpx::util::report_errors();
 }

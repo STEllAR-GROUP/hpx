@@ -25,7 +25,6 @@
 #include <hpx/parallel/detail/fill.hpp>
 #include <hpx/parallel/detail/for_each.hpp>
 #include <hpx/parallel/detail/move.hpp>
-#include <hpx/parallel/detail/reduce.hpp>
 #include <hpx/parallel/detail/swap_ranges.hpp>
 #include <hpx/parallel/detail/transform.hpp>
 

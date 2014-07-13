@@ -404,7 +404,7 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
     using hpx::util::unwrapped;
 
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
-    std::size_t nl = localities.size();                    // Number of localities
+    //std::size_t nl = localities.size();                    // Number of localities
 
     // U[t][i] is the state of position i at time t.
     for (space& s: U_)

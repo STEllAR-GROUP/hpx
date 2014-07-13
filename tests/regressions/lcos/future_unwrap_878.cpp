@@ -13,18 +13,18 @@
 
 int main()
 {
-    hpx::promise<hpx::shared_future<int> > promise;
-    hpx::future<hpx::shared_future<int> > future = promise.get_future();
+    hpx::lcos::local::promise<hpx::future<int> > promise;
+    hpx::future<hpx::future<int> > future = promise.get_future();
     try
     {
-        throw hpx::bad_parameter;
         //promise.set_value(42);
+        throw hpx::bad_parameter;
     } catch(...) {
         promise.set_exception(boost::current_exception());
     }
     HPX_TEST(future.has_exception());
 
-    hpx::future<int> inner = future.unwrap();
+    hpx::future<int> inner(std::move(future));
     HPX_TEST(inner.has_exception());
 
     return hpx::util::report_errors();

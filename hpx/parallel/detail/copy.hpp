@@ -12,6 +12,7 @@
 #include <hpx/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
+#include <hpx/parallel/detail/for_each.hpp>
 #include <hpx/parallel/detail/is_negative.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
@@ -55,7 +56,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             result_type;
 
             return get_iter<1, result_type>(
-                plain_for_each_n(policy,
+                for_each_n(policy,
                     hpx::util::make_zip_iterator(first, dest),
                     std::distance(first, last),
                     [](reference t) {
@@ -190,7 +191,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             result_type;
 
             return get_iter<1, result_type>(
-                plain_for_each_n(policy,
+                for_each_n(policy,
                     hpx::util::make_zip_iterator(first, dest),
                     count,
                     [](reference t) {
@@ -338,7 +339,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             result_type;
 
             return get_iter<1, result_type>(
-                plain_for_each_n(policy,
+                for_each_n(policy,
                     hpx::util::make_zip_iterator(first, dest),
                     std::distance(first,last),
                     [f](reference t) {

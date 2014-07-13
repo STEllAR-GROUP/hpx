@@ -129,7 +129,7 @@ namespace hpx { namespace lcos { namespace local
         private:
             bool try_recursive_lock(threads::thread_id_repr_type current_thread_id)
             {
-                if(locking_thread_id.load(boost::memory_order_acquire) ==
+                if (locking_thread_id.load(boost::memory_order_acquire) ==
                     current_thread_id)
                 {
                     ++recursion_count;

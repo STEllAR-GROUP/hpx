@@ -169,9 +169,12 @@ namespace hpx { namespace iostreams
                 // Create the next buffer, returns the previous buffer
                 buffer next = this->detail::buffer::init();
 
+                // Unlock the mutex before we cleanup.
+                l.unlock();
+
                 // Perform the write operation, then destroy the old buffer and
                 // stream.
-                this->base_type::write_sync(get_gid(), next);
+                this->base_type::write_async(get_gid(), next);
             }
             return true;
         }
