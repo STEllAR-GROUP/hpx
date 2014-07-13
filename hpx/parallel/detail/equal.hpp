@@ -29,6 +29,31 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
+
+        // Using std::equal is not possible as the value_types of the two
+        // iterators could be different.
+        struct equal_to
+        {
+            template <typename T1, typename T2>
+            bool operator() (T1 const& t1, T2 const& t2) const
+            {
+                return t1 == t2;
+            }
+        };
+
+        // Our own version of the C++14 equal(_binary).
+        template <typename InIter1, typename InIter2, typename F>
+        bool sequential_equal_binary(InIter1 first1, InIter1 last1,
+            InIter2 first2, InIter2 last2, F && f)
+        {
+            for (/**/; first1 != last1 && first2 != last2; ++first1, ++first2)
+            {
+                if (!f(*first1, *first2))
+                    return false;
+            }
+            return first1 == last1 && first2 == last2;
+        }
+
         template <typename ExPolicy, typename InIter1, typename InIter2, typename F>
         typename detail::algorithm_result<ExPolicy, bool>::type
         equal_binary(ExPolicy const&, InIter1 first1, InIter1 last1,
@@ -36,7 +61,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {
             try {
                 return detail::algorithm_result<ExPolicy, bool>::get(
-                    std::equal(first1, last1, first2, std::forward<F>(f)));
+                    sequential_equal_binary(first1, last1, first2, last2,
+                        std::forward<F>(f)));
             }
             catch (...) {
                 detail::handle_exception<ExPolicy>::call();
@@ -205,7 +231,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename std::iterator_traits<InIter1>::value_type value_type;
 
         return detail::equal_binary(std::forward<ExPolicy>(policy), first1,
-            last1, first2, last2, std::equal_to<value_type>(), is_seq());
+            last1, first2, last2, detail::equal_to(), is_seq());
     }
 
     /// Returns true if the range [first1, last1) is equal to the range
@@ -477,7 +503,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename std::iterator_traits<InIter1>::value_type value_type;
 
         return detail::equal(std::forward<ExPolicy>(policy), first1, last1,
-            first2, std::equal_to<value_type>(), is_seq());
+            first2, detail::equal_to(), is_seq());
     }
 
     /// Returns true if the range [first1, last1) is equal to the range
