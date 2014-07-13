@@ -78,6 +78,9 @@ parallel::fill_n                      "fill_n" "hpx\.parallel\.v1\.fill_n.*"
 parallel::for_each                    "for_each" "hpx\.parallel\.v1\.for_each$"
 parallel::for_each_n                  "for_each_n" "hpx\.parallel\.v1\.for_each_n.*"
 
+# hpx/parallel/detail/mismatch.hpp
+parallel::mismatch                    "mismatch" "hpx\.parallel\.v1\.mismatch_id.*"
+
 # hpx/parallel/detail/move.hpp
 parallel::move                        "move" "hpx\.parallel\.v1\.move$"
 

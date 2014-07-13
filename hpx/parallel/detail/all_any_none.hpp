@@ -57,7 +57,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename std::iterator_traits<FwdIter>::value_type
                 value_type;
 
-            util::cancellation_token tok;
+            util::cancellation_token<> tok;
             return util::partitioner<ExPolicy, bool>::call(
                 policy, first, std::distance(first, last),
                 [op, tok](FwdIter part_begin, std::size_t part_count) mutable
@@ -210,7 +210,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename std::iterator_traits<FwdIter>::value_type
                 value_type;
 
-            util::cancellation_token tok;
+            util::cancellation_token<> tok;
             return util::partitioner<ExPolicy, bool>::call(
                 policy, first, std::distance(first, last),
                 [op, tok](FwdIter part_begin, std::size_t part_count) mutable
@@ -363,7 +363,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename std::iterator_traits<FwdIter>::value_type
                 value_type;
 
-            util::cancellation_token tok;
+            util::cancellation_token<> tok;
             return util::partitioner<ExPolicy, bool>::call(
                 policy, first, std::distance(first, last),
                 [op, tok](FwdIter part_begin, std::size_t part_count) mutable
