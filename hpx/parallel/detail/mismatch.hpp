@@ -11,6 +11,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
+#include <hpx/parallel/detail/predicates.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
@@ -29,14 +30,28 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 //     namespace detail
 //     {
 //         /// \cond NOINTERNAL
-//         template <typename ExPolicy, typename InIter1, typename InIter2, typename F>
+//         template <typename InIter1, typename InIter2, typename F>
+//         std::pair<InIter1, InIter1>
+//         sequential_mismatch_binary(InIter1 first1, InIter1 last1,
+//             InIter2 first2, InIter2 last2, F && f)
+//         {
+//             while (first1 != last1 && first2 != last2 && f(*first1, *first2))
+//             {
+//                 ++first1, ++first2;
+//             }
+//             return std::make_pair(first1, first2);
+//         }
+//
+//         template <typename ExPolicy, typename InIter1, typename InIter2,
+//             typename F>
 //         typename detail::algorithm_result<ExPolicy, bool>::type
 //         mismatch_binary(ExPolicy const&, InIter1 first1, InIter1 last1,
 //             InIter2 first2, InIter2 last2, F && f, boost::mpl::true_)
 //         {
 //             try {
 //                 return detail::algorithm_result<ExPolicy, bool>::get(
-//                     std::mismatch(first1, last1, first2, std::forward<F>(f)));
+//                     sequential_mismatch_binary(first1, last1,
+//                         first2, last2, std::forward<F>(f)));
 //             }
 //             catch (...) {
 //                 detail::handle_exception<ExPolicy>::call();
@@ -202,10 +217,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 //             boost::is_same<std::input_iterator_tag, iterator_category2>
 //         >::type is_seq;
 //
-//         typedef typename std::iterator_traits<InIter1>::value_type value_type;
-//
 //         return detail::mismatch_binary(std::forward<ExPolicy>(policy), first1,
-//             last1, first2, last2, std::mismatch_to<value_type>(), is_seq());
+//             last1, first2, last2, detail::equal_to(), is_seq());
 //     }
 //
 //     /// Returns true if the range [first1, last1) is mismatch to the range
@@ -310,8 +323,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 //             boost::is_same<std::input_iterator_tag, iterator_category1>,
 //             boost::is_same<std::input_iterator_tag, iterator_category2>
 //         >::type is_seq;
-//
-//         typedef typename std::iterator_traits<InIter1>::value_type value_type;
 //
 //         return detail::mismatch_binary(std::forward<ExPolicy>(policy), first1,
 //             last1, first2, last2, std::forward<F>(f), is_seq());
@@ -476,10 +487,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category2>
         >::type is_seq;
 
-        typedef typename std::iterator_traits<InIter1>::value_type value_type;
-
         return detail::mismatch(std::forward<ExPolicy>(policy), first1, last1,
-            first2, std::equal_to<value_type>(), is_seq());
+            first2, detail::equal_to(), is_seq());
     }
 
     /// Returns std::pair with iterators to the first two non-equivalent
@@ -572,8 +581,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category1>,
             boost::is_same<std::input_iterator_tag, iterator_category2>
         >::type is_seq;
-
-        typedef typename std::iterator_traits<InIter1>::value_type value_type;
 
         return detail::mismatch(std::forward<ExPolicy>(policy), first1, last1,
             first2, std::forward<F>(f), is_seq());
