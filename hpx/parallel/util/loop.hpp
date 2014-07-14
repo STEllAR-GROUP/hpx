@@ -19,7 +19,7 @@ namespace hpx { namespace parallel { namespace util
     {
         struct no_data
         {
-            static bool operator<= (no_data, no_data) { return true; }
+            bool operator<= (no_data) const { return true; }
         };
     }
 
@@ -51,7 +51,7 @@ namespace hpx { namespace parallel { namespace util
                     break;      // if we already have a closer one, break
 
             } while (!was_cancelled_->compare_exchange_strong(old_data, data,
-                boost::memory_order_relaxed);
+                boost::memory_order_relaxed));
         }
 
         T get_data() const BOOST_NOEXCEPT
