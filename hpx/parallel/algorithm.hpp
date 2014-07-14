@@ -26,6 +26,7 @@
 #include <hpx/parallel/detail/move.hpp>
 #include <hpx/parallel/detail/swap_ranges.hpp>
 #include <hpx/parallel/detail/transform.hpp>
+#include <hpx/parallel/detail/transform_reduce.hpp>
 
 #undef HPX_PARALLEL_DISPATCH
 

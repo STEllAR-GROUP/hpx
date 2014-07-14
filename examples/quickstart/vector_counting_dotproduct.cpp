@@ -21,7 +21,7 @@ int hpx_main()
     std::fill(boost::begin(yvalues), boost::end(yvalues), 1.0);
 
     double result =
-        hpx::parallel::reduce(
+        hpx::parallel::transform_reduce(
             hpx::parallel::par,
             boost::counting_iterator<size_t>(0),
             boost::counting_iterator<size_t>(10007),

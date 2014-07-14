@@ -21,6 +21,7 @@ set(tests
     swapranges
     transform
     transform_binary
+	transform_reduce
    )
 
 foreach(test ${tests})

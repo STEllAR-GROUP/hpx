@@ -14,7 +14,6 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
-#include <hpx/parallel/util/loop.hpp>
 
 #include <algorithm>
 #include <numeric>
@@ -31,43 +30,26 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename T>
-        struct identity
-        {
-            typedef T type;
-            T const& operator()(T const& val) const
-            {
-                return val;
-            }
-        };
-
-        template <typename ExPolicy, typename InIter, typename T,
-            typename Reduce, typename Convert>
+        template <typename ExPolicy, typename InIter, typename T, typename Pred>
         typename detail::algorithm_result<ExPolicy, T>::type
         reduce(ExPolicy const&, InIter first, InIter last, T && init,
-            Reduce && r, Convert && conv, boost::mpl::true_)
+            Pred && op, boost::mpl::true_)
         {
             try {
-                typedef typename std::iterator_traits<InIter>::value_type
-                    value_type;
-
+                detail::synchronize(first, last);
                 return detail::algorithm_result<ExPolicy, T>::get(
                     std::accumulate(first, last, std::forward<T>(init),
-                        [&r, &conv](T const& res, value_type const& next)
-                        {
-                            return r(res, conv(next));
-                        }));
+                        std::forward<Pred>(op)));
             }
             catch (...) {
                 detail::handle_exception<ExPolicy>::call();
             }
         }
 
-        template <typename ExPolicy, typename FwdIter, typename T,
-            typename Reduce, typename Convert>
+        template <typename ExPolicy, typename FwdIter, typename T, typename Pred>
         typename detail::algorithm_result<ExPolicy, T>::type
         reduce(ExPolicy const& policy, FwdIter first, FwdIter last, T && init,
-            Reduce && r, Convert && conv, boost::mpl::false_)
+            Pred && op, boost::mpl::false_)
         {
             if (first == last)
             {
@@ -77,159 +59,38 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             typedef typename std::iterator_traits<FwdIter>::iterator_category
                 category;
-            typedef typename std::iterator_traits<FwdIter>::reference
-                reference;
 
             return util::partitioner<ExPolicy, T>::call(
                 policy, first, std::distance(first, last),
-                [r, conv](FwdIter part_begin, std::size_t part_count)
+                [op](FwdIter part_begin, std::size_t part_count)
                 {
-                    T val = conv(*part_begin);
+                    T val = *part_begin;
                     return util::accumulate_n(++part_begin, --part_count,
-                        std::move(val),
-                        [&r, &conv](T const& res, reference next)
-                        {
-                            return r(res, conv(next));
-                        });
+                        std::move(val), op);
                 },
-                hpx::util::unwrapped([init, r](std::vector<T> && results)
+                hpx::util::unwrapped([init, op](std::vector<T>&& results)
                 {
                     return util::accumulate_n(boost::begin(results),
-                        boost::size(results), init, r);
+                        boost::size(results), init, op);
                 }));
         }
 
-        template <typename InIter, typename T, typename Reduce, typename Convert>
+        template <typename InIter, typename T, typename Pred>
         T reduce(execution_policy const& policy, InIter first, InIter last,
-            T && init, Reduce && r, Convert&& conv, boost::mpl::false_)
+            T && init, Pred && op, boost::mpl::false_)
         {
             HPX_PARALLEL_DISPATCH(policy, detail::reduce, first, last,
-                std::forward<T>(init), std::forward<Reduce>(r),
-                std::forward<Convert>(conv));
+                std::forward<T>(init), std::forward<Pred>(op));
         }
 
-        template <typename InIter, typename T, typename Reduce, typename Convert>
+        template<typename InIter, typename T, typename Pred>
         T reduce(execution_policy const& policy, InIter first, InIter last,
-            T init, Reduce && r, Convert&& conv, boost::mpl::true_)
+            T init, Pred && op, boost::mpl::true_ t)
         {
             return detail::reduce(sequential_execution_policy(),
-                first, last, std::forward<T>(init), std::forward<Reduce>(r),
-                std::forward<Convert>(conv), boost::mpl::true_());
+                first, last, std::forward<T>(init), std::forward<Pred>(op), t);
         }
         /// \endcond
-    }
-
-    /// Returns GENERALIZED_SUM(red_op, init, conv_op(*first), ..., conv_op(*(first + (last - first) - 1))).
-    ///
-    /// \note   Complexity: O(\a last - \a first) applications of the
-    ///         predicates \a red_op and \a conv_op.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam InIter      The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    /// \tparam F           The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a copy_if requires \a F to meet the
-    ///                     requirements of \a CopyConstructible.
-    /// \tparam T           The type of the value to be used as initial (and
-    ///                     intermediate) values (deduced).
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    /// \param red_op       Specifies the function (or function object) which
-    ///                     will be invoked for each of the values returned
-    ///                     from the invocation of \a conv_op. This is a
-    ///                     binary predicate. The signature of this predicate
-    ///                     should be equivalent to:
-    ///                     \code
-    ///                     Ret fun(const Type1 &a, const Type2 &b);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
-    ///                     the function must not modify the objects passed to
-    ///                     it.
-    ///                     The types \a Type1, \a Type2, and \a Ret must be
-    ///                     such that an object of a type as returned from
-    ///                     \a conv_op can be implicitly converted to any
-    ///                     of those types.
-    /// \param conv_op      Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last). This is a
-    ///                     unary predicate. The signature of this predicate
-    ///                     should be equivalent to:
-    ///                     \code
-    ///                     R fun(const Type &a);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
-    ///                     the function must not modify the objects passed to
-    ///                     it. The type \a Type must be such that an object of
-    ///                     type \a InIter can be dereferenced and then
-    ///                     implicitly converted to Type.
-    ///                     The type \a R must be such that an object of this
-    ///                     type can be implicitly converted to \a T.
-    /// \param init         The initial value for the generalized sum.
-    ///
-    /// The reduce operations in the parallel \a reduce algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The reduce operations in the parallel \a copy_if algorithm invoked
-    /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a task_execution_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a reduce algorithm returns a \a hpx::future<T> if the
-    ///           execution policy is of type \a task_execution_policy and
-    ///           returns \a T otherwise.
-    ///           The \a reduce algorithm returns the result of the
-    ///           generalized sum over the values returned from \a conv_op when
-    ///           applied to the elements given by the input range
-    ///           [first, last).
-    ///
-    /// \note   GENERALIZED_SUM(op, a1, ..., aN) is defined as follows:
-    ///         * a1 when N is 1
-    ///         * op(GENERALIZED_SUM(op, b1, ..., bK), GENERALIZED_SUM(op, bM, ..., bN)),
-    ///           where:
-    ///           * b1, ..., bN may be any permutation of a1, ..., aN and
-    ///           * 1 < K+1 = M <= N.
-    ///
-    /// The difference between \a reduce and \a accumulate is
-    /// that the behavior of reduce may be non-deterministic for
-    /// non-associative or non-commutative binary predicate.
-    ///
-    template <typename ExPolicy, typename InIter, typename T, typename Reduce,
-        typename Convert>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, T>::type
-    >::type
-    reduce(ExPolicy&& policy, InIter first, InIter last, T init,
-        Reduce && red_op, Convert && conv_op)
-    {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-            iterator_category;
-
-        BOOST_STATIC_ASSERT_MSG(
-            (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
-            "Requires at least input iterator.");
-
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>
-        >::type is_seq;
-
-        return detail::reduce(
-            std::forward<ExPolicy>(policy), first, last, std::move(init),
-            std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
-            is_seq());
     }
 
     /// Returns GENERALIZED_SUM(f, init, *first, ..., *(first + (last - first) - 1)).
@@ -248,8 +109,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a copy_if requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
-    /// \tparam T           The type of the value to be used as initial (and
-    ///                     intermediate) values (deduced).
+    /// \tparam T           The type of the value to be assigned (deduced).
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -266,10 +126,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     Ret fun(const Type1 &a, const Type2 &b);
     ///                     \endcode \n
     ///                     The signature does not need to have const&.
-    ///                     The types \a Type1, \a Type2, and \a Ret must be
-    ///                     such that an object of type \a InIter can be
-    ///                     dereferenced and then implicitly converted to any
-    ///                     of those types.
+    ///                     it. The type \a Type1 must be such that an object
+    ///                     of type \a T can be implicitly converted to \a Type1.
+    ///                     The type \a Type2 must be such that an object of
+    ///                     type \a InIter can be dereferenced and then implicitly
+    ///                     converted to \a Type2. The type \a Ret must be such
+    ///                     that an object of type \a T can be assigned a value
+    ///                     of type \a Ret.
     /// \param init         The initial value for the generalized sum.
     ///
     /// The reduce operations in the parallel \a reduce algorithm invoked
@@ -285,8 +148,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \returns  The \a reduce algorithm returns a \a hpx::future<T> if the
     ///           execution policy is of type \a task_execution_policy and
     ///           returns \a T otherwise.
-    ///           The \a reduce algorithm returns the result of the
-    ///           generalized sum over the elements given by the input range
+    /// \returns  The \a reduce algorithm returns the result of the
+    ///           generalized sum over the element given by the input range
     ///           [first, last).
     ///
     /// \note   GENERALIZED_SUM(op, a1, ..., aN) is defined as follows:
@@ -320,8 +183,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::reduce(std::forward<ExPolicy>(policy), first, last,
-            std::move(init), std::forward<F>(f), detail::identity<T>(),
-            is_seq());
+            std::move(init), std::forward<F>(f), is_seq());
     }
 
     /// Returns GENERALIZED_SUM(+, init, *first, ..., *(first + (last - first) - 1)).
@@ -336,8 +198,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \tparam InIter      The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     input iterator.
-    /// \tparam T           The type of the value to be used as initial (and
-    ///                     intermediate) values (deduced).
+    /// \tparam T           The type of the value to be assigned (deduced).
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -360,8 +221,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \returns  The \a reduce algorithm returns a \a hpx::future<T> if the
     ///           execution policy is of type \a task_execution_policy and
     ///           returns \a T otherwise.
-    ///           The \a reduce algorithm returns the result of the
-    ///           generalized sum (applying operator+()) over the elements given
+    /// \returns  The \a reduce algorithm returns the result of the
+    ///           generalized sum (applying operator+()) over the element given
     ///           by the input range [first, last).
     ///
     /// \note   GENERALIZED_SUM(+, a1, ..., aN) is defined as follows:
@@ -395,7 +256,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::reduce(std::forward<ExPolicy>(policy), first, last,
-            std::move(init), std::plus<T>(), detail::identity<T>(), is_seq());
+            std::move(init), std::plus<T>(), is_seq());
     }
 
     /// Returns GENERALIZED_SUM(+, T(), *first, ..., *(first + (last - first) - 1)).
@@ -430,10 +291,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// \returns  The \a reduce algorithm returns a \a hpx::future<T> if the
     ///           execution policy is of type \a task_execution_policy and
-    ///           returns T otherwise (where T is the the value_type of
-    ///           \a InIter).
-    ///           The \a reduce algorithm returns the result of the
-    ///           generalized sum (applying operator+()) over the elements given
+    ///           returns \a T otherwise.
+    /// \returns  The \a reduce algorithm returns the result of the
+    ///           generalized sum (applying operator+()) over the element given
     ///           by the input range [first, last).
     ///
     /// \note   The type of the initial value (and the result type) \a T is
@@ -475,7 +335,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::reduce(std::forward<ExPolicy>(policy), first, last,
-            T(), std::plus<T>(), detail::identity<T>(), is_seq());
+            T(), std::plus<T>(), is_seq());
     }
 #endif
 }}}
