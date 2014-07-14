@@ -178,12 +178,6 @@ void test_reduce3(hpx::parallel::task_execution_policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    std::size_t const val(42);
-    auto op =
-        [val](std::size_t v1, std::size_t v2) {
-            return v1 + v2 + val;
-        };
-
     hpx::future<std::size_t> f =
         hpx::parallel::reduce(hpx::parallel::task,
             iterator(boost::begin(c)), iterator(boost::end(c)));
