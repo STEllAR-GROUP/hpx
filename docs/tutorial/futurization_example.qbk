@@ -170,7 +170,12 @@ for the functions to run on.
 In example 6, we begin to distribute the partition data on different nodes.
 This is accomplished in [^stepper::do_work()] by passing the 
 GID of the locality where we wish to create the partition to the 
-the partition constructor.  We distribute the partitions evenly 
+the partition constructor. 
+
+[import ../../examples/1d_stencil/1d_stencil_6.cpp]
+[do_work_6]
+
+We distribute the partitions evenly 
 based on the number
 of localities used, which is described in the function 
 [^locidx]. Because some of the data needed to update the
@@ -193,7 +198,11 @@ data and working on the data in the middle partition. Because
 we know that the data for the middle partition is local,
 we can overlap the work on the middle partition with that 
 of the possibly remote call of [^get_data()].  This
-algorithmic change was implemented in example 7.
+algorithmic change which was implemented in example 7
+can be seen below:
+
+[import ../../examples/1d_stencil/1d_stencil_7.cpp]
+[stepper_7]
 
 Example 8 goes the extra mile and distributes the program
 flow. It accomplishes this task by running an instance 

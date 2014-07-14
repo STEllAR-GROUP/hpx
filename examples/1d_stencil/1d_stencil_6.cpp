@@ -305,9 +305,10 @@ stepper::space stepper::do_work(std::size_t np, std::size_t nx, std::size_t nt)
         s.resize(np);
 
     // Initial conditions: f(0, i) = i
+    //[do_work_6
     for (std::size_t i = 0; i != np; ++i)
         U[0][i] = partition(localities[locidx(i, np, nl)], nx, double(i));
-
+    //]
     heat_part_action act;
     for (std::size_t t = 0; t != nt; ++t)
     {
