@@ -14,6 +14,7 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/parallel/util/loop.hpp>
 
 #include <algorithm>
 #include <numeric>
@@ -36,7 +37,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             Pred && op, boost::mpl::true_)
         {
             try {
-                detail::synchronize(first, last);
                 return detail::algorithm_result<ExPolicy, T>::get(
                     std::accumulate(first, last, std::forward<T>(init),
                         std::forward<Pred>(op)));
@@ -109,7 +109,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a copy_if requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
-    /// \tparam T           The type of the value to be assigned (deduced).
+    /// \tparam T           The type of the value to be used as initial values (deduced).
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
