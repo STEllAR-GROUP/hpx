@@ -30,26 +30,28 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     // reduce
     namespace detail
     {
-        /// \cond NOINTERNAL
-        template <typename ExPolicy, typename InIter, typename T, typename Pred>
+
+        template <typename ExPolicy, typename InIter, typename T,
+            typename Reduce>
         typename detail::algorithm_result<ExPolicy, T>::type
         reduce(ExPolicy const&, InIter first, InIter last, T && init,
-            Pred && op, boost::mpl::true_)
+            Reduce && r, boost::mpl::true_)
         {
             try {
                 return detail::algorithm_result<ExPolicy, T>::get(
                     std::accumulate(first, last, std::forward<T>(init),
-                        std::forward<Pred>(op)));
+                        std::forward<Reduce>(r)));
             }
             catch (...) {
                 detail::handle_exception<ExPolicy>::call();
             }
         }
 
-        template <typename ExPolicy, typename FwdIter, typename T, typename Pred>
+        template <typename ExPolicy, typename FwdIter, typename T,
+            typename Reduce>
         typename detail::algorithm_result<ExPolicy, T>::type
         reduce(ExPolicy const& policy, FwdIter first, FwdIter last, T && init,
-            Pred && op, boost::mpl::false_)
+            Reduce && r, boost::mpl::false_)
         {
             if (first == last)
             {
@@ -62,33 +64,34 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             return util::partitioner<ExPolicy, T>::call(
                 policy, first, std::distance(first, last),
-                [op](FwdIter part_begin, std::size_t part_count)
+                [r](FwdIter part_begin, std::size_t part_count)
                 {
                     T val = *part_begin;
                     return util::accumulate_n(++part_begin, --part_count,
-                        std::move(val), op);
+                        std::move(val), r);
                 },
-                hpx::util::unwrapped([init, op](std::vector<T>&& results)
+                hpx::util::unwrapped([init, r](std::vector<T> && results)
                 {
                     return util::accumulate_n(boost::begin(results),
-                        boost::size(results), init, op);
+                        boost::size(results), init, r);
                 }));
         }
 
-        template <typename InIter, typename T, typename Pred>
+        template <typename InIter, typename T, typename Reduce>
         T reduce(execution_policy const& policy, InIter first, InIter last,
-            T && init, Pred && op, boost::mpl::false_)
+            T && init, Reduce && r, boost::mpl::false_)
         {
             HPX_PARALLEL_DISPATCH(policy, detail::reduce, first, last,
-                std::forward<T>(init), std::forward<Pred>(op));
+                std::forward<T>(init), std::forward<Reduce>(r));
         }
 
-        template<typename InIter, typename T, typename Pred>
+        template <typename InIter, typename T, typename Reduce>
         T reduce(execution_policy const& policy, InIter first, InIter last,
-            T init, Pred && op, boost::mpl::true_ t)
+            T init, Reduce && r, boost::mpl::true_)
         {
             return detail::reduce(sequential_execution_policy(),
-                first, last, std::forward<T>(init), std::forward<Pred>(op), t);
+                first, last, std::forward<T>(init), std::forward<Reduce>(r), 
+                boost::mpl::true_());
         }
         /// \endcond
     }
@@ -109,7 +112,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a copy_if requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
-    /// \tparam T           The type of the value to be used as initial values (deduced).
+    /// \tparam T           The type of the value to be used as initial (and
+    ///                     intermediate) values (deduced).
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -126,13 +130,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     Ret fun(const Type1 &a, const Type2 &b);
     ///                     \endcode \n
     ///                     The signature does not need to have const&.
-    ///                     it. The type \a Type1 must be such that an object
-    ///                     of type \a T can be implicitly converted to \a Type1.
-    ///                     The type \a Type2 must be such that an object of
-    ///                     type \a InIter can be dereferenced and then implicitly
-    ///                     converted to \a Type2. The type \a Ret must be such
-    ///                     that an object of type \a T can be assigned a value
-    ///                     of type \a Ret.
+    ///                     The types \a Type1, \a Type2, and \a Ret must be
+    ///                     such that an object of type \a InIter can be
+    ///                     dereferenced and then implicitly converted to any
+    ///                     of those types.
     /// \param init         The initial value for the generalized sum.
     ///
     /// The reduce operations in the parallel \a reduce algorithm invoked
@@ -148,8 +149,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \returns  The \a reduce algorithm returns a \a hpx::future<T> if the
     ///           execution policy is of type \a task_execution_policy and
     ///           returns \a T otherwise.
-    /// \returns  The \a reduce algorithm returns the result of the
-    ///           generalized sum over the element given by the input range
+    ///           The \a reduce algorithm returns the result of the
+    ///           generalized sum over the elements given by the input range
     ///           [first, last).
     ///
     /// \note   GENERALIZED_SUM(op, a1, ..., aN) is defined as follows:
@@ -198,7 +199,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \tparam InIter      The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     input iterator.
-    /// \tparam T           The type of the value to be assigned (deduced).
+    /// \tparam T           The type of the value to be used as initial (and
+    ///                     intermediate) values (deduced).
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -221,8 +223,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \returns  The \a reduce algorithm returns a \a hpx::future<T> if the
     ///           execution policy is of type \a task_execution_policy and
     ///           returns \a T otherwise.
-    /// \returns  The \a reduce algorithm returns the result of the
-    ///           generalized sum (applying operator+()) over the element given
+    ///           The \a reduce algorithm returns the result of the
+    ///           generalized sum (applying operator+()) over the elements given
     ///           by the input range [first, last).
     ///
     /// \note   GENERALIZED_SUM(+, a1, ..., aN) is defined as follows:
@@ -291,9 +293,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// \returns  The \a reduce algorithm returns a \a hpx::future<T> if the
     ///           execution policy is of type \a task_execution_policy and
-    ///           returns \a T otherwise.
-    /// \returns  The \a reduce algorithm returns the result of the
-    ///           generalized sum (applying operator+()) over the element given
+    ///           returns T otherwise (where T is the the value_type of
+    ///           \a InIter).
+    ///           The \a reduce algorithm returns the result of the
+    ///           generalized sum (applying operator+()) over the elements given
     ///           by the input range [first, last).
     ///
     /// \note   The type of the initial value (and the result type) \a T is
