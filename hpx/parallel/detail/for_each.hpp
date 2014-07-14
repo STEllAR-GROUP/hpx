@@ -32,54 +32,45 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename ExPolicy, typename InIter, typename F>
-        typename detail::algorithm_result<ExPolicy, InIter>::type
-        for_each_n(ExPolicy const&, InIter first,
-            std::size_t count, F && f, boost::mpl::true_)
+        template <typename Iter>
+        struct for_each_n : public detail::algorithm<for_each_n<Iter>, Iter>
         {
-            try {
-                return detail::algorithm_result<ExPolicy, InIter>::get(
-                    util::loop_n(first, count, std::forward<F>(f)));
-            }
-            catch (...) {
-                detail::handle_exception<ExPolicy>::call();
-            }
-        }
+            for_each_n()
+              : detail::algorithm<for_each_n<Iter>, Iter>("for_each_n")
+            {}
 
-        template <typename ExPolicy, typename FwdIter, typename F>
-        typename detail::algorithm_result<ExPolicy, FwdIter>::type
-        for_each_n(ExPolicy const& policy, FwdIter first, std::size_t count,
-            F && f, boost::mpl::false_)
-        {
-            if (count > 0)
+            template <typename ExPolicy, typename F>
+            static typename detail::algorithm_result<ExPolicy, Iter>::type
+            sequential(ExPolicy const&, Iter first, std::size_t count, F && f)
             {
-                return util::partitioner<ExPolicy>::call(
-                    policy, first, count,
-                    [f](FwdIter part_begin, std::size_t part_count)
-                    {
-                        util::loop_n(part_begin, part_count, f);
-                    });
+                try {
+                    return detail::algorithm_result<ExPolicy, Iter>::get(
+                        util::loop_n(first, count, std::forward<F>(f)));
+                }
+                catch (...) {
+                    detail::handle_exception<ExPolicy>::call();
+                }
             }
 
-            return detail::algorithm_result<ExPolicy, FwdIter>::get(
-                std::move(first));
-        }
+            template <typename ExPolicy, typename F>
+            static typename detail::algorithm_result<ExPolicy, Iter>::type
+            parallel(ExPolicy const& policy, Iter first, std::size_t count,
+                F && f)
+            {
+                if (count > 0)
+                {
+                    return util::partitioner<ExPolicy>::call(
+                        policy, first, count,
+                        [f](Iter part_begin, std::size_t part_count)
+                        {
+                            util::loop_n(part_begin, part_count, f);
+                        });
+                }
 
-        template <typename InIter, typename F>
-        InIter for_each_n(execution_policy const& policy,
-            InIter first, std::size_t count, F && f, boost::mpl::false_)
-        {
-            HPX_PARALLEL_DISPATCH(policy, detail::for_each_n, first, count,
-                std::forward<F>(f));
-        }
-
-        template <typename InIter, typename F>
-        InIter for_each_n(execution_policy const& policy,
-            InIter first, std::size_t count, F && f, boost::mpl::true_ t)
-        {
-            return detail::for_each_n(sequential_execution_policy(),
-                first, count, std::forward<F>(f), t);
-        }
+                return detail::algorithm_result<ExPolicy, Iter>::get(
+                    std::move(first));
+            }
+        };
         /// \endcond
     }
 
@@ -177,147 +168,147 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category>
         >::type is_seq;
 
-        return detail::for_each_n(
+        return detail::for_each_n<InIter>().call(
             std::forward<ExPolicy>(policy),
             first, std::size_t(count), std::forward<F>(f), is_seq());
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // for_each
-    namespace detail
-    {
-        /// \cond NOINTERNAL
-        template <typename ExPolicy, typename InIter, typename F>
-        typename detail::algorithm_result<ExPolicy, void>::type
-        for_each(ExPolicy const&, InIter first, InIter last, F && f,
-            boost::mpl::true_)
-        {
-            try {
-                std::for_each(first, last, std::forward<F>(f));
-                return detail::algorithm_result<ExPolicy, void>::get();
-            }
-            catch (...) {
-                detail::handle_exception<ExPolicy>::call();
-            }
-        }
-
-        template <typename ExPolicy, typename FwdIter, typename F>
-        typename detail::algorithm_result<ExPolicy, void>::type
-        for_each(ExPolicy const& policy, FwdIter first, FwdIter last, F && f,
-            boost::mpl::false_ fls)
-        {
-            typedef
-                typename detail::algorithm_result<ExPolicy, void>::type
-            result_type;
-
-            return hpx::util::void_guard<result_type>(),
-                detail::for_each_n(policy, first, std::distance(first, last),
-                    std::forward<F>(f), boost::mpl::false_());
-        }
-
-        template <typename InIter, typename F>
-        void for_each(execution_policy const& policy,
-            InIter first, InIter last, F && f, boost::mpl::false_)
-        {
-            HPX_PARALLEL_DISPATCH(policy, detail::for_each, first, last,
-                std::forward<F>(f));
-        }
-
-        template <typename InIter, typename F>
-        void for_each(execution_policy const& policy,
-            InIter first, InIter last, F && f, boost::mpl::true_ t)
-        {
-            detail::for_each(sequential_execution_policy(),
-                first, last, std::forward<F>(f), t);
-        }
-        /// \endcond
-    }
-
-    /// Applies \a f to the result of dereferencing every iterator in the
-    /// range [first, last).
-    ///
-    /// \note   Complexity: Applies \a f exactly \a last - \a first times.
-    ///
-    /// If \a f returns a result, the result is ignored.
-    ///
-    /// If the type of \a first satisfies the requirements of a mutable
-    /// iterator, \a f may apply non-constant functions through the
-    /// dereferenced iterator.
-    ///
-    /// Unlike its sequential form, the parallel overload of
-    /// \a for_each does not return a copy of its \a Function parameter,
-    /// since parallelization may not permit efficient state
-    /// accumulation.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it applies user-provided function objects.
-    /// \tparam InIter      The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    /// \tparam F           The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a for_each requires \a F to meet the
-    ///                     requirements of \a CopyConstructible.
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    /// \param f            Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last).
-    ///                     The signature of this predicate
-    ///                     should be equivalent to:
-    ///                     \code
-    ///                     <ignored> pred(const Type &a);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&. The
-    ///                     type \a Type must be such that an object of
-    ///                     type \a InIter can be dereferenced and then
-    ///                     implicitly converted to Type.
-    ///
-    /// The application of function objects in parallel algorithm
-    /// invoked with an execution policy object of type
-    /// \a sequential_execution_policy execute in sequential order in the
-    /// calling thread.
-    ///
-    /// The application of function objects in parallel algorithm
-    /// invoked with an execution policy object of type
-    /// \a parallel_execution_policy or \a task_execution_policy are
-    /// permitted to execute in an unordered fashion in unspecified
-    /// threads, and indeterminately sequenced within each thread.
-    ///
-    /// \returns  The \a for_each algorithm returns a \a hpx::future<void> if the
-    ///           execution policy is of type \a task_execution_policy and
-    ///           returns \a void otherwise.
-    ///
-    template <typename ExPolicy, typename InIter, typename F>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, void>::type
-    >::type
-    for_each(ExPolicy && policy, InIter first, InIter last, F && f)
-    {
-        typedef typename std::iterator_traits<InIter>::iterator_category
-            iterator_category;
-
-        BOOST_STATIC_ASSERT_MSG(
-            (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
-            "Requires at least input iterator.");
-
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>
-        >::type is_seq;
-
-        return detail::for_each(
-            std::forward<ExPolicy>(policy),
-            first, last, std::forward<F>(f), is_seq());
-    }
+//     ///////////////////////////////////////////////////////////////////////////
+//     // for_each
+//     namespace detail
+//     {
+//         /// \cond NOINTERNAL
+//         template <typename ExPolicy, typename InIter, typename F>
+//         typename detail::algorithm_result<ExPolicy, void>::type
+//         for_each(ExPolicy const&, InIter first, InIter last, F && f,
+//             boost::mpl::true_)
+//         {
+//             try {
+//                 std::for_each(first, last, std::forward<F>(f));
+//                 return detail::algorithm_result<ExPolicy, void>::get();
+//             }
+//             catch (...) {
+//                 detail::handle_exception<ExPolicy>::call();
+//             }
+//         }
+//
+//         template <typename ExPolicy, typename FwdIter, typename F>
+//         typename detail::algorithm_result<ExPolicy, void>::type
+//         for_each(ExPolicy const& policy, FwdIter first, FwdIter last, F && f,
+//             boost::mpl::false_ fls)
+//         {
+//             typedef
+//                 typename detail::algorithm_result<ExPolicy, void>::type
+//             result_type;
+//
+//             return hpx::util::void_guard<result_type>(),
+//                 detail::for_each_n(policy, first, std::distance(first, last),
+//                     std::forward<F>(f), boost::mpl::false_());
+//         }
+//
+//         template <typename InIter, typename F>
+//         void for_each(execution_policy const& policy,
+//             InIter first, InIter last, F && f, boost::mpl::false_)
+//         {
+//             HPX_PARALLEL_DISPATCH(policy, detail::for_each, first, last,
+//                 std::forward<F>(f));
+//         }
+//
+//         template <typename InIter, typename F>
+//         void for_each(execution_policy const& policy,
+//             InIter first, InIter last, F && f, boost::mpl::true_ t)
+//         {
+//             detail::for_each(sequential_execution_policy(),
+//                 first, last, std::forward<F>(f), t);
+//         }
+//         /// \endcond
+//     }
+//
+//     /// Applies \a f to the result of dereferencing every iterator in the
+//     /// range [first, last).
+//     ///
+//     /// \note   Complexity: Applies \a f exactly \a last - \a first times.
+//     ///
+//     /// If \a f returns a result, the result is ignored.
+//     ///
+//     /// If the type of \a first satisfies the requirements of a mutable
+//     /// iterator, \a f may apply non-constant functions through the
+//     /// dereferenced iterator.
+//     ///
+//     /// Unlike its sequential form, the parallel overload of
+//     /// \a for_each does not return a copy of its \a Function parameter,
+//     /// since parallelization may not permit efficient state
+//     /// accumulation.
+//     ///
+//     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+//     ///                     It describes the manner in which the execution
+//     ///                     of the algorithm may be parallelized and the manner
+//     ///                     in which it applies user-provided function objects.
+//     /// \tparam InIter      The type of the source iterators used (deduced).
+//     ///                     This iterator type must meet the requirements of an
+//     ///                     input iterator.
+//     /// \tparam F           The type of the function/function object to use
+//     ///                     (deduced). Unlike its sequential form, the parallel
+//     ///                     overload of \a for_each requires \a F to meet the
+//     ///                     requirements of \a CopyConstructible.
+//     ///
+//     /// \param policy       The execution policy to use for the scheduling of
+//     ///                     the iterations.
+//     /// \param first        Refers to the beginning of the sequence of elements
+//     ///                     the algorithm will be applied to.
+//     /// \param last         Refers to the end of the sequence of elements the
+//     ///                     algorithm will be applied to.
+//     /// \param f            Specifies the function (or function object) which
+//     ///                     will be invoked for each of the elements in the
+//     ///                     sequence specified by [first, last).
+//     ///                     The signature of this predicate
+//     ///                     should be equivalent to:
+//     ///                     \code
+//     ///                     <ignored> pred(const Type &a);
+//     ///                     \endcode \n
+//     ///                     The signature does not need to have const&. The
+//     ///                     type \a Type must be such that an object of
+//     ///                     type \a InIter can be dereferenced and then
+//     ///                     implicitly converted to Type.
+//     ///
+//     /// The application of function objects in parallel algorithm
+//     /// invoked with an execution policy object of type
+//     /// \a sequential_execution_policy execute in sequential order in the
+//     /// calling thread.
+//     ///
+//     /// The application of function objects in parallel algorithm
+//     /// invoked with an execution policy object of type
+//     /// \a parallel_execution_policy or \a task_execution_policy are
+//     /// permitted to execute in an unordered fashion in unspecified
+//     /// threads, and indeterminately sequenced within each thread.
+//     ///
+//     /// \returns  The \a for_each algorithm returns a \a hpx::future<void> if the
+//     ///           execution policy is of type \a task_execution_policy and
+//     ///           returns \a void otherwise.
+//     ///
+//     template <typename ExPolicy, typename InIter, typename F>
+//     inline typename boost::enable_if<
+//         is_execution_policy<ExPolicy>,
+//         typename detail::algorithm_result<ExPolicy, void>::type
+//     >::type
+//     for_each(ExPolicy && policy, InIter first, InIter last, F && f)
+//     {
+//         typedef typename std::iterator_traits<InIter>::iterator_category
+//             iterator_category;
+//
+//         BOOST_STATIC_ASSERT_MSG(
+//             (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
+//             "Requires at least input iterator.");
+//
+//         typedef typename boost::mpl::or_<
+//             is_sequential_execution_policy<ExPolicy>,
+//             boost::is_same<std::input_iterator_tag, iterator_category>
+//         >::type is_seq;
+//
+//         return detail::for_each(
+//             std::forward<ExPolicy>(policy),
+//             first, last, std::forward<F>(f), is_seq());
+//     }
 }}}
 
 #endif
