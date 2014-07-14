@@ -47,18 +47,18 @@ executed into a code which creates asynchronous threads. In the simplest
 case this involves relplacing a variable with a futue to a variable,
 a function with a future to a function, and adding a [^.get()] at the
 point where a value is actually needed. The code below shows how this
-technique was applied to the [^struc stepper].
+technique was applied to the [^struct stepper].
 
 [import ../../examples/1d_stencil/1d_stencil_2.cpp]
 [stepper_2]
 
-In our example we re-define 
+In our example, we re-define 
 our partition type as a [^shared_future] and, in [^main], create 
-the object "result" which is a future to a vector of shared futures. We
-use [^result] to represent the last vector of futures on a string of 
-vectors of futures created for each timestep. 
-This execution tree is unraveled by passing the values 
-of a partition and its neighbors to [^heat] once the futures that 
+the object "result" which is a future to a vector of partitions. We
+use [^result] to represent the last vector in a string of 
+vectors created for each timestep. 
+In order to move to the next timestep, the values 
+of a partition and its neighbors must be passed to [^heat] once the futures that 
 contain them are ready. In HPX, 
 we have an LCO (Local Control Object) named Dataflow which assists the 
 programmer in expressing this dependency.  Dataflow 
@@ -70,12 +70,12 @@ the function call (async or sync), the function to
 call (in this case [^Op]), and futures to the arguments 
 that will be passed to the function. 
 When called, dataflow immediately returns a future to the result of the 
-specified function.  This allows users to string the dataflows together 
+specified function.  This allows users to string dataflows together 
 and construct an execution tree. 
 
 After the values of the futures in dataflow are ready, the values must 
 be pulled out of the future container to be passed to the function [^heat]. 
-In order to do this we 
+In order to do this, we 
 use the HPX facility [^unwrapped], which underneath calls [^.get()] on
 each of the futures so that the function [^heat] will be passed doubles
 and not futures to doubles.
@@ -84,7 +84,7 @@ By setting up the algorithm this way, the program will be able to execute
 as quickly as the dependencies of each future are met. 
 Unfortunately, this example runs 
 terribly slow. This increase in execution time is caused 
-by the increased overheads needed to create a future for each
+by the overheads needed to create a future for each
 data point. Because the work done within each call to heat is very
 small, the overhead of creating and scheduling each of the three
 futures is greater than that of the actual useful work! In order
@@ -98,16 +98,22 @@ control the grain size of our program. The strategy that we
 employ is to create "partitions" of data points. The user
 can define how many partitions are created and how many 
 data points are contained in each partition. This is accomplished 
-by creating the [^struct partition] and defining [^space] to now
-be a vector of partitions.
+by creating the [^struct partition] which contains a member
+object [^data_]. [^data_] is a vector of doubles which holds
+the datapoints assigned to a particular instance of [^partition].
 
 In example 4, we take advantage of the partition setup by redefining
-[^space] to be a vector of shared_futures which represents partitions.
+[^space] to be a vector of shared_futures with each future
+representing a partition. In this manner, each future represents
+several datapoints. Because the user can define how many
+datapoints are contained in each partition (and therefore how many 
+datapoints that are represented by one future) a user can now 
+control the grainsize of the simulation.
 The rest of the code was then futureized in the same manner that was 
 done in example 2. It should be noted
 how strikingly similar example 4 is to example 2.
 
-Example 4 finally shows us some good results.  This code 
+Example 4 finally shows good results.  This code 
 is faster than the OpenMP version by a factor of [INSERT FACTOR HERE].
 While these results are impressive, our work on this
 algorithm is not over. This example only runs on one locality.
@@ -180,9 +186,9 @@ The reader should be reminded that this exchange of end
 elements occurs in the function 
 [^get_data()] and therefore is executed asynchronously.
 
-Now that we have the code running in distributed it 
+Now that we have the code running in distributed, it 
 is time to make some optimizations. The function [^heat_part] 
-spends most of its time on two task: retrieving remote 
+spends most of its time on two tasks: retrieving remote 
 data and working on the data in the middle partition. Because
 we know that the data for the middle partition is local,
 we can overlap the work on the middle partition with that 
@@ -196,9 +202,10 @@ the execution of the program
 the [^struct stepper] is wrapped into a component. In this 
 way, each locality contains an instance of stepper which
 executes its own instance of the function [^do_work()].
-This scheme does create an interesting problem that must
+This scheme does create an interesting synchronization 
+problem that must
 be sloved. When the program flow was being coordinated on
-the head node the GID of each component was known. However,
+the head node the, GID of each component was known. However,
 when we distribute the program flow, each partition has no
 notion of the GID of its neighbors if the next partition 
 is on another locality. In order to make the GIDs of neighboring
