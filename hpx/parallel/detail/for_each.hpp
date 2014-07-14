@@ -43,13 +43,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename detail::algorithm_result<ExPolicy, Iter>::type
             sequential(ExPolicy const&, Iter first, std::size_t count, F && f)
             {
-                try {
-                    return detail::algorithm_result<ExPolicy, Iter>::get(
-                        util::loop_n(first, count, std::forward<F>(f)));
-                }
-                catch (...) {
-                    detail::handle_exception<ExPolicy>::call();
-                }
+                return detail::algorithm_result<ExPolicy, Iter>::get(
+                    util::loop_n(first, count, std::forward<F>(f)));
             }
 
             template <typename ExPolicy, typename F>

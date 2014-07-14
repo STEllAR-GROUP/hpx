@@ -84,7 +84,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     call(ExPolicy const& policy, HPX_ENUM_FWD_ARGS(N, Arg, arg),
         boost::mpl::true_)
     {
-        return derived().sequential(policy, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+        try {
+            return derived().sequential(policy,
+                HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+        }
+        catch (...) {
+            detail::handle_exception<ExPolicy>::call();
+        }
     }
 
     template <typename ExPolicy, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
