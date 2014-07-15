@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/reduce.hpp
+/// \file parallel/detail/reduce.hpp
 
 #if !defined(HPX_PARALLEL_DETAILREUCE_JUN_01_2014_0903AM)
 #define HPX_PARALLEL_DETAILREUCE_JUN_01_2014_0903AM
@@ -11,8 +11,11 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/unwrapped.hpp>
+
+#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
+#include <hpx/parallel/detail/dispatch.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
@@ -30,69 +33,50 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     // reduce
     namespace detail
     {
-
-        template <typename ExPolicy, typename InIter, typename T,
-            typename Reduce>
-        typename detail::algorithm_result<ExPolicy, T>::type
-        reduce(ExPolicy const&, InIter first, InIter last, T && init,
-            Reduce && r, boost::mpl::true_)
+        /// \cond NOINTERNAL
+        template <typename T>
+        struct reduce : public detail::algorithm<reduce<T>, T>
         {
-            try {
-                return detail::algorithm_result<ExPolicy, T>::get(
-                    std::accumulate(first, last, std::forward<T>(init),
-                        std::forward<Reduce>(r)));
-            }
-            catch (...) {
-                detail::handle_exception<ExPolicy>::call();
-            }
-        }
+            reduce()
+              : detail::algorithm<reduce<T>, T>("reduce")
+            {}
 
-        template <typename ExPolicy, typename FwdIter, typename T,
-            typename Reduce>
-        typename detail::algorithm_result<ExPolicy, T>::type
-        reduce(ExPolicy const& policy, FwdIter first, FwdIter last, T && init,
-            Reduce && r, boost::mpl::false_)
-        {
-            if (first == last)
+            template <typename ExPolicy, typename InIter, typename Reduce>
+            static typename detail::algorithm_result<ExPolicy, T>::type
+            sequential(ExPolicy const&, InIter first, InIter last,
+                T && init, Reduce && r)
             {
                 return detail::algorithm_result<ExPolicy, T>::get(
-                    std::forward<T>(init));
+                    std::accumulate(first, last, std::forward<T>(init),
+                    std::forward<Reduce>(r)));
             }
 
-            typedef typename std::iterator_traits<FwdIter>::iterator_category
-                category;
-
-            return util::partitioner<ExPolicy, T>::call(
-                policy, first, std::distance(first, last),
-                [r](FwdIter part_begin, std::size_t part_count)
+            template <typename ExPolicy, typename FwdIter, typename Reduce>
+            static typename detail::algorithm_result<ExPolicy, T>::type
+            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+                T && init, Reduce && r)
+            {
+                if (first == last)
                 {
-                    T val = *part_begin;
-                    return util::accumulate_n(++part_begin, --part_count,
-                        std::move(val), r);
-                },
-                hpx::util::unwrapped([init, r](std::vector<T> && results)
-                {
-                    return util::accumulate_n(boost::begin(results),
-                        boost::size(results), init, r);
-                }));
-        }
+                    return detail::algorithm_result<ExPolicy, T>::get(
+                        std::forward<T>(init));
+                }
 
-        template <typename InIter, typename T, typename Reduce>
-        T reduce(execution_policy const& policy, InIter first, InIter last,
-            T && init, Reduce && r, boost::mpl::false_)
-        {
-            HPX_PARALLEL_DISPATCH(policy, detail::reduce, first, last,
-                std::forward<T>(init), std::forward<Reduce>(r));
-        }
-
-        template <typename InIter, typename T, typename Reduce>
-        T reduce(execution_policy const& policy, InIter first, InIter last,
-            T init, Reduce && r, boost::mpl::true_)
-        {
-            return detail::reduce(sequential_execution_policy(),
-                first, last, std::forward<T>(init), std::forward<Reduce>(r), 
-                boost::mpl::true_());
-        }
+                return util::partitioner<ExPolicy, T>::call(
+                    policy, first, std::distance(first, last),
+                    [r](FwdIter part_begin, std::size_t part_size)
+                    {
+                        T val = *part_begin;
+                        return util::accumulate_n(++part_begin, --part_size,
+                            std::move(val), r);
+                    },
+                    hpx::util::unwrapped([init, r](std::vector<T> && results)
+                    {
+                        return util::accumulate_n(boost::begin(results),
+                            boost::size(results), init, r);
+                    }));
+            }
+        };
         /// \endcond
     }
 
@@ -183,8 +167,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category>
         >::type is_seq;
 
-        return detail::reduce(std::forward<ExPolicy>(policy), first, last,
-            std::move(init), std::forward<F>(f), is_seq());
+        return detail::reduce<T>().call(
+            std::forward<ExPolicy>(policy),
+            first, last, std::move(init), std::forward<F>(f), is_seq());
     }
 
     /// Returns GENERALIZED_SUM(+, init, *first, ..., *(first + (last - first) - 1)).
@@ -257,8 +242,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category>
         >::type is_seq;
 
-        return detail::reduce(std::forward<ExPolicy>(policy), first, last,
-            std::move(init), std::plus<T>(), is_seq());
+        return detail::reduce<T>().call(
+            std::forward<ExPolicy>(policy),
+            first, last, std::move(init), std::plus<T>(), is_seq());
     }
 
     /// Returns GENERALIZED_SUM(+, T(), *first, ..., *(first + (last - first) - 1)).
@@ -337,8 +323,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category>
         >::type is_seq;
 
-        return detail::reduce(std::forward<ExPolicy>(policy), first, last,
-            T(), std::plus<T>(), is_seq());
+        return detail::reduce<T>().call(
+            std::forward<ExPolicy>(policy),
+            first, last, T(), std::plus<T>(), is_seq());
     }
 #endif
 }}}

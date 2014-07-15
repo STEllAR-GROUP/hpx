@@ -59,7 +59,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         Derived& derived() { return static_cast<Derived&>(*this); }
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (3, 7, "hpx/parallel/detail/dispatch.hpp"))                           \
+    (3, (3, 5, "hpx/parallel/detail/dispatch.hpp"))                           \
     /**/
 
 #include BOOST_PP_ITERATE()

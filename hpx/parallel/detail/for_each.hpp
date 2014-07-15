@@ -59,9 +59,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 {
                     return util::partitioner<ExPolicy>::call(
                         policy, first, count,
-                        [f](Iter part_begin, std::size_t part_count)
+                        [f](Iter part_begin, std::size_t part_size)
                         {
-                            util::loop_n(part_begin, part_count, f);
+                            util::loop_n(part_begin, part_size, f);
                         });
                 }
 
