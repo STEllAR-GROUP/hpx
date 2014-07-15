@@ -132,7 +132,7 @@ namespace hpx { namespace parcelset
 #endif
 
     template <typename Connection>
-    boost::shared_ptr<parcel_buffer<typename Connection::buffer_type> >
+    void
     encode_parcels(std::vector<parcel> const & pv, Connection & connection,
         int archive_flags_, bool enable_security)
     {
@@ -218,7 +218,7 @@ namespace hpx { namespace parcelset
                        "caught hpx::exception: "
                     << e.what();
                 hpx::report_error(boost::current_exception());
-                return buffer;
+                return;
             }
             catch (boost::system::system_error const& e) {
                 LPT_(fatal)
@@ -226,14 +226,14 @@ namespace hpx { namespace parcelset
                        "caught boost::system::error: "
                     << e.what();
                 hpx::report_error(boost::current_exception());
-                return buffer;
+                return;
             }
             catch (boost::exception const&) {
                 LPT_(fatal)
                     << "encode_parcels: "
                        "caught boost::exception";
                 hpx::report_error(boost::current_exception());
-                return buffer;
+                return;
             }
             catch (std::exception const& e) {
                 // We have to repackage all exceptions thrown by the
@@ -248,7 +248,7 @@ namespace hpx { namespace parcelset
                     << "encode_parcels: "
                    "caught unknown exception";
             hpx::report_error(boost::current_exception());
-            return buffer;
+            return;
         }
 
         buffer->size_ = buffer->data_.size();
@@ -297,7 +297,7 @@ namespace hpx { namespace parcelset
             }
         }
 
-        return buffer;
+        return;
     }
 }}
 
