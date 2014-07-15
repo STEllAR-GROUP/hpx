@@ -21,7 +21,7 @@ int main() {
   future<future<void> > f1 =
       async(launch::deferred, &nested_future);
 
-  future<void> f2 = f1.unwrap();
+  future<void> f2(std::move(f1));
   f2.wait();
 
   std::cout << "Done.\n";

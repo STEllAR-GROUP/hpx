@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/algorithm.hpp>
+#include <hpx/include/parallel_for_each_n.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include "test_utils.hpp"
@@ -104,7 +104,7 @@ void test_for_each_n_exception(ExPolicy const& policy, IteratorTag)
 
     bool caught_exception = false;
     try {
-        iterator result = hpx::parallel::for_each_n(policy,
+        hpx::parallel::for_each_n(policy,
             iterator(boost::begin(c)), c.size(),
             [](std::size_t& v) {
                 throw std::runtime_error("test");
@@ -194,7 +194,7 @@ void test_for_each_n_bad_alloc(ExPolicy const& policy, IteratorTag)
 
     bool caught_bad_alloc = false;
     try {
-        iterator result = hpx::parallel::for_each_n(policy,
+        hpx::parallel::for_each_n(policy,
             iterator(boost::begin(c)), c.size(),
             [](std::size_t& v) {
                 throw std::bad_alloc();

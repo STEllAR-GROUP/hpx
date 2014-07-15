@@ -5,107 +5,10 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/numeric.hpp>
+#include <hpx/include/parallel_reduce.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include "test_utils.hpp"
-
-///////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename IteratorTag>
-void test_reduce0(ExPolicy const& policy, IteratorTag)
-{
-    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
-
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
-    std::vector<std::size_t> c(3);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
-
-    typedef hpx::util::tuple<std::size_t, std::size_t> result_type;
-
-    using hpx::util::make_tuple;
-    using hpx::util::get;
-
-    auto reduce_op =
-        [](result_type v1, result_type v2) -> result_type
-        {
-            return make_tuple(get<0>(v1)*get<0>(v2), get<1>(v1)*get<1>(v2));
-        };
-
-    auto convert_op =
-        [](std::size_t val) -> result_type
-        {
-            return make_tuple(val, val);
-        };
-
-    result_type const init = make_tuple(std::size_t(1), std::size_t(1));
-
-    result_type r1 =
-        hpx::parallel::reduce(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
-            init, reduce_op, convert_op);
-
-    // verify values
-    result_type r2 =
-        std::accumulate(
-            boost::begin(c), boost::end(c), init,
-            [&reduce_op, &convert_op](result_type res, std::size_t val)
-            {
-                return reduce_op(res, convert_op(val));
-            });
-
-    HPX_TEST_EQ(get<0>(r1), get<0>(r2));
-    HPX_TEST_EQ(get<1>(r1), get<1>(r2));
-}
-
-template <typename IteratorTag>
-void test_reduce0(hpx::parallel::task_execution_policy, IteratorTag)
-{
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
-    std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
-
-    std::size_t const val(42);
-    auto op =
-        [val](std::size_t v1, std::size_t v2) {
-            return v1 + v2 + val;
-        };
-
-    hpx::future<std::size_t> f =
-        hpx::parallel::reduce(hpx::parallel::task,
-            iterator(boost::begin(c)), iterator(boost::end(c)), val, op);
-    f.wait();
-
-    // verify values
-    std::size_t r2 = std::accumulate(boost::begin(c), boost::end(c), val, op);
-    HPX_TEST_EQ(f.get(), r2);
-}
-
-template <typename IteratorTag>
-void test_reduce0()
-{
-    using namespace hpx::parallel;
-
-    test_reduce0(seq, IteratorTag());
-    test_reduce0(par, IteratorTag());
-    test_reduce0(par_vec, IteratorTag());
-    test_reduce0(task, IteratorTag());
-
-    test_reduce0(execution_policy(seq), IteratorTag());
-    test_reduce0(execution_policy(par), IteratorTag());
-    test_reduce0(execution_policy(par_vec), IteratorTag());
-    test_reduce0(execution_policy(task), IteratorTag());
-}
-
-void reduce_test0()
-{
-    test_reduce0<std::random_access_iterator_tag>();
-    test_reduce0<std::forward_iterator_tag>();
-    test_reduce0<std::input_iterator_tag>();
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
@@ -274,12 +177,6 @@ void test_reduce3(hpx::parallel::task_execution_policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand());
-
-    std::size_t const val(42);
-    auto op =
-        [val](std::size_t v1, std::size_t v2) {
-            return v1 + v2 + val;
-        };
 
     hpx::future<std::size_t> f =
         hpx::parallel::reduce(hpx::parallel::task,
@@ -502,7 +399,6 @@ void reduce_bad_alloc_test()
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    reduce_test0();
     reduce_test1();
     reduce_test2();
 #if !defined(BOOST_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS)

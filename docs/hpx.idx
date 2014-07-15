@@ -70,6 +70,9 @@ parallel::copy_n                      "copy_n" "hpx\.parallel\.v1\.copy_n.*"
 parallel::count                       "count" "hpx\.parallel\.v1\.count$.*"
 parallel::count_if                    "count_if" "hpx\.parallel\.v1\.count_if.*"
 
+# hpx/parallel/detail/equal.hpp
+parallel::equal                       "equal" "hpx\.parallel\.v1\.equal_id.*"
+
 # hpx/parallel/detail/fill.hpp
 parallel::fill                        "fill" "hpx\.parallel\.v1\.fill$"
 parallel::fill_n                      "fill_n" "hpx\.parallel\.v1\.fill_n.*"
@@ -95,6 +98,9 @@ parallel::task_canceled_exception     "task_canceled_exception" "hpx\.parallel\.
 
 # hpx/parallel/detail/transform.hpp
 parallel::transform                   "transform" "hpx\.parallel\.v1\.transform.*"
+
+# hpx/parallel/detail/transform_reduce.hpp
+parallel::transform_reduce            "transform_reduce" "hpx\.parallel\.v1\.transform_reduce.*"
 
 
 # hpx/runtime/components/new.hpp

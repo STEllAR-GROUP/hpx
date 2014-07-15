@@ -49,7 +49,7 @@ namespace hpx
             template <typename Component>
             void operator()(Component* p)
             {
-                bool was_migrated = p->pin_count() == ~0x0;
+                bool was_migrated = p->pin_count() == ~0x0u;
                 p->unpin();
 
                 if (was_migrated)

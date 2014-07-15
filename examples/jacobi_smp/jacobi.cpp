@@ -29,8 +29,10 @@ namespace jacobi_smp {
       , std::size_t n
     )
     {
+#ifdef HPX_INTEL_VERSION
 #pragma vector always
 #pragma unroll(4)
+#endif
         for(std::size_t x = 1; x < n-1; ++x)
         {
             dst[x]

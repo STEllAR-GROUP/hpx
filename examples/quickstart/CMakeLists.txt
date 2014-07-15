@@ -47,7 +47,7 @@ if(HPX_HAVE_CXX11_LAMBDAS)
       1d_wave_equation
       hello_world
       fibonacci_dataflow
-      simple_pipeline
+      pipeline1
       vector_zip_dotproduct
       vector_counting_dotproduct
      )

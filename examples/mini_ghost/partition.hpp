@@ -662,7 +662,7 @@ namespace mini_ghost {
                     }
                   , dependencies
                   , flux_out_future
-                ).unwrap();
+                ).share();
         }
 
         ///////////////////////////////////////////////////////////////////////

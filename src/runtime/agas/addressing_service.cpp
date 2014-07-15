@@ -1725,8 +1725,8 @@ void addressing_service::route(
     }
 
     // apply directly as we have the resolved destination address
-    applier::detail::apply_r_p_cb<action_type>(addr, target, action_priority_
-      , f, req);
+    applier::detail::apply_r_p_cb<action_type>(std::move(addr), target,
+        action_priority_, f, req);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

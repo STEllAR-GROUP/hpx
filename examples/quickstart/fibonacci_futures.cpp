@@ -158,8 +158,7 @@ hpx::future<boost::uint64_t> fibonacci_future_unwrapped_when_all(boost::uint64_t
 
     // asynchronously launch the creation of one of the sub-terms of the
     // execution graph
-    hpx::future<boost::uint64_t> f =
-        hpx::async(&fibonacci_future, n-1).unwrap();
+    hpx::future<boost::uint64_t> f = hpx::async(&fibonacci_future, n-1);
     hpx::future<boost::uint64_t> r = fibonacci_future(n-2);
 
     return hpx::when_all(f, r).then(when_all_wrapper());

@@ -80,10 +80,6 @@ struct do_nothing_member
     }
 };
 
-#ifndef BOOST_NO_CXX11_LAMBDAS
-auto increment_lambda = [](boost::int32_t i){ return i + 1; };
-#endif /*BOOST_NO_CXX11_LAMBDAS*/
-
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {

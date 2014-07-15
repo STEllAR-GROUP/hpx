@@ -36,15 +36,15 @@ std::size_t thread_affinity_worker(std::size_t desired)
     // Returns the OS-thread number of the worker that is running this
     // PX-thread.
     std::size_t current = hpx::get_worker_thread_num();
-    bool numa_sensitive = hpx::is_scheduler_numa_sensitive();
-
     if (current == desired)
     {
+#if defined(HPX_HAVE_HWLOC)
+        bool numa_sensitive = hpx::is_scheduler_numa_sensitive();
+
         // extract the desired affinity mask
         hpx::threads::topology const& t = hpx::get_runtime().get_topology();
         hpx::threads::mask_type desired_mask = t.get_thread_affinity_mask(current, numa_sensitive);
 
-#if defined(HPX_HAVE_HWLOC)
         std::size_t idx = hpx::threads::find_first(desired_mask);
 
         hwloc_topology_t topo;

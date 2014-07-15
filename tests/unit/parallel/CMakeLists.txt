@@ -11,6 +11,8 @@ set(tests
     copyn
     count
     countif
+    equal
+    equal_binary
     fill
     filln
     foreach
@@ -22,6 +24,7 @@ set(tests
     task_region
     transform
     transform_binary
+	transform_reduce
    )
 
 set(task_region_FLAGS DEPENDENCIES iostreams_component)

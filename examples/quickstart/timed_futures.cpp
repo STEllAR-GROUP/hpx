@@ -41,7 +41,6 @@ int return_int_at_time()
 
     // Schedule a wakeup 2 seconds from now.
     using namespace boost::posix_time;
-    int arg = 42;
     hpx::future<int> f = hpx::make_ready_future_at(
         microsec_clock::universal_time() + seconds(2), 42);
 

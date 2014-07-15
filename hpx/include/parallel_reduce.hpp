@@ -7,16 +7,7 @@
 #if !defined(HPX_PARALLEL_REDUCE_JUN_28_2014_0827AM)
 #define HPX_PARALLEL_REDUCE_JUN_28_2014_0827AM
 
-#include <hpx/hpx_fwd.hpp>
-
-#include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/parallel/exception_list.hpp>
-#include <hpx/parallel/detail/dispatch.hpp>
-
-#include <hpx/parallel/detail/for_each.hpp>
 #include <hpx/parallel/detail/reduce.hpp>
-
-#undef HPX_PARALLEL_DISPATCH
 
 #endif
 

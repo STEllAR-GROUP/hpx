@@ -31,27 +31,10 @@ namespace hpx
         exception_list_type exceptions_;
 
     public:
-        /// The value_type stored by \a exceptions_list is a
-        /// \a boost::exception_ptr
-        typedef boost::exception_ptr value_type;
-        typedef value_type const& reference;
-        typedef value_type const& const_reference;
-
-        /// Unsigned integral type (usually std::size_t)
-        typedef exception_list_type::size_type size_type;
-
         /// bidirectional iterator
         typedef exception_list_type::const_iterator iterator;
 
-        /// Constant bidirectional iterator
-        typedef exception_list_type::const_iterator const_iterator;
-
-        /// Signed integer type (usually std::ptrdiff_t)
-        typedef std::iterator_traits<const_iterator>::difference_type
-            difference_type;
-
         /// \cond NOINTERNAL
-
         // \throws nothing
         ~exception_list() throw() {}
 
@@ -98,8 +81,6 @@ namespace hpx
         boost::system::error_code get_error() const;
 
         std::string get_message() const;
-
-        std::size_t get_error_count() const;
         /// \endcond
     };
 }

@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file execution_policy.hpp
+/// \file parallel/execution_policy.hpp
 
 #if !defined(HPX_PARALLEL_EXECUTION_POLICY_MAY_27_2014_0908PM)
 #define HPX_PARALLEL_EXECUTION_POLICY_MAY_27_2014_0908PM
@@ -94,7 +94,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// The class sequential_execution_policy is an execution policy type used
     /// as a unique type to disambiguate parallel algorithm overloading and
     /// require that a parallel algorithm's execution may not be parallelized.
-    struct sequential_execution_policy {};
+    struct sequential_execution_policy
+    {
+        sequential_execution_policy() {}
+    };
 
     /// Default sequential execution policy object.
     static sequential_execution_policy const seq;
@@ -106,6 +109,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     struct parallel_vector_execution_policy
     {
         /// \cond NOINTERNAL
+        parallel_vector_execution_policy() {}
+
         static threads::executor get_executor() { return threads::executor(); }
         static std::size_t get_chunk_size() { return 0; }
         /// \endcond

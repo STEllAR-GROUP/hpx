@@ -59,6 +59,7 @@ double ireceive(hpx::naming::id_type dest, std::size_t size, std::size_t window_
 
     // align used buffers on page boundaries
     unsigned long align_size = getpagesize();
+    (void)align_size;
     BOOST_ASSERT(align_size <= MAX_ALIGNMENT);
 
     char *send_buffer = new char[size];

@@ -3,20 +3,23 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file for_each.hpp
+/// \file parallel/detail/for_each.hpp
 
 #if !defined(HPX_PARALLEL_DETAIL_FOR_EACH_MAY_29_2014_0932PM)
 #define HPX_PARALLEL_DETAIL_FOR_EACH_MAY_29_2014_0932PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/detail/algorithm_result.hpp>
-#include <hpx/parallel/detail/is_negative.hpp>
-#include <hpx/parallel/util/partitioner.hpp>
-#include <hpx/parallel/util/loop.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/util/void_guard.hpp>
 #include <hpx/util/move.hpp>
+
+#include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/detail/algorithm_result.hpp>
+#include <hpx/parallel/detail/dispatch.hpp>
+#include <hpx/parallel/detail/is_negative.hpp>
+#include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/parallel/util/loop.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -32,54 +35,40 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename ExPolicy, typename InIter, typename F>
-        typename detail::algorithm_result<ExPolicy, InIter>::type
-        for_each_n(ExPolicy const&, InIter first,
-            std::size_t count, F && f, boost::mpl::true_)
+        template <typename Iter>
+        struct for_each_n : public detail::algorithm<for_each_n<Iter>, Iter>
         {
-            try {
-                return detail::algorithm_result<ExPolicy, InIter>::get(
+            for_each_n()
+              : detail::algorithm<for_each_n<Iter>, Iter>("for_each_n")
+            {}
+
+            template <typename ExPolicy, typename F>
+            static typename detail::algorithm_result<ExPolicy, Iter>::type
+            sequential(ExPolicy const&, Iter first, std::size_t count, F && f)
+            {
+                return detail::algorithm_result<ExPolicy, Iter>::get(
                     util::loop_n(first, count, std::forward<F>(f)));
             }
-            catch (...) {
-                detail::handle_exception<ExPolicy>::call();
-            }
-        }
 
-        template <typename ExPolicy, typename FwdIter, typename F>
-        typename detail::algorithm_result<ExPolicy, FwdIter>::type
-        for_each_n(ExPolicy const& policy, FwdIter first, std::size_t count,
-            F && f, boost::mpl::false_)
-        {
-            if (count > 0)
+            template <typename ExPolicy, typename F>
+            static typename detail::algorithm_result<ExPolicy, Iter>::type
+            parallel(ExPolicy const& policy, Iter first, std::size_t count,
+                F && f)
             {
-                return util::partitioner<ExPolicy>::call(
-                    policy, first, count,
-                    [f](FwdIter part_begin, std::size_t part_count)
-                    {
-                        util::loop_n(part_begin, part_count, f);
-                    });
+                if (count > 0)
+                {
+                    return util::partitioner<ExPolicy>::call(
+                        policy, first, count,
+                        [f](Iter part_begin, std::size_t part_size)
+                        {
+                            util::loop_n(part_begin, part_size, f);
+                        });
+                }
+
+                return detail::algorithm_result<ExPolicy, Iter>::get(
+                    std::move(first));
             }
-
-            return detail::algorithm_result<ExPolicy, FwdIter>::get(
-                std::move(first));
-        }
-
-        template <typename InIter, typename F>
-        InIter for_each_n(execution_policy const& policy,
-            InIter first, std::size_t count, F && f, boost::mpl::false_)
-        {
-            HPX_PARALLEL_DISPATCH(policy, detail::for_each_n, first, count,
-                std::forward<F>(f));
-        }
-
-        template <typename InIter, typename F>
-        InIter for_each_n(execution_policy const& policy,
-            InIter first, std::size_t count, F && f, boost::mpl::true_ t)
-        {
-            return detail::for_each_n(sequential_execution_policy(),
-                first, count, std::forward<F>(f), t);
-        }
+        };
         /// \endcond
     }
 
@@ -177,7 +166,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category>
         >::type is_seq;
 
-        return detail::for_each_n(
+        return detail::for_each_n<InIter>().call(
             std::forward<ExPolicy>(policy),
             first, std::size_t(count), std::forward<F>(f), is_seq());
     }
@@ -187,49 +176,34 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename ExPolicy, typename InIter, typename F>
-        typename detail::algorithm_result<ExPolicy, void>::type
-        for_each(ExPolicy const&, InIter first, InIter last, F && f,
-            boost::mpl::true_)
+        struct for_each : public detail::algorithm<for_each>
         {
-            try {
+            for_each()
+              : detail::algorithm<for_each>("for_each")
+            {}
+
+            template <typename ExPolicy, typename InIter, typename F>
+            static typename detail::algorithm_result<ExPolicy>::type
+            sequential(ExPolicy const&, InIter first, InIter last, F && f)
+            {
                 std::for_each(first, last, std::forward<F>(f));
-                return detail::algorithm_result<ExPolicy, void>::get();
+                return detail::algorithm_result<ExPolicy>::get();
             }
-            catch (...) {
-                detail::handle_exception<ExPolicy>::call();
+
+            template <typename ExPolicy, typename FwdIter, typename F>
+            static typename detail::algorithm_result<ExPolicy>::type
+            parallel(ExPolicy const& policy, FwdIter first, FwdIter last, F && f)
+            {
+                typedef
+                    typename detail::algorithm_result<ExPolicy>::type
+                result_type;
+
+                return hpx::util::void_guard<result_type>(),
+                    detail::for_each_n<FwdIter>().call(
+                        policy, first, std::distance(first, last),
+                        std::forward<F>(f), boost::mpl::false_());
             }
-        }
-
-        template <typename ExPolicy, typename FwdIter, typename F>
-        typename detail::algorithm_result<ExPolicy, void>::type
-        for_each(ExPolicy const& policy, FwdIter first, FwdIter last, F && f,
-            boost::mpl::false_ fls)
-        {
-            typedef
-                typename detail::algorithm_result<ExPolicy, void>::type
-            result_type;
-
-            return hpx::util::void_guard<result_type>(),
-                detail::for_each_n(policy, first, std::distance(first, last),
-                    std::forward<F>(f), boost::mpl::false_());
-        }
-
-        template <typename InIter, typename F>
-        void for_each(execution_policy const& policy,
-            InIter first, InIter last, F && f, boost::mpl::false_)
-        {
-            HPX_PARALLEL_DISPATCH(policy, detail::for_each, first, last,
-                std::forward<F>(f));
-        }
-
-        template <typename InIter, typename F>
-        void for_each(execution_policy const& policy,
-            InIter first, InIter last, F && f, boost::mpl::true_ t)
-        {
-            detail::for_each(sequential_execution_policy(),
-                first, last, std::forward<F>(f), t);
-        }
+        };
         /// \endcond
     }
 
@@ -314,7 +288,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category>
         >::type is_seq;
 
-        return detail::for_each(
+        return detail::for_each().call(
             std::forward<ExPolicy>(policy),
             first, last, std::forward<F>(f), is_seq());
     }

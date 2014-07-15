@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/algorithm.hpp>
+#include <hpx/include/parallel_swap_ranges.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include "test_utils.hpp"
@@ -24,7 +24,7 @@ void test_swap_ranges(ExPolicy const& policy, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand());
     std::fill(boost::begin(d), boost::end(d), std::rand());
 
-    base_iterator res = hpx::parallel::swap_ranges(policy,
+    hpx::parallel::swap_ranges(policy,
         iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d));
 
     //equal begins at one, therefore counter is started at 1
@@ -120,7 +120,7 @@ void test_swap_ranges_exception(ExPolicy const& policy, IteratorTag)
 
     bool caught_exception = false;
     try {
-        base_iterator outiter = hpx::parallel::swap_ranges(policy,
+        hpx::parallel::swap_ranges(policy,
             decorated_iterator(
                 boost::begin(c),
                 [](){ throw std::runtime_error("test"); }),
@@ -216,7 +216,7 @@ void test_swap_ranges_bad_alloc(ExPolicy const& policy, IteratorTag)
 
     bool caught_bad_alloc = false;
     try {
-        base_iterator outiter = hpx::parallel::swap_ranges(policy,
+        hpx::parallel::swap_ranges(policy,
             decorated_iterator(
                 boost::begin(c),
                 [](){ throw std::bad_alloc(); }),

@@ -56,13 +56,17 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         void close()
         {
-            HPX_ASSERT(!closing_);
             closing_ = true;
         }
 
-        bool closing() const
+        bool closing()
         {
-            return closing_ && header_.empty();
+            if(closing_ && header_.empty())
+            {
+                closing_ = false;
+                return true;
+            }
+            return false;
         }
 
         bool async_read(header const & h)

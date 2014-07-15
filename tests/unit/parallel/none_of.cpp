@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/algorithm.hpp>
+#include <hpx/include/parallel_none_of.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include "test_utils.hpp"
@@ -19,7 +19,8 @@ void test_none_of(ExPolicy const& policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    for (std::size_t i: { 0, 1, 3 })
+    std::size_t iseq[] = { 0, 1, 3 };
+    for (std::size_t i: iseq)
     {
         std::vector<std::size_t> c = test::fill_all_any_none(3, i);
 
@@ -47,7 +48,8 @@ void test_none_of(hpx::parallel::task_execution_policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    for (std::size_t i: { 0, 23, 10007 })
+    std::size_t iseq[] = { 0, 23, 10007 };
+    for (std::size_t i : iseq)
     {
         std::vector<std::size_t> c = test::fill_all_any_none(10007, i);
 
@@ -130,7 +132,8 @@ void test_none_of_exception(ExPolicy const& policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    for (std::size_t i: { 0, 23, 10007 })
+    std::size_t iseq[] = { 0, 23, 10007 };
+    for (std::size_t i : iseq)
     {
         std::vector<std::size_t> c = test::fill_all_any_none(10007, i);
 
@@ -163,7 +166,8 @@ void test_none_of_exception(hpx::parallel::task_execution_policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    for (std::size_t i: { 0, 23, 10007 })
+    std::size_t iseq[] = { 0, 23, 10007 };
+    for (std::size_t i : iseq)
     {
         std::vector<std::size_t> c = test::fill_all_any_none(10007, i);
 
@@ -226,7 +230,8 @@ void test_none_of_bad_alloc(ExPolicy const& policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    for (std::size_t i: { 0, 23, 10007 })
+    std::size_t iseq[] = { 0, 23, 10007 };
+    for (std::size_t i : iseq)
     {
         std::vector<std::size_t> c = test::fill_all_any_none(10007, i);
 
@@ -258,7 +263,8 @@ void test_none_of_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    for (std::size_t i: { 0, 23, 10007 })
+    std::size_t iseq[] = { 0, 23, 10007 };
+    for (std::size_t i : iseq)
     {
         std::vector<std::size_t> c = test::fill_all_any_none(10007, i);
 
