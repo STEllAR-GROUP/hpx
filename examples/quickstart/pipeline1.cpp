@@ -49,13 +49,14 @@ struct pipeline
 
 int main()
 {
-    std::vector<std::string> input = {
+    std::string inputs[] = {
         "Error: foobar",
         "Error. foo",
         " Warning: barbaz",
         "Notice: qux",
         "\tError: abc"
       };
+    std::vector<std::string> input(std::begin(inputs), std::end(inputs));
 
     pipeline::process(input);
 
