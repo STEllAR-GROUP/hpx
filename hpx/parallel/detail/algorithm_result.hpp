@@ -60,7 +60,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy, typename T>
+    template <typename ExPolicy, typename T = void>
     struct algorithm_result
       : algorithm_result_impl<typename hpx::util::decay<ExPolicy>::type, T>
     {

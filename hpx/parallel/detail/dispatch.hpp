@@ -9,8 +9,8 @@
 #define HPX_PARALLEL_DISPATCH_JUN_25_2014_1145PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/exception_list.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
 
@@ -20,6 +20,8 @@
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 
 #include <boost/mpl/bool.hpp>
+
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_PARALLEL_DISPATCH(policy, ...)                                    \
@@ -49,7 +51,7 @@
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 {
-    template <typename Derived, typename Result>
+    template <typename Derived, typename Result = void>
     struct algorithm
     {
         typedef Result result_type;

@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_COPY_JUN_28_2014_0827AM)
-#define HPX_PARALLEL_COPY_JUN_28_2014_0827AM
+#if !defined(HPX_PARALLEL_COPY_IF_JUL_14_2014_0625PM)
+#define HPX_PARALLEL_COPY_IF_JUL_14_2014_0625PM
 
 #include <hpx/parallel/detail/copy.hpp>
 

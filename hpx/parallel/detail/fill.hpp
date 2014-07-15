@@ -9,14 +9,15 @@
 #define HPX_PARALLEL_DETAIL_FILL_JUNE_12_2014_0405PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/detail/algorithm_result.hpp>
-#include <hpx/parallel/detail/for_each.hpp>
-#include <hpx/parallel/detail/is_negative.hpp>
-#include <hpx/parallel/util/loop.hpp>
-#include <hpx/exception_list.hpp>
 #include <hpx/util/void_guard.hpp>
 #include <hpx/util/move.hpp>
+
+#include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/detail/algorithm_result.hpp>
+#include <hpx/parallel/detail/dispatch.hpp>
+#include <hpx/parallel/detail/for_each.hpp>
+#include <hpx/parallel/detail/is_negative.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -32,51 +33,37 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename ExPolicy, typename InIter, typename T>
-        typename detail::algorithm_result<ExPolicy, void>::type
-        fill(ExPolicy const&, InIter first, InIter last, T val,
-            boost::mpl::true_)
+        struct fill : public detail::algorithm<fill>
         {
-            try {
+            fill()
+              : detail::algorithm<fill>("fill")
+            {}
+
+            template <typename ExPolicy, typename InIter, typename T>
+            static typename detail::algorithm_result<ExPolicy>::type
+            sequential(ExPolicy const&, InIter first, InIter last, T val)
+            {
                 std::fill(first, last, val);
-                return detail::algorithm_result<ExPolicy, void>::get();
+                return detail::algorithm_result<ExPolicy>::get();
             }
-            catch(...) {
-                detail::handle_exception<ExPolicy>::call();
+
+            template <typename ExPolicy, typename FwdIter, typename T>
+            static typename detail::algorithm_result<ExPolicy>::type
+            parallel(ExPolicy const& policy, FwdIter first, FwdIter last, T val)
+            {
+                typedef typename detail::algorithm_result<ExPolicy>::type
+                    result_type;
+                typedef typename std::iterator_traits<FwdIter>::value_type type;
+
+                return hpx::util::void_guard<result_type>(),
+                    for_each_n<FwdIter>().call(
+                        policy, first, std::distance(first, last),
+                        [val](type& v){
+                            v = val;
+                        },
+                        boost::mpl::false_());
             }
-        }
-
-        template <typename ExPolicy, typename FwdIter, typename T>
-        typename detail::algorithm_result<ExPolicy, void>::type
-        fill(ExPolicy const& policy, FwdIter first, FwdIter last, T val,
-            boost::mpl::false_ f)
-        {
-            typedef typename detail::algorithm_result<ExPolicy, void>::type
-                result_type;
-            typedef typename std::iterator_traits<FwdIter>::value_type type;
-
-            return hpx::util::void_guard<result_type>(),
-                for_each_n(policy, first,
-                    std::distance(first, last),
-                    [val](type& v){
-                        v = val;
-                    }, f);
-        }
-
-        template <typename InIter, typename T>
-        void fill(execution_policy const& policy,
-            InIter first, InIter last, T val, boost::mpl::false_)
-        {
-            HPX_PARALLEL_DISPATCH(policy, detail::fill, first, last, val);
-        }
-
-       template <typename InIter, typename T>
-        void fill(execution_policy const& policy,
-            InIter first, InIter last, T val, boost::mpl::true_ t)
-        {
-            detail::fill(sequential_execution_policy(),
-                first, last, val, t);
-        }
+        };
         /// \endcond
     }
 
@@ -133,7 +120,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
 
-        return detail::fill( std::forward<ExPolicy>(policy),
+        return detail::fill().call(
+            std::forward<ExPolicy>(policy),
             first, last, value, is_seq());
     }
     ///////////////////////////////////////////////////////////////////////////
@@ -141,50 +129,39 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename ExPolicy, typename OutIter, typename T>
-        typename detail::algorithm_result<ExPolicy, OutIter>::type
-        fill_n(ExPolicy const&, OutIter first, std::size_t count, T val,
-        boost::mpl::true_)
+        template <typename OutIter>
+        struct fill_n : public detail::algorithm<fill_n<OutIter>, OutIter>
         {
-            try {
+            fill_n()
+              : detail::algorithm<fill_n<OutIter>, OutIter>("fill_n")
+            {}
+
+            template <typename ExPolicy, typename T>
+            static typename detail::algorithm_result<ExPolicy, OutIter>::type
+            sequential(ExPolicy const&, OutIter first, std::size_t count, T val)
+            {
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
                     std::fill_n(first, count, val));
             }
-            catch (...) {
-                detail::handle_exception<ExPolicy>::call();
-            }
-        }
 
-        template <typename ExPolicy, typename OutIter, typename T>
-        typename detail::algorithm_result<ExPolicy, OutIter>::type
-        fill_n(ExPolicy const& policy, OutIter first, std::size_t count, T val,
-            boost::mpl::false_ f)
-        {
-            typedef typename std::iterator_traits<OutIter>::iterator_category
-                category;
-            typedef typename std::iterator_traits<OutIter>::value_type type;
+            template <typename ExPolicy, typename T>
+            static typename detail::algorithm_result<ExPolicy, OutIter>::type
+            parallel(ExPolicy const& policy, OutIter first, std::size_t count,
+                T val)
+            {
+                typedef typename std::iterator_traits<OutIter>::iterator_category
+                    category;
+                typedef typename std::iterator_traits<OutIter>::value_type type;
 
-            return for_each_n(policy, first, count,
+                return
+                    for_each_n<OutIter>().call(
+                        policy, first, count,
                         [val](type& v) {
                             v = val;
-                        }, f);
-
-        }
-
-        template <typename OutIter, typename T>
-        OutIter fill_n(execution_policy const& policy,
-            OutIter first, std::size_t count, T val, boost::mpl::false_)
-        {
-            HPX_PARALLEL_DISPATCH(policy, detail::fill_n, first, count, val);
-        }
-
-        template <typename OutIter, typename T>
-        OutIter fill_n(execution_policy const& policy,
-            OutIter first, std::size_t count, T val, boost::mpl::true_ t)
-        {
-            return detail::fill_n(sequential_execution_policy(),
-                first, count, val, t);
-        }
+                        },
+                        boost::mpl::false_());
+            }
+        };
         /// \endcond
     }
 
@@ -245,7 +222,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 boost::is_same<
                     std::output_iterator_tag, iterator_category>
             >::value),
-            "Requires at least output iterator.");
+            "Requires at least bidirectional iterator.");
 
         // if count is representing a negative value, we do nothing
         if (detail::is_negative<Size>::call(count))
@@ -259,7 +236,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::output_iterator_tag, iterator_category>
         >::type is_seq;
 
-        return detail::fill_n(
+        return detail::fill_n<OutIter>().call(
             std::forward<ExPolicy>(policy),
             first, std::size_t(count), value, is_seq());
     }

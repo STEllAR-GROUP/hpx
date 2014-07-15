@@ -7,14 +7,7 @@
 #if !defined(HPX_PARALLEL_NONE_OF_JUL_07_2014_1244PM)
 #define HPX_PARALLEL_NONE_OF_JUL_07_2014_1244PM
 
-#include <hpx/hpx_fwd.hpp>
-
-#include <hpx/parallel/exception_list.hpp>
-#include <hpx/parallel/detail/dispatch.hpp>
-
 #include <hpx/parallel/detail/all_any_none.hpp>
-
-#undef HPX_PARALLEL_DISPATCH
 
 #endif
 
