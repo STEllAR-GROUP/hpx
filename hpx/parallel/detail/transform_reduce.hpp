@@ -3,14 +3,21 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/transform_reduce.hpp
+/// \file parallel/detail/transform_reduce.hpp
+
+#if !defined(HPX_PARALLEL_DETAIL_TRANSFORM_REDUCE_JUL_11_2014_0428PM)
+#define HPX_PARALLEL_DETAIL_TRANSFORM_REDUCE_JUL_11_2014_0428PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/unwrapped.hpp>
+
+#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
+#include <hpx/parallel/detail/dispatch.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/parallel/util/loop.hpp>
 
 #include <algorithm>
 #include <numeric>
@@ -19,9 +26,6 @@
 #include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
-
-#if !defined(HPX_PARALLEL_DETAILTRANSFORMREDUCE_JUL_11_2014_0428PM)
-#define HPX_PARALLEL_DETAILTRANSFORMREDUCE_JUL_11_2014_0428PM
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -40,13 +44,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
         };
 
-        template <typename ExPolicy, typename InIter, typename T,
-            typename Reduce, typename Convert>
-        typename detail::algorithm_result<ExPolicy, T>::type
-        transform_reduce(ExPolicy const&, InIter first, InIter last, T && init,
-            Reduce && r, Convert && conv, boost::mpl::true_)
+        template <typename T>
+        struct transform_reduce
+          : public detail::algorithm<transform_reduce<T>, T>
         {
-            try {
+            transform_reduce()
+              : detail::algorithm<transform_reduce<T>, T>("transform_reduce")
+            {}
+
+            template <typename ExPolicy, typename InIter, typename Reduce,
+                typename Convert>
+            static typename detail::algorithm_result<ExPolicy, T>::type
+            sequential(ExPolicy const&, InIter first, InIter last,
+                T && init, Reduce && r, Convert && conv)
+            {
                 typedef typename std::iterator_traits<InIter>::value_type
                     value_type;
 
@@ -57,64 +68,41 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             return r(res, conv(next));
                         }));
             }
-            catch (...) {
-                detail::handle_exception<ExPolicy>::call();
-            }
-        }
 
-        template <typename ExPolicy, typename FwdIter, typename T,
-            typename Reduce, typename Convert>
-        typename detail::algorithm_result<ExPolicy, T>::type
-        transform_reduce(ExPolicy const& policy, FwdIter first, FwdIter last, T && init,
-            Reduce && r, Convert && conv, boost::mpl::false_)
-        {
-            if (first == last)
+            template <typename ExPolicy, typename FwdIter, typename Reduce,
+                typename Convert>
+            static typename detail::algorithm_result<ExPolicy, T>::type
+            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+                T && init, Reduce && r, Convert && conv)
             {
-                return detail::algorithm_result<ExPolicy, T>::get(
-                    std::forward<T>(init));
+                if (first == last)
+                {
+                    return detail::algorithm_result<ExPolicy, T>::get(
+                        std::forward<T>(init));
+                }
+
+                typedef typename std::iterator_traits<FwdIter>::reference
+                    reference;
+
+                return util::partitioner<ExPolicy, T>::call(
+                    policy, first, std::distance(first, last),
+                    [r, conv](FwdIter part_begin, std::size_t part_size)
+                    {
+                        T val = conv(*part_begin);
+                        return util::accumulate_n(++part_begin, --part_size,
+                            std::move(val),
+                            [&r, &conv](T const& res, reference next)
+                            {
+                                return r(res, conv(next));
+                            });
+                    },
+                    hpx::util::unwrapped([init, r](std::vector<T> && results)
+                    {
+                        return util::accumulate_n(boost::begin(results),
+                            boost::size(results), init, r);
+                    }));
             }
-
-            typedef typename std::iterator_traits<FwdIter>::iterator_category
-                category;
-            typedef typename std::iterator_traits<FwdIter>::reference
-                reference;
-
-            return util::partitioner<ExPolicy, T>::call(
-                policy, first, std::distance(first, last),
-                [r, conv](FwdIter part_begin, std::size_t part_count)
-                {
-                    T val = conv(*part_begin);
-                    return util::accumulate_n(++part_begin, --part_count,
-                        std::move(val),
-                        [&r, &conv](T const& res, reference next)
-                        {
-                            return r(res, conv(next));
-                        });
-                },
-                hpx::util::unwrapped([init, r](std::vector<T> && results)
-                {
-                    return util::accumulate_n(boost::begin(results),
-                        boost::size(results), init, r);
-                }));
-        }
-
-        template <typename InIter, typename T, typename Reduce, typename Convert>
-        T transform_reduce(execution_policy const& policy, InIter first, InIter last,
-            T && init, Reduce && r, Convert&& conv, boost::mpl::false_)
-        {
-            HPX_PARALLEL_DISPATCH(policy, detail::transform_reduce, first, last,
-                std::forward<T>(init), std::forward<Reduce>(r),
-                std::forward<Convert>(conv));
-        }
-
-        template <typename InIter, typename T, typename Reduce, typename Convert>
-        T transform_reduce(execution_policy const& policy, InIter first, InIter last,
-            T init, Reduce && r, Convert&& conv, boost::mpl::true_)
-        {
-            return detail::transform_reduce(sequential_execution_policy(),
-                first, last, std::forward<T>(init), std::forward<Reduce>(r),
-                std::forward<Convert>(conv), boost::mpl::true_());
-        }
+        };
         /// \endcond
     }
 
@@ -225,11 +213,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category>
         >::type is_seq;
 
-        return detail::transform_reduce(
+        return detail::transform_reduce<T>().call(
             std::forward<ExPolicy>(policy), first, last, std::move(init),
             std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
             is_seq());
     }
-
 }}}
+
 #endif

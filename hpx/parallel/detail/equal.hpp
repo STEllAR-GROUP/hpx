@@ -9,8 +9,12 @@
 #define HPX_PARALLEL_DETAIL_EQUAL_JUL_06_2014_0848PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/move.hpp>
+
+#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
+#include <hpx/parallel/detail/dispatch.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
@@ -54,91 +58,80 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return first1 == last1 && first2 == last2;
         }
 
-        template <typename ExPolicy, typename InIter1, typename InIter2, typename F>
-        typename detail::algorithm_result<ExPolicy, bool>::type
-        equal_binary(ExPolicy const&, InIter1 first1, InIter1 last1,
-            InIter2 first2, InIter2 last2, F && f, boost::mpl::true_)
+        ///////////////////////////////////////////////////////////////////////
+        struct equal_binary : public detail::algorithm<equal_binary, bool>
         {
-            try {
+            equal_binary()
+              : detail::algorithm<equal_binary, bool>("equal_binary")
+            {}
+
+            template <typename ExPolicy, typename InIter1, typename InIter2,
+                typename F>
+            static typename detail::algorithm_result<ExPolicy, bool>::type
+            sequential(ExPolicy const&, InIter1 first1, InIter1 last1,
+                InIter2 first2, InIter2 last2, F && f)
+            {
                 return detail::algorithm_result<ExPolicy, bool>::get(
                     sequential_equal_binary(first1, last1, first2, last2,
                         std::forward<F>(f)));
             }
-            catch (...) {
-                detail::handle_exception<ExPolicy>::call();
+
+            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+                typename F>
+            static typename detail::algorithm_result<ExPolicy, bool>::type
+            parallel(ExPolicy const& policy, FwdIter1 first1, FwdIter1 last1,
+                FwdIter2 first2, FwdIter2 last2, F && f)
+            {
+                if (first1 == last1)
+                {
+                    return detail::algorithm_result<ExPolicy, bool>::get(
+                        first2 == last2);
+                }
+
+                if (first2 == last2)
+                    return detail::algorithm_result<ExPolicy, bool>::get(false);
+
+                std::size_t count1 = std::distance(first1, last1);
+
+                // The specifcation of std::equal(_binary) states that if InIter1
+                // and InIter2 meet the requirements of RandomAccessIterator and
+                // last1 - first1 != last2 - first2 then no applications of the
+                // predicate p are made.
+                //
+                // We perform this check for any iterator type better than input
+                // iterators. This could turn into a QoI issue.
+                std::size_t count2 = std::distance(first2, last2);
+                if (count1 != count2)
+                    return detail::algorithm_result<ExPolicy, bool>::get(false);
+
+                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2> zip_iterator;
+                typedef typename zip_iterator::reference reference;
+
+                util::cancellation_token tok;
+                return util::partitioner<ExPolicy, bool>::call(policy,
+                    hpx::util::make_zip_iterator(first1, first2), count1,
+                    [f, tok](zip_iterator it, std::size_t part_count) mutable
+                    {
+                        util::loop_n(
+                            it, part_count, tok,
+                            [&f, &tok](reference t)
+                            {
+                                if (!f(hpx::util::get<0>(t), hpx::util::get<1>(t)))
+                                    tok.cancel();
+                            });
+                        return !tok.was_cancelled();
+                    },
+                    [](std::vector<hpx::future<bool> > && results)
+                    {
+                        return std::all_of(
+                            boost::begin(results), boost::end(results),
+                            [](hpx::future<bool>& val)
+                            {
+                                return val.get();
+                            });
+                    });
             }
-        }
-
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename F>
-        typename detail::algorithm_result<ExPolicy, bool>::type
-        equal_binary(ExPolicy const& policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, FwdIter2 last2, F && f, boost::mpl::false_)
-        {
-            if (first1 == last1)
-                return detail::algorithm_result<ExPolicy, bool>::get(first2 == last2);
-
-            if (first2 == last2)
-                return detail::algorithm_result<ExPolicy, bool>::get(false);
-
-            std::size_t count1 = std::distance(first1, last1);
-
-            // The specifcation of std::equal(_binary) states that if InIter1
-            // and InIter2 meet the requirements of RandomAccessIterator and
-            // last1 - first1 != last2 - first2 then no applications of the
-            // predicate p are made.
-            //
-            // We perform this check for any iterator type better than input
-            // iterators. This could turn into a QoI issue.
-            std::size_t count2 = std::distance(first2, last2);
-            if (count1 != count2)
-                return detail::algorithm_result<ExPolicy, bool>::get(false);
-
-            typedef hpx::util::zip_iterator<FwdIter1, FwdIter2> zip_iterator;
-            typedef typename zip_iterator::reference reference;
-
-            util::cancellation_token tok;
-            return util::partitioner<ExPolicy, bool>::call(policy,
-                hpx::util::make_zip_iterator(first1, first2), count1,
-                [f, tok](zip_iterator it, std::size_t part_count) mutable
-                {
-                    util::loop_n(
-                        it, part_count, tok,
-                        [&f, &tok](reference t)
-                        {
-                            if (!f(hpx::util::get<0>(t), hpx::util::get<1>(t)))
-                                tok.cancel();
-                        });
-                    return !tok.was_cancelled();
-                },
-                [](std::vector<hpx::future<bool> > && results)
-                {
-                    return std::all_of(
-                        boost::begin(results), boost::end(results),
-                        [](hpx::future<bool>& val)
-                        {
-                            return val.get();
-                        });
-                });
-        }
-
-        template <typename InIter1, typename InIter2, typename F>
-        bool equal_binary(execution_policy const& policy, InIter1 first1,
-            InIter1 last1, InIter2 first2, InIter2 last2, F && f,
-            boost::mpl::false_)
-        {
-            HPX_PARALLEL_DISPATCH(policy, detail::equal_binary, first1, last1,
-                first2, last2, std::forward<F>(f));
-        }
-
-        template <typename InIter1, typename InIter2, typename F>
-        bool equal_binary(execution_policy const& policy, InIter1 first1,
-            InIter1 last1, InIter2 first2, InIter2 last2, F && f,
-            boost::mpl::true_)
-        {
-            return detail::equal_binary(sequential_execution_policy(),
-                first1, last1, first2, last2,
-                std::forward<F>(f), boost::mpl::true_());
-        }
+        };
         /// \endcond
     }
 
@@ -230,8 +223,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         typedef typename std::iterator_traits<InIter1>::value_type value_type;
 
-        return detail::equal_binary(std::forward<ExPolicy>(policy), first1,
-            last1, first2, last2, detail::equal_to(), is_seq());
+        return detail::equal_binary().call(
+            std::forward<ExPolicy>(policy),
+            first1, last1, first2, last2, detail::equal_to(), is_seq());
     }
 
     /// Returns true if the range [first1, last1) is equal to the range
@@ -339,8 +333,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         typedef typename std::iterator_traits<InIter1>::value_type value_type;
 
-        return detail::equal_binary(std::forward<ExPolicy>(policy), first1,
-            last1, first2, last2, std::forward<F>(f), is_seq());
+        return detail::equal_binary().call(
+            std::forward<ExPolicy>(policy),
+            first1, last1, first2, last2, std::forward<F>(f), is_seq());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -348,73 +343,61 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename ExPolicy, typename InIter1, typename InIter2, typename F>
-        typename detail::algorithm_result<ExPolicy, bool>::type
-        equal(ExPolicy const&, InIter1 first1, InIter1 last1,
-            InIter2 first2, F && f, boost::mpl::true_)
+        struct equal : public detail::algorithm<equal, bool>
         {
-            try {
+            equal()
+              : detail::algorithm<equal, bool>("equal")
+            {}
+
+            template <typename ExPolicy, typename InIter1, typename InIter2,
+                typename F>
+            static typename detail::algorithm_result<ExPolicy, bool>::type
+            sequential(ExPolicy const&, InIter1 first1, InIter1 last1,
+                InIter2 first2, F && f)
+            {
                 return detail::algorithm_result<ExPolicy, bool>::get(
                     std::equal(first1, last1, first2, std::forward<F>(f)));
             }
-            catch (...) {
-                detail::handle_exception<ExPolicy>::call();
+
+            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+                typename F>
+            static typename detail::algorithm_result<ExPolicy, bool>::type
+            parallel(ExPolicy const& policy, FwdIter1 first1, FwdIter1 last1,
+                FwdIter2 first2, F && f)
+            {
+                if (first1 == last1)
+                    return detail::algorithm_result<ExPolicy, bool>::get(true);
+
+                std::size_t count = std::distance(first1, last1);
+
+                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2> zip_iterator;
+                typedef typename zip_iterator::reference reference;
+
+                util::cancellation_token tok;
+                return util::partitioner<ExPolicy, bool>::call(policy,
+                    hpx::util::make_zip_iterator(first1, first2), count,
+                    [f, tok](zip_iterator it, std::size_t part_count) mutable
+                    {
+                        util::loop_n(
+                            it, part_count, tok,
+                            [&f, &tok](reference t)
+                            {
+                                if (!f(hpx::util::get<0>(t), hpx::util::get<1>(t)))
+                                    tok.cancel();
+                            });
+                        return !tok.was_cancelled();
+                    },
+                    [](std::vector<hpx::future<bool> > && results)
+                    {
+                        return std::all_of(
+                            boost::begin(results), boost::end(results),
+                            [](hpx::future<bool>& val)
+                            {
+                                return val.get();
+                            });
+                    });
             }
-        }
-
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename F>
-        typename detail::algorithm_result<ExPolicy, bool>::type
-        equal(ExPolicy const& policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, F && f, boost::mpl::false_)
-        {
-            if (first1 == last1)
-                return detail::algorithm_result<ExPolicy, bool>::get(true);
-
-            std::size_t count = std::distance(first1, last1);
-
-            typedef hpx::util::zip_iterator<FwdIter1, FwdIter2> zip_iterator;
-            typedef typename zip_iterator::reference reference;
-
-            util::cancellation_token tok;
-            return util::partitioner<ExPolicy, bool>::call(policy,
-                hpx::util::make_zip_iterator(first1, first2), count,
-                [f, tok](zip_iterator it, std::size_t part_count) mutable
-                {
-                    util::loop_n(
-                        it, part_count, tok,
-                        [&f, &tok](reference t)
-                        {
-                            if (!f(hpx::util::get<0>(t), hpx::util::get<1>(t)))
-                                tok.cancel();
-                        });
-                    return !tok.was_cancelled();
-                },
-                [](std::vector<hpx::future<bool> > && results)
-                {
-                    return std::all_of(
-                        boost::begin(results), boost::end(results),
-                        [](hpx::future<bool>& val)
-                        {
-                            return val.get();
-                        });
-                });
-        }
-
-        template <typename InIter1, typename InIter2, typename F>
-        bool equal(execution_policy const& policy, InIter1 first1, InIter1 last1,
-            InIter2 first2, F && f, boost::mpl::false_)
-        {
-            HPX_PARALLEL_DISPATCH(policy, detail::equal, first1, last1,
-                first2, std::forward<F>(f));
-        }
-
-        template <typename InIter1, typename InIter2, typename F>
-        bool equal(execution_policy const& policy, InIter1 first1, InIter1 last1,
-            InIter2 first2, F && f, boost::mpl::true_)
-        {
-            return detail::equal(sequential_execution_policy(),
-                first1, last1, first2, std::forward<F>(f), boost::mpl::true_());
-        }
+        };
         /// \endcond
     }
 
@@ -502,8 +485,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         typedef typename std::iterator_traits<InIter1>::value_type value_type;
 
-        return detail::equal(std::forward<ExPolicy>(policy), first1, last1,
-            first2, detail::equal_to(), is_seq());
+        return detail::equal().call(
+            std::forward<ExPolicy>(policy),
+            first1, last1, first2, detail::equal_to(), is_seq());
     }
 
     /// Returns true if the range [first1, last1) is equal to the range
@@ -607,8 +591,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         typedef typename std::iterator_traits<InIter1>::value_type value_type;
 
-        return detail::equal(std::forward<ExPolicy>(policy), first1, last1,
-            first2, std::forward<F>(f), is_seq());
+        return detail::equal().call(
+            std::forward<ExPolicy>(policy),
+            first1, last1, first2, std::forward<F>(f), is_seq());
     }
 }}}
 
