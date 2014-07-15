@@ -56,8 +56,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     {
         typedef Result result_type;
 
-        Derived& derived() { return static_cast<Derived&>(*this); }
-
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (3, 5, "hpx/parallel/detail/dispatch.hpp"))                           \
     /**/
@@ -87,8 +85,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         boost::mpl::true_)
     {
         try {
-            return derived().sequential(policy,
-                HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+            return detail::algorithm_result<ExPolicy, result_type>::get(
+                Derived::sequential(policy, HPX_ENUM_FORWARD_ARGS(N, Arg, arg)));
         }
         catch (...) {
             detail::handle_exception<ExPolicy>::call();
@@ -100,7 +98,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     call(ExPolicy const& policy, HPX_ENUM_FWD_ARGS(N, Arg, arg),
         boost::mpl::false_)
     {
-        return derived().parallel(policy, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+        return Derived::parallel(policy, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
@@ -121,4 +119,3 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 #undef N
 
 #endif
-

@@ -62,18 +62,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct equal_binary : public detail::algorithm<equal_binary, bool>
         {
             equal_binary()
-              : detail::algorithm<equal_binary, bool>("equal_binary")
+              : equal_binary::algorithm("equal_binary")
             {}
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
-            static typename detail::algorithm_result<ExPolicy, bool>::type
+            static bool
             sequential(ExPolicy const&, InIter1 first1, InIter1 last1,
                 InIter2 first2, InIter2 last2, F && f)
             {
-                return detail::algorithm_result<ExPolicy, bool>::get(
-                    sequential_equal_binary(first1, last1, first2, last2,
-                        std::forward<F>(f)));
+                return sequential_equal_binary(first1, last1, first2, last2,
+                    std::forward<F>(f));
             }
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
@@ -346,17 +345,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct equal : public detail::algorithm<equal, bool>
         {
             equal()
-              : detail::algorithm<equal, bool>("equal")
+              : equal::algorithm("equal")
             {}
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
-            static typename detail::algorithm_result<ExPolicy, bool>::type
+            static bool
             sequential(ExPolicy const&, InIter1 first1, InIter1 last1,
                 InIter2 first2, F && f)
             {
-                return detail::algorithm_result<ExPolicy, bool>::get(
-                    std::equal(first1, last1, first2, std::forward<F>(f)));
+                return std::equal(first1, last1, first2, std::forward<F>(f));
             }
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,

@@ -49,24 +49,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
           : public detail::algorithm<transform_reduce<T>, T>
         {
             transform_reduce()
-              : detail::algorithm<transform_reduce<T>, T>("transform_reduce")
+              : transform_reduce::algorithm("transform_reduce")
             {}
 
             template <typename ExPolicy, typename InIter, typename Reduce,
                 typename Convert>
-            static typename detail::algorithm_result<ExPolicy, T>::type
+            static T
             sequential(ExPolicy const&, InIter first, InIter last,
                 T && init, Reduce && r, Convert && conv)
             {
                 typedef typename std::iterator_traits<InIter>::value_type
                     value_type;
 
-                return detail::algorithm_result<ExPolicy, T>::get(
-                    std::accumulate(first, last, std::forward<T>(init),
-                        [&r, &conv](T const& res, value_type const& next)
-                        {
-                            return r(res, conv(next));
-                        }));
+                return std::accumulate(first, last, std::forward<T>(init),
+                    [&r, &conv](T const& res, value_type const& next)
+                    {
+                        return r(res, conv(next));
+                    });
             }
 
             template <typename ExPolicy, typename FwdIter, typename Reduce,

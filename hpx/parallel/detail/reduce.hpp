@@ -38,17 +38,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct reduce : public detail::algorithm<reduce<T>, T>
         {
             reduce()
-              : detail::algorithm<reduce<T>, T>("reduce")
+              : reduce::algorithm("reduce")
             {}
 
             template <typename ExPolicy, typename InIter, typename Reduce>
-            static typename detail::algorithm_result<ExPolicy, T>::type
+            static T
             sequential(ExPolicy const&, InIter first, InIter last,
                 T && init, Reduce && r)
             {
-                return detail::algorithm_result<ExPolicy, T>::get(
-                    std::accumulate(first, last, std::forward<T>(init),
-                    std::forward<Reduce>(r)));
+                return std::accumulate(first, last, std::forward<T>(init),
+                    std::forward<Reduce>(r));
             }
 
             template <typename ExPolicy, typename FwdIter, typename Reduce>

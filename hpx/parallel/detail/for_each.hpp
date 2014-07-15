@@ -39,15 +39,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct for_each_n : public detail::algorithm<for_each_n<Iter>, Iter>
         {
             for_each_n()
-              : detail::algorithm<for_each_n<Iter>, Iter>("for_each_n")
+              : for_each_n::algorithm("for_each_n")
             {}
 
             template <typename ExPolicy, typename F>
-            static typename detail::algorithm_result<ExPolicy, Iter>::type
+            static Iter
             sequential(ExPolicy const&, Iter first, std::size_t count, F && f)
             {
-                return detail::algorithm_result<ExPolicy, Iter>::get(
-                    util::loop_n(first, count, std::forward<F>(f)));
+                return util::loop_n(first, count, std::forward<F>(f));
             }
 
             template <typename ExPolicy, typename F>
@@ -179,15 +178,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct for_each : public detail::algorithm<for_each>
         {
             for_each()
-              : detail::algorithm<for_each>("for_each")
+              : for_each::algorithm("for_each")
             {}
 
             template <typename ExPolicy, typename InIter, typename F>
-            static typename detail::algorithm_result<ExPolicy>::type
+            static hpx::util::unused_type
             sequential(ExPolicy const&, InIter first, InIter last, F && f)
             {
                 std::for_each(first, last, std::forward<F>(f));
-                return detail::algorithm_result<ExPolicy>::get();
+                return hpx::util::unused;
             }
 
             template <typename ExPolicy, typename FwdIter, typename F>

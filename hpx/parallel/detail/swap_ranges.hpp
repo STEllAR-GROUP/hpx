@@ -37,17 +37,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
           : public detail::algorithm<swap_ranges<ForwardIter2>, ForwardIter2>
         {
             swap_ranges()
-              : detail::algorithm<swap_ranges<ForwardIter2>, ForwardIter2>(
-                    "swap_ranges")
+              : swap_ranges::algorithm("swap_ranges")
             {}
 
             template <typename ExPolicy, typename ForwardIter1>
-            static typename detail::algorithm_result<ExPolicy, ForwardIter2>::type
+            static ForwardIter2
             sequential(ExPolicy const&, ForwardIter1 first1, ForwardIter1 last1,
                 ForwardIter2 first2)
             {
-                return detail::algorithm_result<ExPolicy, ForwardIter2>::get(
-                    std::swap_ranges(first1, last1, first2));
+                return std::swap_ranges(first1, last1, first2);
             }
 
             template <typename ExPolicy, typename ForwardIter1>
