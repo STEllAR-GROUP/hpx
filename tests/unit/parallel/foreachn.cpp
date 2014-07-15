@@ -104,7 +104,7 @@ void test_for_each_n_exception(ExPolicy const& policy, IteratorTag)
 
     bool caught_exception = false;
     try {
-        iterator result = hpx::parallel::for_each_n(policy,
+        hpx::parallel::for_each_n(policy,
             iterator(boost::begin(c)), c.size(),
             [](std::size_t& v) {
                 throw std::runtime_error("test");
@@ -194,7 +194,7 @@ void test_for_each_n_bad_alloc(ExPolicy const& policy, IteratorTag)
 
     bool caught_bad_alloc = false;
     try {
-        iterator result = hpx::parallel::for_each_n(policy,
+        hpx::parallel::for_each_n(policy,
             iterator(boost::begin(c)), c.size(),
             [](std::size_t& v) {
                 throw std::bad_alloc();

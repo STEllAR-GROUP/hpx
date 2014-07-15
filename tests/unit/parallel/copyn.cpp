@@ -23,7 +23,7 @@ void test_copy_n(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    base_iterator outiter = hpx::parallel::copy_n(policy,
+    hpx::parallel::copy_n(policy,
         iterator(boost::begin(c)), c.size(), boost::begin(d));
 
     std::size_t count = 0;
@@ -73,7 +73,7 @@ void test_copy_n_outiter(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> d(0);
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    auto outiter = hpx::parallel::copy_n(policy,
+    hpx::parallel::copy_n(policy,
         iterator(boost::begin(c)), c.size(), std::back_inserter(d));
 
     std::size_t count = 0;
@@ -163,7 +163,7 @@ void test_copy_n_exception(ExPolicy const& policy, IteratorTag)
 
     bool caught_exception = false;
     try {
-        base_iterator outiter = hpx::parallel::copy_n(policy,
+        hpx::parallel::copy_n(policy,
             decorated_iterator(
                 boost::begin(c),
                 [](){throw std::runtime_error("test");}
@@ -260,7 +260,7 @@ void test_copy_n_bad_alloc(ExPolicy const& policy, IteratorTag)
 
     bool caught_bad_alloc = false;
     try {
-        base_iterator outiter = hpx::parallel::copy_n(policy,
+        hpx::parallel::copy_n(policy,
             decorated_iterator(
                 boost::begin(c),
                 [](){throw std::bad_alloc();}
