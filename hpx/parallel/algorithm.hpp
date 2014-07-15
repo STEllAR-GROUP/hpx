@@ -18,6 +18,7 @@
 #include <hpx/parallel/detail/equal.hpp>
 #include <hpx/parallel/detail/fill.hpp>
 #include <hpx/parallel/detail/for_each.hpp>
+#include <hpx/parallel/detail/generate.hpp>
 #include <hpx/parallel/detail/move.hpp>
 #include <hpx/parallel/detail/swap_ranges.hpp>
 #include <hpx/parallel/detail/transform.hpp>

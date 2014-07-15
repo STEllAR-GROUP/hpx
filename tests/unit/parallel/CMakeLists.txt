@@ -17,6 +17,8 @@ set(tests
     filln
     foreach
     foreachn
+	generate
+	generaten
     move
     none_of
     reduce_
