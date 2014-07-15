@@ -7,15 +7,7 @@
 #if !defined(HPX_PARALLEL_EQUAL_JUL_13_2014_1225PM)
 #define HPX_PARALLEL_EQUAL_JUL_13_2014_1225PM
 
-#include <hpx/hpx_fwd.hpp>
-
-#include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/parallel/exception_list.hpp>
-#include <hpx/parallel/detail/dispatch.hpp>
-
 #include <hpx/parallel/detail/equal.hpp>
-
-#undef HPX_PARALLEL_DISPATCH
 
 #endif
 
