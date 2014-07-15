@@ -3,15 +3,18 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file move.hpp
+/// \file parallel/detail/move.hpp
 
 #if !defined(HPX_PARALLEL_DETAIL_MOVE_JUNE_16_2014_1106AM)
 #define HPX_PARALLEL_DETAIL_MOVE_JUNE_16_2014_1106AM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/exception_list.hpp>
+#include <hpx/util/move.hpp>
+
+#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
+#include <hpx/parallel/detail/dispatch.hpp>
 #include <hpx/parallel/detail/for_each.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
@@ -29,55 +32,42 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename ExPolicy, typename InIter, typename OutIter>
-        typename detail::algorithm_result<ExPolicy, OutIter>::type
-        move(ExPolicy const&, InIter first, InIter last, OutIter dest,
-            boost::mpl::true_)
+        template <typename OutIter>
+        struct move : public detail::algorithm<move<OutIter>, OutIter>
         {
-            try {
+            move()
+              : detail::algorithm<move<OutIter>, OutIter>("move")
+            {}
+
+            template <typename ExPolicy, typename InIter>
+            static typename detail::algorithm_result<ExPolicy, OutIter>::type
+            sequential(ExPolicy const&, InIter first, InIter last, OutIter dest)
+            {
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
                     std::move(first, last, dest));
             }
-            catch (...) {
-                detail::handle_exception<ExPolicy>::call();
+
+            template <typename ExPolicy, typename FwdIter>
+            static typename detail::algorithm_result<ExPolicy, OutIter>::type
+            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+                OutIter dest)
+            {
+                typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
+                typedef typename zip_iterator::reference reference;
+                typedef
+                    typename detail::algorithm_result<ExPolicy, OutIter>::type
+                result_type;
+
+                return get_iter<1, result_type>(
+                    for_each_n<zip_iterator>().call(policy,
+                        hpx::util::make_zip_iterator(first, dest),
+                        std::distance(first, last),
+                        [](reference t) {
+                            hpx::util::get<1>(t) = std::move(hpx::util::get<0>(t)); //-V573
+                        },
+                        boost::mpl::false_()));
             }
-        }
-
-        template <typename ExPolicy, typename FwdIter, typename OutIter>
-        typename detail::algorithm_result<ExPolicy, OutIter>::type
-        move(ExPolicy const& policy, FwdIter first, FwdIter last, OutIter dest,
-            boost::mpl::false_ fls)
-        {
-            typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
-            typedef typename zip_iterator::reference reference;
-            typedef
-                typename detail::algorithm_result<ExPolicy, OutIter>::type
-            result_type;
-
-            return get_iter<1, result_type>(
-                for_each_n(policy,
-                    hpx::util::make_zip_iterator(first,dest),
-                    std::distance(first,last),
-                    [](reference t) {
-                        hpx::util::get<1>(t) = std::move(hpx::util::get<0>(t)); //-V573
-                    },
-                    fls));
-        }
-
-        template <typename InIter, typename OutIter>
-        OutIter move(execution_policy const& policy,
-            InIter first, InIter last, OutIter dest, boost::mpl::false_)
-        {
-            HPX_PARALLEL_DISPATCH(policy, detail::move, first, last, dest);
-        }
-
-        template <typename InIter, typename OutIter>
-        OutIter move(execution_policy const& policy,
-            InIter first, InIter last, OutIter dest, boost::mpl::true_ t)
-        {
-            return detail::move(sequential_execution_policy(),
-                first, last, dest, t);
-        }
+        };
         /// \endcond
     }
 
@@ -158,7 +148,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::output_iterator_tag, output_iterator_category>
         >::type is_seq;
 
-        return detail::move( std::forward<ExPolicy>(policy),
+        return detail::move<OutIter>().call(
+            std::forward<ExPolicy>(policy),
             first, last, dest, is_seq());
     }
 }}}
