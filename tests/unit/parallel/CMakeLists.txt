@@ -11,6 +11,8 @@ set(tests
     copyn
     count
     countif
+    equal
+    equal_binary
     fill
     filln
     foreach
@@ -21,6 +23,7 @@ set(tests
     swapranges
     transform
     transform_binary
+	transform_reduce
    )
 
 foreach(test ${tests})

@@ -36,7 +36,7 @@ BOOST_NOINLINE boost::uint64_t fibonacci_serial(boost::uint64_t n)
 //     if (n < 2) return hpx::make_ready_future(n);
 //     if (n < threshold) return hpx::make_ready_future(fibonacci_serial(n));
 //
-//     hpx::future<boost::uint64_t> lhs = hpx::async(&fibonacci, n-1).unwrap();
+//     hpx::future<boost::uint64_t> lhs = hpx::async(&fibonacci, n-1);
 //     hpx::future<boost::uint64_t> rhs = fibonacci(n-2);
 //
 //     return await lhs + await rhs;
@@ -99,8 +99,8 @@ void _fibonacci(boost::shared_ptr<_fibonacci_frame> const& frame_)
         return;
     }
 
-    // hpx::future<boost::uint64_t> lhs = hpx::async(&fibonacci, n-1).unwrap();
-    frame->lhs_ = hpx::async(&fibonacci, frame->n_-1); //.unwrap();
+    // hpx::future<boost::uint64_t> lhs = hpx::async(&fibonacci, n-1);
+    frame->lhs_ = hpx::async(&fibonacci, frame->n_-1);
 
     // hpx::future<boost::uint64_t> rhs = fibonacci(n-2);
     frame->rhs_ = fibonacci(frame->n_-2);

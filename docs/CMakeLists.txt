@@ -50,6 +50,7 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/parallel/detail/all_any_none.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/detail/copy.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/detail/count.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/detail/equal.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/detail/fill.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/detail/for_each.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/detail/move.hpp"

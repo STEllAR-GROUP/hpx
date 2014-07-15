@@ -62,44 +62,58 @@ namespace hpx
             }
             return addr;
         }
-        
+
         template <typename Action>
         struct put_parcel
         {
             typedef void result_type;
 
             explicit put_parcel(naming::id_type const& id,
-                naming::address&& addr, threads::thread_priority priority,
-                actions::continuation_type cont = actions::continuation_type())
+                    naming::address&& addr
+                  , threads::thread_priority priority
+                  , actions::continuation_type cont = actions::continuation_type()
+                  , parcelset::parcelhandler::write_handler_type const& cb =
+                        parcelset::parcelhandler::write_handler_type())
               : id_(id)
               , addr_(std::move(addr))
               , priority_(priority)
               , cont_(cont)
+              , cb_(cb)
             {}
 
             template <typename Args>
             result_type send_parcel(Args&& args)
             {
-                typedef 
+                typedef
                     typename hpx::actions::extract_action<Action>::type
                     action_type;
 
                 actions::base_action* action =
                     new hpx::actions::transfer_action<action_type>(priority_,
                         std::forward<Args>(args));
+                parcelset::parcelhandler& ph =
+                    hpx::applier::get_applier().get_parcel_handler();
+
                 if (!cont_)
                 {
                     parcelset::parcel p(id_, complement_addr<action_type>(addr_),
                         action);
-                
+
                     // Send the parcel through the parcel handler
-                    hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
-                } else {
+                    if (cb_.empty())
+                        ph.put_parcel(p);
+                    else
+                        ph.put_parcel(p, cb_);
+                }
+                else {
                     parcelset::parcel p(id_, complement_addr<action_type>(addr_),
                         action, cont_);
-                
+
                     // Send the parcel through the parcel handler
-                    hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
+                    if (cb_.empty())
+                        ph.put_parcel(p);
+                    else
+                        ph.put_parcel(p, cb_);
                 }
             }
 
@@ -120,13 +134,14 @@ namespace hpx
             BOOST_PP_REPEAT_FROM_TO(
                 1, HPX_FUNCTION_ARGUMENT_LIMIT
               , HPX_APPLIER_PUT_PARCEL, _);
-            
+
 #   undef HPX_APPLIER_PUT_PARCEL
-            
+
             naming::id_type id_;
             naming::address addr_;
             threads::thread_priority priority_;
             actions::continuation_type cont_;
+            parcelset::parcelhandler::write_handler_type cb_;
         };
 
         // We know it is remote.
@@ -205,9 +220,10 @@ namespace hpx
 
         template <typename Action>
         inline bool
-        apply_r (naming::address& addr, naming::id_type const& gid)
+        apply_r (naming::address&& addr, naming::id_type const& gid)
         {
-            return apply_r_p<Action>(addr, gid, actions::action_priority<Action>());
+            return apply_r_p<Action>(std::move(addr), gid,
+                actions::action_priority<Action>());
         }
 
         // We know it is local and has to be directly executed.
@@ -254,10 +270,10 @@ namespace hpx
         // Determine whether the gid is local or remote
         naming::address addr;
         if (agas::is_local_address_cached(gid, addr))
-            return applier::detail::apply_l_p<Action>(gid, addr, priority);   // apply locally
+            return applier::detail::apply_l_p<Action>(gid, std::move(addr), priority);   // apply locally
 
         // apply remotely
-        return applier::detail::apply_r_p<Action>(std::move(addr), gid, 
+        return applier::detail::apply_r_p<Action>(std::move(addr), gid,
             priority);
     }
 
@@ -351,16 +367,16 @@ namespace hpx
 
         template <typename Action>
         inline bool
-        apply_r (naming::address& addr, actions::continuation* c,
+        apply_r (naming::address&& addr, actions::continuation* c,
             naming::id_type const& gid)
         {
-            return apply_r_p<Action>(addr, c, gid,
+            return apply_r_p<Action>(std::move(addr), c, gid,
                 actions::action_priority<Action>());
         }
 
         template <typename Action>
         inline bool
-        apply_r_sync_p(naming::address& addr, naming::id_type const& id,
+        apply_r_sync_p(naming::address&& addr, naming::id_type const& id,
             threads::thread_priority priority)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type_;
@@ -378,16 +394,16 @@ namespace hpx
 
         template <typename Action>
         inline bool
-        apply_r_sync (naming::address& addr, naming::id_type const& gid)
+        apply_r_sync (naming::address&& addr, naming::id_type const& gid)
         {
-            return apply_r_sync_p<Action>(addr, gid,
+            return apply_r_sync_p<Action>(std::move(addr), gid,
                 actions::action_priority<Action>());
         }
 
         // We know it is local and has to be directly executed.
         template <typename Action>
         inline bool apply_l_p(actions::continuation* c, naming::id_type const& target,
-            naming::address const& addr, threads::thread_priority priority)
+            naming::address&& addr, threads::thread_priority priority)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type_;
 
@@ -396,15 +412,17 @@ namespace hpx
 
             actions::continuation_type cont(c);
             util::tuple<> env;
-            apply_helper<action_type_>::call(cont, target, addr.address_, priority, env);
+            apply_helper<action_type_>::call(cont, target, addr.address_,
+                priority, env);
             return true;     // no parcel has been sent (dest is local)
         }
 
         template <typename Action>
         inline bool apply_l (actions::continuation* c, naming::id_type const& target,
-            naming::address const& addr)
+            naming::address&& addr)
         {
-            return apply_l_p<Action>(c, target, addr, actions::action_priority<Action>());
+            return apply_l_p<Action>(c, target, std::move(addr),
+                actions::action_priority<Action>());
         }
     }}
 
@@ -424,10 +442,10 @@ namespace hpx
         // Determine whether the gid is local or remote
         naming::address addr;
         if (agas::is_local_address_cached(gid, addr))
-            return applier::detail::apply_l_p<Action>(c, gid, addr, priority);
+            return applier::detail::apply_l_p<Action>(c, gid, std::move(addr), priority);
 
         // apply remotely
-        return applier::detail::apply_r_p<Action>(std::move(addr), c, gid, 
+        return applier::detail::apply_r_p<Action>(std::move(addr), c, gid,
             priority);
     }
 
@@ -452,28 +470,28 @@ namespace hpx
     {
         template <typename Action>
         inline bool
-        apply_c_p(naming::address& addr, naming::id_type const& contgid,
+        apply_c_p(naming::address&& addr, naming::id_type const& contgid,
             naming::id_type const& gid, threads::thread_priority priority)
         {
             typedef
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
 
-            return apply_r_p<Action>(addr,
+            return apply_r_p<Action>(std::move(addr),
                 new actions::typed_continuation<result_type>(contgid),
                 gid, priority);
         }
 
         template <typename Action>
         inline bool
-        apply_c (naming::address& addr, naming::id_type const& contgid,
+        apply_c (naming::address&& addr, naming::id_type const& contgid,
             naming::id_type const& gid)
         {
             typedef
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
 
-            return apply_r<Action>(addr,
+            return apply_r<Action>(std::move(addr),
                 new actions::typed_continuation<result_type>(contgid), gid);
         }
     }}

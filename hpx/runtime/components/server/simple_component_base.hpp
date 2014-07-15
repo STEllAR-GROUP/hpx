@@ -195,7 +195,7 @@ namespace hpx { namespace components
         // Pinning functionality
         void pin() {}
         void unpin() {}
-        unsigned int pin_count() const { return 0; }
+        boost::uint32_t pin_count() const { return 0; }
         void mark_as_migrated()
         {
             // If this assertion is triggered then this component instance is

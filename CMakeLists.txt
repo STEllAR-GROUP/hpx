@@ -671,7 +671,6 @@ if(CMAKE_COMPILER_IS_GNUCXX AND WITH_GCC_VERSION_CHECK)
   if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.4.4)
     hpx_error("GCC 4.4.5 or higher is required. Specify WITH_GCC_VERSION_CHECK=OFF to ignore this error.")
   endif()
-endif()
 
 if(MSVC)
   if(NOT (MSVC11 OR MSVC12))
@@ -782,9 +781,8 @@ if(MSVC)
   #     non-referenced functions and data (-Zc:inline)
   # VS2013 update 3 and above know how to generate better debug symbols for
   #     optimized builds (-Z0)
-  if(MSVC12)
+  if(MSVC12 OR MSVC13)
     hpx_add_compile_flag(-Zc:inline)
-    hpx_add_compile_flag(-Z0 RelWithDebInfo)
     hpx_add_compile_flag(-Gw
       CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
   endif()

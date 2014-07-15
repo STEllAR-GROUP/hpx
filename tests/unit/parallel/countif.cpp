@@ -27,7 +27,7 @@ void test_count_if(ExPolicy const& policy, IteratorTag)
         iterator(boost::begin(c)), iterator(boost::end(c)),
         [](std::size_t x) { return x < 50; });
 
-    HPX_TEST_EQ(num_items, 50);
+    HPX_TEST_EQ(num_items, 50u);
 }
 
 template <typename IteratorTag>
