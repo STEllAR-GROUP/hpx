@@ -70,6 +70,9 @@ parallel::copy_n                      "copy_n" "hpx\.parallel\.v1\.copy_n.*"
 parallel::count                       "count" "hpx\.parallel\.v1\.count$.*"
 parallel::count_if                    "count_if" "hpx\.parallel\.v1\.count_if.*"
 
+# hpx/parallel/detail/equal.hpp
+parallel::equal                       "equal" "hpx\.parallel\.v1\.equal_id.*"
+
 # hpx/parallel/detail/fill.hpp
 parallel::fill                        "fill" "hpx\.parallel\.v1\.fill$"
 parallel::fill_n                      "fill_n" "hpx\.parallel\.v1\.fill_n.*"
