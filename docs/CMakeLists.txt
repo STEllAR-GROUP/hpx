@@ -53,6 +53,7 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/parallel/detail/reduce.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/detail/swap_ranges.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/detail/transform.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/detail/transform_reduce.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/get_ptr.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/actions/action_support.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action.hpp"

@@ -87,8 +87,11 @@ parallel::reduce                      "reduce" "hpx\.parallel\.v1\.reduce.*"
 # hpx/parallel/detail/swap_ranges.hpp
 parallel::swap_ranges                 "swap_ranges" "hpx\.parallel\.v1\.swap_ranges.*"
 
-# hpx/parallel/detail/swap_ranges.hpp
-parallel::transform                   "transform" "hpx\.parallel\.v1\.transform.*"
+# hpx/parallel/detail/transform.hpp
+parallel::transform                   "transform" "hpx\.parallel\.v1\.transform$"
+
+# hpx/parallel/detail/transform_reduce.hpp
+parallel::transform_reduce            "transform_reduce" "hpx\.parallel\.v1\.transform_reduce.*"
 
 
 # hpx/runtime/components/new.hpp
