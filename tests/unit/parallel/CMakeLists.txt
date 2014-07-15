@@ -21,10 +21,13 @@ set(tests
     none_of
     reduce_
     swapranges
+    task_region
     transform
     transform_binary
 	transform_reduce
    )
+
+set(task_region_FLAGS DEPENDENCIES iostreams_component)
 
 foreach(test ${tests})
   set(sources
