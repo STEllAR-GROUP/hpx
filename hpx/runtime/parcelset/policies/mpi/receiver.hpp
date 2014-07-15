@@ -56,7 +56,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         void close()
         {
-            HPX_ASSERT(!closing_);
             closing_ = true;
         }
 
