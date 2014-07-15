@@ -39,8 +39,4 @@ foreach(v IBVERBS_ROOT)
   endif()
 endforeach()
 
-if(NOT IBVERBS_FOUND)
-  hpx_info("Set IBVERBS_ROOT to the location where tbbmalloc are installed")
-endif()
-
 mark_as_advanced(IBVERBS_ROOT IBVERBS_LIBRARY IBVERBS_INCLUDE_DIR)

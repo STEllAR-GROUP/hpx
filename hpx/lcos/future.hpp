@@ -529,15 +529,6 @@ namespace hpx { namespace lcos { namespace detail
             return shared_state_ != 0 && shared_state_->has_exception();
         }
 
-        // Returns the future status
-        BOOST_SCOPED_ENUM(future_status) get_status() const
-        {
-            if (!shared_state_)
-                return future_status::uninitialized;
-
-            return shared_state_->get_status();
-        }
-
         // Effects:
         //   - Blocks until the future is ready.
         // Returns: The stored exception_ptr if has_exception(), a null
@@ -967,7 +958,6 @@ namespace hpx { namespace lcos
         using base_type::is_ready;
         using base_type::has_value;
         using base_type::has_exception;
-        using base_type::get_status;
 
         template <typename F>
         typename boost::lazy_disable_if<
@@ -1197,7 +1187,6 @@ namespace hpx { namespace lcos
         using base_type::is_ready;
         using base_type::has_value;
         using base_type::has_exception;
-        using base_type::get_status;
 
         using base_type::then;
 

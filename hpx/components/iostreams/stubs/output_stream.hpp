@@ -26,7 +26,7 @@ namespace hpx { namespace iostreams { namespace stubs
         write_async(naming::id_type const& gid, detail::buffer const& in)
         {
             typedef server::output_stream::write_async_action action_type;
-            hpx::async<action_type>(gid, in).get();
+            hpx::apply<action_type>(gid, in);
         }
     };
 }}}

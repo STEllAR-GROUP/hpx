@@ -429,29 +429,6 @@ namespace hpx {
         lcos::local::spinlock::scoped_lock l(security_mtx_);
         return components::security::verify(*cert_store(ec), data, parcel_id);
     }
-
-    /// \brief Verify the certificate in the given byte sequence
-    ///
-    /// \param data      The full received message buffer, assuming that it
-    ///                  has a parcel_suffix appended.
-    /// \param hash      The has object for the received data.
-    /// \param parcel_id The parcel id of the first parcel in side the message
-    ///
-    template <typename Buffer>
-    bool verify_parcel_suffix(Buffer const& data,
-        naming::gid_type& parcel_id, error_code& ec = throws)
-    {
-        runtime* rt = get_runtime_ptr();
-        if (0 == rt)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
-                "hpx::verify_parcel_suffix",
-                "the runtime system is not operational at this point");
-            return false;
-        }
-
-        return rt->verify_parcel_suffix(data, parcel_id, ec);
-    }
 }
 #endif
 

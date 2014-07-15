@@ -16,8 +16,10 @@ set(example_programs
     event_synchronization
     factorial
     fibonacci
+    fibonacci_await
     fibonacci_one
     fibonacci_futures
+    fibonacci_futures_distributed
     fractals
     fractals_struct
     interest_calculator
@@ -42,23 +44,12 @@ endif()
 
 if(WITH_CXX11_LAMBDAS)
   set(example_programs ${example_programs}
-      hello_world
       1d_wave_equation
-     )
-
-  # MSVC 2010 is not able to cope with this example
-  if(NOT MSVC10)
-    set(example_programs ${example_programs}
-        fibonacci_dataflow
-        )
-  endif()
-endif()
-
-# MSVC 2010 is not able to cope with this example
-if(NOT MSVC10)
-  set(example_programs ${example_programs}
-      fibonacci_await
-      fibonacci_futures_distributed
+      hello_world
+      fibonacci_dataflow
+      simple_pipeline
+      vector_zip_dotproduct
+      vector_counting_dotproduct
      )
 endif()
 
@@ -83,6 +74,8 @@ set(interest_calculator_FLAGS COMPONENT_DEPENDENCIES dataflow)
 set(simple_future_continuation_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(timed_futures_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(pingpong_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(vector_zip_dotproduct_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(vector_counting_dotproduct_FLAGS COMPONENT_DEPENDENCIES iostreams)
 
 foreach(example_program ${example_programs})
   set(sources

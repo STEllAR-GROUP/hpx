@@ -31,7 +31,7 @@ namespace hpx { namespace iostreams
 
     inline std::ostream& operator<< (std::ostream& os, endl_type const&)
     {
-        return os << std::endl << std::flush;
+        return os << std::endl;
     }
 
     inline std::ostream& operator<< (std::ostream& os, async_flush_type const&)
@@ -41,7 +41,7 @@ namespace hpx { namespace iostreams
 
     inline std::ostream& operator<< (std::ostream& os, async_endl_type const&)
     {
-        return os << std::endl << std::flush;
+        return os << std::endl;
     }
 }}
 

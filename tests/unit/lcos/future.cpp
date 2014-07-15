@@ -75,7 +75,6 @@ void test_store_value_from_thread()
     HPX_TEST(fi2.is_ready());
     HPX_TEST(fi2.has_value());
     HPX_TEST(!fi2.has_exception());
-    HPX_TEST(fi2.get_status() == hpx::lcos::future_status::ready);
     int j = fi2.get();
     HPX_TEST_EQ(j, 42);
     t.join();
@@ -92,7 +91,6 @@ void test_store_exception()
     HPX_TEST(fi3.is_ready());
     HPX_TEST(!fi3.has_value());
     HPX_TEST(fi3.has_exception());
-    HPX_TEST(fi3.get_status() ==  hpx::lcos::future_status::ready);
     try {
         fi3.get();
         HPX_TEST(false);
@@ -110,7 +108,6 @@ void test_initial_state()
     HPX_TEST(!fi.is_ready());
     HPX_TEST(!fi.has_value());
     HPX_TEST(!fi.has_exception());
-    HPX_TEST(fi.get_status() == hpx::lcos::future_status::uninitialized);
     int i;
     try {
         i = fi.get();
@@ -134,8 +131,7 @@ void test_waiting_future()
     HPX_TEST(!fi.is_ready());
     HPX_TEST(!fi.has_value());
     HPX_TEST(!fi.has_exception());
-    HPX_TEST(fi.get_status() == hpx::lcos::future_status::deferred);
-    
+
     // fulfill the promise so the destructor of promise is happy.
     pi.set_value(0);
 }
@@ -170,7 +166,6 @@ void test_set_value_updates_future_status()
     HPX_TEST(fi.is_ready());
     HPX_TEST(fi.has_value());
     HPX_TEST(!fi.has_exception());
-    HPX_TEST(fi.get_status() == hpx::lcos::future_status::ready);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -186,7 +181,6 @@ void test_set_value_can_be_retrieved()
     HPX_TEST(fi.is_ready());
     HPX_TEST(fi.has_value());
     HPX_TEST(!fi.has_exception());
-    HPX_TEST(fi.get_status() == hpx::lcos::future_status::ready);
     int i = fi.get();
     HPX_TEST_EQ(i, 42);
 }
@@ -204,7 +198,6 @@ void test_set_value_can_be_moved()
     HPX_TEST(fi.is_ready());
     HPX_TEST(fi.has_value());
     HPX_TEST(!fi.has_exception());
-    HPX_TEST(fi.get_status() == hpx::lcos::future_status::ready);
     int i=0;
     HPX_TEST(i = fi.get());
     HPX_TEST_EQ(i, 42);
@@ -219,7 +212,6 @@ void test_future_from_packaged_task_is_waiting()
     HPX_TEST(!fi.is_ready());
     HPX_TEST(!fi.has_value());
     HPX_TEST(!fi.has_exception());
-    HPX_TEST(fi.get_status() == hpx::lcos::future_status::deferred);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -233,7 +225,6 @@ void test_invoking_a_packaged_task_populates_future()
     HPX_TEST(fi.is_ready());
     HPX_TEST(fi.has_value());
     HPX_TEST(!fi.has_exception());
-    HPX_TEST(fi.get_status() == hpx::lcos::future_status::ready);
 
     int i = fi.get();
     HPX_TEST_EQ(i, 42);
@@ -289,7 +280,6 @@ void test_task_stores_exception_if_function_throws()
     HPX_TEST(fi.is_ready());
     HPX_TEST(!fi.has_value());
     HPX_TEST(fi.has_exception());
-    HPX_TEST(fi.get_status()==hpx::lcos::future_status::ready);
     try {
         fi.get();
         HPX_TEST(false);
@@ -311,7 +301,6 @@ void test_void_promise()
     HPX_TEST(f.is_ready());
     HPX_TEST(f.has_value());
     HPX_TEST(!f.has_exception());
-    HPX_TEST(f.get_status() == hpx::lcos::future_status::ready);
 }
 
 void test_reference_promise()
@@ -323,7 +312,6 @@ void test_reference_promise()
     HPX_TEST(f.is_ready());
     HPX_TEST(f.has_value());
     HPX_TEST(!f.has_exception());
-    HPX_TEST(f.get_status() == hpx::lcos::future_status::ready);
     HPX_TEST_EQ(&f.get(), &i);
 }
 
@@ -341,7 +329,6 @@ void test_task_returning_void()
     HPX_TEST(fi.is_ready());
     HPX_TEST(fi.has_value());
     HPX_TEST(!fi.has_exception());
-    HPX_TEST(fi.get_status() == hpx::lcos::future_status::ready);
 }
 
 int global_ref_target = 0;
@@ -361,7 +348,6 @@ void test_task_returning_reference()
     HPX_TEST(fi.is_ready());
     HPX_TEST(fi.has_value());
     HPX_TEST(!fi.has_exception());
-    HPX_TEST(fi.get_status() == hpx::lcos::future_status::ready);
     int& i = fi.get();
     HPX_TEST_EQ(&i, &global_ref_target);
 }
@@ -629,7 +615,7 @@ void test_wait_for_either_of_two_futures_2()
     HPX_STD_TUPLE<
         hpx::lcos::future<int>
       , hpx::lcos::future<int> > t = r.get();
-    
+
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
 
@@ -650,7 +636,7 @@ void test_wait_for_either_of_two_futures_list_1()
     hpx::lcos::future<std::vector<hpx::lcos::future<int> > > r =
         hpx::when_any(futures);
     std::vector<hpx::lcos::future<int> > t = r.get();
-    
+
     HPX_TEST(!futures[0].valid());
     HPX_TEST(!futures[1].valid());
 
@@ -866,7 +852,7 @@ void test_wait_for_either_of_four_futures_2()
       , hpx::lcos::future<int>
       , hpx::lcos::future<int>
       , hpx::lcos::future<int> > t = r.get();
-    
+
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
     HPX_TEST(!f3.valid());
@@ -900,7 +886,7 @@ void test_wait_for_either_of_four_futures_3()
       , hpx::lcos::future<int>
       , hpx::lcos::future<int>
       , hpx::lcos::future<int> > t = r.get();
-    
+
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
     HPX_TEST(!f3.valid());
@@ -934,7 +920,7 @@ void test_wait_for_either_of_four_futures_4()
       , hpx::lcos::future<int>
       , hpx::lcos::future<int>
       , hpx::lcos::future<int> > t = r.get();
-    
+
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
     HPX_TEST(!f3.valid());
@@ -969,7 +955,7 @@ void test_wait_for_either_of_five_futures_1_from_list()
     hpx::lcos::future<std::vector<hpx::lcos::future<int> > > r =
         hpx::when_any(futures);
     std::vector<hpx::lcos::future<int> > t = r.get();
-    
+
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
     HPX_TEST(!f3.valid());
@@ -1005,7 +991,7 @@ void test_wait_for_either_of_five_futures_1_from_list_iterators()
     hpx::lcos::future<std::vector<hpx::lcos::future<int> > > r =
         hpx::when_any(futures.begin(), futures.end());
     std::vector<hpx::lcos::future<int> > t = r.get();
-    
+
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
     HPX_TEST(!f3.valid());
@@ -1041,7 +1027,7 @@ void test_wait_swapped_for_either_of_five_futures_1_from_list()
     hpx::lcos::future<std::vector<hpx::lcos::future<int> > > r =
         hpx::when_any_swapped(futures);
     std::vector<hpx::lcos::future<int> > t = r.get();
-    
+
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
     HPX_TEST(!f3.valid());
@@ -1077,7 +1063,7 @@ void test_wait_swapped_for_either_of_five_futures_1_from_list_iterators()
     hpx::lcos::future<std::vector<hpx::lcos::future<int> > > r =
         hpx::when_any_swapped(futures.begin(), futures.end());
     std::vector<hpx::lcos::future<int> > t = r.get();
-    
+
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
     HPX_TEST(!f3.valid());
@@ -1116,7 +1102,7 @@ void test_wait_for_either_of_five_futures_1()
       , hpx::lcos::future<int>
       , hpx::lcos::future<int>
       , hpx::lcos::future<int> > t = r.get();
-    
+
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
     HPX_TEST(!f3.valid());
@@ -1155,7 +1141,7 @@ void test_wait_for_either_of_five_futures_2()
       , hpx::lcos::future<int>
       , hpx::lcos::future<int>
       , hpx::lcos::future<int> > t = r.get();
-    
+
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
     HPX_TEST(!f3.valid());
@@ -1194,7 +1180,7 @@ void test_wait_for_either_of_five_futures_3()
       , hpx::lcos::future<int>
       , hpx::lcos::future<int>
       , hpx::lcos::future<int> > t = r.get();
-    
+
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
     HPX_TEST(!f3.valid());
@@ -1233,7 +1219,7 @@ void test_wait_for_either_of_five_futures_4()
       , hpx::lcos::future<int>
       , hpx::lcos::future<int>
       , hpx::lcos::future<int> > t = r.get();
-    
+
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
     HPX_TEST(!f3.valid());
@@ -1272,7 +1258,7 @@ void test_wait_for_either_of_five_futures_5()
       , hpx::lcos::future<int>
       , hpx::lcos::future<int>
       , hpx::lcos::future<int> > t = r.get();
-    
+
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
     HPX_TEST(!f3.valid());

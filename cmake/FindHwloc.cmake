@@ -1,4 +1,3 @@
-
 # Copyright (c)      2014 Thomas Heller
 # Copyright (c) 2007-2012 Hartmut Kaiser
 # Copyright (c) 2010-2011 Matt Anderson

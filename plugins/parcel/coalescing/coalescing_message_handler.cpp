@@ -68,7 +68,7 @@ namespace hpx { namespace plugins { namespace parcel
     coalescing_message_handler::coalescing_message_handler(
             char const* action_name, parcelset::parcelport* pp, std::size_t num,
             std::size_t interval)
-      : buffer_(detail::get_num_messages(num)), pp_(pp),
+      : pp_(pp), buffer_(detail::get_num_messages(num)),
         timer_(boost::bind(&coalescing_message_handler::timer_flush, this_()),
             boost::bind(&coalescing_message_handler::flush, this_(), true),
             detail::get_interval(interval), std::string(action_name) + "_timer",

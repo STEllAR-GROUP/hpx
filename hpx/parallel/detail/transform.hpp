@@ -12,7 +12,6 @@
 #include <hpx/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
-#include <hpx/parallel/detail/synchronize.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 #include <hpx/util/move.hpp>
 
@@ -37,7 +36,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             F && f, boost::mpl::true_)
         {
             try {
-                detail::synchronize(first, last);
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
                     std::transform(first, last, dest, std::forward<F>(f)));
             }
@@ -52,7 +50,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         transform(ExPolicy const& policy, FwdIter first, FwdIter last,
             OutIter dest, F && f, boost::mpl::false_ fls)
         {
-            typedef util::zip_iterator<FwdIter, OutIter> zip_iterator;
+            typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
             typedef typename zip_iterator::reference reference;
             typedef
                 typename detail::algorithm_result<ExPolicy, OutIter>::type
@@ -60,10 +58,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             return get_iter<1, result_type>(
                 for_each_n(policy,
-                    util::make_zip_iterator(first, dest),
+                    hpx::util::make_zip_iterator(first, dest),
                     std::distance(first, last),
-                    [f](reference it) {
-                        hpx::util::get<1>(it) = f(hpx::util::get<0>(it));
+                    [f](reference t) {
+                        hpx::util::get<1>(t) = f(hpx::util::get<0>(t)); //-V573
                     },
                     fls));
         }
@@ -182,7 +180,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             InIter2 first2, OutIter dest, F && f, boost::mpl::true_)
         {
             try {
-                detail::synchronize_binary(first1, last1, first2);
                 return detail::algorithm_result<ExPolicy, OutIter>::get(
                     std::transform(first1, last1, first2, dest,
                         std::forward<F>(f)));
@@ -198,7 +195,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         transform_binary(ExPolicy const& policy, FwdIter1 first1, FwdIter1 last1,
             FwdIter2 first2, OutIter dest, F && f, boost::mpl::false_ fls)
         {
-            typedef util::zip_iterator<FwdIter1, FwdIter2, OutIter> zip_iterator;
+            typedef hpx::util::zip_iterator<FwdIter1, FwdIter2, OutIter> zip_iterator;
             typedef typename zip_iterator::reference reference;
             typedef
                 typename detail::algorithm_result<ExPolicy, OutIter>::type
@@ -206,11 +203,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             return get_iter<2, result_type>(
                 for_each_n(policy,
-                    util::make_zip_iterator(first1, first2, dest),
+                    hpx::util::make_zip_iterator(first1, first2, dest),
                     std::distance(first1, last1),
-                    [f](reference it) {
-                        hpx::util::get<2>(it) =
-                            f(hpx::util::get<0>(it), hpx::util::get<1>(it));
+                    [f](reference t) {
+                        hpx::util::get<2>(t) = //-V573
+                            f(hpx::util::get<0>(t), hpx::util::get<1>(t));
                     },
                     fls));
         }

@@ -47,6 +47,7 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/exception_list.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/execution_policy.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithm.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/detail/all_any_none.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/detail/copy.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/detail/count.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/detail/fill.hpp"

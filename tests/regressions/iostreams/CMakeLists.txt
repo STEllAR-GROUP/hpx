@@ -9,9 +9,9 @@ set(tests
    )
 
 set(no_output_1173_PARAMETERS LOCALITIES 2)
-set(no_output_1173_FLAGS DEPENDENCIES iostreams_component)
+set(no_output_1173_FLAGS COMPONENT_DEPENDENCIES iostreams)
 
-set(delayed_output_1180_FLAGS DEPENDENCIES iostreams_component)
+set(delayed_output_1180_FLAGS COMPONENT_DEPENDENCIES iostreams)
 
 foreach(test ${tests})
   set(sources

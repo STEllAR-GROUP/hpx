@@ -360,6 +360,9 @@ namespace hpx { namespace lcos { namespace detail
             else
                 cb = &continuation::async;
 
+            if (future.wait_for(boost::posix_time::seconds(0)) == future_status::deferred)
+                future.wait();
+
             shared_state_ptr const& state =
                 lcos::detail::get_shared_state(future);
             state->set_on_completed(util::bind(cb, std::move(this_), state));
@@ -376,6 +379,9 @@ namespace hpx { namespace lcos { namespace detail
             boost::intrusive_ptr<continuation> this_(this);
             void (continuation::*cb)(shared_state_ptr const&, threads::executor&) =
                 &continuation::async;
+
+            if (future.wait_for(boost::posix_time::seconds(0)) == future_status::deferred)
+                future.wait();
 
             shared_state_ptr const& state =
                 lcos::detail::get_shared_state(future);
@@ -456,6 +462,9 @@ namespace hpx { namespace lcos { namespace detail
             boost::intrusive_ptr<void_continuation> this_(this);
             void (void_continuation::*ready)(shared_state_ptr const&) =
                 &void_continuation::on_ready<Future>;
+
+            if (future.wait_for(boost::posix_time::seconds(0)) == future_status::deferred)
+                future.wait();
 
             shared_state_ptr const& state =
                 lcos::detail::get_shared_state(future);

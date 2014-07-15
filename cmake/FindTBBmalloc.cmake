@@ -51,8 +51,4 @@ foreach(v TBBMALLOC_ROOT TBBMALLOC_PLATFORM)
   endif()
 endforeach()
 
-if(NOT TBBMALLOC_FOUND)
-  hpx_info("Set TBBMALLOC_ROOT to the location where tbbmalloc are installed")
-endif()
-
 mark_as_advanced(TBBMALLOC_ROOT TBBMALLOC_LIBRARY TBBMALLOC_PROXY_LIBRARY TBBMALLOC_INCLUDE_DIR)

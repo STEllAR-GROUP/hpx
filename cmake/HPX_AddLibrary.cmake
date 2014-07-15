@@ -115,88 +115,43 @@ macro(add_hpx_library name)
     set(hpx_lib hpx hpx_serialization)
   endif()
 
-  if(NOT MSVC)
-    if(NOT ${name}_NOLIBS)
-      target_link_libraries(${name}_lib
-        ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} ${hpx_lib})
-      set_property(TARGET ${name}_lib APPEND
-                   PROPERTY COMPILE_DEFINITIONS
-                   "HPX_ENABLE_ASSERT_HANDLER")
-    else()
-      target_link_libraries(${name}_lib
-        ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES})
-    endif()
+  if(NOT ${name}_NOLIBS)
+    target_link_libraries(${name}_lib
+      ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} ${hpx_lib})
   else()
-    if(NOT ${name}_NOLIBS)
-      target_link_libraries(${name}_lib
-        ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} ${hpx_lib})
-    else()
-      target_link_libraries(${name}_lib
-        ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES})
-    endif()
+    target_link_libraries(${name}_lib
+      ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES})
   endif()
 
   # set properties of generated shared library
-  if("${HPX_PLATFORM}" STREQUAL "Android")
-    set_target_properties(${name}_lib PROPERTIES
-      # allow creating static and shared libs without conflicts
-      CLEAN_DIRECT_OUTPUT 1
-      OUTPUT_NAME ${name})
-  else()
-    set_target_properties(${name}_lib PROPERTIES
-      # create *nix style library versions + symbolic links
-      VERSION ${HPX_VERSION}
-      SOVERSION ${HPX_SOVERSION}
-      # allow creating static and shared libs without conflicts
-      CLEAN_DIRECT_OUTPUT 1
-      OUTPUT_NAME ${name})
-  endif()
+  set_target_properties(${name}_lib PROPERTIES
+    # create *nix style library versions + symbolic links
+    VERSION ${HPX_LIBRARY_VERSION}
+    SOVERSION ${HPX_SOVERSION}
+    # allow creating static and shared libs without conflicts
+    CLEAN_DIRECT_OUTPUT 1
+    OUTPUT_NAME ${name})
 
-  if(MSVC AND (NOT ${${name}_STATIC}) AND HPX_LINK_FLAG_TARGET_PROPERTIES)
-    set_target_properties(${name}_lib PROPERTIES LINK_FLAGS "${HPX_LINK_FLAG_TARGET_PROPERTIES}")
-  endif()
-
-  if(HPX_SET_OUTPUT_PATH AND NOT ${name}_OUTPUT_SUFFIX)
-    if(MSVC)
-      set_target_properties("${name}_lib" PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${HPX_LIBRARY_OUTPUT_DIRECTORY_RELEASE}"
-        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${HPX_LIBRARY_OUTPUT_DIRECTORY_DEBUG}"
-        RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${HPX_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}"
-        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${HPX_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO}"
-        ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${HPX_ARCHIVE_OUTPUT_DIRECTORY_RELEASE}"
-        ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${HPX_ARCHIVE_OUTPUT_DIRECTORY_DEBUG}"
-        ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL "${HPX_ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL}"
-        ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "${HPX_ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO}"
-        LIBRARY_OUTPUT_DIRECTORY_RELEASE "${HPX_LIBRARY_OUTPUT_DIRECTORY_RELEASE}"
-        LIBRARY_OUTPUT_DIRECTORY_DEBUG "${HPX_LIBRARY_OUTPUT_DIRECTORY_DEBUG}"
-        LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL "${HPX_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}"
-        LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${HPX_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO}")
-    else()
-      set_target_properties("${name}_lib" PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${HPX_LIBRARY_OUTPUT_DIRECTORY}"
-        ARCHIVE_OUTPUT_DIRECTORY "${HPX_LIBRARY_OUTPUT_DIRECTORY}"
-        LIBRARY_OUTPUT_DIRECTORY "${HPX_LIBRARY_OUTPUT_DIRECTORY}")
-    endif()
-  elseif(${name}_OUTPUT_SUFFIX)
+  if(${name}_OUTPUT_SUFFIX)
     if(MSVC)
       set_target_properties("${name}_lib" PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release/${${name}_OUTPUT_SUFFIX}"
         RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/Debug/${${name}_OUTPUT_SUFFIX}"
         RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}/MinSizeRel/${${name}_OUTPUT_SUFFIX}"
         RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/RelWithDebInfo/${${name}_OUTPUT_SUFFIX}"
-        ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release/${${name}_OUTPUT_SUFFIX}"
-        ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/Debug/${${name}_OUTPUT_SUFFIX}"
-        ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}/MinSizeRel/${${name}_OUTPUT_SUFFIX}"
-        ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/RelWithDebInfo/${${name}_OUTPUT_SUFFIX}"
         LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release/${${name}_OUTPUT_SUFFIX}"
         LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/Debug/${${name}_OUTPUT_SUFFIX}"
         LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}/MinSizeRel/${${name}_OUTPUT_SUFFIX}"
-        LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/RelWithDebInfo/${${name}_OUTPUT_SUFFIX}")
+        LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/RelWithDebInfo/${${name}_OUTPUT_SUFFIX}"
+        ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release/${${name}_OUTPUT_SUFFIX}"
+        ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/Debug/${${name}_OUTPUT_SUFFIX}"
+        ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}/MinSizeRel/${${name}_OUTPUT_SUFFIX}"
+        ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/RelWithDebInfo/${${name}_OUTPUT_SUFFIX}")
     else()
       set_target_properties("${name}_lib" PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${${name}_OUTPUT_SUFFIX}"
-        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${${name}_OUTPUT_SUFFIX}"
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${${name}_OUTPUT_SUFFIX}")
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${${name}_OUTPUT_SUFFIX}"
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${${name}_OUTPUT_SUFFIX}")
     endif()
   endif()
 
@@ -206,17 +161,6 @@ macro(add_hpx_library name)
 
   if(${name}_LINK_FLAGS)
     hpx_append_property(${name}_lib LINK_FLAGS ${${name}_LINK_FLAGS})
-  endif()
-
-  if(HPX_HAVE_PARCELPORT_MPI AND MPI_FOUND)
-    hpx_append_property(${name}_lib LINK_FLAGS ${MPI_${${name}_LANGUAGE}_LINK_FLAGS})
-  endif()
-
-  if(HPX_${${name}_LANGUAGE}_COMPILE_FLAGS)
-    hpx_append_property(${name}_lib COMPILE_FLAGS ${HPX_${${name}_LANGUAGE}_COMPILE_FLAGS})
-    if(NOT MSVC)
-      hpx_append_property(${name}_lib LINK_FLAGS ${HPX_${${name}_LANGUAGE}_COMPILE_FLAGS})
-    endif()
   endif()
 
   if(${name}_FOLDER)

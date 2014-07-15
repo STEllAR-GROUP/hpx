@@ -348,18 +348,23 @@ string(TOUPPER ${WITH_THREAD_SCHEDULERS} WITH_THREAD_SCHEDULERS_UC)
 foreach(_scheduler ${WITH_THREAD_SCHEDULERS_UC})
   if(_scheduler STREQUAL "ALL")
     set(_all On)
+    set(WITH_ALL_SCHEDULERS ON CACHE INTERNAL "")
   endif()
   if(_scheduler STREQUAL "LOCAL" OR _all)
     hpx_add_config_define(HPX_LOCAL_SCHEDULER)
+    set(WITH_LOCAL_SCHEDULER ON CACHE INTERNAL "")
   endif()
   if(_scheduler STREQUAL "STATIC_PRIORITY" OR _all)
     hpx_add_config_define(HPX_STATIC_PRIORITY_SCHEDULER)
+    set(WITH_STATIC_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
   endif()
   if(_scheduler STREQUAL "HIERARCHY" OR _all)
     hpx_add_config_define(HPX_HIERARCHY_SCHEDULER)
+    set(WITH_HIERARCHY_SCHEDULER ON CACHE INTERNAL "")
   endif()
   if(_scheduler STREQUAL "PERIODIC_PRIORITY" OR _all)
     hpx_add_config_define(HPX_PERIODIC_PRIORITY_SCHEDULER)
+    set(WITH_PERIODIC_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
   endif()
   unset(_all)
 endforeach()
@@ -462,6 +467,9 @@ if(WITH_THREAD_DEBUG_INFO)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_DESCRIPTION)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_DEADLOCK_DETECTION)
 endif()
+
+# Options for our plugins
+hpx_option(WITH_COMPRESSION_BZIP2 BOOL "Enable bzip2 compression for parcel data (default: OFF)." OFF ADVANCED)
 
 ################################################################################
 
@@ -1098,21 +1106,21 @@ hpx_include(SetOutputPaths)
 ################################################################################
 # # Configure compression and other plugins
 # ###############################################################################
-# add_hpx_pseudo_target(plugins)
-# add_subdirectory(plugins)
-#
-# if(HPX_HAVE_COMPRESSION_BZIP2 AND BZIP2_FOUND)
-#   hpx_add_config_define(HPX_HAVE_COMPRESSION_BZIP2)
-# endif()
+add_hpx_pseudo_target(plugins)
+add_subdirectory(plugins)
+
+if(WITH_COMPRESSION_BZIP2)
+  hpx_add_config_define(HPX_HAVE_COMPRESSION_BZIP2)
+endif()
 # if(HPX_HAVE_COMPRESSION_SNAPPY AND SNAPPY_FOUND)
 #   hpx_add_config_define(HPX_HAVE_COMPRESSION_SNAPPY)
 # endif()
 # if(HPX_HAVE_COMPRESSION_ZLIB AND ZLIB_FOUND)
 #   hpx_add_config_define(HPX_HAVE_COMPRESSION_ZLIB)
 # endif()
-#
-# # Parcel coalescing is used by the main HPX library, enable it always
-# hpx_add_config_define(HPX_HAVE_PARCEL_COALESCING)
+
+# Parcel coalescing is used by the main HPX library, enable it always
+hpx_add_config_define(HPX_HAVE_PARCEL_COALESCING)
 
 ################################################################################
 # Documentation toolchain (DocBook, BoostBook, QuickBook, xsltproc)
@@ -1142,12 +1150,11 @@ if(WITH_BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif()
 
-# ###############################################################################
-# # Activate plugins
-# ###############################################################################
-# add_plugin_modules()
-#
-# ###############################################################################
+###############################################################################
+# Activate plugins
+###############################################################################
+add_plugin_modules()
+###############################################################################
 
 
 ###############################################################################

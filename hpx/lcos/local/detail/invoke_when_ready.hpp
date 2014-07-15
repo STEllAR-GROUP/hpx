@@ -274,11 +274,13 @@ namespace hpx { namespace lcos { namespace local { namespace detail
           , typename util::tuple_decay<typename util::decay<Args>::type>::type
         > invoker_type;
 
+        // launch a new thread with high priority which performs the 'waiting'
         boost::intrusive_ptr<invoker_type> p(new invoker_type(
             std::forward<F>(f), std::forward<Args>(args)));
         threads::register_thread_nullary(
             util::deferred_call(&invoker_type::apply, p)
-          , "hpx::lcos::local::detail::invoke_when_ready");
+          , "hpx::lcos::local::detail::invoke_when_ready",
+          threads::pending, true, threads::thread_priority_critical);
 
         using traits::future_access;
         return future_access<typename invoker_type::type>::create(std::move(p));

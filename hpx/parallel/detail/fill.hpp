@@ -11,7 +11,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
-#include <hpx/parallel/detail/synchronize.hpp>
 #include <hpx/parallel/detail/is_negative.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/exception_list.hpp>
@@ -56,7 +55,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename std::iterator_traits<FwdIter>::value_type type;
 
             return hpx::util::void_guard<result_type>(),
-                plain_for_each_n(policy, first,
+                for_each_n(policy, first,
                     std::distance(first, last),
                     [val](type& v){
                         v = val;
@@ -164,7 +163,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 category;
             typedef typename std::iterator_traits<OutIter>::value_type type;
 
-            return plain_for_each_n(policy, first, count,
+            return for_each_n(policy, first, count,
                         [val](type& v) {
                             v = val;
                         }, f);

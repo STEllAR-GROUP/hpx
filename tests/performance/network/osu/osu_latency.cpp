@@ -60,7 +60,7 @@ double receive(
     std::size_t loop,
     std::size_t window_size)
 {
-    int skip = SKIP_LARGE;
+    std::size_t skip = SKIP_LARGE;
 
     typedef hpx::util::serialize_buffer<char> buffer_type;
     buffer_type recv_buffer;
@@ -115,7 +115,7 @@ void run_benchmark(boost::program_options::variables_map & vm)
     std::size_t max_size = vm["max-size"].as<std::size_t>();
 
     if(max_size < min_size) std::swap(max_size, min_size);
-    
+
     // align used buffers on page boundaries
     unsigned long align_size = getpagesize();
     //BOOST_ASSERT(align_size <= MAX_ALIGNMENT);

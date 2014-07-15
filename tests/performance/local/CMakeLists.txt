@@ -6,17 +6,13 @@
 ################################################################################
 # find dependencies
 ################################################################################
-find_package(HPX_Qthreads)
-find_package(HPX_TBB)
-find_package(HPX_SWARM)
-find_package(HPX_OpenMP)
+find_package(QThreads)
+find_package(TBB)
+find_package(SWARM)
+find_package(OpenMP)
 
-if(MSVC)
-  set(boost_library_dependencies)
-else()
-  set(boost_library_dependencies "${BOOST_PROGRAM_OPTIONS_LIBRARY}"
-                                 "${BOOST_SYSTEM_LIBRARY}"
-                                 "${BOOST_CHRONO_LIBRARY}")
+if(NOT MSVC)
+  set(boost_library_dependencies ${Boost_LIBRARIES})
 endif()
 
 set(benchmarks
@@ -40,7 +36,7 @@ if(OPENMP_FOUND)
 endif()
 
 if(QTHREADS_FOUND)
-  include_directories("${QTHREADS_INCLUDE_DIR}")
+  include_directories(${QTHREADS_INCLUDE_DIR})
 
   set(benchmarks
       ${benchmarks}
@@ -50,15 +46,15 @@ if(QTHREADS_FOUND)
 
   set(qthreads_homogeneous_timed_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies}
-                   "${QTHREADS_LIBRARY}")
+                  ${QTHREADS_LIBRARIES})
 
   set(qthreads_heterogeneous_timed_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies}
-                   "${QTHREADS_LIBRARY}")
+                  ${QTHREADS_LIBRARIES})
 endif()
 
 if(TBB_FOUND)
-  include_directories("${TBB_INCLUDE_DIR}")
+  include_directories(${TBB_INCLUDE_DIR})
 
   set(benchmarks
       ${benchmarks}
@@ -67,11 +63,11 @@ if(TBB_FOUND)
 
   set(tbb_homogeneous_timed_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies}
-                   "${TBB_LIBRARY}")
+                   ${TBB_LIBRARIES})
 endif()
 
 if(SWARM_FOUND)
-  include_directories("${SWARM_INCLUDE_DIR}")
+  include_directories(${SWARM_INCLUDE_DIR})
 
   set(benchmarks
       ${benchmarks}
@@ -80,20 +76,18 @@ if(SWARM_FOUND)
 
   set(swarm_homogeneous_timed_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies}
-                   "${SWARM_LIBRARY}")
+                   ${SWARM_LIBRARIES})
 endif()
 
 set(hpx_homogeneous_timed_task_spawn_executors_FLAGS DEPENDENCIES iostreams_component)
 set(hpx_heterogeneous_timed_task_spawn_FLAGS DEPENDENCIES iostreams_component)
 
 set(delay_baseline_FLAGS NOLIBS
-    DEPENDENCIES ${boost_library_dependencies} "${BOOST_DATE_TIME_LIBRARY}")
+    DEPENDENCIES ${boost_library_dependencies})
 
 set(delay_baseline_threaded_FLAGS NOLIBS
     DEPENDENCIES
-        ${boost_library_dependencies}
-        "${BOOST_THREAD_LIBRARY}"
-        "${BOOST_DATE_TIME_LIBRARY}")
+        ${boost_library_dependencies})
 
 set(print_heterogeneous_payloads_FLAGS NOLIBS
     DEPENDENCIES ${boost_library_dependencies})

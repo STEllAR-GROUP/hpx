@@ -60,6 +60,7 @@ namespace hpx { namespace components { namespace security
 
         capability(boost::uint64_t bits)
         {
+            std::fill(bits_.begin(), bits_.end(), 0);
             for (std::size_t i = 0;
                  i != security::traits::capability<>::size;
                  ++i)
