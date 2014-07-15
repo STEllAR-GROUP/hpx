@@ -23,7 +23,7 @@ void test_transform(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    base_iterator outiter = hpx::parallel::transform(policy,
+    hpx::parallel::transform(policy,
         iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
         [](std::size_t v) {
             return v + 1;
@@ -107,7 +107,7 @@ void test_transform_exception(ExPolicy const& policy, IteratorTag)
 
     bool caught_exception = false;
     try {
-        base_iterator outiter = hpx::parallel::transform(policy,
+        hpx::parallel::transform(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
             [](std::size_t v) {
                 throw std::runtime_error("test");
@@ -202,7 +202,7 @@ void test_transform_bad_alloc(ExPolicy const& policy, IteratorTag)
 
     bool caught_bad_alloc = false;
     try {
-        base_iterator outiter = hpx::parallel::transform(policy,
+        hpx::parallel::transform(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
             [](std::size_t v) {
                 throw std::bad_alloc();

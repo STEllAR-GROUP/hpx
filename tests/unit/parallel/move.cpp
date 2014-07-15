@@ -24,7 +24,7 @@ void test_move(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
-    base_iterator res = hpx::parallel::move(policy,
+    hpx::parallel::move(policy,
         iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d));
 
     //copy contents of d back into c for testing
@@ -85,7 +85,7 @@ void test_outiter_move(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(0);
     std::iota(boost::begin(c), boost::end(c), std::rand());
-    outiterator res = hpx::parallel::move(policy,
+    hpx::parallel::move(policy,
         iterator(boost::begin(c)), iterator(boost::end(c)), std::back_inserter(d));
 
     //copy contents of d back into c for testing
@@ -185,7 +185,7 @@ void test_move_exception(ExPolicy const& policy, IteratorTag)
 
     bool caught_exception = false;
     try {
-        base_iterator outiter = hpx::parallel::move(policy,
+        hpx::parallel::move(policy,
             decorated_iterator(
                 boost::begin(c),
                 [](){ throw std::runtime_error("test"); }),
@@ -282,7 +282,7 @@ void test_move_bad_alloc(ExPolicy const& policy, IteratorTag)
 
     bool caught_bad_alloc = false;
     try {
-        base_iterator outiter = hpx::parallel::move(policy,
+        hpx::parallel::move(policy,
             decorated_iterator(
                 boost::begin(c),
                 [](){ throw std::bad_alloc(); }),

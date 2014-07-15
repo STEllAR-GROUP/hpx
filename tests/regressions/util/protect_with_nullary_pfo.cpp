@@ -65,6 +65,7 @@ int hpx_main()
 
     v2.reserve(v1.size());
     iterator_type itr_o = v2.begin();
+    (void)itr_o;
     
     std::size_t i = 0;
     BOOST_FOREACH(std::size_t const & v, my_range)

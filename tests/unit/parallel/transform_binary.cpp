@@ -30,7 +30,7 @@ void test_transform_binary(ExPolicy const& policy, IteratorTag)
             return v1 + v2;
         };
 
-    base_iterator outiter = hpx::parallel::transform(policy,
+    hpx::parallel::transform(policy,
         iterator(boost::begin(c1)), iterator(boost::end(c1)),
         boost::begin(c2), boost::begin(d1), add);
 
@@ -127,7 +127,7 @@ void test_transform_binary_exception(ExPolicy const& policy, IteratorTag)
 
     bool caught_exception = false;
     try {
-        base_iterator outiter = hpx::parallel::transform(policy,
+        hpx::parallel::transform(policy,
             iterator(boost::begin(c1)), iterator(boost::end(c1)),
             boost::begin(c2), boost::begin(d1),
             [](std::size_t v1, std::size_t v2) {
@@ -227,7 +227,7 @@ void test_transform_binary_bad_alloc(ExPolicy const& policy, IteratorTag)
 
     bool caught_bad_alloc = false;
     try {
-        base_iterator outiter = hpx::parallel::transform(policy,
+        hpx::parallel::transform(policy,
             iterator(boost::begin(c1)), iterator(boost::end(c1)),
             boost::begin(c2), boost::begin(d1),
             [](std::size_t v1, std::size_t v2) {
