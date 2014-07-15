@@ -5,8 +5,8 @@
 
 /// \file parallel/detail/transform_reduce.hpp
 
-#if !defined(HPX_PARALLEL_DETAILTRANSFORMREDUCE_JUL_11_2014_0428PM)
-#define HPX_PARALLEL_DETAILTRANSFORMREDUCE_JUL_11_2014_0428PM
+#if !defined(HPX_PARALLEL_DETAIL_TRANSFORM_REDUCE_JUL_11_2014_0428PM)
+#define HPX_PARALLEL_DETAIL_TRANSFORM_REDUCE_JUL_11_2014_0428PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
@@ -69,8 +69,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         }));
             }
 
-            template <typename ExPolicy, typename FwdIter, typename T,
-                typename Reduce, typename Convert>
+            template <typename ExPolicy, typename FwdIter, typename Reduce,
+                typename Convert>
             static typename detail::algorithm_result<ExPolicy, T>::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
                 T && init, Reduce && r, Convert && conv)
