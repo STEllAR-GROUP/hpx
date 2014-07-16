@@ -5,30 +5,24 @@
 
 include(HPX_AddLibrary)
 
-hpx_option(HPX_HAVE_COMPRESSION_ZLIB BOOL "Enable zlib compression for parcel data (default: OFF)." OFF ADVANCED)
-if(HPX_HAVE_COMPRESSION_ZLIB)
-  if(MSVC)
-    set(BOOST_LIBRARIES ${BOOST_LIBRARIES} iostreams zlib)
-    set(ZLIB_FOUND ON CACHE INTERNAL "ZLIB_FOUND")
-  else()
-    find_package(HPX_Zlib)
-    if(ZLIB_FOUND)
-      set(BOOST_LIBRARIES ${BOOST_LIBRARIES} iostreams)
-    endif()
+hpx_option(WITH_COMPRESSION_ZLIB BOOL "Enable zlib compression for parcel data (default: OFF)." OFF ADVANCED)
+if(WITH_COMPRESSION_ZLIB)
+  find_package(ZLIB)
+  if(NOT ZLIB_FOUND)
+    hpx_error("zlib could not be found and WITH_COMPRESSION_ZLIB=ON, please point cmake to the correct location or set WITH_COMPRESSION_BZIP2 to OFF")
   endif()
 endif()
 
 macro(add_zlib_module)
   hpx_debug("add_zlib_module" "ZLIB_FOUND: ${ZLIB_FOUND}")
-  if(HPX_HAVE_COMPRESSION_ZLIB AND ZLIB_FOUND)
-    hpx_include_sys_directories("${ZLIB_INCLUDE_DIR}")
-    hpx_link_sys_directories("${ZLIB_LIBRARY_DIR}")
+  if(WITH_COMPRESSION_ZLIB)
+    include_directories(${ZLIB_INCLUDE_DIRS})
 
     add_hpx_library(compress_zlib
       SOURCES "${hpx_SOURCE_DIR}/plugins/binary_filter/zlib/zlib_serialization_filter.cpp"
       HEADERS "${hpx_SOURCE_DIR}/hpx/plugins/binary_filter/zlib_serialization_filter.hpp"
       FOLDER "Core/Plugins/Compression"
-      DEPENDENCIES "${ZLIB_LIBRARY}")
+      DEPENDENCIES ${ZLIB_LIBRARIES})
 
     set_property(TARGET compress_zlib_lib APPEND
       PROPERTY COMPILE_DEFINITIONS

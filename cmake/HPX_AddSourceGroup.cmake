@@ -6,9 +6,10 @@
 
 macro(add_hpx_source_group)
   if(MSVC)
-    hpx_parse_arguments(GROUP "NAME;CLASS;ROOT;TARGETS" "" ${ARGN})
-
-    set(targets "${GROUP_TARGETS}")
+    set(options NAME CLASS ROOT)
+    set(one_value_args)
+    set(multi_value_args TARGETS)
+    cmake_parse_arguments(SOURCES "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
     set(name "")
     if(GROUP_NAME)
@@ -20,7 +21,7 @@ macro(add_hpx_source_group)
     endif()
     get_filename_component(root "${GROUP_ROOT}" ABSOLUTE)
 
-    foreach(target ${targets})
+    foreach(target ${GROUP_TARGETS})
       string(REGEX REPLACE "${root}" "" relpath "${target}")
       string(REGEX REPLACE "[\\\\/][^\\\\/]*$" "" relpath "${relpath}")
       string(REGEX REPLACE "^[\\\\/]" "" relpath "${relpath}")

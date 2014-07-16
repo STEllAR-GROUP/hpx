@@ -7,13 +7,9 @@ include(HPX_Include)
 
 hpx_include(Message
             Option
-            ListContains
-            ParseArguments
             AppendProperty
-            AppendLibraries
+            Libraries
             Install
-            GetIncludeDirectory
-            Compile
             TargetPaths
             AddCompileFlag
             AddLinkFlag
@@ -23,7 +19,6 @@ hpx_include(Message
             AddExecutable
             AddConfigTest
             AddTest
-            AddPythonConfigTest
             AddPseudoDependencies
             AddPseudoTarget
             AddLibrarySources
@@ -31,7 +26,5 @@ hpx_include(Message
             AddSourceGroup
             IsTarget
             HandleComponentDependencies
-            LinkDirectories
-            IncludeDirectories
             ForceOutOfTreeBuild)
 

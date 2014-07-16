@@ -5,22 +5,24 @@
 
 include(HPX_AddLibrary)
 
-hpx_option(HPX_HAVE_COMPRESSION_SNAPPY BOOL "Enable snappy compression for parcel data (default: OFF)." OFF ADVANCED)
-if(HPX_HAVE_COMPRESSION_SNAPPY)
-  find_package(HPX_Snappy)
+hpx_option(WITH_COMPRESSION_SNAPPY BOOL "Enable snappy compression for parcel data (default: OFF)." OFF ADVANCED)
+if(WITH_COMPRESSION_SNAPPY)
+  find_package(Snappy)
+  if(NOT SNAPPY_FOUND)
+    hpx_error("Snappy could not be found and WITH_COMPRESSION_SNAPPY=ON, please specify SNAPPY_ROOT to point to the correct location or set WITH_COMPRESSION_SNAPPY to OFF")
+  endif()
 endif()
 
 macro(add_snappy_module)
   hpx_debug("add_snappy_module" "SNAPPY_FOUND: ${SNAPPY_FOUND}")
-  if(HPX_HAVE_COMPRESSION_SNAPPY AND SNAPPY_FOUND)
-    hpx_include_sys_directories("${SNAPPY_INCLUDE_DIR}")
-    hpx_link_sys_directories("${SNAPPY_LIBRARY_DIR}")
+  if(WITH_COMPRESSION_SNAPPY)
+    include_directories("${SNAPPY_INCLUDE_DIR}")
 
     add_hpx_library(compress_snappy
       SOURCES "${hpx_SOURCE_DIR}/plugins/binary_filter/snappy/snappy_serialization_filter.cpp"
       HEADERS "${hpx_SOURCE_DIR}/hpx/plugins/binary_filter/snappy_serialization_filter.hpp"
       FOLDER "Core/Plugins/Compression"
-      DEPENDENCIES "${SNAPPY_LIBRARY}")
+      DEPENDENCIES ${SNAPPY_LIBRARIES})
 
     set_property(TARGET compress_snappy_lib APPEND
       PROPERTY COMPILE_DEFINITIONS

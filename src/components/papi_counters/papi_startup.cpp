@@ -271,7 +271,8 @@ namespace hpx { namespace performance_counters { namespace papi
             "the current count of occurrences of a specific PAPI event",
             HPX_PERFORMANCE_COUNTER_V1,
             &create_papi_counter,
-            &discover_papi_counters
+            &discover_papi_counters,
+            ""
         };
         install_counter_types(&papi_cnt_type, 1);
 

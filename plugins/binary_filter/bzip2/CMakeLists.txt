@@ -15,8 +15,7 @@ endif()
 macro(add_bzip2_module)
   hpx_debug("add_bzip2_module" "BZIP2_FOUND: ${BZIP2_FOUND}")
   if(WITH_COMPRESSION_BZIP2)
-    hpx_include_sys_directories(${BZIP2_INCLUDE_DIR})
-    hpx_link_sys_directories(${BZIP2_LIBRARY_DIR})
+    include_directories(${BZIP2_INCLUDE_DIR})
 
     add_hpx_library(compress_bzip2
       SOURCES "${hpx_SOURCE_DIR}/plugins/binary_filter/bzip2/bzip2_serialization_filter.cpp"

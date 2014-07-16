@@ -6,13 +6,10 @@
 
 macro(add_hpx_library name)
   # retrieve arguments
-  hpx_parse_arguments(${name}
-    "SOURCES;HEADERS;DEPENDENCIES;COMPONENT_DEPENDENCIES;COMPILE_FLAGS;LINK_FLAGS;FOLDER;SOURCE_ROOT;HEADER_ROOT;SOURCE_GLOB;HEADER_GLOB;OUTPUT_SUFFIX;INSTALL_SUFFIX;LANGUAGE"
-    "ESSENTIAL;NOLIBS;AUTOGLOB;STATIC" ${ARGN})
-
-  if(NOT ${name}_LANGUAGE)
-    set(${name}_LANGUAGE CXX)
-  endif()
+  set(options ESSENTIAL NOLIBS AUTOGLOB STATIC)
+  set(one_value_args FOLDER SOURCE_ROOT HEADER_ROOT SOURCE_GLOB HEADER_GLOB OUTPUT_SUFFIX INSTALL_SUFFIX)
+  set(multi_value_args SOURCES HEADERS DEPENDENCIES COMPONENT_DEPENDENCIES COMPILER__FLAGS LINK_FLAGS)
+  cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   if(NOT ${name}_SOURCE_ROOT)
     set(${name}_SOURCE_ROOT ".")

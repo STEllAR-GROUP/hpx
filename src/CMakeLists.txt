@@ -211,10 +211,6 @@ set_property(TARGET hpx_serialization APPEND
   "HPX_EXPORTS"
   "HPX_COROUTINE_EXPORTS")
 
-# if(NOT HPX_NO_INSTALL)
-#   hpx_library_install(hpx_serialization ${LIB}/hpx)
-# endif()
-
 ################################################################################
 # libhpx
 if(WITH_DEFAULT_BUILD_TARGETS)
@@ -254,10 +250,6 @@ set_property(TARGET hpx APPEND
   "HPX_ENABLE_ASSERT_HANDLER"
   "HPX_COROUTINE_EXPORTS") # Do we still need this?
 
-#if(NOT HPX_NO_INSTALL)
-#  hpx_library_install(hpx ${LIB}/hpx)
-#endif()
-
 ################################################################################
 # libhpx_init
 if(WITH_DEFAULT_BUILD_TARGETS)
@@ -276,8 +268,24 @@ set_property(TARGET hpx_init APPEND
 
 set_property(TARGET hpx_init PROPERTY FOLDER "Core")
 
-if(NOT HPX_NO_INSTALL)
-  hpx_archive_install(hpx_init ${LIB}/hpx)
+set(_optional)
+if(WITH_DEFAULT_BUILD_TARGETS)
+  set(_optional OPTIONAL)
 endif()
+
+install(
+  TARGETS
+    hpx_serialization
+    hpx
+    hpx_init
+  EXPORT HPXTargets
+  LIBRARY DESTINATION ${LIB}
+  ARCHIVE DESTINATION ${LIB}
+  RUNTIME DESTINATION bin
+  COMPONENT runtime
+  ${_optional}
+)
+
+set(HPX_EXPORT_TARGETS ${HPX_EXPORT_TARGETS} hpx_serialization hpx hpx_init)
 
 set(HPX_CONFIG_DEFINITIONS ${HPX_CONFIG_DEFINITIONS} PARENT_SCOPE)

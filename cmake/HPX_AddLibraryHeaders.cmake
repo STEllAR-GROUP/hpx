@@ -6,9 +6,12 @@
 
 macro(add_hpx_library_headers name globtype)
   if(MSVC)
-    hpx_parse_arguments(HEADERS "EXCLUDE;GLOBS" "APPEND" ${ARGN})
+    set(options APPEND)
+    set(one_value_args)
+    set(multi_value_args EXCLUDE GLOBS)
+    cmake_parse_arguments(HEADERS "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
-    if(NOT ${HEADERS_APPEND})
+    if(NOT HEADERS_APPEND)
       set(${name}_HEADERS "" CACHE INTERNAL "Headers for lib${name}." FORCE)
     endif()
 
@@ -38,14 +41,17 @@ endmacro()
 ###############################################################################
 macro(add_hpx_library_headers_noglob name)
   if(MSVC)
-    hpx_parse_arguments(HEADERS "EXCLUDE;HEADERS" "APPEND" ${ARGN})
+    set(options APPEND)
+    set(one_value_args)
+    set(multi_value_args EXCLUDE HEADERS)
+    cmake_parse_arguments(HEADERS "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
 #    hpx_print_list("DEBUG" "add_hpx_library_sources_noglob.${name}"
 #      "Sources for ${name}" ${HEADERS_HEADERS})
 
     set(headers ${HEADERS_HEADERS})
 
-    if(NOT ${HEADERS_APPEND})
+    if(NOT HEADERS_APPEND)
       set(${name}_HEADERS "" CACHE INTERNAL "Headers for lib${name}." FORCE)
     endif()
 

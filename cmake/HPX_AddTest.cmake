@@ -4,8 +4,10 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 macro(add_hpx_test category name)
-  hpx_parse_arguments(${name} "EXECUTABLE;LOCALITIES;THREADS_PER_LOCALITY;ARGS"
-                              "FAILURE_EXPECTED" ${ARGN})
+  set(options FAILURE_EXPECTED)
+  set(one_value_args EXECUTABLE LOCALITIES THREADS_PER_LOCALITY)
+  set(multi_value_args ARGS)
+  cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   if(NOT ${name}_LOCALITIES)
     set(${name}_LOCALITIES 1)
@@ -39,7 +41,7 @@ macro(add_hpx_test category name)
           "-l" "${${name}_LOCALITIES}"
           "-t" "${${name}_THREADS_PER_LOCALITY}")
 
-  if("${${name}_LOCALITIES}" STREQUAL "1")
+  if(${name}_LOCALITIES STREQUAL "1")
     add_test(
       NAME "${category}.${name}"
       COMMAND ${cmd} ${args})
