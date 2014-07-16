@@ -286,6 +286,4 @@ install(
   ${_optional}
 )
 
-set(HPX_EXPORT_TARGETS ${HPX_EXPORT_TARGETS} hpx_serialization hpx hpx_init)
-
-set(HPX_CONFIG_DEFINITIONS ${HPX_CONFIG_DEFINITIONS} PARENT_SCOPE)
+hpx_export_targets(hpx_serialization hpx hpx_init)

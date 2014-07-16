@@ -34,8 +34,8 @@ file(
     COPY "${HPX_SOURCE_DIR}/docs/html"
   DESTINATION "${CMAKE_BINARY_DIR}/gh-pages/docs")
 
-if(HPX_BUILD_TYPE)
-  set(doc_dir ${CMAKE_BINARY_DIR}/${HPX_BUILD_TYPE}/../share/hpx-${HPX_VERSION})
+if(CMAKE_BUILD_TYPE)
+  set(doc_dir ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/../share/hpx-${HPX_VERSION})
 else()
   set(doc_dir ${CMAKE_BINARY_DIR}/../share/hpx-${HPX_VERSION})
 endif()

@@ -3,4 +3,37 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+# include exported targets
 include("${CMAKE_CURRENT_LIST_DIR}/HPXTargets.cmake")
+
+# include HPX cmake utilities
+include("${CMAKE_CURRENT_LIST_DIR}/HPXMacros.cmake")
+
+get_filename_component(_hpx_root_dir "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
+
+set(HPX_INCLUDE_DIRS @HPX_CONF_INCLUDE_DIRS@)
+
+set(HPX_LIBRARIES @HPX_LIBRARIES@)
+
+set(HPX_MAJOR_VERSION @HPX_MAJOR_VERSION@)
+set(HPX_MINOR_VERSION @HPX_MINOR_VERSION@)
+set(HPX_PATCH_LEVEL   @HPX_PATCH_LEVEL@)
+
+set(HPX_PREFIX "${_hpx_root_dir}")
+
+set(HPX_GIT_COMMIT @HPX_GIT_COMMIT@
+    CACHE STRING "Revision of HPX from Git")
+
+set(HPX_C_COMPILER "@CMAKE_C_COMPILER@" CACHE STRING "C compiler for HPX")
+
+set(HPX_CXX_COMPILER "@CMAKE_CXX_COMPILER@" CACHE STRING "CXX compiler for HPX")
+
+set(HPX_Fortran_COMPILER "@CMAKE_Fortran_COMPILER@" CACHE STRING "Fortran compiler for HPX")
+
+# Enforce C++11 mode
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} @CXX11_FLAG@)
+
+hpx_check_compiler_compatibility()
+if(NOT HPX_DISABLE_FIND_BOOST)
+  include(HPX_SetupBoost)
+endif()

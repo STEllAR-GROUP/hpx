@@ -4,6 +4,10 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+if(NOT DEFINED HPX_LIBRARIES)
+  set(HPX_LIBRARIES CACHE INTERNAL "" FORCE)
+endif()
+
 macro(hpx_libraries)
   set(_libs)
   set(_keyword "")
@@ -27,5 +31,5 @@ macro(hpx_libraries)
       set(_skip FALSE)
     endif()
   endforeach()
-  set(HPX_LIBRARIES ${HPX_LIBRARIES} ${_libs})
+  set(HPX_LIBRARIES ${HPX_LIBRARIES} ${_libs} CACHE INTERNAL "" FORCE)
 endmacro()

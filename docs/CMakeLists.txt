@@ -220,7 +220,7 @@ set_source_files_properties(${documentation_files}
 if(MSVC)
   add_custom_target(git_docs
     COMMAND "${CMAKE_COMMAND}"
-    -DHPX_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+    -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
       -DHPX_SOURCE_DIR:PATH=${CMAKE_SOURCE_DIR}
       -DHPX_VERSION:STRING=${HPX_VERSION}
       -DHPX_DOCUMENTATION_FILES=\"${documentation_dependencies}\"

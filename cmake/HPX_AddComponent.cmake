@@ -109,29 +109,15 @@ macro(add_hpx_component name)
   set(hpx_libs "")
 
   if(NOT ${name}_NOLIBS)
-    if(HPX_EXTERNAL_CMAKE)
-      set(hpx_libs ${HPX_LIBRARIES})
-    else()
-      set(hpx_libs ${hpx_LIBRARIES})
-    endif()
+    set(hpx_libs ${hpx_LIBRARIES})
 
-    if(HPX_EXTERNAL_CMAKE AND "${HPX_BUILD_TYPE}" STREQUAL "Debug")
-      set(hpx_libs hpx${HPX_DEBUG_POSTFIX} hpx_serialization${HPX_DEBUG_POSTFIX} ${hpx_libs})
-    else()
-      set(hpx_libs hpx hpx_serialization ${hpx_libs})
-    endif()
+    set(hpx_libs hpx hpx_serialization ${hpx_libs})
   endif()
 
   list(REMOVE_DUPLICATES hpx_libs)
 
   target_link_libraries(${name}_component
     ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} ${hpx_libs})
-
-  if(HPX_EXTERNAL_CMAKE AND "${HPX_BUILD_TYPE}" STREQUAL "Debug")
-    set(lib_name ${name}${HPX_DEBUG_POSTFIX})
-  else()
-    set(lib_name ${name})
-  endif()
 
   # set properties of generated shared library
   set_target_properties(${name}_component PROPERTIES
@@ -140,7 +126,7 @@ macro(add_hpx_component name)
     SOVERSION ${HPX_SOVERSION}
     # allow creating static and shared libs without conflicts
     CLEAN_DIRECT_OUTPUT 1
-    OUTPUT_NAME ${lib_name})
+    OUTPUT_NAME ${name})
 
   if(${name}_OUTPUT_SUFFIX)
     if(MSVC)

@@ -139,20 +139,11 @@ macro(add_hpx_executable name)
 
   # linker instructions
   if(NOT ${name}_NOLIBS)
-    if(HPX_EXTERNAL_CMAKE AND "${HPX_BUILD_TYPE}" STREQUAL "Debug")
-      set(hpx_libs
-        hpx${HPX_DEBUG_POSTFIX}
-        hpx_serialization${HPX_DEBUG_POSTFIX})
-      if(NOT ${name}_NOHPXINIT)
-        set(hpx_libs ${hpx_libs} hpx_init${HPX_DEBUG_POSTFIX})
-      endif()
-    else()
-      set(hpx_libs
-        hpx
-        hpx_serialization)
-      if(NOT ${name}_NOHPXINIT)
-        set(hpx_libs ${hpx_libs} hpx_init)
-      endif()
+    set(hpx_libs
+      hpx
+      hpx_serialization)
+    if(NOT ${name}_NOHPXINIT)
+      set(hpx_libs ${hpx_libs} hpx_init)
     endif()
 
     set(hpx_libs ${hpx_libs} ${HPX_LIBRARIES})

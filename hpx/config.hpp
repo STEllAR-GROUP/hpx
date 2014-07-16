@@ -39,12 +39,10 @@
 #  define HPX_DEBUG
 #endif
 
-#if !defined(HPX_BUILD_TYPE)
-#  if defined(HPX_DEBUG)
-#    define HPX_BUILD_TYPE debug
-#  else
-#    define HPX_BUILD_TYPE release
-#  endif
+#if defined(HPX_DEBUG)
+#  define HPX_BUILD_TYPE debug
+#else
+#  define HPX_BUILD_TYPE release
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

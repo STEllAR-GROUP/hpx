@@ -32,8 +32,6 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Configuration type (one of Debug, RelWithDebInfo, Release, MinSizeRel)")
 endif()
 
-set(HPX_BUILD_TYPE "${CMAKE_BUILD_TYPE}")
-
 ################################################################################
 # project metadata
 ################################################################################
@@ -60,25 +58,10 @@ include(CMakeDependentOption)
 
 # include additional macro definitions
 include(HPX_Utils)
-
-if(NOT DEFINED HPX_DEFINITIONS)
-  set(HPX_DEFINITIONS CACHE INTERNAL FORCE)
-endif()
-if(NOT DEFINED HPX_LIBRARIES)
-  set(HPX_LIBRARIES CACHE INTERNAL "" FORCE)
-endif()
-
-if(NOT DEFINED HPX_CONFIG_DEFINITIONS)
-  set(HPX_CONFIG_DEFINITIONS "" CACHE INTERNAL "" FORCE)
-else()
-  set(HPX_CONFIG_DEFINITIONS ${HPX_CONFIG_DEFINITIONS} CACHE INTERNAL FORCE)
-endif()
-
-if(NOT DEFINED HPX_EXPORT_TARGETS)
-  set(HPX_EXPORT_TARGETS "" CACHE INTERNAL "" FORCE)
-else()
-  set(HPX_EXPORT_TARGETS ${HPX_EXPORT_TARGETS} CACHE INTERNAL FORCE)
-endif()
+include(HPX_ExportTargets)
+include(HPX_Libraries)
+include(HPX_AddConfigTest)
+include(HPX_AddDefinitions)
 
 hpx_force_out_of_tree_build("This project requires an out-of-source-tree build. See README.rst. Clean your CMake cache and CMakeFiles if this message persists.")
 
@@ -733,16 +716,16 @@ if(NOT MSVC)
   if(NOT WITH_CXX11)
     check_cxx_compiler_flag(-std=c++0x WITH_CXX0X)
     if(WITH_CXX0X)
-      set(_cxx11_flag -std=c++0x)
+      set(CXX11_FLAG -std=c++0x)
       set(WITH_CXX11 TRUE)
     endif()
   else()
-    set(_cxx11_flag -std=c++11)
+    set(CXX11_FLAG -std=c++11)
   endif()
   if(NOT WITH_CXX11)
     hpx_error("Unable to compile HPX without C++11 support in your compiler. HPX needs at the very least rvalue references with proper move semantics")
   endif()
-  hpx_add_compile_flag(${_cxx11_flag})
+  hpx_add_compile_flag(${CXX11_FLAG})
 
   ##############################################################################
   # Macro definitions for system headers
@@ -1430,158 +1413,10 @@ endif()
 
 include(HPX_GeneratePackage)
 
-# set(HPX_LINK_DIRECTORIES
-#     "${CMAKE_INSTALL_PREFIX}/lib/hpx" ${HPX_LINK_DIRECTORIES})
-# set(HPX_INCLUDE_DIRECTORIES
-#     "${CMAKE_INSTALL_PREFIX}/include" ${HPX_INCLUDE_DIRECTORIES}
-#     "${CMAKE_INSTALL_PREFIX}/include/hpx/external")
-#
-# list(REMOVE_DUPLICATES HPX_LINK_DIRECTORIES)
-# list(REMOVE_DUPLICATES HPX_INCLUDE_DIRECTORIES)
-#
-# set(external_rpath "")
-# set(external_link_directories "")
-# set(external_libraries "")
-# set(external_libraries_name "")
-# set(external_link_flags "")
-# set(external_include_directories "")
-# set(external_include_flags "")
-#
-# foreach(directory ${HPX_LINK_DIRECTORIES})
-#   string(REGEX REPLACE "([ ()])" "\\\\\\1" directory "${directory}")
-#   set(external_link_directories "${external_link_directories} ${directory}")
-#   set(external_link_flags "${external_link_flags} -L${directory}")
-#   set(external_rpath "${external_rpath}:${directory}")
-# endforeach()
-#
-# #hpx_info("external_link_directories" "hpx_LIBRARIES: ${hpx_LIBRARIES}")
-# foreach(lib ${hpx_LIBRARIES})
-#   get_filename_component(lib_dir ${lib} PATH)
-#   if(lib_dir)
-#     string(REGEX REPLACE "([ ()])" "\\\\\\1" lib_dir "${lib_dir}")
-#     set(external_link_directories "${external_link_directories} ${lib_dir}")
-#   endif()
-#   get_filename_component(lib ${lib} NAME_WE)
-#
-#   # if a library starts with 'lib' on Windows, this is probably by design
-#   if(NOT MSVC)
-#     string(REGEX REPLACE "^lib" "" lib ${lib})
-#   endif()
-#
-#   set(external_libraries "${external_libraries} ${lib}")
-#   set(external_libraries_name "${external_libraries_name} -l${lib}")
-# endforeach()
-#
-# # Make lists unique
-# list(REMOVE_DUPLICATES external_link_directories)
-# list(REMOVE_DUPLICATES external_libraries)
-# list(REMOVE_DUPLICATES external_libraries_name)
-#
-# if(HPX_NO_INSTALL)
-# #  foreach(PREFIX ${HPX_PREFIX})
-# #    list(REMOVE_ITEM HPX_INCLUDE_DIRECTORIES "${PREFIX}/include)"
-# #                                             "${PREFIX}/include/hpx/external")
-# #  endforeach()
-# else()
-#   list(REMOVE_ITEM HPX_INCLUDE_DIRECTORIES "${hpx_SOURCE_DIR}"
-#                                            "${CMAKE_BINARY_DIR}")
-# endif()
-#
-# foreach(directory ${HPX_INCLUDE_DIRECTORIES})
-#   string(REGEX REPLACE "([ ()])" "\\\\\\1" directory "${directory}")
-#   set(external_include_directories "${external_include_directories} ${directory}")
-#   set(external_include_flags "${external_include_flags} -I${directory}")
-# endforeach()
-#
-# # Make lists unique
-# list(REMOVE_DUPLICATES external_include_directories)
-# list(REMOVE_DUPLICATES external_include_flags)
-#
-# set(boost_library_info "")
-#
-# foreach(library ${BOOST_LIBRARIES})
-#   string(TOUPPER ${library} library_uc)
-#   string(REGEX REPLACE "([ ()])" "\\\\\\1" "BOOST_${library_uc}_LIBRARY" "${BOOST_${library_uc}_LIBRARY}")
-#   set(boost_library_info
-#     "${boost_library_info}set(HPX_BOOST_${library_uc}_LIBRARY ${BOOST_${library_uc}_LIBRARY})\n")
-# # FIXME: this doesn't work when used in external projects
-# #  set(boost_library_info
-# #    "${boost_library_info}    CACHE FILEPATH \"Boost ${library} shared library.\")\n")
-# endforeach()
-#
-# set(external_definitions "")
-#
-# foreach(definition ${HPX_DEFINITIONS})
-#     set(external_definitions "${external_definitions} ${definition}")
-# endforeach()
-#
-# # Make list unique
-# list(REMOVE_DUPLICATES external_definitions)
-#
-# set(CMAKE_DIR "cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" CACHE STRING "directory (in share), where to put FindHPX cmake module")
-#
-# if(MSVC)
-#   set(output_dir "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
-# else()
-#   set(output_dir "${CMAKE_BINARY_DIR}")
-# endif()
-#
-# string(REGEX REPLACE "([ ()])" "\\\\\\1" HPX_PREFIX "${HPX_PREFIX}")
-# if(HPX_NO_INSTALL)
-#   set(external_cmake_path "${hpx_SOURCE_DIR}/cmake")
-# else()
-#     set(external_cmake_path "${CMAKE_INSTALL_PREFIX}/share/hpx-${HPX_VERSION}/cmake")
-# endif()
-#
-# set(hpx_link_flag_target_properties "")
-# if(MSVC AND HPX_LINK_FLAG_TARGET_PROPERTIES)
-#   set(hpx_link_flag_target_properties "${HPX_LINK_FLAG_TARGET_PROPERTIES}")
-# endif()
-#
-# configure_file("${hpx_SOURCE_DIR}/cmake/templates/FindHPX.cmake.in"
-#                "${output_dir}/share/${CMAKE_DIR}/Modules/FindHPX.cmake"
-#                ESCAPE_QUOTES @ONLY)
-#
-# if(NOT HPX_NO_INSTALL)
-#   install(FILES "${output_dir}/share/${CMAKE_DIR}/Modules/FindHPX.cmake"
-#           DESTINATION "share/${CMAKE_DIR}/Modules")
-# endif()
-#
-# if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
-#     configure_file("${hpx_SOURCE_DIR}/cmake/templates/hpx_application.pc.in"
-#                    "${output_dir}/lib/pkgconfig/hpx_application.pc"
-#                    @ONLY)
-#     configure_file("${hpx_SOURCE_DIR}/cmake/templates/hpx_component.pc.in"
-#                    "${output_dir}/lib/pkgconfig/hpx_component.pc"
-#                    @ONLY)
-# else()
-#     configure_file("${hpx_SOURCE_DIR}/cmake/templates/hpx_application_debug.pc.in"
-#                    "${output_dir}/lib/pkgconfig/hpx_application_debug.pc"
-#                    @ONLY)
-#
-#     configure_file("${hpx_SOURCE_DIR}/cmake/templates/hpx_component_debug.pc.in"
-#                    "${output_dir}/lib/pkgconfig/hpx_component_debug.pc"
-#                    @ONLY)
-# endif()
-#
-# if(NOT HPX_NO_INSTALL)
-#   if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
-#     install(FILES "${output_dir}/lib/pkgconfig/hpx_application.pc"
-#             DESTINATION ${LIB}/pkgconfig)
-#     install(FILES "${output_dir}/lib/pkgconfig/hpx_component.pc"
-#             DESTINATION ${LIB}/pkgconfig)
-#   else()
-#     install(FILES "${output_dir}/lib/pkgconfig/hpx_application_debug.pc"
-#             DESTINATION ${LIB}/pkgconfig)
-#     install(FILES "${output_dir}/lib/pkgconfig/hpx_component_debug.pc"
-#             DESTINATION ${LIB}/pkgconfig)
-#   endif()
-# endif()
-#
-# # Create a symlink in share pointing to the latest HPX installation
-# execute_process(COMMAND
-#   "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx"
-#   WORKING_DIRECTORY "${output_dir}/share")
+# Create a symlink in share pointing to the latest HPX installation
+execute_process(COMMAND
+  "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx"
+  WORKING_DIRECTORY "${output_dir}/share")
 
 set(_HPX_INFO_STRING "\nHPX has been configured with the following options:\n\n")
 
@@ -1615,3 +1450,7 @@ endforeach()
 #message(${_HPX_INFO_STRING})
 message("HPX will be installed to ${CMAKE_INSTALL_PREFIX}")
 message("")
+
+
+message("${HPX_LIBRARIES}")
+message("${HPX_CONFIG_DEFINITIONS}")

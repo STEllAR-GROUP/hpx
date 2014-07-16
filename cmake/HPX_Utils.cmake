@@ -8,16 +8,13 @@ include(HPX_Include)
 hpx_include(Message
             Option
             AppendProperty
-            Libraries
             Install
             TargetPaths
             AddCompileFlag
             AddLinkFlag
             AddComponent
-            AddDefinitions
             AddLibrary
             AddExecutable
-            AddConfigTest
             AddTest
             AddPseudoDependencies
             AddPseudoTarget
