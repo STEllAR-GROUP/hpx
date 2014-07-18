@@ -133,6 +133,7 @@ foreach(benchmark ${benchmarks})
   add_hpx_executable(${benchmark}
                      SOURCES ${sources}
                      ${${benchmark}_FLAGS}
+                     EXCLUDE_FROM_ALL
                      FOLDER "Benchmarks/Local/${benchmark}")
 
   # add a custom target for this example

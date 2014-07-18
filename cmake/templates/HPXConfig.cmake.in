@@ -9,7 +9,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/HPXTargets.cmake")
 # include HPX cmake utilities
 include("${CMAKE_CURRENT_LIST_DIR}/HPXMacros.cmake")
 
-get_filename_component(_hpx_root_dir "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
+get_filename_component(_hpx_root_dir "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
 
 set(HPX_INCLUDE_DIRS @HPX_CONF_INCLUDE_DIRS@)
 
@@ -33,7 +33,11 @@ set(HPX_Fortran_COMPILER "@CMAKE_Fortran_COMPILER@" CACHE STRING "Fortran compil
 # Enforce C++11 mode
 set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} @CXX11_FLAG@)
 
+set(HPX_BOOST_ROOT @BOOST_ROOT@)
+set(HPX_MALLOC @WITH_MALLOC@)
+
+enable_language(C)
+
 hpx_check_compiler_compatibility()
-if(NOT HPX_DISABLE_FIND_BOOST)
-  include(HPX_SetupBoost)
-endif()
+hpx_check_boost_compatibility()
+hpx_setup_allocator()

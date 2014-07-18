@@ -6,7 +6,7 @@
 
 macro(add_hpx_library name)
   # retrieve arguments
-  set(options ESSENTIAL NOLIBS AUTOGLOB STATIC)
+  set(options EXCLUDE_FROM_ALL NOLIBS AUTOGLOB STATIC)
   set(one_value_args FOLDER SOURCE_ROOT HEADER_ROOT SOURCE_GLOB HEADER_GLOB OUTPUT_SUFFIX INSTALL_SUFFIX)
   set(multi_value_args SOURCES HEADERS DEPENDENCIES COMPONENT_DEPENDENCIES COMPILER__FLAGS LINK_FLAGS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
@@ -86,42 +86,39 @@ macro(add_hpx_library name)
   hpx_print_list("DEBUG" "add_library.${name}" "Dependencies for ${name}" ${name}_DEPENDENCIES)
   hpx_print_list("DEBUG" "add_library.${name}" "Component dependencies for ${name}" ${name}_COMPONENT_DEPENDENCIES)
 
+  set(exclude_from_all)
+  set(install_options)
+  if(${name}_EXCLUDE_FROM_ALL)
+    set(exclude_from_all EXCLUDE_FROM_ALL)
+  else()
+    if(${name}_PLUGIN)
+      set(install_destination lib/hpx)
+      set(${name}_OUTPUT_SUFFIX lib/hpx)
+    else()
+      set(install_destination lib)
+    endif()
+    if(${name}_INSTALL_SUFFIX)
+      set(install_destination ${${name}_INSTALL_SUFFIX})
+    endif()
+    set(_target_flags ${_target_flags}
+      INSTALL
+      INSTALL_FLAGS
+        DESTINATION ${install_destination}
+    )
+  endif()
+
+  if(${name}_PLUGIN)
+    set(_target_flags ${_target_flags} PLUGIN)
+  endif()
+
   if(${${name}_STATIC})
     set(${name}_lib_linktype STATIC)
   else()
     set(${name}_lib_linktype SHARED)
   endif()
 
-  set(exclude_from_all EXCLUDE_FROM_ALL)
-
-  if(${name}_ESSENTIAL)
-    add_library(${name}_lib ${${name}_lib_linktype}
-      ${${name}_SOURCES} ${${name}_HEADERS})
-  else()
-    add_library(${name}_lib ${${name}_lib_linktype} ${exclude_from_all}
-      ${${name}_SOURCES} ${${name}_HEADERS})
-  endif()
-
-  hpx_handle_component_dependencies(${name}_COMPONENT_DEPENDENCIES)
-
-  set(hpx_lib hpx hpx_serialization)
-
-  if(NOT ${name}_NOLIBS)
-    target_link_libraries(${name}_lib
-      ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} ${hpx_lib})
-  else()
-    target_link_libraries(${name}_lib
-      ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES})
-  endif()
-
-  # set properties of generated shared library
-  set_target_properties(${name}_lib PROPERTIES
-    # create *nix style library versions + symbolic links
-    VERSION ${HPX_LIBRARY_VERSION}
-    SOVERSION ${HPX_SOVERSION}
-    # allow creating static and shared libs without conflicts
-    CLEAN_DIRECT_OUTPUT 1
-    OUTPUT_NAME ${name})
+  add_library(${name}_lib ${${name}_lib_linktype} ${exclude_from_all}
+    ${${name}_SOURCES} ${${name}_HEADERS})
 
   if(${name}_OUTPUT_SUFFIX)
     if(MSVC)
@@ -146,28 +143,19 @@ macro(add_hpx_library name)
     endif()
   endif()
 
-  if(${name}_COMPILE_FLAGS)
-    hpx_append_property(${name}_lib COMPILE_FLAGS ${${name}_COMPILE_FLAGS})
-  endif()
+  hpx_setup_target(
+    ${name}_lib
+    TYPE LIBRARY
+    NAME ${name}
+    EXPORT
+    FOLDER ${${name}_FOLDER}
+    COMPILE_FLAGS ${${name}_COMPILE_FLAGS}
+    LINK_FLAGS ${${name}_LINK_FLAGS}
+    DEPENDENCIES ${${name}_DEPENDENCIES}
+    COMPONENT_DEPENDENCIES ${${name}_COMPONENT_DEPENDENCIES}
+    ${_target_flags}
+    ${install_optional}
+  )
 
-  if(${name}_LINK_FLAGS)
-    hpx_append_property(${name}_lib LINK_FLAGS ${${name}_LINK_FLAGS})
-  endif()
-
-  if(${name}_FOLDER)
-    set_target_properties(${name}_lib PROPERTIES FOLDER "${${name}_FOLDER}")
-  endif()
-
-  set_property(TARGET ${name}_lib APPEND
-               PROPERTY COMPILE_DEFINITIONS
-                 "HPX_LIBRARY_EXPORTS")
-
-  if(NOT HPX_NO_INSTALL)
-    if(${name}_INSTALL_SUFFIX)
-      hpx_library_install("${name}_lib" "${${name}_INSTALL_SUFFIX}")
-    else()
-      hpx_library_install(${name}_lib ${LIB}/hpx)
-    endif()
-  endif()
 endmacro()
 

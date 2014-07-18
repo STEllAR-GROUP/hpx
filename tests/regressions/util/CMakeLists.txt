@@ -45,6 +45,7 @@ foreach(test ${tests})
   add_hpx_executable(${test}_test
                      SOURCES ${sources}
                      ${${test}_FLAGS}
+                     EXCLUDE_FROM_ALL
                      FOLDER "Tests/Regressions/Util")
 
   add_hpx_regression_test("util" ${test} ${${test}_PARAMETERS})

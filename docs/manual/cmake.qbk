@@ -1,6 +1,6 @@
 [/==============================================================================
     Copyright (C) 2007-2013 Hartmut Kaiser
-    Copyright (C)      2013 Thomas Heller
+    Copyright (C) 2013-2014 Thomas Heller
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -285,7 +285,7 @@ all applications built with __hpx__. For more information about the
 avalable scheduling policies see the section __scheduling__.
 
 [variablelist Enable __hpx__ Scheduling Policies
-    [[`HPX_STATIC_PRIORITY_SCHEDULER:BOOL`] 
+    [[`HPX_STATIC_PRIORITY_SCHEDULER:BOOL`]
      [Enable static priority scheduling policy (default: `OFF`)]
     ]
     [[`HPX_STATI_SCHEDULER:BOOL`]

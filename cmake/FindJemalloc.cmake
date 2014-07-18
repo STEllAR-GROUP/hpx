@@ -42,8 +42,4 @@ if(_type)
   endif()
 endif()
 
-if(NOT JEMALLOC_FOUND AND NOT Jemalloc_FIND_QUIETLY)
-  message("    Set JEMALLOC_ROOT to the location where jemalloc is installed")
-endif()
-
 mark_as_advanced(JEMALLOC_ROOT JEMALLOC_LIBRARY JEMALLOC_INCLUDE_DIR)

@@ -19,20 +19,12 @@ macro(add_zlib_module)
     include_directories(${ZLIB_INCLUDE_DIRS})
 
     add_hpx_library(compress_zlib
+      PLUGIN
       SOURCES "${hpx_SOURCE_DIR}/plugins/binary_filter/zlib/zlib_serialization_filter.cpp"
       HEADERS "${hpx_SOURCE_DIR}/hpx/plugins/binary_filter/zlib_serialization_filter.hpp"
       FOLDER "Core/Plugins/Compression"
       DEPENDENCIES ${ZLIB_LIBRARIES})
 
-    set_property(TARGET compress_zlib_lib APPEND
-      PROPERTY COMPILE_DEFINITIONS
-      "HPX_LIBRARY_EXPORTS"
-      "HPX_PLUGIN_NAME=compress_zlib")
-
     add_hpx_pseudo_dependencies(plugins.binary_filter.zlib compress_zlib_lib)
-
-    if(NOT HPX_NO_INSTALL)
-      hpx_library_install(compress_zlib_lib ${LIB}/hpx)
-    endif()
   endif()
 endmacro()

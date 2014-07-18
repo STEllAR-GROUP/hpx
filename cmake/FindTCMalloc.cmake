@@ -43,8 +43,4 @@ if(_type)
   endif()
 endif()
 
-if(NOT TCMALLOC_FOUND AND NOT TCMalloc_FIND_QUIETLY)
-  message("    Set TCMALLOC_ROOT to the location where tcmalloc is installed")
-endif()
-
 mark_as_advanced(TCMALLOC_ROOT TCMALLOC_LIBRARY TCMALLOC_INCLUDE_DIR)

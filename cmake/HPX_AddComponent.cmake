@@ -6,7 +6,7 @@
 
 macro(add_hpx_component name)
   # retrieve arguments
-  set(options ESSENTIAL AUTOGLOB NOLIBS STATIC)
+  set(options EXCLUDE_FROM_ALL AUTOGLOB STATIC PLUGIN)
   set(one_value_args INI FOLDER SOURCE_ROOT HEADER_ROOT SOURCE_GLOB HEADER_GLOB OUTPUT_SUFFIX INSTALL_SUFFIX LANGUAGE)
   set(multi_value_args SOURCES HEADERS DEPENDENCIES COMPONENT_DEPENDENCIES COMPILE_FLAGS LINK_FLAGS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
@@ -97,36 +97,34 @@ macro(add_hpx_component name)
   hpx_print_list("DEBUG" "Add component ${name}: Configuration files for ${name}" ${name}_INI)
 
   set(exclude_from_all)
-  if(NOT ${name}_ESSENTIAL)
+  set(install_options)
+  if(${name}_EXCLUDE_FROM_ALL)
     set(exclude_from_all EXCLUDE_FROM_ALL)
+  else()
+    if(${name}_PLUGIN)
+      set(install_destination lib/hpx)
+      set(${name}_OUTPUT_SUFFIX lib/hpx)
+    else()
+      set(install_destination lib)
+    endif()
+    if(${name}_INSTALL_SUFFIX)
+      set(install_destination ${${name}_INSTALL_SUFFIX})
+    endif()
+    set(_target_flags
+      INSTALL
+      INSTALL_FLAGS
+        DESTINATION ${install_destination}
+    )
   endif()
 
-  add_library(${name}_component SHARED ${exclude_from_all}
+  if(${${name}_STATIC})
+    set(${name}_lib_linktype STATIC)
+  else()
+    set(${name}_lib_linktype SHARED)
+  endif()
+
+  add_library(${name}_component ${${name}_lib_linktype} ${exclude_from_all}
     ${${name}_SOURCES} ${${name}_HEADERS})
-
-  hpx_handle_component_dependencies(${name}_COMPONENT_DEPENDENCIES)
-
-  set(hpx_libs "")
-
-  if(NOT ${name}_NOLIBS)
-    set(hpx_libs ${hpx_LIBRARIES})
-
-    set(hpx_libs hpx hpx_serialization ${hpx_libs})
-  endif()
-
-  list(REMOVE_DUPLICATES hpx_libs)
-
-  target_link_libraries(${name}_component
-    ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} ${hpx_libs})
-
-  # set properties of generated shared library
-  set_target_properties(${name}_component PROPERTIES
-    # create *nix style library versions + symbolic links
-    VERSION ${HPX_LIBRARY_VERSION}
-    SOVERSION ${HPX_SOVERSION}
-    # allow creating static and shared libs without conflicts
-    CLEAN_DIRECT_OUTPUT 1
-    OUTPUT_NAME ${name})
 
   if(${name}_OUTPUT_SUFFIX)
     if(MSVC)
@@ -151,40 +149,18 @@ macro(add_hpx_component name)
     endif()
   endif()
 
-  if(${name}_COMPILE_FLAGS)
-    hpx_append_property(${name}_component COMPILE_FLAGS ${${name}_COMPILE_FLAGS})
-  endif()
-
-  if(${name}_LINK_FLAGS)
-    hpx_append_property(${name}_component LINK_FLAGS ${${name}_LINK_FLAGS})
-  endif()
-
-  if(HPX_${${name}_LANGUAGE}_COMPILE_FLAGS)
-    set_property(TARGET ${name}_component APPEND
-      PROPERTY COMPILE_FLAGS ${HPX_${${name}_LANGUAGE}_COMPILE_FLAGS})
-  endif()
-
-  if(${name}_FOLDER)
-    set_target_properties(${name}_component PROPERTIES FOLDER "${${name}_FOLDER}")
-  endif()
-
-  set_property(TARGET ${name}_component APPEND
-               PROPERTY COMPILE_DEFINITIONS
-               "HPX_COMPONENT_NAME=${name}"
-               "HPX_COMPONENT_STRING=\"${name}\""
-               "HPX_COMPONENT_EXPORTS")
-
-#   if(NOT HPX_NO_INSTALL)
-#     if(${name}_INSTALL_SUFFIX)
-#       hpx_library_install("${name}_component" "${${name}_INSTALL_SUFFIX}")
-#     else()
-#       hpx_library_install(${name}_component ${LIB}/hpx)
-#     endif()
-#
-#     foreach(target ${${name}_INI})
-#       hpx_debug("add_component.${name}" "installing ini: ${name}")
-#       hpx_ini_install(${target})
-#     endforeach()
-#   endif()
+  hpx_setup_target(
+    ${name}_component
+    TYPE COMPONENT
+    NAME ${name}
+    EXPORT
+    FOLDER ${${name}_FOLDER}
+    COMPILE_FLAGS ${${name}_COMPILE_FLAGS}
+    LINK_FLAGS ${${name}_LINK_FLAGS}
+    DEPENDENCIES ${${name}_DEPENDENCIES}
+    COMPONENT_DEPENDENCIES ${${name}_COMPONENT_DEPENDENCIES}
+    ${_target_flags}
+    ${install_optional}
+  )
 endmacro()
 

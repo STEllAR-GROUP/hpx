@@ -5,6 +5,7 @@
 
 add_hpx_component(action_move_semantics
   FOLDER "Tests/Regressions/Actions"
+  EXCLUDE_FROM_ALL
   AUTOGLOB)
 
 add_hpx_pseudo_target(tests.regressions.actions.action_move_semantics)

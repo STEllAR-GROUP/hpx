@@ -17,6 +17,7 @@ foreach(test ${tests})
   add_hpx_executable(${test}_test
                      SOURCES ${sources}
                      ${${test}_FLAGS}
+                     EXCLUDE_FROM_ALL
                      FOLDER "Tests/Unit/Traits/")
 
   add_hpx_unit_test("traits" ${test} ${${test}_PARAMETERS})

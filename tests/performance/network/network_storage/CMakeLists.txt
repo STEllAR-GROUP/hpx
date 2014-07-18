@@ -7,6 +7,7 @@
 
 add_hpx_executable(network_storage
   AUTOGLOB
+  EXCLUDE_FROM_ALL
   FOLDER "Benchmarks/Network/network_storage")
 
 # add pseudo-target dependencies

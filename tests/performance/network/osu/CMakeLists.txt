@@ -22,6 +22,7 @@ foreach(benchmark ${benchmarks})
                      SOURCES ${sources}
                      ${${benchmark}_FLAGS}
                      COMPONENT_DEPENDENCIES iostreams
+                     EXCLUDE_FROM_ALL
                      FOLDER "Benchmarks/Network/${benchmark}")
 
   # add a custom target for this example
@@ -53,6 +54,7 @@ foreach(benchmark ${coll_benchmarks})
                      SOURCES ${sources}
                      ${${benchmark}_FLAGS}
                      COMPONENT_DEPENDENCIES iostreams
+                     EXCLUDE_FROM_ALL
                      FOLDER "Benchmarks/Network/${benchmark}")
 
   # add a custom target for this example

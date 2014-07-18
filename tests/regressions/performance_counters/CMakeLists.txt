@@ -24,11 +24,13 @@ foreach(test ${tests})
                        SOURCES ${sources}
                        COMPONENT_DEPENDENCIES "papi_counters"
                        ${${test}_FLAGS}
+                       EXCLUDE_FROM_ALL
                        FOLDER "Tests/Regressions/performance_counters")
   else()
     add_hpx_executable(${test}_test
                        SOURCES ${sources}
                        ${${test}_FLAGS}
+                       EXCLUDE_FROM_ALL
                        FOLDER "Tests/Regressions/performance_counters")
   endif()
 

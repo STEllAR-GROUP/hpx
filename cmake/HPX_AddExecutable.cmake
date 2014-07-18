@@ -6,7 +6,7 @@
 
 macro(add_hpx_executable name)
   # retrieve arguments
-  set(options ESSENTIAL AUTOGLOB NOLIBS NOHPX_INIT)
+  set(options EXCLUDE_FROM_ALL AUTOGLOB NOLIBS NOHPX_INIT)
   set(one_value_args INI FOLDER SOURCE_ROOT HEADER_ROOT SOURCE_GLOB HEADER_GLOB OUTPUT_SUFFIX INSTALL_SUFFIX LANGUAGE)
   set(multi_value_args SOURCES HEADERS DEPENDENCIES COMPONENT_DEPENDENCIES COMPILE_FLAGS LINK_FLAGS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
@@ -95,10 +95,23 @@ macro(add_hpx_executable name)
   hpx_print_list("DEBUG" "Add executable ${name}: Dependencies for ${name}" ${name}_DEPENDENCIES)
   hpx_print_list("DEBUG" "Add executable ${name}: Component dependencies for ${name}" ${name}_COMPONENT_DEPENDENCIES)
 
+  set(_target_flags)
+
   # add the executable build target
   set(exclude_from_all)
-  if(NOT ${name}_ESSENTIAL)
+  set(install_options)
+  if(${name}_EXCLUDE_FROM_ALL)
     set(exclude_from_all EXCLUDE_FROM_ALL)
+  else()
+    set(install_destination bin)
+    if(${name}_INSTALL_SUFFIX)
+      set(install_destination ${${name}_INSTALL_SUFFIX})
+    endif()
+    set(_target_flags
+      INSTALL
+      INSTALL_FLAGS
+        DESTINATION ${install_destination}
+    )
   endif()
 
   add_executable(${name}_exe ${exclude_from_all}
@@ -119,61 +132,24 @@ macro(add_hpx_executable name)
 
   set_target_properties(${name}_exe PROPERTIES OUTPUT_NAME ${name})
 
-  if(${name}_FOLDER)
-    set_target_properties(${name}_exe PROPERTIES FOLDER "${${name}_FOLDER}")
+  if(${${name}_NOLIBS})
+    set(_target_flags ${_target_flags} NOLIBS)
   endif()
 
-  set_property(TARGET ${name}_exe APPEND
-               PROPERTY COMPILE_DEFINITIONS
-               "HPX_APPLICATION_NAME=${name}"
-               "HPX_APPLICATION_STRING=\"${name}\""
-               "HPX_APPLICATION_EXPORTS")
-
-  if(${name}_COMPILE_FLAGS)
-    hpx_append_property(${name}_exe COMPILE_FLAGS ${${name}_COMPILE_FLAGS})
+  if(${${name}_NOHPX_INIT})
+    set(_target_flags ${_target_flags} NOHPX_INIT)
   endif()
 
-  if(${name}_LINK_FLAGS)
-    hpx_append_property(${name}_exe LINK_FLAGS ${${name}_LINK_FLAGS})
-  endif()
-
-  # linker instructions
-  if(NOT ${name}_NOLIBS)
-    set(hpx_libs
-      hpx
-      hpx_serialization)
-    if(NOT ${name}_NOHPXINIT)
-      set(hpx_libs ${hpx_libs} hpx_init)
-    endif()
-
-    set(hpx_libs ${hpx_libs} ${HPX_LIBRARIES})
-
-    hpx_print_list("DEBUG" "Add executable ${name}: library dependencies (hpx_libs)" hpx_libs)
-
-    hpx_handle_component_dependencies(${name}_COMPONENT_DEPENDENCIES)
-
-    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-      target_link_libraries(${name}_exe
-        ${${name}_DEPENDENCIES}
-        ${${name}_COMPONENT_DEPENDENCIES}
-        ${hpx_libs}
-        imf svml irng intlc)
-    else()
-      target_link_libraries(${name}_exe
-        ${${name}_DEPENDENCIES}
-        ${${name}_COMPONENT_DEPENDENCIES}
-        ${hpx_libs})
-    endif()
-  else()
-    target_link_libraries(${name}_exe ${${name}_DEPENDENCIES})
-  endif()
-
-#   if(NOT HPX_NO_INSTALL)
-#     if(${name}_INSTALL_SUFFIX)
-#       hpx_executable_install("${name}_exe" "${${name}_INSTALL_SUFFIX}")
-#     else()
-#       hpx_executable_install(${name}_exe bin)
-#     endif()
-#   endif()
+  hpx_setup_target(
+    ${name}_exe
+    TYPE EXECUTABLE
+    FOLDER ${${name}_FOLDER}
+    COMPILE_FLAGS ${${name}_COMPILE_FLAGS}
+    LINK_FLAGS ${${name}_LINK_FLAGS}
+    DEPENDENCIES ${${name}_DEPENDENCIES}
+    COMPONENT_DEPENDENCIES ${${name}_COMPONENT_DEPENDENCIES}
+    ${_target_flags}
+    ${install_optional}
+  )
 endmacro()
 

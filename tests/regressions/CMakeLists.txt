@@ -39,6 +39,7 @@ foreach(test ${tests})
   add_hpx_executable(${test}_test
                      SOURCES ${sources}
                      ${${test}_FLAGS}
+                     EXCLUDE_FROM_ALL
                      FOLDER "Tests/Regressions/")
 
   add_hpx_test("tests.regressions" ${test} ${${test}_PARAMETERS})
@@ -54,7 +55,7 @@ foreach(test ${tests})
   add_hpx_pseudo_dependencies(tests.regressions.${test}
                               ${test}_test_exe)
 endforeach()
-  
+
 add_hpx_test(
   "tests.regressions" id_type_ref_counting_1032_4
   EXECUTABLE id_type_ref_counting_1032 THREADS_PER_LOCALITY 4)

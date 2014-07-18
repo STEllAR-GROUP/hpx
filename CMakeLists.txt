@@ -69,6 +69,8 @@ if(NOT HPX_CMAKE_LOGLEVEL)
   set(HPX_CMAKE_LOGLEVEL "WARN")
 endif()
 
+message("${CMAKE_CXX_FLAGS} <--What the heck??!?")
+
 ################################################################################
 # Fortran compiler detection
 #
@@ -92,12 +94,8 @@ endif()
 ## Generic build options
 set(DEFAULT_MALLOC "system")
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
-  if(HPX_PLATFORM_UC STREQUAL "XEONPHI")
-    set(DEFAULT_MALLOC "tbbmalloc")
-  else()
-    set(DEFAULT_MALLOC "tcmalloc")
+  set(DEFAULT_MALLOC "tcmalloc")
 #    set(DEFAULT_MALLOC "jemalloc")
-  endif()
 endif()
 
 hpx_option(WITH_MALLOC
@@ -140,12 +138,14 @@ hpx_option(WITH_DOCUMENTATION_SINGLEPAGE BOOL "The HPX documentation should be b
 hpx_option(WITH_AUTOMATIC_PREPROCESSING BOOL "True if the automatic header preprocessing target should be created (default: OFF)." OFF ADVANCED)
 hpx_option(WITH_WAVE_ADDITIONAL_INCLUDE_DIRS STRING "Additional (compiler specific) include directories for the wave preprocessing tool." "" CATEGORY "Generic" ADVANCED)
 
-hpx_option(WITH_EXAMPLES BOOL "Build the HPX examples (default ON)" ON)
+hpx_option(WITH_EXAMPLES BOOL "Build the HPX examples (default OFF)" OFF)
 hpx_option(WITH_TESTS BOOL "Build the HPX tests (default ON)" ON)
 hpx_option(WITH_TESTS_BENCHMARKS BOOL "Build HPX benchmark tests (default: ON)" ON ADVANCED)
 hpx_option(WITH_TESTS_REGRESSIONS BOOL "Build HPX regression tests (default: ON)" ON ADVANCED)
 hpx_option(WITH_TESTS_UNIT BOOL "Build HPX unit tests (default: ON)" ON ADVANCED)
 hpx_option(WITH_RUNTIME BOOL "Build HPX runtime (default: ON)" ON ADVANCED)
+
+hpx_option(WITH_FULL_RPATH BOOL "Build and link HPX libraries and executables with full RPATHs (default: ON)" ON ADVANCED)
 
 ################################################################################
 # Native TLS configuration
@@ -214,9 +214,6 @@ hpx_option(WITH_UNIQUE_FUTURE_ALIAS BOOL
 ## Thread Manager related build options
 
 set(WITH_MAX_CPU_COUNT_DEFAULT "64")
-if(HPX_PLATFORM_UC STREQUAL "XEONPHI")
-  set(WITH_MAX_CPU_COUNT_DEFAULT "256")
-endif()
 hpx_option(WITH_MAX_CPU_COUNT STRING
   "HPX applications will not use more that this number of OS-Threads (default: ${WITH_MAX_CPU_COUNT_DEFAULT})"
   ${WITH_MAX_CPU_COUNT_DEFAULT}
@@ -678,11 +675,6 @@ elseif(HPX_PLATFORM_UC STREQUAL "XEONPHI")
   if(NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
     hpx_error("HPX on the MIC can only be compiled with the Intel compiler.")
   endif()
-  hpx_add_config_define(HPX_NATIVE_MIC)
-  # We need to append the -mmic compile flag here.
-  hpx_add_compile_flag(-mmic)
-  # Set the TBBMALLOC_PLATFORM correctly so that find_package(TBBMalloc) sets the right hints
-  set(TBBMALLOC_PLATFORM "mic")
 elseif(HPX_PLATFORM_UC STREQUAL "BLUEGENEQ")
   if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     hpx_error("HPX on the BG/Q can only be compiled with bgclang")
@@ -987,7 +979,7 @@ hpx_check_for_cxx11_auto(
   DEFINITIONS HPX_HAVE_CXX11_LAMBDAS)
 
 hpx_check_for_cxx11_decltype(
-  DEFINITIONS HPX_HAVE_CXX11_DECLTYPE)
+  DEFINITIONS HPX_HAVE_CXX11_DECLTYPE BOOST_RESULT_OF_USE_DECLTYPE)
 
 hpx_check_for_cxx11_alias_templates(
   DEFINITIONS HPX_HAVE_CXX11_ALIAS_TEMPLATES)
@@ -1072,6 +1064,14 @@ hpx_add_config_define(HPX_PREFIX "\"${HPX_PREFIX}\"")
 if (NOT DEFINED LIB)
   set(LIB "lib")
 endif(NOT DEFINED LIB)
+
+if(WITH_FULL_RPATH)
+  list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/${LIB}" isSystemDir)
+  if(isSystemDir EQUAL -1)
+    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB}")
+  endif()
+  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH On)
+endif()
 ###############################################################################
 
 ################################################################################
@@ -1125,7 +1125,7 @@ set(HPX_DEBUG_POSTFIX "d")
 # directory structure.
 add_subdirectory(src)
 
-if(WITH_BUILD_EXAMPLES)
+if(WITH_EXAMPLES)
   add_hpx_pseudo_target(examples)
   include_directories(examples)
   add_subdirectory(examples)
@@ -1263,7 +1263,7 @@ install( # install all hpx tests source files
 
 install( # Install all HPX cmake utility files
   DIRECTORY cmake/
-  DESTINATION share/hpx-${HPX_VERSION}/cmake
+  DESTINATION ${LIB}/cmake/hpx
   COMPONENT core
   PATTERN ".cmake.in" EXCLUDE
   PATTERN ".git" EXCLUDE)

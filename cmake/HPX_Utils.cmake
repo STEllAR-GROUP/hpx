@@ -5,23 +5,25 @@
 
 include(HPX_Include)
 
-hpx_include(Message
-            Option
-            AppendProperty
-            Install
-            TargetPaths
-            AddCompileFlag
-            AddLinkFlag
-            AddComponent
-            AddLibrary
-            AddExecutable
-            AddTest
-            AddPseudoDependencies
-            AddPseudoTarget
-            AddLibrarySources
-            AddLibraryHeaders
-            AddSourceGroup
-            IsTarget
-            HandleComponentDependencies
-            ForceOutOfTreeBuild)
+hpx_include(
+  Message
+  Option
+  AppendProperty
+  TargetPaths
+  AddCompileFlag
+  AddLinkFlag
+  AddComponent
+  AddLibrary
+  AddExecutable
+  AddTest
+  AddPseudoDependencies
+  AddPseudoTarget
+  AddLibrarySources
+  AddLibraryHeaders
+  AddSourceGroup
+  IsTarget
+  HandleComponentDependencies
+  ForceOutOfTreeBuild
+  SetupTarget
+)
 

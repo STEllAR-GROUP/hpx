@@ -22,6 +22,9 @@ find_package(Boost
 set(Boost_TMP_LIBRARIES ${Boost_LIBRARIES})
 if(UNIX AND NOT CYGWIN)
   find_library(BOOST_THREAD_LIBRARY NAMES pthread DOC "The threading library used by boost.thread")
+  if(NOT BOOST_THREAD_LIBRARY AND (HPX_PLATFORM_UC STREQUAL "XEONPHI"))
+    set(BOOST_THREAD_LIBRARY "-pthread")
+  endif()
   set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${BOOST_THREAD_LIBRARY})
 endif()
 

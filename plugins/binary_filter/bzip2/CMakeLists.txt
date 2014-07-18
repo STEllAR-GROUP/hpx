@@ -18,20 +18,12 @@ macro(add_bzip2_module)
     include_directories(${BZIP2_INCLUDE_DIR})
 
     add_hpx_library(compress_bzip2
+      PLUGIN
       SOURCES "${hpx_SOURCE_DIR}/plugins/binary_filter/bzip2/bzip2_serialization_filter.cpp"
       HEADERS "${hpx_SOURCE_DIR}/hpx/plugins/binary_filter/bzip2_serialization_filter.hpp"
       FOLDER "Core/Plugins/Compression"
       DEPENDENCIES ${BZIP2_LIBRARIES})
 
-    set_property(TARGET compress_bzip2_lib APPEND
-      PROPERTY COMPILE_DEFINITIONS
-      "HPX_LIBRARY_EXPORTS"
-      "HPX_PLUGIN_NAME=compress_bzip2")
-
     add_hpx_pseudo_dependencies(plugins.binary_filter.bzip2 compress_bzip2_lib)
-
-    if(NOT HPX_NO_INSTALL)
-      hpx_library_install(compress_bzip2_lib ${LIB}/hpx)
-    endif()
   endif()
 endmacro()

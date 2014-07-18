@@ -15,13 +15,13 @@ endif()
 
 
 write_basic_package_version_file(
-  "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/HPXConfigVersion.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/hpx/HPXConfigVersion.cmake"
   VERSION ${HPX_VERSION}
   COMPATIBILITY AnyNewerVersion
 )
 
-export(TARGETS hpx_serialization hpx hpx_init
-  FILE "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/HPXTargets.cmake"
+export(TARGETS ${HPX_EXPORT_TARGETS}
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/hpx/HPXTargets.cmake"
 #  NAMESPACE hpx::
 )
 
@@ -97,7 +97,7 @@ set(HPX_CONF_INCLUDE_DIRS
   ${_NEEDED_INCLUDE_DIRS}
 )
 configure_file(cmake/templates/HPXConfig.cmake.in
-  "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/HPXConfig.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/hpx/HPXConfig.cmake"
   ESCAPE_QUOTES @ONLY)
 configure_file(cmake/templates/hpx_application.pc.in
   "${CMAKE_CURRENT_BINARY_DIR}/lib/pkgconfig/hpx_application.pc"
@@ -113,29 +113,29 @@ configure_file(cmake/templates/hpx_component_debug.pc.in
   ESCAPE_QUOTES @ONLY)
 
 # Configure macros for the install dir ...
-set(HPX_CMAKE_MODULE_PATH "${hpx_SOURCE_DIR}/cmake")
+set(HPX_CMAKE_MODULE_PATH "${CMAKE_INSTALL_PREFIX}/lib/cmake/hpx")
 configure_file(cmake/templates/HPXMacros.cmake.in
   "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/HPXMacros.cmake"
   ESCAPE_QUOTES @ONLY)
 # ... and the build dir
-set(HPX_CMAKE_MODULE_PATH "${CMAKE_INSTALL_PREFIX}/share/hpx-${HPX_VERSION}/cmake")
+set(HPX_CMAKE_MODULE_PATH "${hpx_SOURCE_DIR}/cmake")
 configure_file(cmake/templates/HPXMacros.cmake.in
-  "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/HPXMacros.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/hpx/HPXMacros.cmake"
   ESCAPE_QUOTES @ONLY)
 
 install(
   EXPORT HPXTargets
   FILE HPXTargets.cmake
 #  NAMESPACE hpx::
-  DESTINATION lib/cmake
+  DESTINATION ${LIB}/cmake/hpx
 )
 
 install(
   FILES
     "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/HPXConfig.cmake"
     "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/HPXMacros.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/HPXConfigVersion.cmake"
-  DESTINATION lib/cmake
+    "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/hpx/HPXConfigVersion.cmake"
+    DESTINATION ${LIB}/cmake/hpx
   COMPONENT cmake
 )
 
@@ -145,6 +145,6 @@ install(
     "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx_application_debug.pc"
     "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx_component.pc"
     "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx_component_debug.pc"
-  DESTINATION lib/pkgconfig
+  DESTINATION ${LIB}/pkgconfig
   COMPONENT pkgconfig
 )

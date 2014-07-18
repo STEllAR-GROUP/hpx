@@ -19,21 +19,13 @@ macro(add_snappy_module)
     include_directories("${SNAPPY_INCLUDE_DIR}")
 
     add_hpx_library(compress_snappy
+      PLUGIN
       SOURCES "${hpx_SOURCE_DIR}/plugins/binary_filter/snappy/snappy_serialization_filter.cpp"
       HEADERS "${hpx_SOURCE_DIR}/hpx/plugins/binary_filter/snappy_serialization_filter.hpp"
       FOLDER "Core/Plugins/Compression"
       DEPENDENCIES ${SNAPPY_LIBRARIES})
 
-    set_property(TARGET compress_snappy_lib APPEND
-      PROPERTY COMPILE_DEFINITIONS
-      "HPX_LIBRARY_EXPORTS"
-      "HPX_PLUGIN_NAME=compress_snappy")
-
     add_hpx_pseudo_dependencies(plugins.binary_filter.snappy compress_snappy_lib)
-
-    if(NOT HPX_NO_INSTALL)
-      hpx_library_install(compress_snappy_lib ${LIB}/hpx)
-    endif()
   endif()
 endmacro()
 

@@ -3,7 +3,10 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(WITH_AUTOMATIC_PREPROCESSING)
+if(NOT WITH_AUTOMATIC_PREPROCESSING)
+  macro(hpx_partial_preprocess_header file)
+  endmacro()
+else()
   if(Boost_VERSION LESS 105100)
     hpx_error("In order to use partial preprocessing, a Boost version of at least 1.51 is required. This feature is only needed if you change headers that need to be preprocessed.")
   endif()
@@ -146,8 +149,6 @@ if(WITH_AUTOMATIC_PREPROCESSING)
 
   foreach(limit RANGE 5 20 5)
     set(HPX_PREPROCESSING_LIMITS ${HPX_PREPROCESSING_LIMITS} "hpx_partial_preprocess_headers_${limit}")
-
-    message("...")
 
     add_custom_command(
       OUTPUT "${output_dir}/preprocess/hpx_preprocessed_${limit}.touch"
