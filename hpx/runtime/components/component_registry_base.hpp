@@ -10,7 +10,8 @@
 
 #include <hpx/util/plugin.hpp>
 #include <hpx/util/plugin/export_plugin.hpp>
-#include <hpx/runtime/components/static_component_data.hpp>
+#include <hpx/runtime/components/static_factory_data.hpp>
+#include <hpx/components/static_component_data.hpp>
 
 #include <boost/mpl/list.hpp>
 

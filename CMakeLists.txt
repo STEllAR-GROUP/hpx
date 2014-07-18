@@ -127,8 +127,6 @@ hpx_option(WITH_GCC_VERSION_CHECK BOOL "Ignore version reported by gcc (default:
 hpx_option(WITH_DEFAULT_BUILD_TARGETS BOOL
   "Associate the core HPX library with the default build target (default: ON)." ON ADVANCED)
 
-hpx_option(WITH_BUILD_EXAMPLES BOOL "Build HPX examples (default: ON)" ON ADVANCED)
-
 hpx_option(WITH_WARNINGS BOOL "Enable compiler warnings (default: ON)" ON ADVANCED)
 
 hpx_option(WITH_DOCUMENTATION BOOL "Build the HPX documentation (default OFF)." OFF)
@@ -137,6 +135,22 @@ hpx_option(WITH_DOCUMENTATION_SINGLEPAGE BOOL "The HPX documentation should be b
 
 hpx_option(WITH_AUTOMATIC_PREPROCESSING BOOL "True if the automatic header preprocessing target should be created (default: OFF)." OFF ADVANCED)
 hpx_option(WITH_WAVE_ADDITIONAL_INCLUDE_DIRS STRING "Additional (compiler specific) include directories for the wave preprocessing tool." "" CATEGORY "Generic" ADVANCED)
+
+################################################################################
+# Some platforms do not support dynamic linking. Enable this to link all
+# libraries statically. This also changes some of the internals of HPX related
+# to how components are loaded.
+################################################################################
+hpx_option(WITH_STATIC_LINKING BOOL
+  "Compile HPX staticly linked libraries (Default: OFF)" OFF ADVANCED)
+if(WITH_STATIC_LINKING)
+  hpx_add_config_define(HPX_STATIC_LINKING)
+  set(hpx_library_link_mode STATIC)
+else()
+  set(hpx_library_link_mode SHARED)
+endif()
+
+################################################################################
 
 hpx_option(WITH_EXAMPLES BOOL "Build the HPX examples (default OFF)" OFF)
 hpx_option(WITH_TESTS BOOL "Build the HPX tests (default ON)" ON)
@@ -1123,6 +1137,14 @@ set(HPX_DEBUG_POSTFIX "d")
 # Recurse into some subdirectories. This does not actually cause another cmake
 # executable to run. The same process will walk through the project's entire
 # directory structure.
+
+hpx_option(HPX_BUILD_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED)
+
+if(HPX_BUILD_TOOLS OR HPX_STATIC_LINKING)
+  add_hpx_pseudo_target(tools)
+  add_subdirectory(tools)
+endif()
+
 add_subdirectory(src)
 
 if(WITH_EXAMPLES)
@@ -1450,7 +1472,6 @@ endforeach()
 #message(${_HPX_INFO_STRING})
 message("HPX will be installed to ${CMAKE_INSTALL_PREFIX}")
 message("")
-
 
 message("${HPX_LIBRARIES}")
 message("${HPX_CONFIG_DEFINITIONS}")
