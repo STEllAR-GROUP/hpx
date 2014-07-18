@@ -333,55 +333,54 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename ExPolicy, typename InIter1, typename InIter2,
-            typename F>
-        typename detail::algorithm_result<ExPolicy, bool>::type
-        mismatch(ExPolicy const&, InIter1 first1, InIter1 last1,
-            InIter2 first2, F && f, boost::mpl::true_)
+        template <typename T>
+        struct mismatch : public detail::algorithm<mismatch<T>, T>
         {
-            try {
-                typedef std::pair<InIter1, InIter2> return_type;
-                return detail::algorithm_result<ExPolicy, return_type>::get(
+            mismatch()
+              : mismatch::algorithm("mismatch")
+            {}
+
+            template <typename ExPolicy, typename InIter1, typename InIter2,
+                typename F>
+            static result_type
+            sequential(ExPolicy const&, InIter1 first1, InIter1 last1,
+                InIter2 first2, F && f)
+            {
+                return detail::algorithm_result<ExPolicy, result_type>::get(
                     std::mismatch(first1, last1, first2, std::forward<F>(f)));
             }
-            catch (...) {
-                detail::handle_exception<ExPolicy>::call();
-            }
-        }
 
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename F>
-        typename detail::algorithm_result<
-            ExPolicy, std::pair<InIter1, InIter2>
-        >::type
-        mismatch(ExPolicy const& policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, F && f, boost::mpl::false_)
-        {
-            if (first1 == last1)
-                return detail::algorithm_result<ExPolicy, bool>::get(true);
+            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+                typename F>
+            typename detail::algorithm_result<ExPolicy, result_type>::type
+            parallel(ExPolicy const& policy, FwdIter1 first1, FwdIter1 last1,
+                FwdIter2 first2, F && f)
+            {
+                if (first1 == last1)
+                    return detail::algorithm_result<ExPolicy, bool>::get(true);
 
-            std::size_t count = std::distance(first1, last1);
+                std::size_t count = std::distance(first1, last1);
 
-            typedef hpx::util::zip_iterator<FwdIter1, FwdIter2> zip_iterator;
-            typedef typename zip_iterator::reference reference;
+                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2> zip_iterator;
+                typedef typename zip_iterator::reference reference;
 
-            util::cancellation_token<std::size_t> tok(count);
+                util::cancellation_token<std::size_t> tok(count);
 
-            util::partitioner<ExPolicy>::call(policy,
-                hpx::util::make_zip_iterator(first1, first2), count,
-                [f, tok](zip_iterator it, std::size_t part_count) mutable
-                {
-                    std::size_t base_idx =
-                        std::distance(first1, hpx::util::get<0>(*it));
+                util::partitioner<ExPolicy>::call(policy,
+                    hpx::util::make_zip_iterator(first1, first2), count,
+                    [f, tok](zip_iterator it, std::size_t part_count) mutable
+                    {
+                        std::size_t base_idx =
+                            std::distance(first1, hpx::util::get<0>(*it));
 
-                    util::loop_idx_n(
-                        base_idx, it, part_count, tok,
-                        [&f, &tok](reference t, std::size_t i)
-                        {
-                            if (!f(hpx::util::get<0>(t), hpx::util::get<1>(t)))
-                                tok.cancel(i);
-                        });
-                });
+                        util::loop_idx_n(
+                            base_idx, it, part_count, tok,
+                            [&f, &tok](reference t, std::size_t i)
+                            {
+                                if (!f(hpx::util::get<0>(t), hpx::util::get<1>(t)))
+                                    tok.cancel(i);
+                            });
+                    });
 
                 std::size_t mismatched = tok.get_data();
                 if (mismatched != count)
@@ -391,25 +390,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 std::advance(first2, mismatched);
                 return std::make_pair(first1, first2);
-        }
-
-        template <typename InIter1, typename InIter2, typename F>
-        std::pair<InIter1, InIter2> mismatch(execution_policy const& policy,
-            InIter1 first1, InIter1 last1, InIter2 first2, F && f,
-            boost::mpl::false_)
-        {
-            HPX_PARALLEL_DISPATCH(policy, detail::mismatch, first1, last1,
-                first2, std::forward<F>(f));
-        }
-
-        template <typename InIter1, typename InIter2, typename F>
-        std::pair<InIter1, InIter2> mismatch(execution_policy const& policy,
-            InIter1 first1, InIter1 last1, InIter2 first2, F && f,
-            boost::mpl::true_)
-        {
-            return detail::mismatch(sequential_execution_policy(),
-                first1, last1, first2, std::forward<F>(f), boost::mpl::true_());
-        }
+            }
+        };
         /// \endcond
     }
 
@@ -487,8 +469,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category2>
         >::type is_seq;
 
-        return detail::mismatch(std::forward<ExPolicy>(policy), first1, last1,
-            first2, detail::equal_to(), is_seq());
+        typedef std::pair<InIter1, InIter2> result_type;
+        return detail::mismatch<result_type>().call(
+            std::forward<ExPolicy>(policy),
+            first1, last1, first2, detail::equal_to(), is_seq());
     }
 
     /// Returns std::pair with iterators to the first two non-equivalent
@@ -582,8 +566,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category2>
         >::type is_seq;
 
-        return detail::mismatch(std::forward<ExPolicy>(policy), first1, last1,
-            first2, std::forward<F>(f), is_seq());
+        typedef std::pair<InIter1, InIter2> result_type;
+        return detail::mismatch<result_type>().call(
+            std::forward<ExPolicy>(policy),
+            first1, last1, first2, std::forward<F>(f), is_seq());
     }
 }}}
 
