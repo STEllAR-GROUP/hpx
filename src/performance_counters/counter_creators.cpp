@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,6 +9,7 @@
 #include <hpx/runtime/agas/stubs/component_namespace.hpp>
 #include <hpx/runtime/agas/stubs/primary_namespace.hpp>
 #include <hpx/runtime/agas/stubs/symbol_namespace.hpp>
+#include <hpx/runtime/agas/stubs/locality_namespace.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 
@@ -75,8 +76,8 @@ namespace hpx { namespace performance_counters
         return true;
     }
 
-    /// Default discoverer function for AGAS performance counters; to be 
-    /// registered with the counter types. It is suitable to be used for all 
+    /// Default discoverer function for AGAS performance counters; to be
+    /// registered with the counter types. It is suitable to be used for all
     /// counters following the naming scheme:
     ///
     ///   /<objectname>{locality#0/total}/<instancename>
@@ -235,6 +236,10 @@ namespace hpx { namespace performance_counters
                 rep = agas::stubs::symbol_namespace::service(
                     agas_id, req, threads::thread_priority_default, ec);
                 break;
+            case agas::locality_ns_statistics_counter:
+                rep = agas::stubs::locality_namespace::service(
+                    agas_id, req, threads::thread_priority_default, ec);
+                break;
             default:
                 HPX_THROWS_IF(ec, bad_parameter, "retrieve_statistics_counter",
                     "unknown counter agas counter name: " + name);
@@ -296,7 +301,7 @@ namespace hpx { namespace performance_counters
             if (!result) {
                 HPX_THROWS_IF(ec, not_implemented,
                     "agas_raw_counter_creator",
-                    "invalid counter name: " + 
+                    "invalid counter name: " +
                         remove_counter_prefix(info.fullname_));
                 return naming::invalid_gid;
             }
