@@ -15,6 +15,11 @@ set(tests
     equal_binary
     fill
     filln
+	find
+	findend
+	findfirstof
+	findif
+	findifnot
     foreach
     foreachn
 	generate

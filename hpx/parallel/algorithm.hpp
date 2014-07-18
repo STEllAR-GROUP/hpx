@@ -17,6 +17,7 @@
 #include <hpx/parallel/detail/count.hpp>
 #include <hpx/parallel/detail/equal.hpp>
 #include <hpx/parallel/detail/fill.hpp>
+#include <hpx/parallel/detail/find.hpp>
 #include <hpx/parallel/detail/for_each.hpp>
 #include <hpx/parallel/detail/generate.hpp>
 #include <hpx/parallel/detail/move.hpp>
