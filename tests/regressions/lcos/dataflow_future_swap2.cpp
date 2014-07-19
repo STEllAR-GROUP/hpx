@@ -26,7 +26,7 @@ struct mul
 {
     double operator()( double x1 , double x2 ) const
     {
-        //boost::this_thread::sleep( boost::posix_time::milliseconds(1000) );
+        //boost::this_thread::sleep( boost::chrono::milliseconds(1000) );
         hpx::cout << boost::format( "func: %f , %f\n" ) % x1 %x2 << hpx::flush;
         return x1*x2;
     }
@@ -36,7 +36,7 @@ struct divide
 {
     double operator()( double x1 , double x2 ) const
     {
-        //boost::this_thread::sleep( boost::posix_time::milliseconds(1000) );
+        //boost::this_thread::sleep( boost::chrono::milliseconds(1000) );
         hpx::cout << boost::format( "func: %f , %f\n" ) % x1 %x2 << hpx::flush;
         return x1/x2;
     }

@@ -20,7 +20,7 @@
 #include <boost/format.hpp>
 #include <boost/bind.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/date_time/posix_time/posix_time_duration.hpp>
+#include <boost/chrono/duration.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -98,7 +98,7 @@ namespace test
                 /*
                 if (hpx::threads::get_self_ptr())
                 {
-                    hpx::this_thread::suspend(boost::posix_time::microseconds(1));
+                    hpx::this_thread::suspend(boost::chrono::microseconds(1));
                 }
                 else
                 */

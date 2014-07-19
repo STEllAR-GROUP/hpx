@@ -28,7 +28,7 @@ struct mul
 
     double operator()( double x1 , double x2 ) const
     {
-        hpx::this_thread::sleep_for( boost::posix_time::milliseconds(10000) );
+        hpx::this_thread::sleep_for( boost::chrono::milliseconds(10000) );
         hpx::cout << boost::format( "func: %f , %f\n" ) % x1 %x2 << hpx::flush;
         return x1*x2;
     }

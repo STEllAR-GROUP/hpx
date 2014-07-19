@@ -48,9 +48,9 @@ void test_wait_for()
 
     HPX_TEST(thread.joinable());
 
-    hpx::this_thread::sleep_for(boost::posix_time::seconds(10));
+    hpx::this_thread::sleep_for(boost::chrono::seconds(10));
     promise.set_value(42);
-    hpx::this_thread::sleep_for(boost::posix_time::seconds(10));
+    hpx::this_thread::sleep_for(boost::chrono::seconds(10));
 
     hpx::threads::thread_state thread_state =
         hpx::threads::get_thread_state(thread.native_handle());
@@ -72,9 +72,9 @@ void test_wait_until()
 
     HPX_TEST(thread.joinable());
 
-    hpx::this_thread::sleep_for(boost::posix_time::seconds(10));
+    hpx::this_thread::sleep_for(boost::chrono::seconds(10));
     promise.set_value(42);
-    hpx::this_thread::sleep_for(boost::posix_time::seconds(10));
+    hpx::this_thread::sleep_for(boost::chrono::seconds(10));
 
     hpx::threads::thread_state thread_state =
         hpx::threads::get_thread_state(thread.native_handle());
