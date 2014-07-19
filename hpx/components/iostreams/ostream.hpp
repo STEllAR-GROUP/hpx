@@ -16,7 +16,7 @@
 #include <boost/swap.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/iostreams/stream.hpp>
-#include <boost/atomic/atomic.hpp>
+#include <boost/atomic.hpp>
 
 #include <hpx/state.hpp>
 #include <hpx/include/client.hpp>
