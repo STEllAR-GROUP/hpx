@@ -1233,7 +1233,7 @@ namespace hpx { namespace lcos
     make_ready_future_after(boost::chrono::duration<Rep, Period> const& d,
         Result && init)
     {
-        return make_ready_future_at(
+        return make_ready_future_after(
             util::to_time_duration(d), std::forward<Result>(init));
     }
 
@@ -1279,7 +1279,7 @@ namespace hpx { namespace lcos
     }
 
     template <typename Rep, typename Period>
-    inline future<void> make_ready_future_at(
+    inline future<void> make_ready_future_after(
         boost::chrono::duration<Rep, Period> const& d)
     {
         return make_ready_future_after(util::to_time_duration(d));

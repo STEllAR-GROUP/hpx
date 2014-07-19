@@ -345,7 +345,7 @@ int RemoveCompletions()
                 }
             }
         }
-        hpx::this_thread::suspend(boost::posix_time::microseconds(10));
+        hpx::this_thread::suspend(boost::chrono::microseconds(10));
     }
     return num_removed;
 }
