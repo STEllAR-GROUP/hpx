@@ -16,6 +16,7 @@
 #include <boost/swap.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/iostreams/stream.hpp>
+#include <boost/atomic/atomic.hpp>
 
 #include <hpx/state.hpp>
 #include <hpx/include/client.hpp>
@@ -99,6 +100,7 @@ namespace hpx { namespace iostreams
 
     private:
         mutex_type mtx_;
+        boost::atomic<boost::uint64_t> generational_count_;
 
         // Performs a lazy streaming operation.
         template <typename T>
@@ -128,7 +130,8 @@ namespace hpx { namespace iostreams
 
                 // Perform the write operation, then destroy the old buffer and
                 // stream.
-                this->base_type::write_async(get_gid(), next);
+                this->base_type::write_async(get_gid(), hpx::get_locality_id(),
+                    generational_count_++, next);
             }
 
             return *this;
@@ -152,7 +155,8 @@ namespace hpx { namespace iostreams
 
                 // Perform the write operation, then destroy the old buffer and
                 // stream.
-                this->base_type::write_sync(get_gid(), next);
+                this->base_type::write_sync(get_gid(), hpx::get_locality_id(),
+                    generational_count_++, next);
             }
 
             return *this;
@@ -174,7 +178,8 @@ namespace hpx { namespace iostreams
 
                 // Perform the write operation, then destroy the old buffer and
                 // stream.
-                this->base_type::write_async(get_gid(), next);
+                this->base_type::write_async(get_gid(), hpx::get_locality_id(),
+                    generational_count_++, next);
             }
             return true;
         }
@@ -206,6 +211,7 @@ namespace hpx { namespace iostreams
           : base_type()
           , buffer()
           , stream_base_type(*this)
+          , generational_count_(0)
         {}
 
         // hpx::flush manipulator

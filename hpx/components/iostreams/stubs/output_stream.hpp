@@ -16,17 +16,19 @@ namespace hpx { namespace iostreams { namespace stubs
     struct output_stream : components::stub_base<server::output_stream>
     {
         static void
-        write_sync(naming::id_type const& gid, detail::buffer const& in)
+        write_sync(naming::id_type const& gid, boost::uint32_t locality_id,
+            boost::uint64_t count, detail::buffer const& in)
         {
             typedef server::output_stream::write_sync_action action_type;
-            hpx::async<action_type>(gid, in).get();
+            hpx::async<action_type>(gid, locality_id, count, in).get();
         }
 
         static void
-        write_async(naming::id_type const& gid, detail::buffer const& in)
+        write_async(naming::id_type const& gid, boost::uint32_t locality_id,
+            boost::uint64_t count, detail::buffer const& in)
         {
             typedef server::output_stream::write_async_action action_type;
-            hpx::apply<action_type>(gid, in);
+            hpx::apply<action_type>(gid, locality_id, count, in);
         }
     };
 }}}
