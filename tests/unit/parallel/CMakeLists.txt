@@ -17,6 +17,7 @@ set(tests
     filln
     foreach
     foreachn
+    mismatch
     move
     none_of
     reduce_
@@ -24,7 +25,7 @@ set(tests
     task_region
     transform
     transform_binary
-	transform_reduce
+    transform_reduce
    )
 
 set(task_region_FLAGS DEPENDENCIES iostreams_component)

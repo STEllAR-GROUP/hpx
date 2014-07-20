@@ -39,7 +39,7 @@ namespace hpx { namespace parallel { namespace util
 
         bool was_cancelled(T data) const BOOST_NOEXCEPT
         {
-            return Pred()(data, was_cancelled_->load(boost::memory_order_relaxed));
+            return Pred()(was_cancelled_->load(boost::memory_order_relaxed), data);
         }
 
         void cancel(T data) BOOST_NOEXCEPT

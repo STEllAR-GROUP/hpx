@@ -12,6 +12,7 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
 #include <hpx/parallel/detail/predicates.hpp>
+#include <hpx/parallel/detail/dispatch.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
@@ -346,18 +347,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             sequential(ExPolicy const&, InIter1 first1, InIter1 last1,
                 InIter2 first2, F && f)
             {
-                return detail::algorithm_result<ExPolicy, result_type>::get(
-                    std::mismatch(first1, last1, first2, std::forward<F>(f)));
+                return std::mismatch(first1, last1, first2, std::forward<F>(f));
             }
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F>
-            typename detail::algorithm_result<ExPolicy, result_type>::type
+            static typename detail::algorithm_result<ExPolicy, result_type>::type
             parallel(ExPolicy const& policy, FwdIter1 first1, FwdIter1 last1,
                 FwdIter2 first2, F && f)
             {
                 if (first1 == last1)
-                    return detail::algorithm_result<ExPolicy, bool>::get(true);
+                {
+                    return detail::algorithm_result<ExPolicy, result_type>::get(
+                        std::make_pair(first1, first2));
+                }
 
                 std::size_t count = std::distance(first1, last1);
 
@@ -366,12 +369,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 util::cancellation_token<std::size_t> tok(count);
 
-                util::partitioner<ExPolicy>::call(policy,
-                    hpx::util::make_zip_iterator(first1, first2), count,
-                    [f, tok](zip_iterator it, std::size_t part_count) mutable
+                return util::partitioner<ExPolicy, result_type, void>::call(
+                    policy, hpx::util::make_zip_iterator(first1, first2), count,
+                    [first1, f, tok](zip_iterator it, std::size_t part_count) mutable
                     {
-                        std::size_t base_idx =
-                            std::distance(first1, hpx::util::get<0>(*it));
+                        std::size_t base_idx = std::distance(
+                            first1, hpx::util::get<0>(it.get_iterator_tuple()));
 
                         util::loop_idx_n(
                             base_idx, it, part_count, tok,
@@ -380,16 +383,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                 if (!f(hpx::util::get<0>(t), hpx::util::get<1>(t)))
                                     tok.cancel(i);
                             });
+                    },
+                    [=](std::vector<hpx::future<void> > &&) mutable
+                    {
+                        std::size_t mismatched = tok.get_data();
+                        if (mismatched != count)
+                            std::advance(first1, mismatched);
+                        else
+                            first1 = last1;
+
+                        std::advance(first2, mismatched);
+                        return std::make_pair(first1, first2);
                     });
-
-                std::size_t mismatched = tok.get_data();
-                if (mismatched != count)
-                    std::advance(first1, mismatched);
-                else
-                    first1 = last1;
-
-                std::advance(first2, mismatched);
-                return std::make_pair(first1, first2);
             }
         };
         /// \endcond

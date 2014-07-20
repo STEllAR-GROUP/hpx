@@ -79,7 +79,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         return ret;
                     },
                     hpx::util::unwrapped(
-                        [](std::vector<difference_type>&& results)
+                        [](std::vector<difference_type> && results)
                         {
                             return util::accumulate_n(
                                 boost::begin(results), boost::size(results),
@@ -207,7 +207,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         return ret;
                     },
                     hpx::util::unwrapped(
-                        [](std::vector<difference_type>&& results)
+                        [](std::vector<difference_type> && results)
                         {
                             return util::accumulate_n(
                                 boost::begin(results), boost::size(results),
