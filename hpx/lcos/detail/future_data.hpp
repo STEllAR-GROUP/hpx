@@ -341,6 +341,8 @@ namespace detail
             if (state_ == empty) {
                 cond_.wait(l, "future_data::wait", ec);
                 if (ec) return;
+
+                HPX_ASSERT(state_ != empty);
             }
 
             if (&ec != &throws)
@@ -357,6 +359,8 @@ namespace detail
                 threads::thread_state_ex_enum const reason =
                     cond_.wait_for(l, p, "future_data::wait_for", ec);
                 if (ec) return future_status::uninitialized;
+
+                HPX_ASSERT(state_ != empty);
 
                 return (reason == threads::wait_signaled) ?
                     future_status::timeout : future_status::ready; //-V110
