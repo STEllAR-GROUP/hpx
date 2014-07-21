@@ -11,6 +11,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
+#include <hpx/parallel/detail/dispatch.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
@@ -31,15 +32,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct find : public detail::algorithm<find<InIter>, InIter>
         {
             find()
-                : detail::algorithm<find<InIter>, InIter>("find")
+                : find::algorithm("find")
             {}
 
             template <typename ExPolicy, typename T>
-            static typename detail::algorithm_result<ExPolicy, InIter>::type
+            static InIter
             sequential(ExPolicy const&, InIter first, InIter last, const T& val)
             {
-                return detail::algorithm_result<ExPolicy, InIter>::get(
-                    std::find(first, last, val));
+                return std::find(first, last, val);
             }
 
             template <typename ExPolicy, typename T>

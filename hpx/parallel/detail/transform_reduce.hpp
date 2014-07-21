@@ -16,6 +16,7 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
 #include <hpx/parallel/detail/dispatch.hpp>
+#include <hpx/parallel/detail/predicates.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
@@ -34,16 +35,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename T>
-        struct identity
-        {
-            typedef T type;
-            T const& operator()(T const& val) const
-            {
-                return val;
-            }
-        };
-
         template <typename T>
         struct transform_reduce
           : public detail::algorithm<transform_reduce<T>, T>

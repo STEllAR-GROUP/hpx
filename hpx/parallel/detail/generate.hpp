@@ -29,15 +29,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct generate : public detail::algorithm<generate>
         {
             generate()
-                : detail::algorithm<generate>("generate")
+                : generate::algorithm("generate")
             {}
 
             template <typename ExPolicy, typename InIter, typename F>
-            static typename detail::algorithm_result<ExPolicy>::type
+            static hpx::util::unused_type
             sequential(ExPolicy const&, InIter first, InIter last, F && f)
             {
                 std::generate(first, last, std::forward<F>(f));
-                return detail::algorithm_result<ExPolicy>::get();
+                return hpx::util::unused;
             }
 
             template <typename ExPolicy, typename FwdIter, typename F>
@@ -91,15 +91,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct generate_n: public detail::algorithm<generate_n<OutIter>, OutIter>
         {
             generate_n()
-                : detail::algorithm<generate_n<OutIter>, OutIter>("generate_n")
+                : generate_n::algorithm("generate_n")
             {}
 
             template <typename ExPolicy, typename F>
-            static typename detail::algorithm_result<ExPolicy, OutIter>::type
+            static OutIter
             sequential(ExPolicy const&, OutIter first, std::size_t count, F && f)
             {
-                return detail::algorithm_result<ExPolicy, OutIter>::get(
-                    std::generate_n(first, count, f));
+                return std::generate_n(first, count, f);
             }
 
             template <typename ExPolicy, typename F>

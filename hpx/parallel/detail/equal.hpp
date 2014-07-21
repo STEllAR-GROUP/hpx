@@ -15,6 +15,7 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
 #include <hpx/parallel/detail/dispatch.hpp>
+#include <hpx/parallel/detail/predicates.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
@@ -103,8 +104,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             it, part_count, tok,
                             [&f, &tok](reference t)
                             {
-                                if (!f(hpx::util::get<0>(t), hpx::util::get<1>(t)))
+                                if (!f(hpx::util::get<0>(t), hpx::util::get<1>(t))){
                                     tok.cancel();
+                                }
                             });
                         return !tok.was_cancelled();
                     },
