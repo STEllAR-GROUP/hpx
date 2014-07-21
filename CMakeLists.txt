@@ -69,8 +69,6 @@ if(NOT HPX_CMAKE_LOGLEVEL)
   set(HPX_CMAKE_LOGLEVEL "WARN")
 endif()
 
-message("${CMAKE_CXX_FLAGS} <--What the heck??!?")
-
 ################################################################################
 # Fortran compiler detection
 #
@@ -103,15 +101,10 @@ hpx_option(WITH_MALLOC
   "Define which allocator should be linked in. Options are: system, tcmalloc, jemalloc and tbbmalloc (default is: tcmalloc)"
   ${DEFAULT_MALLOC} ADVANCED)
 
-set(WITH_HWLOC_DEFAULT ON)
-if(APPLE)
-  set(WITH_HWLOC_DEFAULT OFF)
-endif()
-
 hpx_option(WITH_HWLOC
   BOOL
   "Use Hwloc for hardware topolgy information and thread pinning. If disabled, performance might be reduced."
-  ${WITH_HWLOC_DEFAULT} ADVANCED)
+  ON ADVANCED)
 
 hpx_option(WITH_SECURITY BOOL "Enable security support via libsodium." OFF)
 
@@ -166,11 +159,7 @@ hpx_option(WITH_FULL_RPATH BOOL "Build and link HPX libraries and executables wi
 ################################################################################
 # Native TLS configuration
 ################################################################################
-set(WITH_NATIVE_TLS_DEFAULT ON)
-if(APPLE)
-  set(WITH_NATIVE_TLS_DEFAULT OFF)
-endif()
-hpx_option(WITH_NATIVE_TLS BOOL "Use native TLS support if available (default: ON)" ${WITH_NATIVE_TLS_DEFAULT} ADVANCED)
+hpx_option(WITH_NATIVE_TLS BOOL "Use native TLS support if available (default: ON)" ON ADVANCED)
 if(WITH_NATIVE_TLS)
   hpx_info("Native TLS is enabled.")
   hpx_add_config_define(HPX_HAVE_NATIVE_TLS)
@@ -1464,8 +1453,6 @@ foreach(_cat "Generic" "Thread Manager" "AGAS" "Parcelport" "Profiling" "Debuggi
 endforeach()
 
 #message(${_HPX_INFO_STRING})
+message("")
 message("HPX will be installed to ${CMAKE_INSTALL_PREFIX}")
 message("")
-
-message("${HPX_LIBRARIES}")
-message("${HPX_CONFIG_DEFINITIONS}")
