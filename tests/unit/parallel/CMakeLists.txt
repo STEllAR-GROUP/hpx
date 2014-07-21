@@ -17,14 +17,15 @@ set(tests
     filln
     find
     findend
-	  findfirstof
-	  findif
-	  findifnot
+    findfirstof
+    findif
+    findifnot
     foreach
     foreachn
-	  generate
-	  generaten
+    generate
+    generaten
     mismatch
+    mismatch_binary
     move
     none_of
     reduce_
