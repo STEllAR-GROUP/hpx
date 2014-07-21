@@ -3,20 +3,22 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file all_any_none.hpp
+/// \file parallel/detail/all_any_none.hpp
 
 #if !defined(HPX_PARALLEL_DETAIL_ALL_ANY_NONE_JUL_05_2014_0940PM)
 #define HPX_PARALLEL_DETAIL_ALL_ANY_NONE_JUL_05_2014_0940PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/void_guard.hpp>
+#include <hpx/util/move.hpp>
+
+#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
+#include <hpx/parallel/detail/dispatch.hpp>
 #include <hpx/parallel/detail/is_negative.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
-#include <hpx/exception_list.hpp>
-#include <hpx/util/void_guard.hpp>
-#include <hpx/util/move.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -32,71 +34,55 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename ExPolicy, typename InIter, typename F>
-        typename detail::algorithm_result<ExPolicy, bool>::type
-        none_of(ExPolicy const&, InIter first, InIter last, F && f,
-            boost::mpl::true_)
+        struct none_of : public detail::algorithm<none_of, bool>
         {
-            try {
-                return detail::algorithm_result<ExPolicy, bool>::get(
-                    std::none_of(first, last, std::forward<F>(f)));
+            none_of()
+              : none_of::algorithm("none_of")
+            {}
+
+            template <typename ExPolicy, typename InIter, typename F>
+            static bool
+            sequential(ExPolicy const&, InIter first, InIter last, F && f)
+            {
+                return std::none_of(first, last, std::forward<F>(f));
             }
-            catch (...) {
-                detail::handle_exception<ExPolicy>::call();
+
+            template <typename ExPolicy, typename FwdIter, typename F>
+            static typename detail::algorithm_result<ExPolicy, bool>::type
+            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+                F && op)
+            {
+                if (first == last)
+                    return detail::algorithm_result<ExPolicy, bool>::get(true);
+
+                typedef typename std::iterator_traits<FwdIter>::value_type
+                    value_type;
+
+                util::cancellation_token tok;
+                return util::partitioner<ExPolicy, bool>::call(
+                    policy, first, std::distance(first, last),
+                    [op, tok](FwdIter part_begin, std::size_t part_size) mutable
+                    {
+                        util::loop_n(
+                            part_begin, part_size, tok,
+                            [&op, &tok](value_type const& val)
+                            {
+                                if (op(val))
+                                    tok.cancel();
+                            });
+                        return !tok.was_cancelled();
+                    },
+                    [](std::vector<hpx::future<bool> > && results)
+                    {
+                        return std::all_of(
+                            boost::begin(results), boost::end(results),
+                            [](hpx::future<bool>& val)
+                            {
+                                return val.get();
+                            });
+                    });
             }
-        }
-
-        template <typename ExPolicy, typename FwdIter, typename F>
-        typename detail::algorithm_result<ExPolicy, bool>::type
-        none_of(ExPolicy const& policy, FwdIter first, FwdIter last, F && op,
-            boost::mpl::false_)
-        {
-            if (first == last)
-                return detail::algorithm_result<ExPolicy, bool>::get(true);
-
-            typedef typename std::iterator_traits<FwdIter>::value_type
-                value_type;
-
-            util::cancellation_token tok;
-            return util::partitioner<ExPolicy, bool>::call(
-                policy, first, std::distance(first, last),
-                [op, tok](FwdIter part_begin, std::size_t part_count) mutable
-                {
-                    util::loop_n(
-                        part_begin, part_count, tok,
-                        [&op, &tok](value_type const& val)
-                        {
-                            if (op(val))
-                                tok.cancel();
-                        });
-                    return !tok.was_cancelled();
-                },
-                [](std::vector<hpx::future<bool> > && results)
-                {
-                    return std::all_of(
-                        boost::begin(results), boost::end(results),
-                        [](hpx::future<bool>& val)
-                        {
-                            return val.get();
-                        });
-                });
-        }
-
-        template <typename InIter, typename F>
-        bool none_of(execution_policy const& policy,
-            InIter first, InIter last, F && f, boost::mpl::false_)
-        {
-            HPX_PARALLEL_DISPATCH(policy, detail::none_of, first, last,
-                std::forward<F>(f));
-        }
-
-        template <typename InIter, typename F>
-        bool none_of(execution_policy const& policy,
-            InIter first, InIter last, F && f, boost::mpl::true_ t)
-        {
-            return detail::none_of(sequential_execution_policy(),
-                first, last, std::forward<F>(f), t);
-        }
+        };
         /// \endcond
     }
 
@@ -175,7 +161,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category>
         >::type is_seq;
 
-        return detail::none_of(
+        return detail::none_of().call(
             std::forward<ExPolicy>(policy),
             first, last, std::forward<F>(f), is_seq());
     }
@@ -185,71 +171,55 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename ExPolicy, typename InIter, typename F>
-        typename detail::algorithm_result<ExPolicy, bool>::type
-        any_of(ExPolicy const&, InIter first, InIter last, F && f,
-            boost::mpl::true_)
+        struct any_of : public detail::algorithm<any_of, bool>
         {
-            try {
-                return detail::algorithm_result<ExPolicy, bool>::get(
-                    std::any_of(first, last, std::forward<F>(f)));
+            any_of()
+              : any_of::algorithm("any_of")
+            {}
+
+            template <typename ExPolicy, typename InIter, typename F>
+            static bool
+            sequential(ExPolicy const&, InIter first, InIter last, F && f)
+            {
+                return std::any_of(first, last, std::forward<F>(f));
             }
-            catch (...) {
-                detail::handle_exception<ExPolicy>::call();
+
+            template <typename ExPolicy, typename FwdIter, typename F>
+            static typename detail::algorithm_result<ExPolicy, bool>::type
+            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+                F && op)
+            {
+                if (first == last)
+                    return detail::algorithm_result<ExPolicy, bool>::get(false);
+
+                typedef typename std::iterator_traits<FwdIter>::value_type
+                    value_type;
+
+                util::cancellation_token tok;
+                return util::partitioner<ExPolicy, bool>::call(
+                    policy, first, std::distance(first, last),
+                    [op, tok](FwdIter part_begin, std::size_t part_size) mutable
+                    {
+                        util::loop_n(
+                            part_begin, part_size, tok,
+                            [&op, &tok](value_type const& val)
+                            {
+                                if (op(val))
+                                    tok.cancel();
+                            });
+                        return tok.was_cancelled();
+                    },
+                    [](std::vector<hpx::future<bool> > && results)
+                    {
+                        return std::any_of(
+                            boost::begin(results), boost::end(results),
+                            [](hpx::future<bool>& val)
+                            {
+                                return val.get();
+                            });
+                    });
             }
-        }
-
-        template <typename ExPolicy, typename FwdIter, typename F>
-        typename detail::algorithm_result<ExPolicy, bool>::type
-        any_of(ExPolicy const& policy, FwdIter first, FwdIter last, F && op,
-            boost::mpl::false_)
-        {
-            if (first == last)
-                return detail::algorithm_result<ExPolicy, bool>::get(false);
-
-            typedef typename std::iterator_traits<FwdIter>::value_type
-                value_type;
-
-            util::cancellation_token tok;
-            return util::partitioner<ExPolicy, bool>::call(
-                policy, first, std::distance(first, last),
-                [op, tok](FwdIter part_begin, std::size_t part_count) mutable
-                {
-                    util::loop_n(
-                        part_begin, part_count, tok,
-                        [&op, &tok](value_type const& val)
-                        {
-                            if (op(val))
-                                tok.cancel();
-                        });
-                    return tok.was_cancelled();
-                },
-                [](std::vector<hpx::future<bool> > && results)
-                {
-                    return std::any_of(
-                        boost::begin(results), boost::end(results),
-                        [](hpx::future<bool>& val)
-                        {
-                            return val.get();
-                        });
-                });
-        }
-
-        template <typename InIter, typename F>
-        bool any_of(execution_policy const& policy,
-            InIter first, InIter last, F && f, boost::mpl::false_)
-        {
-            HPX_PARALLEL_DISPATCH(policy, detail::any_of, first, last,
-                std::forward<F>(f));
-        }
-
-        template <typename InIter, typename F>
-        bool any_of(execution_policy const& policy,
-            InIter first, InIter last, F && f, boost::mpl::true_ t)
-        {
-            return detail::any_of(sequential_execution_policy(),
-                first, last, std::forward<F>(f), t);
-        }
+        };
         /// \endcond
     }
 
@@ -328,7 +298,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category>
         >::type is_seq;
 
-        return detail::any_of(
+        return detail::any_of().call(
             std::forward<ExPolicy>(policy),
             first, last, std::forward<F>(f), is_seq());
     }
@@ -338,71 +308,55 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename ExPolicy, typename InIter, typename F>
-        typename detail::algorithm_result<ExPolicy, bool>::type
-        all_of(ExPolicy const&, InIter first, InIter last, F && f,
-            boost::mpl::true_)
+        struct all_of : public detail::algorithm<all_of, bool>
         {
-            try {
-                return detail::algorithm_result<ExPolicy, bool>::get(
-                    std::all_of(first, last, std::forward<F>(f)));
+            all_of()
+              : all_of::algorithm("all_of")
+            {}
+
+            template <typename ExPolicy, typename InIter, typename F>
+            static bool
+            sequential(ExPolicy const&, InIter first, InIter last, F && f)
+            {
+                return std::all_of(first, last, std::forward<F>(f));
             }
-            catch (...) {
-                detail::handle_exception<ExPolicy>::call();
+
+            template <typename ExPolicy, typename FwdIter, typename F>
+            static typename detail::algorithm_result<ExPolicy, bool>::type
+            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+                F && op)
+            {
+                if (first == last)
+                    return detail::algorithm_result<ExPolicy, bool>::get(true);
+
+                typedef typename std::iterator_traits<FwdIter>::value_type
+                    value_type;
+
+                util::cancellation_token tok;
+                return util::partitioner<ExPolicy, bool>::call(
+                    policy, first, std::distance(first, last),
+                    [op, tok](FwdIter part_begin, std::size_t part_size) mutable
+                    {
+                        util::loop_n(
+                            part_begin, part_size, tok,
+                            [&op, &tok](value_type const& val)
+                            {
+                                if (!op(val))
+                                    tok.cancel();
+                            });
+                        return !tok.was_cancelled();
+                    },
+                    [](std::vector<hpx::future<bool> > && results)
+                    {
+                        return std::all_of(
+                            boost::begin(results), boost::end(results),
+                            [](hpx::future<bool>& val)
+                            {
+                                return val.get();
+                            });
+                    });
             }
-        }
-
-        template <typename ExPolicy, typename FwdIter, typename F>
-        typename detail::algorithm_result<ExPolicy, bool>::type
-        all_of(ExPolicy const& policy, FwdIter first, FwdIter last, F && op,
-            boost::mpl::false_)
-        {
-            if (first == last)
-                return detail::algorithm_result<ExPolicy, bool>::get(true);
-
-            typedef typename std::iterator_traits<FwdIter>::value_type
-                value_type;
-
-            util::cancellation_token tok;
-            return util::partitioner<ExPolicy, bool>::call(
-                policy, first, std::distance(first, last),
-                [op, tok](FwdIter part_begin, std::size_t part_count) mutable
-                {
-                    util::loop_n(
-                        part_begin, part_count, tok,
-                        [&op, &tok](value_type const& val)
-                        {
-                            if (!op(val))
-                                tok.cancel();
-                        });
-                    return !tok.was_cancelled();
-                },
-                [](std::vector<hpx::future<bool> > && results)
-                {
-                    return std::all_of(
-                        boost::begin(results), boost::end(results),
-                        [](hpx::future<bool>& val)
-                        {
-                            return val.get();
-                        });
-                });
-        }
-
-        template <typename InIter, typename F>
-        bool all_of(execution_policy const& policy,
-            InIter first, InIter last, F && f, boost::mpl::false_)
-        {
-            HPX_PARALLEL_DISPATCH(policy, detail::all_of, first, last,
-                std::forward<F>(f));
-        }
-
-        template <typename InIter, typename F>
-        bool all_of(execution_policy const& policy,
-            InIter first, InIter last, F && f, boost::mpl::true_ t)
-        {
-            return detail::all_of(sequential_execution_policy(),
-                first, last, std::forward<F>(f), t);
-        }
+        };
         /// \endcond
     }
 
@@ -481,7 +435,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category>
         >::type is_seq;
 
-        return detail::all_of(
+        return detail::all_of().call(
             std::forward<ExPolicy>(policy),
             first, last, std::forward<F>(f), is_seq());
     }

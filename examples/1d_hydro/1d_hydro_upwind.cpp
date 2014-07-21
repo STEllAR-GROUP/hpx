@@ -183,18 +183,12 @@ struct time_element{
 class One_Dimension_Grid
 {
 public:
-    One_Dimension_Grid():number_t_steps(0),number_of_cells(0),time_array(0)
-    {}
-    One_Dimension_Grid(boost::uint64_t num_cells,boost::uint64_t num_time_steps):number_t_steps(num_time_steps),number_of_cells(num_cells)
+    One_Dimension_Grid():time_array(0)
     {}
     // ~One_Dimension_Grid();
     void remove_bottom_time_step();//takes the timesteps position in the vector
     void addNewTimeStep();
 
-private:
-
-   boost::uint64_t number_t_steps;
-   boost::uint64_t number_of_cells;
 public:
    std::vector<time_element> time_array;//pointer to the Grid we will create whden the user starts a simulation
 
@@ -364,8 +358,8 @@ cell compute(boost::uint64_t timestep, boost::uint64_t location)
   //now we have to actually compute some values.
 
   //these are the dependencies, or "stencil"
-  if(timestep<0)
-        return grid.time_array.at(timestep).fluid.at(location);
+  //if(timestep<0) // unsigned comparision always false
+  //      return grid.time_array.at(timestep).fluid.at(location);
 
   compute_future nleft = async<compute_action>(here,timestep-1,location-1);
   compute_future nmiddle = async<compute_action>(here,timestep-1,location);

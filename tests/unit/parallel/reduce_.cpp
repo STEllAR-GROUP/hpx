@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/numeric.hpp>
+#include <hpx/include/parallel_reduce.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include "test_utils.hpp"
@@ -148,7 +148,6 @@ void reduce_test2()
     test_reduce2<std::input_iterator_tag>();
 }
 
-#if !defined(BOOST_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS)
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
 void test_reduce3(ExPolicy const& policy, IteratorTag)
@@ -210,7 +209,6 @@ void reduce_test3()
     test_reduce3<std::forward_iterator_tag>();
     test_reduce3<std::input_iterator_tag>();
 }
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
@@ -401,9 +399,8 @@ int hpx_main()
 {
     reduce_test1();
     reduce_test2();
-#if !defined(BOOST_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS)
     reduce_test3();
-#endif
+
     reduce_exception_test();
     reduce_bad_alloc_test();
     return hpx::finalize();
@@ -422,5 +419,3 @@ int main(int argc, char* argv[])
 
     return hpx::util::report_errors();
 }
-
-

@@ -39,4 +39,12 @@
     HPX_DELETE_COPY_ASSIGN(cls)                                               \
 /**/
 
+#if !defined(BOOST_DELETED_FUNCTION)
+#if !defined(BOOST_NO_CXX11_DELETED_FUNCTIONS)
+#   define BOOST_DELETED_FUNCTION(fun) fun = delete;
+#else
+#   define BOOST_DELETED_FUNCTION(fun) private: fun;
+#endif
+#endif
+
 #endif

@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/algorithm.hpp>
+#include <hpx/include/parallel_copy.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include "test_utils.hpp"
@@ -22,7 +22,7 @@ void test_copy(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
-    base_iterator res = hpx::parallel::copy(policy,
+    hpx::parallel::copy(policy,
         iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d));
 
     std::size_t count = 0;
@@ -71,7 +71,7 @@ void test_copy_outiter(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(0);
     std::iota(boost::begin(c), boost::end(c), std::rand());
-    auto res = hpx::parallel::copy(policy,
+    hpx::parallel::copy(policy,
         iterator(boost::begin(c)), iterator(boost::end(c)), std::back_inserter(d));
 
     std::size_t count = 0;
@@ -158,7 +158,7 @@ void test_copy_exception(ExPolicy const& policy, IteratorTag)
 
     bool caught_exception = false;
     try {
-        base_iterator outiter = hpx::parallel::copy(policy,
+        hpx::parallel::copy(policy,
             decorated_iterator(
                 boost::begin(c),
                 [](){ throw std::runtime_error("test"); }),
@@ -253,7 +253,7 @@ void test_copy_bad_alloc(ExPolicy const& policy, IteratorTag)
 
     bool caught_bad_alloc = false;
     try {
-        base_iterator outiter = hpx::parallel::copy(policy,
+        hpx::parallel::copy(policy,
             decorated_iterator(
                 boost::begin(c),
                 [](){ throw std::bad_alloc(); }),

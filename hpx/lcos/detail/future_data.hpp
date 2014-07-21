@@ -341,6 +341,8 @@ namespace detail
             if (state_ == empty) {
                 cond_.wait(l, "future_data::wait", ec);
                 if (ec) return;
+
+                HPX_ASSERT(state_ != empty);
             }
 
             if (&ec != &throws)
@@ -358,8 +360,11 @@ namespace detail
                     cond_.wait_for(l, p, "future_data::wait_for", ec);
                 if (ec) return future_status::uninitialized;
 
-                return (reason == threads::wait_signaled) ?
-                    future_status::timeout : future_status::ready; //-V110
+                if (reason == threads::wait_signaled)
+                    return future_status::timeout;
+
+                HPX_ASSERT(state_ != empty);
+                return future_status::ready;
             }
 
             if (&ec != &throws)
@@ -380,8 +385,11 @@ namespace detail
                     cond_.wait_until(l, at, "future_data::wait_until", ec);
                 if (ec) return future_status::uninitialized;
 
-                return (reason == threads::wait_signaled) ?
-                    future_status::timeout : future_status::ready; //-V110
+                if (reason == threads::wait_signaled)
+                    return future_status::timeout;
+
+                HPX_ASSERT(state_ != empty);
+                return future_status::ready;
             }
 
             if (&ec != &throws)

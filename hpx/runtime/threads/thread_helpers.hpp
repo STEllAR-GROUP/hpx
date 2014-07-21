@@ -96,6 +96,18 @@ namespace hpx { namespace threads
         thread_priority priority = thread_priority_normal,
         error_code& ec = throws);
 
+    template <typename Clock, typename Duration>
+    thread_id_type set_thread_state(thread_id_type const& id,
+        boost::chrono::time_point<Clock, Duration> const& abs_time,
+        thread_state_enum state = pending,
+        thread_state_ex_enum stateex = wait_timeout,
+        thread_priority priority = thread_priority_normal,
+        error_code& ec = throws)
+    {
+        return set_thread_state(id, util::to_ptime(abs_time), state,
+            stateex, priority, ec);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief  Set the thread state of the \a thread referenced by the
     ///         thread_id \a id.
@@ -128,6 +140,18 @@ namespace hpx { namespace threads
         thread_state_ex_enum stateex = wait_timeout,
         thread_priority priority = thread_priority_normal,
         error_code& ec = throws);
+
+    template <typename Rep, typename Period>
+    thread_id_type set_thread_state(thread_id_type const& id,
+        boost::chrono::duration<Rep, Period> const& rel_time,
+        thread_state_enum state = pending,
+        thread_state_ex_enum stateex = wait_timeout,
+        thread_priority priority = thread_priority_normal,
+        error_code& ec = throws)
+    {
+        return set_thread_state(id, util::to_time_duration(rel_time), state,
+            stateex, priority, ec);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     /// The function get_thread_description is part of the thread related API
@@ -444,6 +468,15 @@ namespace hpx { namespace this_thread
         char const* description = "this_thread::suspend",
         error_code& ec = throws);
 
+    template <typename Clock, typename Duration>
+    threads::thread_state_ex_enum suspend(
+        boost::chrono::time_point<Clock, Duration> const& abs_time,
+        char const* description = "this_thread::suspend",
+        error_code& ec = throws)
+    {
+        return suspend(util::to_ptime(abs_time), description, ec);
+    }
+
     /// The function \a suspend will return control to the thread manager
     /// (suspends the current thread). It sets the new state of this thread
     /// to \a suspended and schedules a wakeup for this threads after the given
@@ -465,6 +498,15 @@ namespace hpx { namespace this_thread
         boost::posix_time::time_duration const&,
         char const* description = "this_thread::suspend",
         error_code& ec = throws);
+
+    template <typename Rep, typename Period>
+    threads::thread_state_ex_enum suspend(
+        boost::chrono::duration<Rep, Period> const& rel_time,
+        char const* description = "this_thread::suspend",
+        error_code& ec = throws)
+    {
+        return suspend(util::to_time_duration(rel_time), description, ec);
+    }
 
     /// The function \a suspend will return control to the thread manager
     /// (suspends the current thread). It sets the new state of this thread

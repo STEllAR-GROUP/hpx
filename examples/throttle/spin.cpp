@@ -27,8 +27,6 @@ using hpx::naming::get_locality_id_from_gid;
 int hpx_main(variables_map& vm)
 {
     {
-        resolver_client& agas_client = get_agas_client();
-
         std::cout << "commands: localities, help, quit\n";
 
         while (true)

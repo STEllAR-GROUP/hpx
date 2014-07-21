@@ -3,15 +3,19 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file count.hpp
+/// \file parallel/detail/count.hpp
 
 #if !defined(HPX_PARALLEL_DETAIL_COUNT_JUNE_17_2014_1154AM)
 #define HPX_PARALLEL_DETAIL_COUNT_JUNE_17_2014_1154AM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/exception_list.hpp>
+#include <hpx/util/move.hpp>
+#include <hpx/util/unwrapped.hpp>
+
+#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
+#include <hpx/parallel/detail/dispatch.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
@@ -29,77 +33,60 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename ExPolicy, typename InIter, typename T>
-        typename detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<InIter>::difference_type>::type
-        count(ExPolicy const&, InIter first, InIter last, T const& value,
-            boost::mpl::true_)
+        template <typename Iter>
+        struct count
+          : public detail::algorithm<
+                count<Iter>,
+                typename std::iterator_traits<Iter>::difference_type
+            >
         {
-            try {
-                typedef typename std::iterator_traits<InIter>::difference_type
-                    difference;
-
-                return detail::algorithm_result<ExPolicy, difference>::get(
-                    std::count(first, last, value));
-            }
-            catch (...) {
-                detail::handle_exception<ExPolicy>::call();
-            }
-        }
-
-        template <typename ExPolicy, typename FwdIter, typename T>
-        typename detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<FwdIter>::difference_type
-        >::type
-        count(ExPolicy const& policy, FwdIter first, FwdIter last,
-            T const& value, boost::mpl::false_)
-        {
-            typedef typename std::iterator_traits<FwdIter>::value_type
-                value_type;
-            typedef typename std::iterator_traits<FwdIter>::difference_type
+            typedef typename std::iterator_traits<Iter>::difference_type
                 difference_type;
 
-            if (first == last)
-                return detail::algorithm_result<ExPolicy, difference_type>::get(0);
+            count()
+              : count::algorithm("count")
+            {}
 
-            return util::partitioner<ExPolicy, difference_type>::call(
-                policy, first, std::distance(first, last),
-                [value](FwdIter part_begin, std::size_t part_count)
-                {
-                    difference_type ret = 0;
-                    util::loop_n(part_begin, part_count,
-                        [&value, &ret](value_type const& val)
-                        {
-                            if (value == val)
-                                ++ret;
-                        });
-                    return ret;
-                },
-                hpx::util::unwrapped(
-                    [](std::vector<difference_type>&& results)
+            template <typename ExPolicy, typename T>
+            static difference_type
+            sequential(ExPolicy const&, Iter first, Iter last, T const& value)
+            {
+                return std::count(first, last, value);
+            }
+
+            template <typename ExPolicy, typename T>
+            static typename detail::algorithm_result<ExPolicy, difference_type>::type
+            parallel(ExPolicy const& policy, Iter first, Iter last,
+                T const& value)
+            {
+                typedef typename std::iterator_traits<Iter>::value_type
+                    value_type;
+
+                if (first == last)
+                    return detail::algorithm_result<ExPolicy, difference_type>::get(0);
+
+                return util::partitioner<ExPolicy, difference_type>::call(
+                    policy, first, std::distance(first, last),
+                    [value](Iter part_begin, std::size_t part_size)
                     {
-                        return util::accumulate_n(
-                            boost::begin(results), boost::size(results),
-                            difference_type(0), std::plus<difference_type>());
-                    }));
-        }
-
-        template <typename InIter, typename T>
-        typename std::iterator_traits<InIter>::difference_type
-        count(execution_policy const& policy, InIter first, InIter last,
-            T const& value, boost::mpl::false_)
-        {
-            HPX_PARALLEL_DISPATCH(policy, detail::count, first, last, value);
-        }
-
-        template <typename InIter, typename T>
-        typename std::iterator_traits<InIter>::difference_type count(
-            execution_policy const& policy, InIter first, InIter last,
-            const T& value, boost::mpl::true_ t)
-        {
-            return detail::count(sequential_execution_policy(),
-                first, last, value, t);
-        }
+                        difference_type ret = 0;
+                        util::loop_n(part_begin, part_size,
+                            [&value, &ret](value_type const& val)
+                            {
+                                if (value == val)
+                                    ++ret;
+                            });
+                        return ret;
+                    },
+                    hpx::util::unwrapped(
+                        [](std::vector<difference_type>&& results)
+                        {
+                            return util::accumulate_n(
+                                boost::begin(results), boost::size(results),
+                                difference_type(0), std::plus<difference_type>());
+                        }));
+            }
+        };
         /// \endcond
     }
 
@@ -165,7 +152,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, category>
         >::type is_seq;
 
-        return detail::count(std::forward<ExPolicy>(policy),
+        return detail::count<InIter>().call(
+            std::forward<ExPolicy>(policy),
             first, last, value, is_seq());
     }
 
@@ -174,79 +162,59 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename ExPolicy, typename InIter, typename Pred>
-        typename detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<InIter>::difference_type
-        >::type
-        count_if(ExPolicy const&, InIter first, InIter last, Pred && op,
-            boost::mpl::true_)
+        template <typename Iter>
+        struct count_if
+          : public detail::algorithm<
+                count_if<Iter>,
+                typename std::iterator_traits<Iter>::difference_type
+            >
         {
-            typedef typename std::iterator_traits<InIter>::difference_type
+            typedef typename std::iterator_traits<Iter>::difference_type
                 difference_type;
 
-            try {
-                return detail::algorithm_result<ExPolicy, difference_type>
-                    ::get(std::count_if(first, last, std::forward<Pred>(op)));
+            count_if()
+              : count_if::algorithm("count_if")
+            {}
+
+            template <typename ExPolicy, typename Pred>
+            static difference_type
+            sequential(ExPolicy const&, Iter first, Iter last, Pred && op)
+            {
+                return std::count_if(first, last, std::forward<Pred>(op));
             }
-            catch(...) {
-                detail::handle_exception<ExPolicy>::call();
-            }
-        }
 
-        template <typename ExPolicy, typename FwdIter, typename Pred>
-        typename detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<FwdIter>::difference_type
-        >::type
-        count_if(ExPolicy const& policy, FwdIter first, FwdIter last,
-            Pred && op, boost::mpl::false_)
-        {
-            typedef typename std::iterator_traits<FwdIter>::value_type
-                value_type;
-            typedef typename std::iterator_traits<FwdIter>::difference_type
-                difference_type;
+            template <typename ExPolicy, typename Pred>
+            static typename detail::algorithm_result<ExPolicy, difference_type>::type
+            parallel(ExPolicy const& policy, Iter first, Iter last, Pred && op)
+            {
+                typedef typename std::iterator_traits<Iter>::value_type
+                    value_type;
 
-            if (first == last)
-                return detail::algorithm_result<ExPolicy, difference_type>::get(0);
+                if (first == last)
+                    return detail::algorithm_result<ExPolicy, difference_type>::get(0);
 
-            return util::partitioner<ExPolicy, difference_type>::call(
-                policy, first, std::distance(first, last),
-                [op](FwdIter part_begin, std::size_t part_count)
-                {
-                    difference_type ret = 0;
-                    util::loop_n(part_begin, part_count,
-                        [&op, &ret](value_type const& val)
-                        {
-                            if (op(val))
-                                ++ret;
-                        });
-                    return ret;
-                },
-                hpx::util::unwrapped(
-                    [](std::vector<difference_type>&& results)
+                return util::partitioner<ExPolicy, difference_type>::call(
+                    policy, first, std::distance(first, last),
+                    [op](Iter part_begin, std::size_t part_size)
                     {
-                        return util::accumulate_n(
-                            boost::begin(results), boost::size(results),
-                            difference_type(0), std::plus<difference_type>());
-                    }));
-        }
-
-        template <typename InIter, typename Pred>
-        typename std::iterator_traits<InIter>::difference_type
-        count_if(execution_policy const& policy, InIter first, InIter last,
-            Pred && op, boost::mpl::false_)
-        {
-            HPX_PARALLEL_DISPATCH(policy, detail::count_if, first, last,
-                std::forward<Pred>(op));
-        }
-
-        template <typename InIter, typename Pred>
-        typename std::iterator_traits<InIter>::difference_type
-        count_if(execution_policy const& policy, InIter first, InIter last,
-            Pred && op, boost::mpl::true_ t)
-        {
-            return detail::count_if(sequential_execution_policy(),
-                first, last, std::forward<Pred>(op), t);
-        }
+                        difference_type ret = 0;
+                        util::loop_n(part_begin, part_size,
+                            [&op, &ret](value_type const& val)
+                            {
+                                if (op(val))
+                                    ++ret;
+                            });
+                        return ret;
+                    },
+                    hpx::util::unwrapped(
+                        [](std::vector<difference_type>&& results)
+                        {
+                            return util::accumulate_n(
+                                boost::begin(results), boost::size(results),
+                                difference_type(0), std::plus<difference_type>());
+                        }));
+            }
+        };
         /// \endcond
     }
 
@@ -328,7 +296,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, category>
         >::type is_seq;
 
-        return detail::count_if(std::forward<ExPolicy>(policy),
+        return detail::count_if<InIter>().call(
+            std::forward<ExPolicy>(policy),
             first, last, std::forward<F>(f), is_seq());
     }
 }}}

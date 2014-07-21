@@ -277,8 +277,15 @@ namespace hpx { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     void print_counters(boost::shared_ptr<util::query_counters> const& qc)
     {
-        HPX_ASSERT(qc);
-        qc->start();
+        try {
+            HPX_ASSERT(qc);
+            qc->start();
+        }
+        catch (...) {
+            std::cerr << hpx::diagnostic_information(boost::current_exception())
+                << std::flush;
+            hpx::terminate();
+        }
     }
 }}
 

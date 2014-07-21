@@ -11,9 +11,11 @@
 namespace hpx { namespace parallel
 {
     HPX_INLINE_NAMESPACE(v1) {}
+    HPX_INLINE_NAMESPACE(v2) {}
 
 #if defined(BOOST_NO_CXX11_INLINE_NAMESPACES)
     using namespace v1;
+    using namespace v2;
 #endif
 }}
 
