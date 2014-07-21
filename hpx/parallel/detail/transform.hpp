@@ -36,16 +36,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct transform : public detail::algorithm<transform<OutIter>, OutIter>
         {
             transform()
-              : detail::algorithm<transform<OutIter>, OutIter>("transform")
+              : transform::algorithm("transform")
             {}
 
             template <typename ExPolicy, typename InIter, typename F>
-            static typename detail::algorithm_result<ExPolicy, OutIter>::type
+            static OutIter
             sequential(ExPolicy const&, InIter first, InIter last, OutIter dest,
                 F && f)
             {
-                return detail::algorithm_result<ExPolicy, OutIter>::get(
-                    std::transform(first, last, dest, std::forward<F>(f)));
+                return std::transform(first, last, dest, std::forward<F>(f));
             }
 
             template <typename ExPolicy, typename FwdIter, typename F>
@@ -167,19 +166,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
           : public detail::algorithm<transform_binary<OutIter>, OutIter>
         {
             transform_binary()
-              : detail::algorithm<transform_binary<OutIter>, OutIter>(
-                    "transform_binary")
+              : transform_binary::algorithm("transform_binary")
             {}
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
-            static typename detail::algorithm_result<ExPolicy, OutIter>::type
+            static OutIter
             sequential(ExPolicy const&, InIter1 first1, InIter1 last1,
                 InIter2 first2, OutIter dest, F && f)
             {
-                return detail::algorithm_result<ExPolicy, OutIter>::get(
-                    std::transform(first1, last1, first2, dest,
-                        std::forward<F>(f)));
+                return std::transform(first1, last1, first2, dest,
+                    std::forward<F>(f));
             }
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,

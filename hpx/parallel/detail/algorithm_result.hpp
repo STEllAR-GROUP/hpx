@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/parallel/execution_policy.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/static_assert.hpp>
 #include <boost/type_traits/is_lvalue_reference.hpp>
@@ -19,9 +20,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     template <typename ExPolicy, typename T>
     struct algorithm_result_impl
     {
-        typedef T type;         // The return type of the initiating function.
+        // The return type of the initiating function.
+        typedef T type;
 
-        static type get(T && t) // Obtain initiating function's return type.
+        // Obtain initiating function's return type.
+        static type get(T && t)
         {
             return std::move(t);
         }
@@ -30,9 +33,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     template <typename ExPolicy>
     struct algorithm_result_impl<ExPolicy, void>
     {
-        typedef void type;      // The return type of the initiating function.
+        // The return type of the initiating function.
+        typedef void type;
 
-        static void get() {}    // Obtain initiating function's return type.
+        // Obtain initiating function's return type.
+        static void get(hpx::util::unused_type) {}
     };
 
     template <typename T>
@@ -41,7 +46,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         // The return type of the initiating function.
         typedef hpx::future<T> type;
 
-        static type get(T && t) // Obtain initiating function's return type.
+        // Obtain initiating function's return type.
+        static type get(T && t)
         {
             return hpx::make_ready_future(std::move(t));
         }
@@ -53,7 +59,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         // The return type of the initiating function.
         typedef hpx::future<void> type;
 
-        static type get()       // Obtain initiating function's return type.
+        // Obtain initiating function's return type.
+        static type get(hpx::util::unused_type)
         {
             return hpx::make_ready_future();
         }

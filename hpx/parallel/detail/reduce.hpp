@@ -38,17 +38,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct reduce : public detail::algorithm<reduce<T>, T>
         {
             reduce()
-              : detail::algorithm<reduce<T>, T>("reduce")
+              : reduce::algorithm("reduce")
             {}
 
             template <typename ExPolicy, typename InIter, typename Reduce>
-            static typename detail::algorithm_result<ExPolicy, T>::type
+            static T
             sequential(ExPolicy const&, InIter first, InIter last,
                 T && init, Reduce && r)
             {
-                return detail::algorithm_result<ExPolicy, T>::get(
-                    std::accumulate(first, last, std::forward<T>(init),
-                    std::forward<Reduce>(r)));
+                return std::accumulate(first, last, std::forward<T>(init),
+                    std::forward<Reduce>(r));
             }
 
             template <typename ExPolicy, typename FwdIter, typename Reduce>
@@ -295,24 +294,21 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           * b1, ..., bN may be any permutation of a1, ..., aN and
     ///           * 1 < K+1 = M <= N.
     ///
-    /// This overload of \a reduce is available only if the compiler
-    /// supports default function template arguments.
-    ///
     /// The difference between \a reduce and \a accumulate is
     /// that the behavior of reduce may be non-deterministic for
     /// non-associative or non-commutative binary predicate.
     ///
-#if !defined(BOOST_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS)
-    template <typename ExPolicy, typename InIter,
-        typename T = typename std::iterator_traits<InIter>::value_type>
+    template <typename ExPolicy, typename InIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, T>::type
+        typename detail::algorithm_result<ExPolicy,
+            typename std::iterator_traits<InIter>::value_type>::type
     >::type
     reduce(ExPolicy&& policy, InIter first, InIter last)
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
             iterator_category;
+        typedef typename std::iterator_traits<InIter>::value_type value_type;
 
         BOOST_STATIC_ASSERT_MSG(
             (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
@@ -323,11 +319,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category>
         >::type is_seq;
 
-        return detail::reduce<T>().call(
+        return detail::reduce<value_type>().call(
             std::forward<ExPolicy>(policy),
-            first, last, T(), std::plus<T>(), is_seq());
+            first, last, value_type(), std::plus<value_type>(), is_seq());
     }
-#endif
 }}}
 
 #endif

@@ -37,15 +37,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct copy : public detail::algorithm<copy<OutIter>, OutIter>
         {
             copy()
-              : detail::algorithm<copy<OutIter>, OutIter>("copy")
+              : copy::algorithm("copy")
             {}
 
             template <typename ExPolicy, typename InIter>
-            static typename detail::algorithm_result<ExPolicy, OutIter>::type
+            static OutIter
             sequential(ExPolicy const&, InIter first, InIter last, OutIter dest)
             {
-                return detail::algorithm_result<ExPolicy, OutIter>::get(
-                    std::copy(first, last, dest));
+                return std::copy(first, last, dest);
             }
 
             template <typename ExPolicy, typename FwdIter>
@@ -160,16 +159,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct copy_n : public detail::algorithm<copy_n<OutIter>, OutIter>
         {
             copy_n()
-              : detail::algorithm<copy_n<OutIter>, OutIter>("copy_n")
+              : copy_n::algorithm("copy_n")
             {}
 
             template <typename ExPolicy, typename InIter>
-            static typename detail::algorithm_result<ExPolicy, OutIter>::type
+            static OutIter
             sequential(ExPolicy const&, InIter first, std::size_t count,
                 OutIter dest)
             {
-                return detail::algorithm_result<ExPolicy, OutIter>::get(
-                    std::copy_n(first, count, dest));
+                return std::copy_n(first, count, dest);
             }
 
             template <typename ExPolicy, typename FwdIter>
@@ -295,16 +293,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct copy_if : public detail::algorithm<copy_if<OutIter>, OutIter>
         {
             copy_if()
-              : detail::algorithm<copy_if<OutIter>, OutIter>("copy_if")
+              : copy_if::algorithm("copy_if")
             {}
 
             template <typename ExPolicy, typename InIter, typename F>
-            static typename detail::algorithm_result<ExPolicy, OutIter>::type
+            static OutIter
             sequential(ExPolicy const&, InIter first, InIter last, OutIter dest,
                 F && f)
             {
-                return detail::algorithm_result<ExPolicy, OutIter>::get(
-                    std::copy_if(first, last, dest, std::forward<F>(f)));
+                return std::copy_if(first, last, dest, std::forward<F>(f));
             }
 
             template <typename ExPolicy, typename FwdIter, typename F>

@@ -37,19 +37,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct none_of : public detail::algorithm<none_of, bool>
         {
             none_of()
-              : detail::algorithm<none_of, bool>("none_of")
+              : none_of::algorithm("none_of")
             {}
 
             template <typename ExPolicy, typename InIter, typename F>
-            static typename detail::algorithm_result<ExPolicy, bool>::type
+            static bool
             sequential(ExPolicy const&, InIter first, InIter last, F && f)
             {
-                return detail::algorithm_result<ExPolicy, bool>::get(
-                    std::none_of(first, last, std::forward<F>(f)));
+                return std::none_of(first, last, std::forward<F>(f));
             }
 
             template <typename ExPolicy, typename FwdIter, typename F>
-            typename detail::algorithm_result<ExPolicy, bool>::type
+            static typename detail::algorithm_result<ExPolicy, bool>::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
                 F && op)
             {
@@ -59,13 +58,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename std::iterator_traits<FwdIter>::value_type
                     value_type;
 
-                util::cancellation_token tok;
+                util::cancellation_token<> tok;
                 return util::partitioner<ExPolicy, bool>::call(
                     policy, first, std::distance(first, last),
-                    [op, tok](FwdIter part_begin, std::size_t part_size) mutable
+                    [op, tok](FwdIter part_begin, std::size_t part_count) mutable
                     {
                         util::loop_n(
-                            part_begin, part_size, tok,
+                            part_begin, part_count, tok,
                             [&op, &tok](value_type const& val)
                             {
                                 if (op(val))
@@ -175,15 +174,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct any_of : public detail::algorithm<any_of, bool>
         {
             any_of()
-              : detail::algorithm<any_of, bool>("any_of")
+              : any_of::algorithm("any_of")
             {}
 
             template <typename ExPolicy, typename InIter, typename F>
-            static typename detail::algorithm_result<ExPolicy, bool>::type
+            static bool
             sequential(ExPolicy const&, InIter first, InIter last, F && f)
             {
-                return detail::algorithm_result<ExPolicy, bool>::get(
-                    std::any_of(first, last, std::forward<F>(f)));
+                return std::any_of(first, last, std::forward<F>(f));
             }
 
             template <typename ExPolicy, typename FwdIter, typename F>
@@ -197,13 +195,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename std::iterator_traits<FwdIter>::value_type
                     value_type;
 
-                util::cancellation_token tok;
+                util::cancellation_token<> tok;
                 return util::partitioner<ExPolicy, bool>::call(
                     policy, first, std::distance(first, last),
-                    [op, tok](FwdIter part_begin, std::size_t part_size) mutable
+                    [op, tok](FwdIter part_begin, std::size_t part_count) mutable
                     {
                         util::loop_n(
-                            part_begin, part_size, tok,
+                            part_begin, part_count, tok,
                             [&op, &tok](value_type const& val)
                             {
                                 if (op(val))
@@ -313,15 +311,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct all_of : public detail::algorithm<all_of, bool>
         {
             all_of()
-              : detail::algorithm<all_of, bool>("all_of")
+              : all_of::algorithm("all_of")
             {}
 
             template <typename ExPolicy, typename InIter, typename F>
-            static typename detail::algorithm_result<ExPolicy, bool>::type
+            static bool
             sequential(ExPolicy const&, InIter first, InIter last, F && f)
             {
-                return detail::algorithm_result<ExPolicy, bool>::get(
-                    std::all_of(first, last, std::forward<F>(f)));
+                return std::all_of(first, last, std::forward<F>(f));
             }
 
             template <typename ExPolicy, typename FwdIter, typename F>
@@ -335,13 +332,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename std::iterator_traits<FwdIter>::value_type
                     value_type;
 
-                util::cancellation_token tok;
+                util::cancellation_token<> tok;
                 return util::partitioner<ExPolicy, bool>::call(
                     policy, first, std::distance(first, last),
-                    [op, tok](FwdIter part_begin, std::size_t part_size) mutable
+                    [op, tok](FwdIter part_begin, std::size_t part_count) mutable
                     {
                         util::loop_n(
-                            part_begin, part_size, tok,
+                            part_begin, part_count, tok,
                             [&op, &tok](value_type const& val)
                             {
                                 if (!op(val))

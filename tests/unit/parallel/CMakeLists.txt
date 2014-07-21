@@ -15,15 +15,16 @@ set(tests
     equal_binary
     fill
     filln
-	find
-	findend
-	findfirstof
-	findif
-	findifnot
+    find
+    findend
+	  findfirstof
+	  findif
+	  findifnot
     foreach
     foreachn
-	generate
-	generaten
+	  generate
+	  generaten
+    mismatch
     move
     none_of
     reduce_
@@ -31,7 +32,7 @@ set(tests
     task_region
     transform
     transform_binary
-	transform_reduce
+    transform_reduce
    )
 
 set(task_region_FLAGS DEPENDENCIES iostreams_component)
@@ -63,4 +64,3 @@ foreach(test ${tests})
   add_hpx_pseudo_dependencies(tests.unit.parallel.${test}
                               ${test}_test_exe)
 endforeach()
-

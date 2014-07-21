@@ -36,15 +36,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct move : public detail::algorithm<move<OutIter>, OutIter>
         {
             move()
-              : detail::algorithm<move<OutIter>, OutIter>("move")
+              : move::algorithm("move")
             {}
 
             template <typename ExPolicy, typename InIter>
-            static typename detail::algorithm_result<ExPolicy, OutIter>::type
+            static OutIter
             sequential(ExPolicy const&, InIter first, InIter last, OutIter dest)
             {
-                return detail::algorithm_result<ExPolicy, OutIter>::get(
-                    std::move(first, last, dest));
+                return std::move(first, last, dest);
             }
 
             template <typename ExPolicy, typename FwdIter>

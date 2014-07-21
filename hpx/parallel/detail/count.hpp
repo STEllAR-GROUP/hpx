@@ -44,15 +44,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 difference_type;
 
             count()
-              : detail::algorithm<count<Iter>, difference_type>("count")
+              : count::algorithm("count")
             {}
 
             template <typename ExPolicy, typename T>
-            static typename detail::algorithm_result<ExPolicy, difference_type>::type
+            static difference_type
             sequential(ExPolicy const&, Iter first, Iter last, T const& value)
             {
-                return detail::algorithm_result<ExPolicy, difference_type>::get(
-                    std::count(first, last, value));
+                return std::count(first, last, value);
             }
 
             template <typename ExPolicy, typename T>
@@ -80,7 +79,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         return ret;
                     },
                     hpx::util::unwrapped(
-                        [](std::vector<difference_type>&& results)
+                        [](std::vector<difference_type> && results)
                         {
                             return util::accumulate_n(
                                 boost::begin(results), boost::size(results),
@@ -174,15 +173,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 difference_type;
 
             count_if()
-              : detail::algorithm<count_if<Iter>, difference_type>("count_if")
+              : count_if::algorithm("count_if")
             {}
 
             template <typename ExPolicy, typename Pred>
-            static typename detail::algorithm_result<ExPolicy, difference_type>::type
+            static difference_type
             sequential(ExPolicy const&, Iter first, Iter last, Pred && op)
             {
-                return detail::algorithm_result<ExPolicy, difference_type>
-                    ::get(std::count_if(first, last, std::forward<Pred>(op)));
+                return std::count_if(first, last, std::forward<Pred>(op));
             }
 
             template <typename ExPolicy, typename Pred>
@@ -209,7 +207,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         return ret;
                     },
                     hpx::util::unwrapped(
-                        [](std::vector<difference_type>&& results)
+                        [](std::vector<difference_type> && results)
                         {
                             return util::accumulate_n(
                                 boost::begin(results), boost::size(results),

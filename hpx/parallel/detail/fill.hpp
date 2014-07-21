@@ -36,15 +36,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct fill : public detail::algorithm<fill>
         {
             fill()
-              : detail::algorithm<fill>("fill")
+              : fill::algorithm("fill")
             {}
 
             template <typename ExPolicy, typename InIter, typename T>
-            static typename detail::algorithm_result<ExPolicy>::type
+            static hpx::util::unused_type
             sequential(ExPolicy const&, InIter first, InIter last, T val)
             {
                 std::fill(first, last, val);
-                return detail::algorithm_result<ExPolicy>::get();
+                return hpx::util::unused;
             }
 
             template <typename ExPolicy, typename FwdIter, typename T>
@@ -133,15 +133,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct fill_n : public detail::algorithm<fill_n<OutIter>, OutIter>
         {
             fill_n()
-              : detail::algorithm<fill_n<OutIter>, OutIter>("fill_n")
+              : fill_n::algorithm("fill_n")
             {}
 
             template <typename ExPolicy, typename T>
-            static typename detail::algorithm_result<ExPolicy, OutIter>::type
+            static OutIter
             sequential(ExPolicy const&, OutIter first, std::size_t count, T val)
             {
-                return detail::algorithm_result<ExPolicy, OutIter>::get(
-                    std::fill_n(first, count, val));
+                return std::fill_n(first, count, val);
             }
 
             template <typename ExPolicy, typename T>

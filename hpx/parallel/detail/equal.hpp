@@ -15,6 +15,7 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
 #include <hpx/parallel/detail/dispatch.hpp>
+#include <hpx/parallel/detail/predicates.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
@@ -33,18 +34,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-
-        // Using std::equal is not possible as the value_types of the two
-        // iterators could be different.
-        struct equal_to
-        {
-            template <typename T1, typename T2>
-            bool operator() (T1 const& t1, T2 const& t2) const
-            {
-                return t1 == t2;
-            }
-        };
-
         // Our own version of the C++14 equal(_binary).
         template <typename InIter1, typename InIter2, typename F>
         bool sequential_equal_binary(InIter1 first1, InIter1 last1,
@@ -62,18 +51,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct equal_binary : public detail::algorithm<equal_binary, bool>
         {
             equal_binary()
-              : detail::algorithm<equal_binary, bool>("equal_binary")
+              : equal_binary::algorithm("equal_binary")
             {}
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
-            static typename detail::algorithm_result<ExPolicy, bool>::type
+            static bool
             sequential(ExPolicy const&, InIter1 first1, InIter1 last1,
                 InIter2 first2, InIter2 last2, F && f)
             {
-                return detail::algorithm_result<ExPolicy, bool>::get(
-                    sequential_equal_binary(first1, last1, first2, last2,
-                        std::forward<F>(f)));
+                return sequential_equal_binary(first1, last1, first2, last2,
+                    std::forward<F>(f));
             }
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
@@ -107,7 +95,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef hpx::util::zip_iterator<FwdIter1, FwdIter2> zip_iterator;
                 typedef typename zip_iterator::reference reference;
 
-                util::cancellation_token tok;
+                util::cancellation_token<> tok;
                 return util::partitioner<ExPolicy, bool>::call(policy,
                     hpx::util::make_zip_iterator(first1, first2), count1,
                     [f, tok](zip_iterator it, std::size_t part_count) mutable
@@ -346,17 +334,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct equal : public detail::algorithm<equal, bool>
         {
             equal()
-              : detail::algorithm<equal, bool>("equal")
+              : equal::algorithm("equal")
             {}
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
-            static typename detail::algorithm_result<ExPolicy, bool>::type
+            static bool
             sequential(ExPolicy const&, InIter1 first1, InIter1 last1,
                 InIter2 first2, F && f)
             {
-                return detail::algorithm_result<ExPolicy, bool>::get(
-                    std::equal(first1, last1, first2, std::forward<F>(f)));
+                return std::equal(first1, last1, first2, std::forward<F>(f));
             }
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
@@ -373,7 +360,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef hpx::util::zip_iterator<FwdIter1, FwdIter2> zip_iterator;
                 typedef typename zip_iterator::reference reference;
 
-                util::cancellation_token tok;
+                util::cancellation_token<> tok;
                 return util::partitioner<ExPolicy, bool>::call(policy,
                     hpx::util::make_zip_iterator(first1, first2), count,
                     [f, tok](zip_iterator it, std::size_t part_count) mutable
