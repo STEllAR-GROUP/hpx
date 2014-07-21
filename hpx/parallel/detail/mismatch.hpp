@@ -11,7 +11,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
-#include <hpx/parallel/detail/predicates.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
@@ -352,7 +351,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename F>
         typename detail::algorithm_result<
-            ExPolicy, std::pair<InIter1, InIter2>
+            ExPolicy, std::pair<FwdIter1, FwdIter2>
         >::type
         mismatch(ExPolicy const& policy, FwdIter1 first1, FwdIter1 last1,
             FwdIter2 first2, F && f, boost::mpl::false_)

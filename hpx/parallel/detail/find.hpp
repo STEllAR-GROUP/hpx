@@ -11,6 +11,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/parallel/util/loop.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -55,17 +57,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 util::partitioner<ExPolicy>::call(policy,
                     first, count,
-                    [val, tok](InIter it, std::size_t part_count) mutable
+                    [val, &tok, first](InIter it, std::size_t part_count) mutable
                     {
                         std::size_t base_idx =
                             std::distance(first, it);
 
                         util::loop_idx_n(
                             base_idx, it, part_count, tok,
-                            [&val, &tok](type& v, std::size_t i)
+                            [val, &tok](type& v, std::size_t i)
                             {
-                                if(v == val)
+                                if(v == val){
                                     tok.cancel(i);
+                                }
                             });
                     });
 
@@ -75,7 +78,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 else
                     first = last;
 
+                std::cout << *first;
                 return first;
+                //return detail::algorithm_result<ExPolicy, InIter>::get(std::move(res));
             }
         };
         /// \endcond
