@@ -221,7 +221,7 @@ namespace hpx
                     , typename StagedQueuing = lockfree_fifo
                     , typename TerminatedQueuing = lockfree_lifo
                      >
-            class HPX_API_EXPORT static_priority_queue_scheduler;
+            class HPX_EXPORT static_priority_queue_scheduler;
 #endif
 
 #if defined(HPX_HIERARCHY_SCHEDULER)
@@ -242,24 +242,10 @@ namespace hpx
 
             typedef local_priority_queue_scheduler<
                 boost::mutex,
-                lockfree_lifo, // LIFO pending queuing
-                lockfree_lifo, // LIFO staged queuing
-                lockfree_lifo  // LIFO terminated queuing
-            > lifo_priority_queue_scheduler;
-
-            typedef local_priority_queue_scheduler<
-                boost::mutex,
                 lockfree_abp_fifo, // FIFO + ABP pending queuing
                 lockfree_abp_fifo, // FIFO + ABP staged queuing
                 lockfree_lifo  // LIFO terminated queuing
             > abp_fifo_priority_queue_scheduler;
-
-            typedef local_priority_queue_scheduler<
-                boost::mutex,
-                lockfree_abp_lifo, // LIFO + ABP pending queuing
-                lockfree_abp_lifo, // LIFO + ABP staged queuing
-                lockfree_lifo  // LIFO terminated queuing
-            > abp_lifo_priority_queue_scheduler;
 
             // define the default scheduler to use
             typedef fifo_priority_queue_scheduler queue_scheduler;
