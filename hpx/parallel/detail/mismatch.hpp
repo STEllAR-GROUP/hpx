@@ -32,7 +32,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     {
         /// \cond NOINTERNAL
         template <typename InIter1, typename InIter2, typename F>
-        std::pair<InIter1, InIter1>
+        std::pair<InIter1, InIter2>
         sequential_mismatch_binary(InIter1 first1, InIter1 last1,
             InIter2 first2, InIter2 last2, F && f)
         {
@@ -94,7 +94,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 util::cancellation_token<std::size_t> tok(count1);
 
                 return util::partitioner<ExPolicy, result_type, void>::call(
-                    policy, hpx::util::make_zip_iterator(first1, first2), count,
+                    policy, hpx::util::make_zip_iterator(first1, first2), count1,
                     [first1, f, tok](zip_iterator it, std::size_t part_count) mutable
                     {
                         std::size_t base_idx = std::distance(
@@ -189,7 +189,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter1, typename InIter2>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, bool>::type
+        typename detail::algorithm_result<
+            ExPolicy, std::pair<InIter1, InIter2>
+        >::type
     >::type
     mismatch(ExPolicy&& policy, InIter1 first1, InIter1 last1,
         InIter2 first2, InIter2 last2)
@@ -298,7 +300,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter1, typename InIter2, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, bool>::type
+        typename detail::algorithm_result<
+            ExPolicy, std::pair<InIter1, InIter2>
+        >::type
     >::type
     mismatch(ExPolicy&& policy, InIter1 first1, InIter1 last1,
         InIter2 first2, InIter2 last2, F && f)
