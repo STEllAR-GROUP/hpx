@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/algorithm.hpp>
+#include <hpx/include/parallel_find_if_not.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include "test_utils.hpp"
@@ -25,5 +25,4 @@ int main(int argc, char* argv[])
         "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
-
 }
