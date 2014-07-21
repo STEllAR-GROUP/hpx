@@ -23,6 +23,7 @@ struct lockfree_lifo;
 struct lockfree_abp_fifo;
 struct lockfree_abp_lifo;
 
+///////////////////////////////////////////////////////////////////////////////
 template <typename T, typename Queuing>
 struct basic_lockfree_queue_backend
 {
@@ -33,18 +34,18 @@ struct basic_lockfree_queue_backend
     typedef boost::uint64_t size_type;
 
     basic_lockfree_queue_backend(
-        size_type initial_size = 0 
+        size_type initial_size = 0
       , size_type num_thread = size_type(-1)
         )
       : queue_(initial_size)
     {}
 
-    bool push(const_reference val)
+    bool push(const_reference val, bool /*other_end*/ = false)
     {
         return queue_.push(val);
     }
- 
-    bool pop(reference val, bool steal = true)
+
+    bool pop(reference val, bool /*steal*/ = true)
     {
         return queue_.pop(val);
     }
@@ -80,6 +81,7 @@ struct lockfree_lifo
     };
 };
 
+///////////////////////////////////////////////////////////////////////////////
 // FIFO + stealing at opposite end.
 template <typename T>
 struct lockfree_abp_fifo_backend
@@ -91,17 +93,17 @@ struct lockfree_abp_fifo_backend
     typedef boost::uint64_t size_type;
 
     lockfree_abp_fifo_backend(
-        size_type initial_size = 0 
+        size_type initial_size = 0
       , size_type num_thread = size_type(-1)
         )
       : queue_(initial_size)
     {}
 
-    bool push(const_reference val)
+    bool push(const_reference val, bool /*other_end*/ = false)
     {
         return queue_.push_left(val);
     }
- 
+
     bool pop(reference val, bool steal = true)
     {
         if (steal)
@@ -123,10 +125,11 @@ struct lockfree_abp_fifo
     template <typename T>
     struct apply
     {
-        typedef lockfree_abp_fifo_backend<T> type; 
+        typedef lockfree_abp_fifo_backend<T> type;
     };
 };
 
+///////////////////////////////////////////////////////////////////////////////
 // LIFO + stealing at opposite end.
 template <typename T>
 struct lockfree_abp_lifo_backend
@@ -138,17 +141,19 @@ struct lockfree_abp_lifo_backend
     typedef boost::uint64_t size_type;
 
     lockfree_abp_lifo_backend(
-        size_type initial_size = 0 
+        size_type initial_size = 0
       , size_type num_thread = size_type(-1)
         )
       : queue_(initial_size)
     {}
 
-    bool push(const_reference val)
+    bool push(const_reference val, bool other_end = false)
     {
+        if (other_end)
+            return queue_.push_right(val);
         return queue_.push_left(val);
     }
- 
+
     bool pop(reference val, bool steal = true)
     {
         if (steal)
@@ -170,7 +175,7 @@ struct lockfree_abp_lifo
     template <typename T>
     struct apply
     {
-        typedef lockfree_abp_lifo_backend<T> type; 
+        typedef lockfree_abp_lifo_backend<T> type;
     };
 };
 
