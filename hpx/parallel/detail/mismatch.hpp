@@ -335,32 +335,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <typename T>
         struct mismatch : public detail::algorithm<mismatch<T>, T>
         {
-<<<<<<< HEAD
-            try {
-                typedef std::pair<InIter1, InIter2> return_type;
-                return detail::algorithm_result<ExPolicy, return_type>::get(
-                    std::mismatch(first1, last1, first2, std::forward<F>(f)));
-            }
-            catch (...) {
-                detail::handle_exception<ExPolicy>::call();
-            }
-        }
-
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename F>
-        typename detail::algorithm_result<
-            ExPolicy, std::pair<FwdIter1, FwdIter2>
-        >::type
-        mismatch(ExPolicy const& policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, F && f, boost::mpl::false_)
-        {
-            if (first1 == last1)
-                return detail::algorithm_result<ExPolicy, bool>::get(true);
-=======
             mismatch()
               : mismatch::algorithm("mismatch")
             {}
->>>>>>> parallel_mismatch
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>

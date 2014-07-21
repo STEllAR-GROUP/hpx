@@ -55,32 +55,32 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 util::cancellation_token<std::size_t> tok(count);
 
-                util::partitioner<ExPolicy>::call(policy,
-                    first, count,
-                    [val, &tok, first](InIter it, std::size_t part_count) mutable
+                return util::partitioner<ExPolicy, InIter, void>::call(
+                    policy, first, count,
+                    [val, tok, first](InIter it, std::size_t part_count) mutable
                     {
                         std::size_t base_idx =
                             std::distance(first, it);
 
                         util::loop_idx_n(
                             base_idx, it, part_count, tok,
-                            [val, &tok](type& v, std::size_t i)
+                            [&val, &tok](type& v, std::size_t i)
                             {
                                 if(v == val){
                                     tok.cancel(i);
                                 }
                             });
+                    },
+                    [=](std::vector<hpx::future<void> > &&) mutable
+                    {
+                        std::size_t find_res = tok.get_data();
+                        if(find_res != count)
+                            std::advance(first, find_res);
+                        else
+                            first = last;
+
+                        return std::move(first);
                     });
-
-                std::size_t findres = tok.get_data();
-                if(findres != count)
-                    std::advance(first, findres);
-                else
-                    first = last;
-
-                std::cout << *first;
-                return first;
-                //return detail::algorithm_result<ExPolicy, InIter>::get(std::move(res));
             }
         };
         /// \endcond
