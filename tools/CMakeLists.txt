@@ -11,13 +11,8 @@ if(NOT MSVC)
 endif()
 
 foreach(tool ${tools})
-  add_hpx_executable(${tool} 
+  add_hpx_executable(${tool}
     SOURCES ${tool}.cpp ${${tool}}
     FOLDER "Tools/${tool}")
   add_hpx_pseudo_dependencies(tools ${tool}_exe)
 endforeach()
-
-if(HPX_STATIC_LINKING)
-  hpx_include(StaticComponentList)
-  hpx_static_componentlist()
-endif()

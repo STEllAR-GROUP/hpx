@@ -6,6 +6,11 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 
+#if defined(HPX_STATIC_LINKING)
+HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_COMPONENT_PREFIX, factory)
+HPX_REGISTER_REGISTRY_MODULE()
+#endif
+
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////

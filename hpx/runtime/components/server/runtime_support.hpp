@@ -34,7 +34,6 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
-#include <hpx/components/static_component_data.hpp>
 
 #include <hpx/plugins/plugin_factory_base.hpp>
 

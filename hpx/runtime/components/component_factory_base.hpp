@@ -183,7 +183,7 @@ namespace hpx { namespace util { namespace plugin
 /**/
 
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_APPLICATION_NAME)
+#if !defined(HPX_APPLICATION_NAME) && !defined(HPX_STATIC_LINKING)
 /// This macro is used to define the required Hpx.Plugin entry points. This
 /// macro has to be used in exactly one compilation unit of a component module.
 #define HPX_REGISTER_COMPONENT_MODULE()                                       \

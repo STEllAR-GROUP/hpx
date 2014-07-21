@@ -146,6 +146,7 @@ hpx_option(WITH_STATIC_LINKING BOOL
 if(WITH_STATIC_LINKING)
   hpx_add_config_define(HPX_STATIC_LINKING)
   set(hpx_library_link_mode STATIC)
+  set(CMAKE_SHARED_LIBS OFF)
 else()
   set(hpx_library_link_mode SHARED)
 endif()
@@ -157,6 +158,7 @@ hpx_option(WITH_TESTS BOOL "Build the HPX tests (default ON)" ON)
 hpx_option(WITH_TESTS_BENCHMARKS BOOL "Build HPX benchmark tests (default: ON)" ON ADVANCED)
 hpx_option(WITH_TESTS_REGRESSIONS BOOL "Build HPX regression tests (default: ON)" ON ADVANCED)
 hpx_option(WITH_TESTS_UNIT BOOL "Build HPX unit tests (default: ON)" ON ADVANCED)
+hpx_option(WITH_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED)
 hpx_option(WITH_RUNTIME BOOL "Build HPX runtime (default: ON)" ON ADVANCED)
 
 hpx_option(WITH_FULL_RPATH BOOL "Build and link HPX libraries and executables with full RPATHs (default: ON)" ON ADVANCED)
@@ -1138,9 +1140,8 @@ set(HPX_DEBUG_POSTFIX "d")
 # executable to run. The same process will walk through the project's entire
 # directory structure.
 
-hpx_option(HPX_BUILD_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED)
 
-if(HPX_BUILD_TOOLS OR HPX_STATIC_LINKING)
+if(WITH_TOOLS)
   add_hpx_pseudo_target(tools)
   add_subdirectory(tools)
 endif()
@@ -1186,13 +1187,6 @@ if(WITH_RUNTIME)
   add_hpx_pseudo_target(runtime)
   add_subdirectory(runtime)
 endif()
-
-# hpx_option(HPX_BUILD_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED)
-#
-# if(HPX_BUILD_TOOLS)
-#   add_hpx_pseudo_target(tools)
-#   add_subdirectory(tools)
-# endif()
 
 if(WITH_DOCUMENTATION)
   add_subdirectory(docs)

@@ -5,6 +5,9 @@
 
 # We first try to find the required minimum set of Boost libraries. This will
 # also give us the version of the found boost installation
+if(WITH_STATIC_LINKING)
+  set(Boost_USE_STATIC_LIBS ON)
+endif()
 find_package(Boost
   1.49
   REQUIRED

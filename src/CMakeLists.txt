@@ -123,7 +123,7 @@ add_hpx_library_headers(hpx
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/parallel/*.hpp"
   APPEND)
 
-if(HPX_STATIC_LINKING)
+if(WITH_STATIC_LINKING)
   add_hpx_library_headers(hpx
     GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/components/*.hpp"
     APPEND)
@@ -179,54 +179,60 @@ add_hpx_source_group(
 
 ################################################################################
 # libhpx_serialization
-if(MSVC)
-  # The MSVC linker can't handle a static library as large as we get when
-  # statically linking the main HPX library.
-  set(hpx_library_link_mode_core SHARED)
-else()
-  set(hpx_library_link_mode_core ${hpx_library_link_mode})
-endif()
+if(NOT WITH_STATIC_LINKING)
+  if(MSVC)
+    # The MSVC linker can't handle a static library as large as we get when
+    # statically linking the main HPX library.
+    set(hpx_library_link_mode_core SHARED)
+  else()
+    set(hpx_library_link_mode_core ${hpx_library_link_mode})
+  endif()
 
-if(WITH_DEFAULT_BUILD_TARGETS)
-  add_library(hpx_serialization ${hpx_library_link_mode_core}
-    ${hpx_serialization_SOURCES} ${hpx_serialization_HEADERS})
-else()
-  add_library(hpx_serialization ${hpx_library_link_mode_core} EXCLUDE_FROM_ALL
-    ${hpx_serialization_SOURCES} ${hpx_serialization_HEADERS})
-endif()
+  if(WITH_DEFAULT_BUILD_TARGETS)
+    add_library(hpx_serialization ${hpx_library_link_mode_core}
+      ${hpx_serialization_SOURCES} ${hpx_serialization_HEADERS})
+  else()
+    add_library(hpx_serialization ${hpx_library_link_mode_core} EXCLUDE_FROM_ALL
+      ${hpx_serialization_SOURCES} ${hpx_serialization_HEADERS})
+  endif()
 
-set_target_properties(hpx_serialization PROPERTIES
-  VERSION ${HPX_LIBRARY_VERSION}
-  SOVERSION ${HPX_SOVERSION}
-  CLEAN_DIRECT_OUTPUT 1
-  OUTPUT_NAME hpx_serialization
-  FOLDER "Core")
+  set_target_properties(hpx_serialization PROPERTIES
+    VERSION ${HPX_LIBRARY_VERSION}
+    SOVERSION ${HPX_SOVERSION}
+    CLEAN_DIRECT_OUTPUT 1
+    OUTPUT_NAME hpx_serialization
+    FOLDER "Core")
 
-set(hpx_serialization_lib_dependencies
-  ${hpx_MALLOC_LIBRARY})
-
-if(NOT MSVC)
   set(hpx_serialization_lib_dependencies
-      ${hpx_serialization_lib_dependencies}
-      debug ${Boost_SYSTEM_LIBRARY_DEBUG}
-      optimized ${Boost_SYSTEM_LIBRARY_RELEASE}
-      debug ${Boost_SERIALIZATION_LIBRARY_DEBUG}
-      optimized ${Boost_SERIALIZATION_LIBRARY_DEBUG})
+    ${hpx_MALLOC_LIBRARY})
+
+  if(NOT MSVC)
+    set(hpx_serialization_lib_dependencies
+        ${hpx_serialization_lib_dependencies}
+        debug ${Boost_SYSTEM_LIBRARY_DEBUG}
+        optimized ${Boost_SYSTEM_LIBRARY_RELEASE}
+        debug ${Boost_SERIALIZATION_LIBRARY_DEBUG}
+        optimized ${Boost_SERIALIZATION_LIBRARY_DEBUG})
+  endif()
+
+  target_link_libraries(hpx_serialization
+    ${hpx_serialization_lib_dependencies})
+
+  hpx_get_target_file(name hpx_serialization)
+
+  set_property(TARGET hpx_serialization APPEND
+    PROPERTY COMPILE_DEFINITIONS
+    "HPX_DLL_STRING=\"${name}\""
+    "HPX_EXPORTS"
+    "HPX_COROUTINE_EXPORTS")
+  set(hpx_targets ${hpx_targets} hpx_serialization)
 endif()
-
-target_link_libraries(hpx_serialization
-  ${hpx_serialization_lib_dependencies})
-
-hpx_get_target_file(name hpx_serialization)
-
-set_property(TARGET hpx_serialization APPEND
-  PROPERTY COMPILE_DEFINITIONS
-  "HPX_DLL_STRING=\"${name}\""
-  "HPX_EXPORTS"
-  "HPX_COROUTINE_EXPORTS")
 
 ################################################################################
 # libhpx
+if(WITH_STATIC_LINKING)
+  set(hpx_SOURCES ${hpx_SOURCES} ${hpx_serialization_SOURCES} ${hpx_init_SOURCES})
+endif()
 if(WITH_DEFAULT_BUILD_TARGETS)
   add_library(hpx ${hpx_library_link_mode_core}
     ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
@@ -235,9 +241,9 @@ else()
     ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
 endif()
 
-if(HPX_STATIC_LINKING)
-  add_dependencies(hpx static_component_data_hpp)
-endif()
+#if(WITH_STATIC_LINKING)
+#  add_dependencies(hpx static_component_data_hpp)
+#endif()
 
 if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
   set_target_properties(hpx PROPERTIES
@@ -253,9 +259,14 @@ else()
     FOLDER "Core")
 endif()
 
-target_link_libraries(hpx
-  hpx_serialization
-  ${HPX_LIBRARIES})
+if(WITH_STATIC_LINKING)
+  target_link_libraries(hpx
+    ${HPX_LIBRARIES})
+else()
+  target_link_libraries(hpx
+    hpx_serialization
+    ${HPX_LIBRARIES})
+endif()
 
 hpx_get_target_file(name hpx)
 
@@ -267,24 +278,28 @@ set_property(TARGET hpx APPEND
   "HPX_LIMIT=5"
   "HPX_ENABLE_ASSERT_HANDLER"
   "HPX_COROUTINE_EXPORTS") # Do we still need this?
+set(hpx_targets ${hpx_targets} hpx)
 
 ################################################################################
 # libhpx_init
-if(WITH_DEFAULT_BUILD_TARGETS)
-  add_library(hpx_init STATIC
-    ${hpx_init_SOURCES} ${hpx_init_HEADERS})
-else()
-  add_library(hpx_init STATIC EXCLUDE_FROM_ALL
-    ${hpx_init_SOURCES} ${hpx_init_HEADERS})
+if(NOT WITH_STATIC_LINKING)
+  if(WITH_DEFAULT_BUILD_TARGETS)
+    add_library(hpx_init STATIC
+      ${hpx_init_SOURCES} ${hpx_init_HEADERS})
+  else()
+    add_library(hpx_init STATIC EXCLUDE_FROM_ALL
+      ${hpx_init_SOURCES} ${hpx_init_HEADERS})
+  endif()
+
+  set_property(TARGET hpx_init APPEND
+    PROPERTY COMPILE_DEFINITIONS
+    "HPX_APPLICATION_EXPORTS"
+    "HPX_LIMIT=5"
+    "HPX_ENABLE_ASSERT_HANDLER")
+
+  set_property(TARGET hpx_init PROPERTY FOLDER "Core")
+  set(hpx_targets ${hpx_targets} hpx_init)
 endif()
-
-set_property(TARGET hpx_init APPEND
-  PROPERTY COMPILE_DEFINITIONS
-  "HPX_APPLICATION_EXPORTS"
-  "HPX_LIMIT=5"
-  "HPX_ENABLE_ASSERT_HANDLER")
-
-set_property(TARGET hpx_init PROPERTY FOLDER "Core")
 
 set(_optional)
 if(WITH_DEFAULT_BUILD_TARGETS)
@@ -293,9 +308,7 @@ endif()
 
 install(
   TARGETS
-    hpx_serialization
-    hpx
-    hpx_init
+    ${hpx_targets}
   EXPORT HPXTargets
   LIBRARY DESTINATION ${LIB}
   ARCHIVE DESTINATION ${LIB}
@@ -304,4 +317,4 @@ install(
   ${_optional}
 )
 
-hpx_export_targets(hpx_serialization hpx hpx_init)
+hpx_export_targets(${hpx_targets})

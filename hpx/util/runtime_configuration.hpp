@@ -13,7 +13,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/components/static_factory_data.hpp>
-#include <hpx/components/static_component_data.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/plugin/dll.hpp>
 
