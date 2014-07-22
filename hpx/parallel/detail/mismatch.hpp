@@ -130,7 +130,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// [first2, last2), and false otherwise.
     ///
     /// \note   Complexity: At most min(last1 - first1, last2 - first2)
-    ///         applications of the operator==().
+    ///         applications of the operator==(). If \a InIter1
+    ///         and \a InIter2 meet the requirements of \a RandomAccessIterator
+    ///         and (last1 - first1) != (last2 - first2) then no applications
+    ///         of the operator==() are made.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -224,7 +227,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// [first2, last2), and false otherwise.
     ///
     /// \note   Complexity: At most min(last1 - first1, last2 - first2)
-    ///         applications of the predicate \a f.
+    ///         applications of the predicate \a f. If \a InIter1
+    ///         and \a InIter2 meet the requirements of \a RandomAccessIterator
+    ///         and (last1 - first1) != (last2 - first2) then no applications
+    ///         of the predicate \a f are made.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
