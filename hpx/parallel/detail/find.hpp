@@ -31,21 +31,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct find : public detail::algorithm<find<InIter>, InIter>
         {
             find()
-                : detail::algorithm<find<InIter>, InIter>("find")
+              : find::algorithm("find")
             {}
 
             template <typename ExPolicy, typename T>
-            static typename detail::algorithm_result<ExPolicy, InIter>::type
-            sequential(ExPolicy const&, InIter first, InIter last, const T& val)
+            static InIter
+            sequential(ExPolicy const&, InIter first, InIter last, T const& val)
             {
-                return detail::algorithm_result<ExPolicy, InIter>::get(
-                    std::find(first, last, val));
+                return std::find(first, last, val);
             }
 
             template <typename ExPolicy, typename T>
             static typename detail::algorithm_result<ExPolicy, InIter>::type
             parallel(ExPolicy const& policy, InIter first, InIter last,
-                const T& val)
+                T const& val)
             {
                 typedef typename std::iterator_traits<InIter>::iterator_category
                     category;
@@ -86,12 +85,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \endcond
     }
 
-        template <typename ExPolicy, typename InIter, typename T>
+    template <typename ExPolicy, typename InIter, typename T>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
         typename detail::algorithm_result<ExPolicy, InIter>::type
     >::type
-    find(ExPolicy && policy, InIter first, InIter last, const T& val)
+    find(ExPolicy && policy, InIter first, InIter last, T const& val)
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
             iterator_category;
@@ -109,8 +108,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         return detail::find<InIter>().call(
             std::forward<ExPolicy>(policy),
-            first, last, val,
-            is_seq());
+            first, last, val, is_seq());
     }
 }}}
 
