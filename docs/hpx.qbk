@@ -187,9 +187,9 @@
 [def __scheduling__             [link hpx.manual.schedulers __hpx__ Thread Scheduling Policies]]
 
 [def __cmake_hpx__              [link hpx.manual.cmake Building __hpx__ with CMake]]
-[def __cmake_quick_start__      [link hpx.manual.cmake.quick_start Quick Start]]
-[def __cmake_basic_usage__      [link hpx.manual.cmake.basic_usage Basic CMake Usage]]
-[def __cmake_options__          [link hpx.manual.cmake.options Options and Variables]]
+[def __cmake_quick_start__      [link hpx.build_system.cmake_basics CMake Quick Start]]
+[def __cmake_basic_usage__      [link hpx.build_system.basic_cmake_usage Basic CMake Usage]]
+[def __cmake_options__          [link hpx.build_system.cmake_variables CMake Variables used to configure __hpx__]]
 [def __cmake_doc_tools__        [link hpx.manual.cmake.doc_tools Setting up the HPX Documentation Tool Chain]]
 [def __pkg_config__             [link hpx.manual.cmake.unix_comps_pkg_config How to Build __hpx__ Components with pkg-config]]
 
@@ -272,45 +272,7 @@ __boost_auto_index__ can be found in the collection of __boost_tools__.
 
 [include preface.qbk]
 [include whats_new.qbk]
-
-[section:build_system The HPX Build System]
-
-The HPX Build System is centered around __cmake__. This section gives an
-introduction on how to use our build system to build HPX and how to use HPX in
-your own projects.
-
-[section:cmake_basics CMake Basics]
-[endsect] [/ CMake Basics]
-
-[section:prerequesites Build Prerequistes]
-[endsect] [/ Prerequistes]
-
-[section:building_hpx Building HPX]
-
-[section:cmake_variables CMake Variables used to configure HPX]
-[endsect] [/ CMake Variables used to configure HPX]
-
-[section:cmake_modules Costum CMake Modules shipped with HPX]
-[endsect] [/ Costum CMake Modules shipped with HPX]
-
-[section:cmake_toolchains CMake Toolchains shipped with HPX]
-[endsect] [/ CMake Toolchains shipped with HPX]
-
-[section:build_reciepts Build reciepts]
-[endsect] [/ Build reciepts]
-
-[endsect] [/ Builind HPX]
-
-[section:building_hpx Building Projects using HPX]
-
-[section:using_hpx_cmake Using HPX with CMake based projects]
-[endsect] [/ Using HPX with CMake based projects]
-
-[section:using_hpx_pkgconfig Using HPX with pkg-config]
-[endsect] [/ Using HPX with CMake based pkg-config]
-[endsect] [/ Using HPX with CMake based projects]
-
-[endsect] [/ The HPX Build System]
+[include build_system.qbk]
 
 [/////////////////////////////////////////////////////////////////////////////]
 [section:tutorial Tutorial]

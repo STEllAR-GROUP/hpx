@@ -6,6 +6,15 @@
 
 include(CMakeParseArguments)
 
+set(HPX_OPTION_CATEGORIES
+  "Generic"
+  "Thread Manager"
+  "AGAS"
+  "Parcelport"
+  "Profiling"
+  "Debugging"
+)
+
 function(hpx_option option type description default)
   set(options ADVANCED)
   set(one_value_args CATEGORY)

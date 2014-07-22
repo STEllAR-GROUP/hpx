@@ -131,10 +131,61 @@ endif()
 set(image
     images/hpx_${HPX_MAJOR_VERSION}_${HPX_MINOR_VERSION}_${HPX_PATCH_LEVEL}_draft.png)
 
+set(HPX_CMAKE_OPTIONS "")
+foreach(_cat ${HPX_OPTION_CATEGORIES})
+  string(REPLACE " " "_" _cat_link "${_cat}")
+  set(HPX_CMAKE_OPTIONS "${HPX_CMAKE_OPTIONS}* [link build_system.cmake_variables.${_cat_link} ${_cat} Options]\n")
+endforeach()
+set(HPX_CMAKE_OPTIONS "${HPX_CMAKE_OPTIONS}\n")
+
+get_cmake_property(_variableNames CACHE_VARIABLES)
+foreach(_cat ${HPX_OPTION_CATEGORIES})
+  string(REPLACE " " "_" _cat_anchor "${_cat}")
+  set(HPX_CMAKE_OPTIONS "${HPX_CMAKE_OPTIONS}[#build_system.cmake_variables.${_cat_anchor}][h3 ${_cat} Options]\n")
+  foreach (_variableName ${_variableNames})
+    if(${_variableName}Category)
+      if(_cat STREQUAL ${_variableName}Category)
+        string(REPLACE " " "_" _variableName_anchor "${_variableName}")
+        set(HPX_CMAKE_OPTIONS "${HPX_CMAKE_OPTIONS}* [link build_system.cmake_variables.${_variableName_anchor} ${_variableName}]\n")
+      endif()
+    endif()
+  endforeach()
+  set(HPX_CMAKE_OPTIONS "${HPX_CMAKE_OPTIONS}\n")
+  set(HPX_CMAKE_OPTIONS "${HPX_CMAKE_OPTIONS}[variablelist\n")
+
+  foreach (_variableName ${_variableNames})
+    get_property(_var_cat_strings CACHE "${_variableName}" PROPERTY STRINGS)
+
+    if(${_variableName}Category)
+      if(_cat STREQUAL ${_variableName}Category)
+        string(REPLACE " " "_" _variableName_anchor "${_variableName}")
+
+        get_property(_doc CACHE "${_variableName}" PROPERTY HELPSTRING)
+        set(HPX_CMAKE_OPTIONS
+          "${HPX_CMAKE_OPTIONS}    [[[#build_system.cmake_variables.${_variableName_anchor}] ")
+        set(HPX_CMAKE_OPTIONS
+          "${HPX_CMAKE_OPTIONS}    `${_variableName}`]\n")
+        set(HPX_CMAKE_OPTIONS
+          "${HPX_CMAKE_OPTIONS}     [${_doc}]\n")
+        set(HPX_CMAKE_OPTIONS
+          "${HPX_CMAKE_OPTIONS}    ]\n")
+      endif()
+    endif()
+  endforeach()
+
+  set(HPX_CMAKE_OPTIONS "${HPX_CMAKE_OPTIONS}] [/ ${_cat} Options]\n\n")
+endforeach()
+
+configure_file(
+  "${hpx_SOURCE_DIR}/cmake/templates/cmake_variables.qbk.in"
+  "${hpx_SOURCE_DIR}/docs/cmake_variables.qbk"
+  @ONLY
+)
+
 hpx_quickbook_to_html(hpx
   SOURCE hpx.qbk
   INDEX hpx.idx
-  DEPENDENCIES ${all_documentation_dependencies}
+  DEPENDENCIES ${all_documentation_dependencies} "${hpx_SOURCE_DIR}/docs/cmake_variables.qbk"
   CATALOG "${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml"
   XSLTPROC_ARGS chunk.section.depth=4
                 chunk.first.sections=1

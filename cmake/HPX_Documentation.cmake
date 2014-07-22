@@ -83,7 +83,7 @@ endmacro()
 # Quickbook -> BoostBook XML
 macro(hpx_quickbook_to_boostbook name)
   set(options NODOXYGEN)
-  set(one_value_args SOURCE )
+  set(one_value_args SOURCE)
   set(multi_value_args DEPENDENCIES QUICKBOOK_ARGS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
