@@ -262,6 +262,34 @@ namespace hpx { namespace parallel { namespace util
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
+        template <typename Result, typename F, typename Iter>
+        void push_back_result(std::vector<hpx::future<Result> >& workitems,
+            F && f, Iter it, std::size_t count)
+        {
+            workitems.push_back(hpx::make_ready_future(f(it, count)));
+        }
+
+        template <typename F, typename Iter>
+        void push_back_result(std::vector<hpx::future<void> >&,
+            F && f, Iter it, std::size_t count)
+        {
+            f(it, count);
+        }
+
+        template <typename Result, typename F, typename Iter>
+        void push_back_result(std::vector<hpx::future<Result> >& workitems,
+            F && f, std::size_t base_idx, Iter it, std::size_t count)
+        {
+            workitems.push_back(hpx::make_ready_future(f(base_idx, it, count)));
+        }
+
+        template <typename F, typename Iter>
+        void push_back_result(std::vector<hpx::future<void> >&,
+            F && f, std::size_t base_idx, Iter it, std::size_t count)
+        {
+            f(base_idx, it, count);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // The static partitioner simply spawns one chunk of iterations for
         // each available core.
@@ -293,8 +321,7 @@ namespace hpx { namespace parallel { namespace util
                 if (count != 0)
                 {
                     try {
-                        workitems.push_back(hpx::make_ready_future(
-                            f1(first, count)));
+                        push_back_result(workitems, std::forward<F1>(f1), first, count);
                     }
                     catch (...) {
                         detail::handle_local_exceptions<ExPolicy>::call(
@@ -338,8 +365,7 @@ namespace hpx { namespace parallel { namespace util
                 if (count != 0)
                 {
                     try {
-                        workitems.push_back(hpx::make_ready_future(
-                            f1(base_idx, first, count)));
+                        push_back_result(workitems, f1, base_idx, first, count);
                     }
                     catch (...) {
                         detail::handle_local_exceptions<ExPolicy>::call(
