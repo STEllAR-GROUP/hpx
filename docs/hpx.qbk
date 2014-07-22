@@ -280,30 +280,37 @@ introduction on how to use our build system to build HPX and how to use HPX in
 your own projects.
 
 [section:cmake_basics CMake Basics]
-[endsec] [/ CMake Basics]
+[endsect] [/ CMake Basics]
 
 [section:prerequesites Build Prerequistes]
-[endsec] [/ Prerequistes]
+[endsect] [/ Prerequistes]
+
+[section:building_hpx Building HPX]
 
 [section:cmake_variables CMake Variables used to configure HPX]
-[endsec] [/ CMake Variables used to configure HPX]
+[endsect] [/ CMake Variables used to configure HPX]
 
 [section:cmake_modules Costum CMake Modules shipped with HPX]
-[endsec] [/ Costum CMake Modules shipped with HPX]
+[endsect] [/ Costum CMake Modules shipped with HPX]
 
 [section:cmake_toolchains CMake Toolchains shipped with HPX]
-[endsec] [/ CMake Toolchains shipped with HPX]
+[endsect] [/ CMake Toolchains shipped with HPX]
 
 [section:build_reciepts Build reciepts]
-[endsec] [/ Build reciepts]
+[endsect] [/ Build reciepts]
+
+[endsect] [/ Builind HPX]
+
+[section:building_hpx Building Projects using HPX]
 
 [section:using_hpx_cmake Using HPX with CMake based projects]
-[endsec] [/ Using HPX with CMake based projects]
+[endsect] [/ Using HPX with CMake based projects]
 
 [section:using_hpx_pkgconfig Using HPX with pkg-config]
-[endsec] [/ Using HPX with CMake based projects]
+[endsect] [/ Using HPX with CMake based pkg-config]
+[endsect] [/ Using HPX with CMake based projects]
 
-[endsec] [/ The HPX Build System]
+[endsect] [/ The HPX Build System]
 
 [/////////////////////////////////////////////////////////////////////////////]
 [section:tutorial Tutorial]

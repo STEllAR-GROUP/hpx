@@ -12,13 +12,13 @@ if(WITH_DEFAULT_BUILD_TARGETS)
   add_hpx_component(iostreams
     FOLDER "Core/Components"
     HEADER_ROOT ${root}
-    AUTOGLOB
-    ESSENTIAL)
+    AUTOGLOB)
 else()
   add_hpx_component(iostreams
     FOLDER "Core/Components"
     HEADER_ROOT ${root}
-    AUTOGLOB)
+    AUTOGLOB
+    EXCLUDE_FROM_ALL)
 endif()
 
 add_hpx_pseudo_dependencies(components.iostreams

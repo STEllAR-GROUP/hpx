@@ -7,6 +7,7 @@
 set(subdirs
     actions
     agas
+    build
     components
     diagnostics
     lcos

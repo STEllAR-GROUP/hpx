@@ -4,22 +4,10 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 macro(hpx_is_target variable target)
-
-  if(POLICY CMP0026)
-    cmake_policy(PUSH)
-    cmake_policy(SET CMP0026 OLD)
-  endif()
-
-  get_target_property(is_target ${target} LOCATION)
-
-  if(POLICY CMP0026)
-    cmake_policy(POP)
-  endif()
-
-  if(${is_target} STREQUAL "is_target-NOTFOUND")
-    set(${variable} FALSE)
-  else()
+  if(TARGET ${target})
     set(${variable} TRUE)
+  else()
+    set(${variable} FALSE)
   endif()
 endmacro()
 
