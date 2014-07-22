@@ -570,7 +570,7 @@ Now, in the directory where you put hello_world.cpp, issue the following command
 ``
 
 [important When using pkg-config with __hpx__, the pkg-config flags must go after
-           the [^-o] flag.]
+           the input files.]
 
 [note If __hpx__ was build in debug mode (`cmake -DCMAKE_BUILD_TYPE=Debug`) the
       pkg-config names have to be different. Instead of `hpx_application` or
