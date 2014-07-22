@@ -74,7 +74,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (boost::is_base_of<
                 std::forward_iterator_tag, iterator_category>::value),
             "Required at least forward iterator.");
-            
+
         typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
 
         return detail::generate().call(
@@ -133,12 +133,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             iterator_category;
 
         BOOST_STATIC_ASSERT_MSG(
-            (boost::is_base_of<
-                std::output_iterator_tag, iterator_category
+            (boost::mpl::or_<
+                boost::is_base_of<
+                    std::forward_iterator_tag, iterator_category>,
+                boost::is_same<
+                    std::output_iterator_tag, iterator_category>
             >::value),
             "Requires at least output iterator.");
 
-        if(detail::is_negative<Size>::call(count))
+        if (detail::is_negative<Size>::call(count))
         {
             return detail::algorithm_result<ExPolicy, OutIter>::get(
                 std::move(first));
@@ -154,7 +157,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             first, std::size_t(count), std::forward<F>(f),
             is_seq());
     }
-
 }}}
 
 #endif
