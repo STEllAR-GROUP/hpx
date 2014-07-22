@@ -26,7 +26,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
     ///////////////////////////////////////////////////////////////////////////
     // find
-    namespace detail {
+    namespace detail
+    {
         /// \cond NOINTERNAL
         template <typename InIter>
         struct find : public detail::algorithm<find<InIter>, InIter>
@@ -45,7 +46,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename T>
             static typename detail::algorithm_result<ExPolicy, InIter>::type
             parallel(ExPolicy const& policy, InIter first, InIter last,
-                const T& val)
+                T const& val)
             {
                 typedef typename std::iterator_traits<InIter>::iterator_category
                     category;
@@ -55,20 +56,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 util::cancellation_token<std::size_t> tok(count);
 
-                return util::partitioner<ExPolicy, InIter, void>::call(
+                return util::partitioner<ExPolicy, InIter, void>::call_with_index(
                     policy, first, count,
-                    [val, tok, first](InIter it, std::size_t part_count) mutable
+                    [val, tok](std::size_t base_idx, InIter it,
+                        std::size_t part_size) mutable
                     {
-                        std::size_t base_idx =
-                            std::distance(first, it);
-
                         util::loop_idx_n(
-                            base_idx, it, part_count, tok,
+                            base_idx, it, part_size, tok,
                             [&val, &tok](type& v, std::size_t i)
                             {
-                                if(v == val){
+                                if (v == val)
                                     tok.cancel(i);
-                                }
                             });
                     },
                     [=](std::vector<hpx::future<void> > &&) mutable
@@ -86,12 +84,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \endcond
     }
 
-        template <typename ExPolicy, typename InIter, typename T>
+    template <typename ExPolicy, typename InIter, typename T>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
         typename detail::algorithm_result<ExPolicy, InIter>::type
     >::type
-    find(ExPolicy && policy, InIter first, InIter last, const T& val)
+    find(ExPolicy && policy, InIter first, InIter last, T const& val)
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
             iterator_category;
@@ -109,8 +107,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         return detail::find<InIter>().call(
             std::forward<ExPolicy>(policy),
-            first, last, val,
-            is_seq());
+            first, last, val, is_seq());
     }
 }}}
 

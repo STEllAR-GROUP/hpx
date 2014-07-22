@@ -12,7 +12,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_mismatch1(ExPolicy const& policy, IteratorTag)
+void test_mismatch_binary1(ExPolicy const& policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -34,7 +34,7 @@ void test_mismatch1(ExPolicy const& policy, IteratorTag)
 
     {
         return_type result = hpx::parallel::mismatch(policy,
-            begin1, end1, boost::begin(c2));
+            begin1, end1, boost::begin(c2), boost::end(c2));
 
         // verify values
         HPX_TEST_EQ(std::distance(begin1, result.first), c1.size());
@@ -46,7 +46,7 @@ void test_mismatch1(ExPolicy const& policy, IteratorTag)
         ++c1[changed_idx];
 
         return_type result = hpx::parallel::mismatch(policy,
-            begin1, end1, boost::begin(c2));
+            begin1, end1, boost::begin(c2), boost::end(c2));
 
         // verify values
         HPX_TEST_EQ(std::distance(begin1, result.first), changed_idx);
@@ -55,7 +55,7 @@ void test_mismatch1(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_mismatch1(hpx::parallel::task_execution_policy, IteratorTag)
+void test_mismatch_binary1(hpx::parallel::task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -76,7 +76,7 @@ void test_mismatch1(hpx::parallel::task_execution_policy, IteratorTag)
     {
         hpx::future<return_type> f =
             hpx::parallel::mismatch(hpx::parallel::task,
-                begin1, end1, boost::begin(c2));
+                begin1, end1, boost::begin(c2), boost::end(c2));
         f.wait();
 
         // verify values
@@ -91,7 +91,7 @@ void test_mismatch1(hpx::parallel::task_execution_policy, IteratorTag)
 
         hpx::future<return_type> f =
             hpx::parallel::mismatch(hpx::parallel::task,
-                begin1, end1, boost::begin(c2));
+                begin1, end1, boost::begin(c2), boost::end(c2));
         f.wait();
 
         // verify values
@@ -102,31 +102,31 @@ void test_mismatch1(hpx::parallel::task_execution_policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_mismatch1()
+void test_mismatch_binary1()
 {
     using namespace hpx::parallel;
 
-    test_mismatch1(seq, IteratorTag());
-    test_mismatch1(par, IteratorTag());
-    test_mismatch1(par_vec, IteratorTag());
-    test_mismatch1(task, IteratorTag());
+    test_mismatch_binary1(seq, IteratorTag());
+    test_mismatch_binary1(par, IteratorTag());
+    test_mismatch_binary1(par_vec, IteratorTag());
+    test_mismatch_binary1(task, IteratorTag());
 
-    test_mismatch1(execution_policy(seq), IteratorTag());
-    test_mismatch1(execution_policy(par), IteratorTag());
-    test_mismatch1(execution_policy(par_vec), IteratorTag());
-    test_mismatch1(execution_policy(task), IteratorTag());
+    test_mismatch_binary1(execution_policy(seq), IteratorTag());
+    test_mismatch_binary1(execution_policy(par), IteratorTag());
+    test_mismatch_binary1(execution_policy(par_vec), IteratorTag());
+    test_mismatch_binary1(execution_policy(task), IteratorTag());
 }
 
-void mismatch_test1()
+void mismatch_binary_test1()
 {
-    test_mismatch1<std::random_access_iterator_tag>();
-    test_mismatch1<std::forward_iterator_tag>();
-    test_mismatch1<std::input_iterator_tag>();
+    test_mismatch_binary1<std::random_access_iterator_tag>();
+    test_mismatch_binary1<std::forward_iterator_tag>();
+    test_mismatch_binary1<std::input_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_mismatch2(ExPolicy const& policy, IteratorTag)
+void test_mismatch_binary2(ExPolicy const& policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -148,7 +148,8 @@ void test_mismatch2(ExPolicy const& policy, IteratorTag)
 
     {
         return_type result = hpx::parallel::mismatch(policy,
-            begin1, end1, boost::begin(c2), std::equal_to<std::size_t>());
+            begin1, end1, boost::begin(c2), boost::end(c2),
+            std::equal_to<std::size_t>());
 
         // verify values
         HPX_TEST_EQ(std::distance(begin1, result.first), c1.size());
@@ -160,7 +161,8 @@ void test_mismatch2(ExPolicy const& policy, IteratorTag)
         ++c1[changed_idx];
 
         return_type result = hpx::parallel::mismatch(policy,
-            begin1, end1, boost::begin(c2), std::equal_to<std::size_t>());
+            begin1, end1, boost::begin(c2), boost::end(c2),
+            std::equal_to<std::size_t>());
 
         // verify values
         HPX_TEST_EQ(std::distance(begin1, result.first), changed_idx);
@@ -169,7 +171,7 @@ void test_mismatch2(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_mismatch2(hpx::parallel::task_execution_policy, IteratorTag)
+void test_mismatch_binary2(hpx::parallel::task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -190,7 +192,8 @@ void test_mismatch2(hpx::parallel::task_execution_policy, IteratorTag)
     {
         hpx::future<return_type> f =
             hpx::parallel::mismatch(hpx::parallel::task,
-                begin1, end1, boost::begin(c2), std::equal_to<std::size_t>());
+                begin1, end1, boost::begin(c2), boost::end(c2),
+                std::equal_to<std::size_t>());
         f.wait();
 
         // verify values
@@ -205,7 +208,8 @@ void test_mismatch2(hpx::parallel::task_execution_policy, IteratorTag)
 
         hpx::future<return_type> f =
             hpx::parallel::mismatch(hpx::parallel::task,
-                begin1, end1, boost::begin(c2), std::equal_to<std::size_t>());
+                begin1, end1, boost::begin(c2), boost::end(c2),
+                std::equal_to<std::size_t>());
         f.wait();
 
         // verify values
@@ -216,31 +220,31 @@ void test_mismatch2(hpx::parallel::task_execution_policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_mismatch2()
+void test_mismatch_binary2()
 {
     using namespace hpx::parallel;
 
-    test_mismatch2(seq, IteratorTag());
-    test_mismatch2(par, IteratorTag());
-    test_mismatch2(par_vec, IteratorTag());
-    test_mismatch2(task, IteratorTag());
+    test_mismatch_binary2(seq, IteratorTag());
+    test_mismatch_binary2(par, IteratorTag());
+    test_mismatch_binary2(par_vec, IteratorTag());
+    test_mismatch_binary2(task, IteratorTag());
 
-    test_mismatch2(execution_policy(seq), IteratorTag());
-    test_mismatch2(execution_policy(par), IteratorTag());
-    test_mismatch2(execution_policy(par_vec), IteratorTag());
-    test_mismatch2(execution_policy(task), IteratorTag());
+    test_mismatch_binary2(execution_policy(seq), IteratorTag());
+    test_mismatch_binary2(execution_policy(par), IteratorTag());
+    test_mismatch_binary2(execution_policy(par_vec), IteratorTag());
+    test_mismatch_binary2(execution_policy(task), IteratorTag());
 }
 
-void mismatch_test2()
+void mismatch_binary_test2()
 {
-    test_mismatch2<std::random_access_iterator_tag>();
-    test_mismatch2<std::forward_iterator_tag>();
-    test_mismatch2<std::input_iterator_tag>();
+    test_mismatch_binary2<std::random_access_iterator_tag>();
+    test_mismatch_binary2<std::forward_iterator_tag>();
+    test_mismatch_binary2<std::input_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_mismatch_exception(ExPolicy const& policy, IteratorTag)
+void test_mismatch_binary_exception(ExPolicy const& policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -261,7 +265,7 @@ void test_mismatch_exception(ExPolicy const& policy, IteratorTag)
     try {
         hpx::parallel::mismatch(policy,
             iterator(boost::begin(c1)), iterator(boost::end(c1)),
-            boost::begin(c2),
+            boost::begin(c2), boost::end(c2),
             [](std::size_t v1, std::size_t v2) {
                 throw std::runtime_error("test");
                 return true;
@@ -281,7 +285,7 @@ void test_mismatch_exception(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_mismatch_exception(hpx::parallel::task_execution_policy, IteratorTag)
+void test_mismatch_binary_exception(hpx::parallel::task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -304,7 +308,7 @@ void test_mismatch_exception(hpx::parallel::task_execution_policy, IteratorTag)
         hpx::future<return_type> f =
             hpx::parallel::mismatch(hpx::parallel::task,
                 iterator(boost::begin(c1)), iterator(boost::end(c1)),
-                boost::begin(c2),
+                boost::begin(c2), boost::end(c2),
                 [](std::size_t v1, std::size_t v2) {
                     throw std::runtime_error("test");
                     return true;
@@ -328,32 +332,32 @@ void test_mismatch_exception(hpx::parallel::task_execution_policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_mismatch_exception()
+void test_mismatch_binary_exception()
 {
     using namespace hpx::parallel;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_mismatch_exception(seq, IteratorTag());
-    test_mismatch_exception(par, IteratorTag());
-    test_mismatch_exception(task, IteratorTag());
+    test_mismatch_binary_exception(seq, IteratorTag());
+    test_mismatch_binary_exception(par, IteratorTag());
+    test_mismatch_binary_exception(task, IteratorTag());
 
-    test_mismatch_exception(execution_policy(seq), IteratorTag());
-    test_mismatch_exception(execution_policy(par), IteratorTag());
-    test_mismatch_exception(execution_policy(task), IteratorTag());
+    test_mismatch_binary_exception(execution_policy(seq), IteratorTag());
+    test_mismatch_binary_exception(execution_policy(par), IteratorTag());
+    test_mismatch_binary_exception(execution_policy(task), IteratorTag());
 }
 
-void mismatch_exception_test()
+void mismatch_binary_exception_test()
 {
-    test_mismatch_exception<std::random_access_iterator_tag>();
-    test_mismatch_exception<std::forward_iterator_tag>();
-    test_mismatch_exception<std::input_iterator_tag>();
+    test_mismatch_binary_exception<std::random_access_iterator_tag>();
+    test_mismatch_binary_exception<std::forward_iterator_tag>();
+    test_mismatch_binary_exception<std::input_iterator_tag>();
 }
 
 /////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_mismatch_bad_alloc(ExPolicy const& policy, IteratorTag)
+void test_mismatch_binary_bad_alloc(ExPolicy const& policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -374,7 +378,7 @@ void test_mismatch_bad_alloc(ExPolicy const& policy, IteratorTag)
     try {
         hpx::parallel::mismatch(policy,
             iterator(boost::begin(c1)), iterator(boost::end(c1)),
-            boost::begin(c2),
+            boost::begin(c2), boost::end(c2),
             [](std::size_t v1, std::size_t v2) {
                 throw std::bad_alloc();
                 return true;
@@ -393,7 +397,7 @@ void test_mismatch_bad_alloc(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_mismatch_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
+void test_mismatch_binary_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -416,7 +420,7 @@ void test_mismatch_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
         hpx::future<return_type> f =
             hpx::parallel::mismatch(hpx::parallel::task,
                 iterator(boost::begin(c1)), iterator(boost::end(c1)),
-                boost::begin(c2),
+                boost::begin(c2), boost::end(c2),
                 [](std::size_t v1, std::size_t v2) {
                     throw std::bad_alloc();
                     return true;
@@ -437,36 +441,36 @@ void test_mismatch_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_mismatch_bad_alloc()
+void test_mismatch_binary_bad_alloc()
 {
     using namespace hpx::parallel;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_mismatch_bad_alloc(seq, IteratorTag());
-    test_mismatch_bad_alloc(par, IteratorTag());
-    test_mismatch_bad_alloc(task, IteratorTag());
+    test_mismatch_binary_bad_alloc(seq, IteratorTag());
+    test_mismatch_binary_bad_alloc(par, IteratorTag());
+    test_mismatch_binary_bad_alloc(task, IteratorTag());
 
-    test_mismatch_bad_alloc(execution_policy(seq), IteratorTag());
-    test_mismatch_bad_alloc(execution_policy(par), IteratorTag());
-    test_mismatch_bad_alloc(execution_policy(task), IteratorTag());
+    test_mismatch_binary_bad_alloc(execution_policy(seq), IteratorTag());
+    test_mismatch_binary_bad_alloc(execution_policy(par), IteratorTag());
+    test_mismatch_binary_bad_alloc(execution_policy(task), IteratorTag());
 }
 
-void mismatch_bad_alloc_test()
+void mismatch_binary_bad_alloc_test()
 {
-    test_mismatch_bad_alloc<std::random_access_iterator_tag>();
-    test_mismatch_bad_alloc<std::forward_iterator_tag>();
-    test_mismatch_bad_alloc<std::input_iterator_tag>();
+    test_mismatch_binary_bad_alloc<std::random_access_iterator_tag>();
+    test_mismatch_binary_bad_alloc<std::forward_iterator_tag>();
+    test_mismatch_binary_bad_alloc<std::input_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    mismatch_test1();
-    mismatch_test2();
-    mismatch_exception_test();
-    mismatch_bad_alloc_test();
+    mismatch_binary_test1();
+    mismatch_binary_test2();
+    mismatch_binary_exception_test();
+    mismatch_binary_bad_alloc_test();
     return hpx::finalize();
 }
 
