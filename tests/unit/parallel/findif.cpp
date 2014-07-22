@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/parallel_find_if.hpp>
+#include <hpx/include/parallel_find.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include "test_utils.hpp"
