@@ -93,13 +93,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 util::cancellation_token<std::size_t> tok(count1);
 
-                return util::partitioner<ExPolicy, result_type, void>::call(
+                return util::partitioner<ExPolicy, result_type, void>::call_with_index(
                     policy, hpx::util::make_zip_iterator(first1, first2), count1,
-                    [first1, f, tok](zip_iterator it, std::size_t part_count) mutable
+                    [f, tok](std::size_t base_idx, zip_iterator it,
+                        std::size_t part_count) mutable
                     {
-                        std::size_t base_idx = std::distance(
-                            first1, hpx::util::get<0>(it.get_iterator_tuple()));
-
                         util::loop_idx_n(
                             base_idx, it, part_count, tok,
                             [&f, &tok](reference t, std::size_t i)
@@ -377,13 +375,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 util::cancellation_token<std::size_t> tok(count);
 
-                return util::partitioner<ExPolicy, result_type, void>::call(
+                return util::partitioner<ExPolicy, result_type, void>::call_with_index(
                     policy, hpx::util::make_zip_iterator(first1, first2), count,
-                    [first1, f, tok](zip_iterator it, std::size_t part_count) mutable
+                    [f, tok](std::size_t base_idx, zip_iterator it,
+                        std::size_t part_count) mutable
                     {
-                        std::size_t base_idx = std::distance(
-                            first1, hpx::util::get<0>(it.get_iterator_tuple()));
-
                         util::loop_idx_n(
                             base_idx, it, part_count, tok,
                             [&f, &tok](reference t, std::size_t i)

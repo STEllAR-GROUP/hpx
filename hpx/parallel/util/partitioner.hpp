@@ -309,6 +309,50 @@ namespace hpx { namespace parallel { namespace util
 
                 return f2(std::move(workitems));
             }
+
+            template <typename FwdIter, typename F1, typename F2>
+            static R call_with_index(ExPolicy const& policy, FwdIter first,
+                std::size_t count, F1 && f1, F2 && f2, std::size_t chunk_size)
+            {
+                // estimate a chunk size based on number of cores used
+                chunk_size = get_static_chunk_size(policy, count, chunk_size);
+
+                // schedule every chunk on a separate thread
+                std::vector<hpx::future<Result> > workitems;
+                workitems.reserve(count / chunk_size + 1);
+
+                std::size_t base_idx = 0;
+                threads::executor exec = policy.get_executor();
+                while (count > chunk_size)
+                {
+                    workitems.push_back(hpx::async(exec, f1, base_idx, first, chunk_size));
+                    count -= chunk_size;
+                    std::advance(first, chunk_size);
+                    base_idx += chunk_size;
+                }
+
+                std::list<boost::exception_ptr> errors;
+
+                // execute last chunk directly
+                if (count != 0)
+                {
+                    try {
+                        f1(base_idx, first, count);
+                    }
+                    catch (...) {
+                        detail::handle_local_exceptions<ExPolicy>::call(
+                            boost::current_exception(), errors);
+                    }
+                    std::advance(first, count);
+                }
+
+                // wait for all tasks to finish
+                hpx::wait_all(workitems);
+                detail::handle_local_exceptions<ExPolicy>::call(
+                    workitems, errors);
+
+                return f2(std::move(workitems));
+            }
         };
 
         template <typename R, typename Result>
@@ -353,6 +397,49 @@ namespace hpx { namespace parallel { namespace util
                     },
                     std::move(workitems));
             }
+
+            template <typename FwdIter, typename F1, typename F2>
+            static hpx::future<R> call_with_index(
+                task_execution_policy const& policy,
+                FwdIter first, std::size_t count, F1 && f1, F2 && f2,
+                std::size_t chunk_size)
+            {
+                // estimate a chunk size based on number of cores used
+                chunk_size = get_static_chunk_size(policy, count, chunk_size);
+
+                // schedule every chunk on a separate thread
+                std::vector<hpx::future<Result> > workitems;
+                workitems.reserve(count / chunk_size + 1);
+
+                std::size_t base_idx = 0;
+                threads::executor exec = policy.get_executor();
+                while (count > chunk_size)
+                {
+                    workitems.push_back(hpx::async(exec, f1, base_idx, first, chunk_size));
+                    count -= chunk_size;
+                    std::advance(first, chunk_size);
+                    base_idx += count;
+                }
+
+                // add last chunk
+                if (count != 0)
+                {
+                    workitems.push_back(hpx::async(exec, f1, base_idx, first, count));
+                    std::advance(first, count);
+                }
+
+                // wait for all tasks to finish
+                return hpx::lcos::local::dataflow(
+                    [f2](std::vector<hpx::future<Result> > && r) mutable
+                    {
+                        std::list<boost::exception_ptr> errors;
+                        detail::handle_local_exceptions<task_execution_policy>
+                            ::call(r, errors);
+
+                        return f2(std::move(r));
+                    },
+                    std::move(workitems));
+            }
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -375,6 +462,15 @@ namespace hpx { namespace parallel { namespace util
                     policy, first, count,
                     std::forward<F1>(f1), std::forward<F2>(f2), 0);
             }
+
+            template <typename FwdIter, typename F1, typename F2>
+            static R call_with_index(ExPolicy const& policy, FwdIter first,
+                std::size_t count, F1 && f1, F2 && f2)
+            {
+                return static_partitioner<ExPolicy, R, Result>::call_with_index(
+                    policy, first, count,
+                    std::forward<F1>(f1), std::forward<F2>(f2), 0);
+            }
         };
 
         template <typename R, typename Result>
@@ -387,6 +483,17 @@ namespace hpx { namespace parallel { namespace util
                 return static_partitioner<
                         task_execution_policy, R, Result
                     >::call(policy, first, count,
+                        std::forward<F1>(f1), std::forward<F2>(f2), 0);
+            }
+
+            template <typename FwdIter, typename F1, typename F2>
+            static hpx::future<R> call_with_index(
+                task_execution_policy const& policy,
+                FwdIter first, std::size_t count, F1 && f1, F2 && f2)
+            {
+                return static_partitioner<
+                        task_execution_policy, R, Result
+                    >::call_with_index(policy, first, count,
                         std::forward<F1>(f1), std::forward<F2>(f2), 0);
             }
         };
