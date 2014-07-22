@@ -7,8 +7,8 @@
 #define HPX_EXAMPLES_MINI_GHOST_PARAMS_HPP
 
 #include <hpx/hpx_finalize.hpp>
-#include <boost/chrono.hpp>
 #include <boost/program_options.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace mini_ghost {
     static const std::size_t SCALING_STRONG = 1;
@@ -376,9 +376,8 @@ namespace mini_ghost {
             }
             std::cout << std::endl;
 
-            boost::chrono::system_clock::time_point const now = 
-                boost::chrono::system_clock::now();
-            std::cout << "Program execution date " << now << "\n";
+            boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
+            std::cout << "Program execution date " << to_simple_string(now) << "\n";
             std::cout << std::endl;
         }
 
