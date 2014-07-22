@@ -2890,8 +2890,8 @@ namespace hpx
                 "no basename specified");
         }
 
-        if (sequence_nr == ~0U)
-            sequence_nr = naming::get_locality_id_from_id(find_here());
+        if (sequence_nr == std::size_t(~0U))
+            sequence_nr = std::size_t(naming::get_locality_id_from_id(find_here()));
 
         std::string name = detail::name_from_basename(basename, sequence_nr);
         return agas::on_symbol_namespace_event(name, agas::symbol_ns_bind, true);
@@ -2907,8 +2907,8 @@ namespace hpx
                 "no basename specified");
         }
 
-        if (sequence_nr == ~0U)
-            sequence_nr = naming::get_locality_id_from_id(find_here());
+        if (sequence_nr == std::size_t(~0U))
+            sequence_nr = std::size_t(naming::get_locality_id_from_id(find_here()));
 
         std::string name = detail::name_from_basename(basename, sequence_nr);
         return agas::register_name(name, id);
@@ -2924,8 +2924,8 @@ namespace hpx
                 "no basename specified");
         }
 
-        if (sequence_nr == ~0U)
-            sequence_nr = naming::get_locality_id_from_id(find_here());
+        if (sequence_nr == std::size_t(~0U))
+            sequence_nr = std::size_t(naming::get_locality_id_from_id(find_here()));
 
         std::string name = detail::name_from_basename(basename, sequence_nr);
         return agas::unregister_name(name);

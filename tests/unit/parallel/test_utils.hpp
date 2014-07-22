@@ -188,7 +188,7 @@ namespace test
         std::vector<std::size_t> c(size, 0);
         for (std::size_t i = 0; i < num_filled; /**/)
         {
-            std::size_t pos = std::rand() % c.size();
+            std::size_t pos = std::rand() % c.size(); //-V104
             if (c[pos])
                 continue;
 

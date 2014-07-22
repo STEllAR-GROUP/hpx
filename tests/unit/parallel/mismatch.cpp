@@ -25,7 +25,7 @@ void test_mismatch1(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand();
+    std::size_t first_value = std::rand(); //-V101
     std::iota(boost::begin(c1), boost::end(c1), first_value);
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 
@@ -42,7 +42,7 @@ void test_mismatch1(ExPolicy const& policy, IteratorTag)
     }
 
     {
-        std::size_t changed_idx = std::rand() % c1.size();
+        std::size_t changed_idx = std::rand() % c1.size(); //-V104
         ++c1[changed_idx];
 
         return_type result = hpx::parallel::mismatch(policy,
@@ -66,7 +66,7 @@ void test_mismatch1(hpx::parallel::task_execution_policy, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand();
+    std::size_t first_value = std::rand(); //-V101
     std::iota(boost::begin(c1), boost::end(c1), first_value);
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 
@@ -86,7 +86,7 @@ void test_mismatch1(hpx::parallel::task_execution_policy, IteratorTag)
     }
 
     {
-        std::size_t changed_idx = std::rand() % c1.size();
+        std::size_t changed_idx = std::rand() % c1.size(); //-V104
         ++c1[changed_idx];
 
         hpx::future<return_type> f =
@@ -139,7 +139,7 @@ void test_mismatch2(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand();
+    std::size_t first_value = std::rand(); //-V101
     std::iota(boost::begin(c1), boost::end(c1), first_value);
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 
@@ -156,7 +156,7 @@ void test_mismatch2(ExPolicy const& policy, IteratorTag)
     }
 
     {
-        std::size_t changed_idx = std::rand() % c1.size();
+        std::size_t changed_idx = std::rand() % c1.size(); //-V104
         ++c1[changed_idx];
 
         return_type result = hpx::parallel::mismatch(policy,
@@ -180,7 +180,7 @@ void test_mismatch2(hpx::parallel::task_execution_policy, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand();
+    std::size_t first_value = std::rand(); //-V101
     std::iota(boost::begin(c1), boost::end(c1), first_value);
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 
@@ -200,7 +200,7 @@ void test_mismatch2(hpx::parallel::task_execution_policy, IteratorTag)
     }
 
     {
-        std::size_t changed_idx = std::rand() % c1.size();
+        std::size_t changed_idx = std::rand() % c1.size(); //-V104
         ++c1[changed_idx];
 
         hpx::future<return_type> f =
@@ -253,7 +253,7 @@ void test_mismatch_exception(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand();
+    std::size_t first_value = std::rand(); //-V101
     std::iota(boost::begin(c1), boost::end(c1), first_value);
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 
@@ -292,7 +292,7 @@ void test_mismatch_exception(hpx::parallel::task_execution_policy, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand();
+    std::size_t first_value = std::rand(); //-V101
     std::iota(boost::begin(c1), boost::end(c1), first_value);
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 
@@ -366,7 +366,7 @@ void test_mismatch_bad_alloc(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand();
+    std::size_t first_value = std::rand(); //-V101
     std::iota(boost::begin(c1), boost::end(c1), first_value);
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 
@@ -404,7 +404,7 @@ void test_mismatch_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand();
+    std::size_t first_value = std::rand(); //-V101
     std::iota(boost::begin(c1), boost::end(c1), first_value);
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 

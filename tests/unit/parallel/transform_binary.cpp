@@ -21,7 +21,7 @@ void test_transform_binary(ExPolicy const& policy, IteratorTag)
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
-    std::vector<std::size_t> d1(c1.size());
+    std::vector<std::size_t> d1(c1.size()); //-V656
     std::iota(boost::begin(c1), boost::end(c1), std::rand());
     std::iota(boost::begin(c2), boost::end(c2), std::rand());
 
@@ -57,7 +57,7 @@ void test_transform_binary(hpx::parallel::task_execution_policy, IteratorTag)
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
-    std::vector<std::size_t> d1(c1.size());
+    std::vector<std::size_t> d1(c1.size()); //-V656
     std::iota(boost::begin(c1), boost::end(c1), std::rand());
     std::iota(boost::begin(c2), boost::end(c2), std::rand());
 
@@ -121,7 +121,7 @@ void test_transform_binary_exception(ExPolicy const& policy, IteratorTag)
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
-    std::vector<std::size_t> d1(c1.size());
+    std::vector<std::size_t> d1(c1.size()); //-V656
     std::iota(boost::begin(c1), boost::end(c1), std::rand());
     std::iota(boost::begin(c2), boost::end(c2), std::rand());
 
@@ -156,7 +156,7 @@ void test_transform_binary_exception(hpx::parallel::task_execution_policy, Itera
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
-    std::vector<std::size_t> d1(c1.size());
+    std::vector<std::size_t> d1(c1.size()); //-V656
     std::iota(boost::begin(c1), boost::end(c1), std::rand());
     std::iota(boost::begin(c2), boost::end(c2), std::rand());
 
@@ -221,7 +221,7 @@ void test_transform_binary_bad_alloc(ExPolicy const& policy, IteratorTag)
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
-    std::vector<std::size_t> d1(c1.size());
+    std::vector<std::size_t> d1(c1.size()); //-V656
     std::iota(boost::begin(c1), boost::end(c1), std::rand());
     std::iota(boost::begin(c2), boost::end(c2), std::rand());
 
@@ -255,7 +255,7 @@ void test_transform_binary_bad_alloc(hpx::parallel::task_execution_policy, Itera
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
-    std::vector<std::size_t> d1(c1.size());
+    std::vector<std::size_t> d1(c1.size()); //-V656
     std::iota(boost::begin(c1), boost::end(c1), std::rand());
     std::iota(boost::begin(c2), boost::end(c2), std::rand());
 
