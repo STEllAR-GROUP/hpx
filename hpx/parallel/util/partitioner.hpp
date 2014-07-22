@@ -338,7 +338,8 @@ namespace hpx { namespace parallel { namespace util
                 if (count != 0)
                 {
                     try {
-                        f1(base_idx, first, count);
+                        workitems.push_back(hpx::make_ready_future(
+                            f1(base_idx, first, count)));
                     }
                     catch (...) {
                         detail::handle_local_exceptions<ExPolicy>::call(
