@@ -189,8 +189,6 @@ namespace hpx
 
             struct lockfree_fifo;
             struct lockfree_lifo;
-            struct lockfree_abp_fifo;
-            struct lockfree_abp_lifo;
 
             template <typename Mutex = boost::mutex
                     , typename PendingQueuing = lockfree_fifo
@@ -240,12 +238,17 @@ namespace hpx
                 lockfree_lifo  // LIFO terminated queuing
             > fifo_priority_queue_scheduler;
 
+#if defined(HPX_ABP_SCHEDULER)
+            struct lockfree_abp_fifo;
+            struct lockfree_abp_lifo;
+
             typedef local_priority_queue_scheduler<
                 boost::mutex,
                 lockfree_abp_fifo, // FIFO + ABP pending queuing
                 lockfree_abp_fifo, // FIFO + ABP staged queuing
                 lockfree_lifo  // LIFO terminated queuing
             > abp_fifo_priority_queue_scheduler;
+#endif
 
             // define the default scheduler to use
             typedef fifo_priority_queue_scheduler queue_scheduler;

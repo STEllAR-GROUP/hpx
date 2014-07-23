@@ -855,6 +855,7 @@ namespace hpx
             return 0;
         }
 
+#if defined(HPX_ABP_SCHEDULER)
         ///////////////////////////////////////////////////////////////////////
         // priority abp scheduler: local priority deques for each OS thread,
         // with work stealing from the "bottom" of each.
@@ -898,6 +899,7 @@ namespace hpx
             rt.release();          // pointer to runtime is stored in TLS
             return 0;
         }
+#endif
 
 #if defined(HPX_HIERARCHY_SCHEDULER)
         ///////////////////////////////////////////////////////////////////////
@@ -1051,10 +1053,16 @@ namespace hpx
                 result = detail::run_priority_local(startup, shutdown, cfg, blocking);
             }
             else if (0 == std::string("priority_abp").find(cfg.queuing_)) {
+#if defined(HPX_ABP_SCHEDULER)
                 // local scheduler with priority deque (one deque for each OS threads
                 // plus separate deques for high priority HPX-threads), uses
                 // abp-style stealing
                 result = detail::run_priority_abp(startup, shutdown, cfg, blocking);
+#else
+                throw std::logic_error("Command line option --hpx:queuing=priority_abp "
+                    "is not configured in this build. Please rebuild with "
+                    "'cmake -DHPX_ABP_SCHEDULER=ON'.");
+#endif
             }
             else if (0 == std::string("hierarchy").find(cfg.queuing_)) {
 #if defined(HPX_HIERARCHY_SCHEDULER)
