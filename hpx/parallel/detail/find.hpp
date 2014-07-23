@@ -207,7 +207,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static InIter
             sequential(ExPolicy const&, InIter first, InIter last, F && f)
             {
-                return std::find_if_not(first, last, f);
+                for (; first != last; ++first) {
+                    if (!f(*first)) {
+                        return first;
+                    }
+                }
+                return last;
             }
 
             template <typename ExPolicy, typename FwdIter, typename F>
