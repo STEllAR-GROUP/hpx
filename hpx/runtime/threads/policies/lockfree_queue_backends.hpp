@@ -20,8 +20,6 @@ namespace hpx { namespace threads { namespace policies
 
 struct lockfree_fifo;
 struct lockfree_lifo;
-struct lockfree_abp_fifo;
-struct lockfree_abp_lifo;
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T, typename Queuing>
@@ -83,6 +81,10 @@ struct lockfree_lifo
 
 ///////////////////////////////////////////////////////////////////////////////
 // FIFO + stealing at opposite end.
+#if defined(HPX_ABP_SCHEDULER)
+struct lockfree_abp_fifo;
+struct lockfree_abp_lifo;
+
 template <typename T>
 struct lockfree_abp_fifo_backend
 {
@@ -178,6 +180,8 @@ struct lockfree_abp_lifo
         typedef lockfree_abp_lifo_backend<T> type;
     };
 };
+
+#endif // HPX_ABP_SCHEDULER
 
 }}}
 
