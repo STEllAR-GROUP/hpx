@@ -52,7 +52,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
-            static result_type
+            static T
             sequential(ExPolicy const&, InIter1 first1, InIter1 last1,
                 InIter2 first2, InIter2 last2, F && f)
             {
@@ -62,13 +62,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F>
-            static typename detail::algorithm_result<ExPolicy, result_type>::type
+            static typename detail::algorithm_result<ExPolicy, T>::type
             parallel(ExPolicy const& policy, FwdIter1 first1, FwdIter1 last1,
                 FwdIter2 first2, FwdIter2 last2, F && f)
             {
                 if (first1 == last1 || first2 == last2)
                 {
-                    return detail::algorithm_result<ExPolicy, result_type>::get(
+                    return detail::algorithm_result<ExPolicy, T>::get(
                         std::make_pair(first1, first2));
                 }
 
@@ -84,7 +84,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::size_t count2 = std::distance(first2, last2);
                 if (count1 != count2)
                 {
-                    return detail::algorithm_result<ExPolicy, result_type>::get(
+                    return detail::algorithm_result<ExPolicy, T>::get(
                         std::make_pair(first1, first2));
                 }
 
@@ -93,7 +93,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 util::cancellation_token<std::size_t> tok(count1);
 
-                return util::partitioner<ExPolicy, result_type, void>::call_with_index(
+                return util::partitioner<ExPolicy, T, void>::call_with_index(
                     policy, hpx::util::make_zip_iterator(first1, first2), count1,
                     [f, tok](std::size_t base_idx, zip_iterator it,
                         std::size_t part_count) mutable
@@ -349,7 +349,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
-            static result_type
+            static T
             sequential(ExPolicy const&, InIter1 first1, InIter1 last1,
                 InIter2 first2, F && f)
             {
@@ -358,13 +358,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F>
-            static typename detail::algorithm_result<ExPolicy, result_type>::type
+            static typename detail::algorithm_result<ExPolicy, T>::type
             parallel(ExPolicy const& policy, FwdIter1 first1, FwdIter1 last1,
                 FwdIter2 first2, F && f)
             {
                 if (first1 == last1)
                 {
-                    return detail::algorithm_result<ExPolicy, result_type>::get(
+                    return detail::algorithm_result<ExPolicy, T>::get(
                         std::make_pair(first1, first2));
                 }
 
@@ -375,7 +375,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 util::cancellation_token<std::size_t> tok(count);
 
-                return util::partitioner<ExPolicy, result_type, void>::call_with_index(
+                return util::partitioner<ExPolicy, T, void>::call_with_index(
                     policy, hpx::util::make_zip_iterator(first1, first2), count,
                     [f, tok](std::size_t base_idx, zip_iterator it,
                         std::size_t part_count) mutable
