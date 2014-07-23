@@ -109,6 +109,89 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             std::forward<ExPolicy>(policy),
             first, last, val, is_seq());
     }
+
+    namespace detail 
+    {
+        /// \cond NOINTERNAL
+        template <typename InIter>
+        struct find_if : public detail::algorithm<find_if<InIter>, InIter>
+        {
+            find_if()
+                : find_if::algorithm("find_if")
+            {}
+
+            template <typename ExPolicy, typename F>
+            static InIter
+            sequential(ExPolicy const&, InIter first, InIter last, F && f)
+            {
+                return std::find_if(first, last, f);
+            }
+
+            template <typename ExPolicy, typename FwdIter, typename F>
+            static typename detail::algorithm_result<ExPolicy, FwdIter>::type
+            parallel(ExPolicy const& policy, FwdIter first, FwdIter last, F && f)
+            {
+                typedef typename std::iterator_traits<InIter>::iterator_category
+                    category;
+                typedef typename std::iterator_traits<InIter>::value_type type;
+
+                std::size_t count = std::distance(first, last);
+
+                util::cancellation_token<std::size_t> tok(count);
+
+                return util::partitioner<ExPolicy, InIter, void>::call_with_index(
+                    policy, first, count,
+                    [f, tok](std::size_t base_idx, InIter it,
+                        std::size_t part_size) mutable
+                {
+                    util::loop_idx_n(
+                        base_idx, it, part_size, tok,
+                        [&f, &tok](type& v, std::size_t i)
+                    {
+                        if (f(v))
+                            tok.cancel(i);
+                    });
+                },
+                [=](std::vector<hpx::future<void> > &&) mutable
+                {
+                    std::size_t find_res = tok.get_data();
+                    if(find_res != count)
+                        std::advance(first, find_res);
+                    else
+                        first = last;
+
+                    return std::move(first);
+                });
+            }
+        };
+        /// \endcond
+    }
+
+    template <typename ExPolicy, typename InIter, typename F>
+    inline typename boost::enable_if<
+        is_execution_policy<ExPolicy>,
+        typename detail::algorithm_result<ExPolicy, InIter>::type
+    >::type
+    find_if(ExPolicy && policy, InIter first, InIter last, F && f)
+    {
+        typedef typename std::iterator_traits<InIter>::iterator_category
+            iterator_category;
+
+        BOOST_STATIC_ASSERT_MSG(
+            (boost::is_base_of<
+                std::input_iterator_tag, iterator_category
+            >::value),
+            "Requires at least input iterator.");
+
+        typedef typename boost::mpl::or_<
+            is_sequential_execution_policy<ExPolicy>,
+            boost::is_same<std::input_iterator_tag, iterator_category>
+        >::type is_seq;
+
+        return detail::find_if<InIter>().call(
+            std::forward<ExPolicy>(policy),
+            first, last, std::forward<F>(f), is_seq());
+    } 
 }}}
 
 #endif
