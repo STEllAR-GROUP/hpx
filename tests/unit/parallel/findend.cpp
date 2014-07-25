@@ -178,7 +178,7 @@ void test_find_end_exception()
 void find_end_exception_test()
 {
     test_find_end_exception<std::random_access_iterator_tag>();
-    //test_find_end_exception<std::forward_iterator_tag>();
+    test_find_end_exception<std::forward_iterator_tag>();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -273,7 +273,7 @@ void test_find_end_bad_alloc()
 void find_end_bad_alloc_test()
 {
     test_find_end_bad_alloc<std::random_access_iterator_tag>();
-    //test_find_end_bad_alloc<std::forward_iterator_tag>();
+    test_find_end_bad_alloc<std::forward_iterator_tag>();
 }
 
 int hpx_main()

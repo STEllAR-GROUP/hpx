@@ -321,29 +321,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     //Each partition is allowed to run across it's right adjacent chunk
                     //N - 1 times, where N is the size of the subsequence
                     FwdIter res =
-                        std::search(it, it + (part_count + (diff - 1)), first2, last2);
+                        std::search(it, next(it,(part_count + (diff - 1))), first2, last2);
 
                     //no subsequence found results in -1
-                    if(res == (it + (part_count+(diff-1))))
+                    if(res == next(it,(part_count+(diff-1))))
                         return -1;
                     else
                         return (int)std::distance(first1, res);
                 },
-                [=](std::vector<hpx::future<int> > && results) mutable
+                hpx::util::unwrapped([=](std::vector<int> && results) mutable
                 {
-                    int index = std::accumulate(boost::begin(results), boost::end(results),
-                        0,[](int max_end, hpx::future<int>& r) {
-                            int tmp = r.get();
-                            if(tmp > max_end)
-                                return tmp;
-                            return max_end;
-                        });
-                    if(index != -1)
-                        std::advance(first1, index);
+                    auto index = std::max_element(boost::begin(results), boost::end(results));
+                    if(*index != -1)
+                        std::advance(first1, *index);
                     else
                         first1 = last1;
                     return std::move(first1);
-                });
+                }));
             }
         };
     }
@@ -374,7 +368,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             >::value),
             "Requires at least forward iterator.");
 
-        typedef typename is_sequential_execution_policy<ExPolicy> is_seq;
+        typedef is_sequential_execution_policy<ExPolicy> is_seq;
 
         return detail::find_end<FwdIter1>().call(
             std::forward<ExPolicy>(policy),

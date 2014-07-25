@@ -79,6 +79,7 @@ void find_if_test()
 {
     test_find_if<std::random_access_iterator_tag>();
     test_find_if<std::forward_iterator_tag>();
+    test_find_if<std::input_iterator_tag>();
 }
 
 
@@ -173,6 +174,7 @@ void find_if_exception_test()
 {
     test_find_if_exception<std::random_access_iterator_tag>();
     test_find_if_exception<std::forward_iterator_tag>();
+    test_find_if_exception<std::input_iterator_tag>();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -264,6 +266,7 @@ void find_if_bad_alloc_test()
 {
     test_find_if_bad_alloc<std::random_access_iterator_tag>();
     test_find_if_bad_alloc<std::forward_iterator_tag>();
+    test_find_if_bad_alloc<std::input_iterator_tag>();
 }
 
 int hpx_main()
