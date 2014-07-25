@@ -30,6 +30,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             return t1 == t2;
         }
     };
+
 }}}}
 
 #endif

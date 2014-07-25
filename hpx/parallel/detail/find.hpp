@@ -14,6 +14,8 @@
 #include <hpx/parallel/detail/dispatch.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
+#include <hpx/parallel/util/zip_iterator.hpp>
+#include <hpx/parallel/detail/transform_reduce.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -279,6 +281,104 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         return detail::find_if_not<InIter>().call(
             std::forward<ExPolicy>(policy),
             first, last, std::forward<F>(f), is_seq());
+    }
+
+    namespace detail {
+        /// \cond NOINTERNAL
+        template <typename FwdIter>
+        struct find_end : public detail::algorithm<find_end<FwdIter>, FwdIter>
+        {
+            find_end()
+                : find_end::algorithm("find_end")
+            {}
+
+            template <typename ExPolicy, typename FwdIter2>
+            static FwdIter
+            sequential(ExPolicy const&, FwdIter first1, FwdIter last1, 
+                FwdIter2 first2, FwdIter2 last2)
+            {
+                return
+                    std::find_end(first1, last1, first2, last2);
+            }
+
+            template <typename ExPolicy, typename FwdIter2>
+            static typename detail::algorithm_result<ExPolicy, FwdIter>::type
+            parallel(ExPolicy const& policy, FwdIter first1, FwdIter last1, 
+                FwdIter2 first2, FwdIter2 last2)
+            {
+                std::size_t count = std::distance(first1, last1);
+                std::size_t diff = std::distance(first2, last2);
+
+                typedef typename std::iterator_traits<FwdIter>::iterator_category
+                    category;
+                typedef typename std::iterator_traits<FwdIter>::value_type value;
+
+                return util::partitioner<ExPolicy, FwdIter, int>::call(
+                    policy, first1, count-(diff-1),
+                    [diff,first1, first2, last2](FwdIter it,
+                        std::size_t part_count) mutable
+                {
+                    //Each partition is allowed to run across it's right adjacent chunk
+                    //N - 1 times, where N is the size of the subsequence
+                    FwdIter res =
+                        std::search(it, it + (part_count + (diff - 1)), first2, last2);
+
+                    //no subsequence found results in -1
+                    if(res == (it + (part_count+(diff-1))))
+                        return -1;
+                    else
+                        return (int)std::distance(first1, res);
+                },
+                [=](std::vector<hpx::future<int> > && results) mutable
+                {
+                    int index = std::accumulate(boost::begin(results), boost::end(results),
+                        0,[](int max_end, hpx::future<int>& r) {
+                            int tmp = r.get();
+                            if(tmp > max_end)
+                                return tmp;
+                            return max_end;
+                        });
+                    if(index != -1)
+                        std::advance(first1, index);
+                    else
+                        first1 = last1;
+                    return std::move(first1);
+                });
+            }
+        };
+    }
+
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
+    inline typename boost::enable_if<
+        is_execution_policy<ExPolicy>,
+        typename detail::algorithm_result<ExPolicy, FwdIter1>::type
+    >::type
+    find_end(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
+        FwdIter2 last2)
+    {
+        typedef typename std::iterator_traits<FwdIter1>::iterator_category
+            iterator_category1;
+
+        typedef typename std::iterator_traits<FwdIter2>::iterator_category
+            iterator_category2;
+
+        BOOST_STATIC_ASSERT_MSG(
+            (boost::is_base_of<
+                std::forward_iterator_tag, iterator_category1
+            >::value),
+            "Requires at least forward iterator.");
+
+        BOOST_STATIC_ASSERT_MSG(
+            (boost::is_base_of<
+                std::forward_iterator_tag, iterator_category2
+            >::value),
+            "Requires at least forward iterator.");
+
+        typedef typename is_sequential_execution_policy<ExPolicy> is_seq;
+
+        return detail::find_end<FwdIter1>().call(
+            std::forward<ExPolicy>(policy),
+            first1, last1, first2, last2, is_seq());
     }
 }}}
 
