@@ -125,6 +125,11 @@ function(hpx_setup_target target)
                  "HPX_COMPONENT_EXPORTS")
   endif()
 
+  # We force the -DDEBUG and -D_DEBUG defines in debug mode to avoid
+  # ABI differences
+  set_property(TARGET ${target} APPEND PROPERTY
+    COMPILE_DEFINITIONS_DEBUG HPX_DEBUG)
+
   # linker instructions
   if(NOT target_NOLIBS)
     set(hpx_libs hpx)
