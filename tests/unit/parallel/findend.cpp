@@ -66,21 +66,23 @@ template <typename IteratorTag>
 void test_find_end()
 {
     using namespace hpx::parallel;
-    test_find_end(seq, IteratorTag());
+    //test_find_end(seq, IteratorTag());
     test_find_end(par, IteratorTag());
-    test_find_end(par_vec, IteratorTag());
-    test_find_end(task, IteratorTag());
+    //test_find_end(par_vec, IteratorTag());
+    //test_find_end(task, IteratorTag());
 
-    test_find_end(execution_policy(seq), IteratorTag());
-    test_find_end(execution_policy(par), IteratorTag());
-    test_find_end(execution_policy(par_vec), IteratorTag());
-    test_find_end(execution_policy(task), IteratorTag());
+    
+    //test_find_end(execution_policy(seq), IteratorTag());
+    //test_find_end(execution_policy(par), IteratorTag());
+    //test_find_end(execution_policy(par_vec), IteratorTag());
+    //test_find_end(execution_policy(task), IteratorTag());
+    
 }
 
 void find_end_test()
 {
     test_find_end<std::random_access_iterator_tag>();
-    test_find_end<std::forward_iterator_tag>();
+    //test_find_end<std::forward_iterator_tag>();
 }
 
 
@@ -272,15 +274,23 @@ void test_find_end_bad_alloc()
 
 void find_end_bad_alloc_test()
 {
+ 
     test_find_end_bad_alloc<std::random_access_iterator_tag>();
     test_find_end_bad_alloc<std::forward_iterator_tag>();
+  
 }
 
 int hpx_main()
 {
-    find_end_test();
-    find_end_exception_test();
-    find_end_bad_alloc_test();
+    int t[] = {0,0,3,1,2,1,2,3,4,1,5,8};
+    int f[] = {1,2};
+    auto g = hpx::parallel::find_end(hpx::parallel::par(6),
+        boost::begin(t), boost::end(t), boost::begin(f),
+        boost::end(f));
+    std::cout << std::distance(boost::begin(t),g) << std::endl;
+    //find_end_test();
+    //find_end_exception_test();
+    //find_end_bad_alloc_test();
     return hpx::finalize();
 }
 

@@ -312,32 +312,51 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename std::iterator_traits<FwdIter>::iterator_category
                     category;
                 typedef typename std::iterator_traits<FwdIter>::value_type value;
+                typedef typename std::iterator_traits<FwdIter>::difference_type diff_type;
 
-                return util::partitioner<ExPolicy, FwdIter, int>::call(
+                util::cancellation_token<std::size_t, std::greater_equal<std::size_t>> tok(-1);
+
+                return util::partitioner<ExPolicy, FwdIter, void>::call_with_index(
                     policy, first1, count-(diff-1),
-                    [diff,first1, first2, last2](FwdIter it,
+                    [count,tok, diff,first1, first2, last2]( std::size_t base_idx, FwdIter it,
                         std::size_t part_count) mutable
                 {
-                    //Each partition is allowed to run across it's right adjacent chunk
-                    //N - 1 times, where N is the size of the subsequence
-                    FwdIter res =
-                        std::search(it, next(it,(part_count + (diff - 1))), first2, last2);
+                    util::loop_idx_n(
+                        base_idx, it, part_count, tok,
+                        [&tok,first2,count,&it,diff](value& t, std::size_t i)
+                        {
+                            std::cout << t << "=" << *first2 << std::endl;
+                            if(t == *first2) {
+                                diff_type local_count = 1;
+                                FwdIter2 needle = first2;
+                                FwdIter mid = it;
+                                std::cout << t << " " << *it << std::endl;
+                                for(; std::size_t(local_count) < count; ++local_count) {
+                                    std::cout << *mid << "=" << *needle << std::endl;
+                                    ++needle;
+                                    ++mid;
 
-                    //no subsequence found results in -1
-                    if(res == next(it,(part_count+(diff-1))))
-                        return -1;
-                    else
-                        return (int)std::distance(first1, res);
+                                    if( *mid != *needle )
+                                        break;
+                                }
+                                
+                                if(local_count == diff) {
+                                    tok.cancel(i);
+                                }
+                            }
+
+                        });
                 },
-                hpx::util::unwrapped([=](std::vector<int> && results) mutable
+                [=](std::vector<hpx::future<void> > &&) mutable
                 {
-                    auto index = std::max_element(boost::begin(results), boost::end(results));
-                    if(*index != -1)
-                        std::advance(first1, *index);
-                    else
+                    std::size_t find_end_res = tok.get_data();
+                    if(find_end_res != count) {
+                        std::advance(first1, find_end_res);
+                    }else{
                         first1 = last1;
+                    }
                     return std::move(first1);
-                }));
+                });
             }
         };
     }
