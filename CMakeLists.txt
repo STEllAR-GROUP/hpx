@@ -96,47 +96,47 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
 #    set(DEFAULT_MALLOC "jemalloc")
 endif()
 
-hpx_option(WITH_MALLOC
+hpx_option(HPX_MALLOC
   STRING
   "Define which allocator should be linked in. Options are: system, tcmalloc, jemalloc and tbbmalloc (default is: tcmalloc)"
   ${DEFAULT_MALLOC} ADVANCED)
 
-hpx_option(WITH_HWLOC
+hpx_option(HPX_WITH_HWLOC
   BOOL
   "Use Hwloc for hardware topolgy information and thread pinning. If disabled, performance might be reduced."
   ON ADVANCED)
 
-hpx_option(WITH_SECURITY BOOL "Enable security support via libsodium." OFF)
+hpx_option(HPX_WITH_SECURITY BOOL "Enable security support via libsodium." OFF)
 
 # Logging configuration
-hpx_option(WITH_LOGGING BOOL "Build HPX with logging enabled (default: ON)." ON ADVANCED)
-if(NOT WITH_LOGGING)
+hpx_option(HPX_WITH_LOGGING BOOL "Build HPX with logging enabled (default: ON)." ON ADVANCED)
+if(NOT HPX_WITH_LOGGING)
   hpx_add_config_define(HPX_NO_LOGGING)
 endif()
 
 ## Compiler related build options
-hpx_option(WITH_GCC_VERSION_CHECK BOOL "Ignore version reported by gcc (default: ON)" ON ADVANCED)
+hpx_option(HPX_GCC_VERSION_CHECK BOOL "Ignore version reported by gcc (default: ON)" ON ADVANCED)
 
-hpx_option(WITH_DEFAULT_BUILD_TARGETS BOOL
-  "Associate the core HPX library with the default build target (default: ON)." ON ADVANCED)
+hpx_option(HPX_BUILD_DEFAULT_TARGETS BOOL
+  "Associate the core HPX library with the default build target (default: ON)." ON ADVANCED CATEGORY "Build Targets")
 
-hpx_option(WITH_WARNINGS BOOL "Enable compiler warnings (default: ON)" ON ADVANCED)
+hpx_option(HPX_COMPILER_WARNINGS BOOL "Enable compiler warnings (default: ON)" ON ADVANCED)
 
-hpx_option(WITH_DOCUMENTATION BOOL "Build the HPX documentation (default OFF)." OFF)
+hpx_option(HPX_BUILD_DOCUMENTATION BOOL "Build the HPX documentation (default OFF)." OFF CATEGORY "Build Targets")
 
-hpx_option(WITH_DOCUMENTATION_SINGLEPAGE BOOL "The HPX documentation should be build as a single page HTML (default OFF)." OFF)
+hpx_option(HPX_BUILD_DOCUMENTATION_SINGLEPAGE BOOL "The HPX documentation should be build as a single page HTML (default OFF)." OFF CATEGORY "Build Targets")
 
-hpx_option(WITH_AUTOMATIC_PREPROCESSING BOOL "True if the automatic header preprocessing target should be created (default: OFF)." OFF ADVANCED)
-hpx_option(WITH_WAVE_ADDITIONAL_INCLUDE_DIRS STRING "Additional (compiler specific) include directories for the wave preprocessing tool." "" CATEGORY "Generic" ADVANCED)
+hpx_option(HPX_AUTOMATIC_PREPROCESSING BOOL "True if the automatic header preprocessing target should be created (default: OFF)." OFF ADVANCED)
+hpx_option(HPX_WAVE_ADDITIONAL_INCLUDE_DIRS STRING "Additional (compiler specific) include directories for the wave preprocessing tool." "" CATEGORY "Generic" ADVANCED)
 
 ################################################################################
 # Some platforms do not support dynamic linking. Enable this to link all
 # libraries statically. This also changes some of the internals of HPX related
 # to how components are loaded.
 ################################################################################
-hpx_option(WITH_STATIC_LINKING BOOL
+hpx_option(HPX_STATIC_LINKING BOOL
   "Compile HPX staticly linked libraries (Default: OFF)" OFF ADVANCED)
-if(WITH_STATIC_LINKING)
+if(HPX_STATIC_LINKING)
   hpx_add_config_define(HPX_STATIC_LINKING)
   set(hpx_library_link_mode STATIC)
   set(CMAKE_SHARED_LIBS OFF)
@@ -146,21 +146,21 @@ endif()
 
 ################################################################################
 
-hpx_option(WITH_EXAMPLES BOOL "Build the HPX examples (default OFF)" OFF)
-hpx_option(WITH_TESTS BOOL "Build the HPX tests (default ON)" ON)
-hpx_option(WITH_TESTS_BENCHMARKS BOOL "Build HPX benchmark tests (default: ON)" ON ADVANCED)
-hpx_option(WITH_TESTS_REGRESSIONS BOOL "Build HPX regression tests (default: ON)" ON ADVANCED)
-hpx_option(WITH_TESTS_UNIT BOOL "Build HPX unit tests (default: ON)" ON ADVANCED)
-hpx_option(WITH_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED)
-hpx_option(WITH_RUNTIME BOOL "Build HPX runtime (default: ON)" ON ADVANCED)
+hpx_option(HPX_BUILD_EXAMPLES BOOL "Build the HPX examples (default OFF)" OFF CATEGORY "Build Targets")
+hpx_option(HPX_BUILD_TESTS BOOL "Build the HPX tests (default ON)" ON CATEGORY "Build Targets")
+hpx_option(HPX_BUILD_TESTS_BENCHMARKS BOOL "Build HPX benchmark tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
+hpx_option(HPX_BUILD_TESTS_REGRESSIONS BOOL "Build HPX regression tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
+hpx_option(HPX_BUILD_TESTS_UNIT BOOL "Build HPX unit tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
+hpx_option(HPX_BUILD_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED CATEGORY "Build Targets")
+hpx_option(HPX_BUILD_RUNTIME BOOL "Build HPX runtime (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 
-hpx_option(WITH_FULL_RPATH BOOL "Build and link HPX libraries and executables with full RPATHs (default: ON)" ON ADVANCED)
+hpx_option(HPX_FULL_RPATH BOOL "Build and link HPX libraries and executables with full RPATHs (default: ON)" ON ADVANCED)
 
 ################################################################################
 # Native TLS configuration
 ################################################################################
-hpx_option(WITH_NATIVE_TLS BOOL "Use native TLS support if available (default: ON)" ON ADVANCED)
-if(WITH_NATIVE_TLS)
+hpx_option(HPX_NATIVE_TLS BOOL "Use native TLS support if available (default: ON)" ON ADVANCED)
+if(HPX_NATIVE_TLS)
   hpx_info("Native TLS is enabled.")
   hpx_add_config_define(HPX_HAVE_NATIVE_TLS)
 endif()
@@ -168,9 +168,9 @@ endif()
 ################################################################################
 # Disable the use of partially preprocessed header files
 ################################################################################
-hpx_option(WITH_PREPROCESSOR_LIMIT_EXPANSION BOOL "Do not use preprocessed headers (default: OFF)" OFF ADVANCED)
+hpx_option(HPX_PREPROCESSOR_LIMIT_EXPANSION BOOL "Do not use preprocessed headers (default: OFF)" OFF ADVANCED)
 
-if(WITH_PREPROCESSOR_LIMIT_EXPANSION)
+if(HPX_PREPROCESSOR_LIMIT_EXPANSION)
   hpx_info("Use of preprocessed headers is disabled.")
   hpx_add_config_define(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 endif()
@@ -178,66 +178,66 @@ endif()
 ################################################################################
 # Utility configuration
 ################################################################################
-hpx_option(WITH_UTIL_FUNCTION BOOL "Use hpx::util::function instead of boost::function or std::function (default: ON)" ON ADVANCED)
-if(WITH_UTIL_FUNCTION)
+hpx_option(HPX_UTIL_FUNCTION BOOL "Use hpx::util::function instead of boost::function or std::function (default: ON)" ON ADVANCED)
+if(HPX_UTIL_FUNCTION)
   hpx_add_config_define(HPX_UTIL_FUNCTION)
 endif()
 
-hpx_option(WITH_UTIL_TUPLE BOOL "Use hpx::util::tuple instead of boost::tuple or std::tuple (default: ON)" ON ADVANCED)
-if(WITH_UTIL_TUPLE)
+hpx_option(HPX_UTIL_TUPLE BOOL "Use hpx::util::tuple instead of boost::tuple or std::tuple (default: ON)" ON ADVANCED)
+if(HPX_UTIL_TUPLE)
   hpx_add_config_define(HPX_UTIL_TUPLE)
 endif()
 
-set(WITH_HIDDEN_VISIBILITY_DEFAULT ON)
+set(HPX_HIDDEN_VISIBILITY_DEFAULT ON)
 if(CMAKE_COMPILER_IS_GNUCXX)
   if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.6.99
       AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8)
-    set(WITH_HIDDEN_VISIBILITY_DEFAULT OFF)
+    set(HPX_HIDDEN_VISIBILITY_DEFAULT OFF)
   endif()
   if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
-    set(WITH_HIDDEN_VISIBILITY_DEFAULT OFF)
+    set(HPX_HIDDEN_VISIBILITY_DEFAULT OFF)
   endif()
 endif()
 
-hpx_option(WITH_HIDDEN_VISIBILITY BOOL
+hpx_option(HPX_HIDDEN_VISIBILITY BOOL
   "Use -fvisibility=hidden for builds on platforms which support it (default ON)"
-  ${WITH_HIDDEN_VISIBILITY_DEFAULT}
+  ${HPX_HIDDEN_VISIBILITY_DEFAULT}
   ADVANCED)
 
-hpx_option(WITH_AUTOMATIC_SERIALIZATION_REGISTRATION BOOL
+hpx_option(HPX_AUTOMATIC_SERIALIZATION_REGISTRATION BOOL
   "Use automatic serialization registration for actions and functions. This affects compatibility between HPX applications compiled with different compilers (default ON)"
   ON
   ADVANCED)
-if(NOT WITH_AUTOMATIC_SERIALIZATION_REGISTRATION)
+if(NOT HPX_AUTOMATIC_SERIALIZATION_REGISTRATION)
   hpx_add_config_define(HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
 endif()
 
-hpx_option(WITH_UNIQUE_FUTURE_ALIAS BOOL
+hpx_option(HPX_UNIQUE_FUTURE_ALIAS BOOL
   "HPX will defined unique_future<R> as a template alias to future<R>. (default OFF)."
   OFF ADVANCED)
 
 ## Thread Manager related build options
 
-set(WITH_MAX_CPU_COUNT_DEFAULT "64")
-hpx_option(WITH_MAX_CPU_COUNT STRING
-  "HPX applications will not use more that this number of OS-Threads (default: ${WITH_MAX_CPU_COUNT_DEFAULT})"
-  ${WITH_MAX_CPU_COUNT_DEFAULT}
+set(HPX_MAX_CPU_COUNT_DEFAULT "64")
+hpx_option(HPX_MAX_CPU_COUNT STRING
+  "HPX applications will not use more that this number of OS-Threads (default: ${HPX_MAX_CPU_COUNT_DEFAULT})"
+  ${HPX_MAX_CPU_COUNT_DEFAULT}
   CATEGORY "Thread Manager" ADVANCED)
 
-hpx_option(WITH_THREAD_STACK_MMAP BOOL
+hpx_option(HPX_THREAD_STACK_MMAP BOOL
   "Use mmap for stack allocation on appropriate platforms"
   ON
   CATEGORY "Thread Manager" ADVANCED)
 
-hpx_option(WITH_THREAD_MANAGER_IDLE_BACKOFF BOOL
+hpx_option(HPX_THREAD_MANAGER_IDLE_BACKOFF BOOL
   "Use mmap for stack allocation on appropriate platforms (default: OFF)"
   OFF
   CATEGORY "Thread Manager" ADVANCED)
 
-hpx_option(WITH_STACKTRACES BOOL "Attach backtraces to HPX exceptions (default: ON)"
+hpx_option(HPX_WITH_STACKTRACES BOOL "Attach backtraces to HPX exceptions (default: ON)"
   ON CATEGORY "Thread Manager" ADVANCED)
 
-if(WITH_STACKTRACES OR WITH_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION)
+if(HPX_WITH_STACKTRACES OR HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION)
   hpx_info("Stack traces are enabled.")
   hpx_add_config_define(HPX_HAVE_STACKTRACES)
   if(MSVC)
@@ -245,212 +245,199 @@ if(WITH_STACKTRACES OR WITH_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION)
   endif()
 endif()
 
-hpx_option(WITH_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION BOOL
+hpx_option(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION BOOL
   "Enable thread stack back trace being captured on suspension (default: OFF)"
   OFF
   CATEGORY "Thread Manager" ADVANCED)
 
-hpx_option(WITH_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH STRING
+hpx_option(HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH STRING
   "Thread stack back trace depth being captured on suspension (default: 5)"
   "5" CATEGORY "Thread Manager" ADVANCED)
 
-hpx_option(WITH_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION BOOL
+hpx_option(HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION BOOL
   "Enable thread stack back trace being captured on suspension (default: OFF)"
   OFF CATEGORY "Thread Manager" ADVANCED)
 
-if(WITH_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION)
+if(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION)
   hpx_add_config_define(HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH
-    ${WITH_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH})
-  if(WITH_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION)
+    ${HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH})
+  if(HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION)
     hpx_add_config_define(HPX_THREAD_MAINTAIN_FULLBAKCTRACE_ON_SUSPENSION)
   endif()
 endif()
 
-hpx_option(WITH_THREAD_MAINTAIN_TARGET_ADDRESS BOOL
+hpx_option(HPX_THREAD_MAINTAIN_TARGET_ADDRESS BOOL
   "Enable storing target address in thread for NUMA awareness (default: OFF)"
   OFF CATEGORY "Thread Manager" ADVANCED)
 
-if(WITH_THREAD_MAINTAIN_TARGET_ADDRESS)
+if(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
 endif()
 
-hpx_option(WITH_THREAD_MAINTAIN_QUEUE_WAITTIME BOOL
+hpx_option(HPX_THREAD_MAINTAIN_QUEUE_WAITTIME BOOL
   "Enable collecting queue wait times for threads (default: OFF)"
   OFF CATEGORY "Thread Manager" ADVANCED)
 
-if(WITH_THREAD_MAINTAIN_QUEUE_WAITTIME)
+if(HPX_THREAD_MAINTAIN_QUEUE_WAITTIME)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_QUEUE_WAITTIME)
 endif()
 
-hpx_option(WITH_THREAD_MAINTAIN_IDLE_RATES BOOL
+hpx_option(HPX_THREAD_MAINTAIN_IDLE_RATES BOOL
   "Enable measuring the percentage of overhead times spent in the scheduler (default: OFF)"
   OFF CATEGORY "Thread Manager" ADVANCED)
 
-hpx_option(WITH_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES BOOL
+hpx_option(HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES BOOL
   "Enable measuring thread creation and cleanup times (default: OFF)"
   OFF CATEGORY "Thread Manager" ADVANCED)
 
-if(WITH_THREAD_MAINTAIN_IDLE_RATES)
+if(HPX_THREAD_MAINTAIN_IDLE_RATES)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_IDLE_RATES)
-  if(WITH_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES)
+  if(HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES)
     hpx_add_config_define(HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES)
   endif()
 endif()
 
-hpx_option(WITH_THREAD_MAINTAIN_CUMULATIVE_COUNTS BOOL
+hpx_option(HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS BOOL
   "Enable keeping track of cumulative thread counts in the schedulers (default: ON)"
   ON CATEGORY "Thread Manager" ADVANCED)
 
-if(WITH_THREAD_MAINTAIN_CUMULATIVE_COUNTS)
+if(HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS)
 endif()
 
-hpx_option(WITH_THREAD_MAINTAIN_STEALING_COUNTS BOOL
+hpx_option(HPX_THREAD_MAINTAIN_STEALING_COUNTS BOOL
   "Enable keeping track of counts of thread stealing incidents in the schedulers (default: ON)"
   ON CATEGORY "Thread Manager" ADVANCED)
 
-if(WITH_THREAD_MAINTAIN_STEALING_COUNTS)
+if(HPX_THREAD_MAINTAIN_STEALING_COUNTS)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_STEALING_COUNTS)
 endif()
 
-hpx_option(WITH_THREAD_MAINTAIN_LOCAL_STORAGE BOOL
+hpx_option(HPX_THREAD_MAINTAIN_LOCAL_STORAGE BOOL
   "Enable thread local storage for all HPX threads (default: ON)"
   ON CATEGORY "Thread Manager" ADVANCED)
 
-if(WITH_THREAD_MAINTAIN_LOCAL_STORAGE)
+if(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
 endif()
 
-hpx_option(WITH_SWAP_CONTEXT_EMULATION BOOL "Emulate SwapContext API for coroutines (default: OFF)"
+hpx_option(HPX_SWAP_CONTEXT_EMULATION BOOL "Emulate SwapContext API for coroutines (default: OFF)"
   OFF CATEGORY "Thread Manager" ADVANCED)
 
 ################################################################################
 # Scheduler configuration
 ################################################################################
-hpx_option(WITH_THREAD_SCHEDULERS STRING
+hpx_option(HPX_THREAD_SCHEDULERS STRING
   "Which thread schedulers are build. Options are: all, local, static-priority, hierarchy, and periodic-priority. For multiple enabled schedulers, separate with a semicolon (default: all)"
   "all"
   CATEGORY "Thread Manager" ADVANCED)
 
-string(TOUPPER ${WITH_THREAD_SCHEDULERS} WITH_THREAD_SCHEDULERS_UC)
-foreach(_scheduler ${WITH_THREAD_SCHEDULERS_UC})
+string(TOUPPER ${HPX_THREAD_SCHEDULERS} HPX_THREAD_SCHEDULERS_UC)
+foreach(_scheduler ${HPX_THREAD_SCHEDULERS_UC})
   if(_scheduler STREQUAL "ALL")
     set(_all On)
-    set(WITH_ALL_SCHEDULERS ON CACHE INTERNAL "")
+    set(HPX_ALL_SCHEDULERS ON CACHE INTERNAL "")
   endif()
   if(_scheduler STREQUAL "LOCAL" OR _all)
     hpx_add_config_define(HPX_LOCAL_SCHEDULER)
-    set(WITH_LOCAL_SCHEDULER ON CACHE INTERNAL "")
+    set(HPX_LOCAL_SCHEDULER ON CACHE INTERNAL "")
   endif()
   if(_scheduler STREQUAL "STATIC_PRIORITY" OR _all)
     hpx_add_config_define(HPX_STATIC_PRIORITY_SCHEDULER)
-    set(WITH_STATIC_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
+    set(HPX_STATIC_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
   endif()
   if(_scheduler STREQUAL "HIERARCHY" OR _all)
     hpx_add_config_define(HPX_HIERARCHY_SCHEDULER)
-    set(WITH_HIERARCHY_SCHEDULER ON CACHE INTERNAL "")
+    set(HPX_HIERARCHY_SCHEDULER ON CACHE INTERNAL "")
   endif()
   if(_scheduler STREQUAL "PERIODIC_PRIORITY" OR _all)
     hpx_add_config_define(HPX_PERIODIC_PRIORITY_SCHEDULER)
-    set(WITH_PERIODIC_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
+    set(HPX_PERIODIC_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
   endif()
   unset(_all)
 endforeach()
 
 ## AGAS related build options
-hpx_option(WITH_AGAS_DUMP_REFCNT_ENTRIES BOOL
+hpx_option(HPX_AGAS_DUMP_REFCNT_ENTRIES BOOL
   "Enable dumps of the AGAS refcnt tables to logs (default: OFF)"
   OFF CATEGORY "AGAS" ADVANCED)
-if(WITH_AGAS_DUMP_REFCNT_ENTRIES)
+if(HPX_AGAS_DUMP_REFCNT_ENTRIES)
   hpx_add_config_define(HPX_AGAS_DUMP_REFCNT_ENTRIES)
 endif()
 
 ## Parcelport related build options
-set(WITH_PARCELPORT_TCP_DEFAULT ON)
-if(HPX_PLATFORM_UC STREQUAL "BLUEGENEQ")
-  set(WITH_PARCELPORT_TCP_DEFAULT OFF)
-endif()
-
-hpx_option(WITH_PARCELPORT_IBVERBS BOOL "Enable the ibverbs based parcelport. This is currently an experimental feature" OFF CATEGORY "Parcelport" ADVANCED)
-hpx_option(WITH_PARCELPORT_IPC BOOL "Enable the IPC (inter process communication) based parcelport. This is currently an experimental feature" OFF CATEGORY "Parcelport" ADVANCED)
-hpx_option(WITH_PARCELPORT_MPI BOOL "Enable the MPI based parcelport." ON CATEGORY "Parcelport")
-hpx_option(WITH_PARCELPORT_TCP BOOL "Enable the TCP based parcelport." ${WITH_PARCELPORT_TCP_DEFAULT} CATEGORY "Parcelport")
+hpx_option(HPX_PARCELPORT_IBVERBS BOOL "Enable the ibverbs based parcelport. This is currently an experimental feature" OFF CATEGORY "Parcelport" ADVANCED)
+hpx_option(HPX_PARCELPORT_IPC BOOL "Enable the IPC (inter process communication) based parcelport. This is currently an experimental feature" OFF CATEGORY "Parcelport" ADVANCED)
+hpx_option(HPX_PARCELPORT_MPI BOOL "Enable the MPI based parcelport." OFF CATEGORY "Parcelport")
+hpx_option(HPX_PARCELPORT_TCP BOOL "Enable the TCP based parcelport." ON CATEGORY "Parcelport")
 
 ## ibverbs parcelport settings
-hpx_option(WITH_PARCELPORT_IBVERBS_IFNAME STRING "The interface name of the ibverbs capable network adapter (default: ib0)" "ib0" CATEGORY "Parcelport" ADVANCED)
-hpx_option(WITH_PARCELPORT_IBVERBS_MESSAGE_PAYLOAD STRING "Size of the message payload not sent with RDMA (default: 512 byte)" "512" CATEGORY "Parcelport" ADVANCED)
-hpx_option(WITH_PARCELPORT_IBVERBS_MEMORY_CHUNK_SIZE STRING "Number of bytes a chunk in the memory pool can hold (default: 64MB)" "67108864" CATEGORY "Parcelport" ADVANCED)
-hpx_option(WITH_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS STRING "Maximum number of chunks that can be allocated (default: 100)" "100" CATEGORY "Parcelport" ADVANCED)
+hpx_option(HPX_PARCELPORT_IBVERBS_IFNAME STRING "The interface name of the ibverbs capable network adapter (default: ib0)" "ib0" CATEGORY "Parcelport" ADVANCED)
+hpx_option(HPX_PARCELPORT_IBVERBS_MESSAGE_PAYLOAD STRING "Size of the message payload not sent with RDMA (default: 512 byte)" "512" CATEGORY "Parcelport" ADVANCED)
+hpx_option(HPX_PARCELPORT_IBVERBS_MEMORY_CHUNK_SIZE STRING "Number of bytes a chunk in the memory pool can hold (default: 64MB)" "67108864" CATEGORY "Parcelport" ADVANCED)
+hpx_option(HPX_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS STRING "Maximum number of chunks that can be allocated (default: 100)" "100" CATEGORY "Parcelport" ADVANCED)
 
 ## mpi parcelport settings
-hpx_option(WITH_PARCELPORT_MPI_ENV STRING
+hpx_option(HPX_PARCELPORT_MPI_ENV STRING
   "List of environment variables checked to detect MPI (default: PMI_RANK;OMPI_COMM_WORLD_SIZE)."
   "PMI_RANK;OMPI_COMM_WORLD_SIZE" CATEGORY "Parcelport" ADVANCED)
 
 ## Profiling related build options
-hpx_option(WITH_APEX BOOL "Enable APEX instrumentation support." OFF CATEGORY "Profiling")
-hpx_option(WITH_PAPI BOOL "Enable the PAPI based performance counter." OFF CATEGORY "Profiling")
-hpx_option(WITH_TAU BOOL "Enable TAU profiling support." OFF CATEGORY "Profiling")
-hpx_option(WITH_GOOGLE_PERFTOOLS BOOL "Enable Google Perftools instrumentation support." OFF CATEGORY "Profiling")
-hpx_option(WITH_ITTNOTIFY BOOL "Enable Amplifier (ITT) instrumentation support." OFF CATEGORY "Profiling")
+hpx_option(HPX_WITH_APEX BOOL "Enable APEX instrumentation support." OFF CATEGORY "Profiling")
+hpx_option(HPX_WITH_PAPI BOOL "Enable the PAPI based performance counter." OFF CATEGORY "Profiling")
+hpx_option(HPX_WITH_TAU BOOL "Enable TAU profiling support." OFF CATEGORY "Profiling")
+hpx_option(HPX_WITH_GOOGLE_PERFTOOLS BOOL "Enable Google Perftools instrumentation support." OFF CATEGORY "Profiling")
+hpx_option(HPX_WITH_ITTNOTIFY BOOL "Enable Amplifier (ITT) instrumentation support." OFF CATEGORY "Profiling")
 
 ## Debugging related build options
-hpx_option(WITH_VALGRIND BOOL "Enable Valgrind instrumentation support." OFF CATEGORY "Debugging")
+hpx_option(HPX_WITH_VALGRIND BOOL "Enable Valgrind instrumentation support." OFF CATEGORY "Debugging")
 
-set(WITH_VERIFY_LOCKS_DEFAULT OFF)
-set(WITH_VERIFY_LOCKS_GLOBALLY_DEFAULT OFF)
-set(WITH_THREAD_DEBUG_INFO_DEFAULT OFF)
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-  set(WITH_VERIFY_LOCKS_DEFAULT ON)
-  set(WITH_VERIFY_LOCKS_GLOBALLY_DEFAULT ON)
-  set(WITH_THREAD_DEBUG_INFO_DEFAULT ON)
-endif()
-hpx_option(WITH_VERIFY_LOCKS BOOL
-  "Enable lock verification code (default: ${WITH_VERIFY_LOCKS_DEFAULT})"
-  ${WITH_VERIFY_LOCKS_DEFAULT}
-  CATEGORY "Debugging" ADVANCED)
-hpx_option(WITH_VERIFY_LOCKS_GLOBALLY BOOL
-  "Enable global lock verification code (default: ${WITH_VERIFY_LOCKS_GLOBALLY_DEFAULT})"
-  ${WITH_VERIFY_LOCKS_GLOBALLY_DEFAULT}
-  CATEGORY "Debugging" ADVANCED)
-hpx_option(WITH_VERIFY_LOCKS_BACKTRACE BOOL
-  "Enable thred stack back trace being captured on lock registration (to be used in combination with WITH_VERIFY_LOCKS=ON, default: OFF)"
+hpx_option(HPX_VERIFY_LOCKS BOOL
+  "Enable lock verification code (default: OFF, implicitly enabled in debug builds)"
   OFF
   CATEGORY "Debugging" ADVANCED)
-hpx_option(WITH_THREAD_DEBUG_INFO BOOL
-  "Enable thread debugging information (default: ${WITH_THREAD_DEBUG_INFO_DEFAULT})"
-  ${WITH_THREAD_DEBUG_INFO_DEFAULT}
+hpx_option(HPX_VERIFY_LOCKS_GLOBALLY BOOL
+  "Enable global lock verification code (default: OFF, implicitly enabled in debug builds)"
+  OFF
   CATEGORY "Debugging" ADVANCED)
-hpx_option(WITH_THREAD_GUARD_PAGE BOOL
+hpx_option(HPX_VERIFY_LOCKS_BACKTRACE BOOL
+  "Enable thred stack back trace being captured on lock registration (to be used in combination with HPX_VERIFY_LOCKS=ON, default: OFF)"
+  OFF
+  CATEGORY "Debugging" ADVANCED)
+hpx_option(HPX_THREAD_DEBUG_INFO BOOL
+  "Enable thread debugging information (default: OFF, implicitly enabled in debug builds)"
+  OFF
+  CATEGORY "Debugging" ADVANCED)
+hpx_option(HPX_THREAD_GUARD_PAGE BOOL
   "Enable thread guard page (default: ON)"
   ON
   CATEGORY "Debugging" ADVANCED)
 
-if(WITH_VERIFY_LOCKS)
+if(HPX_VERIFY_LOCKS)
   hpx_add_config_define(HPX_HAVE_VERIFY_LOCKS)
-  if(WITH_VERIFY_LOCKS_BACKTRACE)
+  if(HPX_VERIFY_LOCKS_BACKTRACE)
     hpx_add_config_define(HPX_HAVE_VERIFY_LOCKS_BACKTRACE)
   endif()
 endif()
-if(WITH_VERIFY_LOCKS_GLOBALLY)
+if(HPX_VERIFY_LOCKS_GLOBALLY)
   hpx_add_config_define(HPX_HAVE_VERIFY_LOCKS_GLOBALLY)
 endif()
 
 # Additional debug support
-if(NOT MSVC AND WITH_THREAD_GUARD_PAGE)
+if(NOT MSVC AND HPX_THREAD_GUARD_PAGE)
   hpx_add_config_define(HPX_THREAD_GUARD_PAGE)
 endif()
 
-if(NOT MSVC AND WITH_THREAD_STACK_MMAP)
+if(NOT MSVC AND HPX_THREAD_STACK_MMAP)
   hpx_add_config_define(HPX_USE_MMAP)
 endif()
 
-if(WITH_THREAD_MANAGER_IDLE_BACKOFF)
+if(HPX_THREAD_MANAGER_IDLE_BACKOFF)
   hpx_add_config_define(HPX_THREAD_BACKOFF_ON_IDLE)
 endif()
 
-if(WITH_THREAD_DEBUG_INFO)
+if(HPX_THREAD_DEBUG_INFO)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_PHASE_INFORMATION)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_DESCRIPTION)
@@ -458,7 +445,9 @@ if(WITH_THREAD_DEBUG_INFO)
 endif()
 
 # Options for our plugins
-hpx_option(WITH_COMPRESSION_BZIP2 BOOL "Enable bzip2 compression for parcel data (default: OFF)." OFF ADVANCED)
+hpx_option(HPX_WITH_COMPRESSION_BZIP2 BOOL "Enable bzip2 compression for parcel data (default: OFF)." OFF ADVANCED)
+hpx_option(HPX_WITH_COMPRESSION_SNAPPY BOOL "Enable snappy compression for parcel data (default: OFF)." OFF ADVANCED)
+hpx_option(HPX_WITH_COMPRESSION_ZLIB BOOL "Enable zlib compression for parcel data (default: OFF)." OFF ADVANCED)
 
 ################################################################################
 
@@ -485,10 +474,10 @@ include(HPX_SetupBoost)
 # Find all allocators which are currently supported.
 include(HPX_SetupAllocator)
 
-if(WITH_HWLOC)
+if(HPX_WITH_HWLOC)
   find_package(Hwloc)
   if(NOT HWLOC_FOUND)
-    hpx_error("Hwloc could not be found and WITH_HWLOC=ON, please specify HWLOC_ROOT to point to the correct location or set WITH_HWLOC to OFF")
+    hpx_error("Hwloc could not be found and HPX_WITH_HWLOC=ON, please specify HWLOC_ROOT to point to the correct location or set HPX_WITH_HWLOC to OFF")
   endif()
   hpx_libraries(${HWLOC_LIBRARIES})
   include_directories(${HWLOC_INCLUDE_DIR})
@@ -498,32 +487,32 @@ endif()
 ################################################################################
 # Decide whether to use the ibverbs based parcelport
 ################################################################################
-if(WITH_PARCELPORT_IBVERBS)
+if(HPX_PARCELPORT_IBVERBS)
   find_package(Ibverbs)
   if(NOT IBVERBS_FOUND)
-    hpx_error("The ibverbs libraries could not be found and WITH_PARCELPORT_IBVERBS=ON, please specify IBVERBS_ROOT to point to the correct location or set WITH_PARCELPORT_IBVERBS to OFF")
+    hpx_error("The ibverbs libraries could not be found and HPX_PARCELPORT_IBVERBS=ON, please specify IBVERBS_ROOT to point to the correct location or set HPX_PARCELPORT_IBVERBS to OFF")
   endif()
   hpx_libraries(${IBVERBS_LIBRARIES})
   include_directories(${IBVERBS_INCLUDE_DIR})
 
   find_package(Rdmacm)
   if(NOT RDMACM_FOUND)
-    hpx_error("The ibverbs libraries could not be found and WITH_PARCELPORT_IBVERBS=ON, please specify RDMACM_ROOT to point to the correct location or set WITH_PARCELPORT_IBVERBS to OFF")
+    hpx_error("The ibverbs libraries could not be found and HPX_PARCELPORT_IBVERBS=ON, please specify RDMACM_ROOT to point to the correct location or set HPX_PARCELPORT_IBVERBS to OFF")
   endif()
   hpx_libraries(${RDMACM_LIBRARIES})
   include_directories(${RDMACM_INCLUDE_DIR})
   hpx_add_config_define(HPX_HAVE_PARCELPORT_IBVERBS)
-  hpx_add_config_define(HPX_PARCELPORT_IBVERBS_IFNAME "\"${WITH_PARCELPORT_IBVERBS_IFNAME}\"")
-  hpx_add_config_define(HPX_PARCELPORT_IBVERBS_MESSAGE_PAYLOAD "${WITH_PARCELPORT_IBVERBS_MESSAGE_PAYLOAD}")
-  hpx_add_config_define(HPX_PARCELPORT_IBVERBS_MEMORY_CHUNK_SIZE "${WITH_PARCELPORT_IBVERBS_MEMORY_CHUNK_SIZE}")
-  hpx_add_config_define(HPX_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS "${WITH_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS}")
+  hpx_add_config_define(HPX_PARCELPORT_IBVERBS_IFNAME "\"${HPX_PARCELPORT_IBVERBS_IFNAME}\"")
+  hpx_add_config_define(HPX_PARCELPORT_IBVERBS_MESSAGE_PAYLOAD "${HPX_PARCELPORT_IBVERBS_MESSAGE_PAYLOAD}")
+  hpx_add_config_define(HPX_PARCELPORT_IBVERBS_MEMORY_CHUNK_SIZE "${HPX_PARCELPORT_IBVERBS_MEMORY_CHUNK_SIZE}")
+  hpx_add_config_define(HPX_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS "${HPX_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS}")
 endif()
 
 ################################################################################
 # Decide whether to use shared memory based parcelport (starting with
 # Boost V1.52)
 ################################################################################
-if(WITH_PARCELPORT_IPC)
+if(HPX_PARCELPORT_IPC)
   if(Boost_VERSION GREATER 105100)
     hpx_add_config_define(HPX_HAVE_PARCELPORT_IPC)
   endif()
@@ -532,10 +521,10 @@ endif()
 ################################################################################
 # Decide whether to use the MPI based parcelport
 ################################################################################
-if(WITH_PARCELPORT_MPI)
+if(HPX_PARCELPORT_MPI)
   find_package(MPI)
   if(NOT MPI_CXX_FOUND)
-    hpx_error("MPI could not be found and WITH_PARCELPORT_MPI=On, please specify MPI_CXX_COMPILER to point to a working MPI C++ compiler for your platform")
+    hpx_error("MPI could not be found and HPX_PARCELPORT_MPI=On, please specify MPI_CXX_COMPILER to point to a working MPI C++ compiler for your platform")
   endif()
   hpx_add_config_define(HPX_HAVE_PARCELPORT_MPI)
   if(MPI_CXX_COMPILE_FLAGS)
@@ -561,8 +550,8 @@ if(WITH_PARCELPORT_MPI)
   # is enabled by default.
   # PMI_RANK: Intel MPI and MVAPICH2
   # OMPI_COMM_WORLD_SIZE: OpenMPI starting at version 1.3
-  if(WITH_PARCELPORT_MPI_ENV)
-    string(REPLACE ";" "," hpx_parcelport_mpi_env_ "${WITH_PARCELPORT_MPI_ENV}")
+  if(HPX_PARCELPORT_MPI_ENV)
+    string(REPLACE ";" "," hpx_parcelport_mpi_env_ "${HPX_PARCELPORT_MPI_ENV}")
     hpx_add_config_define(HPX_PARCELPORT_MPI_ENV "\"${hpx_parcelport_mpi_env_}\"")
   endif()
 endif()
@@ -570,7 +559,7 @@ endif()
 ################################################################################
 # Decide whether to use the TCP/IP based parcelport
 ################################################################################
-if(WITH_PARCELPORT_TCP)
+if(HPX_PARCELPORT_TCP)
   hpx_add_config_define(HPX_HAVE_PARCELPORT_TCP)
 endif()
 
@@ -587,10 +576,10 @@ if(WITH_AMPLIFIER)
   hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
 endif()
 
-if(WITH_TAU)
+if(HPX_WITH_TAU)
   find_package(TAU)
   if(NOT TAU_FOUND)
-    hpx_error("TAU could not be found and WITH_TAU=On, please specify TAU_ROOT to point to the root of your TAU installation")
+    hpx_error("TAU could not be found and HPX_WITH_TAU=On, please specify TAU_ROOT to point to the root of your TAU installation")
   endif()
   hpx_libraries(${TAU_LIBRARIES})
   include_directories(${TAU_INCLUDE_DIR})
@@ -599,10 +588,10 @@ endif()
 ################################################################################
 # Enable integration with Apex event counters
 ################################################################################
-if(WITH_APEX)
+if(HPX_WITH_APEX)
   find_package(APEX)
   if(NOT APEX_FOUND)
-    hpx_error("Apex could not be found and WITH_APEX=On, please specify APEX_ROOT to point to the root of your Apex installation")
+    hpx_error("Apex could not be found and HPX_WITH_APEX=On, please specify APEX_ROOT to point to the root of your Apex installation")
   endif()
   hpx_libraries(${APEX_LIBRARIES})
   include_directories(${APEX_INCLUDE_DIR})
@@ -612,19 +601,19 @@ if(WITH_APEX)
   hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
 endif()
 
-if(WITH_GOOGLE_PERFTOOLS)
+if(HPX_WITH_GOOGLE_PERFTOOLS)
   find_package(GooglePerftools)
   if(NOT GOOGLE_PERFTOOLS_FOUND)
-    hpx_error("Google Perftools could not be found and WITH_GOOGLE_PERFTOOLS=On, please specify GOOGLE_PERFTOOLS to point to the root of your Google Perftools installation")
+    hpx_error("Google Perftools could not be found and HPX_WITH_GOOGLE_PERFTOOLS=On, please specify GOOGLE_PERFTOOLS to point to the root of your Google Perftools installation")
   endif()
   hpx_libraries(${GOOGLE_PERFTOOLS_LIBRARIES})
   include_directories(${GOOGLE_PERFTOOLS_INCLUDE_DIR})
 endif()
 
-if(WITH_VALGRIND)
+if(HPX_WITH_VALGRIND)
   find_package(Valgrind)
   if(NOT VALGRIND_FOUND)
-    hpx_error("Valgrind could not be found and WITH_VALGRIND=On, please specify VALGRIND_ROOT to point to the root of your Valgrind installation")
+    hpx_error("Valgrind could not be found and HPX_WITH_VALGRIND=On, please specify VALGRIND_ROOT to point to the root of your Valgrind installation")
   endif()
   include_directories(${VALGRIND_INCLUDE_DIR})
   hpx_add_config_define(HPX_HAVE_VALGRIND)
@@ -633,7 +622,7 @@ endif()
 ################################################################################
 # Security, libsodium: P(ortable|ackageable) NaCl
 ################################################################################
-if(WITH_SECURITY)
+if(HPX_WITH_SECURITY)
   find_package(Sodium)
   if(NOT SODIUM_FOUND)
     hpx_error("Sodium could not be found and WITH_SODIUM=On, please specify Sodium_ROOT to point to the root of your Sodium installation")
@@ -656,9 +645,9 @@ endif()
 #
 
 # Check if the selected compiler versions are supposed to work with our codebase
-if(CMAKE_COMPILER_IS_GNUCXX AND WITH_GCC_VERSION_CHECK)
+if(CMAKE_COMPILER_IS_GNUCXX AND HPX_GCC_VERSION_CHECK)
   if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.4.4)
-    hpx_error("GCC 4.4.5 or higher is required. Specify WITH_GCC_VERSION_CHECK=OFF to ignore this error.")
+    hpx_error("GCC 4.4.5 or higher is required. Specify HPX_GCC_VERSION_CHECK=OFF to ignore this error.")
   endif()
 endif()
 
@@ -809,7 +798,7 @@ if(MSVC)
 endif()
 
 # Configure Warnings
-if(WITH_WARNINGS)
+if(HPX_COMPILER_WARNINGS)
   if(MSVC) # Adding special warning settings for the MSVC compiler ...
     hpx_add_compile_flag(-W3 LANGUAGES C CXX)
     # According to the ifort Windows manual, W3 isn't supported
@@ -922,7 +911,7 @@ else()
     hpx_add_compile_flag_if_available(-Wno-deprecated-register CXX C)
   endif()
 
-  if(WITH_HIDDEN_VISIBILITY)
+  if(HPX_HIDDEN_VISIBILITY)
     hpx_add_compile_flag_if_available(-fvisibility=hidden LANGUAGES CXX C Fortran)
     hpx_add_link_flag_if_available(-fvisibility=hidden LANGUAGES CXX C Fortran)
     hpx_add_config_define(HPX_ELF_HIDDEN_VISIBILITY)
@@ -996,11 +985,11 @@ hpx_check_for_cxx11_std_unique_ptr(
   DEFINITIONS HPX_HAVE_CXX11_STD_UNIQUE_PTR
               BOOST_LOCKFREE_HAVE_CXX11_STD_UNIQUE_PTR)
 
-if(NOT WITH_UTIL_TUPLE)
+if(NOT HPX_UTIL_TUPLE)
   hpx_check_for_cxx11_std_tuple(DEFINITIONS HPX_HAVE_CXX11_STD_TUPLE)
 endif()
 
-if(NOT WITH_UTIL_FUNCTION)
+if(NOT HPX_UTIL_FUNCTION)
   hpx_check_for_cxx11_std_bind(DEFINITIONS HPX_HAVE_CXX11_STD_FUNCTION)
 endif()
 
@@ -1031,9 +1020,9 @@ endif()
 # Emulation of SwapContext on Windows
 ################################################################################
 if(MSVC)
-  if(WITH_SWAP_CONTEXT_EMULATION)
+  if(HPX_SWAP_CONTEXT_EMULATION)
     if(NOT CMAKE_ASM_MASM_COMPILER)
-      hpx_error("SwitchToFiber emulation can not be enabled. The masm compiler could not be found. Try setting the ASM_MASM environment variable to the assembler executable (ml.exe/ml64.exe) or disable the emulation by setting WITH_SWAP_CONTEXT_EMULATION to Off")
+      hpx_error("SwitchToFiber emulation can not be enabled. The masm compiler could not be found. Try setting the ASM_MASM environment variable to the assembler executable (ml.exe/ml64.exe) or disable the emulation by setting HPX_SWAP_CONTEXT_EMULATION to Off")
     else()
       hpx_info("SwitchToFiber emulation is enabled, using compiler: '${CMAKE_ASM_MASM_COMPILER}'")
       hpx_add_link_flag_if_available(/EXPORT:switch_to_fiber)
@@ -1042,9 +1031,9 @@ if(MSVC)
   endif()
 endif()
 
-if(WITH_UNIQUE_FUTURE_ALIAS)
+if(HPX_UNIQUE_FUTURE_ALIAS)
   if(NOT WITH_CXX11_ALIAS_TEMPLATES)
-    hpx_error("template aliases are not available for this compiler. Can't create a unique_future<R> alias. Please set WITH_UNIQUE_FUTURE_ALIAS to OFF or use a modern compiler")
+    hpx_error("template aliases are not available for this compiler. Can't create a unique_future<R> alias. Please set HPX_UNIQUE_FUTURE_ALIAS to OFF or use a modern compiler")
   endif()
   hpx_add_config_define(HPX_UNIQUE_FUTURE_ALIAS)
 endif()
@@ -1070,7 +1059,7 @@ if (NOT DEFINED LIB)
   set(LIB "lib")
 endif(NOT DEFINED LIB)
 
-if(WITH_FULL_RPATH)
+if(HPX_FULL_RPATH)
   list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/${LIB}" isSystemDir)
   if(isSystemDir EQUAL -1)
     set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB}")
@@ -1095,13 +1084,13 @@ hpx_include(SetOutputPaths)
 add_hpx_pseudo_target(plugins)
 add_subdirectory(plugins)
 
-if(WITH_COMPRESSION_BZIP2)
+if(HPX_WITH_COMPRESSION_BZIP2)
   hpx_add_config_define(HPX_HAVE_COMPRESSION_BZIP2)
 endif()
-if(WITH_COMPRESSION_SNAPPY)
+if(HPX_WITH_COMPRESSION_SNAPPY)
   hpx_add_config_define(HPX_HAVE_COMPRESSION_SNAPPY)
 endif()
-if(WITH_COMPRESSION_ZLIB)
+if(HPX_WITH_COMPRESSION_ZLIB)
   hpx_add_config_define(HPX_HAVE_COMPRESSION_ZLIB)
 endif()
 
@@ -1130,14 +1119,14 @@ set(HPX_DEBUG_POSTFIX "d")
 # directory structure.
 
 
-if(WITH_TOOLS)
+if(HPX_BUILD_TOOLS)
   add_hpx_pseudo_target(tools)
   add_subdirectory(tools)
 endif()
 
 add_subdirectory(src)
 
-if(WITH_EXAMPLES)
+if(HPX_BUILD_EXAMPLES)
   add_hpx_pseudo_target(examples)
   include_directories(examples)
   add_subdirectory(examples)
@@ -1152,7 +1141,7 @@ add_plugin_modules()
 ###############################################################################
 # Tests
 ###############################################################################
-if(WITH_TESTS)
+if(HPX_BUILD_TESTS)
   find_package(PythonInterp)
 
   if(NOT PYTHONINTERP_FOUND)
@@ -1172,16 +1161,16 @@ if(WITH_TESTS)
 endif()
 
 
-if(WITH_RUNTIME)
+if(HPX_BUILD_RUNTIME)
   add_hpx_pseudo_target(runtime)
   add_subdirectory(runtime)
 endif()
 
-if(WITH_DOCUMENTATION)
+if(HPX_BUILD_DOCUMENTATION)
   add_subdirectory(docs)
 endif()
 
-if(WITH_AUTOMATIC_PREPROCESSING)
+if(HPX_AUTOMATIC_PREPROCESSING)
   add_subdirectory(preprocess)
 endif()
 
@@ -1372,7 +1361,7 @@ install(
   DESTINATION share/hpx-${HPX_VERSION}
   COMPONENT license)
 
-if(WITH_DOCUMENTATION)
+if(HPX_BUILD_DOCUMENTATION)
   # Install HPX documentation files
   if(MSVC)
     set(doc_dir "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}")

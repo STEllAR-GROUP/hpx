@@ -510,6 +510,12 @@
 #  endif
 #endif
 
+#if !defined(HPX_HAVE_VERIFY_LOCKS_GLOBALY)
+#  if defined(HPX_DEBUG)
+#    define HPX_HAVE_VERIFY_LOCKS_GLOBALY
+#  endif
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_SMALL_STACK_SIZE)
 #  if defined(BOOST_WINDOWS) && !defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)

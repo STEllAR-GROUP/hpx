@@ -7,7 +7,7 @@
 ###############################################################################
 set(root "${hpx_SOURCE_DIR}/hpx/components/distributing_factory")
 
-if(WITH_DEFAULT_BUILD_TARGETS)
+if(HPX_BUILD_DEFAULT_TARGETS)
   add_hpx_component(distributing_factory
     FOLDER "Core/Components"
     HEADER_ROOT ${root}

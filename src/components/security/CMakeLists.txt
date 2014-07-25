@@ -4,7 +4,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 ###############################################################################
-if(WITH_SECURITY)
+if(HPX_WITH_SECURITY)
 
   set(root "${hpx_SOURCE_DIR}/hpx/components/security")
 

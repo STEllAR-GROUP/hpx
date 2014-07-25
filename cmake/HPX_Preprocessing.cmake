@@ -3,7 +3,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT WITH_AUTOMATIC_PREPROCESSING)
+if(NOT HPX_AUTOMATIC_PREPROCESSING)
   macro(hpx_partial_preprocess_header file)
   endmacro()
 else()
@@ -80,8 +80,8 @@ else()
 
     set(HPX_WAVE_ARGUMENTS)
 
-    if(NOT WITH_WAVE_ADDITIONAL_INCLUDE_DIRS STREQUAL "")
-      foreach(dir ${WITH_WAVE_ADDITIONAL_INCLUDE_DIRS})
+    if(NOT HPX_WAVE_ADDITIONAL_INCLUDE_DIRS STREQUAL "")
+      foreach(dir ${HPX_WAVE_ADDITIONAL_INCLUDE_DIRS})
         set(HPX_WAVE_ARGUMENTS "${HPX_WAVE_ARGUMENTS}-S${dir}\n")
       endforeach()
     endif()

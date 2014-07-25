@@ -5,7 +5,7 @@
 
 # We first try to find the required minimum set of Boost libraries. This will
 # also give us the version of the found boost installation
-if(WITH_STATIC_LINKING)
+if(HPX_STATIC_LINKING)
   set(Boost_USE_STATIC_LIBS ON)
 endif()
 find_package(Boost
@@ -55,12 +55,12 @@ option(
 
 set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
 
-if(WITH_COMPRESSION_BZIP2 OR WITH_COMPRESSION_ZLIB)
+if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB)
   find_package(Boost 1.49 QUIET COMPONENTS iostreams)
   if(Boost_IOSTREAMS_FOUND)
     hpx_info("  iostreams")
   else()
-    hpx_error("Could not find Boost.Iostreams but WITH_COMPRESSION_BZIP2=On or WITH_COMPRESSION_LIB=On. Either set it to off or provide a boost installation including the iostreams library")
+    hpx_error("Could not find Boost.Iostreams but HPX_WITH_COMPRESSION_BZIP2=On or HPX_WITH_COMPRESSION_LIB=On. Either set it to off or provide a boost installation including the iostreams library")
   endif()
   set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
 endif()

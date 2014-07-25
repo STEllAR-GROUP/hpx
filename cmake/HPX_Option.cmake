@@ -8,6 +8,7 @@ include(CMakeParseArguments)
 
 set(HPX_OPTION_CATEGORIES
   "Generic"
+  "Build Targets"
   "Thread Manager"
   "AGAS"
   "Parcelport"

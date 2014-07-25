@@ -161,14 +161,14 @@ foreach(_cat ${HPX_OPTION_CATEGORIES})
         string(REPLACE " " "_" _variableName_anchor "${_variableName}")
 
         get_property(_doc CACHE "${_variableName}" PROPERTY HELPSTRING)
+        get_property(_type CACHE "${_variableName}" PROPERTY TYPE)
+        if(NOT _type STREQUAL "UNINITIALIZED")
+          set(_variableName "${_variableName}:${_type}")
+        endif()
         set(HPX_CMAKE_OPTIONS
-          "${HPX_CMAKE_OPTIONS}    [[[#build_system.cmake_variables.${_variableName_anchor}] ")
+          "${HPX_CMAKE_OPTIONS}    ")
         set(HPX_CMAKE_OPTIONS
-          "${HPX_CMAKE_OPTIONS}    `${_variableName}`]\n")
-        set(HPX_CMAKE_OPTIONS
-          "${HPX_CMAKE_OPTIONS}     [${_doc}]\n")
-        set(HPX_CMAKE_OPTIONS
-          "${HPX_CMAKE_OPTIONS}    ]\n")
+          "${HPX_CMAKE_OPTIONS}    [[[#build_system.cmake_variables.${_variableName_anchor}] `${_variableName}`][${_doc}]]\n")
       endif()
     endif()
   endforeach()
@@ -178,14 +178,44 @@ endforeach()
 
 configure_file(
   "${hpx_SOURCE_DIR}/cmake/templates/cmake_variables.qbk.in"
-  "${hpx_SOURCE_DIR}/docs/cmake_variables.qbk"
+  "${hpx_SOURCE_DIR}/docs/manual/build_system/cmake_variables.qbk"
+  @ONLY
+)
+
+set(toolchains_base_dir ${hpx_SOURCE_DIR}/cmake/toolchains/)
+file(GLOB _toolchain_files ${toolchains_base_dir} ${toolchains_base_dir}*.cmake)
+
+set(HPX_CMAKE_TOOLCHAINS_LIST "")
+set(HPX_CMAKE_TOOLCHAINS "")
+foreach(_toolchain ${_toolchain_files})
+  get_filename_component(_toolchain_name ${_toolchain} NAME_WE)
+  string(REGEX REPLACE "[ -]" "_" _toolchain_anchor "${_toolchain_name}")
+  message("${_toolchain} ${_toolchain_name}")
+  set(HPX_CMAKE_TOOLCHAINS_LIST "${HPX_CMAKE_TOOLCHAINS_LIST}* [link hpx.manual.build_system.building_hpx.cmake_toolchains.${_toolchain_anchor} ${_toolchain_name}]\n")
+  set(HPX_CMAKE_TOOLCHAINS "${HPX_CMAKE_TOOLCHAINS}[heading:${_toolchain_anchor} ${_toolchain_name}]\n")
+  set(HPX_CMAKE_TOOLCHAINS "${HPX_CMAKE_TOOLCHAINS}\n``\n")
+  file(STRINGS ${_toolchain} _toolchain_content)
+  foreach(_line ${_toolchain_content})
+    set(HPX_CMAKE_TOOLCHAINS "${HPX_CMAKE_TOOLCHAINS}    ${_line}\n")
+  endforeach()
+  set(HPX_CMAKE_TOOLCHAINS "${HPX_CMAKE_TOOLCHAINS}``\n")
+  set(HPX_CMAKE_TOOLCHAINS "${HPX_CMAKE_TOOLCHAINS}\n")
+endforeach()
+
+
+configure_file(
+  "${hpx_SOURCE_DIR}/cmake/templates/cmake_toolchains.qbk.in"
+  "${hpx_SOURCE_DIR}/docs/manual/build_system/cmake_toolchains.qbk"
   @ONLY
 )
 
 hpx_quickbook_to_html(hpx
   SOURCE hpx.qbk
   INDEX hpx.idx
-  DEPENDENCIES ${all_documentation_dependencies} "${hpx_SOURCE_DIR}/docs/cmake_variables.qbk"
+  DEPENDENCIES
+    ${all_documentation_dependencies}
+    "${hpx_SOURCE_DIR}/docs/manual/build_system/cmake_variables.qbk"
+    "${hpx_SOURCE_DIR}/docs/manual/build_system/cmake_toolchains.qbk"
   CATALOG "${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml"
   XSLTPROC_ARGS chunk.section.depth=4
                 chunk.first.sections=1
@@ -199,7 +229,7 @@ hpx_quickbook_to_html(hpx
                 ${auto_index_xsl_param}
   QUICKBOOK_ARGS ${quickbook_fixme_mode} ${auto_index_mode}
   AUTOINDEX_ARGS --internal-index
-  SINGLEPAGE ${WITH_DOCUMENTATION_SINGLEPAGE})
+  SINGLEPAGE ${HPX_BUILD_DOCUMENTATION_SINGLEPAGE})
 
 if(FOP_FOUND)
   # This assumes that Quickbook -> BoostBook succeeded above.
@@ -228,7 +258,7 @@ else()
     SOURCES ${documentation_files})
 endif()
 
-if(WITH_DOCUMENTATION_SINGLEPAGE)
+if(HPX_BUILD_DOCUMENTATION_SINGLEPAGE)
   add_custom_target(singlepage_docs
     DEPENDS hpx_singlepage_HTML.manifest
     SOURCES ${documentation_files})
@@ -293,6 +323,6 @@ else()
 endif()
 
 add_dependencies(git_docs docs)
-if(WITH_DOCUMENTATION_SINGLEPAGE)
+if(HPX_BUILD_DOCUMENTATION_SINGLEPAGE)
   add_dependencies(git_docs singlepage_docs)
 endif()

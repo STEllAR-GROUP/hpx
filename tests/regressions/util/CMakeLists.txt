@@ -21,7 +21,7 @@ set(function_serialization_728_dependencies
 
 set(serialize_buffer_1069_FLAGS DEPENDENCIES iostreams_component)
 
-if(WITH_COMPRESSION_ZLIB)
+if(HPX_WITH_COMPRESSION_ZLIB)
   set(function_serialization_728_dependencies
     ${function_serialization_728_dependencies}
     compress_zlib_lib)

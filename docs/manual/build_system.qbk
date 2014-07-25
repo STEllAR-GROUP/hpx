@@ -1,0 +1,66 @@
+[/==============================================================================
+    Copyright (C) 2014 Thomas Heller
+    Copyright (C) 2007-2013 Hartmut Kaiser
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+===============================================================================/]
+
+[section:build_system The HPX Build System]
+
+The buildsystem for __hpx__ is based on __cmake__. CMake is a cross-platform
+build-generator tool. CMake does not build the project, it generates the files
+needed by your build tool (GNU make, Visual Studio, etc) for building __hpx__.
+
+This section gives an introduction on how to use our build system to build HPX
+and how to use HPX in your own projects.
+
+[include build_system/cmake_basics.qbk]
+[include build_system/prerequisites.qbk]
+
+[section:building_hpx Building HPX]
+
+[include build_system/cmake_variables.qbk]
+
+[/
+[section:cmake_modules Costum CMake Modules shipped with HPX]
+
+TODO...
+
+[endsect] [/ Costum CMake Modules shipped with HPX]
+
+[include build_system/cmake_toolchains.qbk]
+
+[section:cpp_macros C++ Preprocessor Macros that influence the build]
+
+* HPX_DEBUG
+* HPX_ENABLE_ASSERTS
+* ...
+
+TODO ...
+
+[endsect] [/ C++ Preprocessor Macros that influence the build]
+]
+
+[include build_system/doc_tools.qbk]
+
+[section:build_recipes Build recipes]
+
+[include build_system/recipe_unix.qbk]
+[include build_system/recipe_osx.qbk]
+[include build_system/recipe_windows.qbk]
+[include build_system/recipe_bgq.qbk]
+[include build_system/recipe_mic.qbk]
+
+[endsect] [/ Build reciepts]
+
+[endsect] [/ Builing HPX]
+
+[section:using_hpx Building Projects using HPX]
+
+[include build_system/using_hpx_pkgconfig.qbk]
+[include build_system/using_hpx_cmake.qbk]
+
+[endsect] [/ Using Building Projects using HPX]
+
+[endsect] [/ The HPX Build System]

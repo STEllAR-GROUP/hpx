@@ -90,58 +90,13 @@ while invoking cmake:
     cmake -DHPX_ROOT=<HPX installations directory> ...
 ``
 
-Alternatively, if you wish to require __hpx__ for your project, replace the
-`find_package(HPX)` line with `find_package(HPX REQUIRED)`.
-
 The last two lines in the snippet above sets the appropriate include and link
 directories.
 
 In order to add the __hpx__ component we use the `add_hpx_component` macro and
 add it to the `CMakeLists.txt` file:
 
-``
-    # build your application using HPX
-    add_hpx_component(hello_world_component
-        ESSENTIAL
-        SOURCES hello_world_component.cpp
-        HEADERS hello_world_component.hpp
-        COMPONENT_DEPENDENCIES iostreams)
-``
 
-The available options to `add_hpx_component` are:
-
-* `SOURCES`: The source files for that component
-* `HEADERS`: The header files for that component
-* `DEPENDENCIES`: Other libraries or targets this component depends on
-* `COMPONENT_DEPENDENCIES`: The components this component depends on
-* `COMPILE_FLAGS`: Additional compiler flags
-* `LINK_FLAGS`: Additional linker flags
-[/ `INI`:
-* `FOLDER`: Add the headers and source files to this Source Group folder
-* `SOURCE_ROOT`:
-* `HEADER_ROOT`:
-* `SOURCE_GLOB`:
-* `HEADER_GLOB`:
-* `OUTPUT_SUFFIX`:
-* `INSTALL_SUFFIX`:
-]
-* `ESSENTIAL`: Build this component as part of the `all` target
-[/
-* `LANGUAGE`:
-]
-
-After adding the component, the way you add the executable is as follows:
-
-``
-    # build your application using HPX
-    add_hpx_executable(hello_world
-        ESSENTIAL
-        SOURCES hello_world_client.cpp
-        COMPONENT_DEPENDENCIES hello_world_component)
-``
-
-When you configure your application, all you need to do is set the
-HPX_ROOT variable to point to the installation of __hpx__!
 [/
 Now all you
 have to do is type `make` and the application should build using the __hpx__
@@ -155,10 +110,6 @@ installation you specified.
     The `add_hpx_executable` and `add_hpx_component` additionally add the proper
     libraries to link against.
 ]
-
-[c++]
-If you do not use CMake, you can still build against __hpx__ but you should refer
-to the section on __pkg_config__.
 
 [/
 Those two things, the serialization and actually integrating with __hpx__,

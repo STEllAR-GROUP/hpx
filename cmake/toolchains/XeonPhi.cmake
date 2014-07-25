@@ -38,15 +38,15 @@ set(HPX_PLATFORM "XeonPhi")
 set(WITH_IBVERBS_PARCELPORT OFF)
 
 # We have a bunch of cores on the MIC ... increase the default
-set(WITH_MAX_CPU_COUNT "256")
+set(HPX_MAX_CPU_COUNT "256")
 
 # We default to tbbmalloc as our allocator on the MIC
-if(NOT DEFINED WITH_MALLOC)
-  set(WITH_MALLOC "tbbmalloc")
+if(NOT DEFINED HPX_MALLOC)
+  set(HPX_MALLOC "tbbmalloc")
 endif()
 
 # Set the TBBMALLOC_PLATFORM correctly so that find_package(TBBMalloc) sets the
 # right hints
 set(TBBMALLOC_PLATFORM "mic")
 
-set(WITH_HIDDEN_VISIBILITY OFF)
+set(HPX_HIDDEN_VISIBILITY OFF)

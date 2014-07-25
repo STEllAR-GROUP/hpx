@@ -7,22 +7,22 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT WITH_MALLOC)
-  set(WITH_MALLOC ${DEFAULT_MALLOC})
+if(NOT HPX_MALLOC)
+  set(HPX_MALLOC ${DEFAULT_MALLOC})
   set(allocator_error
     "The default allocator for your system is ${DEFAULT_MALLOC}, but ${DEFAULT_MALLOC} could not be found. "
       "The system allocator has poor performance. As such ${DEFAULT_MALLOC} is a strong optional requirement. "
-      "Being aware of the performance hit, you can override this default and get rid of this dependency by setting -DWITH_MALLOC=system. "
-      "Other valid options for WITH_MALLOC are: system, tcmalloc, jemalloc, tbbmalloc")
+      "Being aware of the performance hit, you can override this default and get rid of this dependency by setting -DHPX_MALLOC=system. "
+      "Other valid options for HPX_MALLOC are: system, tcmalloc, jemalloc, tbbmalloc")
 else()
   set(allocator_error
-    "WITH_MALLOC was set to ${WITH_MALLOC}, but ${WITH_MALLOC} could not be found. "
-      "Other valid options for WITH_MALLOC are: system, tcmalloc, jemalloc, tbbmalloc")
+    "HPX_MALLOC was set to ${HPX_MALLOC}, but ${HPX_MALLOC} could not be found. "
+      "Other valid options for HPX_MALLOC are: system, tcmalloc, jemalloc, tbbmalloc")
 endif()
 
-string(TOUPPER "${WITH_MALLOC}" WITH_MALLOC_UPPER)
+string(TOUPPER "${HPX_MALLOC}" HPX_MALLOC_UPPER)
 
-if("${WITH_MALLOC_UPPER}" STREQUAL "TCMALLOC")
+if("${HPX_MALLOC_UPPER}" STREQUAL "TCMALLOC")
   find_package(TCMalloc)
   if(NOT TCMALLOC_LIBRARIES)
     hpx_error(${allocator_error})
@@ -37,7 +37,7 @@ if("${WITH_MALLOC_UPPER}" STREQUAL "TCMALLOC")
   set(_use_custom_allocator TRUE)
 endif()
 
-if("${WITH_MALLOC_UPPER}" STREQUAL "JEMALLOC")
+if("${HPX_MALLOC_UPPER}" STREQUAL "JEMALLOC")
   if(MSVC)
     hpx_error("jemalloc is not usable with MSVC")
   endif()
@@ -52,7 +52,7 @@ if("${WITH_MALLOC_UPPER}" STREQUAL "JEMALLOC")
   set(_use_custom_allocator TRUE)
 endif()
 
-if("${WITH_MALLOC_UPPER}" STREQUAL "TBBMALLOC")
+if("${HPX_MALLOC_UPPER}" STREQUAL "TBBMALLOC")
   find_package(TBBmalloc)
   if(NOT TBBMALLOC_LIBRARY AND NOT TBBMALLOC_PROXY_LIBRARY)
     hpx_error(${allocator_error})
@@ -67,7 +67,7 @@ if("${WITH_MALLOC_UPPER}" STREQUAL "TBBMALLOC")
   set(_use_custom_allocator TRUE)
 endif()
 
-if("${WITH_MALLOC_UPPER}" MATCHES "SYSTEM")
+if("${HPX_MALLOC_UPPER}" MATCHES "SYSTEM")
   hpx_info("malloc" "Using system allocator.")
 
   hpx_warn("malloc"
@@ -96,4 +96,4 @@ if(_use_custom_allocator)
   hpx_add_link_flag_if_available(-fno-builtin-posix_memalign)
 endif()
 
-hpx_info("Using ${WITH_MALLOC} allocator.")
+hpx_info("Using ${HPX_MALLOC} allocator.")

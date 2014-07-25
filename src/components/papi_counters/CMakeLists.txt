@@ -10,16 +10,16 @@ set(root "${hpx_SOURCE_DIR}/hpx/components/papi_counters")
 ################################################################################
 # PAPI event counters
 ################################################################################
-if(WITH_PAPI)
+if(HPX_WITH_PAPI)
   find_package(PAPI)
 
   if(NOT PAPI_FOUND)
-    hpx_error("PAPI could not be found and WITH_PAPI=On, please specify PAPI_ROOT to point to the root of your PAPI installation")
+    hpx_error("PAPI could not be found and HPX_WITH_PAPI=On, please specify PAPI_ROOT to point to the root of your PAPI installation")
   endif()
 
   include_directories(${PAPI_INCLUDE_DIR})
 
-  if(WITH_DEFAULT_BUILD_TARGETS)
+  if(HPX_BUILD_DEFAULT_TARGETS)
     add_hpx_component(papi_counters
       FOLDER "Core/Components"
       HEADER_ROOT ${root}

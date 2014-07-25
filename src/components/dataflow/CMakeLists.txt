@@ -5,7 +5,7 @@
 
 set(root "${hpx_SOURCE_DIR}/hpx/components/dataflow")
 
-if(WITH_DEFAULT_BUILD_TARGETS)
+if(HPX_BUILD_DEFAULT_TARGETS)
   add_hpx_component(dataflow
     FOLDER "Core/Components"
     HEADER_ROOT ${root}

@@ -18,10 +18,10 @@ set(CMAKE_C_COMPILER clang)
 set(CMAKE_CXX_FLAGS_INIT "-stdlib=libc++" CACHE STRING "Initial compiler flags used to compile for OSX")
 
 # HWLOC isn't working on OSX
-set(WITH_HWLOC OFF)
+set(HPX_WITH_HWLOC OFF)
 
 # APPLEs clang doesn't know how to deal with native tls properly
-set(WITH_NATIVE_TLS OFF)
+set(HPX_NATIVE_TLS OFF)
 
 # We don't do cross compilation here ...
 set(CMAKE_CROSSCOMPILING OFF)

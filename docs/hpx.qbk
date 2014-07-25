@@ -151,10 +151,10 @@
 [template issue[num]            '''<ulink url="http://github.com/STEllAR-GROUP/hpx/issues/'''[num]'''">'''#[num]'''</ulink>''']
 
 [/ Section link shortcuts]
-[def __boost_installation__     [link hpx.tutorial.getting_started.boost_installation Installing Boost Libraries]]
-[def __unix_installation__      [link hpx.tutorial.getting_started.unix_installation How to Install __hpx__ on Unix Variants]]
-[def __macos_installation__     [link hpx.tutorial.getting_started.macos_installation How to Install __hpx__ on Mac OS]]
-[def __windows_installation__   [link hpx.tutorial.getting_started.windows_installation How to Install __hpx__ on Windows]]
+[def __boost_installation__     [link hpx.manual.build_system.prerequisites.boost_installation Installing Boost Libraries]]
+[def __unix_installation__      [link hpx.manual.build_system.building_hpx.build_recipes.unix_installation How to Install __hpx__ on Unix Variants]]
+[def __macos_installation__     [link hpx.manual.build_system.building_hpx.build_recipes.macos_installation How to Install __hpx__ on Mac OS]]
+[def __windows_installation__   [link hpx.manual.build_system.building_hpx.build_recipes.windows_installation How to Install __hpx__ on Windows]]
 [def __using_pbs__              [link hpx.tutorial.getting_started.unix_pbs Using PBS]]
 [def __using_slurm__            [link hpx.tutorial.getting_started.unix_slurm Using SLURM]]
 
@@ -186,12 +186,12 @@
 
 [def __scheduling__             [link hpx.manual.schedulers __hpx__ Thread Scheduling Policies]]
 
-[def __cmake_hpx__              [link hpx.manual.cmake Building __hpx__ with CMake]]
-[def __cmake_quick_start__      [link hpx.build_system.cmake_basics CMake Quick Start]]
+[def __cmake_hpx__              [link hpx.manual.build_system.building_hpx Building __hpx__ with CMake]]
+[def __cmake_quick_start__      [link hpx.manual.build_system.cmake_basics CMake Quick Start]]
 [def __cmake_basic_usage__      [link hpx.build_system.basic_cmake_usage Basic CMake Usage]]
-[def __cmake_options__          [link hpx.build_system.cmake_variables CMake Variables used to configure __hpx__]]
+[def __cmake_options__          [link hpx.manual.build_system.building_hpx.cmake_variables CMake Variables used to configure __hpx__]]
 [def __cmake_doc_tools__        [link hpx.manual.cmake.doc_tools Setting up the HPX Documentation Tool Chain]]
-[def __pkg_config__             [link hpx.manual.cmake.unix_comps_pkg_config How to Build __hpx__ Components with pkg-config]]
+[def __pkg_config__             [link hpx.manual.build_system.using_hpx.pkgconfig.comps How to Build __hpx__ Components with pkg-config]]
 
 [/ Do not add any whitespace between [str]and the template body, it ends up in the
    generated docs, which may cause unwanted effects.]
@@ -272,7 +272,6 @@ __boost_auto_index__ can be found in the collection of __boost_tools__.
 
 [include preface.qbk]
 [include whats_new.qbk]
-[include build_system.qbk]
 
 [/////////////////////////////////////////////////////////////////////////////]
 [section:tutorial Tutorial]
@@ -286,7 +285,7 @@ __boost_auto_index__ can be found in the collection of __boost_tools__.
 [/////////////////////////////////////////////////////////////////////////////]
 [section:manual Manual]
 
-[include manual/cmake.qbk]
+[include manual/build_system.qbk]
 [include manual/testing.qbk]
 
 [/////////////////////////////////////////////////////////////////////////////]

@@ -18,7 +18,7 @@ set(subdirs
     util
    )
 
-if(WITH_SECURITY)
+if(HPX_WITH_SECURITY)
   set(subdirs ${subdirs} security)
 endif()
 

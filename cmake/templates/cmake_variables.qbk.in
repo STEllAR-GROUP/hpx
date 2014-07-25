@@ -10,9 +10,13 @@
 In order to configure HPX, you can set a variety of options to allow cmake to generate
 your specific makefiles/project files.
 
+[section:configure Variables that influence how HPX is being built]
+
 The options are split into these categories:
 
 @HPX_CMAKE_OPTIONS@
+
+[endsect] [/ Variables that influence how HPX is being built]
 
 [section:cmake_additional_tools Additional Tools and Libraries used by HPX]
 

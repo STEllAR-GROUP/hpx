@@ -5,17 +5,16 @@
 
 include(HPX_AddLibrary)
 
-hpx_option(WITH_COMPRESSION_ZLIB BOOL "Enable zlib compression for parcel data (default: OFF)." OFF ADVANCED)
-if(WITH_COMPRESSION_ZLIB)
+if(HPX_WITH_COMPRESSION_ZLIB)
   find_package(ZLIB)
   if(NOT ZLIB_FOUND)
-    hpx_error("zlib could not be found and WITH_COMPRESSION_ZLIB=ON, please point cmake to the correct location or set WITH_COMPRESSION_BZIP2 to OFF")
+    hpx_error("zlib could not be found and HPX_WITH_COMPRESSION_ZLIB=ON, please point cmake to the correct location or set HPX_WITH_COMPRESSION_BZIP2 to OFF")
   endif()
 endif()
 
 macro(add_zlib_module)
   hpx_debug("add_zlib_module" "ZLIB_FOUND: ${ZLIB_FOUND}")
-  if(WITH_COMPRESSION_ZLIB)
+  if(HPX_WITH_COMPRESSION_ZLIB)
     include_directories(${ZLIB_INCLUDE_DIRS})
 
     add_hpx_library(compress_zlib

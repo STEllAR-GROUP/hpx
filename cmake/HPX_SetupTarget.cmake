@@ -60,7 +60,7 @@ function(hpx_setup_target target)
   endif()
 
   set(target_STATIC_LINKING OFF)
-  if(WITH_STATIC_LINKING)
+  if(HPX_STATIC_LINKING)
     set(target_STATIC_LINKING ON)
   else()
     get_target_property(_hpx_library_type hpx TYPE)
@@ -68,6 +68,11 @@ function(hpx_setup_target target)
       set(target_STATIC_LINKING ON)
     endif()
   endif()
+
+  set_property(TARGET ${target} APPEND
+    PROPERTY INCLUDE_DIRECTORIES
+    ${HPX_INCLUDE_DIRS}
+  )
 
   if(_type STREQUAL "EXECUTABLE")
     set_property(TARGET ${target} APPEND

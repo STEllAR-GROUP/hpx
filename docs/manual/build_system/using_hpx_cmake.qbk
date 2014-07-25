@@ -1,0 +1,140 @@
+[/==============================================================================
+    Copyright (C) 2014 Thomas Heller
+    Copyright (C) 2007-2013 Hartmut Kaiser
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+===============================================================================/]
+
+[section:using_hpx_cmake Using HPX with CMake based projects]
+
+In Addition to the pkg-config support discussed on the previous pages, __hpx__
+comes with full CMake support. In order to integrate __hpx__ into your existing,
+or new CMakeLists.txt you can leverage the
+[@http://www.cmake.org/cmake/help/v2.8.11/cmake.html#command:find_package find_package]
+command integrated into CMake. Following is a Hello World component example using
+CMake.
+
+Let's revisit what we have. We have three files which compose our example
+application:
+
+* `hello_world_component.hpp`
+* `hello_world_component.cpp`
+* `hello_world_client.hpp`
+
+The basic structure to include __hpx__ into your CMakeLists.txt is shown here:
+[teletype]
+``
+    # Require a recent version of cmake
+    cmake_minimum_required(VERSION 2.8.4 FATAL_ERROR)
+
+    # This project is C++ based.
+    project(your_app CXX)
+
+    # Instruct cmake to find the __hpx__ settings
+    find_package(HPX)
+``
+
+In order to have CMake find HPX, it needs to be told. The easiest is to add
+the HPX_DIR cmake variable pointing to the directory containing the HPXConfig.cmake
+script which gets picked up by cmake and sets up all the necessary macros needed
+to use HPX in your project. Pass it on the command line while invoking cmake
+(where [^$HPX_LOCATION] is the build directory or [^CMAKE_INSTALL_PREFIX] you
+used while building __hpx__):
+
+``
+    cmake -DHPX_DIR=$HPX_LOCATION/lib/cmake/hpx ...
+``
+
+Alternatively, if you wish to require __hpx__ for your project, replace the
+`find_package(HPX)` line with `find_package(HPX REQUIRED)`.
+
+You can check if HPX was succesfully found with the `HPX_FOUND` CMake variable.
+
+The simplst way to add the __hpx__ component is to use the `add_hpx_component`
+macro and add it to the `CMakeLists.txt` file:
+
+``
+    # build your application using HPX
+    add_hpx_component(hello_world_component
+        SOURCES hello_world_component.cpp
+        HEADERS hello_world_component.hpp
+        COMPONENT_DEPENDENCIES iostreams)
+``
+
+The available options to `add_hpx_component` are:
+
+* `SOURCES`: The source files for that component
+* `HEADERS`: The header files for that component
+* `DEPENDENCIES`: Other libraries or targets this component depends on
+* `COMPONENT_DEPENDENCIES`: The components this component depends on
+* `PLUGIN`: Treat this component as a plugin-able library
+* `COMPILE_FLAGS`: Additional compiler flags
+* `LINK_FLAGS`: Additional linker flags
+* `FOLDER`: Add the headers and source files to this Source Group folder
+[/ `INI`:
+* `SOURCE_ROOT`:
+* `HEADER_ROOT`:
+* `SOURCE_GLOB`:
+* `HEADER_GLOB`:
+* `OUTPUT_SUFFIX`:
+* `INSTALL_SUFFIX`:
+]
+* `EXCLUDE_FROM_ALL`: Do not build this component as part of the `all` target
+[/
+* `LANGUAGE`:
+]
+
+
+After adding the component, the way you add the executable is as follows:
+
+``
+    # build your application using HPX
+    add_hpx_executable(hello_world
+        ESSENTIAL
+        SOURCES hello_world_client.cpp
+        COMPONENT_DEPENDENCIES hello_world_component)
+``
+
+When you configure your application, all you need to do is set the
+HPX_DIR variable to point to the installation of __hpx__!
+
+[note All library targets built with __hpx__ are exported and readily available
+      to be used as arguments to
+      [@http://www.cmake.org/cmake/help/v2.8.11/cmake.html#command:target_link_libraries `target_link_libraries`]
+      in your targets. The HPX include directories are available with the [^HPX_INCLUDE_DIRS]
+      CMake variable]
+
+[heading:cmake_integrate_hpx CMake macros to integrate HPX into existing Applications]
+
+In addition to the `add_hpx_component` and `add_hpx_executable` you can use the
+`hpx_setup_target` macro to have an already exisiting target to be used with the
+HPX libraries.
+
+``
+  hpx_setup_target(target)
+``
+
+Optional Parameters are:
+
+* `EXPORT`: Adds it to the CMake export list HPXTargets
+[/ * `NO_HPXINIT`:]
+* `INSTALL`: Generates a install rule for the target
+[/ * `NOLIBS`:]
+* `PLUGIN`: Treat this component as a plugin-able library
+* `TYPE`: The type can be: EXECUTABLE, LIBRARY or COMPONENT
+[/ * `FOLDER`:]
+[/ * `NAME`:]
+[/ * `SOVERSION`:]
+[/ * `VERSION`:]
+* `DEPENDENCIES`: Other libraries or targets this component depends on
+* `COMPONENT_DEPENDENCIES`: The components this component depends on
+* `COMPILE_FLAGS`: Additional compiler flags
+* `LINK_FLAGS`: Additional linker flags
+
+[c++]
+If you do not use CMake, you can still build against __hpx__ but you should refer
+to the section on __pkg_config__.
+
+[endsect] [/ Using HPX with CMake based projects]
+
