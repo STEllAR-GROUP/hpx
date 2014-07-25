@@ -62,17 +62,24 @@ get_directory_property(_INCLUDE_DIRS INCLUDE_DIRECTORIES)
 foreach(dir ${_INCLUDE_DIRS})
   if((NOT dir MATCHES "^${CMAKE_BINARY_DIR}.*")
     AND (NOT dir MATCHES "^${hpx_SOURCE_DIR}.*"))
-    set(_NEEDED_INCLUDE_DIRS ${_NEEDED_INCLUDE_DIRS} "${dir}")
+    set(_NEEDED_INCLUDE_DIRS "${_NEEDED_INCLUDE_DIRS} -I${dir}")
+    set(_NEEDED_CMAKE_INCLUDE_DIRS ${_NEEDED_CMAKE_INCLUDE_DIRS} "${dir}")
   else()
-    set(_NEEDED_BUILD_DIR_INCLUDE_DIRS ${_NEEDED_BUILD_DIR_INCLUDE_DIRS} "${dir}")
+    set(_NEEDED_BUILD_DIR_INCLUDE_DIRS "${_NEEDED_BUILD_DIR_INCLUDE_DIRS} -I${dir}")
+    set(_NEEDED_CMAKE_BUILD_DIR_INCLUDE_DIRS ${_NEEDED_CMAKE_BUILD_DIR_INCLUDE_DIRS} "${dir}")
   endif()
 endforeach()
 
 # Configure config for the install dir ...
 set(HPX_CONF_INCLUDE_DIRS
-  ${CMAKE_INSTALL_PREFIX}/include
-  ${CMAKE_INSTALL_PREFIX}/include/hpx/external
-  ${_NEEDED_INCLUDE_DIRS}
+  "-I${CMAKE_INSTALL_PREFIX}/include"
+  " -I${CMAKE_INSTALL_PREFIX}/include/hpx/external"
+  " ${_NEEDED_INCLUDE_DIRS}"
+)
+set(HPX_CMAKE_CONF_INCLUDE_DIRS
+  "${CMAKE_INSTALL_PREFIX}/include"
+  "${CMAKE_INSTALL_PREFIX}/include/hpx/external"
+  "${_NEEDED_CMAKE_INCLUDE_DIRS}"
 )
 set(HPX_CONF_PREFIX ${CMAKE_INSTALL_PREFIX})
 configure_file(cmake/templates/HPXConfig.cmake.in
@@ -93,8 +100,12 @@ configure_file(cmake/templates/hpx_component_debug.pc.in
 
 # ... and the build dir
 set(HPX_CONF_INCLUDE_DIRS
-  ${_NEEDED_BUILD_DIR_INCLUDE_DIRS}
-  ${_NEEDED_INCLUDE_DIRS}
+  "${_NEEDED_BUILD_DIR_INCLUDE_DIRS}"
+  " ${_NEEDED_INCLUDE_DIRS}"
+)
+set(HPX_CMAKE_CONF_INCLUDE_DIRS
+  ${_NEEDED_CMAKE_BUILD_DIR_INCLUDE_DIRS}
+  ${_NEEDED_CMAKE_INCLUDE_DIRS}
 )
 configure_file(cmake/templates/HPXConfig.cmake.in
   "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/hpx/HPXConfig.cmake"

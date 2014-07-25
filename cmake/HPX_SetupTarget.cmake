@@ -64,15 +64,17 @@ function(hpx_setup_target target)
     set(target_STATIC_LINKING ON)
   else()
     get_target_property(_hpx_library_type hpx TYPE)
-    if(NOT "${_hpx_library_type}" STREQUAL "STATIC_LIBRARY")
+    if("${_hpx_library_type}" STREQUAL "STATIC_LIBRARY")
       set(target_STATIC_LINKING ON)
     endif()
   endif()
 
-  set_property(TARGET ${target} APPEND
-    PROPERTY INCLUDE_DIRECTORIES
-    ${HPX_INCLUDE_DIRS}
-  )
+  if(HPX_INCLUDE_DIRS)
+    set_property(TARGET ${target} APPEND
+      PROPERTY INCLUDE_DIRECTORIES
+      "${HPX_INCLUDE_DIRS}"
+    )
+  endif()
 
   if(_type STREQUAL "EXECUTABLE")
     set_property(TARGET ${target} APPEND

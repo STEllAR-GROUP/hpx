@@ -21,6 +21,12 @@ macro(add_hpx_test category name)
     set(${name}_EXECUTABLE ${name})
   endif()
 
+  if(TARGET ${${name}_EXECUTABLE}_test_exe)
+    set(_exe "$<TARGET_FILE:${${name}_EXECUTABLE}_test_exe>")
+  else()
+    set(_exe "${${name}_EXECUTABLE}")
+  endif()
+
   set(expected "0")
 
   if(${name}_FAILURE_EXPECTED)
@@ -36,7 +42,7 @@ macro(add_hpx_test category name)
 
   set(cmd "${PYTHON_EXECUTABLE}"
           "${CMAKE_BINARY_DIR}/bin/hpxrun.py"
-          "$<TARGET_FILE:${${name}_EXECUTABLE}_test_exe>"
+          ${_exe}
           "-e" "${expected}"
           "-l" "${${name}_LOCALITIES}"
           "-t" "${${name}_THREADS_PER_LOCALITY}")
