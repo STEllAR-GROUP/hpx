@@ -304,7 +304,8 @@ namespace hpx
             thread_priority_default = 0,      ///< use default priority
             thread_priority_low = 1,          ///< low thread priority
             thread_priority_normal = 2,       ///< normal thread priority (default)
-            thread_priority_critical = 3      ///< high thread priority
+            thread_priority_critical = 3,     ///< high thread priority
+            thread_priority_boost = 4         ///< high thread priority for first invocation, normal afterwards
         };
 
         typedef threads::detail::tagged_thread_state<thread_state_enum> thread_state;
@@ -757,7 +758,11 @@ namespace hpx
         deferred = 0x02,
         task = 0x04,        // see N3632
         sync = 0x08,
-        all = 0x0f          // async | deferred | task | sync
+        fork = 0x10,        // same as async, but forces continuation stealing
+
+        sync_policies = 0x0a,       // sync | deferred
+        async_policies = 0x15,      // async | task | fork
+        all = 0x1f                  // async | deferred | task | sync | fork
     };
     BOOST_SCOPED_ENUM_END
 
