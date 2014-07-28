@@ -242,6 +242,87 @@ void find_end_test3()
     test_find_end3<std::forward_iterator_tag>();
 }
 
+template <typename ExPolicy, typename IteratorTag>
+void test_find_end4(ExPolicy const& policy, IteratorTag)
+{
+    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    //fill vector with random values above 2
+    std::fill(boost::begin(c), boost::end(c), (std::rand()%100) + 3);
+    //create subsequence in middle of vector
+    c[c.size()/2] = 1;
+    c[c.size()/2 + 1] = 2;
+
+    std::size_t h[] = { 1, 2 };
+
+    iterator index = hpx::parallel::find_end(policy,
+        iterator(boost::begin(c)), iterator(boost::end(c)),
+        boost::begin(h), boost::end(h), 
+        [](std::size_t v1, std::size_t v2) {
+            return !(v1 != v2);
+        });
+
+    base_iterator test_index = boost::begin(c) + c.size()/2;
+
+    HPX_TEST(index == iterator(test_index));
+}
+
+template <typename IteratorTag>
+void test_find_end4(hpx::parallel::task_execution_policy, IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    //fill vector with random values above 2
+    std::fill(boost::begin(c), boost::end(c), (std::rand()%100) + 3);
+    //create subsequence in middle of vector
+    c[c.size()/2] = 1;
+    c[c.size()/2 + 1] = 2;
+
+    std::size_t h[] = { 1, 2 };
+
+    hpx::future<iterator> f =
+        hpx::parallel::find_end(hpx::parallel::task,
+            iterator(boost::begin(c)), iterator(boost::end(c)),
+            boost::begin(h), boost::end(h),
+            [](std::size_t v1, std::size_t v2) {
+                return !(v1 != v2);
+        });
+    f.wait();
+
+    //create iterator at position of value to be found
+    base_iterator test_index = boost::begin(c) + c.size()/2;
+
+    HPX_TEST(f.get() == iterator(test_index));    
+}
+
+template <typename IteratorTag>
+void test_find_end4()
+{
+    using namespace hpx::parallel;
+    test_find_end4(seq, IteratorTag());
+    test_find_end4(par, IteratorTag());
+    test_find_end4(par_vec, IteratorTag());
+    test_find_end4(task, IteratorTag());
+
+    
+    test_find_end4(execution_policy(seq), IteratorTag());
+    test_find_end4(execution_policy(par), IteratorTag());
+    test_find_end4(execution_policy(par_vec), IteratorTag());
+    test_find_end4(execution_policy(task), IteratorTag());
+}
+
+void find_end_test4()
+{
+    test_find_end4<std::random_access_iterator_tag>();
+    test_find_end4<std::forward_iterator_tag>();
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
@@ -442,6 +523,7 @@ int hpx_main()
     find_end_test1();
     find_end_test2();
     find_end_test3();
+    find_end_test4();
     find_end_exception_test();
     find_end_bad_alloc_test();
     return hpx::finalize();

@@ -11,11 +11,10 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
+#include <hpx/parallel/detail/predicates.hpp>
 #include <hpx/parallel/detail/dispatch.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
-#include <hpx/parallel/util/zip_iterator.hpp>
-#include <hpx/parallel/detail/transform_reduce.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -294,18 +293,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
               : find_end::algorithm("find_end")
             {}
 
-            template <typename ExPolicy, typename FwdIter2>
+            template <typename ExPolicy, typename FwdIter2, typename Pred>
             static FwdIter
             sequential(ExPolicy const&, FwdIter first1, FwdIter last1, 
-                FwdIter2 first2, FwdIter2 last2)
+                FwdIter2 first2, FwdIter2 last2, Pred && op)
             {
-                return std::find_end(first1, last1, first2, last2);
+                return std::find_end(first1, last1, first2, last2, op);
             }
 
-            template <typename ExPolicy, typename FwdIter2>
+            template <typename ExPolicy, typename FwdIter2, typename Pred>
             static typename detail::algorithm_result<ExPolicy, FwdIter>::type
             parallel(ExPolicy const& policy, FwdIter first1, FwdIter last1,
-                FwdIter2 first2, FwdIter2 last2)
+                FwdIter2 first2, FwdIter2 last2, Pred && op)
             {
                 typedef typename std::iterator_traits<FwdIter>::reference reference;
                 typedef typename std::iterator_traits<FwdIter>::difference_type 
@@ -340,7 +339,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             [=, &tok, &curr](reference t, std::size_t i)
                             {
                                 ++curr;
-                                if (t == *first2)
+                                if ( op(t,*first2) )
                                 {
                                     difference_type local_count = 1;
                                     FwdIter2 needle = first2;
@@ -404,7 +403,42 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         return detail::find_end<FwdIter1>().call(
             std::forward<ExPolicy>(policy),
-            first1, last1, first2, last2, is_seq());
+            first1, last1, first2, last2, detail::equal_to(),
+            is_seq());
+    }
+
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename Pred>
+    inline typename boost::enable_if<
+        is_execution_policy<ExPolicy>,
+        typename detail::algorithm_result<ExPolicy, FwdIter1>::type
+    >::type
+    find_end(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
+        FwdIter2 last2, Pred && op)
+    {
+        typedef typename std::iterator_traits<FwdIter1>::iterator_category
+            iterator_category1;
+
+        typedef typename std::iterator_traits<FwdIter2>::iterator_category
+            iterator_category2;
+
+        BOOST_STATIC_ASSERT_MSG(
+            (boost::is_base_of<
+                std::forward_iterator_tag, iterator_category1
+            >::value),
+            "Requires at least forward iterator.");
+
+        BOOST_STATIC_ASSERT_MSG(
+            (boost::is_base_of<
+                std::forward_iterator_tag, iterator_category2
+            >::value),
+            "Requires at least forward iterator.");
+
+        typedef is_sequential_execution_policy<ExPolicy> is_seq;
+
+        return detail::find_end<FwdIter1>().call(
+            std::forward<ExPolicy>(policy),
+            first1, last1, first2, last2, std::forward<Pred>(op) ,
+            is_seq());
     }
 }}}
 
