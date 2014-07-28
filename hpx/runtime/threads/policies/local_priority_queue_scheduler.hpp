@@ -368,7 +368,15 @@ namespace hpx { namespace threads { namespace policies
                 return high_priority_queues_[num]->create_thread(data,
                     initial_state, run_now, ec);
             }
-            else if (data.priority == thread_priority_low) {
+
+            if (data.priority == thread_priority_critical_once) {
+                data.priority = thread_priority_normal;
+                std::size_t num = num_thread % high_priority_queues_.size();
+                return high_priority_queues_[num]->create_thread(data,
+                    initial_state, run_now, ec);
+            }
+
+            if (data.priority == thread_priority_low) {
                 return low_priority_queue_.create_thread(data, initial_state,
                     run_now, ec);
             }
