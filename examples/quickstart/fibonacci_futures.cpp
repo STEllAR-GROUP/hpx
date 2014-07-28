@@ -104,8 +104,6 @@ boost::uint64_t fibonacci(boost::uint64_t n)
     hpx::future<boost::uint64_t> f = hpx::async(&fibonacci, n-1);
     boost::uint64_t r = fibonacci(n-2);
 
-    // attach a continuation to this future which is called asynchronously on
-    // its completion and which calculates the other sub-term
     return f.get() + r;
 }
 
@@ -124,8 +122,6 @@ boost::uint64_t fibonacci_fork(boost::uint64_t n)
         hpx::async(hpx::launch::fork, &fibonacci_fork, n-1);
     boost::uint64_t r = fibonacci_fork(n-2);
 
-    // attach a continuation to this future which is called asynchronously on
-    // its completion and which calculates the other sub-term
     return f.get() + r;
 }
 
@@ -213,8 +209,6 @@ hpx::future<boost::uint64_t> fibonacci_future_all(boost::uint64_t n)
     hpx::future<boost::uint64_t> f2 = fibonacci_future_all(n - 2);
 
     // create a future representing the successful calculation of both sub-terms
-    // attach a continuation to this future which is called asynchronously on
-    // its completion and which calculates the the final result
     return hpx::async(&add, boost::move(f1), boost::move(f2));
 }
 
