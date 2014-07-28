@@ -45,7 +45,7 @@ The options are split into these categories:
 * [link build_system.cmake_variables.HPX_WITH_SECURITY HPX_WITH_SECURITY]
 
 [variablelist
-        [[[#build_system.cmake_variables.HPX_AUTOMATIC_PREPROCESSING] `HPX_AUTOMATIC_PREPROCESSING:BOOL`][No help, variable specified on the command line.]]
+        [[[#build_system.cmake_variables.HPX_AUTOMATIC_PREPROCESSING] `HPX_AUTOMATIC_PREPROCESSING:BOOL`][True if the automatic header preprocessing target should be created (default: OFF).]]
         [[[#build_system.cmake_variables.HPX_AUTOMATIC_SERIALIZATION_REGISTRATION] `HPX_AUTOMATIC_SERIALIZATION_REGISTRATION:BOOL`][Use automatic serialization registration for actions and functions. This affects compatibility between HPX applications compiled with different compilers (default ON)]]
         [[[#build_system.cmake_variables.HPX_COMPILER_WARNINGS] `HPX_COMPILER_WARNINGS:BOOL`][Enable compiler warnings (default: ON)]]
         [[[#build_system.cmake_variables.HPX_FULL_RPATH] `HPX_FULL_RPATH:BOOL`][Build and link HPX libraries and executables with full RPATHs (default: ON)]]
@@ -81,9 +81,9 @@ The options are split into these categories:
 
 [variablelist
         [[[#build_system.cmake_variables.HPX_BUILD_DEFAULT_TARGETS] `HPX_BUILD_DEFAULT_TARGETS:BOOL`][Associate the core HPX library with the default build target (default: ON).]]
-        [[[#build_system.cmake_variables.HPX_BUILD_DOCUMENTATION] `HPX_BUILD_DOCUMENTATION:BOOL`][No help, variable specified on the command line.]]
-        [[[#build_system.cmake_variables.HPX_BUILD_DOCUMENTATION_SINGLEPAGE] `HPX_BUILD_DOCUMENTATION_SINGLEPAGE:BOOL`][No help, variable specified on the command line.]]
-        [[[#build_system.cmake_variables.HPX_BUILD_EXAMPLES] `HPX_BUILD_EXAMPLES`][No help, variable specified on the command line.]]
+        [[[#build_system.cmake_variables.HPX_BUILD_DOCUMENTATION] `HPX_BUILD_DOCUMENTATION:BOOL`][Build the HPX documentation (default OFF).]]
+        [[[#build_system.cmake_variables.HPX_BUILD_DOCUMENTATION_SINGLEPAGE] `HPX_BUILD_DOCUMENTATION_SINGLEPAGE:BOOL`][The HPX documentation should be build as a single page HTML (default OFF).]]
+        [[[#build_system.cmake_variables.HPX_BUILD_EXAMPLES] `HPX_BUILD_EXAMPLES:BOOL`][Build the HPX examples (default OFF)]]
         [[[#build_system.cmake_variables.HPX_BUILD_RUNTIME] `HPX_BUILD_RUNTIME:BOOL`][Build HPX runtime (default: ON)]]
         [[[#build_system.cmake_variables.HPX_BUILD_TESTS] `HPX_BUILD_TESTS:BOOL`][Build the HPX tests (default ON)]]
         [[[#build_system.cmake_variables.HPX_BUILD_TESTS_BENCHMARKS] `HPX_BUILD_TESTS_BENCHMARKS:BOOL`][Build HPX benchmark tests (default: ON)]]
@@ -154,7 +154,7 @@ The options are split into these categories:
         [[[#build_system.cmake_variables.HPX_PARCELPORT_IBVERBS_MEMORY_CHUNK_SIZE] `HPX_PARCELPORT_IBVERBS_MEMORY_CHUNK_SIZE:STRING`][Number of bytes a chunk in the memory pool can hold (default: 64MB)]]
         [[[#build_system.cmake_variables.HPX_PARCELPORT_IBVERBS_MESSAGE_PAYLOAD] `HPX_PARCELPORT_IBVERBS_MESSAGE_PAYLOAD:STRING`][Size of the message payload not sent with RDMA (default: 512 byte)]]
         [[[#build_system.cmake_variables.HPX_PARCELPORT_IPC] `HPX_PARCELPORT_IPC:BOOL`][Enable the IPC (inter process communication) based parcelport. This is currently an experimental feature]]
-        [[[#build_system.cmake_variables.HPX_PARCELPORT_MPI] `HPX_PARCELPORT_MPI:BOOL`][No help, variable specified on the command line.]]
+        [[[#build_system.cmake_variables.HPX_PARCELPORT_MPI] `HPX_PARCELPORT_MPI:BOOL`][Enable the MPI based parcelport.]]
         [[[#build_system.cmake_variables.HPX_PARCELPORT_MPI_ENV] `HPX_PARCELPORT_MPI_ENV:STRING`][List of environment variables checked to detect MPI (default: PMI_RANK;OMPI_COMM_WORLD_SIZE).]]
         [[[#build_system.cmake_variables.HPX_PARCELPORT_TCP] `HPX_PARCELPORT_TCP:BOOL`][Enable the TCP based parcelport.]]
 ] [/ Parcelport Options]
@@ -170,7 +170,7 @@ The options are split into these categories:
         [[[#build_system.cmake_variables.HPX_WITH_APEX] `HPX_WITH_APEX:BOOL`][Enable APEX instrumentation support.]]
         [[[#build_system.cmake_variables.HPX_WITH_GOOGLE_PERFTOOLS] `HPX_WITH_GOOGLE_PERFTOOLS:BOOL`][Enable Google Perftools instrumentation support.]]
         [[[#build_system.cmake_variables.HPX_WITH_ITTNOTIFY] `HPX_WITH_ITTNOTIFY:BOOL`][Enable Amplifier (ITT) instrumentation support.]]
-        [[[#build_system.cmake_variables.HPX_WITH_PAPI] `HPX_WITH_PAPI:BOOL`][No help, variable specified on the command line.]]
+        [[[#build_system.cmake_variables.HPX_WITH_PAPI] `HPX_WITH_PAPI:BOOL`][Enable the PAPI based performance counter.]]
         [[[#build_system.cmake_variables.HPX_WITH_TAU] `HPX_WITH_TAU:BOOL`][Enable TAU profiling support.]]
 ] [/ Profiling Options]
 

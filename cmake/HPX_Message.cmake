@@ -3,24 +3,24 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-macro(hpx_info)
-  message(STATUS ${ARGN})
+macro(hpx_info type)
+  message(STATUS "${type} " ${ARGN})
 endmacro()
 
-macro(hpx_debug)
+macro(hpx_debug type)
   if("${HPX_CMAKE_LOGLEVEL}" MATCHES "DEBUG|debug|Debug")
-    message("DEBUG: " ${ARGN})
+    message("DEBUG: ${type} " ${ARGN})
   endif()
 endmacro()
 
-macro(hpx_warn)
+macro(hpx_warn type)
   if("${HPX_CMAKE_LOGLEVEL}" MATCHES "DEBUG|debug|Debug|WARN|warn|Warn")
-    message("WARNING: " ${ARGN})
+    message("WARNING: ${type} " ${ARGN})
   endif()
 endmacro()
 
-macro(hpx_error)
-  message(FATAL_ERROR "ERROR: " ${ARGN})
+macro(hpx_error type)
+  message(FATAL_ERROR "ERROR: ${type} " ${ARGN})
 endmacro()
 
 macro(hpx_message level)

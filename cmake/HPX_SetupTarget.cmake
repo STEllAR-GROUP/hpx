@@ -63,7 +63,17 @@ function(hpx_setup_target target)
   if(HPX_STATIC_LINKING)
     set(target_STATIC_LINKING ON)
   else()
+    if(POLICY CMP0045)
+      cmake_policy(PUSH)
+      cmake_policy(SET CMP0045 OLD)
+    endif()
+
     get_target_property(_hpx_library_type hpx TYPE)
+
+    if(POLICY CMP0045)
+      cmake_policy(POP)
+    endif()
+
     if("${_hpx_library_type}" STREQUAL "STATIC_LIBRARY")
       set(target_STATIC_LINKING ON)
     endif()
