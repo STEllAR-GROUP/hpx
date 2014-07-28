@@ -282,12 +282,14 @@ void find_end_bad_alloc_test()
 
 int hpx_main()
 {
-    int t[] = {0,0,3,1,2,1,2,3,4,1,5,8};
+    int t[] = {1,2,3,1,2,9,2,3,4,9,9,2};
     int f[] = {1,2};
     auto g = hpx::parallel::find_end(hpx::parallel::par(6),
         boost::begin(t), boost::end(t), boost::begin(f),
         boost::end(f));
+    //the distance **should** be 3
     std::cout << std::distance(boost::begin(t),g) << std::endl;
+
     //find_end_test();
     //find_end_exception_test();
     //find_end_bad_alloc_test();

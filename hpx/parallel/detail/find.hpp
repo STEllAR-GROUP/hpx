@@ -311,28 +311,25 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 typedef typename std::iterator_traits<FwdIter>::iterator_category
                     category;
-                typedef typename std::iterator_traits<FwdIter>::value_type value;
+                typedef typename std::iterator_traits<FwdIter>::reference value;
                 typedef typename std::iterator_traits<FwdIter>::difference_type diff_type;
 
-                util::cancellation_token<std::size_t, std::greater_equal<std::size_t>> tok(-1);
+                util::cancellation_token<diff_type, std::greater_equal<diff_type>> tok(-1);
 
                 return util::partitioner<ExPolicy, FwdIter, void>::call_with_index(
                     policy, first1, count-(diff-1),
-                    [count,tok, diff,first1, first2, last2]( std::size_t base_idx, FwdIter it,
+                    [tok,first2,diff,count]( std::size_t base_idx, FwdIter it,
                         std::size_t part_count) mutable
                 {
                     util::loop_idx_n(
                         base_idx, it, part_count, tok,
-                        [&tok,first2,count,&it,diff](value& t, std::size_t i)
+                        [&tok,first2,diff,count,it,base_idx](value t, std::size_t i)
                         {
-                            std::cout << t << "=" << *first2 << std::endl;
                             if(t == *first2) {
                                 diff_type local_count = 1;
                                 FwdIter2 needle = first2;
-                                FwdIter mid = it;
-                                std::cout << t << " " << *it << std::endl;
-                                for(; std::size_t(local_count) < count; ++local_count) {
-                                    std::cout << *mid << "=" << *needle << std::endl;
+                                FwdIter mid = next(it,i-base_idx);
+                                for(; std::size_t(local_count) < diff; ++local_count) {
                                     ++needle;
                                     ++mid;
 
@@ -359,6 +356,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 });
             }
         };
+        /// \endcond
     }
 
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
