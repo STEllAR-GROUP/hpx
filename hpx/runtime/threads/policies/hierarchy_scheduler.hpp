@@ -556,7 +556,9 @@ namespace hpx { namespace threads { namespace policies
         void schedule_thread_last(threads::thread_data_base* thrd, std::size_t num_thread,
             thread_priority priority = thread_priority_normal)
         {
-            hierarchy_scheduler::schedule_thread(thrd, num_thread, priority);
+            HPX_ASSERT(tree.size());
+            HPX_ASSERT(tree.back().size());
+            tree.back()[0]->schedule_thread(thrd, true);
         }
 
         /// Destroy the passed thread as it has been terminated

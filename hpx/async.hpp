@@ -105,10 +105,16 @@ namespace hpx
             return detail::call_sync(std::forward<F>(f), predicate());
         }
 
-        lcos::local::futures_factory<result_type()> p(
-            std::forward<F>(f));
+        lcos::local::futures_factory<result_type()> p(std::forward<F>(f));
         if (detail::has_async_policy(policy))
-            p.apply();
+        {
+            p.apply(policy);
+            if (policy == launch::fork)
+            {
+                // make sure this thread is executed last
+                hpx::this_thread::yield();
+            }
+        }
         return p.get_future();
     }
 
@@ -219,7 +225,14 @@ namespace hpx
                 HPX_ENUM_FORWARD_ARGS(N, A, a)
             ));
         if (detail::has_async_policy(policy))
-            p.apply();
+        {
+            p.apply(policy);
+            if (policy == launch::fork)
+            {
+                // make sure this thread is executed last
+                hpx::this_thread::yield();
+            }
+        }
         return p.get_future();
     }
 

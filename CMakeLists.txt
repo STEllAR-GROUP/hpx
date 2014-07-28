@@ -4,6 +4,7 @@
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2011 Vinay C Amatya
 # Copyright (c)      2013 Jeroen Habraken
+# Copyright (c)      2014 Andreas Schäfer
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -192,14 +193,13 @@ else()
     "64" ADVANCED)
 endif()
 
-if (NOT DEFINED LIB)
-  set(LIB "lib")
-endif(NOT DEFINED LIB)
+set(LIB "lib"
+    CACHE STRING "library subdirectory, good for multilib installs (e.g. lib, lib)")
 ###############################################################################
 if(UNIX)
-  hpx_link_directories("${CMAKE_BINARY_DIR}/lib/hpx")
+  hpx_link_directories("${CMAKE_BINARY_DIR}/${LIB}/hpx")
 else()
-  hpx_link_directories("${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/lib/hpx")
+  hpx_link_directories("${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/${LIB}/hpx")
 endif()
 
 ###############################################################################
@@ -468,7 +468,7 @@ hpx_include(SetOutputPaths)
 # RPATH configuration
 ################################################################################
 if(NOT MSVC)
-  set(HPX_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB}/hpx:${CMAKE_BINARY_DIR}/lib/hpx"
+  set(HPX_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB}/hpx:${CMAKE_BINARY_DIR}/${LIB}/hpx"
       CACHE STRING "Base RPATH for linking" FORCE)
 endif()
 
@@ -930,35 +930,42 @@ endif()
 ################################################################################
 # Scheduler configuration
 ################################################################################
-hpx_option(HPX_ALL_SCHEDULERS BOOL "Enables all schedulers, overrides individual configuration options (default: OFF)" OFF ADVANCED)
+hpx_option(HPX_ALL_SCHEDULERS BOOL
+  "Enables all schedulers, overrides individual configuration options (default: OFF)" OFF ADVANCED)
 
-hpx_option(HPX_LOCAL_SCHEDULER BOOL "Enable the use of --queueing=local (default: OFF)" OFF ADVANCED)
-
+hpx_option(HPX_LOCAL_SCHEDULER BOOL
+  "Enable the use of --queueing=local (default: OFF)" OFF ADVANCED)
 if(HPX_LOCAL_SCHEDULER OR HPX_ALL_SCHEDULERS)
   hpx_add_config_define(HPX_LOCAL_SCHEDULER)
 endif()
 
-hpx_option(HPX_STATIC_PRIORITY_SCHEDULER BOOL "Enable the use of --queueing=static (default: OFF)" OFF ADVANCED)
-
+hpx_option(HPX_STATIC_PRIORITY_SCHEDULER BOOL
+  "Enable the use of --queueing=static (default: OFF)" OFF ADVANCED)
 if(HPX_STATIC_PRIORITY_SCHEDULER OR HPX_ALL_SCHEDULERS)
   hpx_add_config_define(HPX_STATIC_PRIORITY_SCHEDULER)
 endif()
 
-hpx_option(HPX_HIERARCHY_SCHEDULER BOOL "Enable the use of --queueing=hierarchy (default: OFF)" OFF ADVANCED)
-
+hpx_option(HPX_HIERARCHY_SCHEDULER BOOL
+  "Enable the use of --queueing=hierarchy (default: OFF)" OFF ADVANCED)
 if(HPX_HIERARCHY_SCHEDULER OR HPX_ALL_SCHEDULERS)
   hpx_add_config_define(HPX_HIERARCHY_SCHEDULER)
 endif()
 
-hpx_option(HPX_PERIODIC_PRIORITY_SCHEDULER BOOL "Enable the use of --queueing=periodic (default: OFF)" OFF ADVANCED)
+hpx_option(HPX_ABP_SCHEDULER BOOL
+  "Enable the use of --queueing=priority_abp (default: OFF)" OFF ADVANCED)
+if(HPX_ABP_SCHEDULER OR HPX_ALL_SCHEDULERS)
+  hpx_add_config_define(HPX_ABP_SCHEDULER)
+endif()
 
+hpx_option(HPX_PERIODIC_PRIORITY_SCHEDULER BOOL
+  "Enable the use of --queueing=periodic (default: OFF)" OFF ADVANCED)
 if(HPX_PERIODIC_PRIORITY_SCHEDULER OR HPX_ALL_SCHEDULERS)
   hpx_add_config_define(HPX_PERIODIC_PRIORITY_SCHEDULER)
 endif()
 
+# Google Perftools
 hpx_option(HPX_GOOGLE_PERFTOOLS BOOL
-           "Compile HPX with google perftools (Default: ON)" ON ADVANCED)
-
+  "Compile HPX with google perftools (Default: ON)" ON ADVANCED)
 if(HPX_GOOGLE_PERFTOOLS)
   find_package(HPX_GooglePerftools)
   if(GOOGLE_PERFTOOLS_FOUND)
@@ -1907,7 +1914,7 @@ endif()
 # External build system support (FindHPX.cmake and pkg-config).
 ################################################################################
 set(HPX_LINK_DIRECTORIES
-    "${CMAKE_INSTALL_PREFIX}/lib/hpx" ${HPX_LINK_DIRECTORIES})
+    "${CMAKE_INSTALL_PREFIX}/${LIB}/hpx" ${HPX_LINK_DIRECTORIES})
 set(HPX_INCLUDE_DIRECTORIES
     "${CMAKE_INSTALL_PREFIX}/include" ${HPX_INCLUDE_DIRECTORIES}
     "${CMAKE_INSTALL_PREFIX}/include/hpx/external")
@@ -2026,31 +2033,31 @@ endif()
 
 if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
     configure_file("${hpx_SOURCE_DIR}/cmake/templates/hpx_application.pc.in"
-                   "${output_dir}/lib/pkgconfig/hpx_application.pc"
+                   "${output_dir}/${LIB}/pkgconfig/hpx_application.pc"
                    @ONLY)
     configure_file("${hpx_SOURCE_DIR}/cmake/templates/hpx_component.pc.in"
-                   "${output_dir}/lib/pkgconfig/hpx_component.pc"
+                   "${output_dir}/${LIB}/pkgconfig/hpx_component.pc"
                    @ONLY)
 else()
     configure_file("${hpx_SOURCE_DIR}/cmake/templates/hpx_application_debug.pc.in"
-                   "${output_dir}/lib/pkgconfig/hpx_application_debug.pc"
+                   "${output_dir}/${LIB}/pkgconfig/hpx_application_debug.pc"
                    @ONLY)
 
     configure_file("${hpx_SOURCE_DIR}/cmake/templates/hpx_component_debug.pc.in"
-                   "${output_dir}/lib/pkgconfig/hpx_component_debug.pc"
+                   "${output_dir}/${LIB}/pkgconfig/hpx_component_debug.pc"
                    @ONLY)
 endif()
 
 if(NOT HPX_NO_INSTALL)
   if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
-    install(FILES "${output_dir}/lib/pkgconfig/hpx_application.pc"
+    install(FILES "${output_dir}/${LIB}/pkgconfig/hpx_application.pc"
             DESTINATION ${LIB}/pkgconfig)
-    install(FILES "${output_dir}/lib/pkgconfig/hpx_component.pc"
+    install(FILES "${output_dir}/${LIB}/pkgconfig/hpx_component.pc"
             DESTINATION ${LIB}/pkgconfig)
   else()
-    install(FILES "${output_dir}/lib/pkgconfig/hpx_application_debug.pc"
+    install(FILES "${output_dir}/${LIB}/pkgconfig/hpx_application_debug.pc"
             DESTINATION ${LIB}/pkgconfig)
-    install(FILES "${output_dir}/lib/pkgconfig/hpx_component_debug.pc"
+    install(FILES "${output_dir}/${LIB}/pkgconfig/hpx_component_debug.pc"
             DESTINATION ${LIB}/pkgconfig)
   endif()
 endif()

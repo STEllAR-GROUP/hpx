@@ -20,7 +20,6 @@ endif()
 if(HPX_LOCAL_SCHEDULER OR HPX_ALL_SCHEDULERS)
   set(tests ${tests}
     thread_pool_executor_1114
-    thread_pool_executor_1127
     )
 endif()
 

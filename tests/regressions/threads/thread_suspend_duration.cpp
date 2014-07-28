@@ -22,7 +22,7 @@ using hpx::finalize;
 
 using hpx::util::report_errors;
 
-using boost::posix_time::microseconds;
+using boost::chrono::microseconds;
 
 ///////////////////////////////////////////////////////////////////////////////
 void suspend_test(barrier& b, std::size_t iterations, std::size_t n)
