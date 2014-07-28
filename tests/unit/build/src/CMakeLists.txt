@@ -11,8 +11,6 @@ if(EXISTS "${HPX_DIR}")
 
   find_package(HPX REQUIRED)
 
-  add_definitions(-DHPX_DEBUG)
-
   if(NOT HPX_FOUND)
     message(FATAL_ERROR "HPX could not be found")
   endif()

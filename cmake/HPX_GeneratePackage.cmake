@@ -99,6 +99,7 @@ configure_file(cmake/templates/hpx_component_debug.pc.in
   ESCAPE_QUOTES @ONLY)
 
 # ... and the build dir
+set(HPX_CONF_PREFIX "${CMAKE_BINARY_DIR}")
 set(HPX_CONF_INCLUDE_DIRS
   "${_NEEDED_BUILD_DIR_INCLUDE_DIRS}"
   " ${_NEEDED_INCLUDE_DIRS}"
