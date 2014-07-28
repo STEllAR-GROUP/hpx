@@ -133,7 +133,16 @@ namespace hpx { namespace parallel { namespace util
                 threads::executor exec = policy.get_executor();
                 while (count > chunk_size)
                 {
-                    workitems.push_back(hpx::async(exec, f1, first, chunk_size));
+                    if (exec)
+                    {
+                        workitems.push_back(hpx::async(exec, f1, first,
+                            chunk_size));
+                    }
+                    else
+                    {
+                        workitems.push_back(hpx::async(hpx::launch::fork, f1,
+                            first, chunk_size));
+                    }
                     count -= chunk_size;
                     std::advance(first, chunk_size);
                 }
@@ -182,7 +191,16 @@ namespace hpx { namespace parallel { namespace util
                 threads::executor exec = policy.get_executor();
                 while (count > chunk_size)
                 {
-                    workitems.push_back(hpx::async(exec, f1, first, chunk_size));
+                    if (exec)
+                    {
+                        workitems.push_back(hpx::async(exec, f1, first,
+                            chunk_size));
+                    }
+                    else
+                    {
+                        workitems.push_back(hpx::async(hpx::launch::fork, f1,
+                            first, chunk_size));
+                    }
                     count -= chunk_size;
                     std::advance(first, chunk_size);
                 }
@@ -190,7 +208,15 @@ namespace hpx { namespace parallel { namespace util
                 // add last chunk
                 if (count != 0)
                 {
-                    workitems.push_back(hpx::async(exec, f1, first, count));
+                    if (exec)
+                    {
+                        workitems.push_back(hpx::async(exec, f1, first, count));
+                    }
+                    else
+                    {
+                        workitems.push_back(hpx::async(hpx::launch::fork, f1,
+                            first, count));
+                    }
                     std::advance(first, count);
                 }
 
@@ -282,7 +308,16 @@ namespace hpx { namespace parallel { namespace util
                 threads::executor exec = policy.get_executor();
                 while (count > chunk_size)
                 {
-                    workitems.push_back(hpx::async(exec, f1, first, chunk_size));
+                    if (exec)
+                    {
+                        workitems.push_back(hpx::async(exec, f1, first,
+                            chunk_size));
+                    }
+                    else
+                    {
+                        workitems.push_back(hpx::async(hpx::launch::fork, f1,
+                            first, chunk_size));
+                    }
                     count -= chunk_size;
                     std::advance(first, chunk_size);
                 }
@@ -326,7 +361,16 @@ namespace hpx { namespace parallel { namespace util
                 threads::executor exec = policy.get_executor();
                 while (count > chunk_size)
                 {
-                    workitems.push_back(hpx::async(exec, f1, base_idx, first, chunk_size));
+                    if (exec)
+                    {
+                        workitems.push_back(hpx::async(exec, f1, base_idx,
+                            first, chunk_size));
+                    }
+                    else
+                    {
+                        workitems.push_back(hpx::async(hpx::launch::fork, f1,
+                            base_idx, first, chunk_size));
+                    }
                     count -= chunk_size;
                     std::advance(first, chunk_size);
                     base_idx += chunk_size;
@@ -375,7 +419,16 @@ namespace hpx { namespace parallel { namespace util
                 threads::executor exec = policy.get_executor();
                 while (count > chunk_size)
                 {
-                    workitems.push_back(hpx::async(exec, f1, first, chunk_size));
+                    if (exec)
+                    {
+                        workitems.push_back(hpx::async(exec, f1, first,
+                            chunk_size));
+                    }
+                    else
+                    {
+                        workitems.push_back(hpx::async(hpx::launch::fork, f1,
+                            first, chunk_size));
+                    }
                     count -= chunk_size;
                     std::advance(first, chunk_size);
                 }
@@ -383,7 +436,15 @@ namespace hpx { namespace parallel { namespace util
                 // add last chunk
                 if (count != 0)
                 {
-                    workitems.push_back(hpx::async(exec, f1, first, count));
+                    if (exec)
+                    {
+                        workitems.push_back(hpx::async(exec, f1, first, count));
+                    }
+                    else
+                    {
+                        workitems.push_back(hpx::async(hpx::launch::fork, f1,
+                            first, count));
+                    }
                     std::advance(first, count);
                 }
 
@@ -417,7 +478,16 @@ namespace hpx { namespace parallel { namespace util
                 threads::executor exec = policy.get_executor();
                 while (count > chunk_size)
                 {
-                    workitems.push_back(hpx::async(exec, f1, base_idx, first, chunk_size));
+                    if (exec)
+                    {
+                        workitems.push_back(hpx::async(exec, f1, base_idx,
+                            first, chunk_size));
+                    }
+                    else
+                    {
+                        workitems.push_back(hpx::async(hpx::launch::fork, f1,
+                            base_idx, first, chunk_size));
+                    }
                     count -= chunk_size;
                     std::advance(first, chunk_size);
                     base_idx += chunk_size;
@@ -426,7 +496,16 @@ namespace hpx { namespace parallel { namespace util
                 // add last chunk
                 if (count != 0)
                 {
-                    workitems.push_back(hpx::async(exec, f1, base_idx, first, count));
+                    if (exec)
+                    {
+                        workitems.push_back(hpx::async(exec, f1, base_idx,
+                            first, count));
+                    }
+                    else
+                    {
+                        workitems.push_back(hpx::async(hpx::launch::fork, f1,
+                            base_idx, first, count));
+                    }
                     std::advance(first, count);
                 }
 
