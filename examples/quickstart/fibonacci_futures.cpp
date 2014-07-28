@@ -93,7 +93,7 @@ hpx::future<boost::uint64_t> fibonacci_future_one(boost::uint64_t n)
 ///////////////////////////////////////////////////////////////////////////////
 boost::uint64_t fibonacci(boost::uint64_t n)
 {
-    // if we know the answer, we return a future encapsulating the final value
+    // if we know the answer, we return the final value
     if (n < 2)
         return n;
     if (n < threshold)
@@ -112,7 +112,7 @@ boost::uint64_t fibonacci(boost::uint64_t n)
 ///////////////////////////////////////////////////////////////////////////////
 boost::uint64_t fibonacci_fork(boost::uint64_t n)
 {
-    // if we know the answer, we return a future encapsulating the final value
+    // if we know the answer, we return the final value
     if (n < 2)
         return n;
     if (n < threshold)
