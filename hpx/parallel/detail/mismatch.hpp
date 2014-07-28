@@ -179,14 +179,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           two ranges are mismatch, otherwise it returns false.
     ///           If the length of the range [first1, last1) does not mismatch
     ///           the length of the range [first2, last2), it returns false.
-    ///
-    /// This overload of \a reduce is available only if the compiler
-    /// supports default function template arguments.
-    ///
-    /// The difference between \a reduce and \a accumulate is
-    /// that the behavior of reduce may be non-deterministic for
-    /// non-associative or non-commutative binary predicate.
-    ///
     template <typename ExPolicy, typename InIter1, typename InIter2>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
@@ -293,14 +285,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           two ranges are mismatch, otherwise it returns false.
     ///           If the length of the range [first1, last1) does not mismatch
     ///           the length of the range [first2, last2), it returns false.
-    ///
-    /// This overload of \a reduce is available only if the compiler
-    /// supports default function template arguments.
-    ///
-    /// The difference between \a reduce and \a accumulate is
-    /// that the behavior of reduce may be non-deterministic for
-    /// non-associative or non-commutative binary predicate.
-    ///
     template <typename ExPolicy, typename InIter1, typename InIter2, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
