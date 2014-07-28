@@ -826,15 +826,14 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Schedule the passed thread
-        void schedule_thread(threads::thread_data_base* thrd)
+        void schedule_thread(threads::thread_data_base* thrd, bool other_end = false)
         {
             ++work_items_count_;
 #ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
-            work_items_.push(
-                new thread_description(thrd, util::high_resolution_clock::now())
-                );
+            work_items_.push(new thread_description(
+                thrd, util::high_resolution_clock::now()), other_end);
 #else
-            work_items_.push(thrd);
+            work_items_.push(thrd, other_end);
 #endif
         }
 

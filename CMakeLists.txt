@@ -4,6 +4,7 @@
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2011 Vinay C Amatya
 # Copyright (c)      2013 Jeroen Habraken
+# Copyright (c)      2014 Andreas Schäfer
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -329,7 +330,7 @@ hpx_option(HPX_SWAP_CONTEXT_EMULATION BOOL "Emulate SwapContext API for coroutin
 # Scheduler configuration
 ################################################################################
 hpx_option(HPX_THREAD_SCHEDULERS STRING
-  "Which thread schedulers are build. Options are: all, local, static-priority, hierarchy, and periodic-priority. For multiple enabled schedulers, separate with a semicolon (default: all)"
+  "Which thread schedulers are build. Options are: all, abp, local, static-priority, hierarchy, and periodic-priority. For multiple enabled schedulers, separate with a semicolon (default: all)"
   "all"
   CATEGORY "Thread Manager" ADVANCED)
 
@@ -338,6 +339,10 @@ foreach(_scheduler ${HPX_THREAD_SCHEDULERS_UC})
   if(_scheduler STREQUAL "ALL")
     set(_all On)
     set(HPX_ALL_SCHEDULERS ON CACHE INTERNAL "")
+  endif()
+  if(_scheduler STREQUAL "ABP" OR _all)
+    hpx_add_config_define(HPX_ABP_SCHEDULER)
+    set(HPX_LOCAL_SCHEDULER ON CACHE INTERNAL "")
   endif()
   if(_scheduler STREQUAL "LOCAL" OR _all)
     hpx_add_config_define(HPX_LOCAL_SCHEDULER)
@@ -1412,27 +1417,6 @@ execute_process(COMMAND
   "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx"
   WORKING_DIRECTORY "${output_dir}/share")
 
-set(_HPX_INFO_STRING "\nHPX has been configured with the following options:\n\n")
-
-get_cmake_property(_variableNames CACHE_VARIABLES)
-foreach(_cat "Generic" "Thread Manager" "AGAS" "Parcelport" "Profiling" "Debugging" "Security")
-
-  set(_HPX_INFO_STRING "${_HPX_INFO_STRING}${_cat} Options:\n\n")
-
-  foreach (_variableName ${_variableNames})
-    get_property(_var_cat_strings CACHE "${_variableName}" PROPERTY STRINGS)
-    if(${_variableName}Category)
-      if(_cat STREQUAL ${_variableName}Category)
-        get_property(_doc CACHE "${_variableName}" PROPERTY HELPSTRING)
-        set(_HPX_INFO_STRING "${_HPX_INFO_STRING}  ${_variableName} = ${${_variableName}}\n")
-        set(_HPX_INFO_STRING "${_HPX_INFO_STRING}     ${_doc}\n")
-        set(_HPX_INFO_STRING "${_HPX_INFO_STRING}\n")
-      endif()
-    endif()
-  endforeach()
-endforeach()
-
-#message(${_HPX_INFO_STRING})
 message("")
 message("HPX will be installed to ${CMAKE_INSTALL_PREFIX}")
 message("")
