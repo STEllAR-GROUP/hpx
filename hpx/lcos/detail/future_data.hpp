@@ -618,7 +618,7 @@ namespace detail
                 threads::register_thread_plain(
                     util::bind(&task_base::run_impl, this_),
                     desc ? desc : "task_base::apply", threads::pending, false,
-                    threads::thread_priority_critical_once, std::size_t(-1),
+                    threads::thread_priority_boost, get_worker_thread_num(),
                     stacksize, ec);
             }
             else {

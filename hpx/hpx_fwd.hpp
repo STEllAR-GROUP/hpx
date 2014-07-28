@@ -305,7 +305,7 @@ namespace hpx
             thread_priority_low = 1,          ///< low thread priority
             thread_priority_normal = 2,       ///< normal thread priority (default)
             thread_priority_critical = 3,     ///< high thread priority
-            thread_priority_critical_once = 4 ///< high thread priority for first invocation, normal afterwards
+            thread_priority_boost = 4         ///< high thread priority for first invocation, normal afterwards
         };
 
         typedef threads::detail::tagged_thread_state<thread_state_enum> thread_state;
