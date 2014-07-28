@@ -1,4 +1,4 @@
-//  copyright (c) 2014 Grant Mercer
+//  Copyright (c) 2014 Grant Mercer
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -21,14 +21,14 @@ void test_find_end(ExPolicy const& policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     //fill vector with random values about 1
-    std::fill(boost::begin(c), boost::end(c), (std::rand()%100)+ 3);
+    std::fill(boost::begin(c), boost::end(c), (std::rand()%100) + 3);
     c.at(c.size()/2) = 1;
-    c.at(c.size()/2 + 1)= 2;
+    c.at(c.size()/2 + 1) = 2;
 
-    std::size_t h[] = {1,2};
+    std::size_t h[] = { 1, 2 };
 
     iterator index = hpx::parallel::find_end(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)), 
+        iterator(boost::begin(c)), iterator(boost::end(c)),
         boost::begin(h), boost::end(h));
 
     base_iterator test_index = boost::begin(c) + c.size()/2;
@@ -46,9 +46,9 @@ void test_find_end(hpx::parallel::task_execution_policy, IteratorTag)
     //fill vector with random values above 1
     std::fill(boost::begin(c), boost::end(c), (std::rand()%100) + 3);
     c.at(c.size()/2) = 1;
-    c.at(c.size()/2 + 1)= 2;
+    c.at(c.size()/2 + 1) = 2;
 
-    std::size_t h[] = {1,2};
+    std::size_t h[] = { 1, 2 };
 
     hpx::future<iterator> f =
         hpx::parallel::find_end(hpx::parallel::task,
@@ -96,10 +96,10 @@ void test_find_end_exception(ExPolicy const& policy, IteratorTag)
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand()+1);
-    c[c.size()/2]=0;
+    std::iota(boost::begin(c), boost::end(c), std::rand() + 1);
+    c[c.size()/2] = 0;
 
-    std::size_t h[] = {1,2};
+    std::size_t h[] = { 1, 2 };
 
     bool caught_exception = false;
     try {
@@ -130,10 +130,10 @@ void test_find_end_exception(hpx::parallel::task_execution_policy, IteratorTag)
         decorated_iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand()+1);
-    c[c.size()/2]=0;
+    std::iota(boost::begin(c), boost::end(c), std::rand() + 1);
+    c[c.size()/2] = 0;
 
-    std::size_t h[] = {1,2};
+    std::size_t h[] = { 1, 2 };
 
     bool caught_exception = false;
     try {
@@ -194,10 +194,10 @@ void test_find_end_bad_alloc(ExPolicy const& policy, IteratorTag)
         decorated_iterator;
 
     std::vector<std::size_t> c(100007);
-    std::iota(boost::begin(c), boost::end(c), std::rand()+1);
-    c[c.size()/2]=0;
+    std::iota(boost::begin(c), boost::end(c), std::rand() + 1);
+    c[c.size()/2] = 0;
 
-    std::size_t h[] = {1,2};
+    std::size_t h[] = { 1, 2 };
 
     bool caught_bad_alloc = false;
     try {
@@ -227,10 +227,10 @@ void test_find_end_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
         decorated_iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand()+1);
+    std::iota(boost::begin(c), boost::end(c), std::rand() + 1);
     c[c.size()/2] = 0;
 
-    std::size_t h[] = {1,2};
+    std::size_t h[] = { 1, 2 };
 
     bool caught_bad_alloc = false;
     try {
@@ -282,14 +282,12 @@ void find_end_bad_alloc_test()
 
 int hpx_main()
 {
-    int t[] = {1,2,3,1,2,9,2,3,4,9,9,2};
-    int f[] = {1,2};
+    int t[] = { 0, 0, 3, 1, 2, 1, 2, 3, 4, 1, 5, 8 };
+    int f[] = { 1, 2 };
     auto g = hpx::parallel::find_end(hpx::parallel::par(6),
         boost::begin(t), boost::end(t), boost::begin(f),
         boost::end(f));
-    //the distance **should** be 3
     std::cout << std::distance(boost::begin(t),g) << std::endl;
-
     //find_end_test();
     //find_end_exception_test();
     //find_end_bad_alloc_test();
