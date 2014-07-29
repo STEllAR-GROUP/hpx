@@ -27,15 +27,15 @@ which is declared in the (inline) namespace `hpx::parallel::v1`.
       as well.]
 
 All parallel
-algorithms are very similar in semantics to their sequential counterarts
-(as defined in the `namespace std`) with a formal template parameter named
-`ExecutionPolicy`. The execution policy is generally passed as the first
+algorithms are very similar in semantics to their sequential counterparts
+(as defined in the `namespace std`) with an additional formal template parameter
+named `ExecutionPolicy`. The execution policy is generally passed as the first
 argument to any of the parallel algorithms and describes the manner in which
 the execution of these algorithms may be parallelized and the manner in which
 they apply user-provided function objects.
 
 The applications of function objects in parallel algorithms invoked with an
-execution policy object of type sequential_execution_policy execute in
+execution policy object of type __sequential_execution_policy__ execute in
 sequential order in the calling thread.
 
 The applications of function objects in parallel algorithms invoked with an
@@ -71,7 +71,7 @@ of the program is determined by the type of execution policy used to invoke
 the algorithm:
 
 * If the execution policy object is of type __parallel_vector_execution_policy__,
-  `hpx::terminate` shall be called.
+  [funcref hpx::terminate] shall be called.
 
 * If the execution policy object is of type __sequential_execution_policy__,
   __parallel_execution_policy__, or __task_execution_policy__ the execution of
