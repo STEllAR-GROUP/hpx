@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/equal.hpp
+/// \file parallel/detail/equal.hpp
 
 #if !defined(HPX_PARALLEL_DETAIL_EQUAL_JUL_06_2014_0848PM)
 #define HPX_PARALLEL_DETAIL_EQUAL_JUL_06_2014_0848PM
@@ -34,12 +34,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        // Our own version of the C++14 equal(_binary).
+
+        // Our own version of the C++14 equal (_binary).
         template <typename InIter1, typename InIter2, typename F>
         bool sequential_equal_binary(InIter1 first1, InIter1 last1,
             InIter2 first2, InIter2 last2, F && f)
         {
-            for (/**/; first1 != last1 && first2 != last2; ++first1, ++first2)
+            for (; first1 != last1 && first2 != last2; ++first1, ++first2)
             {
                 if (!f(*first1, *first2))
                     return false;
@@ -177,13 +178,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           If the length of the range [first1, last1) does not equal
     ///           the length of the range [first2, last2), it returns false.
     ///
-    /// This overload of \a reduce is available only if the compiler
-    /// supports default function template arguments.
-    ///
-    /// The difference between \a reduce and \a accumulate is
-    /// that the behavior of reduce may be non-deterministic for
-    /// non-associative or non-commutative binary predicate.
-    ///
     template <typename ExPolicy, typename InIter1, typename InIter2>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
@@ -286,13 +280,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           two ranges are equal, otherwise it returns false.
     ///           If the length of the range [first1, last1) does not equal
     ///           the length of the range [first2, last2), it returns false.
-    ///
-    /// This overload of \a reduce is available only if the compiler
-    /// supports default function template arguments.
-    ///
-    /// The difference between \a reduce and \a accumulate is
-    /// that the behavior of reduce may be non-deterministic for
-    /// non-associative or non-commutative binary predicate.
     ///
     template <typename ExPolicy, typename InIter1, typename InIter2, typename F>
     inline typename boost::enable_if<
@@ -438,13 +425,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           The \a equal algorithm returns true if the elements in the
     ///           two ranges are equal, otherwise it returns false.
     ///
-    /// This overload of \a reduce is available only if the compiler
-    /// supports default function template arguments.
-    ///
-    /// The difference between \a reduce and \a accumulate is
-    /// that the behavior of reduce may be non-deterministic for
-    /// non-associative or non-commutative binary predicate.
-    ///
     template <typename ExPolicy, typename InIter1, typename InIter2>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
@@ -543,13 +523,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           returns \a bool otherwise.
     ///           The \a equal algorithm returns true if the elements in the
     ///           two ranges are equal, otherwise it returns false.
-    ///
-    /// This overload of \a reduce is available only if the compiler
-    /// supports default function template arguments.
-    ///
-    /// The difference between \a reduce and \a accumulate is
-    /// that the behavior of reduce may be non-deterministic for
-    /// non-associative or non-commutative binary predicate.
     ///
     template <typename ExPolicy, typename InIter1, typename InIter2, typename F>
     inline typename boost::enable_if<
