@@ -231,8 +231,8 @@ hpx_option(HPX_THREAD_STACK_MMAP BOOL
   CATEGORY "Thread Manager" ADVANCED)
 
 hpx_option(HPX_THREAD_MANAGER_IDLE_BACKOFF BOOL
-  "Use mmap for stack allocation on appropriate platforms (default: OFF)"
-  OFF
+  "HPX scheduler threads are backing off on idle queues (default: ON)"
+  ON
   CATEGORY "Thread Manager" ADVANCED)
 
 hpx_option(HPX_WITH_STACKTRACES BOOL "Attach backtraces to HPX exceptions (default: ON)"
