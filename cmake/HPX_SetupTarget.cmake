@@ -137,8 +137,13 @@ function(hpx_setup_target target)
 
   # We force the -DDEBUG and -D_DEBUG defines in debug mode to avoid
   # ABI differences
-  set_property(TARGET ${target} APPEND PROPERTY
-    COMPILE_DEFINITIONS_DEBUG HPX_DEBUG)
+  if(CMAKE_MAJOR_VERSION GREATER 2)
+    set_property(TARGET ${target} APPEND PROPERTY
+	    COMPILE_DEFINITIONS $<$<CONFIG:Debug>:HPX_DEBUG>)
+  else()
+    set_property(TARGET ${target} APPEND PROPERTY
+      COMPILE_DEFINITIONS_DEBUG HPX_DEBUG)
+  endif()
 
   # linker instructions
   if(NOT target_NOLIBS)
