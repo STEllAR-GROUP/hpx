@@ -52,7 +52,7 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/parallel/detail/fill.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/detail/find.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/detail/for_each.hpp"
-	"${hpx_SOURCE_DIR}/hpx/parallel/detail/generate.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/detail/generate.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/detail/mismatch.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/detail/move.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/detail/reduce.hpp"
