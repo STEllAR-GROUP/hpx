@@ -97,4 +97,71 @@ with an exception. For example, this can happen when an algorithm
 fails to allocate memory while creating or adding elements to the
 __exception_list__ object.
 
+[heading Parallel Algorithms]
+
+__hpx__ provides implementations of the following parallel algorithms:
+
+[template algoref[name] [funcref hpx::parallel::v1::[name] hpx::parallel::[name]]]
+
+[table Non-modifying Parallel Algorithms
+    [[Name]     [Description]]
+    [[ [algoref all_of] ]
+     [Checks if a predicate is `true` for all  of the elements in a range]]
+    [[ [algoref any_of] ]
+     [Checks if a predicate is `true` for any of the elements in a range]]
+    [[ [algoref none_of] ]
+     [Checks if a predicate is `true` for none of the elements in a range]]
+    [[ [algoref for_each] ]
+     [Applies a function to a range of elements]]
+    [[ [algoref count] ]
+     [Returns the number of elements equal to a given value]]
+    [[ [algoref count_if] ]
+     [Returns the number of elements satisfying a specific criteria]]
+    [[ [algoref equal] ]
+     [Determines if two sets of elements are the same]]
+    [[ [algoref mismatch] ]
+     [Finds the first position where two ranges differ]]
+    [[ [algoref find] ]
+     [Finds the first element equal to a given value]]
+    [[ [algoref find_if] ]
+     [Finds the first element satisfying a specific criteria]]
+    [[ [algoref find_if_not] ]
+     [Finds the first element not satisfying a specific criteria]]
+]
+
+[table Modifying Parallel Algorithms
+    [[Name]     [Description]]
+    [[ [algoref copy] ]
+     [Copies a range of elements to a new location]]
+    [[ [algoref copy_n] ]
+     [Copies a number of elements to a new location]]
+    [[ [algoref copy_if] ]
+     [Copies the elements from a range to a new location for which the given
+      predicate is `true`]]
+    [[ [algoref move] ]
+     [Moves a range of elements to a new location]]
+    [[ [algoref fill] ]
+     [Assigns a range of elements a certain value]]
+    [[ [algoref fill_n] ]
+     [Assigns a value to a number of elements]]
+    [[ [algoref transform] ]
+     [Applies a function to a range of elements]]
+    [[ [algoref transform_reduce] ]
+     [Applies a function to a range of elements after applying a function]]
+    [[ [algoref generate] ]
+     [Saves the result of a function in a range ]]
+    [[ [algoref generate_n] ]
+     [Saves the result of N applications of a function]]
+    [[ [algoref swap_ranges] ]
+     [Swaps two ranges of elements]]
+]
+
+[table Numeric Parallel Algorithms
+    [[Name]     [Description]]
+    [[ [algoref reduce] ]
+     [Sums up a range of elements]]
+    [[ [algoref transform_reduce] ]
+     [Sums up a range of elements after applying a function]]
+]
+
 [endsect]

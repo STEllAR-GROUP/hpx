@@ -34,12 +34,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        // Our own version of the C++14 equal(_binary).
+
+        // Our own version of the C++14 equal (_binary).
         template <typename InIter1, typename InIter2, typename F>
         bool sequential_equal_binary(InIter1 first1, InIter1 last1,
             InIter2 first2, InIter2 last2, F && f)
         {
-            for (/**/; first1 != last1 && first2 != last2; ++first1, ++first2)
+            for (; first1 != last1 && first2 != last2; ++first1, ++first2)
             {
                 if (!f(*first1, *first2))
                     return false;
