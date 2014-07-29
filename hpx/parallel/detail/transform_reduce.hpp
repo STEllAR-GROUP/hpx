@@ -153,20 +153,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     type can be implicitly converted to \a T.
     /// \param init         The initial value for the generalized sum.
     ///
-    /// The reduce operations in the parallel \a reduce algorithm invoked
+    /// The reduce operations in the parallel \a transform_reduce algorithm invoked
     /// with an execution policy object of type \a sequential_execution_policy
     /// execute in sequential order in the calling thread.
     ///
-    /// The reduce operations in the parallel \a copy_if algorithm invoked
+    /// The reduce operations in the parallel \a transform_reduce algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
     /// or \a task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a reduce algorithm returns a \a hpx::future<T> if the
+    /// \returns  The \a transform_reduce algorithm returns a \a hpx::future<T> if the
     ///           execution policy is of type \a task_execution_policy and
     ///           returns \a T otherwise.
-    ///           The \a reduce algorithm returns the result of the
+    ///           The \a transform_reduce algorithm returns the result of the
     ///           generalized sum over the values returned from \a conv_op when
     ///           applied to the elements given by the input range
     ///           [first, last).
@@ -178,8 +178,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           * b1, ..., bN may be any permutation of a1, ..., aN and
     ///           * 1 < K+1 = M <= N.
     ///
-    /// The difference between \a reduce and \a accumulate is
-    /// that the behavior of reduce may be non-deterministic for
+    /// The difference between \a transform_reduce and \a accumulate is
+    /// that the behavior of transform_reduce may be non-deterministic for
     /// non-associative or non-commutative binary predicate.
     ///
     template <typename ExPolicy, typename InIter, typename T, typename Reduce,
