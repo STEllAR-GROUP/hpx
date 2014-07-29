@@ -20,7 +20,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <typename ExPolicy>
         struct handle_exception
         {
-            BOOST_ATTRIBUTE_NORETURN static void call()
+            HPX_ATTRIBUTE_NORETURN static void call()
             {
                 try {
                     throw; //-V667
@@ -39,7 +39,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <>
         struct handle_exception<parallel_vector_execution_policy>
         {
-            BOOST_ATTRIBUTE_NORETURN static void call()
+            HPX_ATTRIBUTE_NORETURN static void call()
             {
                 std::cout << "terminated";
                 // any exceptions thrown by algorithms executed with the
