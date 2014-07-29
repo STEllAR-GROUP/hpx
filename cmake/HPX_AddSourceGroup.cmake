@@ -6,10 +6,10 @@
 
 macro(add_hpx_source_group)
   if(MSVC)
-    set(options NAME CLASS ROOT)
-    set(one_value_args)
+    set(options)
+    set(one_value_args NAME CLASS ROOT)
     set(multi_value_args TARGETS)
-    cmake_parse_arguments(SOURCES "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+    cmake_parse_arguments(GROUP "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
     set(name "")
     if(GROUP_NAME)
