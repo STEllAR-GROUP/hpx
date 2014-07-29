@@ -77,13 +77,15 @@ create_cmake_test(
   "${CMAKE_INSTALL_PREFIX}/lib/cmake/hpx"
 )
 
-create_pkgconfig_test(
-  pkgconfig_build_dir_test
-  "${CMAKE_BINARY_DIR}/lib/pkgconfig")
+if(NOT MSVC)
+  create_pkgconfig_test(
+    pkgconfig_build_dir_test
+    "${CMAKE_BINARY_DIR}/lib/pkgconfig")
 
-create_pkgconfig_test(
-  pkgconfig_install_dir_test
-  "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
+  create_pkgconfig_test(
+    pkgconfig_install_dir_test
+    "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
+endif()
 
 set(tests
   build_dir
