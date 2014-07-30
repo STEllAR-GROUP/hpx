@@ -106,4 +106,7 @@ if(Boost_VERSION LESS 105300)
 endif()
 
 include_directories(${Boost_INCLUDE_DIRS})
-hpx_libraries(${Boost_LIBRARIES})
+link_directories(${Boost_LIBRARY_DIRS})
+if(NOT MSVC)
+  hpx_libraries(${Boost_LIBRARIES})
+endif()
