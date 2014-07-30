@@ -408,7 +408,7 @@ namespace boost { namespace archive { namespace detail
         template <typename T>
         static void check_load(T& /* t */)
         {
-            check_pointer_level< T >();
+            // check_pointer_level< T >();         // this has to be disabled to avoid warnings
             // check_pointer_tracking< T >();      // this has to be disabled to avoid warnings
         }
 

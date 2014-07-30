@@ -19,8 +19,6 @@
 #include <iostream>
 
 #include <boost/serialization/serialization.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/shared_ptr.hpp>
 
 namespace hpx { namespace iostreams { namespace detail
 {
@@ -87,4 +85,3 @@ namespace hpx { namespace iostreams { namespace server
         this_thread::suspend(threads::suspended, "output_stream::write_sync");
     } // }}}
 }}}
-
