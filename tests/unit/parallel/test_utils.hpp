@@ -42,17 +42,21 @@ namespace test
         base_type;
 
     public:
-        decorated_iterator() : base_type() {}
+        decorated_iterator(BaseIterator base)
+          : base_type(base)
+        {}
+
         decorated_iterator(BaseIterator base, std::function<void()> f)
           : base_type(base), m_callback(f)
-        {};
+        {}
 
     private:
         friend class boost::iterator_core_access;
 
         typename base_type::reference dereference() const
         {
-            m_callback();
+            if (m_callback)
+                m_callback();
             return *(this->base());
         }
 

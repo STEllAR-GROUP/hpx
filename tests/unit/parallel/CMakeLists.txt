@@ -11,6 +11,7 @@ set(tests
     copyn
     count
     countif
+    copy_backward
     equal
     equal_binary
     fill
@@ -18,13 +19,14 @@ set(tests
     foreach
     foreachn
     move
+    move_backward
     none_of
     reduce_
     swapranges
     task_region
     transform
     transform_binary
-	transform_reduce
+    transform_reduce
    )
 
 set(task_region_FLAGS DEPENDENCIES iostreams_component)
