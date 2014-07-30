@@ -101,7 +101,8 @@ namespace hpx
         typedef agas::addressing_service resolver_client;
 
         struct HPX_API_EXPORT gid_type;
-        struct HPX_API_EXPORT id_type;
+        // NOTE: we do not export the symbol here as id_type was already exported and generates a warning on gcc otherwise
+        struct id_type;
         struct HPX_API_EXPORT address;
         class HPX_API_EXPORT locality;
 

@@ -224,6 +224,7 @@ if(NOT HPX_STATIC_LINKING)
     PROPERTY COMPILE_DEFINITIONS
     "HPX_DLL_STRING=\"${name}\""
     "HPX_EXPORTS"
+    "HPX_SERIALIZATION_EXPORTS"
     "HPX_COROUTINE_EXPORTS")
   set(hpx_targets ${hpx_targets} hpx_serialization)
 endif()

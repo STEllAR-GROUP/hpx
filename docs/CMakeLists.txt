@@ -154,8 +154,6 @@ foreach(_cat ${HPX_OPTION_CATEGORIES})
   set(HPX_CMAKE_OPTIONS "${HPX_CMAKE_OPTIONS}[variablelist\n")
 
   foreach (_variableName ${_variableNames})
-    get_property(_var_cat_strings CACHE "${_variableName}" PROPERTY STRINGS)
-
     if(${_variableName}Category)
       if(_cat STREQUAL ${_variableName}Category)
         string(REPLACE " " "_" _variableName_anchor "${_variableName}")

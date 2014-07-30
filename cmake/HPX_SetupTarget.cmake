@@ -86,14 +86,14 @@ function(hpx_setup_target target)
     )
   endif()
 
-  if(_type STREQUAL "EXECUTABLE")
+  if("${_type}" STREQUAL "EXECUTABLE")
     set_property(TARGET ${target} APPEND
                  PROPERTY COMPILE_DEFINITIONS
                  "HPX_APPLICATION_NAME=${name}"
                  "HPX_APPLICATION_STRING=\"${name}\""
                  "HPX_APPLICATION_EXPORTS")
   endif()
-  if(_type STREQUAL "LIBRARY")
+  if("${_type}" STREQUAL "LIBRARY")
     set(nohpxinit FALSE)
     if(HPX_LIBRARY_VERSION AND HPX_SOVERSION)
       # set properties of generated shared library
@@ -115,7 +115,7 @@ function(hpx_setup_target target)
                    ${plugin_name})
 
   endif()
-  if(_type STREQUAL "COMPONENT")
+  if("${_type}" STREQUAL "COMPONENT")
     set(nohpxinit FALSE)
     # set properties of generated shared library
     if(HPX_LIBRARY_VERSION AND HPX_SOVERSION)
