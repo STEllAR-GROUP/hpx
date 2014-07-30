@@ -68,11 +68,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \endcond
     }
 
-    /// Copies the elements in the range, defined by [first, last), to another
-    /// range ending at dest_last. The elements are copied in reverse order
+    /// Copies the elements in the range, defined by \a [first, last), to another
+    /// range ending at \a dest_last. The elements are copied in reverse order
     /// (the last element is copied first), but their relative order is
     /// preserved.
-    /// The behavior is undefined if dest_last is within (first, last]. \a copy
+    /// The behavior is undefined if \a dest_last is within \a (first, last]. \a copy
     /// must be used instead of \a copy_backward in that case.
     ///
     /// \note   Complexity: Performs exactly \a last - \a first assignments.
