@@ -7,7 +7,7 @@ find_package(OpenMP)
 
 set(jacobi_smp_applications)
 
-if(WITH_CXX11_LAMBDAS)
+if(HPX_WITH_CXX11_LAMBDAS)
   set(jacobi_smp_applications ${jacobi_smp_applications}
       jacobi_hpx
       jacobi_nonuniform_hpx)

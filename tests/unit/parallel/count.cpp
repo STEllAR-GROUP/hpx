@@ -32,7 +32,7 @@ void test_count(ExPolicy const& policy, IteratorTag)
     boost::int64_t num_items = hpx::parallel::count(policy,
         iterator(boost::begin(c)), iterator(boost::end(c)), (std::size_t)0);
 
-    HPX_TEST_EQ(num_items, find_count);
+    HPX_TEST_EQ(num_items, static_cast<boost::int64_t>(find_count));
 
 }
 
@@ -57,7 +57,7 @@ void test_count(hpx::parallel::task_execution_policy, IteratorTag)
             iterator(boost::begin(c)), iterator(boost::end(c)),
             (std::size_t)0);
 
-    HPX_TEST_EQ(find_count, f.get());
+    HPX_TEST_EQ(static_cast<boost::int64_t>(find_count), f.get());
 }
 
 template <typename IteratorTag>

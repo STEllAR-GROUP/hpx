@@ -30,7 +30,7 @@ set(tests ${tests}
     dataflow_future_swap
     dataflow_791
    )
- if(WITH_CXX11_LAMBDAS)
+ if(HPX_WITH_CXX11_LAMBDAS)
   set(tests ${tests}
       dataflow_const_functor_773
       dataflow_future_swap2
@@ -49,7 +49,7 @@ set(lifetime_588_1_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 
 set(set_hpx_limit_771_FLAGS DEPENDENCIES dataflow_component)
 
-if(WITH_CXX11_LAMBDAS)
+if(HPX_WITH_CXX11_LAMBDAS)
   set(future_hang_on_wait_with_callback_629_PARAMETERS THREADS_PER_LOCALITY 4)
   set(tests
     ${tests}
