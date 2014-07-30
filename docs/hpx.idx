@@ -66,7 +66,7 @@ parallel::none_of                     "none_of" "hpx\.parallel\.v1\.none_of.*"
 parallel::copy                        "copy" "hpx\.parallel\.v1\.copy_id.*"
 parallel::copy_n                      "copy_n" "hpx\.parallel\.v1\.copy_n.*"
 
-# hpx/parallel/detail/copy.hpp
+# hpx/parallel/detail/count.hpp
 parallel::count                       "count" "hpx\.parallel\.v1\.count$.*"
 parallel::count_if                    "count_if" "hpx\.parallel\.v1\.count_if.*"
 

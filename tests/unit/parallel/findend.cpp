@@ -73,12 +73,12 @@ void test_find_end1()
     test_find_end1(par_vec, IteratorTag());
     test_find_end1(task, IteratorTag());
 
-    
+
     test_find_end1(execution_policy(seq), IteratorTag());
     test_find_end1(execution_policy(par), IteratorTag());
     test_find_end1(execution_policy(par_vec), IteratorTag());
     test_find_end1(execution_policy(task), IteratorTag());
-    
+
 }
 
 void find_end_test1()
@@ -153,7 +153,7 @@ void test_find_end2()
     test_find_end2(par_vec, IteratorTag());
     test_find_end2(task, IteratorTag());
 
-    
+
     test_find_end2(execution_policy(seq), IteratorTag());
     test_find_end2(execution_policy(par), IteratorTag());
     test_find_end2(execution_policy(par_vec), IteratorTag());
@@ -229,7 +229,7 @@ void test_find_end3()
     test_find_end3(par_vec, IteratorTag());
     test_find_end3(task, IteratorTag());
 
-    
+
     test_find_end3(execution_policy(seq), IteratorTag());
     test_find_end3(execution_policy(par), IteratorTag());
     test_find_end3(execution_policy(par_vec), IteratorTag());
@@ -261,7 +261,7 @@ void test_find_end4(ExPolicy const& policy, IteratorTag)
 
     iterator index = hpx::parallel::find_end(policy,
         iterator(boost::begin(c)), iterator(boost::end(c)),
-        boost::begin(h), boost::end(h), 
+        boost::begin(h), boost::end(h),
         [](std::size_t v1, std::size_t v2) {
             return !(v1 != v2);
         });
@@ -298,7 +298,7 @@ void test_find_end4(hpx::parallel::task_execution_policy, IteratorTag)
     //create iterator at position of value to be found
     base_iterator test_index = boost::begin(c) + c.size()/2;
 
-    HPX_TEST(f.get() == iterator(test_index));    
+    HPX_TEST(f.get() == iterator(test_index));
 }
 
 template <typename IteratorTag>
@@ -310,7 +310,7 @@ void test_find_end4()
     test_find_end4(par_vec, IteratorTag());
     test_find_end4(task, IteratorTag());
 
-    
+
     test_find_end4(execution_policy(seq), IteratorTag());
     test_find_end4(execution_policy(par), IteratorTag());
     test_find_end4(execution_policy(par_vec), IteratorTag());
@@ -345,7 +345,7 @@ void test_find_end_exception(ExPolicy const& policy, IteratorTag)
             decorated_iterator(
                 boost::begin(c),
                 [](){ throw std::runtime_error("test"); }),
-            decorated_iterator(boost::end(c), [](){}),
+            decorated_iterator(boost::end(c)),
             boost::begin(h), boost::end(h));
         HPX_TEST(false);
     }
@@ -380,7 +380,7 @@ void test_find_end_exception(hpx::parallel::task_execution_policy, IteratorTag)
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::runtime_error("test"); }),
-                decorated_iterator(boost::end(c), [](){}),
+                decorated_iterator(boost::end(c)),
                 boost::begin(h), boost::end(h));
         f.get();
 
@@ -443,7 +443,7 @@ void test_find_end_bad_alloc(ExPolicy const& policy, IteratorTag)
             decorated_iterator(
                 boost::begin(c),
                 [](){ throw std::bad_alloc(); }),
-            decorated_iterator(boost::end(c), [](){}),
+            decorated_iterator(boost::end(c)),
             boost::begin(h), boost::end(h));
         HPX_TEST(false);
     }
@@ -477,7 +477,7 @@ void test_find_end_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::bad_alloc(); }),
-                decorated_iterator(boost::end(c), [](){}),
+                decorated_iterator(boost::end(c)),
                 boost::begin(h), boost::end(h));
 
         f.get();
@@ -512,10 +512,10 @@ void test_find_end_bad_alloc()
 
 void find_end_bad_alloc_test()
 {
- 
+
     test_find_end_bad_alloc<std::random_access_iterator_tag>();
     test_find_end_bad_alloc<std::forward_iterator_tag>();
-  
+
 }
 
 int hpx_main()

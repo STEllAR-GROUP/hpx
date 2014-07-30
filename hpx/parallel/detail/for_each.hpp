@@ -53,7 +53,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             parallel(ExPolicy const& policy, Iter first, std::size_t count,
                 F && f)
             {
-                if (count > 0)
+                if (count != 0)
                 {
                     return util::foreach_n_partitioner<ExPolicy>::call(
                         policy, first, count,
