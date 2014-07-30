@@ -32,6 +32,16 @@ macro(create_cmake_test name hpx_dir)
   add_hpx_pseudo_target(${name})
   add_hpx_pseudo_dependencies(${name} ${name}.make_compile)
 
+  if(MSVC)
+    set_target_properties(${name}.remove_build_dir PROPERTIES
+      FOLDER "Tests/Unit/Build")
+    set_target_properties(${name}.make_build_dir PROPERTIES
+      FOLDER "Tests/Unit/Build")
+    set_target_properties(${name}.make_configure PROPERTIES
+      FOLDER "Tests/Unit/Build")
+    set_target_properties(${name}.make_compile PROPERTIES
+      FOLDER "Tests/Unit/Build")
+  endif()
   add_hpx_unit_test(
     "build" ${name}
     EXECUTABLE "${build_dir}/test"
