@@ -30,7 +30,7 @@ set(subdirs
     throttle
    )
 
- if(WITH_CXX11_LAMBDAS)
+ if(HPX_WITH_CXX11_LAMBDAS)
   set(subdirs ${subdirs}
      1d_stencil
      diskperf

@@ -100,77 +100,77 @@ endmacro()
 
 ###############################################################################
 macro(hpx_check_for_cxx11_rvalue_references)
-  add_hpx_config_test(WITH_CXX11_RVALUE_REFERENCES
+  add_hpx_config_test(HPX_WITH_CXX11_RVALUE_REFERENCES
     SOURCE cmake/tests/cxx11_rvalue_references.cpp
     FILE ${ARGN})
 endmacro()
 
 ###############################################################################
 macro(hpx_check_for_cxx11_variadic_templates)
-  add_hpx_config_test(WITH_CXX11_VARIADIC_TEMPLATES
+  add_hpx_config_test(HPX_WITH_CXX11_VARIADIC_TEMPLATES
     SOURCE cmake/tests/cxx11_variadic_templates.cpp
     FILE ${ARGN})
 endmacro()
 
 ###############################################################################
 macro(hpx_check_for_cxx11_lambdas)
-  add_hpx_config_test(WITH_CXX11_LAMBDAS
+  add_hpx_config_test(HPX_WITH_CXX11_LAMBDAS
     SOURCE cmake/tests/cxx11_lambdas.cpp
     FILE ${ARGN})
 endmacro()
 
 ###############################################################################
 macro(hpx_check_for_cxx11_auto)
-  add_hpx_config_test(WITH_CXX11_AUTO
+  add_hpx_config_test(HPX_WITH_CXX11_AUTO
     SOURCE cmake/tests/cxx11_auto.cpp
     FILE ${ARGN})
 endmacro()
 
 ###############################################################################
 macro(hpx_check_for_cxx11_decltype)
-  add_hpx_config_test(WITH_CXX11_DECLTYPE
+  add_hpx_config_test(HPX_WITH_CXX11_DECLTYPE
     SOURCE cmake/tests/cxx11_decltype.cpp
     FILE ${ARGN})
 endmacro()
 
 ###############################################################################
 macro(hpx_check_for_cxx11_alias_templates)
-  add_hpx_config_test(WITH_CXX11_ALIAS_TEMPLATES
+  add_hpx_config_test(HPX_WITH_CXX11_ALIAS_TEMPLATES
     SOURCE cmake/tests/cxx11_alias_templates.cpp
     FILE ${ARGN})
 endmacro()
 
 ###############################################################################
 macro(hpx_check_for_cxx11_defaulted_deleted_functions)
-  add_hpx_config_test(WITH_CXX11_DEFAULTED_DELETED_FUNCTIONS
+  add_hpx_config_test(HPX_WITH_CXX11_DEFAULTED_DELETED_FUNCTIONS
     SOURCE cmake/tests/cxx11_defaulted_deleted_functions.cpp
     FILE ${ARGN})
 endmacro()
 
 ###############################################################################
 macro(hpx_check_for_cxx11_std_unique_ptr)
-  add_hpx_config_test(WITH_CXX11_UNIQUE_PTR
+  add_hpx_config_test(HPX_WITH_CXX11_UNIQUE_PTR
     SOURCE cmake/tests/cxx11_std_unique_ptr.cpp
     FILE ${ARGN})
 endmacro()
 
 ###############################################################################
 macro(hpx_check_for_cxx11_std_tuple)
-  add_hpx_config_test(WITH_CXX11_STD_TUPLE
+  add_hpx_config_test(HPX_WITH_CXX11_STD_TUPLE
     SOURCE cmake/tests/cxx11_std_tuple.cpp
     FILE ${ARGN})
 endmacro()
 
 ###############################################################################
 macro(hpx_check_for_cxx11_std_function)
-  add_hpx_config_test(WITH_CXX11_STD_FUNCTION
+  add_hpx_config_test(HPX_WITH_CXX11_STD_FUNCTION
     SOURCE cmake/tests/cxx11_std_function.cpp
     FILE ${ARGN})
 endmacro()
 
 ###############################################################################
 macro(hpx_check_for_cxx11_std_initializer_list)
-  add_hpx_config_test(WITH_CXX11_STD_INITIALIZER_LIST
+  add_hpx_config_test(HPX_WITH_CXX11_STD_INITIALIZER_LIST
     SOURCE cmake/tests/cxx11_std_initializer_list.cpp
     FILE ${ARGN})
 endmacro()

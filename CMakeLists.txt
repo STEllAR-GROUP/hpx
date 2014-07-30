@@ -702,18 +702,18 @@ hpx_add_compile_flag(-DBOOST_DISABLE_ASSERTS
 if(NOT MSVC)
   #set(_cxx11_support FALSE)
   # Try -std=c++11 first
-  check_cxx_compiler_flag(-std=c++11 WITH_CXX11)
+  check_cxx_compiler_flag(-std=c++11 HPX_WITH_CXX11)
   # ... If it failed try -std=c++0x
-  if(NOT WITH_CXX11)
-    check_cxx_compiler_flag(-std=c++0x WITH_CXX0X)
-    if(WITH_CXX0X)
+  if(NOT HPX_WITH_CXX11)
+    check_cxx_compiler_flag(-std=c++0x HPX_WITH_CXX0X)
+    if(HPX_WITH_CXX0X)
       set(CXX11_FLAG -std=c++0x)
-      set(WITH_CXX11 TRUE)
+      set(HPX_WITH_CXX11 TRUE)
     endif()
   else()
     set(CXX11_FLAG -std=c++11)
   endif()
-  if(NOT WITH_CXX11)
+  if(NOT HPX_WITH_CXX11)
     hpx_error("Unable to compile HPX without C++11 support in your compiler. HPX needs at the very least rvalue references with proper move semantics")
   endif()
   hpx_add_compile_flag(${CXX11_FLAG})
@@ -964,7 +964,7 @@ endif()
 
 hpx_check_for_cxx11_rvalue_references()
 
-if(NOT WITH_CXX11_RVALUE_REFERENCES)
+if(NOT HPX_WITH_CXX11_RVALUE_REFERENCES)
   hpx_error("HPX needs support for C++11 rvalue references")
 endif()
 
@@ -1008,7 +1008,7 @@ hpx_check_for_cxx11_std_initializer_list(
 # with incompatible options with the currently selected platform.
 #
 
-if(WITH_GENERIC_COROUTINE_CONTEXT)
+if(HPX_GENERIC_COROUTINE_CONTEXT)
   # Check if we can use generic coroutine contexts without any problems
   if(NOT Boost_CONTEXT_FOUND)
     hpx_error("The usage of Boost.Context was selected but Boost.Context was not found (Version 1.51 or higher is required).")
@@ -1037,7 +1037,7 @@ if(MSVC)
 endif()
 
 if(HPX_UNIQUE_FUTURE_ALIAS)
-  if(NOT WITH_CXX11_ALIAS_TEMPLATES)
+  if(NOT HPX_WITH_CXX11_ALIAS_TEMPLATES)
     hpx_error("template aliases are not available for this compiler. Can't create a unique_future<R> alias. Please set HPX_UNIQUE_FUTURE_ALIAS to OFF or use a modern compiler")
   endif()
   hpx_add_config_define(HPX_UNIQUE_FUTURE_ALIAS)

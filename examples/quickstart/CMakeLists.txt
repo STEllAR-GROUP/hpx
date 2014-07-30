@@ -42,7 +42,7 @@ if(HPX_LOCAL_SCHEDULER OR HPX_ALL_SCHEDULERS)
      )
 endif()
 
-if(WITH_CXX11_LAMBDAS)
+if(HPX_WITH_CXX11_LAMBDAS)
   set(example_programs ${example_programs}
       1d_wave_equation
       hello_world
