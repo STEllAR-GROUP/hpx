@@ -66,7 +66,10 @@ parallel::none_of                     "none_of" "hpx\.parallel\.v1\.none_of.*"
 parallel::copy                        "copy" "hpx\.parallel\.v1\.copy_id.*"
 parallel::copy_n                      "copy_n" "hpx\.parallel\.v1\.copy_n.*"
 
-# hpx/parallel/detail/copy.hpp
+# hpx/parallel/detail/copy_backward.hpp
+parallel::copy_backward               "copy_backward" "hpx\.parallel\.v1\.copy_backward.*"
+
+# hpx/parallel/detail/count.hpp
 parallel::count                       "count" "hpx\.parallel\.v1\.count$.*"
 parallel::count_if                    "count_if" "hpx\.parallel\.v1\.count_if.*"
 
@@ -83,6 +86,9 @@ parallel::for_each_n                  "for_each_n" "hpx\.parallel\.v1\.for_each_
 
 # hpx/parallel/detail/move.hpp
 parallel::move                        "move" "hpx\.parallel\.v1\.move$"
+
+# hpx/parallel/detail/move_backward.hpp
+parallel::move_backward               "move_backward" "hpx\.parallel\.v1\.move_backward.*"
 
 # hpx/parallel/detail/reduce.hpp
 parallel::reduce                      "reduce" "hpx\.parallel\.v1\.reduce.*"

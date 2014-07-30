@@ -98,7 +98,7 @@ void test_fill_exception(ExPolicy const& policy, IteratorTag)
             decorated_iterator(
                 boost::begin(c),
                 [](){ throw std::runtime_error("test"); }),
-            decorated_iterator(boost::end(c), [](){}),
+            decorated_iterator(boost::end(c)),
             10);
         HPX_TEST(false);
     }
@@ -130,7 +130,7 @@ void test_fill_exception(hpx::parallel::task_execution_policy, IteratorTag)
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::runtime_error("test"); }),
-                decorated_iterator(boost::end(c), [](){}),
+                decorated_iterator(boost::end(c)),
                 10);
         f.get();
 
@@ -190,7 +190,7 @@ void test_fill_bad_alloc(ExPolicy const& policy, IteratorTag)
             decorated_iterator(
                 boost::begin(c),
                 [](){ throw std::bad_alloc(); }),
-            decorated_iterator(boost::end(c), [](){}),
+            decorated_iterator(boost::end(c)),
             10);
         HPX_TEST(false);
     }
@@ -221,7 +221,7 @@ void test_fill_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::bad_alloc(); }),
-                decorated_iterator(boost::end(c), [](){}),
+                decorated_iterator(boost::end(c)),
                 10);
 
         f.get();
