@@ -201,7 +201,7 @@ namespace archive {
 namespace hpx { namespace util
 {
     // explicitly instantiate base primitive
-    template class HPX_ALWAYS_EXPORT basic_binary_oprimitive<
+    template class basic_binary_oprimitive<
         hpx::util::portable_binary_oarchive
     >;
 }}

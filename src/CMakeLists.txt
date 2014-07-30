@@ -206,14 +206,12 @@ if(NOT HPX_STATIC_LINKING)
   set(hpx_serialization_lib_dependencies
     ${hpx_MALLOC_LIBRARY})
 
-  if(NOT MSVC)
-    set(hpx_serialization_lib_dependencies
-        ${hpx_serialization_lib_dependencies}
-        debug ${Boost_SYSTEM_LIBRARY_DEBUG}
-        optimized ${Boost_SYSTEM_LIBRARY_RELEASE}
-        debug ${Boost_SERIALIZATION_LIBRARY_DEBUG}
-        optimized ${Boost_SERIALIZATION_LIBRARY_DEBUG})
-  endif()
+  set(hpx_serialization_lib_dependencies
+      ${hpx_serialization_lib_dependencies}
+      debug ${Boost_SYSTEM_LIBRARY_DEBUG}
+      optimized ${Boost_SYSTEM_LIBRARY_RELEASE}
+      debug ${Boost_SERIALIZATION_LIBRARY_DEBUG}
+      optimized ${Boost_SERIALIZATION_LIBRARY_DEBUG})
 
   target_link_libraries(hpx_serialization
     ${hpx_serialization_lib_dependencies})
