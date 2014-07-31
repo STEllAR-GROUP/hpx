@@ -949,12 +949,12 @@ else()
   # rdtsc is an x86 instruction that reads the value of a CPU time stamp
   # counter. rdtscp is an extension to rdtsc. The difference is that rdtscp is
   # a serializing instruction.
-  hpx_cpuid("rdtsc" WITH_RDTSC
+  hpx_cpuid("rdtsc" HPX_WITH_RDTSC
     DEFINITIONS HPX_HAVE_RDTSC)
-  hpx_cpuid("rdtscp" WITH_RDTSCP
+  hpx_cpuid("rdtscp" HPX_WITH_RDTSCP
     DEFINITIONS HPX_HAVE_RDTSCP)
 
-  if(NOT WITH_RDTSC AND NOT WITH_RDTSCP)
+  if(NOT HPX_WITH_RDTSC AND NOT HPX_WITH_RDTSCP)
     hpx_warn("Neither rdtsc nor rdtscp is available; some performance counters may report incorrect results")
   endif()
 endif()
