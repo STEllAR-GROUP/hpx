@@ -1018,7 +1018,7 @@ if(HPX_GENERIC_COROUTINE_CONTEXT)
       hpx_error("On BlueGene/Q, Boost.Context can only be used with a Boost >=1.56")
     endif()
   endif()
-  hpx_add_config_define(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
+  hpx_add_config_define(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
 endif()
 
 ################################################################################
