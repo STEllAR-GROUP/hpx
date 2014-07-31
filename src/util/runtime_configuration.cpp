@@ -86,10 +86,12 @@ namespace hpx { namespace util
             "location = ${HPX_LOCATION:$[system.prefix]}",
             "component_path = $[hpx.location]"
                 HPX_INI_PATH_DELIMITER "$[system.executable_prefix]",
-            "component_path_suffixes = /lib/hpx" HPX_INI_PATH_DELIMITER "/../lib/hpx",
-            "master_ini_path = $[hpx.location]/" HPX_BASE_DIR_NAME
-                HPX_INI_PATH_DELIMITER "$[system.executable_prefix]/" HPX_BASE_DIR_NAME,
-            "master_ini_path_suffixes = /share/" HPX_INI_PATH_DELIMITER "/../share/",
+            "component_path_suffixes = /lib/hpx" HPX_INI_PATH_DELIMITER
+                                      "/../lib/hpx",
+            "master_ini_path = $[hpx.location]" HPX_INI_PATH_DELIMITER
+                              "$[system.executable_prefix]/",
+            "master_ini_path_suffixes = /share/" HPX_BASE_DIR_NAME
+                HPX_INI_PATH_DELIMITER "/../share/" HPX_BASE_DIR_NAME,
 #ifdef HPX_HAVE_ITTNOTIFY
             "use_itt_notify = ${HPX_HAVE_ITTNOTIFY:0}",
 #endif

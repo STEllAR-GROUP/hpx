@@ -59,12 +59,15 @@ namespace hpx { namespace components
                 unique_component_name<component_registry>::call() + "]";
             fillini += "name = " HPX_COMPONENT_STRING;
 
-            if (filepath.empty()) {
-                fillini += std::string("path = ") +
-                    util::find_prefixes("/lib/hpx", HPX_COMPONENT_STRING);
-            }
-            else {
-                fillini += std::string("path = ") + filepath;
+            if(!is_static)
+            {
+                if (filepath.empty()) {
+                    fillini += std::string("path = ") +
+                        util::find_prefixes("/lib/hpx", HPX_COMPONENT_STRING);
+                }
+                else {
+                    fillini += std::string("path = ") + filepath;
+                }
             }
 
             switch (state) {

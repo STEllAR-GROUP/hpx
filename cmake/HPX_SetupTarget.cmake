@@ -95,16 +95,19 @@ function(hpx_setup_target target)
   endif()
   if("${_type}" STREQUAL "LIBRARY")
     set(nohpxinit FALSE)
-    if(HPX_LIBRARY_VERSION AND HPX_SOVERSION)
+    if(DEFINED HPX_LIBRARY_VERSION AND DEFINED HPX_SOVERSION)
       # set properties of generated shared library
-      set_property(TARGET ${target} PROPERTIES
-        # create *nix style library versions + symbolic links
+      set_target_properties(${target}
+        PROPERTIES
         VERSION ${HPX_LIBRARY_VERSION}
-        SOVERSION ${HPX_SOVERSION}
-        # allow creating static and shared libs without conflicts
-        CLEAN_DIRECT_OUTPUT 1
-        OUTPUT_NAME ${name})
+        SOVERSION ${HPX_SOVERSION})
     endif()
+    set_target_properties(${target}
+      PROPERTIES
+      # create *nix style library versions + symbolic links
+      # allow creating static and shared libs without conflicts
+      CLEAN_DIRECT_OUTPUT 1
+      OUTPUT_NAME ${name})
     if(target_PLUGIN)
       set(plugin_name "HPX_PLUGIN_NAME=${name}")
     endif()
@@ -115,18 +118,22 @@ function(hpx_setup_target target)
                    ${plugin_name})
 
   endif()
+
   if("${_type}" STREQUAL "COMPONENT")
     set(nohpxinit FALSE)
+    if(DEFINED HPX_LIBRARY_VERSION AND DEFINED HPX_SOVERSION)
     # set properties of generated shared library
-    if(HPX_LIBRARY_VERSION AND HPX_SOVERSION)
-      set_property(TARGET ${target} PROPERTIES
-        # create *nix style library versions + symbolic links
+      set_target_properties(${target}
+        PROPERTIES
         VERSION ${HPX_LIBRARY_VERSION}
-        SOVERSION ${HPX_SOVERSION}
-        # allow creating static and shared libs without conflicts
-        CLEAN_DIRECT_OUTPUT 1
-        OUTPUT_NAME ${name})
+        SOVERSION ${HPX_SOVERSION})
     endif()
+    set_target_properties(${target}
+      PROPERTIES
+      # create *nix style library versions + symbolic links
+      # allow creating static and shared libs without conflicts
+      CLEAN_DIRECT_OUTPUT 1
+      OUTPUT_NAME ${name})
 
     set_property(TARGET ${target} APPEND
                  PROPERTY COMPILE_DEFINITIONS
