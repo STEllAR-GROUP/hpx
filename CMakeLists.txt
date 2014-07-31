@@ -910,7 +910,9 @@ else()
   endif()
 
   # Check if our libraries have unresolved symbols
-  hpx_add_link_flag_if_available(-Wl,-z,defs)
+  if(NOT APPLE)
+    hpx_add_link_flag_if_available(-Wl,-z,defs)
+  endif()
 
   if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
     hpx_add_compile_flag_if_available(-Wno-deprecated-register CXX C)
