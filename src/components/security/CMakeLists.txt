@@ -11,8 +11,7 @@ if(HPX_WITH_SECURITY)
   add_hpx_component(security
     FOLDER "Core/Components"
     HEADER_ROOT ${root}
-    AUTOGLOB
-    ESSENTIAL)
+    AUTOGLOB)
 
   add_hpx_pseudo_dependencies(components.security
                               security_component)

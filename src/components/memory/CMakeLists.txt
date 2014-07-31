@@ -10,12 +10,6 @@ if(HPX_BUILD_DEFAULT_TARGETS)
   add_hpx_component(memory
     FOLDER "Core/Components"
     HEADER_ROOT ${root}
-    AUTOGLOB
-    ESSENTIAL)
-else()
-  add_hpx_component(memory
-    FOLDER "Core/Components"
-    HEADER_ROOT ${root}
     AUTOGLOB)
 endif()
 

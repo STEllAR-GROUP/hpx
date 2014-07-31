@@ -25,13 +25,7 @@ if(HPX_WITH_PAPI)
       HEADER_ROOT ${root}
       DEPENDENCIES ${PAPI_LIBRARIES}
       AUTOGLOB
-      ESSENTIAL)
-  else()
-    add_hpx_component(papi_counters
-      FOLDER "Core/Components"
-      HEADER_ROOT ${root}
-      DEPENDENCIES ${PAPI_LIBRARIES}
-      AUTOGLOB)
+      PLUGIN)
   endif()
 
   add_hpx_pseudo_dependencies(

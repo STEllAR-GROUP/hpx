@@ -117,6 +117,10 @@ macro(add_hpx_component name)
     )
   endif()
 
+  if(${name}_PLUGIN)
+    set(_target_flags ${_target_flags} PLUGIN)
+  endif()
+
   if(${${name}_STATIC})
     set(${name}_lib_linktype STATIC)
   else()
