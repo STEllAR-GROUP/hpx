@@ -6,9 +6,9 @@
 
 macro(add_hpx_library name)
   # retrieve arguments
-  set(options EXCLUDE_FROM_ALL NOLIBS AUTOGLOB STATIC)
+  set(options EXCLUDE_FROM_ALL NOLIBS AUTOGLOB STATIC PLUGIN)
   set(one_value_args FOLDER SOURCE_ROOT HEADER_ROOT SOURCE_GLOB HEADER_GLOB OUTPUT_SUFFIX INSTALL_SUFFIX)
-  set(multi_value_args SOURCES HEADERS DEPENDENCIES COMPONENT_DEPENDENCIES COMPILER__FLAGS LINK_FLAGS)
+  set(multi_value_args SOURCES HEADERS DEPENDENCIES COMPONENT_DEPENDENCIES COMPILER_FLAGS LINK_FLAGS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   if(NOT ${name}_SOURCE_ROOT)
