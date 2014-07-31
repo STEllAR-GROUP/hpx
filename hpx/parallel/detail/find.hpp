@@ -457,7 +457,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             sequential(ExPolicy const&, FwdIter first1, FwdIter last1,
                 FwdIter2 first2, FwdIter2 last2, Pred && op)
             {
-                return std::find_end(first1, last1, first2, last2, op);
+                if(first2 == last2)
+                    return last1;
+                FwdIter result = last1;
+                while(1) {
+                    FwdIter new_result = std::search(first1, last1, first2, last2, op);
+                    if (new_result == last1) {
+                        return result;
+                    } else {
+                        result = new_result;
+                        first1 = result;
+                        ++first1;
+                    }
+                }
+                return result;
             }
 
             template <typename ExPolicy, typename FwdIter2, typename Pred>
