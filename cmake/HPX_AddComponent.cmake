@@ -138,7 +138,7 @@ macro(add_hpx_component name)
 
   if(${name}_OUTPUT_SUFFIX)
     if(MSVC)
-      set_target_properties("${name}_lib" PROPERTIES
+      set_target_properties("${name}_component" PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/bin/Release/${${name}_OUTPUT_SUFFIX}"
         RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/bin/Debug/${${name}_OUTPUT_SUFFIX}"
         RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}/bin/MinSizeRel/${${name}_OUTPUT_SUFFIX}"
@@ -152,7 +152,7 @@ macro(add_hpx_component name)
         ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}/lib/MinSizeRel/${${name}_OUTPUT_SUFFIX}"
         ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/lib/RelWithDebInfo/${${name}_OUTPUT_SUFFIX}")
     else()
-      set_target_properties("${name}_lib" PROPERTIES
+      set_target_properties("${name}_component" PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${${name}_OUTPUT_SUFFIX}"
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/${${name}_OUTPUT_SUFFIX}"
         ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/${${name}_OUTPUT_SUFFIX}")
