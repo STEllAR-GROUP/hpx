@@ -431,7 +431,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
     // Always throw exit_exception.
     // Never returns from standard control flow.
-    BOOST_ATTRIBUTE_NORETURN void exit_self()
+    HPX_ATTRIBUTE_NORETURN void exit_self()
     {
       HPX_ASSERT(!pending());
       HPX_ASSERT(running());

@@ -35,7 +35,6 @@
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
-#include <boost/lambda/lambda.hpp>
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
 
@@ -451,9 +450,8 @@ namespace hpx { namespace parcelset
         bool result = resolver_.get_localities(allprefixes, type, ec);
         if (ec || !result) return false;
 
-        using boost::lambda::_1;
-        std::remove_copy_if(allprefixes.begin(), allprefixes.end(),
-            std::back_inserter(locality_ids), _1 == locality_);
+        std::remove_copy(allprefixes.begin(), allprefixes.end(),
+            std::back_inserter(locality_ids), locality_);
 
         return !locality_ids.empty();
     }

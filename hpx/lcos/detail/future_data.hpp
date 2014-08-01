@@ -598,7 +598,8 @@ namespace detail
         }
 
         // run in a separate thread
-        void apply(threads::thread_priority priority,
+        void apply(BOOST_SCOPED_ENUM(launch) policy,
+            threads::thread_priority priority,
             threads::thread_stacksize stacksize, error_code& ec)
         {
             check_started();
@@ -611,6 +612,13 @@ namespace detail
             if (sched_) {
                 sched_->add(util::bind(&task_base::run_impl, this_),
                     desc ? desc : "task_base::apply", threads::pending, false,
+                    stacksize, ec);
+            }
+            else if (policy == launch::fork) {
+                threads::register_thread_plain(
+                    util::bind(&task_base::run_impl, this_),
+                    desc ? desc : "task_base::apply", threads::pending, false,
+                    threads::thread_priority_boost, get_worker_thread_num(),
                     stacksize, ec);
             }
             else {

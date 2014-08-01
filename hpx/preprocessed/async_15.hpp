@@ -30,10 +30,16 @@ namespace hpx
             typedef typename boost::is_void<result_type>::type predicate;
             return detail::call_sync(std::forward<F>(f), predicate());
         }
-        lcos::local::futures_factory<result_type()> p(
-            std::forward<F>(f));
+        lcos::local::futures_factory<result_type()> p(std::forward<F>(f));
         if (detail::has_async_policy(policy))
-            p.apply();
+        {
+            p.apply(policy);
+            if (policy == launch::fork)
+            {
+                
+                hpx::this_thread::yield();
+            }
+        }
         return p.get_future();
     }
     template <typename F>
@@ -112,7 +118,14 @@ namespace hpx
                 std::forward<A0>( a0 )
             ));
         if (detail::has_async_policy(policy))
-            p.apply();
+        {
+            p.apply(policy);
+            if (policy == launch::fork)
+            {
+                
+                hpx::this_thread::yield();
+            }
+        }
         return p.get_future();
     }
     template <typename F, typename A0>
@@ -202,7 +215,14 @@ namespace hpx
                 std::forward<A0>( a0 ) , std::forward<A1>( a1 )
             ));
         if (detail::has_async_policy(policy))
-            p.apply();
+        {
+            p.apply(policy);
+            if (policy == launch::fork)
+            {
+                
+                hpx::this_thread::yield();
+            }
+        }
         return p.get_future();
     }
     template <typename F, typename A0 , typename A1>
@@ -292,7 +312,14 @@ namespace hpx
                 std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 )
             ));
         if (detail::has_async_policy(policy))
-            p.apply();
+        {
+            p.apply(policy);
+            if (policy == launch::fork)
+            {
+                
+                hpx::this_thread::yield();
+            }
+        }
         return p.get_future();
     }
     template <typename F, typename A0 , typename A1 , typename A2>
@@ -382,7 +409,14 @@ namespace hpx
                 std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 )
             ));
         if (detail::has_async_policy(policy))
-            p.apply();
+        {
+            p.apply(policy);
+            if (policy == launch::fork)
+            {
+                
+                hpx::this_thread::yield();
+            }
+        }
         return p.get_future();
     }
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3>
@@ -472,7 +506,14 @@ namespace hpx
                 std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 )
             ));
         if (detail::has_async_policy(policy))
-            p.apply();
+        {
+            p.apply(policy);
+            if (policy == launch::fork)
+            {
+                
+                hpx::this_thread::yield();
+            }
+        }
         return p.get_future();
     }
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
@@ -562,7 +603,14 @@ namespace hpx
                 std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 )
             ));
         if (detail::has_async_policy(policy))
-            p.apply();
+        {
+            p.apply(policy);
+            if (policy == launch::fork)
+            {
+                
+                hpx::this_thread::yield();
+            }
+        }
         return p.get_future();
     }
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
@@ -652,7 +700,14 @@ namespace hpx
                 std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 )
             ));
         if (detail::has_async_policy(policy))
-            p.apply();
+        {
+            p.apply(policy);
+            if (policy == launch::fork)
+            {
+                
+                hpx::this_thread::yield();
+            }
+        }
         return p.get_future();
     }
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
@@ -742,7 +797,14 @@ namespace hpx
                 std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 )
             ));
         if (detail::has_async_policy(policy))
-            p.apply();
+        {
+            p.apply(policy);
+            if (policy == launch::fork)
+            {
+                
+                hpx::this_thread::yield();
+            }
+        }
         return p.get_future();
     }
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
@@ -832,7 +894,14 @@ namespace hpx
                 std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 )
             ));
         if (detail::has_async_policy(policy))
-            p.apply();
+        {
+            p.apply(policy);
+            if (policy == launch::fork)
+            {
+                
+                hpx::this_thread::yield();
+            }
+        }
         return p.get_future();
     }
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
@@ -922,7 +991,14 @@ namespace hpx
                 std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 ) , std::forward<A9>( a9 )
             ));
         if (detail::has_async_policy(policy))
-            p.apply();
+        {
+            p.apply(policy);
+            if (policy == launch::fork)
+            {
+                
+                hpx::this_thread::yield();
+            }
+        }
         return p.get_future();
     }
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
@@ -1012,7 +1088,14 @@ namespace hpx
                 std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 ) , std::forward<A9>( a9 ) , std::forward<A10>( a10 )
             ));
         if (detail::has_async_policy(policy))
-            p.apply();
+        {
+            p.apply(policy);
+            if (policy == launch::fork)
+            {
+                
+                hpx::this_thread::yield();
+            }
+        }
         return p.get_future();
     }
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10>
@@ -1102,7 +1185,14 @@ namespace hpx
                 std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 ) , std::forward<A9>( a9 ) , std::forward<A10>( a10 ) , std::forward<A11>( a11 )
             ));
         if (detail::has_async_policy(policy))
-            p.apply();
+        {
+            p.apply(policy);
+            if (policy == launch::fork)
+            {
+                
+                hpx::this_thread::yield();
+            }
+        }
         return p.get_future();
     }
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11>
@@ -1192,7 +1282,14 @@ namespace hpx
                 std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 ) , std::forward<A9>( a9 ) , std::forward<A10>( a10 ) , std::forward<A11>( a11 ) , std::forward<A12>( a12 )
             ));
         if (detail::has_async_policy(policy))
-            p.apply();
+        {
+            p.apply(policy);
+            if (policy == launch::fork)
+            {
+                
+                hpx::this_thread::yield();
+            }
+        }
         return p.get_future();
     }
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12>
@@ -1282,7 +1379,14 @@ namespace hpx
                 std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 ) , std::forward<A9>( a9 ) , std::forward<A10>( a10 ) , std::forward<A11>( a11 ) , std::forward<A12>( a12 ) , std::forward<A13>( a13 )
             ));
         if (detail::has_async_policy(policy))
-            p.apply();
+        {
+            p.apply(policy);
+            if (policy == launch::fork)
+            {
+                
+                hpx::this_thread::yield();
+            }
+        }
         return p.get_future();
     }
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13>
@@ -1372,7 +1476,14 @@ namespace hpx
                 std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 ) , std::forward<A9>( a9 ) , std::forward<A10>( a10 ) , std::forward<A11>( a11 ) , std::forward<A12>( a12 ) , std::forward<A13>( a13 ) , std::forward<A14>( a14 )
             ));
         if (detail::has_async_policy(policy))
-            p.apply();
+        {
+            p.apply(policy);
+            if (policy == launch::fork)
+            {
+                
+                hpx::this_thread::yield();
+            }
+        }
         return p.get_future();
     }
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14>

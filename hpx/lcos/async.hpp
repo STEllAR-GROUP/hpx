@@ -29,8 +29,7 @@ namespace hpx
         BOOST_FORCEINLINE bool has_async_policy(BOOST_SCOPED_ENUM(launch) policy)
         {
             return (static_cast<int>(policy) &
-                (static_cast<int>(launch::async)|static_cast<int>(launch::task))) ?
-                    true : false;
+                static_cast<int>(launch::async_policies)) ? true : false;
         }
 
         template <typename Action, typename Result>
