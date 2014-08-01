@@ -44,6 +44,7 @@ foreach(benchmark ${benchmarks})
                      SOURCES ${sources}
                      ${${benchmark}_FLAGS}
                      EXCLUDE_FROM_ALL
+                     HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Benchmarks/HTTS v2/${benchmark}")
 
   # add a custom target for this example

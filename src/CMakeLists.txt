@@ -292,14 +292,21 @@ if(NOT HPX_STATIC_LINKING)
       ${hpx_init_SOURCES} ${hpx_init_HEADERS})
   endif()
 
+  set(_prefix ${HPX_PREFIX})
+  if(MSVC)
+    string(REPLACE ";" ":" _prefix "${_prefix}")
+  endif()
+
   set_property(TARGET hpx_init APPEND
     PROPERTY COMPILE_DEFINITIONS
     "HPX_APPLICATION_EXPORTS"
     "HPX_LIMIT=5"
+    "HPX_PREFIX=\"${_prefix}\""
     "HPX_ENABLE_ASSERT_HANDLER")
 
   set_property(TARGET hpx_init PROPERTY FOLDER "Core")
   set(hpx_targets ${hpx_targets} hpx_init)
+else()
 endif()
 
 set(_optional)

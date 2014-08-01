@@ -367,12 +367,6 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// This defines the default installation location, should be set by build system
-#if !defined(HPX_PREFIX)
-#  define HPX_PREFIX "."
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 // This defines the maximum number of connect retries to the AGAS service
 // allowing for some leeway during startup of the localities
 #if !defined(HPX_MAX_NETWORK_RETRIES)

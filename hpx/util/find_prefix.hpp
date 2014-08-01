@@ -14,6 +14,7 @@
 
 namespace hpx { namespace util
 {
+    HPX_EXPORT const char * hpx_prefix(const char * prefix);
     // return the installation path of the specified module
     HPX_EXPORT std::string find_prefix(std::string library = "hpx");
 

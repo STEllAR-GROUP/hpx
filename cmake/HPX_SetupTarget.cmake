@@ -8,7 +8,7 @@
 function(hpx_setup_target target)
   # retrieve arguments
   set(options EXPORT NOHPX_INIT INSTALL NOLIBS PLUGIN)
-  set(one_value_args TYPE FOLDER NAME SOVERSION VERSION)
+  set(one_value_args TYPE FOLDER NAME SOVERSION VERSION HPX_PREFIX)
   set(multi_value_args DEPENDENCIES COMPONENT_DEPENDENCIES COMPILE_FLAGS LINK_FLAGS INSTALL_FLAGS)
   cmake_parse_arguments(target "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
@@ -87,10 +87,20 @@ function(hpx_setup_target target)
   endif()
 
   if("${_type}" STREQUAL "EXECUTABLE")
+    if(target_HPX_PREFIX)
+      set(_prefix ${target_HPX_PREFIX})
+    else()
+      set(_prefix ${HPX_PREFIX})
+    endif()
+
+    if(MSVC)
+      string(REPLACE ";" ":" _prefix "${_prefix}")
+    endif()
     set_property(TARGET ${target} APPEND
                  PROPERTY COMPILE_DEFINITIONS
                  "HPX_APPLICATION_NAME=${name}"
                  "HPX_APPLICATION_STRING=\"${name}\""
+                 "HPX_PREFIX=\"${_prefix}\""
                  "HPX_APPLICATION_EXPORTS")
   endif()
   if("${_type}" STREQUAL "LIBRARY")

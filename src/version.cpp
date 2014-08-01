@@ -10,6 +10,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/find_prefix.hpp>
 
 #include <boost/config.hpp>
 #include <boost/version.hpp>
@@ -219,7 +220,7 @@ namespace hpx
              << HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE << "\n";
 #endif
 
-        strm << "  HPX_PREFIX=" << HPX_PREFIX << "\n";
+        strm << "  HPX_PREFIX=" << util::hpx_prefix(0) << "\n";
 
         return util::osstream_get_string(strm);
     }

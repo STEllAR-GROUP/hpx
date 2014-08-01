@@ -20,6 +20,7 @@
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime_impl.hpp>
+#include <hpx/util/find_prefix.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/function.hpp>
@@ -1111,6 +1112,7 @@ namespace hpx
         startup_function_type const& startup,
         shutdown_function_type const& shutdown, hpx::runtime_mode mode)
     {
+        HPX_ASSERT(util::hpx_prefix(0));
         return run_or_start(f, desc_cmdline, argc, argv, ini_config,
             startup, shutdown, mode, true);
     }

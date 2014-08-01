@@ -1053,10 +1053,12 @@ endif()
 ################################################################################
 if(${HPX_PLATFORM_UC} STREQUAL "ANDROID")
   set(HPX_PREFIX "lib")
+  set(HPX_BUILD_PREFIX "lib")
 else()
   set(HPX_PREFIX "${CMAKE_INSTALL_PREFIX}")
+  set(HPX_BUILD_PREFIX "${CMAKE_BINARY_DIR}")
 endif()
-hpx_add_config_define(HPX_PREFIX "\"${HPX_PREFIX}\"")
+
 
 # ################################################################################
 # # search path configuration
@@ -1191,12 +1193,7 @@ list(REMOVE_DUPLICATES HPX_CONFIG_DEFINITIONS)
 
 set(hpx_config_defines "\n")
 foreach(def ${HPX_CONFIG_DEFINITIONS})
-    if("${def}" STREQUAL "HPX_PREFIX" AND NOT MSVC)
-      string(REPLACE ";" ":" define "${${def}_define}")
-      set(hpx_config_defines "${hpx_config_defines}#define ${def} ${define}\n")#"
-    else()
-      set(hpx_config_defines "${hpx_config_defines}#define ${def} ${${def}_define}\n")#"
-    endif()
+    set(hpx_config_defines "${hpx_config_defines}#define ${def} ${${def}_define}\n")#"
 endforeach()
 
 configure_file("${hpx_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"

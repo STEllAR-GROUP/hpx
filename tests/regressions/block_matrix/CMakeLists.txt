@@ -19,6 +19,7 @@ if(HPX_WITH_CXX11_AUTO AND HPX_WITH_CXX11_STD_INITIALIZER_LIST AND
                      SOURCES ${sources}
                      ${block_matrix_FLAGS}
                      EXCLUDE_FROM_ALL
+                     HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Tests/Regressions/Block-Matrix")
 
   add_hpx_regression_test("block_matrix" block_matrix ${block_matrix_PARAMETERS})

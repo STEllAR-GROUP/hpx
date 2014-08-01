@@ -23,6 +23,7 @@ foreach(benchmark ${benchmarks})
                      ${${benchmark}_FLAGS}
                      COMPONENT_DEPENDENCIES iostreams
                      EXCLUDE_FROM_ALL
+                     HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Benchmarks/Network/${benchmark}")
 
   # add a custom target for this example
