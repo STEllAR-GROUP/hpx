@@ -1,80 +1,91 @@
-//  Copyright (c) 2014 Grant Mercer
+//  copyright (c) 2014 Grant Mercer
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/parallel_count.hpp>
+#include <hpx/include/algorithm.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_count_if(ExPolicy const& policy, IteratorTag)
+void test_generate_n(ExPolicy const& policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(100007);
-    std::iota(boost::begin(c), boost::begin(c) + 50, 0);
-    std::iota(boost::begin(c) + 50, boost::end(c), std::rand() + 50);
+    std::vector<std::size_t> c(10007);
+    
+    auto gen = [](){ return std::size_t(10); };
 
-    std::size_t num_items = hpx::parallel::count_if(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)),
-        [](std::size_t x) { return x < 50; });
+    hpx::parallel::generate_n(policy,
+        iterator(boost::begin(c)), c.size(), gen);
 
-    HPX_TEST_EQ(num_items, 50u);
+    // verify values
+    std::size_t count = 0;
+    std::for_each(boost::begin(c), boost::end(c),
+        [&count](std::size_t v) {
+            HPX_TEST_EQ(v, std::size_t(10));
+            ++count;
+        });
+    HPX_TEST_EQ(count, c.size());
 }
 
 template <typename IteratorTag>
-void test_count_if(hpx::parallel::task_execution_policy, IteratorTag)
+void test_generate_n(hpx::parallel::task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::begin(c) + 50, 0);
-    std::iota(boost::begin(c) + 50, boost::end(c), std::rand() + 50);
+    
+    auto gen = [](){ return std::size_t(10); };
 
-    hpx::future<boost::int64_t> f =
-        hpx::parallel::count_if(hpx::parallel::task,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
-            [](std::size_t x) { return x < 50; });
+    hpx::future<iterator> f =
+        hpx::parallel::generate_n(hpx::parallel::task,
+            iterator(boost::begin(c)), c.size(),
+            gen);
+    f.wait();
 
-    HPX_TEST_EQ(f.get(), 50);
-
+    std::size_t count =0;
+    std::for_each(boost::begin(c), boost::end(c),
+        [&count](std::size_t v) {
+            HPX_TEST_EQ(v, std::size_t(10));
+            ++count;
+    });
+    HPX_TEST_EQ(count, c.size());
 }
 
 template <typename IteratorTag>
-void test_count_if()
+void test_generate_n()
 {
     using namespace hpx::parallel;
-    test_count_if(seq, IteratorTag());
-    test_count_if(par, IteratorTag());
-    test_count_if(par_vec, IteratorTag());
-    test_count_if(task, IteratorTag());
+    test_generate_n(seq, IteratorTag());
+    test_generate_n(par, IteratorTag());
+    test_generate_n(par_vec, IteratorTag());
+    test_generate_n(task, IteratorTag());
 
-    test_count_if(execution_policy(seq), IteratorTag());
-    test_count_if(execution_policy(par), IteratorTag());
-    test_count_if(execution_policy(par_vec), IteratorTag());
-    test_count_if(execution_policy(task), IteratorTag());
+    test_generate_n(execution_policy(seq), IteratorTag());
+    test_generate_n(execution_policy(par), IteratorTag());
+    test_generate_n(execution_policy(par_vec), IteratorTag());
+    test_generate_n(execution_policy(task), IteratorTag());
 }
 
-void count_if_test()
+void generate_n_test()
 {
-    test_count_if<std::random_access_iterator_tag>();
-    test_count_if<std::forward_iterator_tag>();
-    test_count_if<std::input_iterator_tag>();
+    test_generate_n<std::random_access_iterator_tag>();
+    test_generate_n<std::forward_iterator_tag>();
+    test_generate_n<std::output_iterator_tag>();
 }
 
-
-////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_count_if_exception(ExPolicy const& policy, IteratorTag)
+void test_generate_n_exception(ExPolicy const& policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -82,17 +93,17 @@ void test_count_if_exception(ExPolicy const& policy, IteratorTag)
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    
+    auto gen = [](){ return std::size_t(10); };
 
     bool caught_exception = false;
     try {
-        //pred should never proc, so simple 'returns true'
-        hpx::parallel::count_if(policy,
+        hpx::parallel::generate_n(policy,
             decorated_iterator(
                 boost::begin(c),
                 [](){ throw std::runtime_error("test"); }),
-            decorated_iterator(boost::end(c)),
-            [](std::size_t val) { return true; });
+            c.size(),
+            gen);
         HPX_TEST(false);
     }
     catch(hpx::exception_list const& e) {
@@ -107,24 +118,25 @@ void test_count_if_exception(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_count_if_exception(hpx::parallel::task_execution_policy, IteratorTag)
+void test_generate_n_exception(hpx::parallel::task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
     std::vector<std::size_t> c(10007);
-    std::fill(boost::begin(c), boost::end(c), 10);
+    
+    auto gen = [](){ return std::size_t(10); };
 
     bool caught_exception = false;
     try {
-        hpx::future<boost::int64_t> f =
-            hpx::parallel::count_if(hpx::parallel::task,
+        hpx::future<decorated_iterator> f =
+            hpx::parallel::generate_n(hpx::parallel::task,
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::runtime_error("test"); }),
-                decorated_iterator(boost::end(c)),
-                [](std::size_t val) { return true; });
+                c.size(),
+                gen);
         f.get();
 
         HPX_TEST(false);
@@ -143,30 +155,30 @@ void test_count_if_exception(hpx::parallel::task_execution_policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_count_if_exception()
+void test_generate_n_exception()
 {
     using namespace hpx::parallel;
     //If the execution policy object is of type vector_execution_policy,
     //  std::terminate shall be called. therefore we do not test exceptions
     //  with a vector execution policy
-    test_count_if_exception(seq, IteratorTag());
-    test_count_if_exception(par, IteratorTag());
-    test_count_if_exception(task, IteratorTag());
+    test_generate_n_exception(seq, IteratorTag());
+    test_generate_n_exception(par, IteratorTag());
+    test_generate_n_exception(task, IteratorTag());
 
-    test_count_if_exception(execution_policy(seq), IteratorTag());
-    test_count_if_exception(execution_policy(par), IteratorTag());
-    test_count_if_exception(execution_policy(task), IteratorTag());
+    test_generate_n_exception(execution_policy(seq), IteratorTag());
+    test_generate_n_exception(execution_policy(par), IteratorTag());
+    test_generate_n_exception(execution_policy(task), IteratorTag());
 }
 
-void count_if_exception_test()
+void generate_n_exception_test()
 {
-    test_count_if_exception<std::random_access_iterator_tag>();
-    test_count_if_exception<std::forward_iterator_tag>();
+    test_generate_n_exception<std::random_access_iterator_tag>();
+    test_generate_n_exception<std::forward_iterator_tag>();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_count_if_bad_alloc(ExPolicy const& policy, IteratorTag)
+void test_generate_n_bad_alloc(ExPolicy const& policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -174,23 +186,24 @@ void test_count_if_bad_alloc(ExPolicy const& policy, IteratorTag)
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::vector<std::size_t> c(100007);
+    
+    auto gen=[](){ return std::size_t(10); };
 
     bool caught_bad_alloc = false;
     try {
-        hpx::parallel::count_if(policy,
+        hpx::parallel::generate_n(policy,
             decorated_iterator(
                 boost::begin(c),
                 [](){ throw std::bad_alloc(); }),
-            decorated_iterator(boost::end(c)),
-            [](std::size_t v) { return true; });
+            c.size(),
+            gen);
         HPX_TEST(false);
     }
-    catch (std::bad_alloc const&) {
+    catch(std::bad_alloc const&) {
         caught_bad_alloc = true;
     }
-    catch (...) {
+    catch(...) {
         HPX_TEST(false);
     }
 
@@ -198,24 +211,25 @@ void test_count_if_bad_alloc(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_count_if_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
+void test_generate_n_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    
+    auto gen = [](){ return std::size_t(10); };
 
     bool caught_bad_alloc = false;
     try {
-        hpx::future<boost::int64_t> f =
-            hpx::parallel::count_if(hpx::parallel::task,
+        hpx::future<decorated_iterator> f =
+            hpx::parallel::generate_n(hpx::parallel::task,
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::bad_alloc(); }),
-                decorated_iterator(boost::end(c)),
-                [](std::size_t v) { return true; });
+                c.size(),
+                gen);
 
         f.get();
 
@@ -232,33 +246,32 @@ void test_count_if_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_count_if_bad_alloc()
+void test_generate_n_bad_alloc()
 {
     using namespace hpx::parallel;
     //If the execution policy object is of type vector_execution_policy,
     //  std::terminate shall be called. therefore we do not test exceptions
     //  with a vector execution policy
-    test_count_if_bad_alloc(seq, IteratorTag());
-    test_count_if_bad_alloc(par, IteratorTag());
-    test_count_if_bad_alloc(task, IteratorTag());
+    test_generate_n_bad_alloc(seq, IteratorTag());
+    test_generate_n_bad_alloc(par, IteratorTag());
+    test_generate_n_bad_alloc(task, IteratorTag());
 
-    test_count_if_bad_alloc(execution_policy(seq), IteratorTag());
-    test_count_if_bad_alloc(execution_policy(par), IteratorTag());
-    test_count_if_bad_alloc(execution_policy(task), IteratorTag());
+    test_generate_n_bad_alloc(execution_policy(seq), IteratorTag());
+    test_generate_n_bad_alloc(execution_policy(par), IteratorTag());
+    test_generate_n_bad_alloc(execution_policy(task), IteratorTag());
 }
 
-void count_if_bad_alloc_test()
+void generate_n_bad_alloc_test()
 {
-    test_count_if_bad_alloc<std::random_access_iterator_tag>();
-    test_count_if_bad_alloc<std::forward_iterator_tag>();
-    test_count_if_bad_alloc<std::input_iterator_tag>();
+    test_generate_n_bad_alloc<std::random_access_iterator_tag>();
+    test_generate_n_bad_alloc<std::forward_iterator_tag>();
 }
 
 int hpx_main()
 {
-    count_if_test();
-    count_if_exception_test();
-    count_if_bad_alloc_test();
+    generate_n_test();
+    generate_n_exception_test();
+    generate_n_bad_alloc_test();
     return hpx::finalize();
 }
 
@@ -272,4 +285,5 @@ int main(int argc, char* argv[])
         "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
+
 }

@@ -18,7 +18,7 @@ void test_transform_reduce(ExPolicy const& policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(3);
+    std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     typedef hpx::util::tuple<std::size_t, std::size_t> result_type;
@@ -134,7 +134,7 @@ void test_transform_reduce_exception(ExPolicy const& policy, IteratorTag)
     }
     catch(hpx::exception_list const& e) {
         caught_exception = true;
-        test::test_num_exeptions<ExPolicy, IteratorTag>::call(policy, e);
+        test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
     catch(...) {
         HPX_TEST(false);
@@ -170,7 +170,7 @@ void test_transform_reduce_exception(hpx::parallel::task_execution_policy, Itera
     }
     catch(hpx::exception_list const& e) {
         caught_exception = true;
-        test::test_num_exeptions<
+        test::test_num_exceptions<
             hpx::parallel::task_execution_policy, IteratorTag
         >::call(hpx::parallel::task, e);
     }

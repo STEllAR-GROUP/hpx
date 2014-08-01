@@ -497,7 +497,7 @@ namespace hpx { namespace traits
     {
         static std::size_t call(util::serialize_buffer<T, Allocator> const& b)
         {
-            return b.size() * sizeof(T) + sizeof(std::size_t) + sizeof(Allocator);
+            return b.size() * sizeof(T) + sizeof(std::size_t) + sizeof(Allocator); //-V119
         }
     };
 }}

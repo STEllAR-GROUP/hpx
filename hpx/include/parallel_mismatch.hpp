@@ -4,10 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_FOREACH_N_JUL_14_2014_0616PM)
-#define HPX_PARALLEL_FOREACH_N_JUL_14_2014_0616PM
+#if !defined(HPX_PARALLEL_MISMATCH_JUL_13_2014_0820PM)
+#define HPX_PARALLEL_MISMATCH_JUL_13_2014_0820PM
 
-#include <hpx/parallel/detail/for_each.hpp>
+#include <hpx/parallel/detail/mismatch.hpp>
 
 #endif
 

@@ -3,15 +3,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/detail/equal.hpp
+/// \file parallel/mismatch.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_EQUAL_JUL_06_2014_0848PM)
-#define HPX_PARALLEL_DETAIL_EQUAL_JUL_06_2014_0848PM
+#if !defined(HPX_PARALLEL_DETAIL_MISMATCH_JUL_13_2014_0142PM)
+#define HPX_PARALLEL_DETAIL_MISMATCH_JUL_13_2014_0142PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/move.hpp>
-
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
 #include <hpx/parallel/detail/dispatch.hpp>
@@ -30,59 +27,54 @@
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
     ///////////////////////////////////////////////////////////////////////////
-    // equal (binary)
+    // mismatch (binary)
     namespace detail
     {
         /// \cond NOINTERNAL
-
-        // Our own version of the C++14 equal (_binary).
         template <typename InIter1, typename InIter2, typename F>
-        bool sequential_equal_binary(InIter1 first1, InIter1 last1,
+        std::pair<InIter1, InIter2>
+        sequential_mismatch_binary(InIter1 first1, InIter1 last1,
             InIter2 first2, InIter2 last2, F && f)
         {
-            for (; first1 != last1 && first2 != last2; ++first1, ++first2)
+            while (first1 != last1 && first2 != last2 && f(*first1, *first2))
             {
-                if (!f(*first1, *first2))
-                    return false;
+                ++first1, ++first2;
             }
-            return first1 == last1 && first2 == last2;
+            return std::make_pair(first1, first2);
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        struct equal_binary : public detail::algorithm<equal_binary, bool>
+        template <typename T>
+        struct mismatch_binary : public detail::algorithm<mismatch_binary<T>, T>
         {
-            equal_binary()
-              : equal_binary::algorithm("equal_binary")
+            mismatch_binary()
+              : mismatch_binary::algorithm("mismatch_binary")
             {}
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
-            static bool
+            static T
             sequential(ExPolicy const&, InIter1 first1, InIter1 last1,
                 InIter2 first2, InIter2 last2, F && f)
             {
-                return sequential_equal_binary(first1, last1, first2, last2,
+                return sequential_mismatch_binary(first1, last1, first2, last2,
                     std::forward<F>(f));
             }
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F>
-            static typename detail::algorithm_result<ExPolicy, bool>::type
+            static typename detail::algorithm_result<ExPolicy, T>::type
             parallel(ExPolicy const& policy, FwdIter1 first1, FwdIter1 last1,
                 FwdIter2 first2, FwdIter2 last2, F && f)
             {
-                if (first1 == last1)
+                if (first1 == last1 || first2 == last2)
                 {
-                    return detail::algorithm_result<ExPolicy, bool>::get(
-                        first2 == last2);
+                    return detail::algorithm_result<ExPolicy, T>::get(
+                        std::make_pair(first1, first2));
                 }
-
-                if (first2 == last2)
-                    return detail::algorithm_result<ExPolicy, bool>::get(false);
 
                 std::size_t count1 = std::distance(first1, last1);
 
-                // The specifcation of std::equal(_binary) states that if InIter1
+                // The specifcation of std::mismatch(_binary) states that if InIter1
                 // and InIter2 meet the requirements of RandomAccessIterator and
                 // last1 - first1 != last2 - first2 then no applications of the
                 // predicate p are made.
@@ -91,45 +83,55 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 // iterators. This could turn into a QoI issue.
                 std::size_t count2 = std::distance(first2, last2);
                 if (count1 != count2)
-                    return detail::algorithm_result<ExPolicy, bool>::get(false);
+                {
+                    return detail::algorithm_result<ExPolicy, T>::get(
+                        std::make_pair(first1, first2));
+                }
 
                 typedef hpx::util::zip_iterator<FwdIter1, FwdIter2> zip_iterator;
                 typedef typename zip_iterator::reference reference;
 
-                util::cancellation_token<> tok;
-                return util::partitioner<ExPolicy, bool>::call(policy,
-                    hpx::util::make_zip_iterator(first1, first2), count1,
-                    [f, tok](zip_iterator it, std::size_t part_count) mutable
+                util::cancellation_token<std::size_t> tok(count1);
+
+                return util::partitioner<ExPolicy, T, void>::call_with_index(
+                    policy, hpx::util::make_zip_iterator(first1, first2), count1,
+                    [f, tok](std::size_t base_idx, zip_iterator it,
+                        std::size_t part_count) mutable
                     {
-                        util::loop_n(
-                            it, part_count, tok,
-                            [&f, &tok](reference t)
+                        util::loop_idx_n(
+                            base_idx, it, part_count, tok,
+                            [&f, &tok](reference t, std::size_t i)
                             {
-                                if (!f(hpx::util::get<0>(t), hpx::util::get<1>(t))){
-                                    tok.cancel();
-                                }
+                                if (!f(hpx::util::get<0>(t), hpx::util::get<1>(t)))
+                                    tok.cancel(i);
                             });
-                        return !tok.was_cancelled();
                     },
-                    [](std::vector<hpx::future<bool> > && results)
+                    [=](std::vector<hpx::future<void> > &&) mutable
                     {
-                        return std::all_of(
-                            boost::begin(results), boost::end(results),
-                            [](hpx::future<bool>& val)
-                            {
-                                return val.get();
-                            });
+                        std::size_t mismatched = tok.get_data();
+                        if (mismatched != count1) {
+                            std::advance(first1, mismatched);
+                            std::advance(first2, mismatched);
+                        }
+                        else {
+                            first1 = last1;
+                            first2 = last2;
+                        }
+                        return std::make_pair(first1, first2);
                     });
             }
         };
         /// \endcond
     }
 
-    /// Returns true if the range [first1, last1) is equal to the range
+    /// Returns true if the range [first1, last1) is mismatch to the range
     /// [first2, last2), and false otherwise.
     ///
     /// \note   Complexity: At most min(last1 - first1, last2 - first2)
-    ///         applications of the operator==().
+    ///         applications of the operator==(). If \a InIter1
+    ///         and \a InIter2 meet the requirements of \a RandomAccessIterator
+    ///         and (last1 - first1) != (last2 - first2) then no applications
+    ///         of the operator==() are made.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -155,35 +157,36 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param last2        Refers to the end of the sequence of elements of
     ///                     the second range the algorithm will be applied to.
     ///
-    /// The comparison operations in the parallel \a equal algorithm invoked
+    /// The comparison operations in the parallel \a mismatch algorithm invoked
     /// with an execution policy object of type \a sequential_execution_policy
     /// execute in sequential order in the calling thread.
     ///
-    /// The comparison operations in the parallel \a equal algorithm invoked
+    /// The comparison operations in the parallel \a mismatch algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
     /// or \a task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \note     The two ranges are considered equal if, for every iterator
-    ///           i in the range [first1,last1), *i equals *(first2 + (i - first1)).
-    ///           This overload of equal uses operator== to determine if two
-    ///           elements are equal.
+    /// \note     The two ranges are considered mismatch if, for every iterator
+    ///           i in the range [first1,last1), *i mismatchs *(first2 + (i - first1)).
+    ///           This overload of mismatch uses operator== to determine if two
+    ///           elements are mismatch.
     ///
-    /// \returns  The \a equal algorithm returns a \a hpx::future<bool> if the
+    /// \returns  The \a mismatch algorithm returns a \a hpx::future<bool> if the
     ///           execution policy is of type \a task_execution_policy and
     ///           returns \a bool otherwise.
-    ///           The \a equal algorithm returns true if the elements in the
-    ///           two ranges are equal, otherwise it returns false.
-    ///           If the length of the range [first1, last1) does not equal
+    ///           The \a mismatch algorithm returns true if the elements in the
+    ///           two ranges are mismatch, otherwise it returns false.
+    ///           If the length of the range [first1, last1) does not mismatch
     ///           the length of the range [first2, last2), it returns false.
-    ///
     template <typename ExPolicy, typename InIter1, typename InIter2>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, bool>::type
+        typename detail::algorithm_result<
+            ExPolicy, std::pair<InIter1, InIter2>
+        >::type
     >::type
-    equal(ExPolicy&& policy, InIter1 first1, InIter1 last1,
+    mismatch(ExPolicy&& policy, InIter1 first1, InIter1 last1,
         InIter2 first2, InIter2 last2)
     {
         typedef typename std::iterator_traits<InIter1>::iterator_category
@@ -204,18 +207,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category2>
         >::type is_seq;
 
-        typedef typename std::iterator_traits<InIter1>::value_type value_type;
-
-        return detail::equal_binary().call(
+        typedef std::pair<InIter1, InIter2> result_type;
+        return detail::mismatch_binary<result_type>().call(
             std::forward<ExPolicy>(policy),
             first1, last1, first2, last2, detail::equal_to(), is_seq());
     }
 
-    /// Returns true if the range [first1, last1) is equal to the range
+    /// Returns true if the range [first1, last1) is mismatch to the range
     /// [first2, last2), and false otherwise.
     ///
     /// \note   Complexity: At most min(last1 - first1, last2 - first2)
-    ///         applications of the predicate \a f.
+    ///         applications of the predicate \a f. If \a InIter1
+    ///         and \a InIter2 meet the requirements of \a RandomAccessIterator
+    ///         and (last1 - first1) != (last2 - first2) then no applications
+    ///         of the predicate \a f are made.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -231,7 +236,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     input iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a equal requires \a F to meet the
+    ///                     overload of \a mismatch requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
     ///
     /// \param policy       The execution policy to use for the scheduling of
@@ -245,7 +250,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param last2        Refers to the end of the sequence of elements of
     ///                     the second range the algorithm will be applied to.
     /// \param f            The binary predicate which returns true if the
-    ///                     elements should be treated as equal. The signature
+    ///                     elements should be treated as mismatch. The signature
     ///                     of the predicate function should be equivalent to
     ///                     the following:
     ///                     \code
@@ -258,35 +263,36 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     be dereferenced and then implicitly converted to
     ///                     \a Type1 and \a Type2 respectively
     ///
-    /// The comparison operations in the parallel \a equal algorithm invoked
+    /// The comparison operations in the parallel \a mismatch algorithm invoked
     /// with an execution policy object of type \a sequential_execution_policy
     /// execute in sequential order in the calling thread.
     ///
-    /// The comparison operations in the parallel \a equal algorithm invoked
+    /// The comparison operations in the parallel \a mismatch algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
     /// or \a task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \note     The two ranges are considered equal if, for every iterator
-    ///           i in the range [first1,last1), *i equals *(first2 + (i - first1)).
-    ///           This overload of equal uses operator== to determine if two
-    ///           elements are equal.
+    /// \note     The two ranges are considered mismatch if, for every iterator
+    ///           i in the range [first1,last1), *i mismatchs *(first2 + (i - first1)).
+    ///           This overload of mismatch uses operator== to determine if two
+    ///           elements are mismatch.
     ///
-    /// \returns  The \a equal algorithm returns a \a hpx::future<bool> if the
+    /// \returns  The \a mismatch algorithm returns a \a hpx::future<bool> if the
     ///           execution policy is of type \a task_execution_policy and
     ///           returns \a bool otherwise.
-    ///           The \a equal algorithm returns true if the elements in the
-    ///           two ranges are equal, otherwise it returns false.
-    ///           If the length of the range [first1, last1) does not equal
+    ///           The \a mismatch algorithm returns true if the elements in the
+    ///           two ranges are mismatch, otherwise it returns false.
+    ///           If the length of the range [first1, last1) does not mismatch
     ///           the length of the range [first2, last2), it returns false.
-    ///
     template <typename ExPolicy, typename InIter1, typename InIter2, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, bool>::type
+        typename detail::algorithm_result<
+            ExPolicy, std::pair<InIter1, InIter2>
+        >::type
     >::type
-    equal(ExPolicy&& policy, InIter1 first1, InIter1 last1,
+    mismatch(ExPolicy&& policy, InIter1 first1, InIter1 last1,
         InIter2 first2, InIter2 last2, F && f)
     {
         typedef typename std::iterator_traits<InIter1>::iterator_category
@@ -307,77 +313,83 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category2>
         >::type is_seq;
 
-        typedef typename std::iterator_traits<InIter1>::value_type value_type;
-
-        return detail::equal_binary().call(
+        typedef std::pair<InIter1, InIter2> result_type;
+        return detail::mismatch_binary<result_type>().call(
             std::forward<ExPolicy>(policy),
             first1, last1, first2, last2, std::forward<F>(f), is_seq());
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // equal
+    // mismatch
     namespace detail
     {
         /// \cond NOINTERNAL
-        struct equal : public detail::algorithm<equal, bool>
+        template <typename T>
+        struct mismatch : public detail::algorithm<mismatch<T>, T>
         {
-            equal()
-              : equal::algorithm("equal")
+            mismatch()
+              : mismatch::algorithm("mismatch")
             {}
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
-            static bool
+            static T
             sequential(ExPolicy const&, InIter1 first1, InIter1 last1,
                 InIter2 first2, F && f)
             {
-                return std::equal(first1, last1, first2, std::forward<F>(f));
+                return std::mismatch(first1, last1, first2, std::forward<F>(f));
             }
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F>
-            static typename detail::algorithm_result<ExPolicy, bool>::type
+            static typename detail::algorithm_result<ExPolicy, T>::type
             parallel(ExPolicy const& policy, FwdIter1 first1, FwdIter1 last1,
                 FwdIter2 first2, F && f)
             {
                 if (first1 == last1)
-                    return detail::algorithm_result<ExPolicy, bool>::get(true);
+                {
+                    return detail::algorithm_result<ExPolicy, T>::get(
+                        std::make_pair(first1, first2));
+                }
 
                 std::size_t count = std::distance(first1, last1);
 
                 typedef hpx::util::zip_iterator<FwdIter1, FwdIter2> zip_iterator;
                 typedef typename zip_iterator::reference reference;
 
-                util::cancellation_token<> tok;
-                return util::partitioner<ExPolicy, bool>::call(policy,
-                    hpx::util::make_zip_iterator(first1, first2), count,
-                    [f, tok](zip_iterator it, std::size_t part_count) mutable
+                util::cancellation_token<std::size_t> tok(count);
+
+                return util::partitioner<ExPolicy, T, void>::call_with_index(
+                    policy, hpx::util::make_zip_iterator(first1, first2), count,
+                    [f, tok](std::size_t base_idx, zip_iterator it,
+                        std::size_t part_count) mutable
                     {
-                        util::loop_n(
-                            it, part_count, tok,
-                            [&f, &tok](reference t)
+                        util::loop_idx_n(
+                            base_idx, it, part_count, tok,
+                            [&f, &tok](reference t, std::size_t i)
                             {
                                 if (!f(hpx::util::get<0>(t), hpx::util::get<1>(t)))
-                                    tok.cancel();
+                                    tok.cancel(i);
                             });
-                        return !tok.was_cancelled();
                     },
-                    [](std::vector<hpx::future<bool> > && results)
+                    [=](std::vector<hpx::future<void> > &&) mutable
                     {
-                        return std::all_of(
-                            boost::begin(results), boost::end(results),
-                            [](hpx::future<bool>& val)
-                            {
-                                return val.get();
-                            });
+                        std::size_t mismatched = tok.get_data();
+                        if (mismatched != count)
+                            std::advance(first1, mismatched);
+                        else
+                            first1 = last1;
+
+                        std::advance(first2, mismatched);
+                        return std::make_pair(first1, first2);
                     });
             }
         };
         /// \endcond
     }
 
-    /// Returns true if the range [first1, last1) is equal to the range
-    /// starting at first2, and false otherwise.
+    /// Returns std::pair with iterators to the first two non-equivalent
+    /// elements.
     ///
     /// \note   Complexity: At most \a last1 - \a first1 applications of the
     ///         operator==().
@@ -404,33 +416,32 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param first2       Refers to the beginning of the sequence of elements
     ///                     of the second range the algorithm will be applied to.
     ///
-    /// The comparison operations in the parallel \a equal algorithm invoked
+    /// The comparison operations in the parallel \a mismatch algorithm invoked
     /// with an execution policy object of type \a sequential_execution_policy
     /// execute in sequential order in the calling thread.
     ///
-    /// The comparison operations in the parallel \a equal algorithm invoked
+    /// The comparison operations in the parallel \a mismatch algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
     /// or \a task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \note     The two ranges are considered equal if, for every iterator
-    ///           i in the range [first1,last1), *i equals *(first2 + (i - first1)).
-    ///           This overload of equal uses operator== to determine if two
-    ///           elements are equal.
-    ///
-    /// \returns  The \a equal algorithm returns a \a hpx::future<bool> if the
+    /// \returns  The \a mismatch algorithm returns a
+    ///           \a hpx::future<std::pair<InIter1, InIter2> > if the
     ///           execution policy is of type \a task_execution_policy and
-    ///           returns \a bool otherwise.
-    ///           The \a equal algorithm returns true if the elements in the
-    ///           two ranges are equal, otherwise it returns false.
+    ///           returns \a std::pair<InIter1, InIter2> otherwise.
+    ///           The \a mismatch algorithm returns the first mismatching pair
+    ///           of elements from two ranges: one defined by [first1, last1)
+    ///           and another defined by [first2, last2).
     ///
     template <typename ExPolicy, typename InIter1, typename InIter2>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, bool>::type
+        typename detail::algorithm_result<
+            ExPolicy, std::pair<InIter1, InIter2>
+        >::type
     >::type
-    equal(ExPolicy&& policy, InIter1 first1, InIter1 last1,
+    mismatch(ExPolicy&& policy, InIter1 first1, InIter1 last1,
         InIter2 first2)
     {
         typedef typename std::iterator_traits<InIter1>::iterator_category
@@ -451,15 +462,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category2>
         >::type is_seq;
 
-        typedef typename std::iterator_traits<InIter1>::value_type value_type;
-
-        return detail::equal().call(
+        typedef std::pair<InIter1, InIter2> result_type;
+        return detail::mismatch<result_type>().call(
             std::forward<ExPolicy>(policy),
             first1, last1, first2, detail::equal_to(), is_seq());
     }
 
-    /// Returns true if the range [first1, last1) is equal to the range
-    /// starting at first2, and false otherwise.
+    /// Returns std::pair with iterators to the first two non-equivalent
+    /// elements.
     ///
     /// \note   Complexity: At most \a last1 - \a first1 applications of the
     ///         predicate \a f.
@@ -478,7 +488,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     input iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a equal requires \a F to meet the
+    ///                     overload of \a mismatch requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
     ///
     /// \param policy       The execution policy to use for the scheduling of
@@ -490,7 +500,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param first2       Refers to the beginning of the sequence of elements
     ///                     of the second range the algorithm will be applied to.
     /// \param f            The binary predicate which returns true if the
-    ///                     elements should be treated as equal. The signature
+    ///                     elements should be treated as mismatch. The signature
     ///                     of the predicate function should be equivalent to
     ///                     the following:
     ///                     \code
@@ -503,33 +513,32 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     be dereferenced and then implicitly converted to
     ///                     \a Type1 and \a Type2 respectively
     ///
-    /// The comparison operations in the parallel \a equal algorithm invoked
+    /// The comparison operations in the parallel \a mismatch algorithm invoked
     /// with an execution policy object of type \a sequential_execution_policy
     /// execute in sequential order in the calling thread.
     ///
-    /// The comparison operations in the parallel \a equal algorithm invoked
+    /// The comparison operations in the parallel \a mismatch algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
     /// or \a task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \note     The two ranges are considered equal if, for every iterator
-    ///           i in the range [first1,last1), *i equals *(first2 + (i - first1)).
-    ///           This overload of equal uses operator== to determine if two
-    ///           elements are equal.
-    ///
-    /// \returns  The \a equal algorithm returns a \a hpx::future<bool> if the
+    /// \returns  The \a mismatch algorithm returns a
+    ///           \a hpx::future<std::pair<InIter1, InIter2> > if the
     ///           execution policy is of type \a task_execution_policy and
-    ///           returns \a bool otherwise.
-    ///           The \a equal algorithm returns true if the elements in the
-    ///           two ranges are equal, otherwise it returns false.
+    ///           returns \a std::pair<InIter1, InIter2> otherwise.
+    ///           The \a mismatch algorithm returns the first mismatching pair
+    ///           of elements from two ranges: one defined by [first1, last1)
+    ///           and another defined by [first2, last2).
     ///
     template <typename ExPolicy, typename InIter1, typename InIter2, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, bool>::type
+        typename detail::algorithm_result<
+            ExPolicy, std::pair<InIter1, InIter2>
+        >::type
     >::type
-    equal(ExPolicy&& policy, InIter1 first1, InIter1 last1, InIter2 first2,
+    mismatch(ExPolicy&& policy, InIter1 first1, InIter1 last1, InIter2 first2,
         F && f)
     {
         typedef typename std::iterator_traits<InIter1>::iterator_category
@@ -550,9 +559,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category2>
         >::type is_seq;
 
-        typedef typename std::iterator_traits<InIter1>::value_type value_type;
-
-        return detail::equal().call(
+        typedef std::pair<InIter1, InIter2> result_type;
+        return detail::mismatch<result_type>().call(
             std::forward<ExPolicy>(policy),
             first1, last1, first2, std::forward<F>(f), is_seq());
     }
