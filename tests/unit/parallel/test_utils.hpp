@@ -66,7 +66,7 @@ namespace test
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename IteratorTag>
-    struct test_num_exeptions
+    struct test_num_exceptions
     {
         static void call(ExPolicy const&, hpx::exception_list const& e)
         {
@@ -77,7 +77,7 @@ namespace test
     };
 
     template <typename IteratorTag>
-    struct test_num_exeptions<
+    struct test_num_exceptions<
         hpx::parallel::sequential_execution_policy, IteratorTag>
     {
         static void call(hpx::parallel::sequential_execution_policy const&,
@@ -88,7 +88,7 @@ namespace test
     };
 
     template <typename ExPolicy>
-    struct test_num_exeptions<ExPolicy, std::input_iterator_tag>
+    struct test_num_exceptions<ExPolicy, std::input_iterator_tag>
     {
         static void call(ExPolicy const&, hpx::exception_list const& e)
         {
@@ -97,7 +97,7 @@ namespace test
     };
 
     template <>
-    struct test_num_exeptions<
+    struct test_num_exceptions<
         hpx::parallel::sequential_execution_policy, std::input_iterator_tag>
     {
         static void call(hpx::parallel::sequential_execution_policy const&,
@@ -108,7 +108,7 @@ namespace test
     };
 
     template <typename IteratorTag>
-    struct test_num_exeptions<hpx::parallel::execution_policy, IteratorTag>
+    struct test_num_exceptions<hpx::parallel::execution_policy, IteratorTag>
     {
         static void call(hpx::parallel::execution_policy const& policy,
             hpx::exception_list const& e)
@@ -127,7 +127,7 @@ namespace test
     };
 
     template <>
-    struct test_num_exeptions<
+    struct test_num_exceptions<
         hpx::parallel::execution_policy, std::input_iterator_tag>
     {
         static void call(hpx::parallel::execution_policy const&,
