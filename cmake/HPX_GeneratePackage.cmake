@@ -72,9 +72,7 @@ endforeach()
 
 # Configure config for the install dir ...
 set(HPX_CONF_INCLUDE_DIRS
-  "-I${CMAKE_INSTALL_PREFIX}/include"
-  " -I${CMAKE_INSTALL_PREFIX}/include/hpx/external"
-  " ${_NEEDED_INCLUDE_DIRS}"
+  "-I${CMAKE_INSTALL_PREFIX}/include -I${CMAKE_INSTALL_PREFIX}/include/hpx/external ${_NEEDED_INCLUDE_DIRS}"
 )
 set(HPX_CMAKE_CONF_INCLUDE_DIRS
   "${CMAKE_INSTALL_PREFIX}/include"
@@ -101,8 +99,7 @@ configure_file(cmake/templates/hpx_component_debug.pc.in
 # ... and the build dir
 set(HPX_CONF_PREFIX "${CMAKE_BINARY_DIR}")
 set(HPX_CONF_INCLUDE_DIRS
-  "${_NEEDED_BUILD_DIR_INCLUDE_DIRS}"
-  " ${_NEEDED_INCLUDE_DIRS}"
+  "${_NEEDED_BUILD_DIR_INCLUDE_DIRS} ${_NEEDED_INCLUDE_DIRS}"
 )
 set(HPX_CMAKE_CONF_INCLUDE_DIRS
   ${_NEEDED_CMAKE_BUILD_DIR_INCLUDE_DIRS}
