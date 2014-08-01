@@ -40,6 +40,7 @@ template <typename IteratorTag>
 void test_count(hpx::parallel::task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<std::size_t>::difference_type diff_type;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
@@ -52,12 +53,12 @@ void test_count(hpx::parallel::task_execution_policy, IteratorTag)
         c[i] = 0;
     }
 
-    hpx::future<boost::int64_t> f =
+    hpx::future<diff_type> f =
         hpx::parallel::count(hpx::parallel::task,
             iterator(boost::begin(c)), iterator(boost::end(c)),
             (std::size_t)0);
 
-    HPX_TEST_EQ(static_cast<boost::int64_t>(find_count), f.get());
+    HPX_TEST_EQ(static_cast<diff_type>(find_count), f.get());
 }
 
 template <typename IteratorTag>
@@ -120,6 +121,7 @@ template <typename IteratorTag>
 void test_count_exception(hpx::parallel::task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<std::size_t>::difference_type diff_type;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
@@ -128,7 +130,7 @@ void test_count_exception(hpx::parallel::task_execution_policy, IteratorTag)
 
     bool caught_exception = false;
     try {
-        hpx::future<boost::int64_t> f =
+        hpx::future<diff_type> f =
             hpx::parallel::count(hpx::parallel::task,
                 decorated_iterator(
                     boost::begin(c),
@@ -213,6 +215,7 @@ template <typename IteratorTag>
 void test_count_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<std::size_t>::difference_type diff_type;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
@@ -221,7 +224,7 @@ void test_count_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
 
     bool caught_bad_alloc = false;
     try {
-        hpx::future<boost::int64_t> f =
+        hpx::future<diff_type> f =
             hpx::parallel::count(hpx::parallel::task,
                 decorated_iterator(
                     boost::begin(c),

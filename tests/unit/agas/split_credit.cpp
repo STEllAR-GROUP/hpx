@@ -69,20 +69,20 @@ void hpx_test_main(
         hpx::naming::detail::log2(HPX_GLOBALCREDIT_INITIAL);
     boost::uint64_t restored_initial_credits =
         hpx::naming::detail::power2(log2_initial_credit);
-    HPX_TEST_EQ(restored_initial_credits, HPX_GLOBALCREDIT_INITIAL);
+    HPX_TEST_EQ(restored_initial_credits, static_cast<boost::uint64_t>(HPX_GLOBALCREDIT_INITIAL));
 
     {
         Client object(find_here());
 
         id_type g0 = split_credits(object.get_gid());
 
-        HPX_TEST_EQ(get_credit(object.get_gid()), HPX_GLOBALCREDIT_INITIAL/2);
-        HPX_TEST_EQ(get_credit(g0), HPX_GLOBALCREDIT_INITIAL/2);
+        HPX_TEST_EQ(get_credit(object.get_gid()), static_cast<boost::uint64_t>(HPX_GLOBALCREDIT_INITIAL/2));
+        HPX_TEST_EQ(get_credit(g0), static_cast<boost::uint64_t>(HPX_GLOBALCREDIT_INITIAL/2));
 
         id_type g1 = split_credits(object.get_gid());
 
-        HPX_TEST_EQ(get_credit(object.get_gid()), HPX_GLOBALCREDIT_INITIAL/4);
-        HPX_TEST_EQ(get_credit(g1), HPX_GLOBALCREDIT_INITIAL/4);
+        HPX_TEST_EQ(get_credit(object.get_gid()), static_cast<boost::uint64_t>(HPX_GLOBALCREDIT_INITIAL/4));
+        HPX_TEST_EQ(get_credit(g1), static_cast<boost::uint64_t>(HPX_GLOBALCREDIT_INITIAL/4));
 
         cout << "  " << object.get_gid() << " : "
                      << get_credit(object.get_gid()) << "\n"

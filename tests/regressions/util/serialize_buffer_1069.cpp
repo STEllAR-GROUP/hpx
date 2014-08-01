@@ -36,13 +36,13 @@ public:
 
     pointer allocate(size_type n, const void *hint=0)
     {
-        HPX_TEST_EQ(n, MEMORY_BLOCK_SIZE);
+        HPX_TEST_EQ(n, static_cast<size_type>(MEMORY_BLOCK_SIZE));
         return std::allocator<T>::allocate(n, hint);
     }
 
     void deallocate(pointer p, size_type n)
     {
-        HPX_TEST_EQ(n, MEMORY_BLOCK_SIZE);
+        HPX_TEST_EQ(n, static_cast<size_type>(MEMORY_BLOCK_SIZE));
         return std::allocator<T>::deallocate(p, n);
     }
 
@@ -57,7 +57,7 @@ typedef hpx::util::serialize_buffer<char, test_allocator<char> >
 
 buffer_allocator_type allocator_message(buffer_allocator_type const& receive_buffer)
 {
-    HPX_TEST_EQ(receive_buffer.size(), MEMORY_BLOCK_SIZE);
+    HPX_TEST_EQ(receive_buffer.size(), static_cast<std::size_t>(MEMORY_BLOCK_SIZE));
     return receive_buffer;
 }
 HPX_PLAIN_ACTION(allocator_message);

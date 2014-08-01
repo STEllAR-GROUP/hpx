@@ -65,6 +65,6 @@ foreach(test ${tests})
                               ${test}_test_exe)
 endforeach()
 
-set_target_properties(remote_object_move_semantics_test_exe
-    PROPERTIES COMPILE_DEFINITIONS
+set_property(TARGET remote_object_move_semantics_test_exe APPEND
+    PROPERTY COMPILE_DEFINITIONS
     "HPX_LIMIT=10")
