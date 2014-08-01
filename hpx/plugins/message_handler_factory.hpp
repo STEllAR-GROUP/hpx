@@ -24,7 +24,7 @@ namespace hpx { namespace plugins
 {
     ///////////////////////////////////////////////////////////////////////////
     /// The \a message_handler_factory provides a minimal implementation of a
-    /// message handler's factory. If no additional functionality is required 
+    /// message handler's factory. If no additional functionality is required
     /// this type can be used to implement the full set of minimally required
     /// functions to be exposed by a message handler's factory instance.
     ///
@@ -65,10 +65,10 @@ namespace hpx { namespace plugins
 
         /// Create a new instance of a message handler
         ///
-        /// return Returns the newly created instance of the message handler 
+        /// return Returns the newly created instance of the message handler
         ///        supported by this factory
         parcelset::policies::message_handler* create(char const* action,
-            parcelset::parcelport* pp, std::size_t num_messages, 
+            parcelset::parcelport* pp, std::size_t num_messages,
             std::size_t interval)
         {
             if (isenabled_)

@@ -24,5 +24,9 @@ set(HPX_WITH_HWLOC OFF CACHE BOOL
 # APPLEs clang doesn't know how to deal with native tls properly
 set(HPX_NATIVE_TLS OFF CACHE BOOL "Use native TLS support if available (default: ON)")
 
+# Clang doesn't know about hidden visibility
+set(HPX_HIDDEN_VISIBILITY OFF CACHE BOOL
+  "Use -fvisibility=hidden for builds on platforms which support it (default ON)")
+
 # We don't do cross compilation here ...
 set(CMAKE_CROSSCOMPILING OFF)
