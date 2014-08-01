@@ -609,9 +609,10 @@ namespace hpx { namespace util
         std::vector<std::string> args = split_unix(cmdline);
 #endif
 
-        boost::scoped_array<char*> argv(new char* [args.size()]);
+        boost::scoped_array<char*> argv(new char* [args.size()+1]);
         for (std::size_t i = 0; i < args.size(); ++i)
             argv[i] = const_cast<char*>(args[i].c_str());
+        argv[args.size()] = 0;
 
         return parse_commandline(
             rtcfg, app_options, static_cast<int>(args.size()), argv.get(), vm,

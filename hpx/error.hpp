@@ -11,7 +11,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/export_definitions.hpp>
-#include <boost/exception/detail/attribute_noreturn.hpp>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -152,7 +151,7 @@ namespace hpx
     /// \cond NOINTERNAL
 
     /// \brief throw an hpx::exception initialized from the given arguments
-    BOOST_ATTRIBUTE_NORETURN HPX_EXPORT
+    HPX_ATTRIBUTE_NORETURN HPX_EXPORT
     void throw_exception(error e, std::string const& msg,
         std::string const& func, std::string const& file = "", long line = -1);
     /// \endcond

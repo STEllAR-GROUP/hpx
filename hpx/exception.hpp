@@ -770,17 +770,17 @@ namespace hpx
 
         // main function for throwing exceptions
         template <typename Exception>
-        BOOST_ATTRIBUTE_NORETURN HPX_EXPORT
+        HPX_ATTRIBUTE_NORETURN HPX_EXPORT
         void throw_exception(Exception const& e,
             std::string const& func, std::string const& file, long line);
 
         // HPX_ASSERT handler
-        BOOST_ATTRIBUTE_NORETURN HPX_EXPORT
+        HPX_ATTRIBUTE_NORETURN HPX_EXPORT
         void assertion_failed(char const* expr, char const* function,
             char const* file, long line);
 
         // HPX_ASSERT_MSG handler
-        BOOST_ATTRIBUTE_NORETURN HPX_EXPORT
+        HPX_ATTRIBUTE_NORETURN HPX_EXPORT
         void assertion_failed_msg(char const* msg, char const* expr,
             char const* function, char const* file, long line);
 

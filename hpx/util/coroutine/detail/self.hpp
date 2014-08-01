@@ -159,7 +159,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
 #endif
 
-    BOOST_ATTRIBUTE_NORETURN void exit() {
+    HPX_ATTRIBUTE_NORETURN void exit() {
       m_pimpl -> exit_self();
       std::terminate(); // FIXME: replace with hpx::terminate();
     }

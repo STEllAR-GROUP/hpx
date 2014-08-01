@@ -23,6 +23,10 @@
 #include <hpx/config/cxx11_macros.hpp>
 #include <hpx/config/preprocessor/round_up.hpp>
 
+#if BOOST_VERSION < 105600
+#include <boost/exception/detail/attribute_noreturn.hpp>
+#endif
+
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/preprocessor/arithmetic/add.hpp>
 #include <boost/preprocessor/selection/min.hpp>
@@ -657,6 +661,16 @@
 #  else
 #    define BOOST_NOINLINE
 #  endif
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// Older Boost versions do not have BOOST_NORETURN defined
+#if defined(BOOST_NORETURN)
+#  define HPX_ATTRIBUTE_NORETURN BOOST_NORETURN
+#elif defined(BOOST_ATTRIBUTE_NORETURN)
+#  define HPX_ATTRIBUTE_NORETURN BOOST_ATTRIBUTE_NORETURN
+#else
+#  define HPX_ATTRIBUTE_NORETURN
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
