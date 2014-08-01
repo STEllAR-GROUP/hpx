@@ -125,6 +125,27 @@ namespace hpx { namespace parallel { namespace util
         }
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename Result, typename F1, typename FwdIter>
+        std::size_t auto_chunk_size(
+            std::vector<hpx::future<Result> >& workitems,
+            F1 const& f1, FwdIter& first, std::size_t& count)
+        {
+            std::size_t test_chunk_size = count / 100;
+            if (0 == test_chunk_size) return 0;
+
+            boost::uint64_t t = hpx::util::high_resolution_clock::now();
+            add_ready_future(workitems, f1, first, test_chunk_size);
+
+            t = (hpx::util::high_resolution_clock::now() - t) / test_chunk_size;
+
+            std::advance(first, test_chunk_size);
+            count -= test_chunk_size;
+
+            // return chunk size which will create 80 microseconds of work
+            return t == 0 ? 0 : (std::min)(count, 80000 / t);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         // The static partitioner simply spawns one chunk of iterations for
         // each available core.
         template <typename ExPolicy, typename R, typename Result = void>
@@ -135,6 +156,8 @@ namespace hpx { namespace parallel { namespace util
                 std::size_t count, F1 && f1, F2 && f2,
                 std::size_t chunk_size = 0)
             {
+                std::vector<hpx::future<Result> > workitems;
+
                 // estimate a chunk size based on number of cores used
                 threads::executor exec = policy.get_executor();
                 if (chunk_size == 0)
@@ -143,12 +166,15 @@ namespace hpx { namespace parallel { namespace util
                     if (chunk_size == 0)
                     {
                         std::size_t const cores = hpx::get_os_thread_count(exec);
-                        chunk_size = (count + cores - 1) / cores;
+                        if (count > 100*cores)
+                            chunk_size = auto_chunk_size(workitems, f1, first, count);
+
+                        if (chunk_size == 0)
+                            chunk_size = (count + cores - 1) / cores;
                     }
                 }
 
                 // schedule every chunk on a separate thread
-                std::vector<hpx::future<Result> > workitems;
                 workitems.reserve(count / chunk_size + 1);
 
                 while (count > chunk_size)
@@ -191,6 +217,8 @@ namespace hpx { namespace parallel { namespace util
                 FwdIter first, std::size_t count,
                 F1 && f1, F2 && f2, std::size_t chunk_size = 0)
             {
+                std::vector<hpx::future<Result> > workitems;
+
                 // estimate a chunk size based on number of cores used
                 threads::executor exec = policy.get_executor();
                 if (chunk_size == 0)
@@ -199,12 +227,15 @@ namespace hpx { namespace parallel { namespace util
                     if (chunk_size == 0)
                     {
                         std::size_t const cores = hpx::get_os_thread_count(exec);
-                        chunk_size = (count + cores - 1) / cores;
+                        if (count > 100*cores)
+                            chunk_size = auto_chunk_size(workitems, f1, first, count);
+
+                        if (chunk_size == 0)
+                            chunk_size = (count + cores - 1) / cores;
                     }
                 }
 
                 // schedule every chunk on a separate thread
-                std::vector<hpx::future<Result> > workitems;
                 workitems.reserve(count / chunk_size + 1);
 
                 while (count > chunk_size)
