@@ -29,6 +29,8 @@ set(tests
     move
     none_of
     reduce_
+    reverse
+    reverse_copy
     swapranges
     task_region
     transform
