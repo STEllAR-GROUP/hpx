@@ -9,12 +9,10 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/lcos/local/conditional_trigger.hpp>
-#include <hpx/lcos/local/no_mutex.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/lcos/local/promise.hpp>
 #include <hpx/util/assert.hpp>
-
-#include <boost/dynamic_bitset.hpp>
-#include <boost/foreach.hpp>
+#include <hpx/util/move.hpp>
 
 #include <utility>
 #include <map>
