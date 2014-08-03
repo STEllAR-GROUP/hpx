@@ -19,7 +19,10 @@
 
 #include <boost/iterator/counting_iterator.hpp>
 
+#include "print_time_results.hpp"
+
 ///////////////////////////////////////////////////////////////////////////////
+bool header = true; // print csv heading
 double k = 0.5;     // heat transfer coefficient
 double dt = 1.;     // time step
 double dx = 1.;     // grid spacing
@@ -164,20 +167,20 @@ int hpx_main(boost::program_options::variables_map& vm)
     // Execute nt time steps on nx grid points and print the final solution.
     hpx::future<stepper::space> result = step.do_work(np, nx, nt);
 
-    // Print the final solution
     stepper::space solution = result.get();
+    hpx::wait_all(solution);
+
+    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+
+    // Print the final solution
     if (vm.count("result"))
     {
         for (std::size_t i = 0; i != np; ++i)
             std::cout << "U[" << i << "] = " << solution[i].get() << std::endl;
     }
-    else
-    {
-        hpx::wait_all(solution);
-    }
 
-    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
-    std::cout << "Elapsed time: " << elapsed / 1e9 << " [s]" << std::endl;
+    boost::uint64_t const os_thread_count = hpx::get_os_thread_count();
+    print_time_results(os_thread_count, elapsed, nx, np, nt, header);
 
     return hpx::finalize();
 }
@@ -201,6 +204,7 @@ int main(int argc, char* argv[])
          "Timestep unit (default: 1.0[s])")
         ("dx", value<double>(&dx)->default_value(1.0),
          "Local x dimension")
+        ( "no-header", "do not print out the csv header row")
     ;
 
     // Initialize and run HPX

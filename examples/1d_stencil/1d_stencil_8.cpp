@@ -424,7 +424,7 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
                 hpx::launch::async, &stepper_server::heat_part,
                 receive_left(t), current[0], current[1]
             );
-        send_right(t, next[0]);
+        send_left(t, next[0]);
 
         for (std::size_t i = 1; i != local_np-1; ++i)
         {
@@ -438,7 +438,7 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
                 hpx::launch::async, &stepper_server::heat_part,
                 current[local_np-2], current[local_np-1], receive_right(t)
             );
-        send_left(t, next[local_np-1]);
+        send_right(t, next[local_np-1]);
     }
 
     return U_[nt % 2];
@@ -480,16 +480,22 @@ int hpx_main(boost::program_options::variables_map& vm)
     // Gather results from all localities
     if (0 == hpx::get_locality_id())
     {
-        boost::uint64_t elapsed = 0;
         hpx::future<std::vector<stepper_server::space> > overall_result =
             hpx::lcos::gather_here(gather_basename, std::move(result), nl);
+
+        std::vector<stepper_server::space> solution = overall_result.get();
+        for (std::size_t i = 0; i != nl; ++i)
+        {
+            stepper_server::space const& s = solution[i];
+            for (std::size_t i = 0; i != np; ++i)
+                s[i].get_data(partition_server::middle_partition).wait();
+        }
+
+        boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
         // Print the solution at time-step 'nt'.
         if (vm.count("results"))
         {
-            std::vector<stepper_server::space> solution = overall_result.get();
-            elapsed = hpx::util::high_resolution_clock::now() - t;
-
             for (std::size_t i = 0; i != nl; ++i)
             {
                 stepper_server::space const& s = solution[i];
@@ -501,13 +507,7 @@ int hpx_main(boost::program_options::variables_map& vm)
                 }
             }
         }
-        else
-        {
-            overall_result.wait();
-            elapsed = hpx::util::high_resolution_clock::now() - t;
-        }
 
-    
         boost::uint64_t const os_thread_count = hpx::get_os_thread_count();
         print_time_results(os_thread_count, elapsed, nx, np, nt, header);
     }
