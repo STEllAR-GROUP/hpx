@@ -140,12 +140,18 @@ namespace hpx { namespace util
             "timer_pool_size = ${HPX_NUM_TIMER_POOL_THREADS:"
                 BOOST_PP_STRINGIZE(HPX_NUM_TIMER_POOL_THREADS) "}",
 
-            // predefine command line aliases
             "[hpx.commandline]",
+            // enable aliasing
+            "aliasing = ${HPX_COMMANDLINE_ALIASING:1}",
+
+            // allow for unknown options to passes through
+            "allow_unknown = ${HPX_COMMANDLINE_ALLOW_UNKNOWN:0}",
+
+            // predefine command line aliases
+            "[hpx.commandline.aliases]",
             "-a = --hpx:agas",
             "-c = --hpx:console",
             "-h = --hpx:help",
-            "--help = --hpx:help",
             "-I = --hpx:ini",
             "-l = --hpx:localities",
             "-p = --hpx:app-config",
@@ -153,7 +159,6 @@ namespace hpx { namespace util
             "-r = --hpx:run-agas-server",
             "-t = --hpx:threads",
             "-v = --hpx:version",
-            "--version = --hpx:version",
             "-w = --hpx:worker",
             "-x = --hpx:hpx",
             "-0 = --hpx:node=0",

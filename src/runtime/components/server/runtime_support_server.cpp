@@ -1568,8 +1568,12 @@ namespace hpx { namespace components { namespace server
                 std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
                 boost::program_options::variables_map vm;
 
+                util::commandline_error_mode mode = util::rethrow_on_error;
+                std::string allow_unknown(ini.get_entry("hpx.commandline.allow_unknown", "0"));
+                if (allow_unknown != "0") mode = util::allow_unregistered;
+
                 util::parse_commandline(ini, options, unknown_cmd_line, vm,
-                    std::size_t(-1), util::rethrow_on_error,
+                    std::size_t(-1), mode,
                     get_runtime_mode_from_name(runtime_mode));
             }
 

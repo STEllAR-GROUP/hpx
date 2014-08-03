@@ -109,7 +109,7 @@ namespace hpx { namespace util
             if (opt.size() < 2 || opt[0] != '-')
                 return result;
 
-            util::section const* sec = ini.get_section("hpx.commandline");
+            util::section const* sec = ini.get_section("hpx.commandline.aliases");
             if (NULL == sec)
                 return result;     // no alias mappings are defined
 
@@ -182,8 +182,11 @@ namespace hpx { namespace util
                 if (handle_node_specific_option(s, node_, opt))
                     return opt;
 
-                // handle aliasing
-                return handle_aliasing(ini_, s);
+                // handle aliasing, if enabled
+                if (ini_.get_entry("hpx.commandline.aliasing", "1") == "1")
+                    return handle_aliasing(ini_, s);
+
+                return opt;
             }
 
             util::section const& ini_;
