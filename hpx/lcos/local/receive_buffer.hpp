@@ -14,10 +14,10 @@
 #include <hpx/util/assert.hpp>
 
 #include <boost/dynamic_bitset.hpp>
-#include <utility>
 #include <boost/foreach.hpp>
 
-#include <list>
+#include <utility>
+#include <map>
 
 namespace hpx { namespace lcos { namespace local
 {
