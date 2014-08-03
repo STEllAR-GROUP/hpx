@@ -157,10 +157,7 @@ namespace hpx { namespace lcos { namespace local
         {}
 
         ~futures_factory()
-        {
-            if (task_ && !future_obtained_)
-                task_->deleting_owner();
-        }
+        {}
 
         futures_factory(futures_factory && rhs)
           : task_(std::move(rhs.task_)),
@@ -173,9 +170,6 @@ namespace hpx { namespace lcos { namespace local
         futures_factory& operator=(futures_factory && rhs)
         {
             if (this != &rhs) {
-                if (task_ && !future_obtained_)
-                    task_->deleting_owner();
-
                 task_ = std::move(rhs.task_);
                 future_obtained_ = rhs.future_obtained_;
 

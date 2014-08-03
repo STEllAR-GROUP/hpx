@@ -352,39 +352,6 @@ void test_task_returning_reference()
     HPX_TEST_EQ(&i, &global_ref_target);
 }
 
-void test_can_get_a_second_future_from_a_moved_promise()
-{
-    hpx::lcos::local::promise<int> pi;
-    hpx::lcos::future<int> fi1 = pi.get_future();
-
-    hpx::lcos::local::promise<int> pi2(boost::move(pi));
-    hpx::lcos::future<int> fi2 = pi.get_future();
-
-    pi2.set_value(3);
-    HPX_TEST(fi1.is_ready());
-    HPX_TEST(!fi2.is_ready());
-    HPX_TEST_EQ(fi1.get(), 3);
-
-    pi.set_value(42);
-    HPX_TEST(fi2.is_ready());
-    HPX_TEST_EQ(fi2.get(), 42);
-}
-
-void test_can_get_a_second_future_from_a_moved_void_promise()
-{
-    hpx::lcos::local::promise<void> pi;
-    hpx::lcos::future<void> fi1 = pi.get_future();
-
-    hpx::lcos::local::promise<void> pi2(boost::move(pi));
-    hpx::lcos::future<void> fi2 = pi.get_future();
-
-    pi2.set_value();
-    HPX_TEST(fi1.is_ready());
-    HPX_TEST(!fi2.is_ready());
-    pi.set_value();
-    HPX_TEST(fi2.is_ready());
-}
-
 void test_future_for_move_only_udt()
 {
     hpx::lcos::local::promise<X> pt;
@@ -1605,8 +1572,6 @@ int hpx_main(variables_map&)
         test_reference_promise();
         test_task_returning_void();
         test_task_returning_reference();
-        test_can_get_a_second_future_from_a_moved_promise();
-        test_can_get_a_second_future_from_a_moved_void_promise();
         test_future_for_move_only_udt();
         test_future_for_string();
         test_wait_callback();
