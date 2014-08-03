@@ -424,36 +424,48 @@ namespace hpx { namespace components { namespace server
         }
 
         // locate the factory for the requested component type
-        component_map_mutex_type::scoped_lock l(cm_mtx_);
-        component_map_type::const_iterator it = components_.find(g.type);
-        if (it == components_.end()) {
-            // we don't know anything about this component
-            hpx::util::osstream strm;
+        boost::shared_ptr<component_factory_base> factory;
 
-            error_code ec(lightweight);
-            strm << "attempt to destroy component " << gid
-                 << " of invalid/unknown type: "
-                 << components::get_component_type_name(g.type) << " ("
-                 << naming::get_agas_client().get_component_type_name(g.type, ec)
-                 << ")" << std::endl;
+        {
+            component_map_mutex_type::scoped_lock l(cm_mtx_);
+            component_map_type::const_iterator it = components_.find(g.type);
+            if (it == components_.end()) {
+                // we don't know anything about this component
+                hpx::util::osstream strm;
 
-            strm << "list of registered components: \n";
-            component_map_type::iterator end = components_.end();
-            for (component_map_type::iterator cit = components_.begin(); cit!= end; ++cit)
-            {
-                strm << "  " << components::get_component_type_name((*cit).first)
-                     << " (" << naming::get_agas_client().get_component_type_name((*cit).first, ec)
-                      << ")" << std::endl;
+                naming::resolver_client& client = naming::get_agas_client();
+                error_code ec(lightweight);
+                strm << "attempt to destroy component "
+                     << gid
+                     << " of invalid/unknown type: "
+                     << components::get_component_type_name(g.type)
+                     << " ("
+                     << client.get_component_type_name(g.type, ec)
+                     << ")" << std::endl;
+
+                strm << "list of registered components: \n";
+                component_map_type::iterator end = components_.end();
+                for (component_map_type::iterator cit = components_.begin(); cit!= end; ++cit)
+                {
+                    strm << "  "
+                         << components::get_component_type_name((*cit).first)
+                         << " ("
+                         << client.get_component_type_name((*cit).first, ec)
+                         << ")" << std::endl;
+                }
+
+                l.unlock();
+                HPX_THROW_EXCEPTION(hpx::bad_component_type,
+                    "runtime_support::free_component",
+                    hpx::util::osstream_get_string(strm));
+                return;
             }
 
-            l.unlock();
-            HPX_THROW_EXCEPTION(hpx::bad_component_type,
-                "runtime_support::free_component",
-                hpx::util::osstream_get_string(strm));
-            return;
+            factory = (*it).second.first;
         }
 
-        // we might end up with the same address, so cache the already deleted ones here.
+        // we might end up with the same address, so cache the already deleted
+        // ones here.
 #if defined(HPX_DEBUG)
         std::vector<naming::address> freed_components;
         freed_components.reserve(count);
@@ -480,7 +492,7 @@ namespace hpx { namespace components { namespace server
             // What should we do instead?
 
             // destroy the component instance
-            (*it).second.first->destroy(target, addr);
+            factory->destroy(target, addr);
 
             LRT_(info) << "successfully destroyed component " << (gid + i)
                 << " of type: " << components::get_component_type_name(g.type);
