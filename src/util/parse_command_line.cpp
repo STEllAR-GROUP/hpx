@@ -576,6 +576,8 @@ namespace hpx { namespace util
                     *unregistered_options =
                         collect_unrecognized(opts.options, exclude_positional);
                 }
+
+                store(opts, vm);
             }
             else
             {
