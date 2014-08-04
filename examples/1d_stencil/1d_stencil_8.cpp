@@ -34,17 +34,23 @@ struct partition_data
 private:
     typedef hpx::util::serialize_buffer<double> buffer_type;
 
+    static boost::atomic<int> count_;
+
 public:
     partition_data()
       : size_(0)
-    {}
+    {
+        ++count_;
+    }
 
     // Create a new (uninitialized) partition of the given size.
     partition_data(std::size_t size)
       : data_(new double [size], size, buffer_type::take),
         size_(size),
         min_index_(0)
-    {}
+    {
+        ++count_;
+    }
 
     // Create a new (initialized) partition of the given size.
     partition_data(std::size_t size, double initial_value)
@@ -55,6 +61,8 @@ public:
         double base_value = double(initial_value * size);
         for (std::size_t i = 0; i != size; ++i)
             data_[i] = base_value + double(i);
+
+        ++count_;
     }
 
     // Create a partition which acts as a proxy to a part of the embedded array.
@@ -66,6 +74,12 @@ public:
         min_index_(min_index)
     {
         HPX_ASSERT(min_index < base.size());
+        ++count_;
+    }
+
+    ~partition_data()
+    {
+        --count_;
     }
 
     double& operator[](std::size_t idx) { return data_[index(idx)]; }
@@ -97,6 +111,8 @@ private:
     std::size_t size_;
     std::size_t min_index_;
 };
+
+boost::atomic<int> partition_data::count_(0);
 
 std::ostream& operator<<(std::ostream& os, partition_data const& c)
 {
@@ -404,7 +420,6 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
     using hpx::util::unwrapped;
 
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
-    //std::size_t nl = localities.size();                    // Number of localities
 
     // U[t][i] is the state of position i at time t.
     for (space& s: U_)
@@ -415,6 +430,10 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
     for (std::size_t i = 0; i != local_np; ++i)
         U_[0][i] = partition(here, nx, double(i));
 
+    // send initial values to neighbors
+    send_left(0, U_[0][0]);
+    send_right(0, U_[0][local_np-1]);
+
     for (std::size_t t = 0; t != nt; ++t)
     {
         space const& current = U_[t % 2];
@@ -424,7 +443,9 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
                 hpx::launch::async, &stepper_server::heat_part,
                 receive_left(t), current[0], current[1]
             );
-        send_left(t, next[0]);
+
+        // send to left if not last
+        if (t != nt-1) send_left(t + 1, next[0]);
 
         for (std::size_t i = 1; i != local_np-1; ++i)
         {
@@ -438,7 +459,9 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
                 hpx::launch::async, &stepper_server::heat_part,
                 current[local_np-2], current[local_np-1], receive_right(t)
             );
-        send_right(t, next[local_np-1]);
+
+        // send to right if not last
+        if (t != nt-1) send_right(t + 1, next[local_np-1]);
     }
 
     return U_[nt % 2];
