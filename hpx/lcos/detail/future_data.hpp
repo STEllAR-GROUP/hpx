@@ -143,8 +143,6 @@ namespace detail
           : data_(), state_(empty)
         {}
 
-        virtual void deleting_owner() {}
-
         // cancellation is disabled by default
         virtual bool cancelable() const
         {
@@ -653,17 +651,6 @@ namespace detail
         }
 
     public:
-        void deleting_owner()
-        {
-            typename mutex_type::scoped_lock l(this->mtx_);
-            if (!started_) {
-                started_ = true;
-                l.unlock();
-                this->set_error(broken_task, "task_base::deleting_owner",
-                    "deleting task owner before future has become ready");
-            }
-        }
-
         template <typename T>
         void set_data(T && result)
         {

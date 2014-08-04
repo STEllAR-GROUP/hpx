@@ -296,18 +296,6 @@ namespace hpx { namespace lcos { namespace detail
             async(f, sched, throws);
         }
 
-        void deleting_owner()
-        {
-            typename mutex_type::scoped_lock l(this->mtx_);
-            if (!started_) {
-                started_ = true;
-                l.unlock();
-                this->set_error(broken_task,
-                    "continuation::deleting_owner",
-                    "deleting task owner before future has been executed");
-            }
-        }
-
         // cancellation support
         bool cancelable() const
         {
@@ -508,7 +496,7 @@ namespace hpx { namespace lcos { namespace detail
             void (unwrap_continuation::*outer_ready)(
                 outer_shared_state_ptr const&) =
                     &unwrap_continuation::on_outer_ready<Future>;
-            
+
             if (future.wait_for(boost::posix_time::seconds(0)) == future_status::deferred)
                 future.wait();
 

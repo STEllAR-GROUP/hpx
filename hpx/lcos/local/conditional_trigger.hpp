@@ -62,14 +62,6 @@ namespace hpx { namespace lcos { namespace local
         /// \brief Trigger this object.
         bool set(error_code& ec = throws)
         {
-            if (promise_.is_ready())
-            {
-                // segment already filled, logic error
-                HPX_THROWS_IF(ec, bad_parameter, "conditional_trigger::set",
-                    "input with the given index has already been triggered");
-                return false;
-            }
-
             if (&ec != &throws)
                 ec = make_success_code();
 
