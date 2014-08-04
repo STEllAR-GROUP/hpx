@@ -12,6 +12,7 @@
 #include <hpx/util/runtime_configuration.hpp>
 
 #include <boost/program_options.hpp>
+#include <boost/foreach.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -30,7 +31,10 @@ namespace hpx { namespace util
             num_threads_(1),
             num_cores_(1),
             num_localities_(1)
-        {}
+        {
+            BOOST_FOREACH(std::string const& e, ini_config)
+                rtcfg_.parse("<user supplied config>", e);
+        }
 
         int call(boost::program_options::options_description  const& desc_cmdline,
             int argc, char** argv);
