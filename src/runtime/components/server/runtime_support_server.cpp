@@ -264,6 +264,8 @@ namespace hpx { namespace components { namespace server
             strm << "attempt to query factory properties for components "
                     "invalid/unknown type: "
                  << components::get_component_type_name(type);
+
+            l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::factory_properties",
                 hpx::util::osstream_get_string(strm));
@@ -289,6 +291,8 @@ namespace hpx { namespace components { namespace server
             hpx::util::osstream strm;
             strm << "attempt to create component instance of invalid/unknown type: "
                  << components::get_component_type_name(type);
+
+            l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::bulk_create_components",
                 hpx::util::osstream_get_string(strm));
@@ -333,6 +337,7 @@ namespace hpx { namespace components { namespace server
                 components_.insert(component_map_type::value_type(type, data));
             if (!p.second)
             {
+                l.unlock();
                 HPX_THROW_EXCEPTION(out_of_memory,
                     "runtime_support::get_promise_heap",
                     "could not create base_lco_factor for type " +
@@ -392,6 +397,7 @@ namespace hpx { namespace components { namespace server
                     hpx::util::osstream strm;
                     strm << "global id " << target << " is not bound to any "
                             "local component instance";
+
                     // FIXME: If this throws then we leak the rest of count.
                     // What should we do instead?
                     HPX_THROW_EXCEPTION(hpx::unknown_component_address,
@@ -418,34 +424,48 @@ namespace hpx { namespace components { namespace server
         }
 
         // locate the factory for the requested component type
-        component_map_type::const_iterator it = components_.find(g.type);
-        if (it == components_.end()) {
-            // we don't know anything about this component
-            hpx::util::osstream strm;
+        boost::shared_ptr<component_factory_base> factory;
 
-            error_code ec(lightweight);
-            strm << "attempt to destroy component " << gid
-                 << " of invalid/unknown type: "
-                 << components::get_component_type_name(g.type) << " ("
-                 << naming::get_agas_client().get_component_type_name(g.type, ec)
-                 << ")" << std::endl;
+        {
+            component_map_mutex_type::scoped_lock l(cm_mtx_);
+            component_map_type::const_iterator it = components_.find(g.type);
+            if (it == components_.end()) {
+                // we don't know anything about this component
+                hpx::util::osstream strm;
 
-            strm << "list of registered components: \n";
-            component_map_type::iterator end = components_.end();
-            for (component_map_type::iterator cit = components_.begin(); cit!= end; ++cit)
-            {
-                strm << "  " << components::get_component_type_name((*cit).first)
-                     << " (" << naming::get_agas_client().get_component_type_name((*cit).first, ec)
-                      << ")" << std::endl;
+                naming::resolver_client& client = naming::get_agas_client();
+                error_code ec(lightweight);
+                strm << "attempt to destroy component "
+                     << gid
+                     << " of invalid/unknown type: "
+                     << components::get_component_type_name(g.type)
+                     << " ("
+                     << client.get_component_type_name(g.type, ec)
+                     << ")" << std::endl;
+
+                strm << "list of registered components: \n";
+                component_map_type::iterator end = components_.end();
+                for (component_map_type::iterator cit = components_.begin(); cit!= end; ++cit)
+                {
+                    strm << "  "
+                         << components::get_component_type_name((*cit).first)
+                         << " ("
+                         << client.get_component_type_name((*cit).first, ec)
+                         << ")" << std::endl;
+                }
+
+                l.unlock();
+                HPX_THROW_EXCEPTION(hpx::bad_component_type,
+                    "runtime_support::free_component",
+                    hpx::util::osstream_get_string(strm));
+                return;
             }
 
-            HPX_THROW_EXCEPTION(hpx::bad_component_type,
-                "runtime_support::free_component",
-                hpx::util::osstream_get_string(strm));
-            return;
+            factory = (*it).second.first;
         }
 
-        // we might end up with the same address, so cache the already deleted ones here.
+        // we might end up with the same address, so cache the already deleted
+        // ones here.
 #if defined(HPX_DEBUG)
         std::vector<naming::address> freed_components;
         freed_components.reserve(count);
@@ -468,12 +488,11 @@ namespace hpx { namespace components { namespace server
             }
             HPX_ASSERT(!found);
 #endif
-
             // FIXME: If this throws then we leak the rest of count.
             // What should we do instead?
 
             // destroy the component instance
-            (*it).second.first->destroy(target, addr);
+            factory->destroy(target, addr);
 
             LRT_(info) << "successfully destroyed component " << (gid + i)
                 << " of type: " << components::get_component_type_name(g.type);
@@ -923,6 +942,8 @@ namespace hpx { namespace components { namespace server
             strm << "attempt to query instance count for components of "
                     "invalid/unknown type: "
                  << components::get_component_type_name(type);
+
+            l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::factory_properties",
                 hpx::util::osstream_get_string(strm));
@@ -1344,6 +1365,8 @@ namespace hpx { namespace components { namespace server
                 }
 
                 // store component factory and module for later use
+                component_map_mutex_type::scoped_lock l(cm_mtx_);
+
                 component_factory_type data(factory, isenabled);
                 std::pair<component_map_type::iterator, bool> p =
                     components_.insert(component_map_type::value_type(t, data));
@@ -1518,8 +1541,12 @@ namespace hpx { namespace components { namespace server
                 std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
                 boost::program_options::variables_map vm;
 
+                util::commandline_error_mode mode = util::rethrow_on_error;
+                std::string allow_unknown(ini.get_entry("hpx.commandline.allow_unknown", "0"));
+                if (allow_unknown != "0") mode = util::allow_unregistered;
+
                 util::parse_commandline(ini, options, unknown_cmd_line, vm,
-                    std::size_t(-1), util::rethrow_on_error,
+                    std::size_t(-1), mode,
                     get_runtime_mode_from_name(runtime_mode));
             }
 
@@ -1863,6 +1890,8 @@ namespace hpx { namespace components { namespace server
                 }
 
                 // store component factory and module for later use
+                component_map_mutex_type::scoped_lock l(cm_mtx_);
+
                 component_factory_type data(factory, d, isenabled);
                 std::pair<component_map_type::iterator, bool> p =
                     components_.insert(component_map_type::value_type(t, data));
@@ -2109,6 +2138,8 @@ namespace hpx { namespace components { namespace server
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (component type not found in map)";
+
+            l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::get_factory_capabilities",
                 hpx::util::osstream_get_string(strm));
@@ -2121,6 +2152,8 @@ namespace hpx { namespace components { namespace server
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (map entry is NULL)";
+
+            l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::get_factory_capabilities",
                 hpx::util::osstream_get_string(strm));

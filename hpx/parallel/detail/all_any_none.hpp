@@ -58,13 +58,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename std::iterator_traits<FwdIter>::value_type
                     value_type;
 
-                util::cancellation_token tok;
+                util::cancellation_token<> tok;
                 return util::partitioner<ExPolicy, bool>::call(
                     policy, first, std::distance(first, last),
-                    [op, tok](FwdIter part_begin, std::size_t part_size) mutable
+                    [op, tok](FwdIter part_begin, std::size_t part_count) mutable
                     {
                         util::loop_n(
-                            part_begin, part_size, tok,
+                            part_begin, part_count, tok,
                             [&op, &tok](value_type const& val)
                             {
                                 if (op(val))
@@ -195,13 +195,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename std::iterator_traits<FwdIter>::value_type
                     value_type;
 
-                util::cancellation_token tok;
+                util::cancellation_token<> tok;
                 return util::partitioner<ExPolicy, bool>::call(
                     policy, first, std::distance(first, last),
-                    [op, tok](FwdIter part_begin, std::size_t part_size) mutable
+                    [op, tok](FwdIter part_begin, std::size_t part_count) mutable
                     {
                         util::loop_n(
-                            part_begin, part_size, tok,
+                            part_begin, part_count, tok,
                             [&op, &tok](value_type const& val)
                             {
                                 if (op(val))
@@ -332,13 +332,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename std::iterator_traits<FwdIter>::value_type
                     value_type;
 
-                util::cancellation_token tok;
+                util::cancellation_token<> tok;
                 return util::partitioner<ExPolicy, bool>::call(
                     policy, first, std::distance(first, last),
-                    [op, tok](FwdIter part_begin, std::size_t part_size) mutable
+                    [op, tok](FwdIter part_begin, std::size_t part_count) mutable
                     {
                         util::loop_n(
-                            part_begin, part_size, tok,
+                            part_begin, part_count, tok,
                             [&op, &tok](value_type const& val)
                             {
                                 if (!op(val))

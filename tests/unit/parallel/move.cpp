@@ -189,13 +189,13 @@ void test_move_exception(ExPolicy const& policy, IteratorTag)
             decorated_iterator(
                 boost::begin(c),
                 [](){ throw std::runtime_error("test"); }),
-            decorated_iterator(boost::end(c), [](){}),
+            decorated_iterator(boost::end(c)),
             boost::begin(d));
         HPX_TEST(false);
     }
     catch (hpx::exception_list const& e) {
         caught_exception = true;
-        test::test_num_exeptions<ExPolicy, IteratorTag>::call(policy, e);
+        test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
     catch (...) {
         HPX_TEST(false);
@@ -223,7 +223,7 @@ void test_move_exception(hpx::parallel::task_execution_policy, IteratorTag)
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::runtime_error("test"); }),
-                decorated_iterator(boost::end(c), [](){}),
+                decorated_iterator(boost::end(c)),
                 boost::begin(d));
         f.get();
 
@@ -231,7 +231,7 @@ void test_move_exception(hpx::parallel::task_execution_policy, IteratorTag)
     }
     catch (hpx::exception_list const& e) {
         caught_exception = true;
-        test::test_num_exeptions<
+        test::test_num_exceptions<
             hpx::parallel::task_execution_policy, IteratorTag
         >::call(hpx::parallel::task, e);
     }
@@ -286,7 +286,7 @@ void test_move_bad_alloc(ExPolicy const& policy, IteratorTag)
             decorated_iterator(
                 boost::begin(c),
                 [](){ throw std::bad_alloc(); }),
-            decorated_iterator(boost::end(c), [](){}),
+            decorated_iterator(boost::end(c)),
             boost::begin(d));
         HPX_TEST(false);
     }
@@ -319,7 +319,7 @@ void test_move_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::bad_alloc(); }),
-                decorated_iterator(boost::end(c), [](){}),
+                decorated_iterator(boost::end(c)),
                 boost::begin(d));
 
         f.get();

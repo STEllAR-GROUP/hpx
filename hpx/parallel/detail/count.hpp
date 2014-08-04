@@ -145,7 +145,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         BOOST_STATIC_ASSERT_MSG(
             (boost::is_base_of<std::input_iterator_tag, category>::value),
-            "Required at least input iterator .");
+            "Required at least input iterator.");
 
         typedef typename boost::mpl::or_<
             is_sequential_execution_policy<ExPolicy>,
@@ -207,7 +207,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         return ret;
                     },
                     hpx::util::unwrapped(
-                        [](std::vector<difference_type>&& results)
+                        [](std::vector<difference_type> && results)
                         {
                             return util::accumulate_n(
                                 boost::begin(results), boost::size(results),

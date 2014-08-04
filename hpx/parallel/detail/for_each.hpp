@@ -9,7 +9,6 @@
 #define HPX_PARALLEL_DETAIL_FOR_EACH_MAY_29_2014_0932PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/exception_list.hpp>
 #include <hpx/util/void_guard.hpp>
 #include <hpx/util/move.hpp>
 
@@ -54,9 +53,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             parallel(ExPolicy const& policy, Iter first, std::size_t count,
                 F && f)
             {
-                if (count > 0)
+                if (count != 0)
                 {
-                    return util::partitioner<ExPolicy>::call(
+                    return util::foreach_n_partitioner<ExPolicy>::call(
                         policy, first, count,
                         [f](Iter part_begin, std::size_t part_size)
                         {

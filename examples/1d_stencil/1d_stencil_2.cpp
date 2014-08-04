@@ -111,19 +111,17 @@ int hpx_main(boost::program_options::variables_map& vm)
     // Execute nt time steps on nx grid points.
     hpx::future<stepper::space> result = step.do_work(nx, nt);
 
-    // Print the final solution
     stepper::space solution = result.get();
+    hpx::wait_all(solution);
+
+    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+
+    // Print the final solution
     if (vm.count("results"))
     {
         for (std::size_t i = 0; i != nx; ++i)
             std::cout << "U[" << i << "] = " << solution[i].get() << std::endl;
     }
-    else
-    {
-        hpx::wait_all(solution);
-    }
-
-    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
     boost::uint64_t const os_thread_count = hpx::get_os_thread_count();
     print_time_results(os_thread_count, elapsed, nx, nt, header);

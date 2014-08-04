@@ -4,10 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_COUNT_IF_JUL_14_2014_0632PM)
-#define HPX_PARALLEL_COUNT_IF_JUL_14_2014_0632PM
+#if !defined(HPX_PARALLEL_FIND_JUL_21_2014_0248PM)
+#define HPX_PARALLEL_FIND_JUL_21_2014_0248PM
 
-#include <hpx/parallel/detail/count.hpp>
+#include <hpx/parallel/detail/find.hpp>
 
 #endif
 

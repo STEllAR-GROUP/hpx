@@ -66,7 +66,7 @@ parallel::none_of                     "none_of" "hpx\.parallel\.v1\.none_of.*"
 parallel::copy                        "copy" "hpx\.parallel\.v1\.copy_id.*"
 parallel::copy_n                      "copy_n" "hpx\.parallel\.v1\.copy_n.*"
 
-# hpx/parallel/detail/copy.hpp
+# hpx/parallel/detail/count.hpp
 parallel::count                       "count" "hpx\.parallel\.v1\.count$.*"
 parallel::count_if                    "count_if" "hpx\.parallel\.v1\.count_if.*"
 
@@ -77,15 +77,32 @@ parallel::equal                       "equal" "hpx\.parallel\.v1\.equal_id.*"
 parallel::fill                        "fill" "hpx\.parallel\.v1\.fill$"
 parallel::fill_n                      "fill_n" "hpx\.parallel\.v1\.fill_n.*"
 
+# hpx/parallel/detail/find.hpp
+parallel::find                        "find" "hpx\.parallel\.v1\.find$"
+parallel::find_if                     "find_if" "hpx\.parallel\.v1\.find_if$"
+parallel::find_if_not                 "find_if_not" "hpx\.parallel\.v1\.find_if_not.*"
+parallel::find_end                    "find_end" "hpx\.parallel\.v1\.find_end_id.*"
+
 # hpx/parallel/detail/for_each.hpp
 parallel::for_each                    "for_each" "hpx\.parallel\.v1\.for_each$"
 parallel::for_each_n                  "for_each_n" "hpx\.parallel\.v1\.for_each_n.*"
+
+# hpx/parallel/detail/generate.hpp
+parallel::generate                    "generate" "hpx\.parallel\.v1\.generate$"
+parallel::generate_n                  "generate_n" "hpx\.parallel\.v1\.generate_n.*"
+
+# hpx/parallel/detail/mismatch.hpp
+parallel::mismatch                    "mismatch" "hpx\.parallel\.v1\.mismatch_id.*"
 
 # hpx/parallel/detail/move.hpp
 parallel::move                        "move" "hpx\.parallel\.v1\.move$"
 
 # hpx/parallel/detail/reduce.hpp
 parallel::reduce                      "reduce" "hpx\.parallel\.v1\.reduce.*"
+
+# hpx/parallel/detail/reverse.hpp
+parallel::reverse                     "reverse" "hpx\.parallel\.v1\.reverse$"
+parallel::reverse_copy                "reverse_copy" "hpx\.parallel\.v1\.reverse_copy.*"
 
 # hpx/parallel/detail/swap_ranges.hpp
 parallel::swap_ranges                 "swap_ranges" "hpx\.parallel\.v1\.swap_ranges.*"

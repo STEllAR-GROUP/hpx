@@ -21,6 +21,10 @@
 #include <vector>
 #include <cstdlib>
 
+#include <omp.h>
+
+#include "print_time_results.hpp"
+
 ///////////////////////////////////////////////////////////////////////////////
 // Timer with nanosecond resolution
 inline boost::uint64_t now()
@@ -31,6 +35,7 @@ inline boost::uint64_t now()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+bool header = true; // print csv heading
 double k = 0.5;     // heat transfer coefficient
 double dt = 1.;     // time step
 double dx = 1.;     // grid spacing
@@ -155,6 +160,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     // Execute nt time steps on nx grid points and print the final solution.
     stepper::space solution = step.do_work(np, nx, nt);
 
+    boost::uint64_t elapsed = now() - t;
+
     // Print the final solution
     if (vm.count("results"))
     {
@@ -162,8 +169,8 @@ int hpx_main(boost::program_options::variables_map& vm)
             std::cout << "U[" << i << "] = " << solution[i] << std::endl;
     }
 
-    boost::uint64_t elapsed = now() - t;
-    std::cout << "Elapsed time: " << elapsed / 1e9 << " [s]" << std::endl;
+    boost::uint64_t const os_thread_count = omp_get_num_threads();
+    print_time_results(os_thread_count, elapsed, nx, np, nt, header);
 
     return 0;
 }
@@ -187,6 +194,7 @@ int main(int argc, char* argv[])
          "Timestep unit (default: 1.0[s])")
         ("dx", po::value<double>(&dx)->default_value(1.0),
          "Local x dimension")
+        ( "no-header", "do not print out the csv header row")
     ;
 
     po::variables_map vm;

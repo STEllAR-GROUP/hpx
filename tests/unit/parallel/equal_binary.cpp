@@ -19,10 +19,10 @@ void test_equal_binary1(ExPolicy const& policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c1(10007);
+    std::vector<std::size_t> c1(10);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand();
+    std::size_t first_value = std::rand(); //-V101
     std::iota(boost::begin(c1), boost::end(c1), first_value);
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 
@@ -39,7 +39,7 @@ void test_equal_binary1(ExPolicy const& policy, IteratorTag)
     }
 
     {
-        ++c1[std::rand() % c1.size()];
+        c1[std::rand() % c1.size()] += 1; //-V104
         bool result = hpx::parallel::equal(policy,
             iterator(boost::begin(c1)), iterator(boost::end(c1)),
             boost::begin(c2), boost::end(c2));
@@ -61,7 +61,7 @@ void test_equal_binary1(hpx::parallel::task_execution_policy, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand();
+    std::size_t first_value = std::rand(); //-V101
     std::iota(boost::begin(c1), boost::end(c1), first_value);
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 
@@ -80,7 +80,7 @@ void test_equal_binary1(hpx::parallel::task_execution_policy, IteratorTag)
     }
 
     {
-        ++c1[std::rand() % c1.size()];
+        ++c1[std::rand() % c1.size()]; //-V104
 
         hpx::future<bool> result =
             hpx::parallel::equal(hpx::parallel::task,
@@ -114,9 +114,9 @@ void test_equal_binary1()
 
 void equal_binary_test1()
 {
-    test_equal_binary1<std::random_access_iterator_tag>();
+    //test_equal_binary1<std::random_access_iterator_tag>();
     test_equal_binary1<std::forward_iterator_tag>();
-    test_equal_binary1<std::input_iterator_tag>();
+    //test_equal_binary1<std::input_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -131,7 +131,7 @@ void test_equal_binary2(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand();
+    std::size_t first_value = std::rand(); //-V101
     std::iota(boost::begin(c1), boost::end(c1), first_value);
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 
@@ -148,7 +148,7 @@ void test_equal_binary2(ExPolicy const& policy, IteratorTag)
     }
 
     {
-        ++c1[std::rand() % c1.size()];
+        ++c1[std::rand() % c1.size()]; //-V104
         bool result = hpx::parallel::equal(policy,
             iterator(boost::begin(c1)), iterator(boost::end(c1)),
             boost::begin(c2), boost::end(c2), std::equal_to<std::size_t>());
@@ -170,7 +170,7 @@ void test_equal_binary2(hpx::parallel::task_execution_policy, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand();
+    std::size_t first_value = std::rand(); //-V101
     std::iota(boost::begin(c1), boost::end(c1), first_value);
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 
@@ -189,7 +189,7 @@ void test_equal_binary2(hpx::parallel::task_execution_policy, IteratorTag)
     }
 
     {
-        ++c1[std::rand() % c1.size()];
+        ++c1[std::rand() % c1.size()]; //-V104
 
         hpx::future<bool> result =
             hpx::parallel::equal(hpx::parallel::task,
@@ -240,7 +240,7 @@ void test_equal_binary_exception(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand();
+    std::size_t first_value = std::rand(); //-V101
     std::iota(boost::begin(c1), boost::end(c1), first_value);
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 
@@ -258,7 +258,7 @@ void test_equal_binary_exception(ExPolicy const& policy, IteratorTag)
     }
     catch(hpx::exception_list const& e) {
         caught_exception = true;
-        test::test_num_exeptions<ExPolicy, IteratorTag>::call(policy, e);
+        test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
     catch(...) {
         HPX_TEST(false);
@@ -276,7 +276,7 @@ void test_equal_binary_exception(hpx::parallel::task_execution_policy, IteratorT
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand();
+    std::size_t first_value = std::rand(); //-V101
     std::iota(boost::begin(c1), boost::end(c1), first_value);
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 
@@ -297,7 +297,7 @@ void test_equal_binary_exception(hpx::parallel::task_execution_policy, IteratorT
     }
     catch(hpx::exception_list const& e) {
         caught_exception = true;
-        test::test_num_exeptions<
+        test::test_num_exceptions<
             hpx::parallel::task_execution_policy, IteratorTag
         >::call(hpx::parallel::task, e);
     }
@@ -344,7 +344,7 @@ void test_equal_binary_bad_alloc(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand();
+    std::size_t first_value = std::rand(); //-V101
     std::iota(boost::begin(c1), boost::end(c1), first_value);
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 
@@ -379,7 +379,7 @@ void test_equal_binary_bad_alloc(hpx::parallel::task_execution_policy, IteratorT
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand();
+    std::size_t first_value = std::rand(); //-V101
     std::iota(boost::begin(c1), boost::end(c1), first_value);
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 
