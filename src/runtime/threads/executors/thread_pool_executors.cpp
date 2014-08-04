@@ -349,7 +349,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             return max_punits_;
 
         case threads::detail::current_concurrency:
-            return current_concurrency_ ? current_concurrency_ : min_punits_;
+            return current_concurrency_ ?
+                static_cast<std::size_t>(current_concurrency_)
+              : min_punits_;
 
         default:
             break;
