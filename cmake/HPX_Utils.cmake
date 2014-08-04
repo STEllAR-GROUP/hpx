@@ -21,6 +21,7 @@ hpx_include(
   AddLibrarySources
   AddLibraryHeaders
   AddSourceGroup
+  ExportTargets
   IsTarget
   HandleComponentDependencies
   ForceOutOfTreeBuild
