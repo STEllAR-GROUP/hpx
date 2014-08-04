@@ -34,23 +34,17 @@ struct partition_data
 private:
     typedef hpx::util::serialize_buffer<double> buffer_type;
 
-    static boost::atomic<int> count_;
-
 public:
     partition_data()
       : size_(0)
-    {
-        ++count_;
-    }
+    {}
 
     // Create a new (uninitialized) partition of the given size.
     partition_data(std::size_t size)
       : data_(new double [size], size, buffer_type::take),
         size_(size),
         min_index_(0)
-    {
-        ++count_;
-    }
+    {}
 
     // Create a new (initialized) partition of the given size.
     partition_data(std::size_t size, double initial_value)
@@ -61,8 +55,6 @@ public:
         double base_value = double(initial_value * size);
         for (std::size_t i = 0; i != size; ++i)
             data_[i] = base_value + double(i);
-
-        ++count_;
     }
 
     // Create a partition which acts as a proxy to a part of the embedded array.
@@ -74,12 +66,6 @@ public:
         min_index_(min_index)
     {
         HPX_ASSERT(min_index < base.size());
-        ++count_;
-    }
-
-    ~partition_data()
-    {
-        --count_;
     }
 
     double& operator[](std::size_t idx) { return data_[index(idx)]; }
@@ -111,8 +97,6 @@ private:
     std::size_t size_;
     std::size_t min_index_;
 };
-
-boost::atomic<int> partition_data::count_(0);
 
 std::ostream& operator<<(std::ostream& os, partition_data const& c)
 {
