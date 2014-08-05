@@ -36,27 +36,21 @@ private:
 
 public:
     partition_data()
-      : size_(0),
-        t_(std::size_t(-1)),
-        n_(std::size_t(-1))
+      : size_(0)
     {}
 
     // Create a new (uninitialized) partition of the given size.
-    partition_data(std::size_t size, std::size_t t, std::size_t n)
+    partition_data(std::size_t size)
       : data_(new double [size], size, buffer_type::take),
         size_(size),
-        min_index_(0),
-        t_(t),
-        n_(n)
+        min_index_(0)
     {}
 
     // Create a new (initialized) partition of the given size.
-    partition_data(std::size_t size, double initial_value, std::size_t n)
+    partition_data(std::size_t size, double initial_value)
       : data_(new double [size], size, buffer_type::take),
         size_(size),
-        min_index_(0),
-        t_(0),
-        n_(n)
+        min_index_(0)
     {
         double base_value = double(initial_value * size);
         for (std::size_t i = 0; i != size; ++i)
@@ -69,15 +63,9 @@ public:
     partition_data(partition_data const& base, std::size_t min_index)
       : data_(base.data_.data()+min_index, 1, buffer_type::reference),
         size_(base.size()),
-        min_index_(min_index),
-        t_(base.t_),
-        n_(base.n_)
+        min_index_(min_index)
     {
         HPX_ASSERT(min_index < base.size());
-    }
-
-    ~partition_data()
-    {
     }
 
     double& operator[](std::size_t idx) { return data_[index(idx)]; }
@@ -101,15 +89,13 @@ private:
     template <typename Archive>
     void serialize(Archive& ar, const unsigned int version)
     {
-        ar & data_ & size_ & min_index_ & t_ & n_;
+        ar & data_ & size_ & min_index_;
     }
 
 private:
     buffer_type data_;
     std::size_t size_;
     std::size_t min_index_;
-    std::size_t t_;
-    std::size_t n_;
 };
 
 std::ostream& operator<<(std::ostream& os, partition_data const& c)
@@ -150,8 +136,8 @@ struct partition_server
       : data_(data)
     {}
 
-    partition_server(std::size_t size, double initial_value, std::size_t n)
-      : data_(size, initial_value, n)
+    partition_server(std::size_t size, double initial_value)
+      : data_(size, initial_value)
     {}
 
     // Access data. The parameter specifies what part of the data should be
@@ -182,7 +168,7 @@ struct partition_server
     // wrapped into a component action. The macro below defines a new type
     // 'get_data_action' which represents the (possibly remote) member function
     // partition::get_data().
-    HPX_DEFINE_COMPONENT_CONST_ACTION(partition_server, get_data, get_data_action);
+    HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(partition_server, get_data, get_data_action);
 
 private:
     partition_data data_;
@@ -211,8 +197,8 @@ struct partition : hpx::components::client_base<partition, partition_server>
     partition() {}
 
     // Create new component on locality 'where' and initialize the held data
-    partition(hpx::id_type where, std::size_t size, double initial_value, std::size_t n)
-      : base_type(hpx::new_<partition_server>(where, size, initial_value, n))
+    partition(hpx::id_type where, std::size_t size, double initial_value)
+      : base_type(hpx::new_<partition_server>(where, size, initial_value))
     {}
 
     // Create a new component on the locality co-located to the id 'where'. The
@@ -289,7 +275,7 @@ protected:
     // The partitioned operator, it invokes the heat operator above on all
     // elements of a partition.
     static partition heat_part(partition const& left, partition const& middle,
-        partition const& right, std::size_t t, std::size_t n);
+        partition const& right);
 
     // Helper functions to receive the left and right boundary elements from
     // the neighbors.
@@ -362,8 +348,7 @@ struct stepper : hpx::components::client_base<stepper, stepper_server>
 // The partitioned operator, it invokes the heat operator above on all elements
 // of a partition.
 partition stepper_server::heat_part(partition const& left,
-    partition const& middle, partition const& right,
-    std::size_t t, std::size_t n)
+    partition const& middle, partition const& right)
 {
     using hpx::lcos::local::dataflow;
     using hpx::util::unwrapped;
@@ -373,12 +358,12 @@ partition stepper_server::heat_part(partition const& left,
 
     hpx::future<partition_data> next_middle = middle_data.then(
         unwrapped(
-            [middle, t, n](partition_data const& m)
+            [middle](partition_data const& m)
             {
                 // All local operations are performed once the middle data of
                 // the previous time step becomes available.
                 std::size_t size = m.size();
-                partition_data next(size, t, n);
+                partition_data next(size);
                 for (std::size_t i = 1; i != size-1; ++i)
                     next[i] = heat(m[i-1], m[i], m[i+1]);
                 return next;
@@ -427,7 +412,7 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
     // Initial conditions: f(0, i) = i
     hpx::id_type here = hpx::find_here();
     for (std::size_t i = 0; i != local_np; ++i)
-        U_[0][i] = partition(here, nx, double(i), i);
+        U_[0][i] = partition(here, nx, double(i));
 
     // send initial values to neighbors
     send_left(0, U_[0][0]);
@@ -443,8 +428,7 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
         space& next = U_[(t + 1) % 2];
 
         next[0] = dataflow(
-                hpx::launch::async,
-                hpx::util::bind(&stepper_server::heat_part, _1, _2, _3, t, 0),
+                hpx::launch::async, &stepper_server::heat_part,
                 receive_left(t), current[0], current[1]
             );
 
@@ -454,15 +438,13 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
         for (std::size_t i = 1; i != local_np-1; ++i)
         {
             next[i] = dataflow(
-                    hpx::launch::async,
-                    hpx::util::bind(&stepper_server::heat_part, _1, _2, _3, t, i),
+                    hpx::launch::async, &stepper_server::heat_part,
                     current[i-1], current[i], current[i+1]
                 );
         }
 
         next[local_np-1] = dataflow(
-                hpx::launch::async,
-                hpx::util::bind(&stepper_server::heat_part, _1, _2, _3, t, local_np-1),
+                hpx::launch::async, &stepper_server::heat_part,
                 current[local_np-2], current[local_np-1], receive_right(t)
             );
 
