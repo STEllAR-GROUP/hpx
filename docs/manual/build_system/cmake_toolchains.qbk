@@ -27,10 +27,12 @@ To use them pass the `-T <toolchain>` argument to the cmake invocation.
     #
     # Distributed under the Boost Software License, Version 1.0. (See accompanying
     # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+    #
     # This is the default toolchain file to be used with CNK on a BlueGene/Q. It sets
     # the appropriate compile flags and compiler such that HPX will compile.
     # Note that you still need to provide Boost, hwloc and other utility libraries
     # like a custom allocator yourself.
+    #
     set(CMAKE_SYSTEM_NAME Linux)
     # Set the Intel Compiler
     set(CMAKE_CXX_COMPILER bgclang++11)
@@ -72,10 +74,12 @@ To use them pass the `-T <toolchain>` argument to the cmake invocation.
     #
     # Distributed under the Boost Software License, Version 1.0. (See accompanying
     # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+    #
     # This is the default toolchain file to be used with OSX building HPX with clang. It sets
     # the appropriate compile flags and compiler such that HPX will compile.
     # Note that you still need to provide Boost, hwloc and other utility libraries
     # like a custom allocator yourself.
+    #
     # Set the Clang Compiler
     set(CMAKE_CXX_COMPILER clang++)
     set(CMAKE_C_COMPILER clang)
@@ -88,6 +92,9 @@ To use them pass the `-T <toolchain>` argument to the cmake invocation.
       "Use Hwloc for hardware topolgy information and thread pinning. If disabled, performance might be reduced.")
     # APPLEs clang doesn't know how to deal with native tls properly
     set(HPX_NATIVE_TLS OFF CACHE BOOL "Use native TLS support if available (default: ON)")
+    # Clang doesn't know about hidden visibility
+    set(HPX_HIDDEN_VISIBILITY OFF CACHE BOOL
+      "Use -fvisibility=hidden for builds on platforms which support it (default ON)")
     # We don't do cross compilation here ...
     set(CMAKE_CROSSCOMPILING OFF)
 ``
@@ -99,10 +106,12 @@ To use them pass the `-T <toolchain>` argument to the cmake invocation.
     #
     # Distributed under the Boost Software License, Version 1.0. (See accompanying
     # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+    #
     # This is the default toolchain file to be used with Intel Xeon PHIs. It sets
     # the appropriate compile flags and compiler such that HPX will compile.
     # Note that you still need to provide Boost, hwloc and other utility libraries
     # like a custom allocator yourself.
+    #
     set(CMAKE_SYSTEM_NAME Linux)
     # Set the Intel Compiler
     set(CMAKE_CXX_COMPILER icpc)
