@@ -1,4 +1,4 @@
-//  copyright (c) 2014 Grant Mercer
+//  Copyright (c) 2014 Grant Mercer
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -46,7 +46,7 @@ void test_find(hpx::parallel::task_execution_policy, IteratorTag)
     hpx::future<iterator> f =
         hpx::parallel::find(hpx::parallel::task,
             iterator(boost::begin(c)), iterator(boost::end(c)),
-            1);
+            std::size_t(1));
     f.wait();
 
     //create iterator at position of value to be found
@@ -98,7 +98,7 @@ void test_find_exception(ExPolicy const& policy, IteratorTag)
                 boost::begin(c),
                 [](){ throw std::runtime_error("test"); }),
             decorated_iterator(boost::end(c)),
-            0);
+            std::size_t(0));
         HPX_TEST(false);
     }
     catch(hpx::exception_list const& e) {
@@ -131,7 +131,7 @@ void test_find_exception(hpx::parallel::task_execution_policy, IteratorTag)
                     boost::begin(c),
                     [](){ throw std::runtime_error("test"); }),
                 decorated_iterator(boost::end(c)),
-                0);
+                std::size_t(0));
         f.get();
 
         HPX_TEST(false);
@@ -193,7 +193,7 @@ void test_find_bad_alloc(ExPolicy const& policy, IteratorTag)
                 boost::begin(c),
                 [](){ throw std::bad_alloc(); }),
             decorated_iterator(boost::end(c)),
-            0);
+            std::size_t(0));
         HPX_TEST(false);
     }
     catch(std::bad_alloc const&) {
@@ -225,7 +225,7 @@ void test_find_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
                     boost::begin(c),
                     [](){ throw std::bad_alloc(); }),
                 decorated_iterator(boost::end(c)),
-                0);
+                std::size_t(0));
 
         f.get();
 

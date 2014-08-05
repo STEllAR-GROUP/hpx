@@ -20,9 +20,9 @@ void test_find_end1(ExPolicy const& policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    //fill vector with random values above 2
-    std::fill(boost::begin(c), boost::end(c), (std::rand()%100) + 3);
-    //create subsequence in middle of vector
+    // fill vector with random values above 2
+    std::fill(boost::begin(c), boost::end(c), (std::rand() % 100) + 3);
+    // create subsequence in middle of vector
     c[c.size()/2] = 1;
     c[c.size()/2 + 1] = 2;
 
@@ -44,9 +44,9 @@ void test_find_end1(hpx::parallel::task_execution_policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    //fill vector with random values above 2
-    std::fill(boost::begin(c), boost::end(c), (std::rand()%100) + 3);
-    //create subsequence in middle of vector
+    // fill vector with random values above 2
+    std::fill(boost::begin(c), boost::end(c), (std::rand() % 100) + 3);
+    // create subsequence in middle of vector
     c[c.size()/2] = 1;
     c[c.size()/2 + 1] = 2;
 
@@ -58,7 +58,7 @@ void test_find_end1(hpx::parallel::task_execution_policy, IteratorTag)
             boost::begin(h), boost::end(h));
     f.wait();
 
-    //create iterator at position of value to be found
+    // create iterator at position of value to be found
     base_iterator test_index = boost::begin(c) + c.size()/2;
 
     HPX_TEST(f.get() == iterator(test_index));
@@ -96,9 +96,9 @@ void test_find_end2(ExPolicy const& policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    //fill vector with random values about 2
-    std::fill(boost::begin(c), boost::end(c), (std::rand()%100) + 3);
-    //create subsequence at start and end
+    // fill vector with random values about 2
+    std::fill(boost::begin(c), boost::end(c), (std::rand() % 100) + 3);
+    // create subsequence at start and end
     c[0] = 1;
     c[1] = 2;
     c[c.size()-1] = 2;
@@ -122,9 +122,9 @@ void test_find_end2(hpx::parallel::task_execution_policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    //fill vector with random values above 2
-    std::fill(boost::begin(c), boost::end(c), (std::rand()%100) + 3);
-    //create subsequence at start and end
+    // fill vector with random values above 2
+    std::fill(boost::begin(c), boost::end(c), (std::rand() % 100) + 3);
+    // create subsequence at start and end
     c[0] = 1;
     c[1] = 2;
     c[c.size()-1] = 2;
@@ -138,7 +138,7 @@ void test_find_end2(hpx::parallel::task_execution_policy, IteratorTag)
             boost::begin(h), boost::end(h));
     f.wait();
 
-    //create iterator at position of value to be found
+    // create iterator at position of value to be found
     base_iterator test_index = boost::begin(c) + c.size()-2;
 
     HPX_TEST(f.get() == iterator(test_index));
@@ -175,9 +175,9 @@ void test_find_end3(ExPolicy const& policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    //fill vector with random values above 2
-    std::fill(boost::begin(c), boost::end(c), (std::rand()%100) + 3);
-    //create subsequence large enough to always be split into multiple partitions
+    // fill vector with random values above 2
+    std::fill(boost::begin(c), boost::end(c), (std::rand() % 100) + 3);
+    // create subsequence large enough to always be split into multiple partitions
     std::iota(boost::begin(c), boost::begin(c) + c.size()/16+1, 1);
     std::size_t sub_size = c.size()/16 + 1;
     std::vector<std::size_t> h(sub_size);
@@ -199,15 +199,16 @@ void test_find_end3(hpx::parallel::task_execution_policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    //fill vector with random values above 6
-    std::fill(boost::begin(c), boost::end(c), (std::rand()%100) + 7);
-    //create subsequence large enoush to always be split into multiple partitions
+    // fill vector with random values above 6
+    std::fill(boost::begin(c), boost::end(c), (std::rand() % 100) + 7);
+    // create subsequence large enoush to always be split into multiple partitions
     std::iota(boost::begin(c), boost::begin(c) + c.size()/16+1, 1);
     std::size_t sub_size = c.size()/16 + 1;
     std::vector<std::size_t> h(sub_size);
     std::iota(boost::begin(h), boost::end(h), 1);
 
-    //create only two partitions, splitting the desired sub sequence into seperate partitions.
+    // create only two partitions, splitting the desired sub sequence into
+    // seperate partitions.
     hpx::future<iterator> f =
         hpx::parallel::find_end(hpx::parallel::task,
             iterator(boost::begin(c)), iterator(boost::end(c)),
@@ -251,9 +252,9 @@ void test_find_end4(ExPolicy const& policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    //fill vector with random values above 2
-    std::fill(boost::begin(c), boost::end(c), (std::rand()%100) + 3);
-    //create subsequence in middle of vector
+    // fill vector with random values above 2
+    std::fill(boost::begin(c), boost::end(c), (std::rand() % 100) + 3);
+    // create subsequence in middle of vector
     c[c.size()/2] = 1;
     c[c.size()/2 + 1] = 2;
 
@@ -278,9 +279,9 @@ void test_find_end4(hpx::parallel::task_execution_policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    //fill vector with random values above 2
-    std::fill(boost::begin(c), boost::end(c), (std::rand()%100) + 3);
-    //create subsequence in middle of vector
+    // fill vector with random values above 2
+    std::fill(boost::begin(c), boost::end(c), (std::rand() % 100) + 3);
+    // create subsequence in middle of vector
     c[c.size()/2] = 1;
     c[c.size()/2 + 1] = 2;
 

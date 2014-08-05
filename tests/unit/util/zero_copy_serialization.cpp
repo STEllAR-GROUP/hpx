@@ -107,7 +107,7 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
         archive >> inp;
     }
 
-    // make sure the parcel has been deserialized properly
+    // make sure the parcel has been de-serialized properly
     HPX_TEST_EQ(outp.get_parcel_id(), inp.get_parcel_id());
     HPX_TEST_EQ(outp.get_source(), inp.get_source());
     HPX_TEST_EQ(outp.get_destination_locality(), inp.get_destination_locality());
@@ -118,12 +118,12 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
 
     HPX_TEST_EQ(outact->get_component_type(), inact->get_component_type());
     HPX_TEST_EQ(outact->get_action_name(), inact->get_action_name());
-    HPX_TEST_EQ(outact->get_action_type(), inact->get_action_type());
+    HPX_TEST_EQ(int(outact->get_action_type()), int(inact->get_action_type()));
     HPX_TEST_EQ(outact->get_parent_locality_id(), inact->get_parent_locality_id());
     HPX_TEST_EQ(outact->get_parent_thread_id(), inact->get_parent_thread_id());
     HPX_TEST_EQ(outact->get_parent_thread_phase(), inact->get_parent_thread_phase());
-    HPX_TEST_EQ(outact->get_thread_priority(), inact->get_thread_priority());
-    HPX_TEST_EQ(outact->get_thread_stacksize(), inact->get_thread_stacksize());
+    HPX_TEST_EQ(int(outact->get_thread_priority()), int(inact->get_thread_priority()));
+    HPX_TEST_EQ(int(outact->get_thread_stacksize()), int(inact->get_thread_stacksize()));
     HPX_TEST_EQ(outact->get_parent_thread_phase(), inact->get_parent_thread_phase());
 
     hpx::actions::continuation_type outcont = outp.get_continuation();

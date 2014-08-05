@@ -54,7 +54,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename std::iterator_traits<InIter>::value_type type;
 
                 std::size_t count = std::distance(first, last);
-
                 util::cancellation_token<std::size_t> tok(count);
 
                 return util::partitioner<ExPolicy, InIter, void>::call_with_index(
@@ -181,7 +180,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename std::iterator_traits<FwdIter>::value_type type;
 
                 std::size_t count = std::distance(first, last);
-
                 util::cancellation_token<std::size_t> tok(count);
 
                 return util::partitioner<ExPolicy, FwdIter, void>::call_with_index(
@@ -327,7 +325,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename std::iterator_traits<FwdIter>::value_type type;
 
                 std::size_t count = std::distance(first, last);
-
                 util::cancellation_token<std::size_t> tok(count);
 
                 return util::partitioner<ExPolicy, FwdIter, void>::call_with_index(
@@ -338,7 +335,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         base_idx, it, part_size, tok,
                         [&f, &tok](type& v, std::size_t i)
                     {
-                        if ( !f(v) )
+                        if (!f(v))
                             tok.cancel(i);
                     });
 
@@ -511,13 +508,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             [=, &tok, &curr](reference t, std::size_t i)
                             {
                                 ++curr;
-                                if ( op(t,*first2) )
+                                if (op(t, *first2))
                                 {
                                     difference_type local_count = 1;
                                     FwdIter2 needle = first2;
                                     FwdIter mid = curr;
 
-                                    for (std::size_t len = 0;
+                                    for (difference_type len = 0;
                                          local_count != diff && len != count;
                                          ++local_count, ++len, ++mid)
                                     {
