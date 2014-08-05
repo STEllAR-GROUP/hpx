@@ -1018,9 +1018,11 @@ if(MSVC)
   # VS2013 and above know how to do link time constant data segment folding
   # VS2013 update 2 and above know how to remove debug information for
   #     non-referenced functions and data (-Zc:inline)
+  # VS2013 update 3 and above know how to generate richer debugging information
+  # for optimized code
   if(MSVC12 OR MSVC13)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Zc:inline")
-    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -Gw -Zc:inline")
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -Gw -Zc:inline -Zo")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Gw -Zc:inline")
     set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -Gw -Zc:inline")
   endif()
