@@ -20,6 +20,7 @@ set(tests
     promise_leak_996
     set_hpx_limit_771
     set_hpx_limit_798
+    shared_stated_leaked_1211
    )
 
 

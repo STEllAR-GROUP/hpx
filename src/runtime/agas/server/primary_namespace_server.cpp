@@ -1126,9 +1126,19 @@ void primary_namespace::free_components_sync(
             % upper
             % at_c<1>(e) % at_c<0>(e) % at_c<2>(e) % at_c<3>(e));
 
-        futures.push_back(
-            hpx::async(act, target_locality, at_c<0>(e), at_c<1>(e), at_c<2>(e).get_lsb())
-        );
+        // Free the object directly, if local (this avoids creating another
+        // local promise via async which would create a snowball effect of
+        // free_component calls.
+        if (at_c<3>(e) == hpx::get_locality_id())
+        {
+            get_runtime_support_ptr()->free_component(at_c<0>(e),
+                at_c<1>(e), at_c<2>(e).get_lsb());
+        }
+        else
+        {
+            futures.push_back(hpx::async(act, target_locality, at_c<0>(e),
+                at_c<1>(e), at_c<2>(e).get_lsb()));
+        }
     }
 
     hpx::wait_all(futures);

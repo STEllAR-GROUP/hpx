@@ -59,6 +59,11 @@ namespace detail
 
         virtual ~future_data_refcnt_base() {}
 
+        virtual bool requires_delete()
+        {
+            return 0 == --count_;
+        }
+
     protected:
         future_data_refcnt_base() : count_(0) {}
 
@@ -76,7 +81,7 @@ namespace detail
     }
     inline void intrusive_ptr_release(future_data_refcnt_base* p)
     {
-        if (0 == --p->count_)
+        if (p->requires_delete())
             delete p;
     }
 
