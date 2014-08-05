@@ -297,6 +297,11 @@ namespace hpx { namespace util
     private:
         static void no_deleter(T*) {}
 
+        static void array_delete(T * x)
+        {
+            delete [] x;
+        }
+
     public:
         enum init_mode
         {
@@ -319,7 +324,8 @@ namespace hpx { namespace util
           : data_(), size_(size)
         {
             if (mode == copy) {
-                data_.reset(new T[size]);
+                data_ = boost::shared_array<T>(data,
+                    &serialize_buffer::array_delete);
                 if (size != 0)
                     std::copy(data, data + size, data_.get());
             }
@@ -329,7 +335,8 @@ namespace hpx { namespace util
             }
             else {
                 // take ownership
-                data_ = boost::shared_array<T>(data);
+                data_ = boost::shared_array<T>(data,
+                    &serialize_buffer::array_delete);
             }
         }
 
@@ -355,7 +362,8 @@ namespace hpx { namespace util
           : data_(), size_(size)
         {
             if (mode == copy) {
-                data_.reset(new T[size]);
+                data_ = boost::shared_array<T>(new T[size],
+                    &serialize_buffer::array_delete);
                 if (size != 0)
                     std::copy(data, data + size, data_.get());
             }
