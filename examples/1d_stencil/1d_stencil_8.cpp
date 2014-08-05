@@ -418,10 +418,6 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
     send_left(0, U_[0][0]);
     send_right(0, U_[0][local_np-1]);
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
-    using hpx::util::placeholders::_3;
-
     for (std::size_t t = 0; t != nt; ++t)
     {
         space const& current = U_[t % 2];
