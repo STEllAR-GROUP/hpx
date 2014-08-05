@@ -16,13 +16,16 @@ macro(add_snappy_module)
   hpx_debug("add_snappy_module" "SNAPPY_FOUND: ${SNAPPY_FOUND}")
   if(HPX_WITH_COMPRESSION_SNAPPY)
     include_directories("${SNAPPY_INCLUDE_DIR}")
+    if(MSVC)
+      link_directories("${SNAPPY_LIBRARY_DIR}")
+    endif()
 
     add_hpx_library(compress_snappy
       PLUGIN
       SOURCES "${hpx_SOURCE_DIR}/plugins/binary_filter/snappy/snappy_serialization_filter.cpp"
       HEADERS "${hpx_SOURCE_DIR}/hpx/plugins/binary_filter/snappy_serialization_filter.hpp"
       FOLDER "Core/Plugins/Compression"
-      DEPENDENCIES ${SNAPPY_LIBRARIES})
+      DEPENDENCIES ${SNAPPY_LIBRARY})
 
     add_hpx_pseudo_dependencies(plugins.binary_filter.snappy compress_snappy_lib)
   endif()
