@@ -6,16 +6,23 @@
 include(HPX_AddLibrary)
 
 if(HPX_WITH_COMPRESSION_BZIP2)
-  find_package(BZip2)
-  if(NOT BZIP2_FOUND)
-    hpx_error("BZip2 could not be found and HPX_WITH_COMPRESSION_BZIP2=ON, please specify BZIP2_ROOT to point to the correct location or set HPX_WITH_COMPRESSION_BZIP2 to OFF")
+  if(MSVC)
+    set(BOOST_LIBRARIES ${BOOST_LIBRARIES} iostreams bzip2)
+    set(BZIP2_FOUND ON CACHE INTERNAL "BZIP2_FOUND")
+  else()
+    find_package(BZip2)
+    if(NOT BZIP2_FOUND)
+      hpx_error("BZip2 could not be found and HPX_WITH_COMPRESSION_BZIP2=ON, please specify BZIP2_ROOT to point to the correct location or set HPX_WITH_COMPRESSION_BZIP2 to OFF")
+    endif()
   endif()
 endif()
 
 macro(add_bzip2_module)
   hpx_debug("add_bzip2_module" "BZIP2_FOUND: ${BZIP2_FOUND}")
   if(HPX_WITH_COMPRESSION_BZIP2)
-    include_directories(${BZIP2_INCLUDE_DIR})
+    if(NOT MSVC)
+      include_directories(${BZIP2_INCLUDE_DIR})
+    endif()
 
     add_hpx_library(compress_bzip2
       PLUGIN

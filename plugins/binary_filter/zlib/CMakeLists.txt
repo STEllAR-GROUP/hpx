@@ -6,16 +6,23 @@
 include(HPX_AddLibrary)
 
 if(HPX_WITH_COMPRESSION_ZLIB)
-  find_package(ZLIB)
-  if(NOT ZLIB_FOUND)
-    hpx_error("zlib could not be found and HPX_WITH_COMPRESSION_ZLIB=ON, please point cmake to the correct location or set HPX_WITH_COMPRESSION_BZIP2 to OFF")
+  if(MSVC)
+    set(BOOST_LIBRARIES ${BOOST_LIBRARIES} iostreams zlib)
+    set(ZLIB_FOUND ON CACHE INTERNAL "ZLIB_FOUND")
+  else()
+    find_package(ZLIB)
+    if(NOT ZLIB_FOUND)
+      hpx_error("zlib could not be found and HPX_WITH_COMPRESSION_ZLIB=ON, please point cmake to the correct location or set HPX_WITH_COMPRESSION_BZIP2 to OFF")
+    endif()
   endif()
 endif()
 
 macro(add_zlib_module)
   hpx_debug("add_zlib_module" "ZLIB_FOUND: ${ZLIB_FOUND}")
   if(HPX_WITH_COMPRESSION_ZLIB)
-    include_directories(${ZLIB_INCLUDE_DIRS})
+    if(NOT MSVC)
+      include_directories(${ZLIB_INCLUDE_DIRS})
+    endif()
 
     add_hpx_library(compress_zlib
       PLUGIN
