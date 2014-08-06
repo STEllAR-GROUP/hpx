@@ -27,6 +27,7 @@
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/hardware/timestamp.hpp>
+#include <hpx/util/runtime_configuration.hpp>
 
 #include <boost/make_shared.hpp>
 #include <boost/bind.hpp>
@@ -90,6 +91,41 @@ namespace hpx { namespace threads
         if (priority < thread_priority_default || priority > thread_priority_critical)
             return "unknown";
         return strings::thread_priority_names[priority];
+    }
+
+    namespace strings
+    {
+        char const* const stack_size_names[] =
+        {
+            "small",
+            "medium",
+            "large",
+            "huge",
+            "stack-less"
+        };
+    }
+
+    char const* get_stack_size_name(std::ptrdiff_t size)
+    {
+        if (size == thread_stacksize_unknown)
+            return "unknown";
+
+        util::runtime_configuration const& rtcfg = hpx::get_config();
+        if (rtcfg.get_stack_size(thread_stacksize_small) == size)
+            size = thread_stacksize_small;
+        else if (rtcfg.get_stack_size(thread_stacksize_medium) == size)
+            size = thread_stacksize_medium;
+        else if (rtcfg.get_stack_size(thread_stacksize_large) == size)
+            size = thread_stacksize_large;
+        else if (rtcfg.get_stack_size(thread_stacksize_huge) == size)
+            size = thread_stacksize_huge;
+        else if (rtcfg.get_stack_size(thread_stacksize_nostack) == size)
+            size = thread_stacksize_nostack;
+
+        if (size < thread_stacksize_small || size > thread_stacksize_nostack)
+            return "custom";
+
+        return strings::stack_size_names[size-1];
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -230,7 +266,7 @@ namespace hpx { namespace threads
     /// queries the state of one of the threads known to the threadmanager_impl
     template <typename SchedulingPolicy, typename NotificationPolicy>
     thread_state threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        get_state(thread_id_type const& thrd)
+        get_state(thread_id_type const& thrd) const
     {
         return thrd ? thrd->get_state() : thread_state(terminated);
     }
@@ -239,7 +275,7 @@ namespace hpx { namespace threads
     /// queries the phase of one of the threads known to the threadmanager_impl
     template <typename SchedulingPolicy, typename NotificationPolicy>
     std::size_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        get_phase(thread_id_type const& thrd)
+        get_phase(thread_id_type const& thrd) const
     {
         return thrd ? thrd->get_thread_phase() : std::size_t(~0);
     }
@@ -248,9 +284,16 @@ namespace hpx { namespace threads
     /// queries the priority of one of the threads known to the threadmanager_impl
     template <typename SchedulingPolicy, typename NotificationPolicy>
     thread_priority threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        get_priority(thread_id_type const& thrd)
+        get_priority(thread_id_type const& thrd) const
     {
         return thrd ? thrd->get_priority() : thread_priority_unknown;
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    std::ptrdiff_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        get_stack_size(thread_id_type const& thrd) const
+    {
+        return thrd ? thrd->get_stack_size() : thread_stacksize_unknown;
     }
 
     /// The get_description function is part of the thread related API and

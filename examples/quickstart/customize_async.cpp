@@ -27,7 +27,10 @@ void run_with_large_stack()
 
     std::fill(large_array, &large_array[array_size], '\0');
 
-    hpx::cout << "This thread runs with a large stack and "
+    hpx::cout << "This thread runs with a "
+              << hpx::threads::get_stack_size_name(
+                    hpx::this_thread::get_stack_size())
+              << " stack and "
               << hpx::threads::get_thread_priority_name(
                     hpx::this_thread::get_priority())
               << " priority." << hpx::endl;
