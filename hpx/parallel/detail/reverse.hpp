@@ -117,11 +117,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     reverse(ExPolicy && policy, BidirIter first, BidirIter last)
     {
         typedef typename std::iterator_traits<BidirIter>::iterator_category
-            input_iterator_category;
+            iterator_category;
 
         BOOST_STATIC_ASSERT_MSG(
             (boost::is_base_of<
-                std::bidirectional_iterator_tag, input_iterator_category>::value),
+                std::bidirectional_iterator_tag, iterator_category>::value),
             "Required at least bidirectional iterator.");
 
         typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
@@ -211,7 +211,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \returns  The \a reverse_copy algorithm returns a \a hpx::future<OutputIter>
     ///           if the execution policy is of type \a task_execution_policy and
     ///           returns \a OutputIter otherwise.
-    ///           The \a reverse_copy algorithm returns output iterator to the
+    ///           The \a reverse_copy algorithm returns the output iterator to the
     ///           element past the last element copied.
     ///
     template <typename ExPolicy, typename BidirIter, typename OutputIter>
