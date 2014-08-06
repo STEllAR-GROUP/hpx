@@ -40,7 +40,12 @@
             __VA_ARGS__, boost::mpl::false_());                               \
                                                                               \
     case detail::execution_policy_enum::task:                                 \
-        return call(par, __VA_ARGS__, boost::mpl::false_());                  \
+        {                                                                     \
+            task_execution_policy const& t =                                  \
+                *policy.get<task_execution_policy>();                         \
+            return call(par(t.get_executor(), t.get_chunk_size()),            \
+                __VA_ARGS__, boost::mpl::false_());                           \
+        }                                                                     \
                                                                               \
     default:                                                                  \
         HPX_THROW_EXCEPTION(hpx::bad_parameter,                               \

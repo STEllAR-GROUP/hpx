@@ -9,6 +9,25 @@
 
 namespace hpx { namespace threads { namespace executors { namespace detail
 {
+    default_executor::default_executor()
+      : stacksize_(thread_stacksize_default),
+        priority_(thread_priority_default),
+        os_thread_(std::size_t(-1))
+    {}
+
+    default_executor::default_executor(thread_stacksize stacksize)
+      : stacksize_(stacksize),
+        priority_(thread_priority_default),
+        os_thread_(std::size_t(-1))
+    {}
+
+    default_executor::default_executor(thread_priority priority,
+        thread_stacksize stacksize, std::size_t os_thread)
+      : stacksize_(stacksize),
+        priority_(priority),
+        os_thread_(os_thread)
+    {}
+
     // Schedule the specified function for execution in this executor.
     // Depending on the subclass implementation, this may block in some
     // situations.
@@ -16,9 +35,11 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         char const* desc, threads::thread_state_enum initial_state,
         bool run_now, threads::thread_stacksize stacksize, error_code& ec)
     {
+        if (stacksize == threads::thread_stacksize_default)
+            stacksize = stacksize_;
+
         register_thread_nullary(std::move(f), desc, initial_state, run_now,
-            threads::thread_priority_normal, std::size_t(-1),
-            stacksize, ec);
+            priority_, os_thread_, stacksize, ec);
     }
 
     // Schedule given function for execution in this executor no sooner
@@ -29,11 +50,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         closure_type && f, char const* description,
         threads::thread_stacksize stacksize, error_code& ec)
     {
+        if (stacksize == threads::thread_stacksize_default)
+            stacksize = stacksize_;
+
         // create new thread
         thread_id_type id = register_thread_nullary(
             std::move(f), description, suspended, false,
-            threads::thread_priority_normal, std::size_t(-1),
-            stacksize, ec);
+            priority_, os_thread_, stacksize, ec);
         if (ec) return;
 
         HPX_ASSERT(invalid_thread_id != id);    // would throw otherwise
@@ -50,11 +73,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         closure_type && f, char const* description,
         threads::thread_stacksize stacksize, error_code& ec)
     {
+        if (stacksize == threads::thread_stacksize_default)
+            stacksize = stacksize_;
+
         // create new thread
         thread_id_type id = register_thread_nullary(
             std::move(f), description, suspended, false,
-            threads::thread_priority_normal, std::size_t(-1),
-            stacksize, ec);
+            priority_, os_thread_, stacksize, ec);
         if (ec) return;
 
         HPX_ASSERT(invalid_thread_id != id);    // would throw otherwise
