@@ -9,7 +9,6 @@ hpx_include(
   Message
   Option
   AppendProperty
-  TargetPaths
   AddCompileFlag
   AddLinkFlag
   AddComponent

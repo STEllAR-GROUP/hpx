@@ -45,11 +45,6 @@
   supported as well. Note that while it is possible to build HPX for x86,
   we don't recommend doing so as 32 bit runs are severely restricted by a 32 bit
   Windows system limitation affecting the number of HPX threads you can create.
-* Make sure that that the `CMAKE_BUILD_TYPE` (under the `CMAKE` tree)
-  is set to `Debug` or `Release`, according to what you plan to do (alternatively,
-  this variable can be set to `RelWithDebInfo` or `MinSizeRel`). The text area at
-  the bottom of CMake GUI displays the output of CMake. CMake prompts an error message
-  in a separate dialog box if a required dependency is not found.
 * Press "Configure" again. Repeat this step until the "Generate" button becomes
   clickable (and until no variable definitions are marked red anymore).
 * Press "Generate".

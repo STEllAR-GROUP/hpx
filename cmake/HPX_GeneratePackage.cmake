@@ -7,13 +7,6 @@ include(CMakePackageConfigHelpers)
 
 set(CMAKE_DIR "cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" CACHE STRING "directory (in share), where to put FindHPX cmake module")
 
-if(MSVC)
-  set(output_dir "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
-else()
-  set(output_dir "${CMAKE_BINARY_DIR}")
-endif()
-
-
 write_basic_package_version_file(
   "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/hpx/HPXConfigVersion.cmake"
   VERSION ${HPX_VERSION}

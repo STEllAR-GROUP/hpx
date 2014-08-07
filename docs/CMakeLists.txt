@@ -266,11 +266,7 @@ if(HPX_BUILD_DOCUMENTATION_SINGLEPAGE)
 endif()
 
 # Create links to properly view the docs in the build directory
-if(WIN32)
-  set(DOCS_OUTPUT_DIR "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/share/hpx-${HPX_VERSION}/docs/html")
-else()
-  set(DOCS_OUTPUT_DIR "${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/html")
-endif()
+set(DOCS_OUTPUT_DIR "${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/html")
 execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${DOCS_OUTPUT_DIR}" )
 execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${DOCS_OUTPUT_DIR}/code" )
 execute_process(
@@ -302,26 +298,14 @@ if(NOT DOC_GIT_REPOSITORY)
   set(DOC_GIT_REPOSITORY "git@github.com:STEllAR-GROUP/hpx.git --branch gh-pages" CACHE STRING "Git repository to use for documentation upload." ADVANCED)
 endif()
 
-if(MSVC)
-  add_custom_target(git_docs
-    COMMAND "${CMAKE_COMMAND}"
-    -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-      -DHPX_SOURCE_DIR:PATH=${CMAKE_SOURCE_DIR}
-      -DHPX_VERSION:STRING=${HPX_VERSION}
-      -DHPX_DOCUMENTATION_FILES=\"${documentation_dependencies}\"
-      -DGIT_REPOSITORY=\"${DOC_GIT_REPOSITORY}\"
-      -P "${CMAKE_SOURCE_DIR}/cmake/HPX_UpdateGitDocs.cmake"
-    VERBATIM)
-else()
-  add_custom_target(git_docs
-    COMMAND "${CMAKE_COMMAND}"
+add_custom_target(git_docs
+  COMMAND "${CMAKE_COMMAND}"
     -DHPX_SOURCE_DIR:PATH=${CMAKE_SOURCE_DIR}
     -DHPX_VERSION:STRING=${HPX_VERSION}
-      -DHPX_DOCUMENTATION_FILES=\"${documentation_dependencies}\"
-      -DGIT_REPOSITORY=\"${DOC_GIT_REPOSITORY}\"
-      -P "${CMAKE_SOURCE_DIR}/cmake/HPX_UpdateGitDocs.cmake"
-    VERBATIM)
-endif()
+    -DHPX_DOCUMENTATION_FILES=\"${documentation_dependencies}\"
+    -DGIT_REPOSITORY=\"${DOC_GIT_REPOSITORY}\"
+    -P "${CMAKE_SOURCE_DIR}/cmake/HPX_UpdateGitDocs.cmake"
+  VERBATIM)
 
 add_dependencies(git_docs docs)
 if(HPX_BUILD_DOCUMENTATION_SINGLEPAGE)

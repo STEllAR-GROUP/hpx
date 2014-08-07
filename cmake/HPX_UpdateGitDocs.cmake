@@ -38,11 +38,7 @@ file(
     COPY "${HPX_SOURCE_DIR}/docs/html"
   DESTINATION "${CMAKE_BINARY_DIR}/gh-pages/docs")
 
-if(CMAKE_BUILD_TYPE)
-  set(doc_dir ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/../share/hpx-${HPX_VERSION})
-else()
-  set(doc_dir ${CMAKE_BINARY_DIR}/../share/hpx-${HPX_VERSION})
-endif()
+set(doc_dir ${CMAKE_BINARY_DIR}/../share/hpx-${HPX_VERSION})
 
 string(REPLACE "\"" "" doc_dir "${doc_dir}")
 
