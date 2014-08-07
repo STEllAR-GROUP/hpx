@@ -22,6 +22,10 @@ find_package(Boost
   thread
   )
 
+if(NOT BOOST_FOUND)
+  hpx_error("Could not find Boost. Please set BOOST_ROOT to point to your Boost installation.")
+endif()
+
 set(Boost_TMP_LIBRARIES ${Boost_LIBRARIES})
 if(UNIX AND NOT CYGWIN)
   find_library(BOOST_THREAD_LIBRARY NAMES pthread DOC "The threading library used by boost.thread")
