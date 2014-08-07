@@ -204,7 +204,8 @@ bool force_entry(std::string& str)
 
 // parse file
 void section::parse (std::string const& sourcename,
-    std::vector<std::string> const& lines, bool verify_existing)
+    std::vector<std::string> const& lines, bool verify_existing,
+    bool weed_out_comments)
 {
     int linenum = 0;
     section* current = this;
@@ -228,15 +229,18 @@ void section::parse (std::string const& sourcename,
         if (line.empty())
             continue;
 
-        // weep out comments
-        boost::smatch what_comment;
-        if (boost::regex_match (line, what_comment, regex_comment))
+        // weed out comments
+        if (weed_out_comments)
         {
-            HPX_ASSERT(3 == what_comment.size());
+            boost::smatch what_comment;
+            if (boost::regex_match (line, what_comment, regex_comment))
+            {
+                HPX_ASSERT(3 == what_comment.size());
 
-            line = trim_whitespace (what_comment[1]);
-            if (line.empty())
-                continue;
+                line = trim_whitespace (what_comment[1]);
+                if (line.empty())
+                    continue;
+            }
         }
 
         // no comments anymore: line is either section, key=val,
