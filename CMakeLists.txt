@@ -1372,14 +1372,8 @@ install(
 
 if(HPX_BUILD_DOCUMENTATION)
   # Install HPX documentation files
-  if(MSVC)
-    set(doc_dir "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
-  else()
-    set(doc_dir "${CMAKE_BINARY_DIR}")
-  endif()
-
   install(
-    DIRECTORY "${doc_dir}/share/hpx-${HPX_VERSION}/docs/"
+    DIRECTORY "${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/"
     DESTINATION share/hpx-${HPX_VERSION}/docs
     COMPONENT docs
     OPTIONAL
