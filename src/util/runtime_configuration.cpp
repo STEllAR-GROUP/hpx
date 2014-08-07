@@ -219,7 +219,7 @@ namespace hpx { namespace util
         lines.insert(lines.end(), lines_pp.begin(), lines_pp.end());
 
         // don't overload user overrides
-        this->parse("static defaults", lines, false);
+        this->parse("<static defaults>", lines, false, false);
 
         need_to_call_pre_initialize = false;
     }
@@ -236,7 +236,9 @@ namespace hpx { namespace util
 
         // let the command line override the config file.
         if (!cmdline_ini_defs_.empty()) {
-            this->parse("command line definitions", cmdline_ini_defs_);
+            // do not weed out comments
+            this->parse("<command line definitions>", cmdline_ini_defs_,
+                true, false);
             need_to_call_pre_initialize = true;
         }
     }
@@ -317,7 +319,7 @@ namespace hpx { namespace util
 
         // let the command line override the config file.
         if (!cmdline_ini_defs.empty())
-            parse("command line definitions", cmdline_ini_defs);
+            parse("<command line definitions>", cmdline_ini_defs, true, false);
 
         // merge all found ini files of all components
         util::merge_component_inis(*this);
@@ -393,7 +395,7 @@ namespace hpx { namespace util
         std::vector<std::string> const& prefill =
             util::detail::get_logging_data();
         if (!prefill.empty())
-            this->parse("static prefill defaults", prefill, false);
+            this->parse("<static prefill defaults>", prefill, false, false);
 
         post_initialize_ini(hpx_ini_file, cmdline_ini_defs);
 

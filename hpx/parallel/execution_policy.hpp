@@ -48,7 +48,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \returns The new parallel_execution_policy
         ///
-        parallel_execution_policy operator()(threads::executor& exec,
+        parallel_execution_policy operator()(threads::executor const& exec,
             std::size_t chunk_size = 0) const
         {
             return parallel_execution_policy(exec, chunk_size);
@@ -68,13 +68,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         }
 
         /// \cond NOINTERNAL
-        threads::executor const& get_executor() const { return exec_; }
+        threads::executor get_executor() const { return exec_; }
         std::size_t get_chunk_size() const { return chunk_size_; }
         /// \endcond
 
     private:
         /// \cond NOINTERNAL
-        parallel_execution_policy(threads::executor& exec, std::size_t chunk_size)
+        parallel_execution_policy(threads::executor const& exec,
+                std::size_t chunk_size)
           : exec_(exec), chunk_size_(chunk_size)
         {}
 
@@ -144,7 +145,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \returns The new task_execution_policy
         ///
-        task_execution_policy operator()(threads::executor& exec,
+        task_execution_policy operator()(threads::executor const& exec,
             std::size_t chunk_size = 0) const
         {
             return task_execution_policy(exec, chunk_size);
@@ -164,13 +165,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         }
 
         /// \cond NOINTERNAL
-        threads::executor const& get_executor() const { return exec_; }
+        threads::executor get_executor() const { return exec_; }
         std::size_t get_chunk_size() const { return chunk_size_; }
         /// \endcond
 
     private:
         /// \cond NOINTERNAL
-        task_execution_policy(threads::executor& exec, std::size_t chunk_size)
+        task_execution_policy(threads::executor const& exec,
+                std::size_t chunk_size)
           : exec_(exec), chunk_size_(chunk_size)
         {}
 

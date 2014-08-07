@@ -522,19 +522,14 @@ namespace hpx { namespace util
                   "   'full' (prints all available counter infos)")
             ;
 
-            // move all positional options into the hpx:positional option group
-            positional_options_description pd;
-            pd.add("hpx:positional", -1);
-
             hidden_options.add_options()
-                ("hpx:positional", value<std::vector<std::string> >(),
-                  "positional options")
                 ("hpx:ignore", "this option will be silently ignored")
             ;
 
             // construct the overall options description and parse the
             // command line
             options_description desc_cmdline;
+            options_description positional_options;
             desc_cmdline
                 .add(app_options).add(cmdline_options)
                 .add(hpx_options).add(counter_options)
@@ -542,34 +537,72 @@ namespace hpx { namespace util
                 .add(hidden_options)
             ;
 
-            // parse command line, allow for unregistered options this point
-            parsed_options opts(
-                detail::get_commandline_parser(
-                    command_line_parser(argc, argv)
-                        .options(desc_cmdline)
-                        .positional(pd)
-                        .style(unix_style)
-                        .extra_parser(detail::option_parser(rtcfg, node)),
-                    error_mode
-                ).run()
-            );
-
-            // collect unregistered options, if needed
-            if (unregistered_options) {
-                using boost::program_options::collect_unrecognized;
-                using boost::program_options::exclude_positional;
-                *unregistered_options =
-                    collect_unrecognized(opts.options, exclude_positional);
-            }
-
-            store(opts, vm);
-            notify(vm);
-
             options_description desc_cfgfile;
             desc_cfgfile
                 .add(app_options).add(hpx_options)
                 .add(counter_options).add(config_options)
-                .add(debugging_options).add(hidden_options);
+                .add(debugging_options).add(hidden_options)
+            ;
+
+            if (rtcfg.get_entry("hpx.commandline.allow_unknown", "0") == "0")
+            {
+                // move all positional options into the hpx:positional option
+                // group
+                positional_options_description pd;
+                pd.add("hpx:positional", -1);
+
+                positional_options.add_options()
+                    ("hpx:positional", value<std::vector<std::string> >(),
+                      "positional options")
+                ;
+                desc_cmdline.add(positional_options);
+                desc_cfgfile.add(positional_options);
+
+                // parse command line, allow for unregistered options this point
+                parsed_options opts(detail::get_commandline_parser(
+                        command_line_parser(argc, argv)
+                            .options(desc_cmdline)
+                            .positional(pd)
+                            .style(unix_style)
+                            .extra_parser(detail::option_parser(rtcfg, node)),
+                        error_mode
+                    ).run()
+                );
+
+                // collect unregistered options, if needed
+                if (unregistered_options) {
+                    using boost::program_options::collect_unrecognized;
+                    using boost::program_options::exclude_positional;
+                    *unregistered_options =
+                        collect_unrecognized(opts.options, exclude_positional);
+                }
+
+                store(opts, vm);
+            }
+            else
+            {
+                // parse command line, allow for unregistered options this point
+                parsed_options opts(detail::get_commandline_parser(
+                        command_line_parser(argc, argv)
+                            .options(desc_cmdline)
+                            .style(unix_style)
+                            .extra_parser(detail::option_parser(rtcfg, node)),
+                        error_mode
+                    ).run()
+                );
+
+                // collect unregistered options, if needed
+                if (unregistered_options) {
+                    using boost::program_options::collect_unrecognized;
+                    using boost::program_options::include_positional;
+                    *unregistered_options =
+                        collect_unrecognized(opts.options, include_positional);
+                }
+
+                store(opts, vm);
+            }
+
+            notify(vm);
 
             detail::handle_generic_config_options(
                 argv[0], vm, desc_cfgfile, rtcfg, node, error_mode);

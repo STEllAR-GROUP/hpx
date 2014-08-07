@@ -397,6 +397,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     }
 }}}
 
+/// \cond NOINTERNAL
 #if !defined(BOOST_NO_CXX11_DELETED_FUNCTIONS)
 namespace std
 {
@@ -409,5 +410,6 @@ namespace boost
     addressof(hpx::parallel::v2::task_region_handle&) = delete;
 }
 #endif
+/// \endcond
 
 #endif

@@ -37,8 +37,8 @@ void test_mismatch_binary1(ExPolicy const& policy, IteratorTag)
             begin1, end1, boost::begin(c2), boost::end(c2));
 
         // verify values
-        HPX_TEST_EQ(std::distance(begin1, result.first), c1.size());
-        HPX_TEST_EQ(std::distance(boost::begin(c2), result.second), c2.size());
+        HPX_TEST_EQ(std::size_t(std::distance(begin1, result.first)), c1.size());
+        HPX_TEST_EQ(std::size_t(std::distance(boost::begin(c2), result.second)), c2.size());
     }
 
     {
@@ -49,8 +49,8 @@ void test_mismatch_binary1(ExPolicy const& policy, IteratorTag)
             begin1, end1, boost::begin(c2), boost::end(c2));
 
         // verify values
-        HPX_TEST_EQ(std::distance(begin1, result.first), changed_idx);
-        HPX_TEST_EQ(std::distance(boost::begin(c2), result.second), changed_idx);
+        HPX_TEST_EQ(std::size_t(std::distance(begin1, result.first)), changed_idx);
+        HPX_TEST_EQ(std::size_t(std::distance(boost::begin(c2), result.second)), changed_idx);
     }
 }
 
@@ -81,8 +81,8 @@ void test_mismatch_binary1(hpx::parallel::task_execution_policy, IteratorTag)
 
         // verify values
         return_type result = f.get();
-        HPX_TEST_EQ(std::distance(begin1, result.first), c1.size());
-        HPX_TEST_EQ(std::distance(boost::begin(c2), result.second), c2.size());
+        HPX_TEST_EQ(std::size_t(std::distance(begin1, result.first)), c1.size());
+        HPX_TEST_EQ(std::size_t(std::distance(boost::begin(c2), result.second)), c2.size());
     }
 
     {
@@ -96,8 +96,8 @@ void test_mismatch_binary1(hpx::parallel::task_execution_policy, IteratorTag)
 
         // verify values
         return_type result = f.get();
-        HPX_TEST_EQ(std::distance(begin1, result.first), changed_idx);
-        HPX_TEST_EQ(std::distance(boost::begin(c2), result.second), changed_idx);
+        HPX_TEST_EQ(std::size_t(std::distance(begin1, result.first)), changed_idx);
+        HPX_TEST_EQ(std::size_t(std::distance(boost::begin(c2), result.second)), changed_idx);
     }
 }
 
@@ -152,8 +152,8 @@ void test_mismatch_binary2(ExPolicy const& policy, IteratorTag)
             std::equal_to<std::size_t>());
 
         // verify values
-        HPX_TEST_EQ(std::distance(begin1, result.first), c1.size());
-        HPX_TEST_EQ(std::distance(boost::begin(c2), result.second), c2.size());
+        HPX_TEST_EQ(std::size_t(std::distance(begin1, result.first)), c1.size());
+        HPX_TEST_EQ(std::size_t(std::distance(boost::begin(c2), result.second)), c2.size());
     }
 
     {
@@ -165,8 +165,8 @@ void test_mismatch_binary2(ExPolicy const& policy, IteratorTag)
             std::equal_to<std::size_t>());
 
         // verify values
-        HPX_TEST_EQ(std::distance(begin1, result.first), changed_idx);
-        HPX_TEST_EQ(std::distance(boost::begin(c2), result.second), changed_idx);
+        HPX_TEST_EQ(std::size_t(std::distance(begin1, result.first)), changed_idx);
+        HPX_TEST_EQ(std::size_t(std::distance(boost::begin(c2), result.second)), changed_idx);
     }
 }
 
@@ -198,8 +198,8 @@ void test_mismatch_binary2(hpx::parallel::task_execution_policy, IteratorTag)
 
         // verify values
         return_type result = f.get();
-        HPX_TEST_EQ(std::distance(begin1, result.first), c1.size());
-        HPX_TEST_EQ(std::distance(boost::begin(c2), result.second), c2.size());
+        HPX_TEST_EQ(std::size_t(std::distance(begin1, result.first)), c1.size());
+        HPX_TEST_EQ(std::size_t(std::distance(boost::begin(c2), result.second)), c2.size());
     }
 
     {
@@ -214,8 +214,8 @@ void test_mismatch_binary2(hpx::parallel::task_execution_policy, IteratorTag)
 
         // verify values
         return_type result = f.get();
-        HPX_TEST_EQ(std::distance(begin1, result.first), changed_idx);
-        HPX_TEST_EQ(std::distance(boost::begin(c2), result.second), changed_idx);
+        HPX_TEST_EQ(std::size_t(std::distance(begin1, result.first)), changed_idx);
+        HPX_TEST_EQ(std::size_t(std::distance(boost::begin(c2), result.second)), changed_idx);
     }
 }
 

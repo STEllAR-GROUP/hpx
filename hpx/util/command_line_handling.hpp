@@ -33,7 +33,7 @@ namespace hpx { namespace util
             num_localities_(1)
         {
             BOOST_FOREACH(std::string const& e, ini_config)
-                rtcfg_.parse("<user supplied config>", e);
+                rtcfg_.parse("<user supplied config>", e, true, false);
         }
 
         int call(boost::program_options::options_description  const& desc_cmdline,

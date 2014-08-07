@@ -328,6 +328,11 @@ namespace hpx
             return threads::get_thread_priority(threads::get_self_id());
         }
 
+        std::ptrdiff_t get_stack_size()
+        {
+            return threads::get_stack_size(threads::get_self_id());
+        }
+
         void interruption_point()
         {
             threads::interruption_point(threads::get_self_id());

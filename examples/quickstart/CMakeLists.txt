@@ -12,6 +12,7 @@ set(example_programs
     component_inheritance_simple
     component_with_executor
     composable_guard
+    customize_async
     data_actions
     error_handling
     event_synchronization
@@ -58,6 +59,7 @@ set(allow_unknown_options_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_in_executable_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_ctors_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_with_executor_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(customize_async_FLAGS COMPONENT_DEPENDENCIES component)
 set(event_synchronization_FLAGS COMPONENT_DEPENDENCIES iostreams)
 
 set(error_handling_FLAGS COMPONENT_DEPENDENCIES iostreams)

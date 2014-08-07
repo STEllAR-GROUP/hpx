@@ -761,12 +761,12 @@ if(MSVC)
   # VS2013 and above know how to do link time constant data segment folding
   # VS2013 update 2 and above know how to remove debug information for
   #     non-referenced functions and data (-Zc:inline)
-  # VS2013 update 3 and above know how to generate better debug symbols for
-  #     optimized builds (-Z0)
   if(MSVC12 OR MSVC13)
     hpx_add_compile_flag(-Zc:inline)
     hpx_add_compile_flag(-Gw
       CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
+    hpx_add_compile_flag(-Zo
+      CONFIGURATIONS RelWithDebInfo)
   endif()
   # Exceptions
   hpx_add_compile_flag(-EHsc)

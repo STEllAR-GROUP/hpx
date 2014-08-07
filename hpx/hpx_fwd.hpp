@@ -266,6 +266,7 @@ namespace hpx
             typename NotificationPolicy = threads::policies::callback_notifier>
         class HPX_EXPORT threadmanager_impl;
 
+        ///////////////////////////////////////////////////////////////////////
         /// \enum thread_state_enum
         ///
         /// The \a thread_state_enum enumerator encodes the current state of a
@@ -292,12 +293,15 @@ namespace hpx
                                      thread objects */
         };
 
+        HPX_API_EXPORT char const* get_thread_state_name(thread_state_enum state);
+
         /// \ cond NODETAIL
         ///   Please note that if you change the value of threads::terminated
         ///   above, you will need to adjust do_call(dummy<1> = 1) in
         ///   util/coroutine/detail/coroutine_impl.hpp as well.
         /// \ endcond
 
+        ///////////////////////////////////////////////////////////////////////
         /// \enum thread_priority
         enum thread_priority
         {
@@ -311,9 +315,9 @@ namespace hpx
 
         typedef threads::detail::tagged_thread_state<thread_state_enum> thread_state;
 
-        HPX_API_EXPORT char const* get_thread_state_name(thread_state_enum state);
         HPX_API_EXPORT char const* get_thread_priority_name(thread_priority priority);
 
+        ///////////////////////////////////////////////////////////////////////
         /// \enum thread_state_ex_enum
         ///
         /// The \a thread_state_ex_enum enumerator encodes the reason why a
@@ -332,9 +336,11 @@ namespace hpx
         typedef thread_state_enum thread_function_sig(thread_state_ex_enum);
         typedef util::unique_function_nonser<thread_function_sig> thread_function_type;
 
+        ///////////////////////////////////////////////////////////////////////
         /// \enum thread_stacksize
         enum thread_stacksize
         {
+            thread_stacksize_unknown = -1,
             thread_stacksize_small = 1,         ///< use small stack size
             thread_stacksize_medium = 2,        ///< use medium sized stack size
             thread_stacksize_large = 3,         ///< use large stack size
@@ -345,6 +351,8 @@ namespace hpx
             thread_stacksize_minimal = thread_stacksize_small,  ///< use minimally possible stack size
             thread_stacksize_maximal = thread_stacksize_huge,   ///< use maximally possible stack size
         };
+
+        HPX_API_EXPORT char const* get_stack_size_name(std::ptrdiff_t size);
 
         class HPX_EXPORT executor;
 

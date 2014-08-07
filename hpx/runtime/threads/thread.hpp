@@ -196,6 +196,7 @@ namespace hpx
 
         // extensions
         HPX_API_EXPORT threads::thread_priority get_priority();
+        HPX_API_EXPORT std::ptrdiff_t get_stack_size();
 
         HPX_API_EXPORT void interruption_point();
         HPX_API_EXPORT bool interruption_enabled();
