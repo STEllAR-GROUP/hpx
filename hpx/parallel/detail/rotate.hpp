@@ -33,6 +33,35 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
+        template <typename FwdIter>
+        void sequential_rotate_helper(FwdIter first, FwdIter new_first,
+            FwdIter last)
+        {
+            FwdIter next = new_first;
+            while (first != next)
+            {
+                std::iter_swap(first++, next++);
+                if (next == last)
+                {
+                    next = new_first;
+                }
+                else if (first == new_first)
+                {
+                    new_first = next;
+                }
+            }
+        }
+
+        template <typename FwdIter>
+        void sequential_rotate(FwdIter first, FwdIter new_first, FwdIter last)
+        {
+            if (first != new_first && new_first != last)
+                sequential_rotate_helper(first, new_first, last);
+
+            std::advance(first, std::distance(new_first, last));
+            return first;
+        }
+
         template <typename ExPolicy, typename FwdIter>
         hpx::future<FwdIter>
         rotate_helper(ExPolicy const& policy, FwdIter first, FwdIter new_first,
