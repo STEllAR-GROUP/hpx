@@ -22,7 +22,7 @@ find_package(Boost
   thread
   )
 
-if(NOT BOOST_FOUND)
+if(NOT Boost_FOUND)
   hpx_error("Could not find Boost. Please set BOOST_ROOT to point to your Boost installation.")
 endif()
 
