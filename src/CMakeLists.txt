@@ -218,11 +218,8 @@ if(NOT HPX_STATIC_LINKING)
   target_link_libraries(hpx_serialization
     ${hpx_serialization_lib_dependencies})
 
-  hpx_get_target_file(name hpx_serialization)
-
   set_property(TARGET hpx_serialization APPEND
     PROPERTY COMPILE_DEFINITIONS
-    "HPX_DLL_STRING=\"${name}\""
     "HPX_EXPORTS"
     "HPX_SERIALIZATION_EXPORTS"
     "HPX_COROUTINE_EXPORTS")
@@ -269,11 +266,8 @@ else()
     ${HPX_LIBRARIES})
 endif()
 
-hpx_get_target_file(name hpx)
-
 set_property(TARGET hpx APPEND
   PROPERTY COMPILE_DEFINITIONS
-  "HPX_DLL_STRING=\"${name}\""
   "HPX_COMPONENT_NAME=hpx"
   "HPX_EXPORTS"
   "HPX_LIMIT=5"
