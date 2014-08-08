@@ -12,8 +12,18 @@ and build upon it until all of the required functionality is present.
 The following set of examples were developed to demonstrate this iterative
 process of evoling a 
 simple serial program to an efficient, fully distrubuted HPX application.
-For this demonstration, we implemented a 1D heat distribution problem, 
-which we parallelize over the followng eight examples:
+For this demonstration, we implemented a 1D heat distribution problem.
+This calculation simulates the the diffusion of heat across a ring from 
+an initialzed
+state to some user defined point in the future. It does this by 
+breaking each portion of the ring into descrete segements and using
+the current segment's temperature and the temperature of the surrounding
+segments to calculate the temerature of the current segment in the next
+timestep as shown in [link examples.1d_pgf figure] below. 
+
+[fig 1d_stencil_program_flow.png..Heat Diffusion Example Program Flow..futurization_example.1d_pgf]
+
+We parallelize this code over the followng eight examples:
 
 *[hpx_link examples/1d_stencil/1d_stencil_1.cpp..Example 1]
 *[hpx_link examples/1d_stencil/1d_stencil_1.cpp..Example 2]
@@ -114,7 +124,7 @@ done in example 2. It should be noted
 how strikingly similar example 4 is to example 2.
 
 Example 4 finally shows good results.  This code 
-is faster than the OpenMP version by a factor of [INSERT FACTOR HERE].
+scales better than the OpenMP version by fifty percent.
 While these results are impressive, our work on this
 algorithm is not over. This example only runs on one locality.
 To get the full benefit of HPX we need to be able to distribute
@@ -233,7 +243,15 @@ together on locality 0 and added into a vector of spaces
 [^overall_result] using the HPX functions [^gather_id] and 
 [^gather_here].
 
+[/Instert performance of stencil_8/]
 
+Example 8 completes this example series which takes the 
+serial code of example 1 and slowly morphs it into
+a fully distributed parallel code. This evolution
+was guided by the simple principles of futurization,
+the knowledge of grainsize, and utilization of components.
+Applying these techniques easily facilitate the scalable
+paralization of most applications.
 
 [/////////////////////////////////////////////////////////////////////////////]
 
