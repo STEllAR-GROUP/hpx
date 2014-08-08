@@ -10,20 +10,20 @@
 When developers write code they typically begin with a simple serial code
 and build upon it until all of the required functionality is present.
 The following set of examples were developed to demonstrate this iterative
-process of evoling a 
-simple serial program to an efficient, fully distrubuted HPX application.
+process of evolving a 
+simple serial program to an efficient, fully distributed HPX application.
 For this demonstration, we implemented a 1D heat distribution problem.
-This calculation simulates the the diffusion of heat across a ring from 
-an initialzed
+This calculation simulates the diffusion of heat across a ring from 
+an initialized
 state to some user defined point in the future. It does this by 
-breaking each portion of the ring into descrete segements and using
+breaking each portion of the ring into discrete segments and using
 the current segment's temperature and the temperature of the surrounding
-segments to calculate the temerature of the current segment in the next
+segments to calculate the temperature of the current segment in the next
 timestep as shown in [link examples.1d_pgf figure] below. 
 
 [fig 1d_stencil_program_flow.png..Heat Diffusion Example Program Flow..futurization_example.1d_pgf]
 
-We parallelize this code over the followng eight examples:
+We parallelize this code over the following eight examples:
 
 *[hpx_link examples/1d_stencil/1d_stencil_1.cpp..Example 1]
 *[hpx_link examples/1d_stencil/1d_stencil_1.cpp..Example 2]
@@ -35,7 +35,7 @@ We parallelize this code over the followng eight examples:
 *[hpx_link examples/1d_stencil/1d_stencil_1.cpp..Example 8]
 
 The first example is straight serial code.  In this code we instantiate
- a vector [^U] which contains two vectors of doubles as seeen in
+ a vector [^U] which contains two vectors of doubles as seen in
 the structure [^stepper]. 
 
 [import ../../examples/1d_stencil/1d_stencil_1.cpp]
@@ -54,7 +54,7 @@ vector, the results are placed into the "next" vector.
 In example 2 we employ a technique called futurization. Futurization is
 a method by which we can easily transform a code which is serially
 executed into a code which creates asynchronous threads. In the simplest
-case this involves relplacing a variable with a future to a variable,
+case this involves replacing a variable with a future to a variable,
 a function with a future to a function, and adding a [^.get()] at the
 point where a value is actually needed. The code below shows how this
 technique was applied to the [^struct stepper].
@@ -110,14 +110,14 @@ can define how many partitions are created and how many
 data points are contained in each partition. This is accomplished 
 by creating the [^struct partition] which contains a member
 object [^data_], a vector of doubles which holds
-the datapoints assigned to a particular instance of [^partition].
+the data points assigned to a particular instance of [^partition].
 
 In example 4, we take advantage of the partition setup by redefining
 [^space] to be a vector of shared_futures with each future
 representing a partition. In this manner, each future represents
-several datapoints. Because the user can define how many
-datapoints are contained in each partition (and therefore how many 
-datapoints that are represented by one future) a user can now 
+several data points. Because the user can define how many
+data points are contained in each partition (and therefore how many 
+data points that are represented by one future) a user can now 
 control the grainsize of the simulation.
 The rest of the code was then futurized in the same manner that was 
 done in example 2. It should be noted
@@ -218,7 +218,7 @@ Example 8 completes the futurization process and utilizes
 the full potential of HPX by 
 distributing the program flow to multiple nodes in a cluster.
 It accomplishes this task by running an instance 
-of HPX main on each locality. In order to cordinate 
+of HPX main on each locality. In order to coordinate 
 the execution of the program
 the [^struct stepper] is wrapped into a component. In this 
 way, each locality contains an instance of stepper which
@@ -234,7 +234,7 @@ partitions visible to each other we created two buffers to
 store the GIDs of the remote neighboring partitions on the 
 left and right respectively. These buffers are filled by 
 sending the GID of a newly created edge partitions to the 
-right and left buffers of the neigboring localities.
+right and left buffers of the neighboring localities.
 
 In order to finish the simulation the solution vectors 
 named "result" 
