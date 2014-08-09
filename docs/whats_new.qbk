@@ -24,6 +24,22 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1216] - Fixing using futures (clients) as arguments to actions
+* [issue 1215] - Error compiling simple component
+* [issue 1214] - Stencil docs
+* [issue 1212] - Parallel rotate
+* [issue 1211] - Direct actions cause the future's shared_state to be leaked
+* [issue 1210] - Refactored local::promise to be standard conformant
+* [issue 1209] - Improve command line handling
+* [issue 1208] - Adding parallel::reverse and parallel::reverse_copy
+* [issue 1207] - Add copy_backward and move_backward
+* [issue 1206] - N4071 additional algorithms implemented
+* [issue 1203] - Implementing new launch policy for (local) async:
+                 `hpx::launch::fork`.
+* [issue 1202] - Failed assertion in connection_cache.hpp
+* [issue 1200] - Error when querying time performance counters
+* [issue 1199] - library path is now configurable (again)
+* [issue 1198] - Error when querying performance counters
 * [issue 1196] - Silence several warnings
 * [issue 1195] - Rephrase initializers to work with VC++ 2012
 * [issue 1194] - Simplify parallel algorithms
@@ -148,6 +164,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 879]  - Hung test leads to cascading test failure; make tests should
                  support the MPI parcelport
 * [issue 865]  - future<T> and friends shall work for movable only Ts
+* [issue 816]  - First Program tutorial pull request
 * [issue 525]  - Extend barrier LCO test to run in distributed
 * [issue 515]  - Multi-destination version of hpx::apply is broken
 * [issue 509]  - Push Boost.Atomic changes upstream
