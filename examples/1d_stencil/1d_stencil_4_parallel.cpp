@@ -158,6 +158,9 @@ int hpx_main(boost::program_options::variables_map& vm)
     boost::uint64_t nx = vm["nx"].as<boost::uint64_t>();   // Number of grid points.
     boost::uint64_t nt = vm["nt"].as<boost::uint64_t>();   // Number of steps.
 
+    if (vm.count("no-header))
+        header = false;
+    
     // Create the stepper object
     stepper step;
 
