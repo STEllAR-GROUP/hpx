@@ -239,6 +239,7 @@ struct stepper
         return middle + (k*dt/dx*dx) * (left - 2*middle + right);
     }
 
+    //[stepper_7
     // The partitioned operator, it invokes the heat operator above on all elements
     // of a partition.
     static partition heat_part(partition const& left,
@@ -288,6 +289,7 @@ struct stepper
             right.get_data(partition_server::right_partition)
         );
     }
+    //]
 
     // do all the work on 'np' partitions, 'nx' data points each, for 'nt'
     // time steps
