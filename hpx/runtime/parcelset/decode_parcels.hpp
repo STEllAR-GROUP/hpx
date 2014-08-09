@@ -291,7 +291,7 @@ namespace hpx { namespace parcelset
                         util::one_shot(&decode_parcels_impl<Parcelport, Buffer>),
                         boost::ref(parcelport), buffer, chunks, first_message),
                     "decode_parcels",
-                    threads::pending, true, threads::thread_priority_critical);
+                    threads::pending, true, threads::thread_priority_boost);
         }
         else
         {

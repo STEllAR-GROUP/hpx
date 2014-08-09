@@ -191,7 +191,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         threads::register_thread_nullary(
             util::deferred_call(&invoker_type::apply, p)
           , "hpx::lcos::local::detail::invoke_when_ready",
-          threads::pending, true, threads::thread_priority_critical);
+          threads::pending, true, threads::thread_priority_boost);
 
         using traits::future_access;
         return future_access<typename invoker_type::type>::create(std::move(p));

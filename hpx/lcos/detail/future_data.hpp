@@ -487,7 +487,7 @@ namespace detail
 
             // start new thread at given point in time
             threads::set_thread_state(id, tpoint, threads::pending,
-                threads::wait_timeout, threads::thread_priority_critical, ec);
+                threads::wait_timeout, threads::thread_priority_boost, ec);
             if (ec) {
                 // thread scheduling failed, report error to the new future
                 this->base_type::set_exception(hpx::detail::access_exception(ec));

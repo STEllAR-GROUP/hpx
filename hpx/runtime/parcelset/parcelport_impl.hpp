@@ -528,7 +528,7 @@ namespace hpx { namespace parcelset
                     &parcelport_impl::get_connection_and_send_parcels,
                     this, loc, background),
                 "get_connection_and_send_parcels",
-                threads::pending, true, threads::thread_priority_critical,
+                threads::pending, true, threads::thread_priority_boost,
                 std::size_t(-1), threads::thread_stacksize_default, ec);
             return ec ? false : true;
         }
@@ -630,7 +630,7 @@ namespace hpx { namespace parcelset
                           , std::move(handlers)
                         )
                       , "parcelport_impl::send_pending_parcels"
-                      , threads::pending, true, threads::thread_priority_critical,
+                      , threads::pending, true, threads::thread_priority_boost,
                         thread_num, threads::thread_stacksize_default
                     );
                 }

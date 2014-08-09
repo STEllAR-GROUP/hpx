@@ -430,6 +430,7 @@ namespace hpx { namespace threads { namespace policies
                 case thread_priority_default:
                 case thread_priority_low:
                 case thread_priority_normal:
+                case thread_priority_boost:
                 case thread_priority_critical:
                     return queues_[num_thread]->get_thread_count(state);
 
@@ -450,6 +451,7 @@ namespace hpx { namespace threads { namespace policies
             case thread_priority_default:
             case thread_priority_low:
             case thread_priority_normal:
+            case thread_priority_boost:
             case thread_priority_critical:
                 {
                     for (std::size_t i = 0; i != queues_.size(); ++i)

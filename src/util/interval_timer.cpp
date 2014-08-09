@@ -106,7 +106,7 @@ namespace hpx { namespace util
             if (id_) {
                 error_code ec(lightweight);       // avoid throwing on error
                 threads::set_thread_state(id_, threads::pending,
-                    threads::wait_abort, threads::thread_priority_critical, ec);
+                    threads::wait_abort, threads::thread_priority_boost, ec);
                 id_ = 0;
             }
             return true;
@@ -194,7 +194,7 @@ namespace hpx { namespace util
             id = hpx::applier::register_thread_plain(
                 boost::bind(&interval_timer::evaluate, this, _1),
                 description_.c_str(), threads::suspended, true,
-                threads::thread_priority_critical, std::size_t(-1),
+                threads::thread_priority_boost, std::size_t(-1),
                 threads::thread_stacksize_default, ec);
         }
 
@@ -208,7 +208,7 @@ namespace hpx { namespace util
         threads::set_thread_state(id,
             boost::posix_time::microseconds(microsecs_),
             threads::pending, threads::wait_signaled,
-            threads::thread_priority_critical, ec);
+            threads::thread_priority_boost, ec);
 
         if (ec) {
             is_terminated_ = true;
@@ -216,7 +216,7 @@ namespace hpx { namespace util
 
             // abort the newly created thread
             threads::set_thread_state(id, threads::pending, threads::wait_abort,
-                threads::thread_priority_critical, ec);
+                threads::thread_priority_boost, ec);
 
             return;
         }

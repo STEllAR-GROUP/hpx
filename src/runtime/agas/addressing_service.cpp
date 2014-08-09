@@ -213,7 +213,7 @@ addressing_service::addressing_service(
   , caching_(ini_.get_agas_caching_mode())
   , range_caching_(caching_ ? ini_.get_agas_range_caching_mode() : false)
   , action_priority_(ini_.get_agas_dedicated_server() ?
-        threads::thread_priority_normal : threads::thread_priority_critical)
+        threads::thread_priority_normal : threads::thread_priority_boost)
   , here_()         // defer initializing this
   , rts_lva_(0)
   , mem_lva_(0)

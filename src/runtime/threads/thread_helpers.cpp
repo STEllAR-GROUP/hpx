@@ -569,7 +569,7 @@ namespace hpx { namespace this_thread
 #endif
             threads::set_thread_state(id,
                 at_time, threads::pending, threads::wait_signaled,
-                threads::thread_priority_critical, ec);
+                threads::thread_priority_boost, ec);
             if (ec) return threads::wait_unknown;
 
             // suspend the HPX-thread
@@ -624,7 +624,7 @@ namespace hpx { namespace this_thread
 #endif
             threads::set_thread_state(id,
                 after_duration, threads::pending, threads::wait_signaled,
-                threads::thread_priority_critical, ec);
+                threads::thread_priority_boost, ec);
             if (ec) return threads::wait_unknown;
 
             // suspend the HPX-thread
