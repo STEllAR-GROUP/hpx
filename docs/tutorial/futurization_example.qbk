@@ -252,7 +252,7 @@ a fully distributed parallel code. This evolution
 was guided by the simple principles of futurization,
 the knowledge of grainsize, and utilization of components.
 Applying these techniques easily facilitates the scalable
-paralization of most applications.
+parallelization of most applications.
 
 [/////////////////////////////////////////////////////////////////////////////]
 
