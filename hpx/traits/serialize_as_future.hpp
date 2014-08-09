@@ -36,6 +36,16 @@ namespace hpx { namespace traits
       : serialize_as_future<T>
     {};
 
+    template <typename T>
+    struct serialize_as_future<T&>
+      : serialize_as_future<T>
+    {};
+
+    template <typename T>
+    struct serialize_as_future<T&&>
+      : serialize_as_future<T>
+    {};
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
     struct serialize_as_future<Future
