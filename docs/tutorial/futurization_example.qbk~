@@ -196,7 +196,7 @@ function [^get_data()] which returns the end element of
 the [^buffer data_] if it is from the left partition or
 the first element of the buffer if the data is from the 
 right partition.  In this way only the necessary elements,
-not the whole buffer, are exchanged between nodes. 
+not the whole buffer, is exchanged between nodes. 
 The reader should be reminded that this exchange of end 
 elements occurs in the function 
 [^get_data()] and therefore is executed asynchronously.
@@ -216,8 +216,7 @@ can be seen below:
 
 Example 8 completes the futurization process and utilizes 
 the full potential of HPX by 
-distributing the program flow to multiple localities, 
-usually defined as nodes in a cluster.
+distributing the program flow to multiple nodes in a cluster.
 It accomplishes this task by running an instance 
 of HPX main on each locality. In order to coordinate 
 the execution of the program
@@ -231,7 +230,7 @@ the head node the, GID of each component was known. However,
 when we distribute the program flow, each partition has no
 notion of the GID of its neighbor if the next partition 
 is on another locality. In order to make the GIDs of neighboring
-partitions visible to each other, we created two buffers to 
+partitions visible to each other we created two buffers to 
 store the GIDs of the remote neighboring partitions on the 
 left and right respectively. These buffers are filled by 
 sending the GID of a newly created edge partitions to the 
@@ -247,11 +246,11 @@ together on locality 0 and added into a vector of spaces
 [/Instert performance of stencil_8/]
 
 Example 8 completes this example series which takes the 
-serial code of example 1 and incrementally morphs it into
+serial code of example 1 and slowly morphs it into
 a fully distributed parallel code. This evolution
 was guided by the simple principles of futurization,
 the knowledge of grainsize, and utilization of components.
-Applying these techniques easily facilitates the scalable
+Applying these techniques easily facilitate the scalable
 paralization of most applications.
 
 [/////////////////////////////////////////////////////////////////////////////]
