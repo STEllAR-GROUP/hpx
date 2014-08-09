@@ -494,7 +494,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         for (std::size_t i = 0; i != nl; ++i)
         {
             stepper_server::space const& s = solution[i];
-            for (std::size_t i = 0; i != np; ++i)
+            for (std::size_t i = 0; i != s.size(); ++i)
                 s[i].get_data(partition_server::middle_partition).wait();
         }
 

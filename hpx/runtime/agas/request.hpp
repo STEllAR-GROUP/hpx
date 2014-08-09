@@ -17,6 +17,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
+#include <hpx/traits/serialize_as_future.hpp>
 
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/version.hpp>
@@ -246,6 +247,23 @@ struct HPX_EXPORT request
     boost::shared_ptr<request_data> data;
 };
 
+}}
+
+namespace hpx { namespace traits
+{
+    template <>
+    struct serialize_as_future<hpx::agas::request>
+      : boost::mpl::true_
+    {
+        static void call(hpx::agas::request& r)
+        {
+            if (r.get_action_code() == hpx::agas::primary_ns_route)
+            {
+                hpx::parcelset::parcel p = r.get_parcel();
+                serialize_as_future<hpx::parcelset::parcel>::call(p);
+            }
+        }
+    };
 }}
 
 HPX_UTIL_REGISTER_FUNCTION_DECLARATION(
