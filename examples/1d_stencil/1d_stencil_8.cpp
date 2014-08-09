@@ -34,6 +34,19 @@ struct partition_data
 private:
     typedef hpx::util::serialize_buffer<double> buffer_type;
 
+    // use template to break circular dependency
+    template <typename Dummy = void>
+    struct hold_reference
+    {
+        hold_reference(partition_data const& data)
+          : data_(data)
+        {}
+
+        void operator()(double*) {}     // no deletion necessary
+
+        partition_data data_;
+    };
+
 public:
     partition_data()
       : size_(0)
@@ -61,7 +74,8 @@ public:
     // The proxy is assumed to refer to either the left or the right boundary
     // element.
     partition_data(partition_data const& base, std::size_t min_index)
-      : data_(base.data_.data()+min_index, 1, buffer_type::reference),
+      : data_(base.data_.data()+min_index, 1, buffer_type::reference,
+            hold_reference<>(base)),      // keep referenced partition alive
         size_(base.size()),
         min_index_(min_index)
     {
