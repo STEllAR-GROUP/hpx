@@ -31,6 +31,8 @@ set(tests
     reduce_
     reverse
     reverse_copy
+    rotate
+    rotate_copy
     swapranges
     task_region
     transform

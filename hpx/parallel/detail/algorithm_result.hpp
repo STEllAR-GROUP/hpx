@@ -28,6 +28,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         {
             return std::move(t);
         }
+
+        static type get(hpx::future<T> && t)
+        {
+            return t.get();
+        }
     };
 
     template <typename ExPolicy>
@@ -50,6 +55,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         static type get(T && t)
         {
             return hpx::make_ready_future(std::move(t));
+        }
+
+        static type get(hpx::future<T> && t)
+        {
+            return std::move(t);
         }
     };
 
