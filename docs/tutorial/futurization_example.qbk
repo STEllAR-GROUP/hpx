@@ -21,7 +21,7 @@ the current segment's temperature and the temperature of the surrounding
 segments to calculate the temperature of the current segment in the next
 timestep as shown in [link examples.1d_pgf figure] below. 
 
-[fig 1d_stencil_program_flow.png..Heat Diffusion Example Program Flow..futurization_example.1d_pgf]
+[fig 1d_stencil_program_flow.png..Heat Diffusion Example Program Flow..examples.1d_pgf]
 
 We parallelize this code over the following eight examples:
 
@@ -256,3 +256,4 @@ parallelization of most applications.
 
 [/////////////////////////////////////////////////////////////////////////////]
 
+[endsect]
