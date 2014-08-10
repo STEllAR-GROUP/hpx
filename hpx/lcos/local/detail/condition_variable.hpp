@@ -106,7 +106,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             if (!queue_.empty())
             {
                 threads::thread_id_repr_type id = queue_.front().id_;
-                if (HPX_UNLIKELY(!id))
+                if (HPX_UNLIKELY(id == threads::invalid_thread_id_repr))
                 {
                     HPX_THROWS_IF(ec, null_thread_id,
                         "condition_variable::notify_one",
@@ -141,7 +141,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             while (!queue.empty())
             {
                 threads::thread_id_repr_type id = queue.front().id_;
-                if (HPX_UNLIKELY(!id))
+                if (HPX_UNLIKELY(id == threads::invalid_thread_id_repr))
                 {
                     HPX_THROWS_IF(ec, null_thread_id,
                         "condition_variable::notify_all",
@@ -202,10 +202,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         void wait(Lock& lock,
             char const* description, error_code& ec = throws)
         {
+            HPX_ASSERT(threads::get_self_ptr() != 0);
             HPX_ASSERT_OWNS_LOCK(lock);
-
-            threads::thread_self* self = threads::get_self_ptr_checked(ec);
-            if (0 == self || ec) return;
 
             // enqueue the request and block this thread
             queue_entry f(threads::get_self_id().get());
@@ -231,10 +229,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         wait_for(Lock& lock, boost::posix_time::time_duration const& rel_time,
             char const* description, error_code& ec = throws)
         {
+            HPX_ASSERT(threads::get_self_ptr() != 0);
             HPX_ASSERT_OWNS_LOCK(lock);
-
-            threads::thread_self* self = threads::get_self_ptr_checked(ec);
-            if (0 == self || ec) return threads::wait_unknown;
 
             // enqueue the request and block this thread
             queue_entry f(threads::get_self_id().get());
@@ -266,10 +262,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         wait_until(Lock& lock, boost::posix_time::ptime const& abs_time,
             char const* description, error_code& ec = throws)
         {
+            HPX_ASSERT(threads::get_self_ptr() != 0);
             HPX_ASSERT_OWNS_LOCK(lock);
-
-            threads::thread_self* self = threads::get_self_ptr_checked(ec);
-            if (0 == self || ec) return threads::wait_unknown;
 
             // enqueue the request and block this thread
             queue_entry f(threads::get_self_id().get());

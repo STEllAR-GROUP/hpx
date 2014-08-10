@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/scoped_unlock.hpp>
@@ -129,8 +130,7 @@ namespace hpx { namespace lcos { namespace local
 
         void lock(char const* description, error_code& ec = throws)
         {
-            threads::thread_self* self = threads::get_self_ptr_checked(ec);
-            if (0 == self || ec) return;
+            HPX_ASSERT(threads::get_self_ptr() != 0);
 
             HPX_ITT_SYNC_PREPARE(this);
             mutex_type::scoped_lock l(mtx_);
@@ -173,8 +173,7 @@ namespace hpx { namespace lcos { namespace local
 
         bool try_lock(char const* description, error_code& ec = throws)
         {
-            threads::thread_self* self = threads::get_self_ptr_checked(ec);
-            if (0 == self || ec) return false;
+            HPX_ASSERT(threads::get_self_ptr() != 0);
 
             HPX_ITT_SYNC_PREPARE(this);
             mutex_type::scoped_lock l(mtx_);
@@ -200,8 +199,7 @@ namespace hpx { namespace lcos { namespace local
         bool try_lock_until(boost::posix_time::ptime const& abs_time,
             char const* description, error_code& ec = throws)
         {
-            threads::thread_self* self = threads::get_self_ptr_checked(ec);
-            if (0 == self || ec) return false;
+            HPX_ASSERT(threads::get_self_ptr() != 0);
 
             HPX_ITT_SYNC_PREPARE(this);
             mutex_type::scoped_lock l(mtx_);
@@ -268,8 +266,7 @@ namespace hpx { namespace lcos { namespace local
             boost::posix_time::time_duration const& rel_time,
             char const* description, error_code& ec = throws)
         {
-            threads::thread_self* self = threads::get_self_ptr_checked(ec);
-            if (0 == self || ec) return false;
+            HPX_ASSERT(threads::get_self_ptr() != 0);
 
             HPX_ITT_SYNC_PREPARE(this);
             mutex_type::scoped_lock l(mtx_);
@@ -335,8 +332,7 @@ namespace hpx { namespace lcos { namespace local
 
         void unlock(error_code& ec = throws)
         {
-            threads::thread_self* self = threads::get_self_ptr_checked(ec);
-            if (0 == self || ec) return;
+            HPX_ASSERT(threads::get_self_ptr() != 0);
 
             HPX_ITT_SYNC_RELEASING(this);
             mutex_type::scoped_lock l(mtx_);
@@ -355,7 +351,7 @@ namespace hpx { namespace lcos { namespace local
                 util::unregister_lock(this);
                 HPX_ITT_SYNC_RELEASED(this);
                 owner_id_ = queue_.front().id_;
-                if (HPX_UNLIKELY(!owner_id_))
+                if (HPX_UNLIKELY(owner_id_ == threads::invalid_thread_id_repr))
                 {
                     HPX_THROWS_IF(ec, null_thread_id,
                         "mutex::unlock",
