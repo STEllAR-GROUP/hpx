@@ -203,7 +203,7 @@ addressing_service::addressing_service(
   , runtime_mode runtime_type_
     )
   : gva_cache_(new gva_cache_type)
-  , console_cache_(0)
+  , console_cache_(naming::invalid_locality_id)
   , max_refcnt_requests_(ini_.get_agas_max_pending_refcnt_requests())
   , refcnt_requests_count_(0)
   , enable_refcnt_caching_(true)
@@ -608,7 +608,7 @@ bool addressing_service::get_console_locality(
         {
             mutex_type::scoped_lock lock(console_cache_mtx_);
 
-            if (console_cache_)
+            if (console_cache_ != naming::invalid_locality_id)
             {
                 prefix = naming::get_gid_from_locality_id(console_cache_);
                 if (&ec != &throws)
@@ -635,7 +635,7 @@ bool addressing_service::get_console_locality(
 
             {
                 mutex_type::scoped_lock lock(console_cache_mtx_);
-                if (!console_cache_) {
+                if (console_cache_ == naming::invalid_locality_id) {
                     console_cache_ = console;
                 }
                 else {
@@ -2583,7 +2583,9 @@ void addressing_service::garbage_collect_non_blocking(
     error_code& ec
     )
 {
-    mutex_type::scoped_lock l(refcnt_requests_mtx_);
+    mutex_type::scoped_lock l(refcnt_requests_mtx_, boost::try_to_lock);
+    if (!l) return;     // no need to compete for garbage collection
+
     send_refcnt_requests_non_blocking(l, ec);
 }
 
@@ -2591,7 +2593,9 @@ void addressing_service::garbage_collect(
     error_code& ec
     )
 {
-    mutex_type::scoped_lock l(refcnt_requests_mtx_);
+    mutex_type::scoped_lock l(refcnt_requests_mtx_, boost::try_to_lock);
+    if (!l) return;     // no need to compete for garbage collection
+
     send_refcnt_requests_sync(l, ec);
 }
 
