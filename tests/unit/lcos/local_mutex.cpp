@@ -184,6 +184,7 @@ struct test_lock_times_out_if_other_thread_has_lock
     }
 };
 
+#if BOOST_VERSION >= 105000 // 1.49 has old timed lock interface
 template <typename M>
 struct test_timedlock
 {
@@ -199,7 +200,6 @@ struct test_timedlock
     {
         test_lock_times_out_if_other_thread_has_lock<mutex_type>()();
         
-#if BOOST_VERSION >= 105000 // 1.49 has old timed lock interface
         mutex_type mutex;
         hpx::lcos::local::condition_variable condition;
 
@@ -258,9 +258,9 @@ struct test_timedlock
         HPX_TEST(lock ? true : false);
         lock.unlock();
         HPX_TEST(!lock);
-#endif
     }
 };
+#endif
 
 template <typename M>
 struct test_recursive_lock
@@ -284,9 +284,11 @@ void test_mutex()
 
 void test_timed_mutex()
 {
+#if BOOST_VERSION >= 105000 // 1.49 has old timed lock interface
     test_lock<hpx::lcos::local::timed_mutex>()();
     test_trylock<hpx::lcos::local::timed_mutex>()();
     test_timedlock<hpx::lcos::local::timed_mutex>()();
+#endif
 }
 
 //void test_recursive_mutex()
@@ -298,10 +300,12 @@ void test_timed_mutex()
 //
 //void test_recursive_timed_mutex()
 //{
+//#if BOOST_VERSION >= 105000 // 1.49 has old timed lock interface
 //    test_lock<hpx::lcos::local::recursive_timed_mutex()();
 //    test_trylock<hpx::lcos::local::recursive_timed_mutex()();
 //    test_timedlock<hpx::lcos::local::recursive_timed_mutex()();
 //    test_recursive_lock<hpx::lcos::local::recursive_timed_mutex()();
+//#endif
 //}
 
 ///////////////////////////////////////////////////////////////////////////////

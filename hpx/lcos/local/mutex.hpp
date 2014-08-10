@@ -35,11 +35,11 @@ namespace hpx { namespace lcos { namespace local
                 boost::intrusive::link_mode<boost::intrusive::normal_link>
             > hook_type;
 
-            queue_entry(threads::thread_id_type const& id)
+            queue_entry(threads::thread_id_repr_type const& id)
               : id_(id)
             {}
 
-            threads::thread_id_type id_;
+            threads::thread_id_repr_type id_;
             hook_type slist_hook_;
         };
 
@@ -75,8 +75,9 @@ namespace hpx { namespace lcos { namespace local
         {
             while (!queue_.empty())
             {
-                threads::thread_id_type id = queue_.front().id_;
-                queue_.front().id_ = threads::invalid_thread_id;
+                threads::thread_id_type id(
+                    reinterpret_cast<threads::thread_data_base*>(queue_.front().id_));
+                queue_.front().id_ = threads::invalid_thread_id_repr;
                 queue_.pop_front();
 
                 // we know that the id is actually the pointer to the thread
@@ -107,7 +108,7 @@ namespace hpx { namespace lcos { namespace local
 
     public:
         mutex()
-          : owner_id_(threads::invalid_thread_id)
+          : owner_id_(threads::invalid_thread_id_repr)
         {}
 
         ~mutex()
@@ -122,22 +123,23 @@ namespace hpx { namespace lcos { namespace local
 
         void lock(char const* description, error_code& ec = throws)
         {
-            mutex_type::scoped_lock l(mtx_);
-
             threads::thread_self* self = threads::get_self_ptr_checked(ec);
             if (0 == self || ec) return;
 
-            if (owner_id_ == threads::invalid_thread_id)
+            mutex_type::scoped_lock l(mtx_);
+
+            threads::thread_id_repr_type self_id = threads::get_self_id().get();
+            if (owner_id_ == threads::invalid_thread_id_repr)
             {
-                owner_id_ = threads::get_self_id();
-            } else if(owner_id_ == threads::get_self_id()) {
+                owner_id_ = self_id;
+            } else if(owner_id_ == self_id) {
                 HPX_THROWS_IF(ec, deadlock,
                     "mutex::unlock",
                     "The calling thread already owns the mutex");
                 return;
             } else {
                 // enqueue the request and block this thread
-                queue_entry f(threads::get_self_id());
+                queue_entry f(self_id);
                 queue_.push_back(f);
 
                 reset_queue_entry r(f, queue_);
@@ -159,15 +161,16 @@ namespace hpx { namespace lcos { namespace local
 
         bool try_lock(char const* description, error_code& ec = throws)
         {
-            mutex_type::scoped_lock l(mtx_);
-
             threads::thread_self* self = threads::get_self_ptr_checked(ec);
             if (0 == self || ec) return false;
 
-            if (owner_id_ != threads::invalid_thread_id)
+            mutex_type::scoped_lock l(mtx_);
+
+            threads::thread_id_repr_type self_id = threads::get_self_id().get();
+            if (owner_id_ != threads::invalid_thread_id_repr)
                 return false;
 
-            owner_id_ = threads::get_self_id();
+            owner_id_ = self_id;
             return true;
         }
 
@@ -179,15 +182,16 @@ namespace hpx { namespace lcos { namespace local
         bool try_lock_until(boost::posix_time::ptime const& abs_time,
             char const* description, error_code& ec = throws)
         {
-            mutex_type::scoped_lock l(mtx_);
-
             threads::thread_self* self = threads::get_self_ptr_checked(ec);
             if (0 == self || ec) return false;
 
-            if (owner_id_ != threads::invalid_thread_id)
+            mutex_type::scoped_lock l(mtx_);
+
+            threads::thread_id_repr_type self_id = threads::get_self_id().get();
+            if (owner_id_ != threads::invalid_thread_id_repr)
             {
                 // enqueue the request and block this thread
-                queue_entry f(threads::get_self_id());
+                queue_entry f(self_id);
                 queue_.push_back(f);
 
                 reset_queue_entry r(f, queue_);
@@ -207,7 +211,7 @@ namespace hpx { namespace lcos { namespace local
                 }
             }
 
-            owner_id_ = threads::get_self_id();
+            owner_id_ = self_id;
             return true;
         }
 
@@ -238,15 +242,16 @@ namespace hpx { namespace lcos { namespace local
             boost::posix_time::time_duration const& rel_time,
             char const* description, error_code& ec = throws)
         {
-            mutex_type::scoped_lock l(mtx_);
-
             threads::thread_self* self = threads::get_self_ptr_checked(ec);
             if (0 == self || ec) return false;
 
-            if (owner_id_ != threads::invalid_thread_id)
+            mutex_type::scoped_lock l(mtx_);
+
+            threads::thread_id_repr_type self_id = threads::get_self_id().get();
+            if (owner_id_ != threads::invalid_thread_id_repr)
             {
                 // enqueue the request and block this thread
-                queue_entry f(threads::get_self_id());
+                queue_entry f(self_id);
                 queue_.push_back(f);
 
                 reset_queue_entry r(f, queue_);
@@ -266,7 +271,7 @@ namespace hpx { namespace lcos { namespace local
                 }
             }
 
-            owner_id_ = threads::get_self_id();
+            owner_id_ = self_id;
             return true;
         }
 
@@ -296,9 +301,13 @@ namespace hpx { namespace lcos { namespace local
 
         void unlock(error_code& ec = throws)
         {
+            threads::thread_self* self = threads::get_self_ptr_checked(ec);
+            if (0 == self || ec) return;
+
             mutex_type::scoped_lock l(mtx_);
 
-            if (HPX_UNLIKELY(owner_id_ != threads::get_self_id()))
+            threads::thread_id_repr_type self_id = threads::get_self_id().get();
+            if (HPX_UNLIKELY(owner_id_ != self_id))
             {
                 HPX_THROWS_IF(ec, lock_error,
                     "mutex::unlock",
@@ -316,21 +325,23 @@ namespace hpx { namespace lcos { namespace local
                         "NULL thread id encountered");
                     return;
                 }
-                queue_.front().id_ = threads::invalid_thread_id;
+                queue_.front().id_ = threads::invalid_thread_id_repr;
                 queue_.pop_front();
 
                 util::scoped_unlock<mutex_type::scoped_lock> unlock(l);
-                threads::set_thread_state(owner_id_, threads::pending,
-                    threads::wait_timeout, threads::thread_priority_default, ec);
+                threads::set_thread_state(threads::thread_id_type(
+                    reinterpret_cast<threads::thread_data_base*>(owner_id_)),
+                    threads::pending, threads::wait_timeout,
+                    threads::thread_priority_default, ec);
                 if (!ec) return;
             } else {
-                owner_id_ = threads::invalid_thread_id;
+                owner_id_ = threads::invalid_thread_id_repr;
             }
         }
 
     private:
         mutable mutex_type mtx_;
-        threads::thread_id_type owner_id_;
+        threads::thread_id_repr_type owner_id_;
         queue_type queue_;
     };
 

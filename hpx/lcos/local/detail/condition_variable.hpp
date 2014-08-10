@@ -31,11 +31,11 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 boost::intrusive::link_mode<boost::intrusive::normal_link>
             > hook_type;
 
-            queue_entry(threads::thread_id_type const& id)
+            queue_entry(threads::thread_id_repr_type const& id)
               : id_(id)
             {}
 
-            threads::thread_id_type id_;
+            threads::thread_id_repr_type id_;
             hook_type slist_hook_;
         };
 
@@ -105,7 +105,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
             if (!queue_.empty())
             {
-                threads::thread_id_type id = queue_.front().id_;
+                threads::thread_id_repr_type id = queue_.front().id_;
                 if (HPX_UNLIKELY(!id))
                 {
                     HPX_THROWS_IF(ec, null_thread_id,
@@ -113,13 +113,15 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                         "NULL thread id encountered");
                     return false;
                 }
-                queue_.front().id_ = threads::invalid_thread_id;
+                queue_.front().id_ = threads::invalid_thread_id_repr;
                 queue_.pop_front();
 
                 util::scoped_unlock<Lock> unlock(lock);
 
-                threads::set_thread_state(id, threads::pending,
-                    threads::wait_timeout, threads::thread_priority_default, ec);
+                threads::set_thread_state(threads::thread_id_type(
+                    reinterpret_cast<threads::thread_data_base*>(id)),
+                    threads::pending, threads::wait_timeout,
+                    threads::thread_priority_default, ec);
                 if (!ec) return true;
             }
 
@@ -138,7 +140,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
             while (!queue.empty())
             {
-                threads::thread_id_type id = queue.front().id_;
+                threads::thread_id_repr_type id = queue.front().id_;
                 if (HPX_UNLIKELY(!id))
                 {
                     HPX_THROWS_IF(ec, null_thread_id,
@@ -146,11 +148,13 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                         "NULL thread id encountered");
                     return;
                 }
-                queue.front().id_ = threads::invalid_thread_id;
+                queue.front().id_ = threads::invalid_thread_id_repr;
                 queue.pop_front();
 
-                threads::set_thread_state(id, threads::pending,
-                    threads::wait_timeout, threads::thread_priority_default, ec);
+                threads::set_thread_state(threads::thread_id_type(
+                    reinterpret_cast<threads::thread_data_base*>(id)),
+                    threads::pending, threads::wait_timeout,
+                    threads::thread_priority_default, ec);
                 if (ec) return;
             }
         }
@@ -167,8 +171,9 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
             while (!queue.empty())
             {
-                threads::thread_id_type id = queue.front().id_;
-                queue.front().id_ = threads::invalid_thread_id;
+                threads::thread_id_type id(
+                    reinterpret_cast<threads::thread_data_base*>(queue_.front().id_));
+                queue.front().id_ = threads::invalid_thread_id_repr;
                 queue.pop_front();
 
                 // we know that the id is actually the pointer to the thread
@@ -203,7 +208,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             if (0 == self || ec) return;
 
             // enqueue the request and block this thread
-            queue_entry f(threads::get_self_id());
+            queue_entry f(threads::get_self_id().get());
             queue_.push_back(f);
 
             reset_queue_entry r(f, queue_);
@@ -232,7 +237,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             if (0 == self || ec) return threads::wait_unknown;
 
             // enqueue the request and block this thread
-            queue_entry f(threads::get_self_id());
+            queue_entry f(threads::get_self_id().get());
             queue_.push_back(f);
 
             reset_queue_entry r(f, queue_);
@@ -267,7 +272,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             if (0 == self || ec) return threads::wait_unknown;
 
             // enqueue the request and block this thread
-            queue_entry f(threads::get_self_id());
+            queue_entry f(threads::get_self_id().get());
             queue_.push_back(f);
 
             reset_queue_entry r(f, queue_);
