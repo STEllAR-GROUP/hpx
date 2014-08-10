@@ -654,6 +654,8 @@ namespace hpx { namespace threads { namespace policies
 
                     for (std::size_t i = 0; i != queues_.size(); ++i)
                         count += queues_[i]->get_thread_count(state);
+
+                    break;
                 }
 
             case thread_priority_low:
