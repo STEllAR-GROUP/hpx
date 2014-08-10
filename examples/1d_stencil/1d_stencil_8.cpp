@@ -31,6 +31,8 @@ char const* stepper_basename = "/1d_stencil_8/stepper/";
 char const* gather_basename = "/1d_stencil_8/gather/";
 
 ///////////////////////////////////////////////////////////////////////////////
+// Use a special allocator for the partition data to remove a major contention
+// point - the constant allocation and deallocation of the data arrays.
 template <typename T>
 struct partition_allocator
 {
