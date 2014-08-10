@@ -8,9 +8,11 @@
 #define HPX_LCOS_MUTEX_JUN_23_2008_0530PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/scoped_unlock.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/util/itt_notify.hpp>
+#include <hpx/util/register_locks.hpp>
+#include <hpx/util/scoped_unlock.hpp>
 
 #include <boost/chrono/time_point.hpp>
 #include <boost/chrono/duration.hpp>
@@ -107,12 +109,16 @@ namespace hpx { namespace lcos { namespace local
         typedef boost::detail::try_lock_wrapper<mutex> scoped_try_lock;
 
     public:
-        mutex()
+        mutex(char const* const description = "")
           : owner_id_(threads::invalid_thread_id_repr)
-        {}
+        {
+            HPX_ITT_SYNC_CREATE(this, "lcos::local::mutex", description);
+            HPX_ITT_SYNC_RENAME(this, "lcos::local::mutex");
+        }
 
         ~mutex()
         {
+            HPX_ITT_SYNC_DESTROY(this);
             if (!queue_.empty())
             {
                 LERR_(fatal) << "~mutex: queue is not empty, aborting threads";
@@ -126,13 +132,17 @@ namespace hpx { namespace lcos { namespace local
             threads::thread_self* self = threads::get_self_ptr_checked(ec);
             if (0 == self || ec) return;
 
+            HPX_ITT_SYNC_PREPARE(this);
             mutex_type::scoped_lock l(mtx_);
 
             threads::thread_id_repr_type self_id = threads::get_self_id().get();
             if (owner_id_ == threads::invalid_thread_id_repr)
             {
+                util::register_lock(this);
+                HPX_ITT_SYNC_ACQUIRED(this);
                 owner_id_ = self_id;
             } else if(owner_id_ == self_id) {
+                HPX_ITT_SYNC_CANCEL(this);
                 HPX_THROWS_IF(ec, deadlock,
                     "mutex::unlock",
                     "The calling thread already owns the mutex");
@@ -147,8 +157,10 @@ namespace hpx { namespace lcos { namespace local
                     // yield this thread
                     util::scoped_unlock<mutex_type::scoped_lock> unlock(l);
                     this_thread::suspend(threads::suspended, description, ec);
-                    if (ec) return;
+                    if (ec) { HPX_ITT_SYNC_CANCEL(this); return; }
 
+                    util::register_lock(this);
+                    HPX_ITT_SYNC_ACQUIRED(this);
                     HPX_ASSERT(owner_id_ == f.id_);
                 }
             }
@@ -164,12 +176,18 @@ namespace hpx { namespace lcos { namespace local
             threads::thread_self* self = threads::get_self_ptr_checked(ec);
             if (0 == self || ec) return false;
 
+            HPX_ITT_SYNC_PREPARE(this);
             mutex_type::scoped_lock l(mtx_);
 
             threads::thread_id_repr_type self_id = threads::get_self_id().get();
             if (owner_id_ != threads::invalid_thread_id_repr)
+            {
+                HPX_ITT_SYNC_CANCEL(this);
                 return false;
+            }
 
+            util::register_lock(this);
+            HPX_ITT_SYNC_ACQUIRED(this);
             owner_id_ = self_id;
             return true;
         }
@@ -185,6 +203,7 @@ namespace hpx { namespace lcos { namespace local
             threads::thread_self* self = threads::get_self_ptr_checked(ec);
             if (0 == self || ec) return false;
 
+            HPX_ITT_SYNC_PREPARE(this);
             mutex_type::scoped_lock l(mtx_);
 
             threads::thread_id_repr_type self_id = threads::get_self_id().get();
@@ -200,17 +219,24 @@ namespace hpx { namespace lcos { namespace local
                     util::scoped_unlock<mutex_type::scoped_lock> unlock(l);
                     threads::thread_state_ex_enum const reason =
                         this_thread::suspend(abs_time, description, ec);
-                    if (ec) return false;
+                    if (ec) { HPX_ITT_SYNC_CANCEL(this); return false; }
 
                     // if the timer has hit, the waiting period timed out
                     if (reason == threads::wait_signaled) //-V110
+                    {
+                        HPX_ITT_SYNC_CANCEL(this);
                         return false;
+                    }
 
+                    util::register_lock(this);
+                    HPX_ITT_SYNC_ACQUIRED(this);
                     HPX_ASSERT(owner_id_ == f.id_);
                     return true;
                 }
             }
 
+            util::register_lock(this);
+            HPX_ITT_SYNC_ACQUIRED(this);
             owner_id_ = self_id;
             return true;
         }
@@ -245,6 +271,7 @@ namespace hpx { namespace lcos { namespace local
             threads::thread_self* self = threads::get_self_ptr_checked(ec);
             if (0 == self || ec) return false;
 
+            HPX_ITT_SYNC_PREPARE(this);
             mutex_type::scoped_lock l(mtx_);
 
             threads::thread_id_repr_type self_id = threads::get_self_id().get();
@@ -260,17 +287,24 @@ namespace hpx { namespace lcos { namespace local
                     util::scoped_unlock<mutex_type::scoped_lock> unlock(l);
                     threads::thread_state_ex_enum const reason =
                         this_thread::suspend(rel_time, description, ec);
-                    if (ec) return false;
+                    if (ec) { HPX_ITT_SYNC_CANCEL(this); return false; }
 
                     // if the timer has hit, the waiting period timed out
                     if (reason == threads::wait_signaled) //-V110
+                    {
+                        HPX_ITT_SYNC_CANCEL(this);
                         return false;
+                    }
 
+                    util::register_lock(this);
+                    HPX_ITT_SYNC_ACQUIRED(this);
                     HPX_ASSERT(owner_id_ == f.id_);
                     return true;
                 }
             }
 
+            util::register_lock(this);
+            HPX_ITT_SYNC_ACQUIRED(this);
             owner_id_ = self_id;
             return true;
         }
@@ -304,6 +338,7 @@ namespace hpx { namespace lcos { namespace local
             threads::thread_self* self = threads::get_self_ptr_checked(ec);
             if (0 == self || ec) return;
 
+            HPX_ITT_SYNC_RELEASING(this);
             mutex_type::scoped_lock l(mtx_);
 
             threads::thread_id_repr_type self_id = threads::get_self_id().get();
@@ -317,6 +352,8 @@ namespace hpx { namespace lcos { namespace local
 
             if (!queue_.empty())
             {
+                util::unregister_lock(this);
+                HPX_ITT_SYNC_RELEASED(this);
                 owner_id_ = queue_.front().id_;
                 if (HPX_UNLIKELY(!owner_id_))
                 {
@@ -335,6 +372,8 @@ namespace hpx { namespace lcos { namespace local
                     threads::thread_priority_default, ec);
                 if (!ec) return;
             } else {
+                util::unregister_lock(this);
+                HPX_ITT_SYNC_RELEASED(this);
                 owner_id_ = threads::invalid_thread_id_repr;
             }
         }
