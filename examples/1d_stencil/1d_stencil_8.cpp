@@ -34,17 +34,15 @@ struct partition_data
 private:
     typedef hpx::util::serialize_buffer<double> buffer_type;
 
-    // use template to break circular dependency
-    template <typename Dummy = void>
     struct hold_reference
     {
-        hold_reference(partition_data const& data)
+        hold_reference(buffer_type const& data)
           : data_(data)
         {}
 
         void operator()(double*) {}     // no deletion necessary
 
-        partition_data data_;
+        buffer_type data_;
     };
 
 public:
@@ -75,7 +73,7 @@ public:
     // element.
     partition_data(partition_data const& base, std::size_t min_index)
       : data_(base.data_.data()+min_index, 1, buffer_type::reference,
-            hold_reference<>(base)),      // keep referenced partition alive
+            hold_reference(base.data_)),      // keep referenced partition alive
         size_(base.size()),
         min_index_(min_index)
     {
