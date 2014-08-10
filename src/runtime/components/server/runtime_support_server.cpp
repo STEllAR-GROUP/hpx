@@ -622,6 +622,7 @@ namespace hpx { namespace components { namespace server
         while (tm.get_thread_count() > 1)
         {
             this_thread::sleep_for(boost::posix_time::millisec(100));
+            this_thread::yield();
         }
 
         // Now this locality has become passive, thus we can send the token
@@ -688,6 +689,7 @@ namespace hpx { namespace components { namespace server
         while (tm.get_thread_count() > 1)
         {
             this_thread::sleep_for(boost::posix_time::millisec(100));
+            this_thread::yield();
         }
 
         // Now this locality has become passive, thus we can send the token
