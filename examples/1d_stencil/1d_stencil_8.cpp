@@ -18,6 +18,8 @@
 
 #include "print_time_results.hpp"
 
+#include <stack>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Command-line variables
 bool header = true; // print csv heading
@@ -27,6 +29,56 @@ double dx = 1.;     // grid spacing
 
 char const* stepper_basename = "/1d_stencil_8/stepper/";
 char const* gather_basename = "/1d_stencil_8/gather/";
+
+///////////////////////////////////////////////////////////////////////////////
+template <typename T>
+struct partition_allocator
+{
+private:
+    typedef hpx::lcos::local::spinlock mutex_type;
+
+public:
+    partition_allocator(std::size_t max_size = std::size_t(-1))
+      : max_size_(max_size)
+    {
+    }
+
+    ~partition_allocator()
+    {
+        mutex_type::scoped_lock l(mtx_);
+        while (!heap_.empty())
+        {
+            T* p = heap_.top();
+            heap_.pop();
+            delete [] p;
+        }
+    }
+
+    T* allocate(std::size_t n)
+    {
+        mutex_type::scoped_lock l(mtx_);
+        if (heap_.empty())
+            return new T[n];
+
+        T* next = heap_.top();
+        heap_.pop();
+        return next;
+    }
+
+    void deallocate(T* p)
+    {
+        mutex_type::scoped_lock l(mtx_);
+        if (max_size_ == std::atomic_size_t(-1) || heap_.size() < max_size_)
+            heap_.push(p);
+        else
+            delete [] p;
+    }
+
+private:
+    mutex_type mtx_;
+    std::size_t max_size_;
+    std::stack<T*> heap_;
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 struct partition_data
@@ -45,6 +97,13 @@ private:
         buffer_type data_;
     };
 
+    static void deallocate(double* p)
+    {
+        alloc_.deallocate(p);
+    }
+
+    static partition_allocator<double> alloc_;
+
 public:
     partition_data()
       : size_(0)
@@ -52,14 +111,16 @@ public:
 
     // Create a new (uninitialized) partition of the given size.
     partition_data(std::size_t size)
-      : data_(new double [size], size, buffer_type::take),
+      : data_(alloc_.allocate(size), size, buffer_type::take,
+            &partition_data::deallocate),
         size_(size),
         min_index_(0)
     {}
 
     // Create a new (initialized) partition of the given size.
     partition_data(std::size_t size, double initial_value)
-      : data_(new double [size], size, buffer_type::take),
+      : data_(alloc_.allocate(size), size, buffer_type::take,
+            &partition_data::deallocate),
         size_(size),
         min_index_(0)
     {
@@ -109,6 +170,8 @@ private:
     std::size_t size_;
     std::size_t min_index_;
 };
+
+partition_allocator<double> partition_data::alloc_;
 
 std::ostream& operator<<(std::ostream& os, partition_data const& c)
 {
