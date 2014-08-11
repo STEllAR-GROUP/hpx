@@ -66,6 +66,11 @@ namespace hpx { namespace lcos { namespace local
     public:
         receive_buffer() {}
 
+        receive_buffer(receive_buffer && other)
+          : mtx_(std::move(mtx_))
+          , buffer_map_(std::move(buffer_map_))
+        {}
+
         ~receive_buffer()
         {
             iterator end = buffer_map_.end();
@@ -210,6 +215,11 @@ namespace hpx { namespace lcos { namespace local
 
     public:
         receive_buffer() {}
+
+        receive_buffer(receive_buffer && other)
+          : mtx_(std::move(mtx_))
+          , buffer_map_(std::move(buffer_map_))
+        {}
 
         ~receive_buffer()
         {
