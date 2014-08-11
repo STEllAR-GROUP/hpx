@@ -118,6 +118,38 @@ system and application performance.
          misses) in the AGAS cache of the specified locality (see
          `<cache_statistics>`.]
     ]
+    [   [`/agas/count/<full_cache_statistics>`
+
+          where:[br] `<full_cache_statistics>` is one of the following:
+          `cache_get_entry`, `cache_insert_entry`, `cache_update_entry`,
+          `cache_erase_entry`
+        ]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the AGAS cache should
+          be queried. The locality id is a (zero based) number identifying the
+          locality.
+        ]
+        [None]
+        [Returns the number of invocations of the specified cache API function
+         of the AGAS cache.]
+    ]
+    [   [`/agas/time/<full_cache_statistics>`
+
+          where:[br] `<full_cache_statistics>` is one of the following:
+          `cache_get_entry`, `cache_insert_entry`, `cache_update_entry`,
+          `cache_erase_entry`
+        ]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the AGAS cache should
+          be queried. The locality id is a (zero based) number identifying the
+          locality.
+        ]
+        [None]
+        [Returns the the overall time spent executing of the specified API
+         function of the AGAS cache.]
+    ]
 ]
 
 [/////////////////////////////////////////////////////////////////////////////]
@@ -642,7 +674,7 @@ system and application performance.
         ]
         [None]
         [Returns the average idle rate for the given worker thread(s) on the
-         given locality which is caused by cleaning up terminated threads. The 
+         given locality which is caused by cleaning up terminated threads. The
          cleanup idle rate is defined as the ratio of the time spent on
          cleaning up terminated thread objects and the overall time spent
          executing work since the application started.
@@ -707,7 +739,7 @@ system and application performance.
          executed by a different worker thread than they were initially
          scheduled on).
          This counter is available only if the configuration time constant
-         `HPX_THREAD_MAINTAIN_STEALING_COUNTS` is set to `ON` 
+         `HPX_THREAD_MAINTAIN_STEALING_COUNTS` is set to `ON`
          (default: ON).]
     ]
     [   [`/threads/count/pending-misses`]
@@ -732,7 +764,7 @@ system and application performance.
          on the referenced locality failed to find pending HPX-threads in its
          associated queue.
          This counter is available only if the configuration time constant
-         `HPX_THREAD_MAINTAIN_STEALING_COUNTS` is set to `ON` 
+         `HPX_THREAD_MAINTAIN_STEALING_COUNTS` is set to `ON`
          (default: ON).]
     ]
     [   [`/threads/count/pending-accesses`]
@@ -757,7 +789,7 @@ system and application performance.
          on the referenced locality looked for pending HPX-threads in its
          associated queue.
          This counter is available only if the configuration time constant
-         `HPX_THREAD_MAINTAIN_STEALING_COUNTS` is set to `ON` 
+         `HPX_THREAD_MAINTAIN_STEALING_COUNTS` is set to `ON`
          (default: ON).]
     ]
     [   [`/threads/count/stolen-from-staged`]
@@ -783,7 +815,7 @@ system and application performance.
          executed by a different worker thread than they were initially
          scheduled on).
          This counter is available only if the configuration time constant
-         `HPX_THREAD_MAINTAIN_STEALING_COUNTS` is set to `ON` 
+         `HPX_THREAD_MAINTAIN_STEALING_COUNTS` is set to `ON`
          (default: ON).]
     ]
     [   [`/threads/count/stolen-to-pending`]
