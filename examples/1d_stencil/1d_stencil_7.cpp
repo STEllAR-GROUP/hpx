@@ -1,5 +1,4 @@
 //  Copyright (c) 2014 Hartmut Kaiser
-//  Copyright (c) 2014 Patricia Grubel
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -388,9 +387,8 @@ int hpx_main(boost::program_options::variables_map& vm)
                       << std::endl;
         }
     }
-
-    boost::uint64_t const os_thread_count = hpx::get_os_thread_count();
-    print_time_results(os_thread_count, elapsed, nx, np, nt, header);
+    boost::uint64_t const num_worker_threads = hpx::get_num_worker_threads();
+    print_time_results(num_worker_threads, elapsed, nx, np, nt, header);
 
     return hpx::finalize();
 }
