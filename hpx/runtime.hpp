@@ -311,6 +311,9 @@ namespace hpx
         void evaluate_active_counters(bool reset = false,
             char const* description = 0, error_code& ec = throws);
 
+        // stop periodic evaluation of counters during shutdown
+        void stop_evaluating_counters();
+
         parcelset::policies::message_handler* create_message_handler(
             char const* message_handler_type, char const* action,
             parcelset::parcelport* pp, std::size_t num_messages,

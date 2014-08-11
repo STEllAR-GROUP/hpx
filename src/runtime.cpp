@@ -553,6 +553,12 @@ namespace hpx
             active_counters_->evaluate_counters(reset, description, ec);
     }
 
+    void runtime::stop_evaluating_counters()
+    {
+        if (active_counters_.get())
+            active_counters_->stop_evaluating_counters();
+    }
+
     parcelset::policies::message_handler* runtime::create_message_handler(
         char const* message_handler_type, char const* action,
         parcelset::parcelport* pp, std::size_t num_messages,
@@ -1373,6 +1379,13 @@ namespace hpx
         HPX_THROWS_IF(ec, invalid_status, "create_binary_filter",
             "the runtime system is not available at this time");
         return 0;
+    }
+
+    // helper function to stop evaluating counters during shutdown
+    void stop_evaluating_counters()
+    {
+        runtime* rt = get_runtime_ptr();
+        if (NULL != rt) rt->stop_evaluating_counters();
     }
 }
 

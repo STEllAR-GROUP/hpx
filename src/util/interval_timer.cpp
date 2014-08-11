@@ -25,7 +25,7 @@ namespace hpx { namespace util
       : f_(f), on_term_(),
         microsecs_(microsecs), id_(0), description_(description),
         pre_shutdown_(pre_shutdown), is_started_(false), first_start_(true),
-        is_terminated_(false)
+        is_terminated_(false), is_stopped_(false)
     {}
 
     interval_timer::interval_timer(HPX_STD_FUNCTION<bool()> const& f,
@@ -35,7 +35,7 @@ namespace hpx { namespace util
       : f_(f), on_term_(on_term),
         microsecs_(microsecs), id_(0), description_(description),
         pre_shutdown_(pre_shutdown), is_started_(false), first_start_(true),
-        is_terminated_(false)
+        is_terminated_(false), is_stopped_(false)
     {}
 
     bool interval_timer::start(bool evaluate_)
@@ -54,6 +54,8 @@ namespace hpx { namespace util
                 else
                     register_shutdown_function(boost::bind(&interval_timer::terminate, this));
             }
+
+            is_stopped_ = false;
 
             if (evaluate_) {
                 l.unlock();
@@ -95,6 +97,7 @@ namespace hpx { namespace util
     bool interval_timer::stop()
     {
         mutex_type::scoped_lock l(mtx_);
+        is_stopped_ = true;
         return stop_locked();
     }
 
@@ -146,8 +149,11 @@ namespace hpx { namespace util
         try {
             mutex_type::scoped_lock l(mtx_);
 
-            if (is_terminated_ || statex == threads::wait_abort || 0 == microsecs_)
+            if (is_stopped_ || is_terminated_ ||
+                statex == threads::wait_abort || 0 == microsecs_)
+            {
                 return threads::terminated;        // object has been finalized, exit
+            }
 
             if (id_ != 0 && id_ != threads::get_self_id())
                 return threads::terminated;        // obsolete timer thread
