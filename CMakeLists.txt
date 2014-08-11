@@ -1413,7 +1413,7 @@ include(HPX_GeneratePackage)
 # Create a symlink in share pointing to the latest HPX installation
 execute_process(COMMAND
   "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx"
-  WORKING_DIRECTORY "${output_dir}/share")
+  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/share")
 
 message("")
 message("HPX will be installed to ${CMAKE_INSTALL_PREFIX}")
