@@ -419,7 +419,7 @@ namespace hpx { namespace lcos
                     HPX_ASSERT(ids.size() >= applied);
 
                     std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    std::vector<hpx::id_type> ids_next(it, it + next_fan);
 
                     hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(

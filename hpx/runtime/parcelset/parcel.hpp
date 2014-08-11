@@ -18,6 +18,8 @@
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/binary_filter.hpp>
+#include <hpx/traits/type_size.hpp>
+#include <hpx/traits/serialize_as_future.hpp>
 
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/serialization.hpp>
@@ -103,6 +105,8 @@ namespace hpx { namespace parcelset
             virtual bool may_require_id_splitting() const = 0;
 
             virtual bool does_termination_detection() const = 0;
+
+            virtual void wait_for_futures() = 0;
 
             // default copy constructor is ok
             // default assignment operator is ok
@@ -334,6 +338,11 @@ namespace hpx { namespace parcelset
             bool does_termination_detection() const
             {
                 return this->get_action()->does_termination_detection();
+            }
+
+            void wait_for_futures()
+            {
+                return this->get_action()->wait_for_futures();
             }
 
             void save(util::portable_binary_oarchive& ar) const;
@@ -723,6 +732,11 @@ namespace hpx { namespace parcelset
             return data_->does_termination_detection();
         }
 
+        void wait_for_futures()
+        {
+            return data_->wait_for_futures();
+        }
+
         // generate unique parcel id
         static naming::gid_type generate_unique_id(
             boost::uint32_t locality_id = naming::invalid_locality_id);
@@ -746,12 +760,22 @@ namespace hpx { namespace parcelset
 
 namespace hpx { namespace traits
 {
-    template<>
+    template <>
     struct type_size<hpx::parcelset::parcel>
     {
-        static std::size_t call(hpx::parcelset::parcel const& parcel_)
+        static std::size_t call(hpx::parcelset::parcel const& p)
         {
-            return sizeof(hpx::parcelset::parcel) + parcel_.get_type_size();
+            return sizeof(hpx::parcelset::parcel) + p.get_type_size();
+        }
+    };
+
+    template <>
+    struct serialize_as_future<hpx::parcelset::parcel>
+      : boost::mpl::true_
+    {
+        static void call(hpx::parcelset::parcel& p)
+        {
+            p.wait_for_futures();
         }
     };
 }}

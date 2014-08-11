@@ -23,6 +23,7 @@ double dt = 1.;     // time step
 double dx = 1.;     // grid spacing
 
 ///////////////////////////////////////////////////////////////////////////////
+//[stepper_1
 struct stepper
 {
     // Our partition type
@@ -67,7 +68,7 @@ struct stepper
         return U[nt % 2];
     }
 };
-
+//]
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {

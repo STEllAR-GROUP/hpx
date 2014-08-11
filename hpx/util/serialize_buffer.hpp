@@ -120,6 +120,30 @@ namespace hpx { namespace util
             }
         }
 
+        template <typename Deleter>
+        serialize_buffer (T const* data, std::size_t size, init_mode mode,
+                Deleter const& deleter,
+                allocator_type const& alloc = allocator_type())
+          : data_()
+          , size_(size)
+          , alloc_(alloc)
+        {
+            if (mode == copy) {
+                data_.reset(alloc_.allocate(size), deleter);
+                if (size != 0)
+                    std::copy(data, data + size, data_.get());
+            }
+            else if (mode == reference) {
+                data_ = boost::shared_array<T>(const_cast<T*>(data), deleter);
+            }
+            else {
+                // can't take ownership of const buffer
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "serialize_buffer::serialize_buffer",
+                    "can't take ownership of const data");
+            }
+        }
+
         // Deleter needs to use deallocator
         template <typename Deallocator, typename Deleter>
         serialize_buffer (T* data, std::size_t size,
@@ -353,6 +377,27 @@ namespace hpx { namespace util
             else {
                 // reference or take ownership, behavior is defined by deleter
                 data_ = boost::shared_array<T>(data, deleter);
+            }
+        }
+
+        template <typename Deleter>
+        serialize_buffer (T const* data, std::size_t size, init_mode mode,
+                Deleter const& deleter)
+          : data_(), size_(size)
+        {
+            if (mode == copy) {
+                data_.reset(new T[size], deleter);
+                if (size != 0)
+                    std::copy(data, data + size, data_.get());
+            }
+            else if (mode == reference) {
+                data_ = boost::shared_array<T>(const_cast<T*>(data), deleter);
+            }
+            else {
+                // can't take ownership of const buffer
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "serialize_buffer::serialize_buffer",
+                    "can't take ownership of const data");
             }
         }
 

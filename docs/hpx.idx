@@ -104,6 +104,10 @@ parallel::reduce                      "reduce" "hpx\.parallel\.v1\.reduce.*"
 parallel::reverse                     "reverse" "hpx\.parallel\.v1\.reverse$"
 parallel::reverse_copy                "reverse_copy" "hpx\.parallel\.v1\.reverse_copy.*"
 
+# hpx/parallel/detail/rotate.hpp
+parallel::rotate                      "rotate" "hpx\.parallel\.v1\.rotate"
+parallel::rotate_copy                 "rotate_copy" "hpx\.parallel\.v1\.rotate_copy.*"
+
 # hpx/parallel/detail/swap_ranges.hpp
 parallel::swap_ranges                 "swap_ranges" "hpx\.parallel\.v1\.swap_ranges.*"
 

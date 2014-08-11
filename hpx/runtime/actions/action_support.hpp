@@ -307,6 +307,9 @@ namespace hpx { namespace actions
         virtual void load(hpx::util::portable_binary_iarchive & ar) = 0;
         virtual void save(hpx::util::portable_binary_oarchive & ar) const = 0;
 
+        /// Wait for embedded futures to become ready
+        virtual void wait_for_futures() = 0;
+
 //         /// Return all data needed for thread initialization
 //         virtual threads::thread_init_data&
 //         get_thread_init_data(naming::id_type const& target,
@@ -612,6 +615,12 @@ namespace hpx { namespace actions
         bool may_require_id_splitting() const
         {
             return traits::action_may_require_id_splitting<derived_type>::call(arguments_);
+        }
+
+        /// Wait for embedded futures to become ready
+        void wait_for_futures()
+        {
+            traits::serialize_as_future<arguments_type>::call(arguments_);
         }
 
         /// Return whether the embedded action is part of termination detection

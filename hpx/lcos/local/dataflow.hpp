@@ -168,7 +168,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
               , "hpx::lcos::local::dataflow::execute"
               , threads::pending
               , true
-              , threads::thread_priority_critical);
+              , threads::thread_priority_boost);
         }
         template <typename Iter>
         BOOST_FORCEINLINE

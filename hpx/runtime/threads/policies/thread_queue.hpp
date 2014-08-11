@@ -865,7 +865,7 @@ namespace hpx { namespace threads { namespace policies
                 return new_tasks_count_;
 
             if (unknown == state)
-                return thread_map_count_ + new_tasks_count_;
+                return thread_map_count_ + new_tasks_count_ - terminated_items_count_;
 
             // acquire lock only if absolutely necessary
             typename mutex_type::scoped_lock lk(mtx_);

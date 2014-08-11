@@ -23,6 +23,7 @@
 #include <hpx/parallel/detail/mismatch.hpp>
 #include <hpx/parallel/detail/move.hpp>
 #include <hpx/parallel/detail/reverse.hpp>
+#include <hpx/parallel/detail/rotate.hpp>
 #include <hpx/parallel/detail/swap_ranges.hpp>
 #include <hpx/parallel/detail/transform.hpp>
 

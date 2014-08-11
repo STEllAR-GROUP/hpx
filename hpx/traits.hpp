@@ -118,6 +118,10 @@ namespace hpx { namespace traits
     struct is_future_tuple;
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Future, typename Enable = void>
+    struct serialize_as_future;
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Plugin, typename Enable = void>
     struct component_config_data;
 

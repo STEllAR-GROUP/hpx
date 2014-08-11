@@ -126,6 +126,12 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::components::server::runtime_support,
     hpx::components::component_runtime_support)
 
+namespace hpx
+{
+    // helper function to stop evaluating counters during shutdown
+    void stop_evaluating_counters();
+}
+
 namespace hpx { namespace components
 {
     bool initial_static_loading = true;
@@ -622,6 +628,7 @@ namespace hpx { namespace components { namespace server
         while (tm.get_thread_count() > 1)
         {
             this_thread::sleep_for(boost::posix_time::millisec(100));
+            this_thread::yield();
         }
 
         // Now this locality has become passive, thus we can send the token
@@ -688,6 +695,7 @@ namespace hpx { namespace components { namespace server
         while (tm.get_thread_count() > 1)
         {
             this_thread::sleep_for(boost::posix_time::millisec(100));
+            this_thread::yield();
         }
 
         // Now this locality has become passive, thus we can send the token
@@ -800,6 +808,8 @@ namespace hpx { namespace components { namespace server
         naming::resolver_client& agas_client = appl.get_agas_client();
 
         agas_client.start_shutdown();
+
+        stop_evaluating_counters();
 
         std::vector<naming::id_type> locality_ids = find_all_localities();
         dijkstra_termination_detection(locality_ids);

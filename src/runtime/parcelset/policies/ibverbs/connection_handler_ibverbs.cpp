@@ -193,7 +193,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
             hpx::applier::register_thread_nullary(
                 util::bind(&connection_handler::handle_messages, this),
                 "ibverbs::connection_handler::handle_messages",
-                threads::pending, true, threads::thread_priority_critical);
+                threads::pending, true, threads::thread_priority_boost);
         }
         else
         {

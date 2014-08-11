@@ -112,6 +112,11 @@ namespace hpx { namespace util
         timer_.start();
     }
 
+    void query_counters::stop_evaluating_counters()
+    {
+        timer_.stop();
+    }
+
     template <typename Stream>
     void query_counters::print_value(Stream& out, std::string const& name,
         performance_counters::counter_value const& value, std::string const& uom)
