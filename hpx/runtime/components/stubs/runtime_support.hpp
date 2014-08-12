@@ -322,8 +322,7 @@ namespace hpx { namespace components { namespace stubs
         static void terminate(naming::id_type const& targetgid);
 
         /// \brief Terminate the runtime systems of all localities
-        static void
-        terminate_all(naming::id_type const& targetgid);
+        static void terminate_all(naming::id_type const& targetgid);
 
         static void terminate_all();
 

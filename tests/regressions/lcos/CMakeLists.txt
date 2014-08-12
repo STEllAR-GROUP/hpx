@@ -14,11 +14,13 @@ set(tests
     future_hang_on_then_629
     future_timed_wait_1025
     future_unwrap_878
+    future_unwrap_1182
     lifetime_588
     lifetime_588_1
     promise_leak_996
     set_hpx_limit_771
     set_hpx_limit_798
+    shared_stated_leaked_1211
    )
 
 

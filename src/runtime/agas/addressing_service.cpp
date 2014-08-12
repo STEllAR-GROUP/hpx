@@ -203,7 +203,7 @@ addressing_service::addressing_service(
   , runtime_mode runtime_type_
     )
   : gva_cache_(new gva_cache_type)
-  , console_cache_(0)
+  , console_cache_(naming::invalid_locality_id)
   , max_refcnt_requests_(ini_.get_agas_max_pending_refcnt_requests())
   , refcnt_requests_count_(0)
   , enable_refcnt_caching_(true)
@@ -213,7 +213,7 @@ addressing_service::addressing_service(
   , caching_(ini_.get_agas_caching_mode())
   , range_caching_(caching_ ? ini_.get_agas_range_caching_mode() : false)
   , action_priority_(ini_.get_agas_dedicated_server() ?
-        threads::thread_priority_normal : threads::thread_priority_critical)
+        threads::thread_priority_normal : threads::thread_priority_boost)
   , here_()         // defer initializing this
   , rts_lva_(0)
   , mem_lva_(0)
@@ -608,7 +608,7 @@ bool addressing_service::get_console_locality(
         {
             mutex_type::scoped_lock lock(console_cache_mtx_);
 
-            if (console_cache_)
+            if (console_cache_ != naming::invalid_locality_id)
             {
                 prefix = naming::get_gid_from_locality_id(console_cache_);
                 if (&ec != &throws)
@@ -635,7 +635,7 @@ bool addressing_service::get_console_locality(
 
             {
                 mutex_type::scoped_lock lock(console_cache_mtx_);
-                if (!console_cache_) {
+                if (console_cache_ == naming::invalid_locality_id) {
                     console_cache_ = console;
                 }
                 else {
@@ -1725,8 +1725,8 @@ void addressing_service::route(
     }
 
     // apply directly as we have the resolved destination address
-    applier::detail::apply_r_p_cb<action_type>(addr, target, action_priority_
-      , f, req);
+    applier::detail::apply_r_p_cb<action_type>(std::move(addr), target,
+        action_priority_, f, req);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1884,7 +1884,7 @@ void addressing_service::decref(
         ) = &addressing_service::decref;
 
         threads::register_thread_nullary(
-            HPX_STD_BIND(decref_ptr, this, gid, credit, boost::ref(throws)),
+            util::bind(decref_ptr, this, gid, credit, boost::ref(throws)),
             "addressing_service::decref");
         return;
     }
@@ -1963,9 +1963,9 @@ lcos::future<bool> addressing_service::register_name_async(
     boost::int64_t new_credit = naming::detail::get_credit_from_gid(new_gid);
     if (new_credit != 0)
     {
-        using HPX_STD_PLACEHOLDERS::_1;
+        using util::placeholders::_1;
         return f.then(
-            HPX_STD_BIND(correct_credit_on_failure, _1, id,
+            util::bind(correct_credit_on_failure, _1, id,
                 HPX_GLOBALCREDIT_INITIAL, new_credit)
         );
     }
@@ -2583,7 +2583,9 @@ void addressing_service::garbage_collect_non_blocking(
     error_code& ec
     )
 {
-    mutex_type::scoped_lock l(refcnt_requests_mtx_);
+    mutex_type::scoped_lock l(refcnt_requests_mtx_, boost::try_to_lock);
+    if (!l) return;     // no need to compete for garbage collection
+
     send_refcnt_requests_non_blocking(l, ec);
 }
 
@@ -2591,7 +2593,9 @@ void addressing_service::garbage_collect(
     error_code& ec
     )
 {
-    mutex_type::scoped_lock l(refcnt_requests_mtx_);
+    mutex_type::scoped_lock l(refcnt_requests_mtx_, boost::try_to_lock);
+    if (!l) return;     // no need to compete for garbage collection
+
     send_refcnt_requests_sync(l, ec);
 }
 
@@ -2890,8 +2894,8 @@ namespace hpx
                 "no basename specified");
         }
 
-        if (sequence_nr == ~0U)
-            sequence_nr = naming::get_locality_id_from_id(find_here());
+        if (sequence_nr == std::size_t(~0U))
+            sequence_nr = std::size_t(naming::get_locality_id_from_id(find_here()));
 
         std::string name = detail::name_from_basename(basename, sequence_nr);
         return agas::on_symbol_namespace_event(name, agas::symbol_ns_bind, true);
@@ -2907,8 +2911,8 @@ namespace hpx
                 "no basename specified");
         }
 
-        if (sequence_nr == ~0U)
-            sequence_nr = naming::get_locality_id_from_id(find_here());
+        if (sequence_nr == std::size_t(~0U))
+            sequence_nr = std::size_t(naming::get_locality_id_from_id(find_here()));
 
         std::string name = detail::name_from_basename(basename, sequence_nr);
         return agas::register_name(name, id);
@@ -2924,8 +2928,8 @@ namespace hpx
                 "no basename specified");
         }
 
-        if (sequence_nr == ~0U)
-            sequence_nr = naming::get_locality_id_from_id(find_here());
+        if (sequence_nr == std::size_t(~0U))
+            sequence_nr = std::size_t(naming::get_locality_id_from_id(find_here()));
 
         std::string name = detail::name_from_basename(basename, sequence_nr);
         return agas::unregister_name(name);

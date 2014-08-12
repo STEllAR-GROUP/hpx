@@ -30,7 +30,7 @@
 
 namespace hpx { namespace util { namespace logging {
 
-    template<class holder, class gather_type> struct gather_holder {
+    template<class holder, class gather_type> struct gather_holder { //-V690
         gather_holder(const holder & p_this) : m_this(p_this), m_use(true) {}
 
         gather_holder(const gather_holder & other) : m_this(other.m_this), m_use(true) {
@@ -116,8 +116,8 @@ namespace hpx { namespace util { namespace logging {
         - the caching
         - the on_destroyed (if present)
     */
-    template<class gather_msg, class write_msg> 
-    struct forward_to_logger : logger<gather_msg, default_> 
+    template<class gather_msg, class write_msg>
+    struct forward_to_logger : logger<gather_msg, default_>
     {
         typedef typename detail::find_gather_if_default<gather_msg>::gather_type gather_type;
         typedef typename gather_type::msg_type msg_type;
@@ -128,8 +128,8 @@ namespace hpx { namespace util { namespace logging {
         typedef typename boost::remove_pointer<write_msg>::type write_type;
 
         typedef logger<gather_msg, write_msg> original_logger_type;
-        forward_to_logger(original_logger_type *original_logger = 0) 
-          : m_writer(0), m_original_logger( original_logger) 
+        forward_to_logger(original_logger_type *original_logger = 0)
+          : m_writer(0), m_original_logger( original_logger)
         {
             if ( m_original_logger)
                 m_writer = &m_original_logger->writer();

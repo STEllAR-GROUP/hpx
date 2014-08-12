@@ -1098,12 +1098,6 @@ struct incrementer
         HPX_ASSERT(amount);
     }
 
-    incrementer(
-        incrementer const& other
-        )
-      : amount_(other.amount_)
-    {}
-
     void operator()(
         T& v
         ) const
@@ -1128,12 +1122,6 @@ struct decrementer
     {
         HPX_ASSERT(amount);
     }
-
-    decrementer(
-        decrementer const& other
-        )
-      : amount_(other.amount_)
-    {}
 
     void operator()(
         T& v

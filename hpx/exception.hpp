@@ -178,7 +178,7 @@ namespace hpx
     /// \note Class hpx::error_code is an adjunct to error reporting by
     /// exception
     ///
-    class error_code : public boost::system::error_code
+    class error_code : public boost::system::error_code //-V690
     {
     public:
         /// Construct an object of type error_code.
@@ -498,8 +498,9 @@ namespace hpx
         ///               \a hpx_category (if mode is \a plain, this is the
         ///               default) or to the category \a hpx_category_rethrow
         ///               (if mode is \a rethrow).
-        error_code get_error_code(throwmode /*mode*/ = plain) const throw()
+        error_code get_error_code(throwmode mode = plain) const throw()
         {
+            HPX_UNUSED(mode);
             return error_code(this->boost::system::system_error::code().value(),
                 *this);
         }
@@ -769,17 +770,17 @@ namespace hpx
 
         // main function for throwing exceptions
         template <typename Exception>
-        BOOST_ATTRIBUTE_NORETURN HPX_EXPORT
+        HPX_ATTRIBUTE_NORETURN HPX_EXPORT
         void throw_exception(Exception const& e,
             std::string const& func, std::string const& file, long line);
 
         // HPX_ASSERT handler
-        BOOST_ATTRIBUTE_NORETURN HPX_EXPORT
+        HPX_ATTRIBUTE_NORETURN HPX_EXPORT
         void assertion_failed(char const* expr, char const* function,
             char const* file, long line);
 
         // HPX_ASSERT_MSG handler
-        BOOST_ATTRIBUTE_NORETURN HPX_EXPORT
+        HPX_ATTRIBUTE_NORETURN HPX_EXPORT
         void assertion_failed_msg(char const* msg, char const* expr,
             char const* function, char const* file, long line);
 

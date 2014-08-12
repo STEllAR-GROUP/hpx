@@ -44,7 +44,7 @@ namespace detail
 #if !HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
         HPX_UNUSED(tm);
         HPX_UNUSED(idle_loop_count);
-        HPX_UNUSED(running);
+        HPX_UNUSED(running); //-V601
         return false;
 #else
         if (!minimal_deadlock_detection)

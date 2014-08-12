@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,12 +19,12 @@
 #include <hpx/include/async.hpp>
 #include <hpx/lcos/wait_any.hpp>
 #include <hpx/lcos/wait_all.hpp>
-#include <hpx/lcos/wait_n.hpp>
+#include <hpx/lcos/wait_each.hpp>
+#include <hpx/lcos/wait_some.hpp>
 #include <hpx/lcos/when_any.hpp>
 #include <hpx/lcos/when_all.hpp>
-#include <hpx/lcos/when_n.hpp>
-
-#include <hpx/lcos/future_wait.hpp>
+#include <hpx/lcos/when_each.hpp>
+#include <hpx/lcos/when_some.hpp>
 
 #endif
 

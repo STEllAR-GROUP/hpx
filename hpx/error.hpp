@@ -11,7 +11,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/export_definitions.hpp>
-#include <boost/exception/detail/attribute_noreturn.hpp>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -77,6 +76,8 @@ namespace hpx
         security_error = 50,                        ///< An error occurred in the security component
         filesystem_error = 51,                      ///< The specified file does not exist or other filesystem related error
         bad_function_call = 52,                     ///< equivalent of std::bad_function_call
+        task_canceled_exception = 53,               ///< parallel::v2::task_canceled_exception
+        task_region_not_active = 54,                ///< task_region is not active
 
         /// \cond NOINTERNAL
         last_error,
@@ -140,6 +141,8 @@ namespace hpx
         /* 50 */ "security_error",
         /* 51 */ "filesystem_error",
         /* 52 */ "bad_function_call",
+        /* 53 */ "task_canceled_exception",
+        /* 54 */ "task_region_not_active",
 
         /*    */ ""
     };
@@ -148,7 +151,7 @@ namespace hpx
     /// \cond NOINTERNAL
 
     /// \brief throw an hpx::exception initialized from the given arguments
-    BOOST_ATTRIBUTE_NORETURN HPX_EXPORT
+    HPX_ATTRIBUTE_NORETURN HPX_EXPORT
     void throw_exception(error e, std::string const& msg,
         std::string const& func, std::string const& file = "", long line = -1);
     /// \endcond

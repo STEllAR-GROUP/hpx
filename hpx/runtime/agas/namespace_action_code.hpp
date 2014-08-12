@@ -248,7 +248,7 @@ namespace detail
           , "ns"
           , counter_target_time
           , locality_ns_resolved_localities
-          , primary_ns_statistics_counter }
+          , locality_ns_statistics_counter }
     };
     static std::size_t const num_locality_namespace_services =
         sizeof(locality_namespace_services)/sizeof(locality_namespace_services[0]);

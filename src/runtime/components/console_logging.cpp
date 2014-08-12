@@ -215,6 +215,12 @@ namespace hpx { namespace components
             return;
 
         try {
+            {
+                queue_mutex_type::scoped_lock l(queue_mtx_);
+                if (queue_.empty())
+                    return;         // some other thread did the deed
+            }
+
             if (!ensure_prefix())
                 return;             // some other thread tries to do logging
 

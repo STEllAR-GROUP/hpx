@@ -176,7 +176,7 @@ hpx::threads::thread_state_enum invoke_worker_timed_no_suspension(
     hpx::threads::thread_state_ex_enum ex = hpx::threads::wait_signaled
     )
 {
-    worker_timed(delay);
+    worker_timed(delay * 1000);
     return hpx::threads::terminated;
 }
 
@@ -184,7 +184,7 @@ hpx::threads::thread_state_enum invoke_worker_timed_suspension(
     hpx::threads::thread_state_ex_enum ex = hpx::threads::wait_signaled
     )
 {
-    worker_timed(delay);
+    worker_timed(delay * 1000);
 
     hpx::error_code ec(hpx::lightweight);
     hpx::this_thread::suspend(hpx::threads::suspended, "suspend", ec);

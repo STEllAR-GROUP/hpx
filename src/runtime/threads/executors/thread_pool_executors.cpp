@@ -175,7 +175,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         // update statistics
         ++tasks_scheduled_;
 
-        threads::detail::create_thread(&scheduler_, data, initial_state, run_now, ec);
+        threads::detail::create_thread(&scheduler_, data, initial_state, run_now, ec); //-V601
         if (ec) {
             --tasks_scheduled_;
             return;
@@ -200,7 +200,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             this, std::move(f)), desc);
         data.stacksize = threads::get_stack_size(stacksize);
 
-        thread_id_type id = threads::detail::create_thread(
+        thread_id_type id = threads::detail::create_thread( //-V601
             &scheduler_, data, suspended, true, ec);
         if (ec) return;
         HPX_ASSERT(invalid_thread_id != id);    // would throw otherwise
@@ -234,7 +234,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             this, std::move(f)), desc);
         data.stacksize = threads::get_stack_size(stacksize);
 
-        thread_id_type id = threads::detail::create_thread(
+        thread_id_type id = threads::detail::create_thread( //-V601
             &scheduler_, data, suspended, true, ec);
         if (ec) return;
         HPX_ASSERT(invalid_thread_id != id);    // would throw otherwise
@@ -349,7 +349,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             return max_punits_;
 
         case threads::detail::current_concurrency:
-            return current_concurrency_;
+            return current_concurrency_ ?
+                static_cast<std::size_t>(current_concurrency_)
+              : min_punits_;
 
         default:
             break;

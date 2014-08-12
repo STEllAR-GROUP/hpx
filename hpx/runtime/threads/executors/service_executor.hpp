@@ -55,6 +55,11 @@ namespace hpx { namespace threads { namespace executors
             void add_no_count(closure_type && f);
             void thread_wrapper(closure_type && f);
 
+        protected:
+            // Return the requested policy element
+            std::size_t get_policy_element(
+                threads::detail::executor_parameter p, error_code& ec) const;
+
         private:
             util::io_service_pool* pool_;
             boost::atomic<std::size_t> task_count_;

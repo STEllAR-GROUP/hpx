@@ -1,23 +1,27 @@
-# Copyright (c) 2007-2013 Hartmut Kaiser
+# Copyright (c) 2007-2014 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(example_programs
+    allow_unknown_options
     component_ctors
     component_in_executable
     component_inheritance
     component_inheritance_simple
     component_with_executor
     composable_guard
+    customize_async
     data_actions
     error_handling
     event_synchronization
     factorial
     fibonacci
+    fibonacci_await
     fibonacci_one
     fibonacci_futures
+    fibonacci_futures_distributed
     fractals
     fractals_struct
     interest_calculator
@@ -42,29 +46,20 @@ endif()
 
 if(HPX_HAVE_CXX11_LAMBDAS)
   set(example_programs ${example_programs}
-      hello_world
       1d_wave_equation
-     )
-
-  # MSVC 2010 is not able to cope with this example
-  if(NOT MSVC10)
-    set(example_programs ${example_programs}
-        fibonacci_dataflow
-        )
-  endif()
-endif()
-
-# MSVC 2010 is not able to cope with this example
-if(NOT MSVC10)
-  set(example_programs ${example_programs}
-      fibonacci_await
-      fibonacci_futures_distributed
+      hello_world
+      fibonacci_dataflow
+      pipeline1
+      vector_zip_dotproduct
+      vector_counting_dotproduct
      )
 endif()
 
+set(allow_unknown_options_FLAGS DEPENDENCIES iostreams_component)
 set(component_in_executable_FLAGS DEPENDENCIES iostreams_component)
 set(component_ctors_FLAGS DEPENDENCIES iostreams_component)
 set(component_with_executor_FLAGS DEPENDENCIES iostreams_component)
+set(customize_async_FLAGS DEPENDENCIES iostreams_component)
 set(event_synchronization_FLAGS DEPENDENCIES iostreams_component)
 
 set(error_handling_FLAGS DEPENDENCIES iostreams_component)
@@ -83,6 +78,8 @@ set(interest_calculator_FLAGS DEPENDENCIES dataflow_component)
 set(simple_future_continuation_FLAGS DEPENDENCIES iostreams_component)
 set(timed_futures_FLAGS DEPENDENCIES iostreams_component)
 set(pingpong_FLAGS DEPENDENCIES iostreams_component)
+set(vector_zip_dotproduct_FLAGS DEPENDENCIES iostreams_component)
+set(vector_counting_dotproduct_FLAGS DEPENDENCIES iostreams_component)
 
 foreach(example_program ${example_programs})
   set(sources
@@ -94,7 +91,7 @@ foreach(example_program ${example_programs})
   add_hpx_executable(${example_program}
                      SOURCES ${sources}
                      ${${example_program}_FLAGS}
-                     FOLDER "Examples/Quickstart/${example_program}")
+                     FOLDER "Examples/Quickstart")
 
   # add a custom target for this example
   add_hpx_pseudo_target(examples.quickstart.${example_program})

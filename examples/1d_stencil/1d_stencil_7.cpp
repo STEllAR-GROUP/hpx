@@ -1,5 +1,4 @@
 //  Copyright (c) 2014 Hartmut Kaiser
-//  Copyright (c) 2014 Patricia Grubel
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -239,6 +238,7 @@ struct stepper
         return middle + (k*dt/dx*dx) * (left - 2*middle + right);
     }
 
+    //[stepper_7
     // The partitioned operator, it invokes the heat operator above on all elements
     // of a partition.
     static partition heat_part(partition const& left,
@@ -288,6 +288,7 @@ struct stepper
             right.get_data(partition_server::right_partition)
         );
     }
+    //]
 
     // do all the work on 'np' partitions, 'nx' data points each, for 'nt'
     // time steps
@@ -371,6 +372,10 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     // Execute nt time steps on nx grid points and print the final solution.
     stepper::space solution = step.do_work(np, nx, nt);
+    for (std::size_t i = 0; i != np; ++i)
+        solution[i].get_data(partition_server::middle_partition).wait();
+
+    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
     // Print the final solution
     if (vm.count("results"))
@@ -382,16 +387,8 @@ int hpx_main(boost::program_options::variables_map& vm)
                       << std::endl;
         }
     }
-    else
-    {
-        for (std::size_t i = 0; i != np; ++i)
-            solution[i].get_data(partition_server::middle_partition).wait();
-    }
-
-    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
-    
-    boost::uint64_t const os_thread_count = hpx::get_os_thread_count();
-    print_time_results(os_thread_count, elapsed, nx, np, nt, header);
+    boost::uint64_t const num_worker_threads = hpx::get_num_worker_threads();
+    print_time_results(num_worker_threads, elapsed, nx, np, nt, header);
 
     return hpx::finalize();
 }

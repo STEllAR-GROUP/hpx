@@ -28,17 +28,20 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
     {
         typedef bool(receiver::*next_function_type)();
     public:
-        receiver(MPI_Comm communicator, int tag)
+        receiver(MPI_Comm communicator, int tag, int sender_tag, int rank, connection_handler & parcelport)
           : communicator_(communicator)
           , tag_(tag)
+          , sender_tag_(sender_tag)
+          , rank_(rank)
           , next_(0)
           , recvd_chunks_(0)
+          , pp_(parcelport)
+          , closing_(false)
         {}
 
         int sender_tag() const
         {
-            header_.assert_valid();
-            return header_.tag();
+            return sender_tag_;
         }
 
         int tag() const
@@ -48,13 +51,63 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         int rank() const
         {
-            header_.assert_valid();
-            return header_.rank();
+            return rank_;
         }
 
-        void async_read(header const & h, connection_handler & parcelport)
+        void close()
         {
-            header_ = h;
+            closing_ = true;
+        }
+
+        bool closing()
+        {
+            if(closing_ && header_.empty())
+            {
+                closing_ = false;
+                return true;
+            }
+            return false;
+        }
+
+        bool async_read(header const & h)
+        {
+            HPX_ASSERT(rank_ == h.rank());
+            HPX_ASSERT(sender_tag_ == h.tag());
+
+            header_.push_back(h);
+
+            if(next_ == 0)
+            {
+                next(&receiver::prepare_send_tag);
+                return true;
+            }
+
+            return false;
+        }
+
+        bool done()
+        {
+            HPX_ASSERT(next_ != 0);
+
+            return ((*this).*next_)();
+        }
+
+        ~receiver()
+        {
+        }
+
+    private:
+
+        bool prepare_send_tag()
+        {
+            if(header_.empty())
+            {
+                next(0);
+                return true;
+            }
+
+            current_header_ = header_.front();
+
             buffer_ = get_buffer();
             buffer_->clear();
             next_ = 0;
@@ -64,48 +117,17 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             performance_counters::parcels::data_point& data = buffer_->data_point_;
             data.time_ = timer_.elapsed_nanoseconds();
             data.serialization_time_ = 0;
-            data.bytes_ = header_.size(); //-V101
+            data.bytes_ = current_header_.size(); //-V101
             data.num_parcels_ = 0;
 
-            if (static_cast<std::size_t>(header_.size()) > get_max_inbound_size(parcelport))
-            {
-                // report this problem ...
-                HPX_THROW_EXCEPTION(boost::asio::error::operation_not_supported,
-                    "mpi::receiver::receiver",
-                    "The size of this message exceeds the maximum inbound data size");
-                return;
-            }
+            current_header_.assert_valid();
+            HPX_ASSERT(rank_ != util::mpi_environment::rank());
 
-            header_.assert_valid();
-            HPX_ASSERT(header_.rank() != util::mpi_environment::rank());
+            buffer_->num_chunks_.first = current_header_.num_chunks_first();
+            buffer_->num_chunks_.second = current_header_.num_chunks_second();
 
-            buffer_->num_chunks_.first = header_.num_chunks_first();
-            buffer_->num_chunks_.second = header_.num_chunks_second();
-
-            next(&receiver::send_tag);
+            return next(&receiver::send_tag);
         }
-
-        bool done(connection_handler & pp)
-        {
-            HPX_ASSERT(next_ != 0);
-            if(((*this).*next_)())
-            {
-                // take measurement of overall receive time
-                buffer_->data_point_.time_ = timer_.elapsed_nanoseconds() -
-                    buffer_->data_point_.time_;
-
-                // decode the received parcels.
-                decode_parcels(pp, *this, buffer_);
-                return true;
-            }
-            return false;
-        }
-
-        ~receiver()
-        {
-        }
-
-    private:
 
         bool send_tag()
         {
@@ -113,18 +135,18 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 &tag_
               , 1
               , MPI_INT
-              , header_.rank()
-              , header_.tag()
+              , rank_
+              , sender_tag_
               , communicator_
               , &request_);
-            return check_tag_sent();
+            return next(&receiver::check_tag_sent);
         }
 
         bool check_tag_sent()
         {
             if(request_ready())
             {
-                return start_send();
+                return next(&receiver::start_send);
             }
             return next(&receiver::check_tag_sent);
         }
@@ -143,14 +165,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             {
                 buffer_->transmission_chunks_.resize(static_cast<std::size_t>(
                     num_zero_copy_chunks + num_non_zero_copy_chunks));
-                buffer_->data_.resize(static_cast<std::size_t>(header_.size()));
+                buffer_->data_.resize(static_cast<std::size_t>(current_header_.size()));
                 buffer_->chunks_.resize(num_zero_copy_chunks);
                 return recv_transmission_chunks();
             }
             else
             {
-                buffer_->data_.resize(std::size_t(header_.size()));
-                return recv_data();
+                buffer_->data_.resize(std::size_t(current_header_.size()));
+                return next(&receiver::recv_data);
             }
         }
 
@@ -163,18 +185,18 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                         * sizeof(parcel_buffer_type::transmission_chunk_type)
                 ),                  // number of elements
                 MPI_CHAR,           // MPI Datatype
-                header_.rank(),     // Source
+                rank_,              // Source
                 tag_,               // Tag
                 communicator_,      // Communicator
                 &request_);         // Request
-            return check_transmission_chunks_recvd();
+            return next(&receiver::check_transmission_chunks_recvd);
         }
 
         bool check_transmission_chunks_recvd()
         {
             if(request_ready())
             {
-                return recv_data();
+                return next(&receiver::recv_data);
             }
 
             return next(&receiver::check_transmission_chunks_recvd);
@@ -186,18 +208,18 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 buffer_->data_.data(),    // data pointer
                 static_cast<int>(buffer_->data_.size()), // number of elements
                 MPI_CHAR,           // MPI Datatype
-                header_.rank(),     // Source
+                rank_,              // Source
                 tag_,               // Tag
                 communicator_,      // Communicator
                 &request_);         // Request
-            return check_data_recvd();
+            return next(&receiver::check_data_recvd);
         }
 
         bool check_data_recvd()
         {
             if(request_ready())
             {
-                return recv_chunks();
+                return next(&receiver::recv_chunks);
             }
 
             return next(&receiver::check_data_recvd);
@@ -211,7 +233,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                     static_cast<boost::uint32_t>(buffer_->num_chunks_.first));
             if(recvd_chunks_ == num_zero_copy_chunks)
             {
-                return send_ack();
+                return next(&receiver::send_ack);
             }
 
             std::size_t chunk_size
@@ -222,7 +244,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 buffer_->chunks_[recvd_chunks_].data(),  // data pointer
                 static_cast<int>(chunk_size), // number of elements
                 MPI_CHAR,           // MPI Datatype
-                header_.rank(),     // Source
+                rank_,              // Source
                 tag_,               // Tag
                 communicator_,      // Communicator
                 &request_);         // Request
@@ -234,7 +256,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
             if(request_ready())
             {
-                return recv_chunks();
+                return next(&receiver::recv_chunks);
             }
 
             return next(&receiver::check_chunks_recvd);
@@ -246,20 +268,28 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 &ack_,          // Data pointer
                 1,              // Size
                 MPI_CHAR,       // MPI Datatype
-                header_.rank(), // Destination
-                header_.tag(),  // Tag
+                rank_, // Destination
+                sender_tag_,  // Tag
                 communicator_,  // Communicator
                 &request_       // Request
             );
-            return check_ack_sent();
+            return next(&receiver::check_ack_sent);
         }
 
         bool check_ack_sent()
         {
             if(request_ready())
             {
-                next(0);
-                return true;
+                // take measurement of overall receive time
+                buffer_->data_point_.time_ = timer_.elapsed_nanoseconds() -
+                    buffer_->data_point_.time_;
+
+                // decode the received parcels.
+                decode_parcels(pp_, *this, buffer_);
+                header_.pop_front();
+                current_header_ = header();
+
+                return next(&receiver::prepare_send_tag);
             }
 
             return next(&receiver::check_ack_sent);
@@ -287,14 +317,20 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             return false;
         }
 
-        header header_;
+        std::deque<header> header_;
+        header current_header_;
         MPI_Comm communicator_;
         int tag_;
+        int sender_tag_;
+        int rank_;
         MPI_Request request_;
         int ack_;
 
         next_function_type next_;
         std::size_t recvd_chunks_;
+        connection_handler & pp_;
+
+        bool closing_;
 
         /// Counters and timers for parcels received.
         util::high_resolution_timer timer_;

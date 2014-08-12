@@ -553,6 +553,12 @@ namespace hpx
             active_counters_->evaluate_counters(reset, description, ec);
     }
 
+    void runtime::stop_evaluating_counters()
+    {
+        if (active_counters_.get())
+            active_counters_->stop_evaluating_counters();
+    }
+
     parcelset::policies::message_handler* runtime::create_message_handler(
         char const* message_handler_type, char const* action,
         parcelset::parcelport* pp, std::size_t num_messages,
@@ -1009,8 +1015,22 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         if (NULL == rt)
-            return 0;
+            return std::size_t(0);
         return rt->get_config().get_os_thread_count();
+    }
+
+    std::size_t get_os_thread_count(threads::executor& exec)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (NULL == rt)
+            return std::size_t(0);
+
+        if (!exec)
+            return rt->get_config().get_os_thread_count();
+
+        error_code ec(lightweight);
+        return exec.executor_data_->get_policy_element(
+            threads::detail::current_concurrency, ec);
     }
 
     std::size_t get_worker_thread_num()
@@ -1028,7 +1048,7 @@ namespace hpx
             return std::size_t(0);
         error_code ec(lightweight);
         return static_cast<std::size_t>(
-            rt->get_agas_client().get_num_overall_threads());
+            rt->get_agas_client().get_num_overall_threads(ec));
     }
 
     bool is_scheduler_numa_sensitive()
@@ -1359,6 +1379,13 @@ namespace hpx
         HPX_THROWS_IF(ec, invalid_status, "create_binary_filter",
             "the runtime system is not available at this time");
         return 0;
+    }
+
+    // helper function to stop evaluating counters during shutdown
+    void stop_evaluating_counters()
+    {
+        runtime* rt = get_runtime_ptr();
+        if (NULL != rt) rt->stop_evaluating_counters();
     }
 }
 

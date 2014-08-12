@@ -31,7 +31,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             shutdown_sem_.wait();
     }
 
-    void service_executor::thread_wrapper(closure_type && f)
+    void service_executor::thread_wrapper(closure_type && f) //-V669
     {
         f();                          // execute the actual thread function
 
@@ -231,5 +231,25 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     std::size_t service_executor::num_pending_closures(error_code& ec) const
     {
         return task_count_;
+    }
+
+    // Return the requested policy element
+    std::size_t service_executor::get_policy_element(
+        threads::detail::executor_parameter p, error_code& ec) const
+    {
+        switch(p) {
+        case threads::detail::min_concurrency:
+        case threads::detail::max_concurrency:
+        case threads::detail::current_concurrency:
+            return pool_->size();
+
+        default:
+            break;
+        }
+
+        HPX_THROWS_IF(ec, bad_parameter,
+            "thread_pool_executor::get_policy_element",
+            "requested value of invalid policy element");
+        return std::size_t(-1);
     }
 }}}}

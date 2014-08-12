@@ -6,8 +6,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/lcos/future_wait.hpp>
+#include <hpx/lcos/wait_each.hpp>
 #include <hpx/include/plain_actions.hpp>
+#include <hpx/util/unwrapped.hpp>
 
 #include <boost/random.hpp>
 #include <boost/format.hpp>
@@ -114,7 +115,8 @@ double null_tree(
 
     null_function(seed, delay_iterations);
 
-    hpx::lcos::wait(futures, [&] (std::size_t, double r) { d += r; });
+    hpx::lcos::wait_each(futures, hpx::util::unwrapped(
+        [&] (double r) { d += r; }));
 
     return d;
 }
@@ -188,4 +190,3 @@ int main(
     // Initialize and run HPX.
     return hpx::init(cmdline, argc, argv);
 }
-

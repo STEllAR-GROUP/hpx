@@ -90,12 +90,12 @@ void invoke_n_workers_nowait(
     // Warmup.
     for (boost::uint64_t i = 0; i < tasks; ++i)
     {
-        worker_timed(delay);
+        worker_timed(delay * 1000);
     }
 
     for (boost::uint64_t i = 0; i < tasks; ++i)
     {
-        worker_timed(delay);
+        worker_timed(delay * 1000);
     }
 
     // Start the clock.
@@ -103,7 +103,7 @@ void invoke_n_workers_nowait(
 
     for (boost::uint64_t i = 0; i < tasks; ++i)
     {
-        worker_timed(delay);
+        worker_timed(delay * 1000);
     }
 
     elapsed = t.elapsed();
@@ -146,7 +146,7 @@ int app_main(
 
     for (boost::uint64_t i = 0; i < elapsed.size(); ++i)
     {
-        //cout << i << " " << elapsed[i] << "\n"; 
+        //cout << i << " " << elapsed[i] << "\n";
         total_elapsed += elapsed[i];
     }
 

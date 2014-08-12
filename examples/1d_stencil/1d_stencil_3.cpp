@@ -18,15 +18,6 @@
 #include "print_time_results.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-// Timer with nanosecond resolution
-inline boost::uint64_t now()
-{
-    boost::chrono::nanoseconds ns =
-        boost::chrono::steady_clock::now().time_since_epoch();
-    return static_cast<boost::uint64_t>(ns.count());
-}
-
-///////////////////////////////////////////////////////////////////////////////
 // Command-line variables
 bool header = true; // print csv heading
 double k = 0.5;     // heat transfer coefficient
@@ -150,10 +141,12 @@ int hpx_main(boost::program_options::variables_map& vm)
     stepper step;
 
     // Measure execution time.
-    boost::uint64_t t = now();
+    boost::uint64_t t = hpx::util::high_resolution_clock::now();
 
     // Execute nt time steps on nx grid points and print the final solution.
     stepper::space solution = step.do_work(np, nx, nt);
+
+    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
     // Print the final solution
     if (vm.count("results"))
@@ -162,7 +155,6 @@ int hpx_main(boost::program_options::variables_map& vm)
             std::cout << "U[" << i << "] = " << solution[i] << std::endl;
     }
 
-    boost::uint64_t elapsed = now() - t;
     boost::uint64_t const os_thread_count = hpx::get_os_thread_count();
     print_time_results(os_thread_count, elapsed, nx, np, nt, header);
 

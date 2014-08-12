@@ -8,7 +8,6 @@
 #define HPX_LIMIT 6
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/lcos/future_wait.hpp>
 #include <hpx/include/plain_actions.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 

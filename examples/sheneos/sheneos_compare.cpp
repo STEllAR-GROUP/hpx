@@ -89,7 +89,7 @@ void test_sheneos(std::size_t num_ye_points, std::size_t num_temp_points,
     }
 
     std::size_t nthreads = omp_thread_count();
-    //std::size_t nthreads = omp_get_num_threads();   
+    //std::size_t nthreads = omp_get_num_threads();
     std::cout << " Number of OMP threads " << nthreads << std::endl;
     std::cout << " Problem Size: Ye " << sequence_ye.size() << " T " << sequence_temp.size() << " R " << sequence_rho.size()  << std::endl;
 
@@ -98,7 +98,7 @@ void test_sheneos(std::size_t num_ye_points, std::size_t num_temp_points,
     // performing the test, so we randomly shuffle the sequences. We combine
     // the shared seed with the locality id to ensure that each locality has
     // a unique, reproducible seed.
-#pragma omp parallel 
+#pragma omp parallel
     std::cout << " HELLO WORLD from thread " << omp_get_thread_num() << std::endl;
     std::srand(static_cast<unsigned int>(omp_get_thread_num() + hpx::get_locality_id()));
     std::random_shuffle(sequence_ye.begin(), sequence_ye.end());
@@ -131,7 +131,7 @@ void test_sheneos(std::size_t num_ye_points, std::size_t num_temp_points,
                 int keyerr = -666;
                 int keytemp = 1;
                 FNAME(nuc_eos_short)(&xrho,&xtemp,&xye,&xenr,&xprs,&xent,&xcs2,&xdedt,
-                                     &xdpderho,&xdpdrhoe,&xmunu,&keytemp,&keyerr,&rfeps); 
+                                     &xdpderho,&xdpdrhoe,&xmunu,&keytemp,&keyerr,&rfeps);
             }
         }
     }
@@ -226,11 +226,11 @@ void test_sheneos_one_bulk(std::size_t num_ye_points,
                 int keyerr = -666;
                 int keytemp = 1;
                 FNAME(nuc_eos_short)(&xrho,&xtemp,&xye,&xenr,&xprs,&xent,&xcs2,&xdedt,
-                                     &xdpderho,&xdpdrhoe,&xmunu,&keytemp,&keyerr,&rfeps); 
+                                     &xdpderho,&xdpdrhoe,&xmunu,&keytemp,&keyerr,&rfeps);
             }
         }
     }
-    
+
     //hpx::lcos::future<std::vector<double> > bulk_one_tests =
     //    shen.interpolate_one_bulk_async(values_ye, values_temp, values_rho,
     //        sheneos::server::partition3d::logpress);
@@ -330,7 +330,7 @@ void test_sheneos_bulk(std::size_t num_ye_points,
                 int keyerr = -666;
                 int keytemp = 1;
                 FNAME(nuc_eos_short)(&xrho,&xtemp,&xye,&xenr,&xprs,&xent,&xcs2,&xdedt,
-                                     &xdpderho,&xdpdrhoe,&xmunu,&keytemp,&keyerr,&rfeps); 
+                                     &xdpderho,&xdpdrhoe,&xmunu,&keytemp,&keyerr,&rfeps);
             }
         }
     }

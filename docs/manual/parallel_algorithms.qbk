@@ -1,0 +1,269 @@
+[/==============================================================================
+    Copyright (C) 2007-2014 Hartmut Kaiser
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+===============================================================================/]
+
+[section:parallel High Level Parallel Facilities]
+
+In preparation for the upcoming C++ Standards we currently see several proposals
+targeting different facilities supporting parallel programming. __hpx__
+implements (and extends) some of those proposals. This is well aligned with
+our strategy to align the APIs exposed from __hpx__ with current and future
+C++ Standards.
+
+At this point, __hpx__ implements two of the C++ Standardization working papers,
+namely __cpp11_n4071__ (Working Draft, Technical Specification for C++
+Extensions for Parallelism) and __cpp11_n4088__ (Task Regions).
+
+
+[section:parallel_algorithms Using Parallel Algorithms]
+
+[def __sequential_execution_policy__ [classref hpx::parallel::v1::sequential_execution_policy `sequential_execution_policy`]]
+[def __parallel_execution_policy__ [classref hpx::parallel::v1::parallel_execution_policy `parallel_execution_policy`]]
+[def __parallel_vector_execution_policy__ [classref hpx::parallel::v1::parallel_vector_execution_policy `parallel_vector_execution_policy`]]
+[def __task_execution_policy__ [classref hpx::parallel::v1::task_execution_policy `task_execution_policy`]]
+[def __execution_policy__ [classref hpx::parallel::v1::execution_policy `execution_policy`]]
+
+[def __exception_list__ [classref hpx::exception_list `exception_list`]]
+
+[def __par_for_each__ [funcref hpx::parallel::v1::for_each `for_each`]]
+
+A parallel algorithm is a function template described by this document
+which is declared in the (inline) namespace `hpx::parallel::v1`.
+
+[note For compilers which do not support inline namespaces, all of the
+      `namespace v1` is imported into the namespace `hpx::parallel`. The effect
+      is similar to what inline namespaces would do, namely all names defined
+      in `hpx::parallel::v1` are accessible from the namespace `hpx::parallel`
+      as well.]
+
+All parallel
+algorithms are very similar in semantics to their sequential counterparts
+(as defined in the `namespace std`) with an additional formal template parameter
+named `ExecutionPolicy`. The execution policy is generally passed as the first
+argument to any of the parallel algorithms and describes the manner in which
+the execution of these algorithms may be parallelized and the manner in which
+they apply user-provided function objects.
+
+The applications of function objects in parallel algorithms invoked with an
+execution policy object of type __sequential_execution_policy__ execute in
+sequential order in the calling thread.
+
+The applications of function objects in parallel algorithms invoked with an
+execution policy object of type __parallel_execution_policy__ or
+__task_execution_policy__ are permitted to execute in an unordered fashion in
+unspecified threads, and indeterminately sequenced within each thread.
+
+[important It is the caller's responsibility to ensure correctness, for example
+           that the invocation does not introduce data races or deadlocks.]
+
+The applications of function objects in parallel algorithms invoked with an
+execution policy of type __parallel_vector_execution_policy__ is in __hpx__
+equivalent to the use of the execution policy __parallel_execution_policy__.
+
+Algorithms invoked with an execution policy object of type __execution_policy__
+execute internally as if invoked with the contained execution policy object.
+An exception is when an __execution_policy__ contains an execution policy of
+type __task_execution_policy__ (which normally turns the algorithm into its
+asynchronous version). In this case the execution is semantically equivalent to
+the case of passing a __parallel_execution_policy__ contained in the
+__execution_policy__ object.
+
+
+[heading Parallel Exceptions]
+
+During the execution of a standard parallel algorithm, if temporary memory
+resources are required by any of the algorithms and
+no memory are available, the algorithm throws a `std::bad_alloc` exception.
+
+During the execution of any of the parallel algorithms, if the application
+of a function object terminates with an uncaught exception, the behavior
+of the program is determined by the type of execution policy used to invoke
+the algorithm:
+
+* If the execution policy object is of type __parallel_vector_execution_policy__,
+  [funcref hpx::terminate] shall be called.
+
+* If the execution policy object is of type __sequential_execution_policy__,
+  __parallel_execution_policy__, or __task_execution_policy__ the execution of
+  the algorithm terminates with an __exception_list__ exception. All
+  uncaught exceptions thrown during the application of user-provided
+  function objects shall be contained in the __exception_list__.
+
+For example, the number of invocations of the user-provided
+function object in for_each is unspecified. When __par_for_each__ is
+executed sequentially, only one exception will be contained in
+the __exception_list__ object.
+
+These guarantees imply that, unless the algorithm has failed to
+allocate memory and terminated with `std::bad_alloc`, all
+exceptions thrown during the execution of the algorithm are
+communicated to the caller. It is unspecified whether an algorithm
+implementation will "forge ahead" after encountering and capturing
+a user exception.
+
+The algorithm may terminate with the `std::bad_alloc` exception
+even if one or more user-provided function objects have terminated
+with an exception. For example, this can happen when an algorithm
+fails to allocate memory while creating or adding elements to the
+__exception_list__ object.
+
+[heading Parallel Algorithms]
+
+__hpx__ provides implementations of the following parallel algorithms:
+
+[template algoref[name] [funcref hpx::parallel::v1::[name] hpx::parallel::[name]]]
+
+[table Non-modifying Parallel Algorithms
+    [[Name]     [Description]]
+    [[ [algoref all_of] ]
+     [Checks if a predicate is `true` for all  of the elements in a range]]
+    [[ [algoref any_of] ]
+     [Checks if a predicate is `true` for any of the elements in a range]]
+    [[ [algoref none_of] ]
+     [Checks if a predicate is `true` for none of the elements in a range]]
+    [[ [algoref for_each] ]
+     [Applies a function to a range of elements]]
+    [[ [algoref count] ]
+     [Returns the number of elements equal to a given value]]
+    [[ [algoref count_if] ]
+     [Returns the number of elements satisfying a specific criteria]]
+    [[ [algoref equal] ]
+     [Determines if two sets of elements are the same]]
+    [[ [algoref mismatch] ]
+     [Finds the first position where two ranges differ]]
+    [[ [algoref find] ]
+     [Finds the first element equal to a given value]]
+    [[ [algoref find_if] ]
+     [Finds the first element satisfying a specific criteria]]
+    [[ [algoref find_if_not] ]
+     [Finds the first element not satisfying a specific criteria]]
+]
+
+[table Modifying Parallel Algorithms
+    [[Name]     [Description]]
+    [[ [algoref copy] ]
+     [Copies a range of elements to a new location]]
+    [[ [algoref copy_n] ]
+     [Copies a number of elements to a new location]]
+    [[ [algoref copy_if] ]
+     [Copies the elements from a range to a new location for which the given
+      predicate is `true`]]
+    [[ [algoref move] ]
+     [Moves a range of elements to a new location]]
+    [[ [algoref fill] ]
+     [Assigns a range of elements a certain value]]
+    [[ [algoref fill_n] ]
+     [Assigns a value to a number of elements]]
+    [[ [algoref transform] ]
+     [Applies a function to a range of elements]]
+    [[ [algoref transform_reduce] ]
+     [Applies a function to a range of elements after applying a function]]
+    [[ [algoref generate] ]
+     [Saves the result of a function in a range ]]
+    [[ [algoref generate_n] ]
+     [Saves the result of N applications of a function]]
+    [[ [algoref reverse] ]
+     [Reverses the order elements in a range]]
+    [[ [algoref reverse_copy] ]
+     [Creates a copy of a range that is reversed]]
+    [[ [algoref rotate] ]
+     [Rotates the order of elements in a range]]
+    [[ [algoref rotate_copy] ]
+     [Copies and rotates a range of elements]]
+    [[ [algoref swap_ranges] ]
+     [Swaps two ranges of elements]]
+]
+
+[table Numeric Parallel Algorithms
+    [[Name]     [Description]]
+    [[ [algoref reduce] ]
+     [Sums up a range of elements]]
+    [[ [algoref transform_reduce] ]
+     [Sums up a range of elements after applying a function]]
+]
+
+[endsect]
+
+[section:task_region Using Task Regions]
+
+The `task_region`, `run` and the `wait` functions implemented based on
+__cpp11_n4088__ are based on the task_group concept that is a part of the
+common subset of the __ppl__ and the __tbb__ libraries.
+
+This implementations adopts a simpler syntax than exposed by those libraries -
+one that is influenced by language-based concepts such as spawn and sync from
+__cilk_pp__ and async and finish from __x10__. It improves on existing practice
+in the following ways:
+
+* The exception handling model is simplified and more consistent with normal
+  C++ exceptions.
+* Most violations of strict fork-join parallelism can be enforced at compile
+  time (with compiler assistance, in some cases).
+* The syntax allows scheduling approaches other than child stealing.
+
+Consider an example of a parallel traversal of a tree, where a user-provided
+function compute is applied to each node of the tree, returning the sum of the
+results:
+
+    template <typename Func>
+    int traverse(node& n, Func && compute)
+    {
+        int left = 0, right = 0;
+        task_region(
+            [&](task_region_handle& tr) {
+                if (n.left)
+                    tr.run([&] { left = traverse(*n.left, compute); });
+                if (n.right)
+                    tr.run([&] { right = traverse(*n.right, compute); });
+            });
+
+        return compute(n) + left + right;
+    }
+
+The example above demonstrates the use of two of the functions,
+[funcref hpx::parallel::v2::task_region task_region] and the
+[memberref hpx::parallel::v2::task_region_handle::run run] member
+function of a [classref hpx::parallel::v2::task_region_handle task_region_handle].
+
+The `task_region` function delineates a region in a program code potentially
+containing invocations of threads spawned by the `run` member function of the
+`task_region_handle` class.
+The `run` function spawns an __hpx__ thread, a unit of work that is allowed to
+execute in parallel with respect to the caller. Any parallel tasks spawned by
+`run` within the `task_region` are joined back to a single thread of execution
+at the end of the `task_region`.
+`run` takes a user-provided function object `f` and starts it asynchronously -
+i.e. it may return before the execution of `f` completes. The __hpx__
+scheduler may choose to run `f` immediately or delay running `f` until compute
+resources become available.
+
+A `task_region_handle` can be constructed only by `task_region` because it has
+no public constructors.
+Thus, `run` can be invoked (directly or indirectly) only from a user-provided
+function passed to task_region:
+
+    void g();
+
+    void f(task_region_handle& tr)
+    {
+        tr.run(g);              // OK, invoked from within task_region in h
+    }
+
+    void h()
+    {
+        task_region(f);
+    }
+
+    int main()
+    {
+        task_region_handle tr;  // Error: no public constructor
+        tr.run(g);              // No way to call run outside of a task_region
+        return 0;
+    }
+
+[endsect]
+
+[endsect]

@@ -15,54 +15,54 @@ namespace hpx { namespace lcos
         template <
             typename Action
           , typename Futures
-          
+
         >
         void
-        reduce_invoke(Action 
+        reduce_invoke(Action
           , Futures& futures
           , hpx::id_type const& id
-          
+
           , std::size_t)
         {
             futures.push_back(
                 hpx::async<Action>(
                     id
-                   
+
                 )
             );
         }
         template <
             typename Action
           , typename Futures
-          
+
         >
         void
         reduce_invoke(reduce_with_index<Action>
           , Futures& futures
           , hpx::id_type const& id
-          
+
           , std::size_t global_idx)
         {
             futures.push_back(
                 hpx::async<Action>(
                     id
-                  
+
                   , global_idx
                 )
             );
         }
-        
+
         template <
             typename Action
           , typename ReduceOp
-          
+
         >
         typename reduce_result<Action>::type
         reduce_impl0(
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , ReduceOp && reduce_op
-          
+
           , std::size_t global_idx
         )
         {
@@ -81,7 +81,7 @@ namespace hpx { namespace lcos
                     act
                   , reduce_futures
                   , ids[i]
-                  
+
                   , global_idx + i
                 );
             }
@@ -98,7 +98,7 @@ namespace hpx { namespace lcos
                 {
                     HPX_ASSERT(ids.size() >= applied);
                     std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    std::vector<hpx::id_type> ids_next(it, it + next_fan);
                     hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
                         hpx::async_colocated<reduce_impl_action>(
@@ -106,7 +106,7 @@ namespace hpx { namespace lcos
                           , act
                           , std::move(ids_next)
                           , reduce_op
-                          
+
                           , global_idx + applied
                         )
                     );
@@ -118,21 +118,21 @@ namespace hpx { namespace lcos
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 get();
         }
-        
+
         template <
             typename Action
           , typename ReduceOp
-          
+
         >
         struct reduce_invoker0
         {
-            
+
             static typename reduce_result<Action>::type
             call(
                 Action const & act
               , std::vector<hpx::id_type> const & ids
               , ReduceOp const& reduce_op
-              
+
               , std::size_t global_idx
             )
             {
@@ -141,7 +141,7 @@ namespace hpx { namespace lcos
                         act
                       , ids
                       , reduce_op
-                      
+
                       , global_idx
                     );
             }
@@ -161,7 +161,7 @@ namespace hpx { namespace lcos
                 typedef reduce_invoker0<
                         Action
                       , reduce_op_type
-                      
+
                     >
                     reduce_invoker_type;
                 typedef
@@ -170,11 +170,11 @@ namespace hpx { namespace lcos
             };
         };
     }
-    
+
     template <
         typename Action
       , typename ReduceOp
-      
+
     >
     hpx::future<
         typename detail::reduce_result<Action>::type
@@ -197,7 +197,7 @@ namespace hpx { namespace lcos
               , Action()
               , ids
               , std::forward<ReduceOp>(reduce_op)
-              
+
               , 0
             );
     }
@@ -207,7 +207,7 @@ namespace hpx { namespace lcos
       , typename Arguments
       , typename Derived
       , typename ReduceOp
-      
+
     >
     hpx::future<
         typename detail::reduce_result<Derived>::type
@@ -215,7 +215,7 @@ namespace hpx { namespace lcos
     reduce(
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > 
+        >
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       )
@@ -223,13 +223,13 @@ namespace hpx { namespace lcos
         return reduce<Derived>(
                 ids
               , std::forward<ReduceOp>(reduce_op)
-              
+
             );
     }
     template <
         typename Action
       , typename ReduceOp
-      
+
     >
     hpx::future<
         typename detail::reduce_result<Action>::type
@@ -242,7 +242,7 @@ namespace hpx { namespace lcos
         return reduce<detail::reduce_with_index<Action> >(
                 ids
               , std::forward<ReduceOp>(reduce_op)
-              
+
             );
     }
     template <
@@ -251,7 +251,7 @@ namespace hpx { namespace lcos
       , typename Arguments
       , typename Derived
       , typename ReduceOp
-      
+
     >
     hpx::future<
         typename detail::reduce_result<Derived>::type
@@ -259,7 +259,7 @@ namespace hpx { namespace lcos
     reduce_with_index(
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > 
+        >
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       )
@@ -267,7 +267,7 @@ namespace hpx { namespace lcos
         return reduce<detail::reduce_with_index<Derived> >(
                 ids
               , std::forward<ReduceOp>(reduce_op)
-              
+
             );
     }
 }}
@@ -281,7 +281,7 @@ namespace hpx { namespace lcos
           , typename A0
         >
         void
-        reduce_invoke(Action 
+        reduce_invoke(Action
           , Futures& futures
           , hpx::id_type const& id
           , A0 const & a0
@@ -314,7 +314,7 @@ namespace hpx { namespace lcos
                 )
             );
         }
-        
+
         template <
             typename Action
           , typename ReduceOp
@@ -361,7 +361,7 @@ namespace hpx { namespace lcos
                 {
                     HPX_ASSERT(ids.size() >= applied);
                     std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    std::vector<hpx::id_type> ids_next(it, it + next_fan);
                     hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
                         hpx::async_colocated<reduce_impl_action>(
@@ -381,7 +381,7 @@ namespace hpx { namespace lcos
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 get();
         }
-        
+
         template <
             typename Action
           , typename ReduceOp
@@ -389,7 +389,7 @@ namespace hpx { namespace lcos
         >
         struct reduce_invoker1
         {
-            
+
             static typename reduce_result<Action>::type
             call(
                 Action const & act
@@ -433,7 +433,7 @@ namespace hpx { namespace lcos
             };
         };
     }
-    
+
     template <
         typename Action
       , typename ReduceOp
@@ -478,7 +478,7 @@ namespace hpx { namespace lcos
     reduce(
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > 
+        >
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0)
@@ -522,7 +522,7 @@ namespace hpx { namespace lcos
     reduce_with_index(
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > 
+        >
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0)
@@ -544,7 +544,7 @@ namespace hpx { namespace lcos
           , typename A0 , typename A1
         >
         void
-        reduce_invoke(Action 
+        reduce_invoke(Action
           , Futures& futures
           , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1
@@ -577,7 +577,7 @@ namespace hpx { namespace lcos
                 )
             );
         }
-        
+
         template <
             typename Action
           , typename ReduceOp
@@ -624,7 +624,7 @@ namespace hpx { namespace lcos
                 {
                     HPX_ASSERT(ids.size() >= applied);
                     std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    std::vector<hpx::id_type> ids_next(it, it + next_fan);
                     hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
                         hpx::async_colocated<reduce_impl_action>(
@@ -644,7 +644,7 @@ namespace hpx { namespace lcos
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 get();
         }
-        
+
         template <
             typename Action
           , typename ReduceOp
@@ -652,7 +652,7 @@ namespace hpx { namespace lcos
         >
         struct reduce_invoker2
         {
-            
+
             static typename reduce_result<Action>::type
             call(
                 Action const & act
@@ -696,7 +696,7 @@ namespace hpx { namespace lcos
             };
         };
     }
-    
+
     template <
         typename Action
       , typename ReduceOp
@@ -741,7 +741,7 @@ namespace hpx { namespace lcos
     reduce(
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > 
+        >
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1)
@@ -785,7 +785,7 @@ namespace hpx { namespace lcos
     reduce_with_index(
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > 
+        >
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1)
@@ -807,7 +807,7 @@ namespace hpx { namespace lcos
           , typename A0 , typename A1 , typename A2
         >
         void
-        reduce_invoke(Action 
+        reduce_invoke(Action
           , Futures& futures
           , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2
@@ -840,7 +840,7 @@ namespace hpx { namespace lcos
                 )
             );
         }
-        
+
         template <
             typename Action
           , typename ReduceOp
@@ -887,7 +887,7 @@ namespace hpx { namespace lcos
                 {
                     HPX_ASSERT(ids.size() >= applied);
                     std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    std::vector<hpx::id_type> ids_next(it, it + next_fan);
                     hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
                         hpx::async_colocated<reduce_impl_action>(
@@ -907,7 +907,7 @@ namespace hpx { namespace lcos
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 get();
         }
-        
+
         template <
             typename Action
           , typename ReduceOp
@@ -915,7 +915,7 @@ namespace hpx { namespace lcos
         >
         struct reduce_invoker3
         {
-            
+
             static typename reduce_result<Action>::type
             call(
                 Action const & act
@@ -959,7 +959,7 @@ namespace hpx { namespace lcos
             };
         };
     }
-    
+
     template <
         typename Action
       , typename ReduceOp
@@ -1004,7 +1004,7 @@ namespace hpx { namespace lcos
     reduce(
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > 
+        >
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2)
@@ -1048,7 +1048,7 @@ namespace hpx { namespace lcos
     reduce_with_index(
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > 
+        >
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2)
@@ -1070,7 +1070,7 @@ namespace hpx { namespace lcos
           , typename A0 , typename A1 , typename A2 , typename A3
         >
         void
-        reduce_invoke(Action 
+        reduce_invoke(Action
           , Futures& futures
           , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3
@@ -1103,7 +1103,7 @@ namespace hpx { namespace lcos
                 )
             );
         }
-        
+
         template <
             typename Action
           , typename ReduceOp
@@ -1150,7 +1150,7 @@ namespace hpx { namespace lcos
                 {
                     HPX_ASSERT(ids.size() >= applied);
                     std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    std::vector<hpx::id_type> ids_next(it, it + next_fan);
                     hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
                         hpx::async_colocated<reduce_impl_action>(
@@ -1170,7 +1170,7 @@ namespace hpx { namespace lcos
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 get();
         }
-        
+
         template <
             typename Action
           , typename ReduceOp
@@ -1178,7 +1178,7 @@ namespace hpx { namespace lcos
         >
         struct reduce_invoker4
         {
-            
+
             static typename reduce_result<Action>::type
             call(
                 Action const & act
@@ -1222,7 +1222,7 @@ namespace hpx { namespace lcos
             };
         };
     }
-    
+
     template <
         typename Action
       , typename ReduceOp
@@ -1267,7 +1267,7 @@ namespace hpx { namespace lcos
     reduce(
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > 
+        >
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3)
@@ -1311,7 +1311,7 @@ namespace hpx { namespace lcos
     reduce_with_index(
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > 
+        >
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3)
@@ -1333,7 +1333,7 @@ namespace hpx { namespace lcos
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
         >
         void
-        reduce_invoke(Action 
+        reduce_invoke(Action
           , Futures& futures
           , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4
@@ -1366,7 +1366,7 @@ namespace hpx { namespace lcos
                 )
             );
         }
-        
+
         template <
             typename Action
           , typename ReduceOp
@@ -1413,7 +1413,7 @@ namespace hpx { namespace lcos
                 {
                     HPX_ASSERT(ids.size() >= applied);
                     std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + fanout);
+                    std::vector<hpx::id_type> ids_next(it, it + next_fan);
                     hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
                         hpx::async_colocated<reduce_impl_action>(
@@ -1433,7 +1433,7 @@ namespace hpx { namespace lcos
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 get();
         }
-        
+
         template <
             typename Action
           , typename ReduceOp
@@ -1441,7 +1441,7 @@ namespace hpx { namespace lcos
         >
         struct reduce_invoker5
         {
-            
+
             static typename reduce_result<Action>::type
             call(
                 Action const & act
@@ -1485,7 +1485,7 @@ namespace hpx { namespace lcos
             };
         };
     }
-    
+
     template <
         typename Action
       , typename ReduceOp
@@ -1530,7 +1530,7 @@ namespace hpx { namespace lcos
     reduce(
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > 
+        >
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4)
@@ -1574,7 +1574,7 @@ namespace hpx { namespace lcos
     reduce_with_index(
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > 
+        >
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4)

@@ -78,13 +78,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                         this,
                         boost::asio::placeholders::error, receiver_conn));
             }
-            catch (boost::system::system_error const& e) {
-                errors.add(e);   // store all errors
+            catch (boost::system::system_error const&) {
+                errors.add(boost::current_exception());
                 continue;
             }
         }
 
-        if (errors.get_error_count() == tried) {
+        if (errors.size() == tried) {
             // all attempts failed
             HPX_THROW_EXCEPTION(network_error,
                 "tcp::parcelport::run", errors.get_message());

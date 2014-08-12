@@ -224,10 +224,10 @@ namespace hpx { namespace performance_counters { namespace papi
         HPX_STD_FUNCTION<hpx::performance_counters::discover_counter_func> const& f,
         hpx::performance_counters::discover_counters_mode mode, hpx::error_code& ec)
     {
-        using HPX_STD_PLACEHOLDERS::_1;
-        using HPX_STD_PLACEHOLDERS::_2;
+        using hpx::util::placeholders::_1;
+        using hpx::util::placeholders::_2;
         return performance_counters::locality_thread_counter_discoverer(info,
-            HPX_STD_BIND(&discover_papi_counters_helper, _1, f, mode, _2),
+            hpx::util::bind(&discover_papi_counters_helper, _1, f, mode, _2),
             mode, ec);
     }
 

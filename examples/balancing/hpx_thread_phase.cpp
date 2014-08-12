@@ -9,9 +9,8 @@
 #include <hpx/lcos/local/barrier.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 
+#include <boost/chrono/duration.hpp>
 #include <boost/lockfree/queue.hpp>
-
-#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <iostream>
 
@@ -21,7 +20,7 @@ using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
 
-using boost::posix_time::milliseconds;
+using boost::chrono::milliseconds;
 
 using hpx::lcos::local::barrier;
 using hpx::lcos::local::mutex;

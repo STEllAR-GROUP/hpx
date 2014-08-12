@@ -8,8 +8,8 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 
-#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/assign/std/vector.hpp>
+#include <boost/chrono.hpp>
 
 #include <tests/unit/agas/components/simple_refcnt_checker.hpp>
 #include <tests/unit/agas/components/managed_refcnt_checker.hpp>
@@ -22,7 +22,7 @@ using hpx::init;
 using hpx::finalize;
 using hpx::find_here;
 
-using boost::posix_time::milliseconds;
+using boost::chrono::milliseconds;
 
 using hpx::naming::id_type;
 using hpx::naming::get_management_type_name;

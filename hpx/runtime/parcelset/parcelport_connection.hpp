@@ -91,6 +91,7 @@ namespace hpx { namespace parcelset {
         {
             buffer_.reset();
         }
+
         /// buffer for data
         boost::shared_ptr<parcel_buffer_type> buffer_;
     };

@@ -203,7 +203,7 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         // Queue the tasks in a serial loop.
         for (boost::uint64_t i = 0; i < tasks; ++i)
-            register_work(HPX_STD_BIND(&worker_timed, payloads[i]));
+            register_work(hpx::util::bind(&worker_timed, payloads[i] * 1000));
 
         ///////////////////////////////////////////////////////////////////////
         // Wait for the work to finish.

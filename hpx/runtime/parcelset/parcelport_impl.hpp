@@ -13,6 +13,7 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/encode_parcels.hpp>
 #include <hpx/runtime/parcelset/detail/call_for_each.hpp>
+#include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -483,31 +484,35 @@ namespace hpx { namespace parcelset
         {
             typedef pending_parcels_map::iterator iterator;
 
-            lcos::local::spinlock::scoped_lock l(mtx_);
-            if(!enable_parcel_handling_) return false;
-
-            iterator it = pending_parcels_.find(locality_id);
-
-            // do nothing if parcels have already been picked up by
-            // another thread
-            if (it != pending_parcels_.end() && !it->second.first.empty())
-            {
-                HPX_ASSERT(it->first == locality_id);
-                HPX_ASSERT(handlers.size() == parcels.size());
-                std::swap(parcels, it->second.first);
-                std::swap(handlers, it->second.second);
-
-                HPX_ASSERT(!handlers.empty());
-            }
-            else
-            {
-                HPX_ASSERT(it->second.second.empty());
+            if (!enable_parcel_handling_)
                 return false;
+
+            {
+                lcos::local::spinlock::scoped_lock l(mtx_);
+
+                iterator it = pending_parcels_.find(locality_id);
+
+                // do nothing if parcels have already been picked up by
+                // another thread
+                if (it != pending_parcels_.end() && !it->second.first.empty())
+                {
+                    HPX_ASSERT(it->first == locality_id);
+                    HPX_ASSERT(handlers.size() == parcels.size());
+                    std::swap(parcels, it->second.first);
+                    std::swap(handlers, it->second.second);
+
+                    HPX_ASSERT(!handlers.empty());
+                }
+                else
+                {
+                    HPX_ASSERT(it->second.second.empty());
+                    return false;
+                }
+
+                parcel_destinations_.erase(locality_id);
+
+                return true;
             }
-
-            parcel_destinations_.erase(locality_id);
-
-            return true;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -519,11 +524,11 @@ namespace hpx { namespace parcelset
 
             error_code ec(lightweight);
             hpx::applier::register_thread_nullary(
-                HPX_STD_BIND(
+                util::bind(
                     &parcelport_impl::get_connection_and_send_parcels,
                     this, loc, background),
                 "get_connection_and_send_parcels",
-                threads::pending, true, threads::thread_priority_critical,
+                threads::pending, true, threads::thread_priority_boost,
                 std::size_t(-1), threads::thread_stacksize_default, ec);
             return ec ? false : true;
         }
@@ -575,7 +580,7 @@ namespace hpx { namespace parcelset
                 // If none of the parcels may require id-splitting we're safe to
                 // force a new connection from the connection cache.
                 bool force_connection = true;
-                BOOST_FOREACH(parcel const&p, parcels)
+                BOOST_FOREACH(parcel const& p, parcels)
                 {
                     if (p.may_require_id_splitting())
                     {
@@ -625,7 +630,7 @@ namespace hpx { namespace parcelset
                           , std::move(handlers)
                         )
                       , "parcelport_impl::send_pending_parcels"
-                      , threads::pending, true, threads::thread_priority_critical,
+                      , threads::pending, true, threads::thread_priority_boost,
                         thread_num, threads::thread_stacksize_default
                     );
                 }
@@ -634,6 +639,12 @@ namespace hpx { namespace parcelset
                     send_pending_parcels(sender_connection, std::move(parcels),
                         std::move(handlers));
                 }
+
+                // We yield here for a short amount of time to give another
+                // HPX thread the chance to put a subsequent parcel which
+                // leads to a more effective parcel buffering
+                if (hpx::threads::get_self_ptr())
+                    hpx::this_thread::yield();
             }
         }
 

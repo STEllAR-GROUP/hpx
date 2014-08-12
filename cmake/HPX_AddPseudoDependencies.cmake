@@ -5,9 +5,21 @@
 
 set(HPX_ADDPSEUDODEPENDENCIES_LOADED TRUE)
 
+include(HPX_Include)
+
+hpx_include(Message)
+
 macro(add_hpx_pseudo_dependencies)
-  # Windows is evil
-  if(NOT MSVC AND NOT MINGW)
+
+  if("${HPX_CMAKE_LOGLEVEL}" MATCHES "DEBUG|debug|Debug")
+    set(args)
+    foreach(arg ${ARGV})
+      set(args "${args} ${arg}")
+    endforeach()
+    hpx_debug("add_hpx_pseudo_dependencies" ${args})
+  endif()
+
+  if(NOT WIN32)
     add_dependencies(${ARGV})
   endif()
 endmacro()

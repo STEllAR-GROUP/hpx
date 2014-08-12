@@ -65,11 +65,11 @@ namespace hpx { namespace util
         names_.reserve(names.size());
         if (ids_.empty())
         {
-            using HPX_STD_PLACEHOLDERS::_1;
-            using HPX_STD_PLACEHOLDERS::_2;
+            using util::placeholders::_1;
+            using util::placeholders::_2;
 
             HPX_STD_FUNCTION<performance_counters::discover_counter_func> func(
-                HPX_STD_BIND(&activate_counters::find_counter, this, _1, _2));
+                util::bind(&activate_counters::find_counter, this, _1, _2));
 
             ids_.reserve(names.size());
             uoms_.reserve(names.size());

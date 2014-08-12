@@ -76,7 +76,7 @@ struct RESULT {
         ar & user;
         ar & sys;
     }
-}; 
+};
 
 struct ofs_test_info_type
 {
@@ -109,12 +109,12 @@ struct promise_rt_ptr_type
 
     promise_rt_ptr_type() {}
 
-    promise_rt_ptr_type(std::string name, 
-            int_promise_type* pp, rt_type* rr) 
+    promise_rt_ptr_type(std::string name,
+            int_promise_type* pp, rt_type* rr)
         : thread_name_(name), p_p_(pp), rt_p_(rr) {}
 
-    void set(std::string name, 
-            int_promise_type* pp, rt_type* rr) 
+    void set(std::string name,
+            int_promise_type* pp, rt_type* rr)
     {
         thread_name_ = name;
         p_p_ = pp;
@@ -209,19 +209,19 @@ RESULT write_files_test(ofs_test_info_type ofs_test_info, int proc)
            continue;
        }
 
-       for (int j = 0; j < count; j++) 
+       for (int j = 0; j < count; j++)
        {
            std::ostringstream tmp_sstream;
-           tmp_sstream << "pxfs_pwrite_loc" << hpx::get_locality_id() 
+           tmp_sstream << "pxfs_pwrite_loc" << hpx::get_locality_id()
                << "_" << proc << "_" << i << "_" << j;
            promise_rt_ptr_array[i*count + j].set(
-                   tmp_sstream.str(), 
-                   &int_promise_array[i*count + j], 
+                   tmp_sstream.str(),
+                   &int_promise_array[i*count + j],
                    hpx::get_runtime_ptr());
 
-           pxfs_pwrite(fd_array[i], buf.get(), bufsiz, j*bufsiz, 
-           &num_written_array[i*count + j], 
-           set_promise_cb, 
+           pxfs_pwrite(fd_array[i], buf.get(), bufsiz, j*bufsiz,
+           &num_written_array[i*count + j],
+           set_promise_cb,
            &promise_rt_ptr_array[i*count + j]);
 
            futures.push_back(int_promise_array[i*count + j].get_future());
@@ -229,8 +229,8 @@ RESULT write_files_test(ofs_test_info_type ofs_test_info, int proc)
 
    }
 
-   hpx::wait(futures,
-           [&](std::size_t idx, int rt) 
+   hpx::lcos::wait_each(futures,
+           hpx::util::unwrapped([&](std::size_t idx, int rt)
            {
            if (rt != 0)
            {
@@ -241,10 +241,10 @@ RESULT write_files_test(ofs_test_info_type ofs_test_info, int proc)
 
            if(num_written_array[idx] != bufsiz)
            {
-           hpx::cerr<<"loc " << hpx::get_locality_id() << " proc " << proc << ": error! not writing all bytes of " << idx%count <<"th block of " 
+           hpx::cerr<<"loc " << hpx::get_locality_id() << " proc " << proc << ": error! not writing all bytes of " << idx%count <<"th block of "
            << idx/count << "th file."<<hpx::endl;
            }
-           });
+           }));
 
    end = times(&t2);
    r.real = ((double) end - (double) start) / (double) sysconf(_SC_CLK_TCK);
@@ -320,7 +320,7 @@ RESULT read_files_test(ofs_test_info_type ofs_test_info, int proc)
 //       fd_array[i] = pvfs_open(filename, oflags);
 
        if(fd_array[i] == -1)
-       { 
+       {
            hpx::cerr<<"Unable to open orangeFS file "<<filename<<hpx::endl;
            continue;
        }
@@ -329,25 +329,25 @@ RESULT read_files_test(ofs_test_info_type ofs_test_info, int proc)
 
        {
            std::ostringstream tmp_sstream;
-           tmp_sstream << "pxfs_pwrite_loc" << hpx::get_locality_id() 
+           tmp_sstream << "pxfs_pwrite_loc" << hpx::get_locality_id()
                << "_" << proc << "_" << i << "_" << j;
            promise_rt_ptr_array[i*count + j].set(
-                   tmp_sstream.str(), 
-                   &int_promise_array[i*count + j], 
+                   tmp_sstream.str(),
+                   &int_promise_array[i*count + j],
                    hpx::get_runtime_ptr());
 
-           pxfs_pread(fd_array[i], &buf_array[j*bufsiz], 
-           bufsiz, j*bufsiz, 
-           &num_read_array[i*count + j], 
-           set_promise_cb, 
+           pxfs_pread(fd_array[i], &buf_array[j*bufsiz],
+           bufsiz, j*bufsiz,
+           &num_read_array[i*count + j],
+           set_promise_cb,
            &promise_rt_ptr_array[i*count + j]);
 
            futures.push_back(int_promise_array[i*count + j].get_future());
        }
    }
 
-   hpx::wait(futures,
-           [&](std::size_t idx, int rt) 
+   hpx::lcos::wait_each(futures,
+           hpx::util::unwrapped([&](std::size_t idx, int rt)
            {
            if (rt != 0)
            {
@@ -358,10 +358,10 @@ RESULT read_files_test(ofs_test_info_type ofs_test_info, int proc)
 
            if(num_read_array[idx] != bufsiz)
            {
-           hpx::cerr<<"loc " << hpx::get_locality_id() << " proc " << proc << ": error! not reading all bytes of " << idx%count <<"th block of " 
+           hpx::cerr<<"loc " << hpx::get_locality_id() << " proc " << proc << ": error! not reading all bytes of " << idx%count <<"th block of "
            << idx/count << "th file."<<hpx::endl;
            }
-           });
+           }));
 
    end = times(&t2);
    r.real = ((double) end - (double) start) / (double) sysconf(_SC_CLK_TCK);
@@ -487,14 +487,14 @@ int hpx_main(variables_map& vm)
             }
         }
 
-        hpx::lcos::wait(futures,
-                [&](std::size_t ii, RESULT r) {
+        hpx::lcos::wait_each(futures,
+                hpx::util::unwrapped([&](std::size_t ii, RESULT r) {
                 r_ptr[ii].real = r.real;
                 r_ptr[ii].user = r.user;
                 r_ptr[ii].sys = r.sys;
-                });
+                }));
 
-        // overall performance 
+        // overall performance
         double tt = t.elapsed();
 
         if(rfiles > 0)
@@ -530,20 +530,20 @@ int hpx_main(variables_map& vm)
 
         if(rfiles > 0)
         {
-            hpx::cout<<(boost::format("Aggregate Reading Throughput: %1% [MB/s]\n") % 
+            hpx::cout<<(boost::format("Aggregate Reading Throughput: %1% [MB/s]\n") %
                     (localities.size() * procs * rfiles * count * bufsiz / tt / (1024*1024)));
-            hpx::cout<<(boost::format("\t Max Throughput per thread: %1% [MB/s]\n") % 
+            hpx::cout<<(boost::format("\t Max Throughput per thread: %1% [MB/s]\n") %
                     (rfiles * count * bufsiz / min_time / (1024*1024)));
-            hpx::cout<<(boost::format("\t Min Throughput per thread: %1% [MB/s]\n") % 
+            hpx::cout<<(boost::format("\t Min Throughput per thread: %1% [MB/s]\n") %
                     (rfiles * count * bufsiz / max_time / (1024*1024)));
         }
         else
         {
-            hpx::cout<<(boost::format("Aggregate Writing Throughput: %1% [MB/s]\n") % 
+            hpx::cout<<(boost::format("Aggregate Writing Throughput: %1% [MB/s]\n") %
                     (localities.size() * procs * wfiles * count * bufsiz / tt / (1024*1024)));
-            hpx::cout<<(boost::format("\t Max Throughput per thread: %1% [MB/s]\n") % 
+            hpx::cout<<(boost::format("\t Max Throughput per thread: %1% [MB/s]\n") %
                     (wfiles * count * bufsiz / min_time / (1024*1024)));
-            hpx::cout<<(boost::format("\t Min Throughput per thread: %1% [MB/s]\n") % 
+            hpx::cout<<(boost::format("\t Min Throughput per thread: %1% [MB/s]\n") %
                     (wfiles * count * bufsiz / max_time / (1024*1024)));
 
         }

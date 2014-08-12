@@ -27,7 +27,7 @@ int hpx_main()
 #endif
 
     // Copy all arguments which are not hpx related to a temporary array
-    boost::scoped_array<char*> argv(new char*[args.size()]);
+    boost::scoped_array<char*> argv(new char*[args.size()+1]);
     std::size_t argcount = 0;
     for (std::size_t i = 0; i < args.size(); ++i)
     {
@@ -42,6 +42,9 @@ int hpx_main()
             }
         }
     }
+
+    // add a single nullptr in the end as some application rely on that
+    argv[argcount] = 0;
 
     // Invoke hpx_main
     return hpx_main(static_cast<int>(argcount), argv.get());

@@ -151,7 +151,7 @@ namespace hpx { namespace util
             static BOOST_FORCEINLINE
             type call(T& t, UnboundArgs && unbound_args)
             {
-                return util::invoke_fused
+                return util::invoke_fused_r<type>
                     (t, std::forward<UnboundArgs>(unbound_args));
             }
         };
@@ -236,7 +236,7 @@ namespace hpx { namespace util
 
         ///////////////////////////////////////////////////////////////////////
         template <typename F>
-        class one_shot_wrapper
+        class one_shot_wrapper //-V690
         {
         public:
 #           if !defined(HPX_DISABLE_ASSERTS)
@@ -361,7 +361,7 @@ namespace hpx { namespace util
 
         ///////////////////////////////////////////////////////////////////////
         template <typename F, typename BoundArgs>
-        class bound
+        class bound //-V690
         {
         public:
             // default constructor is needed for serialization

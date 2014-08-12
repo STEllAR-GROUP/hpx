@@ -27,6 +27,7 @@
 #include <hpx/util/binary_filter.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/void_cast.hpp>
 #include <hpx/traits/supports_streaming_with_any.hpp>
 
 #include <boost/config.hpp>

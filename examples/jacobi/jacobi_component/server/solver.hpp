@@ -13,6 +13,7 @@
 
 #include <hpx/include/components.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
+#include <hpx/lcos/future_wait.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
 #include <vector>

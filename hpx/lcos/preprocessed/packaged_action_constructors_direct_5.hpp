@@ -26,14 +26,14 @@
         else {
             
             hpx::applier::detail::apply_c_cb<action_type>(
-                addr, this->get_gid(), gid,
-                HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                    HPX_STD_PLACEHOLDERS::_1),
+                std::move(addr), this->get_gid(), gid,
+                util::bind(&packaged_action::parcel_write_handler,
+                    this->impl_, util::placeholders::_1),
                 std::forward<Arg0>( arg0 ));
         }
     }
     template <typename Arg0>
-    void apply(BOOST_SCOPED_ENUM(launch) , naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) , naming::address&& addr,
         naming::id_type const& gid, Arg0 && arg0)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
@@ -49,9 +49,9 @@
         else {
             
             hpx::applier::detail::apply_c_cb<action_type>(
-                addr, this->get_gid(), gid,
-                HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                    HPX_STD_PLACEHOLDERS::_1),
+                std::move(addr), this->get_gid(), gid,
+                util::bind(&packaged_action::parcel_write_handler,
+                    this->impl_, util::placeholders::_1),
                 std::forward<Arg0>( arg0 ));
         }
     }
@@ -85,14 +85,14 @@
         else {
             
             hpx::applier::detail::apply_c_cb<action_type>(
-                addr, this->get_gid(), gid,
-                HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                    HPX_STD_PLACEHOLDERS::_1),
+                std::move(addr), this->get_gid(), gid,
+                util::bind(&packaged_action::parcel_write_handler,
+                    this->impl_, util::placeholders::_1),
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
         }
     }
     template <typename Arg0 , typename Arg1>
-    void apply(BOOST_SCOPED_ENUM(launch) , naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) , naming::address&& addr,
         naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
@@ -108,9 +108,9 @@
         else {
             
             hpx::applier::detail::apply_c_cb<action_type>(
-                addr, this->get_gid(), gid,
-                HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                    HPX_STD_PLACEHOLDERS::_1),
+                std::move(addr), this->get_gid(), gid,
+                util::bind(&packaged_action::parcel_write_handler,
+                    this->impl_, util::placeholders::_1),
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
         }
     }
@@ -144,14 +144,14 @@
         else {
             
             hpx::applier::detail::apply_c_cb<action_type>(
-                addr, this->get_gid(), gid,
-                HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                    HPX_STD_PLACEHOLDERS::_1),
+                std::move(addr), this->get_gid(), gid,
+                util::bind(&packaged_action::parcel_write_handler,
+                    this->impl_, util::placeholders::_1),
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
         }
     }
     template <typename Arg0 , typename Arg1 , typename Arg2>
-    void apply(BOOST_SCOPED_ENUM(launch) , naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) , naming::address&& addr,
         naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
@@ -167,9 +167,9 @@
         else {
             
             hpx::applier::detail::apply_c_cb<action_type>(
-                addr, this->get_gid(), gid,
-                HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                    HPX_STD_PLACEHOLDERS::_1),
+                std::move(addr), this->get_gid(), gid,
+                util::bind(&packaged_action::parcel_write_handler,
+                    this->impl_, util::placeholders::_1),
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
         }
     }
@@ -203,14 +203,14 @@
         else {
             
             hpx::applier::detail::apply_c_cb<action_type>(
-                addr, this->get_gid(), gid,
-                HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                    HPX_STD_PLACEHOLDERS::_1),
+                std::move(addr), this->get_gid(), gid,
+                util::bind(&packaged_action::parcel_write_handler,
+                    this->impl_, util::placeholders::_1),
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
         }
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    void apply(BOOST_SCOPED_ENUM(launch) , naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) , naming::address&& addr,
         naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
@@ -226,9 +226,9 @@
         else {
             
             hpx::applier::detail::apply_c_cb<action_type>(
-                addr, this->get_gid(), gid,
-                HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                    HPX_STD_PLACEHOLDERS::_1),
+                std::move(addr), this->get_gid(), gid,
+                util::bind(&packaged_action::parcel_write_handler,
+                    this->impl_, util::placeholders::_1),
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
         }
     }
@@ -262,14 +262,14 @@
         else {
             
             hpx::applier::detail::apply_c_cb<action_type>(
-                addr, this->get_gid(), gid,
-                HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                    HPX_STD_PLACEHOLDERS::_1),
+                std::move(addr), this->get_gid(), gid,
+                util::bind(&packaged_action::parcel_write_handler,
+                    this->impl_, util::placeholders::_1),
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
         }
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    void apply(BOOST_SCOPED_ENUM(launch) , naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) , naming::address&& addr,
         naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
@@ -285,9 +285,9 @@
         else {
             
             hpx::applier::detail::apply_c_cb<action_type>(
-                addr, this->get_gid(), gid,
-                HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                    HPX_STD_PLACEHOLDERS::_1),
+                std::move(addr), this->get_gid(), gid,
+                util::bind(&packaged_action::parcel_write_handler,
+                    this->impl_, util::placeholders::_1),
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
         }
     }

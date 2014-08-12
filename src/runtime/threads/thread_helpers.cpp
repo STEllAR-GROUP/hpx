@@ -136,6 +136,23 @@ namespace hpx { namespace threads
         return app->get_thread_manager().get_priority(id);
     }
 
+    std::ptrdiff_t get_stack_size(thread_id_type const& id, error_code& ec)
+    {
+        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
+        if (NULL == app)
+        {
+            HPX_THROWS_IF(ec, invalid_status,
+                "hpx::threads::get_stack_size",
+                "global applier object is not accessible");
+            return threads::thread_priority_unknown;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return app->get_thread_manager().get_stack_size(id);
+    }
+
     void interrupt_thread(thread_id_type const& id, bool flag, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
@@ -552,7 +569,7 @@ namespace hpx { namespace this_thread
 #endif
             threads::set_thread_state(id,
                 at_time, threads::pending, threads::wait_signaled,
-                threads::thread_priority_critical, ec);
+                threads::thread_priority_boost, ec);
             if (ec) return threads::wait_unknown;
 
             // suspend the HPX-thread
@@ -607,7 +624,7 @@ namespace hpx { namespace this_thread
 #endif
             threads::set_thread_state(id,
                 after_duration, threads::pending, threads::wait_signaled,
-                threads::thread_priority_critical, ec);
+                threads::thread_priority_boost, ec);
             if (ec) return threads::wait_unknown;
 
             // suspend the HPX-thread

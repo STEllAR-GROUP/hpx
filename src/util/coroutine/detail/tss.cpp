@@ -178,7 +178,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         tss_data_node* node = tss_map->find(0);
         if (0 == node)
         {
-            tss_map->insert(0, new std::size_t(data));
+            tss_map->insert(0, new std::size_t(data)); //-V508
             return 0;
         }
 

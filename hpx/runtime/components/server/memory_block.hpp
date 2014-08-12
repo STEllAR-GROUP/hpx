@@ -38,7 +38,7 @@ namespace hpx { namespace components { namespace server { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     /// \brief The memory_block_header holds all information needed to describe
     ///        a block of memory managed by a server#memory_block component.
-    class memory_block_header : boost::noncopyable
+    class memory_block_header : boost::noncopyable //-V690
     {
     public:
         /// This constructor is called on the locality where there memory_block

@@ -120,6 +120,30 @@ namespace hpx { namespace util
             }
         }
 
+        template <typename Deleter>
+        serialize_buffer (T const* data, std::size_t size, init_mode mode,
+                Deleter const& deleter,
+                allocator_type const& alloc = allocator_type())
+          : data_()
+          , size_(size)
+          , alloc_(alloc)
+        {
+            if (mode == copy) {
+                data_.reset(alloc_.allocate(size), deleter);
+                if (size != 0)
+                    std::copy(data, data + size, data_.get());
+            }
+            else if (mode == reference) {
+                data_ = boost::shared_array<T>(const_cast<T*>(data), deleter);
+            }
+            else {
+                // can't take ownership of const buffer
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "serialize_buffer::serialize_buffer",
+                    "can't take ownership of const data");
+            }
+        }
+
         // Deleter needs to use deallocator
         template <typename Deallocator, typename Deleter>
         serialize_buffer (T* data, std::size_t size,
@@ -178,7 +202,7 @@ namespace hpx { namespace util
             }
             else if (mode == reference) {
                 data_ = boost::shared_array<T>(
-                    const_cast<double*>(data),
+                    const_cast<T*>(data),
                     &serialize_buffer::no_deleter);
             }
             else {
@@ -297,6 +321,11 @@ namespace hpx { namespace util
     private:
         static void no_deleter(T*) {}
 
+        static void array_delete(T * x)
+        {
+            delete [] x;
+        }
+
     public:
         enum init_mode
         {
@@ -319,7 +348,8 @@ namespace hpx { namespace util
           : data_(), size_(size)
         {
             if (mode == copy) {
-                data_.reset(new T[size]);
+                data_ = boost::shared_array<T>(data,
+                    &serialize_buffer::array_delete);
                 if (size != 0)
                     std::copy(data, data + size, data_.get());
             }
@@ -329,7 +359,8 @@ namespace hpx { namespace util
             }
             else {
                 // take ownership
-                data_ = boost::shared_array<T>(data);
+                data_ = boost::shared_array<T>(data,
+                    &serialize_buffer::array_delete);
             }
         }
 
@@ -349,19 +380,41 @@ namespace hpx { namespace util
             }
         }
 
+        template <typename Deleter>
+        serialize_buffer (T const* data, std::size_t size, init_mode mode,
+                Deleter const& deleter)
+          : data_(), size_(size)
+        {
+            if (mode == copy) {
+                data_.reset(new T[size], deleter);
+                if (size != 0)
+                    std::copy(data, data + size, data_.get());
+            }
+            else if (mode == reference) {
+                data_ = boost::shared_array<T>(const_cast<T*>(data), deleter);
+            }
+            else {
+                // can't take ownership of const buffer
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "serialize_buffer::serialize_buffer",
+                    "can't take ownership of const data");
+            }
+        }
+
         // same set of constructors, but taking const data
         serialize_buffer (T const* data, std::size_t size,
                 init_mode mode = copy)
           : data_(), size_(size)
         {
             if (mode == copy) {
-                data_.reset(new T[size]);
+                data_ = boost::shared_array<T>(new T[size],
+                    &serialize_buffer::array_delete);
                 if (size != 0)
                     std::copy(data, data + size, data_.get());
             }
             else if (mode == reference) {
                 data_ = boost::shared_array<T>(
-                    const_cast<double*>(data),
+                    const_cast<T*>(data),
                     &serialize_buffer::no_deleter);
             }
             else {
@@ -497,7 +550,7 @@ namespace hpx { namespace traits
     {
         static std::size_t call(util::serialize_buffer<T, Allocator> const& b)
         {
-            return b.size() * sizeof(T) + sizeof(std::size_t) + sizeof(Allocator);
+            return b.size() * sizeof(T) + sizeof(std::size_t) + sizeof(Allocator); //-V119
         }
     };
 }}

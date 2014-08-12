@@ -195,7 +195,7 @@ namespace hpx { namespace components
         // Pinning functionality
         void pin() {}
         void unpin() {}
-        unsigned int pin_count() const { return 0; }
+        boost::uint32_t pin_count() const { return 0; }
         void mark_as_migrated()
         {
             // If this assertion is triggered then this component instance is
@@ -252,11 +252,7 @@ namespace hpx { namespace components
 
         /// \brief  The function \a create is used for allocation and
         ///         initialization of instances of the derived components.
-#if defined(NDEBUG) && defined(HPX_DISABLE_ASSERTS)
-        static component_type* create(std::size_t)
-#else
         static component_type* create(std::size_t count)
-#endif
         {
             // simple components can be created individually only
             HPX_ASSERT(1 == count);
@@ -265,11 +261,7 @@ namespace hpx { namespace components
 
         /// \brief  The function \a destroy is used for destruction and
         ///         de-allocation of instances of the derived components.
-#if defined(NDEBUG) && defined(HPX_DISABLE_ASSERTS)
-        static void destroy(Component* p, std::size_t /*count*/ = 1)
-#else
         static void destroy(Component* p, std::size_t count = 1)
-#endif
         {
             // simple components can be deleted individually only
             HPX_ASSERT(1 == count);

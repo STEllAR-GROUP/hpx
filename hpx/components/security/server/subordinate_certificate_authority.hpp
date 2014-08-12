@@ -37,11 +37,12 @@ namespace hpx { namespace components { namespace security { namespace server
 
         void set_certificate(signed_type<certificate> const &);
 
-        naming::gid_type get_base_gid() const
+        naming::gid_type get_base_gid(
+            naming::gid_type const& assign_gid = naming::invalid_gid) const
         {
             typedef fixed_component_base<subordinate_certificate_authority>
                 component_base_type;
-            return this->component_base_type::get_base_gid();
+            return this->component_base_type::get_base_gid(assign_gid);
         }
     };
 }}}}

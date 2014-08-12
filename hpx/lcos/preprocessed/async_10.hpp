@@ -54,20 +54,41 @@ namespace hpx
             typename action_type::remote_result_type
         >::type result_type;
         naming::address addr;
-        if (policy == launch::sync && agas::is_local_address_cached(gid, addr))
+        if (agas::is_local_address_cached(gid, addr) && policy == launch::sync)
         {
             return detail::sync_local_invoke_1<action_type, result_type>::
                 call(gid, addr, std::forward<Arg0>( arg0 ));
         }
         lcos::packaged_action<action_type, result_type> p;
+        bool target_is_managed = false;
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
-            if (addr)
-                p.apply(policy, addr, gid, std::forward<Arg0>( arg0 ));
-            else
+            if (addr) {
+                p.apply(policy, std::move(addr), gid,
+                    std::forward<Arg0>( arg0 ));
+            }
+            else if (gid.get_management_type() == naming::id_type::managed) {
+                p.apply(policy,
+                    naming::id_type(gid.get_gid(), naming::id_type::unmanaged),
+                    std::forward<Arg0>( arg0 ));
+                target_is_managed = true;
+            }
+            else {
                 p.apply(policy, gid, std::forward<Arg0>( arg0 ));
+            }
         }
-        return p.get_future();
+        
+        
+        future<result_type> f = p.get_future();
+        if (target_is_managed)
+        {
+            typedef typename lcos::detail::shared_state_ptr_for<
+                future<result_type>
+            >::type shared_state_ptr;
+            shared_state_ptr const& state = lcos::detail::get_shared_state(f);
+            state->set_on_completed(detail::keep_id_alive(gid));
+        }
+        return std::move(f);
     }
     template <typename Action, typename Arg0>
     lcos::future<
@@ -155,20 +176,41 @@ namespace hpx
             typename action_type::remote_result_type
         >::type result_type;
         naming::address addr;
-        if (policy == launch::sync && agas::is_local_address_cached(gid, addr))
+        if (agas::is_local_address_cached(gid, addr) && policy == launch::sync)
         {
             return detail::sync_local_invoke_2<action_type, result_type>::
                 call(gid, addr, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
         }
         lcos::packaged_action<action_type, result_type> p;
+        bool target_is_managed = false;
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
-            if (addr)
-                p.apply(policy, addr, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
-            else
+            if (addr) {
+                p.apply(policy, std::move(addr), gid,
+                    std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
+            }
+            else if (gid.get_management_type() == naming::id_type::managed) {
+                p.apply(policy,
+                    naming::id_type(gid.get_gid(), naming::id_type::unmanaged),
+                    std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
+                target_is_managed = true;
+            }
+            else {
                 p.apply(policy, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
+            }
         }
-        return p.get_future();
+        
+        
+        future<result_type> f = p.get_future();
+        if (target_is_managed)
+        {
+            typedef typename lcos::detail::shared_state_ptr_for<
+                future<result_type>
+            >::type shared_state_ptr;
+            shared_state_ptr const& state = lcos::detail::get_shared_state(f);
+            state->set_on_completed(detail::keep_id_alive(gid));
+        }
+        return std::move(f);
     }
     template <typename Action, typename Arg0 , typename Arg1>
     lcos::future<
@@ -256,20 +298,41 @@ namespace hpx
             typename action_type::remote_result_type
         >::type result_type;
         naming::address addr;
-        if (policy == launch::sync && agas::is_local_address_cached(gid, addr))
+        if (agas::is_local_address_cached(gid, addr) && policy == launch::sync)
         {
             return detail::sync_local_invoke_3<action_type, result_type>::
                 call(gid, addr, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
         }
         lcos::packaged_action<action_type, result_type> p;
+        bool target_is_managed = false;
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
-            if (addr)
-                p.apply(policy, addr, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
-            else
+            if (addr) {
+                p.apply(policy, std::move(addr), gid,
+                    std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
+            }
+            else if (gid.get_management_type() == naming::id_type::managed) {
+                p.apply(policy,
+                    naming::id_type(gid.get_gid(), naming::id_type::unmanaged),
+                    std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
+                target_is_managed = true;
+            }
+            else {
                 p.apply(policy, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
+            }
         }
-        return p.get_future();
+        
+        
+        future<result_type> f = p.get_future();
+        if (target_is_managed)
+        {
+            typedef typename lcos::detail::shared_state_ptr_for<
+                future<result_type>
+            >::type shared_state_ptr;
+            shared_state_ptr const& state = lcos::detail::get_shared_state(f);
+            state->set_on_completed(detail::keep_id_alive(gid));
+        }
+        return std::move(f);
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2>
     lcos::future<
@@ -357,20 +420,41 @@ namespace hpx
             typename action_type::remote_result_type
         >::type result_type;
         naming::address addr;
-        if (policy == launch::sync && agas::is_local_address_cached(gid, addr))
+        if (agas::is_local_address_cached(gid, addr) && policy == launch::sync)
         {
             return detail::sync_local_invoke_4<action_type, result_type>::
                 call(gid, addr, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
         }
         lcos::packaged_action<action_type, result_type> p;
+        bool target_is_managed = false;
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
-            if (addr)
-                p.apply(policy, addr, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
-            else
+            if (addr) {
+                p.apply(policy, std::move(addr), gid,
+                    std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
+            }
+            else if (gid.get_management_type() == naming::id_type::managed) {
+                p.apply(policy,
+                    naming::id_type(gid.get_gid(), naming::id_type::unmanaged),
+                    std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
+                target_is_managed = true;
+            }
+            else {
                 p.apply(policy, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
+            }
         }
-        return p.get_future();
+        
+        
+        future<result_type> f = p.get_future();
+        if (target_is_managed)
+        {
+            typedef typename lcos::detail::shared_state_ptr_for<
+                future<result_type>
+            >::type shared_state_ptr;
+            shared_state_ptr const& state = lcos::detail::get_shared_state(f);
+            state->set_on_completed(detail::keep_id_alive(gid));
+        }
+        return std::move(f);
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     lcos::future<
@@ -458,20 +542,41 @@ namespace hpx
             typename action_type::remote_result_type
         >::type result_type;
         naming::address addr;
-        if (policy == launch::sync && agas::is_local_address_cached(gid, addr))
+        if (agas::is_local_address_cached(gid, addr) && policy == launch::sync)
         {
             return detail::sync_local_invoke_5<action_type, result_type>::
                 call(gid, addr, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
         }
         lcos::packaged_action<action_type, result_type> p;
+        bool target_is_managed = false;
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
-            if (addr)
-                p.apply(policy, addr, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
-            else
+            if (addr) {
+                p.apply(policy, std::move(addr), gid,
+                    std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
+            }
+            else if (gid.get_management_type() == naming::id_type::managed) {
+                p.apply(policy,
+                    naming::id_type(gid.get_gid(), naming::id_type::unmanaged),
+                    std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
+                target_is_managed = true;
+            }
+            else {
                 p.apply(policy, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
+            }
         }
-        return p.get_future();
+        
+        
+        future<result_type> f = p.get_future();
+        if (target_is_managed)
+        {
+            typedef typename lcos::detail::shared_state_ptr_for<
+                future<result_type>
+            >::type shared_state_ptr;
+            shared_state_ptr const& state = lcos::detail::get_shared_state(f);
+            state->set_on_completed(detail::keep_id_alive(gid));
+        }
+        return std::move(f);
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     lcos::future<
@@ -559,20 +664,41 @@ namespace hpx
             typename action_type::remote_result_type
         >::type result_type;
         naming::address addr;
-        if (policy == launch::sync && agas::is_local_address_cached(gid, addr))
+        if (agas::is_local_address_cached(gid, addr) && policy == launch::sync)
         {
             return detail::sync_local_invoke_6<action_type, result_type>::
                 call(gid, addr, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
         }
         lcos::packaged_action<action_type, result_type> p;
+        bool target_is_managed = false;
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
-            if (addr)
-                p.apply(policy, addr, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
-            else
+            if (addr) {
+                p.apply(policy, std::move(addr), gid,
+                    std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
+            }
+            else if (gid.get_management_type() == naming::id_type::managed) {
+                p.apply(policy,
+                    naming::id_type(gid.get_gid(), naming::id_type::unmanaged),
+                    std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
+                target_is_managed = true;
+            }
+            else {
                 p.apply(policy, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
+            }
         }
-        return p.get_future();
+        
+        
+        future<result_type> f = p.get_future();
+        if (target_is_managed)
+        {
+            typedef typename lcos::detail::shared_state_ptr_for<
+                future<result_type>
+            >::type shared_state_ptr;
+            shared_state_ptr const& state = lcos::detail::get_shared_state(f);
+            state->set_on_completed(detail::keep_id_alive(gid));
+        }
+        return std::move(f);
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     lcos::future<
@@ -660,20 +786,41 @@ namespace hpx
             typename action_type::remote_result_type
         >::type result_type;
         naming::address addr;
-        if (policy == launch::sync && agas::is_local_address_cached(gid, addr))
+        if (agas::is_local_address_cached(gid, addr) && policy == launch::sync)
         {
             return detail::sync_local_invoke_7<action_type, result_type>::
                 call(gid, addr, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
         }
         lcos::packaged_action<action_type, result_type> p;
+        bool target_is_managed = false;
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
-            if (addr)
-                p.apply(policy, addr, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
-            else
+            if (addr) {
+                p.apply(policy, std::move(addr), gid,
+                    std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
+            }
+            else if (gid.get_management_type() == naming::id_type::managed) {
+                p.apply(policy,
+                    naming::id_type(gid.get_gid(), naming::id_type::unmanaged),
+                    std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
+                target_is_managed = true;
+            }
+            else {
                 p.apply(policy, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
+            }
         }
-        return p.get_future();
+        
+        
+        future<result_type> f = p.get_future();
+        if (target_is_managed)
+        {
+            typedef typename lcos::detail::shared_state_ptr_for<
+                future<result_type>
+            >::type shared_state_ptr;
+            shared_state_ptr const& state = lcos::detail::get_shared_state(f);
+            state->set_on_completed(detail::keep_id_alive(gid));
+        }
+        return std::move(f);
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     lcos::future<
@@ -761,20 +908,41 @@ namespace hpx
             typename action_type::remote_result_type
         >::type result_type;
         naming::address addr;
-        if (policy == launch::sync && agas::is_local_address_cached(gid, addr))
+        if (agas::is_local_address_cached(gid, addr) && policy == launch::sync)
         {
             return detail::sync_local_invoke_8<action_type, result_type>::
                 call(gid, addr, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
         }
         lcos::packaged_action<action_type, result_type> p;
+        bool target_is_managed = false;
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
-            if (addr)
-                p.apply(policy, addr, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
-            else
+            if (addr) {
+                p.apply(policy, std::move(addr), gid,
+                    std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
+            }
+            else if (gid.get_management_type() == naming::id_type::managed) {
+                p.apply(policy,
+                    naming::id_type(gid.get_gid(), naming::id_type::unmanaged),
+                    std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
+                target_is_managed = true;
+            }
+            else {
                 p.apply(policy, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
+            }
         }
-        return p.get_future();
+        
+        
+        future<result_type> f = p.get_future();
+        if (target_is_managed)
+        {
+            typedef typename lcos::detail::shared_state_ptr_for<
+                future<result_type>
+            >::type shared_state_ptr;
+            shared_state_ptr const& state = lcos::detail::get_shared_state(f);
+            state->set_on_completed(detail::keep_id_alive(gid));
+        }
+        return std::move(f);
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     lcos::future<
@@ -862,20 +1030,41 @@ namespace hpx
             typename action_type::remote_result_type
         >::type result_type;
         naming::address addr;
-        if (policy == launch::sync && agas::is_local_address_cached(gid, addr))
+        if (agas::is_local_address_cached(gid, addr) && policy == launch::sync)
         {
             return detail::sync_local_invoke_9<action_type, result_type>::
                 call(gid, addr, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
         }
         lcos::packaged_action<action_type, result_type> p;
+        bool target_is_managed = false;
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
-            if (addr)
-                p.apply(policy, addr, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
-            else
+            if (addr) {
+                p.apply(policy, std::move(addr), gid,
+                    std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
+            }
+            else if (gid.get_management_type() == naming::id_type::managed) {
+                p.apply(policy,
+                    naming::id_type(gid.get_gid(), naming::id_type::unmanaged),
+                    std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
+                target_is_managed = true;
+            }
+            else {
                 p.apply(policy, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
+            }
         }
-        return p.get_future();
+        
+        
+        future<result_type> f = p.get_future();
+        if (target_is_managed)
+        {
+            typedef typename lcos::detail::shared_state_ptr_for<
+                future<result_type>
+            >::type shared_state_ptr;
+            shared_state_ptr const& state = lcos::detail::get_shared_state(f);
+            state->set_on_completed(detail::keep_id_alive(gid));
+        }
+        return std::move(f);
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
     lcos::future<
@@ -963,20 +1152,41 @@ namespace hpx
             typename action_type::remote_result_type
         >::type result_type;
         naming::address addr;
-        if (policy == launch::sync && agas::is_local_address_cached(gid, addr))
+        if (agas::is_local_address_cached(gid, addr) && policy == launch::sync)
         {
             return detail::sync_local_invoke_10<action_type, result_type>::
                 call(gid, addr, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
         }
         lcos::packaged_action<action_type, result_type> p;
+        bool target_is_managed = false;
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
-            if (addr)
-                p.apply(policy, addr, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
-            else
+            if (addr) {
+                p.apply(policy, std::move(addr), gid,
+                    std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
+            }
+            else if (gid.get_management_type() == naming::id_type::managed) {
+                p.apply(policy,
+                    naming::id_type(gid.get_gid(), naming::id_type::unmanaged),
+                    std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
+                target_is_managed = true;
+            }
+            else {
                 p.apply(policy, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
+            }
         }
-        return p.get_future();
+        
+        
+        future<result_type> f = p.get_future();
+        if (target_is_managed)
+        {
+            typedef typename lcos::detail::shared_state_ptr_for<
+                future<result_type>
+            >::type shared_state_ptr;
+            shared_state_ptr const& state = lcos::detail::get_shared_state(f);
+            state->set_on_completed(detail::keep_id_alive(gid));
+        }
+        return std::move(f);
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
     lcos::future<

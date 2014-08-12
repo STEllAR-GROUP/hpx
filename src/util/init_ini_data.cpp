@@ -252,7 +252,7 @@ namespace hpx { namespace util
 
         // incorporate all information from this module's
         // registry into our internal ini object
-        ini.parse("component registry", ini_data, false);
+        ini.parse("<component registry>", ini_data, false, false);
     }
 
     void load_component_factory(hpx::util::plugin::dll& d, util::section& ini,
@@ -298,7 +298,7 @@ namespace hpx { namespace util
 
         // incorporate all information from this module's
         // registry into our internal ini object
-        ini.parse("component registry", ini_data, false);
+        ini.parse("<component registry>", ini_data, false, false);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -329,7 +329,7 @@ namespace hpx { namespace util
 
         // incorporate all information from this module's
         // registry into our internal ini object
-        ini.parse("plugin registry", ini_data, false);
+        ini.parse("<plugin registry>", ini_data, false, false);
     }
 
     namespace detail

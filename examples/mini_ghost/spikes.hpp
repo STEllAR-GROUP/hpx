@@ -27,23 +27,21 @@ namespace mini_ghost {
           , spike_loc_(4, p.num_spikes)
         {
             // Determine global indices (excluding ghost)
+            std::size_t first_nx = p.nx * my_px + 1;
+            std::size_t first_ny = p.ny * my_py + 1;
+            std::size_t first_nz = p.nz * my_pz + 1;
+
+            typedef std::pair<std::size_t, std::size_t> range_type;
+
+            range_type my_global_nx(first_nx, first_nx + p.nx + 1);
+            range_type my_global_ny(first_ny, first_ny + p.ny + 1);
+            range_type my_global_nz(first_nz, first_nz + p.nz + 1);
+
             std::size_t global_nx = p.nx * p.npx;
             std::size_t global_ny = p.ny * p.npy;
             std::size_t global_nz = p.nz * p.npz;
-
-            std::pair<std::size_t, std::size_t> my_global_nx;
-            std::pair<std::size_t, std::size_t> my_global_ny;
-            std::pair<std::size_t, std::size_t> my_global_nz;
-
-            my_global_nx.first = p.nx * my_px + 1;
-            my_global_ny.first = p.ny * my_py + 1;
-            my_global_nz.first = p.nz * my_pz + 1;
-
-            my_global_nx.second = my_global_nx.first + p.nx + 1;
-            my_global_ny.second = my_global_ny.first + p.ny + 1;
-            my_global_nz.second = my_global_nz.first + p.nz + 1;
-
             std::size_t global_n = global_nx * global_ny * global_nz;
+
             for(Real & v : spikes_.data_)
             {
                 v = random() * global_n;
@@ -75,6 +73,7 @@ namespace mini_ghost {
                 std::size_t xloc = spike_loc_(1, i);
                 std::size_t yloc = spike_loc_(2, i);
                 std::size_t zloc = spike_loc_(3, i);
+
                 if((my_global_nx.first <= xloc) && (xloc <= my_global_nx.second) &&
                    (my_global_ny.first <= yloc) && (yloc <= my_global_ny.second) &&
                    (my_global_nz.first <= zloc) && (zloc <= my_global_nz.second))

@@ -140,12 +140,18 @@ namespace hpx { namespace util
             "timer_pool_size = ${HPX_NUM_TIMER_POOL_THREADS:"
                 BOOST_PP_STRINGIZE(HPX_NUM_TIMER_POOL_THREADS) "}",
 
-            // predefine command line aliases
             "[hpx.commandline]",
+            // enable aliasing
+            "aliasing = ${HPX_COMMANDLINE_ALIASING:1}",
+
+            // allow for unknown options to passes through
+            "allow_unknown = ${HPX_COMMANDLINE_ALLOW_UNKNOWN:0}",
+
+            // predefine command line aliases
+            "[hpx.commandline.aliases]",
             "-a = --hpx:agas",
             "-c = --hpx:console",
             "-h = --hpx:help",
-            "--help = --hpx:help",
             "-I = --hpx:ini",
             "-l = --hpx:localities",
             "-p = --hpx:app-config",
@@ -153,7 +159,6 @@ namespace hpx { namespace util
             "-r = --hpx:run-agas-server",
             "-t = --hpx:threads",
             "-v = --hpx:version",
-            "--version = --hpx:version",
             "-w = --hpx:worker",
             "-x = --hpx:hpx",
             "-0 = --hpx:node=0",
@@ -214,7 +219,7 @@ namespace hpx { namespace util
         lines.insert(lines.end(), lines_pp.begin(), lines_pp.end());
 
         // don't overload user overrides
-        this->parse("static defaults", lines, false);
+        this->parse("<static defaults>", lines, false, false);
 
         need_to_call_pre_initialize = false;
     }
@@ -231,7 +236,9 @@ namespace hpx { namespace util
 
         // let the command line override the config file.
         if (!cmdline_ini_defs_.empty()) {
-            this->parse("command line definitions", cmdline_ini_defs_);
+            // do not weed out comments
+            this->parse("<command line definitions>", cmdline_ini_defs_,
+                true, false);
             need_to_call_pre_initialize = true;
         }
     }
@@ -312,7 +319,7 @@ namespace hpx { namespace util
 
         // let the command line override the config file.
         if (!cmdline_ini_defs.empty())
-            parse("command line definitions", cmdline_ini_defs);
+            parse("<command line definitions>", cmdline_ini_defs, true, false);
 
         // merge all found ini files of all components
         util::merge_component_inis(*this);
@@ -388,7 +395,7 @@ namespace hpx { namespace util
         std::vector<std::string> const& prefill =
             util::detail::get_logging_data();
         if (!prefill.empty())
-            this->parse("static prefill defaults", prefill, false);
+            this->parse("<static prefill defaults>", prefill, false, false);
 
         post_initialize_ini(hpx_ini_file, cmdline_ini_defs);
 

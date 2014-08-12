@@ -116,10 +116,10 @@ void run_benchmark(boost::program_options::variables_map & vm)
 
             typedef hpx::util::serialize_buffer<char> buffer_type;
             hpx::future<std::vector<hpx::future<buffer_type> > >recv_futures
-                = hpx::async(HPX_STD_BIND(&recv_async, there, size, window_size));
+                = hpx::async(&recv_async, there, size, window_size);
 
             hpx::future<std::vector<hpx::future<void> > > send_futures
-                = hpx::async(HPX_STD_BIND(&send_async, there, size, window_size));
+                = hpx::async(&send_async, there, size, window_size);
 
             /*
             std::vector<buffer_type> recv_results;

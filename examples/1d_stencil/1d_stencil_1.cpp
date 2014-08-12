@@ -14,14 +14,6 @@
 #include <hpx/hpx.hpp>
 
 #include "print_time_results.hpp"
-///////////////////////////////////////////////////////////////////////////////
-// Timer with nanosecond resolution
-inline boost::uint64_t now()
-{
-    boost::chrono::nanoseconds ns =
-        boost::chrono::steady_clock::now().time_since_epoch();
-    return static_cast<boost::uint64_t>(ns.count());
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Command-line variables
@@ -31,6 +23,7 @@ double dt = 1.;     // time step
 double dx = 1.;     // grid spacing
 
 ///////////////////////////////////////////////////////////////////////////////
+//[stepper_1
 struct stepper
 {
     // Our partition type
@@ -75,7 +68,7 @@ struct stepper
         return U[nt % 2];
     }
 };
-
+//]
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
@@ -84,16 +77,15 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     if (vm.count("no-header"))
         header = false;
-    
+
     // Create the stepper object
     stepper step;
 
     // Measure execution time.
-    boost::uint64_t t = now();
+    boost::uint64_t t = hpx::util::high_resolution_clock::now();
 
     // Execute nt time steps on nx grid points.
     stepper::space solution = step.do_work(nx, nt);
-    
 
     // Print the final solution
     if (vm.count("results"))
@@ -102,11 +94,11 @@ int hpx_main(boost::program_options::variables_map& vm)
             std::cout << "U[" << i << "] = " << solution[i] << std::endl;
     }
 
-    boost::uint64_t elapsed = now() - t;
-    
+    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+
     boost::uint64_t const os_thread_count = hpx::get_os_thread_count();
     print_time_results(os_thread_count, elapsed, nx, nt, header);
-    
+
     return hpx::finalize();
 }
 

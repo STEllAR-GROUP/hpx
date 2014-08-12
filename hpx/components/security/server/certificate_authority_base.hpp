@@ -51,7 +51,8 @@ namespace hpx { namespace components { namespace security { namespace server
             certificate_authority_base
           , is_valid);
 
-        virtual naming::gid_type get_base_gid() const = 0;
+        virtual naming::gid_type get_base_gid(
+            naming::gid_type const& assign_gid = naming::invalid_gid) const = 0;
 
     protected:
         key_pair key_pair_;

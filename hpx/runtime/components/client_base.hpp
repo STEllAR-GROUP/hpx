@@ -67,29 +67,6 @@ namespace hpx { namespace traits
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Derived>
-    struct future_unwrap_getter<lcos::future<Derived>,
-        typename boost::enable_if<is_client<Derived> >::type>
-    {
-        BOOST_FORCEINLINE lcos::shared_future<naming::id_type>
-        operator()(lcos::future<Derived> f) const
-        {
-            return f.get().share();
-        }
-    };
-
-    template <typename Derived>
-    struct future_unwrap_getter<lcos::shared_future<Derived>,
-        typename boost::enable_if<is_client<Derived> >::type>
-    {
-        BOOST_FORCEINLINE lcos::shared_future<naming::id_type>
-        operator()(lcos::shared_future<Derived> f) const
-        {
-            return f.get().share();
-        }
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Derived>
     struct future_access<Derived,
         typename boost::enable_if<is_client<Derived> >::type>
     {
@@ -98,36 +75,6 @@ namespace hpx { namespace traits
         get_shared_state(Derived const& client)
         {
             return client.share().shared_state_;
-        }
-
-        template <typename Archive>
-        static void load(Archive& ar, Derived& client)
-        {
-            typedef shared_future<naming::id_type> future_type;
-
-            future_type f;
-            future_access<future_type>::load(ar, f);
-
-            future<naming::id_type> id;
-            if (f.has_value())
-            {
-                id = hpx::make_ready_future(f.get());
-            }
-            else if (f.has_exception())
-            {
-                id = hpx::make_error_future<naming::id_type>(f.get_exception_ptr());
-            }
-            client = Derived(std::move(id));
-            ar >> client;
-        }
-
-        template <typename Archive>
-        static void save(Archive& ar, Derived const& client)
-        {
-            typedef shared_future<naming::id_type> future_type;
-
-            future_access<future_type>::save(ar, client.share());
-            ar << client;
         }
     };
 }}
@@ -159,6 +106,19 @@ namespace hpx { namespace components
         {
             typedef Stub type;
             typedef typename Stub::server_component_type server_component_type;
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Derived>
+        struct client_unwrapper
+        {
+            typedef shared_future<naming::id_type> result_type;
+
+            BOOST_FORCEINLINE result_type
+            operator()(future<Derived> f) const
+            {
+                return f.get().share();
+            }
         };
     }
 
@@ -207,7 +167,7 @@ namespace hpx { namespace components
         // client_base directly as a client_base holds another future to the
         // id of the referenced object.
         client_base(future<Derived> && d)
-          : gid_(d.unwrap())
+          : gid_(d.then(detail::client_unwrapper<Derived>()))
         {}
 
         // copy assignment and move assignment
@@ -235,12 +195,6 @@ namespace hpx { namespace components
         client_base& operator=(future<naming::id_type> && gid)
         {
             gid_ = gid.share();
-            return *this;
-        }
-
-        client_base& operator=(future<Derived> && d)
-        {
-            gid_ = d.unwrap();
             return *this;
         }
 
@@ -365,14 +319,10 @@ namespace hpx { namespace components
         friend class boost::serialization::access;
 
         template <typename Archive>
-        void load(Archive & ar, unsigned)
-        {}
-
-        template <typename Archive>
-        void save(Archive & ar, unsigned) const
-        {}
-
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
+        void serialize(Archive & ar, unsigned)
+        {
+            ar & gid_;
+        }
 
     protected:
         future_type gid_;

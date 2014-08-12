@@ -101,7 +101,7 @@ namespace ostream_like {
     - ostream_like
 
 */
-template<class stream_type = std::basic_ostringstream<char_type> > struct return_raw_stream {
+template<class stream_type = std::basic_ostringstream<char_type> > struct return_raw_stream { //-V690
     // what does the gather_msg class return?
     typedef stream_type msg_type;
 
@@ -137,7 +137,7 @@ private:
 */
 template<
         class string = hpx::util::logging::optimize::cache_string_one_str<hold_string_type> ,
-        class stream_type = std::basic_ostringstream<char_type> > struct return_str {
+        class stream_type = std::basic_ostringstream<char_type> > struct return_str { //-V690
 
     // what does the gather_msg class return?
     typedef string msg_type;
@@ -159,7 +159,7 @@ private:
 
     See @ref hpx::util::logging::tag namespace
 */
-template<class holder_type, class stream_type> struct return_tag_holder : out_base {
+template<class holder_type, class stream_type> struct return_tag_holder : out_base { //-V690
     // what does the gather_msg class return?
     typedef holder_type msg_type;
 

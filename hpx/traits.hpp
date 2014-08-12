@@ -109,9 +109,6 @@ namespace hpx { namespace traits
     template <typename Future, typename Enable = void>
     struct future_traits;
 
-    template <typename Future, typename Enable = void>
-    struct future_unwrap_getter;
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename Range, typename Enable = void>
     struct is_future_range;
@@ -119,6 +116,10 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename Tuple, typename Enable = void>
     struct is_future_tuple;
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Future, typename Enable = void>
+    struct serialize_as_future;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Plugin, typename Enable = void>

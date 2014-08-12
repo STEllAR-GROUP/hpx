@@ -423,7 +423,7 @@ namespace hpx { namespace naming
         return gid_type(msb, gid.get_lsb());
     }
 
-    boost::uint32_t const invalid_locality_id = ~0U;
+    BOOST_CONSTEXPR_OR_CONST boost::uint32_t invalid_locality_id = ~0U;
 
     ///////////////////////////////////////////////////////////////////////////
     inline bool refers_to_virtual_memory(gid_type const& gid)
@@ -611,6 +611,9 @@ namespace hpx { namespace naming
         HPX_EXPORT gid_type split_gid_if_needed_locked(gid_type& id);
         HPX_EXPORT gid_type replenish_new_gid_if_needed_locked(gid_type const& id);
 
+        HPX_EXPORT gid_type move_gid(gid_type& id);
+        HPX_EXPORT gid_type move_gid_locked(gid_type& gid);
+
         HPX_EXPORT boost::int64_t replenish_credits(gid_type& id);
 
         ///////////////////////////////////////////////////////////////////////
@@ -719,7 +722,9 @@ namespace hpx { namespace naming
         {
             unknown_deleter = -1,
             unmanaged = 0,          // unmanaged GID
-            managed = 1             // managed GID
+            managed = 1,            // managed GID
+            managed_move_credit = 2 // managed GID which will give up all 
+                                    // credits when sent
         };
 
         // forward declaration
@@ -768,7 +773,6 @@ namespace hpx { namespace naming
 
             // serialization
             void save(util::portable_binary_oarchive& ar) const;
-
             void load(util::portable_binary_iarchive& ar);
 
         private:
@@ -797,7 +801,14 @@ namespace hpx { namespace naming
     ///////////////////////////////////////////////////////////////////////////
     inline std::ostream& operator<< (std::ostream& os, id_type const& id)
     {
-        os << id.get_gid();
+        if (!id)
+        {
+            os << "{invalid}";
+        }
+        else
+        {
+            os << id.get_gid();
+        }
         return os;
     }
 

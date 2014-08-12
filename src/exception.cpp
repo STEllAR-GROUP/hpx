@@ -249,56 +249,56 @@ namespace hpx { namespace detail
         get_exception(hpx::exception const&, std::string const&,
         std::string const&, long);
 
-    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
         throw_exception(hpx::exception const&,
         std::string const&, std::string const&, long);
 
-    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
         throw_exception(boost::system::system_error const&,
         std::string const&, std::string const&, long);
 
-    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
         throw_exception(std::exception const&,
         std::string const&, std::string const&, long);
-    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
         throw_exception(hpx::detail::std_exception const&,
         std::string const&, std::string const&, long);
-    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
         throw_exception(std::bad_exception const&,
         std::string const&, std::string const&, long);
-    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
         throw_exception(hpx::detail::bad_exception const&,
         std::string const&, std::string const&, long);
 #ifndef BOOST_NO_TYPEID
-    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
         throw_exception(std::bad_typeid const&,
         std::string const&, std::string const&, long);
-    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
         throw_exception(hpx::detail::bad_typeid const&,
         std::string const&, std::string const&, long);
-    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
         throw_exception(std::bad_cast const&,
         std::string const&, std::string const&, long);
-    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
         throw_exception(hpx::detail::bad_cast const&,
         std::string const&, std::string const&, long);
 #endif
-    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
         throw_exception(std::bad_alloc const&,
         std::string const&, std::string const&, long);
-    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
         throw_exception(hpx::detail::bad_alloc const&,
         std::string const&, std::string const&, long);
-    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
         throw_exception(std::logic_error const&,
         std::string const&, std::string const&, long);
-    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
         throw_exception(std::runtime_error const&,
         std::string const&, std::string const&, long);
-    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
         throw_exception(std::out_of_range const&,
         std::string const&, std::string const&, long);
-    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
         throw_exception(std::invalid_argument const&,
         std::string const&, std::string const&, long);
 

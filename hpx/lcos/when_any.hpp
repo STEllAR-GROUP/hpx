@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,7 +11,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/when_n.hpp>
+#include <hpx/lcos/when_some.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
 #include <hpx/runtime/threads/thread.hpp>
@@ -38,7 +38,7 @@ namespace hpx { namespace lcos
     {
         ///////////////////////////////////////////////////////////////////////
         template <typename Future>
-        struct when_any_swapped
+        struct when_any_swapped //-V690
           : boost::enable_shared_from_this<when_any_swapped<Future> >
         {
         private:
@@ -147,7 +147,7 @@ namespace hpx { namespace lcos
         if (lazy_values.empty())
             return lcos::make_ready_future(result_type());
 
-        return lcos::when_n(1, lazy_values, ec);
+        return lcos::when_some(1, lazy_values, ec);
     }
 
     template <typename Future>
@@ -164,7 +164,14 @@ namespace hpx { namespace lcos
     > >
     when_any(Iterator begin, Iterator end, error_code& ec = throws)
     {
-        return lcos::when_n(1, begin, end, ec);
+        return lcos::when_some(1, begin, end, ec);
+    }
+
+    template <typename Iterator>
+    lcos::future<Iterator> when_any_n(Iterator begin, std::size_t count,
+        error_code& ec = throws)
+    {
+        return when_some_n(1, begin, count, ec);
     }
 
     inline lcos::future<HPX_STD_TUPLE<> > //-V524
@@ -242,6 +249,25 @@ namespace hpx { namespace lcos
             detail::when_acquire_future<future_type>());
         return lcos::when_any_swapped(lazy_values_, ec);
     }
+
+    template <typename Iterator>
+    lcos::future<Iterator>
+    when_any_swapped_n(Iterator begin, std::size_t count,
+        error_code& ec = throws)
+    {
+        typedef
+            typename lcos::detail::future_iterator_traits<Iterator>::type
+            future_type;
+        typedef std::vector<future_type> result_type;
+
+        result_type lazy_values_;
+        lazy_values_.reserve(count);
+        detail::when_acquire_future<future_type> func;
+        for (std::size_t i = 0; i != count; ++i)
+            lazy_values_.push_back(func(*begin++));
+
+        return lcos::when_any_swapped(lazy_values_, ec);
+    }
 }}
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
@@ -267,6 +293,8 @@ namespace hpx
 {
     using lcos::when_any;
     using lcos::when_any_swapped;
+    using lcos::when_any_n;
+    using lcos::when_any_swapped_n;
 }
 
 #endif
@@ -276,7 +304,7 @@ namespace hpx
 
 #define N BOOST_PP_ITERATION()
 
-#define HPX_WHEN_N_DECAY_FUTURE(Z, N, D)                                      \
+#define HPX_WHEN_SOME_DECAY_FUTURE(Z, N, D)                                   \
     typename util::decay<BOOST_PP_CAT(T, N)>::type                            \
     /**/
 
@@ -284,14 +312,14 @@ namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
     template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-    lcos::future<HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_N_DECAY_FUTURE, _)> >
+    lcos::future<HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_SOME_DECAY_FUTURE, _)> >
     when_any(HPX_ENUM_FWD_ARGS(N, T, f), error_code& ec = throws)
     {
-        return lcos::when_n(1, HPX_ENUM_FORWARD_ARGS(N, T, f), ec);
+        return lcos::when_some(1, HPX_ENUM_FORWARD_ARGS(N, T, f), ec);
     }
 }}
 
-#undef HPX_WHEN_N_DECAY_FUTURE
+#undef HPX_WHEN_SOME_DECAY_FUTURE
 #undef N
 
 #endif

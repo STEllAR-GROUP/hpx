@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,7 +11,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/wait_n.hpp>
+#include <hpx/lcos/wait_some.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
 #include <hpx/runtime/threads/thread.hpp>
@@ -57,7 +57,7 @@ namespace hpx { namespace lcos
     void wait_any(std::vector<Future> const& lazy_values,
         error_code& ec = throws)
     {
-        return lcos::wait_n(1, lazy_values, ec);
+        return lcos::wait_some(1, lazy_values, ec);
     }
 
     template <typename Future>
@@ -82,12 +82,19 @@ namespace hpx { namespace lcos
     >::type wait_any(Iterator begin, Iterator end,
         error_code& ec = throws)
     {
-        return lcos::wait_n(1, begin, end, ec);
+        return lcos::wait_some(1, begin, end, ec);
+    }
+
+    template <typename Iterator>
+    Iterator wait_any_n(Iterator begin, std::size_t count,
+        error_code& ec = throws)
+    {
+        return wait_some_n(1, begin, count, ec);
     }
 
     inline void wait_any(error_code& ec = throws)
     {
-        return lcos::wait_n(1, ec);
+        return lcos::wait_some(1, ec);
     }
 }}
 
@@ -113,6 +120,7 @@ namespace hpx { namespace lcos
 namespace hpx
 {
     using lcos::wait_any;
+    using lcos::wait_any_n;
 }
 
 #endif
@@ -128,7 +136,7 @@ namespace hpx { namespace lcos
     template <BOOST_PP_ENUM_PARAMS(N, typename T)>
     void wait_any(HPX_ENUM_FWD_ARGS(N, T, f), error_code& ec = throws)
     {
-        return lcos::wait_n(1, HPX_ENUM_FORWARD_ARGS(N, T, f), ec);
+        return lcos::wait_some(1, HPX_ENUM_FORWARD_ARGS(N, T, f), ec);
     }
 }}
 

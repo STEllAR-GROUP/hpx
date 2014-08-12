@@ -202,7 +202,7 @@ int hpx_main()
             using hpx::async;
             using hpx::wait_all;
             vector<search_action> sAct;//[sizeX * sizeY];
-            vector<future<string>> wordRun;
+            vector<future<string> > wordRun;
             wordRun.reserve(strs.size());
             for (string::size_type i = 0; i < strs.size(); ++i)
             {

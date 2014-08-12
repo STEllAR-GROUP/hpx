@@ -90,7 +90,7 @@ namespace hpx { namespace lcos
                     ready_promise = hpx::lcos::local::promise<void>();
                 }
 
-                return bcast_future.then(HPX_STD_BIND(&broadcast::when_dst<A0>, this));
+                return bcast_future.then(hpx::util::bind(&broadcast::when_dst<A0>, this));
             }
         }
 
@@ -129,7 +129,7 @@ namespace hpx { namespace lcos
             for(std::size_t i = 0; i < (std::min)(fan_out, ids.size()); ++i)
             {
                 broadcast_futures.push_back(
-                    hpx::async(hpx::util::bind(fun, ids[i]))
+                    hpx::async(fun, ids[i])
                 );
             }
 

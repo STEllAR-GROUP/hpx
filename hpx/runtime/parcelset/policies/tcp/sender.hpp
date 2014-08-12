@@ -39,7 +39,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
       : public parcelset::parcelport_connection<sender, std::vector<char> >
     {
     public:
-
         /// Construct a sending parcelport_connection with the given io_service.
         sender(boost::asio::io_service& io_service,
             naming::locality const& locality_id,

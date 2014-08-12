@@ -72,14 +72,16 @@ namespace hpx { namespace util
         section& operator=(section const& rhs);
 
         void parse(std::string const& sourcename,
-            std::vector<std::string> const& lines, bool verify_existing = true);
+            std::vector<std::string> const& lines, bool verify_existing = true,
+            bool weed_out_comments = true);
 
         void parse(std::string const& sourcename,
-            std::string const& line, bool verify_existing = true)
+            std::string const& line, bool verify_existing = true,
+            bool weed_out_comments = true)
         {
             std::vector<std::string> lines;
             lines.push_back(line);
-            parse(sourcename, lines, verify_existing);
+            parse(sourcename, lines, verify_existing, weed_out_comments);
         }
 
         void read(std::string const& filename);

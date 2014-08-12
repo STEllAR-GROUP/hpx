@@ -828,15 +828,14 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Schedule the passed thread
-        void schedule_thread(threads::thread_data_base* thrd)
+        void schedule_thread(threads::thread_data_base* thrd, bool other_end = false)
         {
             ++work_items_count_;
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
-            work_items_.push(
-                new thread_description(thrd, util::high_resolution_clock::now())
-                );
+            work_items_.push(new thread_description(
+                thrd, util::high_resolution_clock::now()), other_end);
 #else
-            work_items_.push(thrd);
+            work_items_.push(thrd, other_end);
 #endif
         }
 
@@ -868,7 +867,7 @@ namespace hpx { namespace threads { namespace policies
                 return new_tasks_count_;
 
             if (unknown == state)
-                return thread_map_count_ + new_tasks_count_;
+                return thread_map_count_ + new_tasks_count_ - terminated_items_count_;
 
             // acquire lock only if absolutely necessary
             typename mutex_type::scoped_lock lk(mtx_);

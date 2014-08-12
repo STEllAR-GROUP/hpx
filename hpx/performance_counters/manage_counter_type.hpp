@@ -203,6 +203,7 @@ namespace hpx { namespace performance_counters
     ///               a new instance of this counter type.
     /// \param discover_counters [in] The function will be called to discover
     ///               counter instances which can be created.
+    /// \param uom    [in] The unit of measure of the counter type (default: "")
     /// \param ec     [in,out] this represents the error status on exit,
     ///               if this is pre-initialized to \a hpx#throws
     ///               the function will throw on error instead.

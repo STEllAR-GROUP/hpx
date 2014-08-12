@@ -111,7 +111,7 @@ namespace hpx { namespace parcelset
         // calculate hash of overall message
         components::security::hash hash(
             reinterpret_cast<unsigned char const*>(&buffer.data_.front()),
-            data_.size());
+            buffer.data_.size());
 
         using components::security::parcel_suffix;
         using components::security::signed_parcel_suffix;
@@ -124,10 +124,10 @@ namespace hpx { namespace parcelset
         // append the signed parcel suffix to the message
         buffer.data_.reserve(buffer.data_.size() + signed_parcel_suffix::size());
 
-        std::copy(suffix.begin(), suffix.end(), std::back_inserter(data_));
+        std::copy(suffix.begin(), suffix.end(), std::back_inserter(buffer.data_));
 
         // store the time required for security
-        data_point_.security_time_ = timer_sec.elapsed_nanoseconds();
+        buffer.data_point_.security_time_ = timer_sec.elapsed_nanoseconds();
     }
 #endif
 
@@ -194,8 +194,8 @@ namespace hpx { namespace parcelset
                     BOOST_FOREACH(parcel const& p, pv)
                     {
 #if defined(HPX_HAVE_SECURITY)
-                        if(enable_security)
-                            serialize_certificate(archive, localities, p);
+                        if (enable_security)
+                            serialize_certificate(archive, connection, localities, p);
 #endif
                         archive << p;
                     }

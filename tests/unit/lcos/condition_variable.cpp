@@ -91,7 +91,8 @@ struct wait_for_flag
 
     void wait_until_without_predicate()
     {
-        boost::system_time const timeout=boost::get_system_time()+boost::posix_time::milliseconds(5);
+        boost::chrono::system_clock::time_point const timeout =
+            boost::chrono::system_clock::now() + boost::chrono::milliseconds(5);
 
         boost::unique_lock<hpx::lcos::local::spinlock> lock(mutex);
         while(!flag)
@@ -106,7 +107,9 @@ struct wait_for_flag
 
     void wait_until_with_predicate()
     {
-        boost::system_time const timeout=boost::get_system_time()+boost::posix_time::milliseconds(5);
+        boost::chrono::system_clock::time_point const timeout =
+            boost::chrono::system_clock::now() + boost::chrono::milliseconds(5);
+
         boost::unique_lock<hpx::lcos::local::spinlock> lock(mutex);
         if(cond_var.wait_until(lock,timeout,check_flag(flag)) && flag)
         {
@@ -116,7 +119,7 @@ struct wait_for_flag
     void relative_wait_until_with_predicate()
     {
         boost::unique_lock<hpx::lcos::local::spinlock> lock(mutex);
-        if(cond_var.wait_for(lock,boost::posix_time::milliseconds(5),check_flag(flag)) && flag)
+        if(cond_var.wait_for(lock,boost::chrono::milliseconds(5),check_flag(flag)) && flag)
         {
             ++woken;
         }
@@ -127,7 +130,7 @@ void test_condition_notify_one_wakes_from_wait()
 {
     wait_for_flag data;
 
-    hpx::thread thread(hpx::util::bind(&wait_for_flag::wait_without_predicate, boost::ref(data)));
+    hpx::thread thread(&wait_for_flag::wait_without_predicate, boost::ref(data));
 
     {
         boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
@@ -143,7 +146,7 @@ void test_condition_notify_one_wakes_from_wait_with_predicate()
 {
     wait_for_flag data;
 
-    hpx::thread thread(hpx::util::bind(&wait_for_flag::wait_with_predicate, boost::ref(data)));
+    hpx::thread thread(&wait_for_flag::wait_with_predicate, boost::ref(data));
 
     {
         boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
@@ -159,7 +162,7 @@ void test_condition_notify_one_wakes_from_wait_until()
 {
     wait_for_flag data;
 
-    hpx::thread thread(hpx::util::bind(&wait_for_flag::wait_until_without_predicate, boost::ref(data)));
+    hpx::thread thread(&wait_for_flag::wait_until_without_predicate, boost::ref(data));
 
     {
         boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
@@ -175,7 +178,7 @@ void test_condition_notify_one_wakes_from_wait_until_with_predicate()
 {
     wait_for_flag data;
 
-    hpx::thread thread(hpx::util::bind(&wait_for_flag::wait_until_with_predicate, boost::ref(data)));
+    hpx::thread thread(&wait_for_flag::wait_until_with_predicate, boost::ref(data));
 
     {
         boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
@@ -191,7 +194,7 @@ void test_condition_notify_one_wakes_from_relative_wait_until_with_predicate()
 {
     wait_for_flag data;
 
-    hpx::thread thread(hpx::util::bind(&wait_for_flag::relative_wait_until_with_predicate, boost::ref(data)));
+    hpx::thread thread(&wait_for_flag::relative_wait_until_with_predicate, boost::ref(data));
 
     {
         boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
@@ -210,15 +213,15 @@ void test_multiple_notify_one_calls_wakes_multiple_threads()
     hpx::thread thread1(wait_for_condvar_and_increase_count);
     hpx::thread thread2(wait_for_condvar_and_increase_count);
 
-    hpx::this_thread::sleep_for(boost::posix_time::milliseconds(200));
+    hpx::this_thread::sleep_for(boost::chrono::milliseconds(200));
     multiple_wake_cond.notify_one();
 
     hpx::thread thread3(wait_for_condvar_and_increase_count);
 
-    hpx::this_thread::sleep_for(boost::posix_time::milliseconds(200));
+    hpx::this_thread::sleep_for(boost::chrono::milliseconds(200));
     multiple_wake_cond.notify_one();
     multiple_wake_cond.notify_one();
-    hpx::this_thread::sleep_for(boost::posix_time::milliseconds(200));
+    hpx::this_thread::sleep_for(boost::chrono::milliseconds(200));
 
     {
         boost::unique_lock<hpx::lcos::local::spinlock> lk(multiple_wake_mutex);
@@ -242,7 +245,7 @@ void test_condition_notify_all_wakes_from_wait()
     {
         for(unsigned i=0;i<5;++i)
         {
-            group.push_back(hpx::thread(hpx::util::bind(&wait_for_flag::wait_without_predicate, boost::ref(data))));
+            group.push_back(hpx::thread(&wait_for_flag::wait_without_predicate, boost::ref(data)));
         }
 
         {
@@ -271,7 +274,7 @@ void test_condition_notify_all_wakes_from_wait_with_predicate()
     {
         for(unsigned i=0;i<5;++i)
         {
-            group.push_back(hpx::thread(hpx::util::bind(&wait_for_flag::wait_with_predicate, boost::ref(data))));
+            group.push_back(hpx::thread(&wait_for_flag::wait_with_predicate, boost::ref(data)));
         }
 
         {
@@ -300,7 +303,7 @@ void test_condition_notify_all_wakes_from_wait_until()
     {
         for(unsigned i=0;i<5;++i)
         {
-            group.push_back(hpx::thread(hpx::util::bind(&wait_for_flag::wait_until_without_predicate, boost::ref(data))));
+            group.push_back(hpx::thread(&wait_for_flag::wait_until_without_predicate, boost::ref(data)));
         }
 
         {
@@ -329,7 +332,7 @@ void test_condition_notify_all_wakes_from_wait_until_with_predicate()
     {
         for(unsigned i=0;i<5;++i)
         {
-            group.push_back(hpx::thread(hpx::util::bind(&wait_for_flag::wait_until_with_predicate, boost::ref(data))));
+            group.push_back(hpx::thread(&wait_for_flag::wait_until_with_predicate, boost::ref(data)));
         }
 
         {
@@ -358,7 +361,7 @@ void test_condition_notify_all_wakes_from_relative_wait_until_with_predicate()
     {
         for(unsigned i=0;i<5;++i)
         {
-            group.push_back(hpx::thread(hpx::util::bind(&wait_for_flag::relative_wait_until_with_predicate, boost::ref(data))));
+            group.push_back(hpx::thread(&wait_for_flag::relative_wait_until_with_predicate, boost::ref(data)));
         }
 
         {
@@ -384,15 +387,15 @@ void test_notify_all_following_notify_one_wakes_all_threads()
     hpx::thread thread1(wait_for_condvar_and_increase_count);
     hpx::thread thread2(wait_for_condvar_and_increase_count);
 
-    hpx::this_thread::sleep_for(boost::posix_time::milliseconds(200));
+    hpx::this_thread::sleep_for(boost::chrono::milliseconds(200));
     multiple_wake_cond.notify_one();
 
     hpx::thread thread3(wait_for_condvar_and_increase_count);
 
-    hpx::this_thread::sleep_for(boost::posix_time::milliseconds(200));
+    hpx::this_thread::sleep_for(boost::chrono::milliseconds(200));
     multiple_wake_cond.notify_one();
     multiple_wake_cond.notify_all();
-    hpx::this_thread::sleep_for(boost::posix_time::milliseconds(200));
+    hpx::this_thread::sleep_for(boost::chrono::milliseconds(200));
 
     {
         boost::unique_lock<hpx::lcos::local::spinlock> lk(multiple_wake_mutex);
@@ -459,9 +462,9 @@ void condition_test_waits(condition_test_data* data)
     data->condition.notify_one();
 
     // Test wait_until.
-    boost::posix_time::ptime xt =
-        boost::posix_time::second_clock::local_time()
-      + boost::posix_time::milliseconds(10);
+    boost::chrono::system_clock::time_point xt =
+        boost::chrono::system_clock::now()
+      + boost::chrono::milliseconds(10);
     while (data->notified != 3)
         data->condition.wait_until(lock, xt);
     HPX_TEST(lock ? true : false);
@@ -470,8 +473,8 @@ void condition_test_waits(condition_test_data* data)
     data->condition.notify_one();
 
     // Test predicate wait_until.
-    xt = boost::posix_time::second_clock::local_time()
-       + boost::posix_time::milliseconds(10);
+    xt = boost::chrono::system_clock::now()
+      + boost::chrono::milliseconds(10);
     cond_predicate pred(data->notified, 4);
     HPX_TEST(data->condition.wait_until(lock, xt, pred));
     HPX_TEST(lock ? true : false);
@@ -482,7 +485,7 @@ void condition_test_waits(condition_test_data* data)
 
     // Test predicate wait_for
     cond_predicate pred_rel(data->notified, 5);
-    HPX_TEST(data->condition.wait_for(lock, boost::posix_time::milliseconds(10), pred_rel));
+    HPX_TEST(data->condition.wait_for(lock, boost::chrono::milliseconds(10), pred_rel));
     HPX_TEST(lock ? true : false);
     HPX_TEST(pred_rel());
     HPX_TEST_EQ(data->notified, 5);
@@ -494,7 +497,7 @@ void test_condition_waits()
 {
     condition_test_data data;
 
-    hpx::thread thread(hpx::util::bind(&condition_test_waits, &data));
+    hpx::thread thread(&condition_test_waits, &data);
 
     {
         boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
@@ -553,25 +556,24 @@ bool fake_predicate()
     return false;
 }
 
-unsigned const timeout_milliseconds=100;
-unsigned const timeout_grace=1;
-boost::posix_time::milliseconds const timeout_resolution(10);
-
+boost::chrono::milliseconds const delay(1000);
+boost::chrono::milliseconds const timeout_resolution(100);
 
 void test_wait_until_times_out()
 {
     hpx::lcos::local::condition_variable cond;
     hpx::lcos::local::spinlock m;
 
-    boost::posix_time::milliseconds const delay(timeout_milliseconds);
     boost::unique_lock<hpx::lcos::local::spinlock> lock(m);
-    boost::system_time const start=boost::get_system_time();
-    boost::system_time const timeout=start+delay;
+    boost::chrono::system_clock::time_point const start =
+        boost::chrono::system_clock::now();
+    boost::chrono::system_clock::time_point const timeout = start + delay;
 
-    while(cond.wait_until(lock,timeout) == hpx::lcos::local::cv_status::no_timeout) {}
+    while(cond.wait_until(lock, timeout) == hpx::lcos::local::cv_status::no_timeout) {}
 
-    boost::system_time const end=boost::get_system_time();
-    HPX_TEST((delay-timeout_resolution)<=(end-start));
+    boost::chrono::system_clock::time_point const end =
+        boost::chrono::system_clock::now();
+    HPX_TEST_LTE(delay - timeout_resolution, end - start);
 }
 
 void test_wait_until_with_predicate_times_out()
@@ -579,16 +581,17 @@ void test_wait_until_with_predicate_times_out()
     hpx::lcos::local::condition_variable cond;
     hpx::lcos::local::spinlock m;
 
-    boost::posix_time::milliseconds const delay(timeout_milliseconds);
     boost::unique_lock<hpx::lcos::local::spinlock> lock(m);
-    boost::system_time const start=boost::get_system_time();
-    boost::system_time const timeout=start+delay;
+    boost::chrono::system_clock::time_point const start = 
+        boost::chrono::system_clock::now();
+    boost::chrono::system_clock::time_point const timeout = start + delay;
 
-    bool const res=cond.wait_until(lock,timeout,fake_predicate);
+    bool const res = cond.wait_until(lock, timeout, fake_predicate);
 
-    boost::system_time const end=boost::get_system_time();
+    boost::chrono::system_clock::time_point const end =
+        boost::chrono::system_clock::now();
     HPX_TEST(!res);
-    HPX_TEST((delay-timeout_resolution)<=(end-start));
+    HPX_TEST_LTE(delay - timeout_resolution, end - start);
 }
 
 void test_relative_wait_until_with_predicate_times_out()
@@ -596,15 +599,16 @@ void test_relative_wait_until_with_predicate_times_out()
     hpx::lcos::local::condition_variable cond;
     hpx::lcos::local::spinlock m;
 
-    boost::posix_time::milliseconds const delay(timeout_milliseconds);
     boost::unique_lock<hpx::lcos::local::spinlock> lock(m);
-    boost::system_time const start=boost::get_system_time();
+    boost::chrono::system_clock::time_point const start = 
+        boost::chrono::system_clock::now();
 
-    bool const res=cond.wait_for(lock,delay,fake_predicate);
+    bool const res = cond.wait_for(lock, delay, fake_predicate);
 
-    boost::system_time const end=boost::get_system_time();
+    boost::chrono::system_clock::time_point const end = 
+        boost::chrono::system_clock::now();
     HPX_TEST(!res);
-    HPX_TEST((delay-timeout_resolution)<=(end-start));
+    HPX_TEST_LTE(delay - timeout_resolution, end - start);
 }
 
 void test_wait_until_relative_times_out()
@@ -612,14 +616,15 @@ void test_wait_until_relative_times_out()
     hpx::lcos::local::condition_variable cond;
     hpx::lcos::local::spinlock m;
 
-    boost::posix_time::milliseconds const delay(timeout_milliseconds);
     boost::unique_lock<hpx::lcos::local::spinlock> lock(m);
-    boost::system_time const start=boost::get_system_time();
+    boost::chrono::system_clock::time_point const start =
+        boost::chrono::system_clock::now();
 
-    while(cond.wait_for(lock,delay) == hpx::lcos::local::cv_status::no_timeout) {}
+    while(cond.wait_for(lock, delay) == hpx::lcos::local::cv_status::no_timeout) {}
 
-    boost::system_time const end=boost::get_system_time();
-    HPX_TEST((delay-timeout_resolution)<=(end-start));
+    boost::chrono::system_clock::time_point const end = 
+        boost::chrono::system_clock::now();
+    HPX_TEST_LTE(delay - timeout_resolution, end - start);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

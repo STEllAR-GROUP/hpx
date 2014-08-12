@@ -12,6 +12,7 @@
 #include <hpx/util/runtime_configuration.hpp>
 
 #include <boost/program_options.hpp>
+#include <boost/foreach.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -30,7 +31,10 @@ namespace hpx { namespace util
             num_threads_(1),
             num_cores_(1),
             num_localities_(1)
-        {}
+        {
+            BOOST_FOREACH(std::string const& e, ini_config)
+                rtcfg_.parse("<user supplied config>", e, true, false);
+        }
 
         int call(boost::program_options::options_description  const& desc_cmdline,
             int argc, char** argv);
@@ -48,8 +52,8 @@ namespace hpx { namespace util
         std::string queuing_;
 
     protected:
-        bool handle_arguments(util::manage_config& cfgmap, 
-            boost::program_options::variables_map& vm, 
+        bool handle_arguments(util::manage_config& cfgmap,
+            boost::program_options::variables_map& vm,
             std::vector<std::string>& ini_config, std::size_t& node);
 
         void store_command_line(int argc, char** argv);
@@ -65,6 +69,8 @@ namespace hpx { namespace util
     void handle_print_bind(boost::program_options::variables_map const& vm,
         std::size_t num_threads);
 #endif
+
+    void handle_list_parcelports();
 }}
 
 #endif

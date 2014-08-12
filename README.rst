@@ -338,8 +338,8 @@ and Technology (CCT) at Louisiana State University, and the Department of
 Computer Science 3 - Computer Architecture at the University of Erlangen Nuremberg 
 who fund and support our work. 
 We would also like to thank the following 
-organizations for granting us allocatons of thier compute resources: 
-LSU HPC, LONI, XSEDE and the Gauss Center for Supercomputing.
+organizations for granting us allocations of their compute resources: 
+LSU HPC, LONI, XSEDE, and the Gauss Center for Supercomputing.
 
 HPX is currently funded by:
 

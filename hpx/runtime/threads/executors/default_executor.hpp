@@ -15,10 +15,17 @@ namespace hpx { namespace threads { namespace executors
 {
     namespace detail
     {
-        class HPX_EXPORT default_executor 
+        class HPX_EXPORT default_executor
           : public threads::detail::scheduled_executor_base
         {
         public:
+            default_executor();
+
+            default_executor(thread_stacksize stacksize);
+
+            default_executor(thread_priority priority,
+                thread_stacksize stacksize, std::size_t os_thread);
+
             // Schedule the specified function for execution in this executor.
             // Depending on the subclass implementation, this may block in some
             // situations.
@@ -42,6 +49,16 @@ namespace hpx { namespace threads { namespace executors
 
             // Return an estimate of the number of waiting tasks.
             std::size_t num_pending_closures(error_code& ec) const;
+
+        protected:
+            // Return the requested policy element
+            std::size_t get_policy_element(
+                threads::detail::executor_parameter p, error_code& ec) const;
+
+        private:
+            thread_stacksize stacksize_;
+            thread_priority priority_;
+            std::size_t os_thread_;
         };
     }
 
@@ -50,6 +67,17 @@ namespace hpx { namespace threads { namespace executors
     {
         default_executor()
           : scheduled_executor(new detail::default_executor())
+        {}
+
+        default_executor(thread_stacksize stacksize)
+          : scheduled_executor(new detail::default_executor(stacksize))
+        {}
+
+        default_executor(thread_priority priority,
+                thread_stacksize stacksize = thread_stacksize_default,
+                std::size_t os_thread = std::size_t(-1))
+          : scheduled_executor(new detail::default_executor(
+                priority, stacksize, os_thread))
         {}
     };
 }}}

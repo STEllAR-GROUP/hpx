@@ -46,6 +46,84 @@ find_ids_from_basename                "" "hpx\.find_ids_from_basename.*"
 register_id_with_basename             "" "hpx\.register_id_with_basename.*"
 unregister_id_with_basename           "" "hpx\.unregister_id_with_basename.*"
 
+# hpx/parallel/execution_policy.hpp
+execution_policy                      "" "hpx\.parallel\.v1\.execution_policy.*"
+parallel_execution_policy             "" "hpx\.parallel\.v1\.parallel_exec.*"
+task_execution_policy                 "" "hpx\.parallel\.v1\.task_exec.*"
+sequential_execution_policy           "" "hpx\.parallel\.v1\.sequential_exec.*"
+vector_execution_policy               "" "hpx\.parallel\.v1\.vector_exec.*"
+is_execution_policy                   "" "hpx\.parallel\.v1\.is_execution_policy.*"
+is_parallel_execution_policy          "" "hpx\.parallel\.v1\.is_parallel_execution_policy.*"
+is_sequential_execution_policy        "" "hpx\.parallel\.v1\.is_sequential_execution_policy.*"
+
+
+# hpx/parallel/detail/all_any_none.hpp
+parallel::all_of                      "all_of" "hpx\.parallel\.v1\.all_of.*"
+parallel::any_of                      "any_of" "hpx\.parallel\.v1\.any_of.*"
+parallel::none_of                     "none_of" "hpx\.parallel\.v1\.none_of.*"
+
+# hpx/parallel/detail/copy.hpp
+parallel::copy                        "copy" "hpx\.parallel\.v1\.copy_id.*"
+parallel::copy_n                      "copy_n" "hpx\.parallel\.v1\.copy_n.*"
+
+# hpx/parallel/detail/count.hpp
+parallel::count                       "count" "hpx\.parallel\.v1\.count$.*"
+parallel::count_if                    "count_if" "hpx\.parallel\.v1\.count_if.*"
+
+# hpx/parallel/detail/equal.hpp
+parallel::equal                       "equal" "hpx\.parallel\.v1\.equal_id.*"
+
+# hpx/parallel/detail/fill.hpp
+parallel::fill                        "fill" "hpx\.parallel\.v1\.fill$"
+parallel::fill_n                      "fill_n" "hpx\.parallel\.v1\.fill_n.*"
+
+# hpx/parallel/detail/find.hpp
+parallel::find                        "find" "hpx\.parallel\.v1\.find$"
+parallel::find_if                     "find_if" "hpx\.parallel\.v1\.find_if$"
+parallel::find_if_not                 "find_if_not" "hpx\.parallel\.v1\.find_if_not.*"
+parallel::find_end                    "find_end" "hpx\.parallel\.v1\.find_end_id.*"
+
+# hpx/parallel/detail/for_each.hpp
+parallel::for_each                    "for_each" "hpx\.parallel\.v1\.for_each$"
+parallel::for_each_n                  "for_each_n" "hpx\.parallel\.v1\.for_each_n.*"
+
+# hpx/parallel/detail/generate.hpp
+parallel::generate                    "generate" "hpx\.parallel\.v1\.generate$"
+parallel::generate_n                  "generate_n" "hpx\.parallel\.v1\.generate_n.*"
+
+# hpx/parallel/detail/mismatch.hpp
+parallel::mismatch                    "mismatch" "hpx\.parallel\.v1\.mismatch_id.*"
+
+# hpx/parallel/detail/move.hpp
+parallel::move                        "move" "hpx\.parallel\.v1\.move$"
+
+# hpx/parallel/detail/reduce.hpp
+parallel::reduce                      "reduce" "hpx\.parallel\.v1\.reduce.*"
+
+# hpx/parallel/detail/reverse.hpp
+parallel::reverse                     "reverse" "hpx\.parallel\.v1\.reverse$"
+parallel::reverse_copy                "reverse_copy" "hpx\.parallel\.v1\.reverse_copy.*"
+
+# hpx/parallel/detail/rotate.hpp
+parallel::rotate                      "rotate" "hpx\.parallel\.v1\.rotate"
+parallel::rotate_copy                 "rotate_copy" "hpx\.parallel\.v1\.rotate_copy.*"
+
+# hpx/parallel/detail/swap_ranges.hpp
+parallel::swap_ranges                 "swap_ranges" "hpx\.parallel\.v1\.swap_ranges.*"
+
+# hpx/parallel/detail/task_region.hpp
+parallel::task_region                 "task_region" "hpx\.parallel\.v2\.task_region_id.*"
+parallel::task_region_final           "task_region_final" "hpx\.parallel\.v2\.task_region_final.*"
+parallel::task_region_handle          "task_region_handle" "hpx\.parallel\.v2\.task_region_handle.*"
+parallel::task_canceled_exception     "task_canceled_exception" "hpx\.parallel\.v2\.task_canceled_exception.*"
+
+# hpx/parallel/detail/transform.hpp
+parallel::transform                   "transform" "hpx\.parallel\.v1\.transform.*"
+
+# hpx/parallel/detail/transform_reduce.hpp
+parallel::transform_reduce            "transform_reduce" "hpx\.parallel\.v1\.transform_reduce.*"
+
+
 # hpx/runtime/components/new.hpp
 new_                                  "" "hpx\.components\.new_.*"
 new_colocated                         "" "hpx\.components\.new_colocated.*"

@@ -19,13 +19,13 @@ void test_make_ready_future()
 
     hpx::future<int&> f_at =
         hpx::make_ready_future_at(
-            boost::get_system_time() + boost::posix_time::seconds(1)
+            boost::chrono::system_clock::now() + boost::chrono::seconds(1)
           , boost::ref(global));
     HPX_TEST(&f_at.get() == &global);
     
     hpx::future<int&> f_after =
         hpx::make_ready_future_after(
-            boost::posix_time::seconds(1)
+            boost::chrono::seconds(1)
           , boost::ref(global));
     HPX_TEST(&f_after.get() == &global);
 }

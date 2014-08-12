@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,7 +11,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/wait_n.hpp>
+#include <hpx/lcos/wait_some.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
@@ -52,7 +52,7 @@ namespace hpx { namespace lcos
     void wait_all(std::vector<Future> const& lazy_values,
         error_code& ec = throws)
     {
-        return lcos::wait_n(
+        return lcos::wait_some(
             lazy_values.size(), lazy_values, ec);
     }
 
@@ -90,16 +90,23 @@ namespace hpx { namespace lcos
         std::transform(begin, end, std::back_inserter(lazy_values_),
             detail::wait_get_shared_state<future_type>());
 
-        boost::shared_ptr<detail::wait_n<result_type> > f =
-            boost::make_shared<detail::wait_n<result_type> >(
+        boost::shared_ptr<detail::wait_some<result_type> > f =
+            boost::make_shared<detail::wait_some<result_type> >(
                 std::move(lazy_values_), lazy_values_.size());
 
         return (*f.get())();
     }
 
+    template <typename Iterator>
+    Iterator wait_all_n(Iterator begin, std::size_t count,
+        error_code& ec = throws)
+    {
+        return wait_some_n(count, begin, count, ec);
+    }
+
     inline void wait_all(error_code& ec = throws)
     {
-        return lcos::wait_n(0, ec);
+        return lcos::wait_some(0, ec);
     }
 }}
 
@@ -125,6 +132,7 @@ namespace hpx { namespace lcos
 namespace hpx
 {
     using lcos::wait_all;
+    using lcos::wait_all_n;
 }
 
 #endif
@@ -140,7 +148,7 @@ namespace hpx { namespace lcos
     template <BOOST_PP_ENUM_PARAMS(N, typename T)>
     void wait_all(HPX_ENUM_FWD_ARGS(N, T, f), error_code& ec = throws)
     {
-        return lcos::wait_n(N, HPX_ENUM_FORWARD_ARGS(N, T, f), ec);
+        return lcos::wait_some(N, HPX_ENUM_FORWARD_ARGS(N, T, f), ec);
     }
 }}
 

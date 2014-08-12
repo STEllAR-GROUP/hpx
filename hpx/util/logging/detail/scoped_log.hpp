@@ -66,7 +66,7 @@ namespace detail {
         when doing scoped logging, we use this as a trick to find out if a logger is enabled.
         That is, we want to do the overhead of gathering the message to happen only if logging is enabled
     */
-    template<class ostream_type = std::basic_ostringstream<char_type> , class gather_msg = default_ > struct scoped_logger {
+    template<class ostream_type = std::basic_ostringstream<char_type> , class gather_msg = default_ > struct scoped_logger { //-V690
 
         typedef scoped_gather_base<gather_msg> scoped_gather;
         scoped_logger(scoped_gather & do_gather) : m_gather(do_gather) {}

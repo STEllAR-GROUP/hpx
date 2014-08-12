@@ -25,7 +25,7 @@ struct spinlock : boost::noncopyable
     boost::detail::spinlock m;
 
   public:
-    spinlock()
+    spinlock(char const* /*desc*/ = 0)
     {
         HPX_ITT_SYNC_CREATE(this, "util::spinlock", "");
 

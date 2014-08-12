@@ -6,7 +6,7 @@
 
 #include <hpx/runtime.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/lcos/future_wait.hpp>
+#include <hpx/lcos/wait_each.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
@@ -20,7 +20,7 @@
 #include <boost/format.hpp>
 #include <boost/bind.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/date_time/posix_time/posix_time_duration.hpp>
+#include <boost/chrono/duration.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -37,7 +37,7 @@ using hpx::actions::plain_result_action1;
 
 using hpx::lcos::future;
 using hpx::async;
-using hpx::lcos::wait;
+using hpx::lcos::wait_each;
 
 using hpx::util::high_resolution_timer;
 
@@ -98,7 +98,7 @@ namespace test
                 /*
                 if (hpx::threads::get_self_ptr())
                 {
-                    hpx::this_thread::suspend(boost::posix_time::microseconds(1));
+                    hpx::this_thread::suspend(boost::chrono::microseconds(1));
                 }
                 else
                 */
@@ -247,7 +247,8 @@ int hpx_main(
                 for (boost::uint64_t i = 0; i < count; ++i)
                     futures.push_back(async<null_action>(here, i));
 
-                wait(futures, [&] (std::size_t, double r) { global_scratch += r; });
+                wait_each(futures, hpx::util::unwrapped(
+                    [] (double r) { global_scratch += r; }));
 
                 // stop the clock
                 const double duration = walltime.elapsed();
@@ -315,4 +316,3 @@ int main(
     // Initialize and run HPX.
     return init(cmdline, argc, argv);
 }
-

@@ -14,6 +14,9 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
+#if defined(HPX_HAVE_SECURITY)
+#include <hpx/lcos/local/spinlock.hpp>
+#endif
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -307,6 +310,9 @@ namespace hpx
         void reset_active_counters(error_code& ec = throws);
         void evaluate_active_counters(bool reset = false,
             char const* description = 0, error_code& ec = throws);
+
+        // stop periodic evaluation of counters during shutdown
+        void stop_evaluating_counters();
 
         parcelset::policies::message_handler* create_message_handler(
             char const* message_handler_type, char const* action,

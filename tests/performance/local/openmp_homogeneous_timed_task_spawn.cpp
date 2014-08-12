@@ -97,7 +97,7 @@ int omp_main(
     {
         for (boost::uint64_t i = 0; i < tasks; ++i)
             #pragma omp task untied
-            worker_timed(delay);
+            worker_timed(delay * 1000);
 
         // Yield until all work is done.
         #pragma omp taskwait

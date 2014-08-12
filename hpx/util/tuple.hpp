@@ -81,7 +81,7 @@ namespace hpx { namespace util
     {
         ///////////////////////////////////////////////////////////////////////
         template <typename T, typename Enable = void>
-        struct tuple_member
+        struct tuple_member //-V690
         {
         public: // exposition-only
             T _value;

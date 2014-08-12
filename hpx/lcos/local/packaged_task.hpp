@@ -157,10 +157,7 @@ namespace hpx { namespace lcos { namespace local
         {}
 
         ~futures_factory()
-        {
-            if (task_ && !future_obtained_)
-                task_->deleting_owner();
-        }
+        {}
 
         futures_factory(futures_factory && rhs)
           : task_(std::move(rhs.task_)),
@@ -173,9 +170,6 @@ namespace hpx { namespace lcos { namespace local
         futures_factory& operator=(futures_factory && rhs)
         {
             if (this != &rhs) {
-                if (task_ && !future_obtained_)
-                    task_->deleting_owner();
-
                 task_ = std::move(rhs.task_);
                 future_obtained_ = rhs.future_obtained_;
 
@@ -199,6 +193,7 @@ namespace hpx { namespace lcos { namespace local
 
         // asynchronous execution
         void apply(
+            BOOST_SCOPED_ENUM(launch) policy = launch::async,
             threads::thread_priority priority = threads::thread_priority_default,
             threads::thread_stacksize stacksize = threads::thread_stacksize_default,
             error_code& ec = throws) const
@@ -209,7 +204,7 @@ namespace hpx { namespace lcos { namespace local
                     "futures_factory invalid (has it been moved?)");
                 return;
             }
-            task_->apply(priority, stacksize, ec);
+            task_->apply(policy, priority, stacksize, ec);
         }
 
         // Result retrieval

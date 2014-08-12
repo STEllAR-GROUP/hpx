@@ -118,12 +118,14 @@ set(sizeof_FLAGS DEPENDENCIES iostreams_component)
 
 if(HPX_HAVE_CXX11_LAMBDAS)
   set(benchmarks ${benchmarks}
+      foreach_scaling
       spinlock_overhead1
       spinlock_overhead2
      )
 
   set(spinlock_overhead1_FLAGS DEPENDENCIES iostreams_component)
   set(spinlock_overhead2_FLAGS DEPENDENCIES iostreams_component)
+  set(foreach_scaling_FLAGS DEPENDENCIES iostreams_component)
 endif()
 
 

@@ -91,10 +91,7 @@ struct channel
     }
 
     ~channel()
-    {
-        if (data_)
-            data_->deleting_owner();
-    }
+    {}
 
     channel& operator=(channel const & other)
     {
@@ -102,8 +99,6 @@ struct channel
 
         if (this != &other)
         {
-            data_->deleting_owner();
-
             data_ = other.data_;
         }
 
@@ -116,8 +111,6 @@ struct channel
 
         if (this != &other)
         {
-            data_->deleting_owner();
-
             data_ = std::move(other.data_);
             other.data_.reset();
         }
@@ -133,8 +126,6 @@ struct channel
     void reset()
     {
         HPX_ASSERT(data_);
-
-        data_->deleting_owner();
 
         data_->reset();
    }
@@ -216,10 +207,7 @@ struct channel<void>
     channel(channel && other) : data_(std::move(other.data_)) {}
 
     ~channel()
-    {
-        if (data_)
-            data_->deleting_owner();
-    }
+    {}
 
     channel& operator=(channel const & other)
     {
@@ -227,8 +215,6 @@ struct channel<void>
 
         if (this != &other)
         {
-            data_->deleting_owner();
-
             data_ = other.data_;
         }
 
@@ -241,8 +227,6 @@ struct channel<void>
 
         if (this != &other)
         {
-            data_->deleting_owner();
-
             data_ = std::move(other.data_);
             other.data_.reset();
         }
@@ -258,8 +242,6 @@ struct channel<void>
     void reset()
     {
         HPX_ASSERT(data_);
-
-        data_->deleting_owner();
 
         data_->reset();
    }

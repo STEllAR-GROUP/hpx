@@ -12,7 +12,7 @@ namespace hpx
 {
     namespace detail
     {
-        std::string indent_message(char const* msg_)
+        std::string indent_message(std::string const& msg_)
         {
             std::string result;
             std::string msg(msg_);
@@ -39,28 +39,30 @@ namespace hpx
 
     error_code throws;        // "throw on error" special error_code;
                               //
-                              // Note that it doesn't matter if this isn't 
-                              // initialized before use since the only use is 
+                              // Note that it doesn't matter if this isn't
+                              // initialized before use since the only use is
                               // to take its address for comparison purposes.
 
     exception_list::exception_list()
+      : hpx::exception(hpx::success)
     {}
 
-    exception_list::exception_list(boost::system::system_error const& e)
+    exception_list::exception_list(boost::exception_ptr const& e)
+      : hpx::exception(hpx::get_error(e))
     {
         add(e);
     }
 
-    void exception_list::add(boost::system::system_error const& e)
-    {
-        exceptions_.push_back(e);
-    }
+    exception_list::exception_list(exception_list_type && l)
+      : hpx::exception(l.size() ? hpx::get_error(l.front()) : success)
+      , exceptions_(std::move(l))
+    {}
 
     boost::system::error_code exception_list::get_error() const
     {
         if (exceptions_.empty())
             return hpx::no_success;
-        return exceptions_.front().code();
+        return hpx::get_error(exceptions_.front());
     }
 
     std::string exception_list::get_message() const
@@ -69,7 +71,7 @@ namespace hpx
             return "";
 
         if (1 == exceptions_.size())
-            return exceptions_.front().what();
+            return hpx::get_error_what(exceptions_.front());
 
         std::string result("\n");
 
@@ -77,15 +79,10 @@ namespace hpx
         exception_list_type::const_iterator it = exceptions_.begin();
         for (/**/; it != end; ++it) {
             result += "  ";
-            result += detail::indent_message((*it).what());
+            result += detail::indent_message(hpx::get_error_what(*it));
             if (result.find_last_of("\n") < result.size()-1)
                 result += "\n";
         }
         return result;
-    }
-
-    std::size_t exception_list::get_error_count() const
-    {
-        return exceptions_.size();
     }
 }

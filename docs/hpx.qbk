@@ -7,7 +7,7 @@
 ===============================================================================/]
 
 [article HPX
-    [quickbook 1.6]
+    [quickbook 1.7]
     [id hpx]
     [authors [STE||AR Group, The]]
     [version 0.9.9]
@@ -118,8 +118,10 @@
 
 [def __cpp11__                  [@http://www.open-std.org/jtc1/sc22/wg21 C++11 Standard]]
 [def __cpp11_n3632__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3632.html N3632]]
-[def __cpp11_n3634__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3634.pdf N3634]]
+[def __cpp11_n3634__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3857.pdf N3857]]
 [def __cpp11_n3562__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3562.pdf N3562]]
+[def __cpp11_n4071__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4071.htm N4071]]
+[def __cpp11_n4088__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4088.pdf N4088ppl]]
 
 
 [def __ini_file_format__        [@http://en.wikipedia.org/wiki/INI_file Windows INI file format]]
@@ -161,6 +163,7 @@
 [def __fibonacci_example__      [link hpx.tutorial.examples.fibonacci Fibonacci Example]]
 [def __hello_world_example__    [link hpx.tutorial.examples.hello_world Hello World Example]]
 [def __accumulator_example__    [link hpx.tutorial.examples.accumulator Accumulator Example]]
+[def __futurization_example__   [link hpx.tutorial.futurization_example Futurization Example]]
 
 [def __people__                 [link hpx.people People]]
 [def __getting_started__        [link hpx.tutorial.getting_started Getting Started]]
@@ -279,7 +282,7 @@ __boost_auto_index__ can be found in the collection of __boost_tools__.
 [include tutorial/gettingstarted.qbk]
 [include tutorial/introduction.qbk]
 [include tutorial/examples.qbk]
-
+[include tutorial/futurization_example.qbk]
 [endsect] [/ Tutorial]
 
 [/////////////////////////////////////////////////////////////////////////////]
@@ -303,6 +306,7 @@ __boost_auto_index__ can be found in the collection of __boost_tools__.
 [include manual/plain_actions.qbk]
 [include manual/components.qbk]
 [include manual/lcos.qbk]
+[include manual/parallel_algorithms.qbk]
 [include manual/exceptions.qbk]
 [include manual/performance_counters.qbk]
 [include manual/scheduling_policies.qbk]

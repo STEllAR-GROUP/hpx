@@ -59,6 +59,11 @@ namespace detail
 
         virtual ~future_data_refcnt_base() {}
 
+        virtual bool requires_delete()
+        {
+            return 0 == --count_;
+        }
+
     protected:
         future_data_refcnt_base() : count_(0) {}
 
@@ -76,7 +81,7 @@ namespace detail
     }
     inline void intrusive_ptr_release(future_data_refcnt_base* p)
     {
-        if (0 == --p->count_)
+        if (p->requires_delete())
             delete p;
     }
 
@@ -142,8 +147,6 @@ namespace detail
         future_data()
           : data_(), state_(empty)
         {}
-
-        virtual void deleting_owner() {}
 
         // cancellation is disabled by default
         virtual bool cancelable() const
@@ -341,6 +344,8 @@ namespace detail
             if (state_ == empty) {
                 cond_.wait(l, "future_data::wait", ec);
                 if (ec) return;
+
+                HPX_ASSERT(state_ != empty);
             }
 
             if (&ec != &throws)
@@ -353,19 +358,23 @@ namespace detail
             typename mutex_type::scoped_lock l(mtx_);
 
             // block if this entry is empty
-            if (state_ == empty) {
+            if (state_ == empty && p > boost::posix_time::seconds(0)) {
                 threads::thread_state_ex_enum const reason =
                     cond_.wait_for(l, p, "future_data::wait_for", ec);
                 if (ec) return future_status::uninitialized;
 
-                return (reason == threads::wait_signaled) ?
-                    future_status::timeout : future_status::ready; //-V110
+                if (reason == threads::wait_signaled)
+                    return future_status::timeout;
+
+                HPX_ASSERT(state_ != empty);
+                return future_status::ready;
             }
 
             if (&ec != &throws)
                 ec = make_success_code();
 
-            return future_status::ready; //-V110
+            return is_ready_locked() ?
+                future_status::ready : future_status::timeout; //-V110
         }
 
         virtual BOOST_SCOPED_ENUM(future_status)
@@ -379,8 +388,11 @@ namespace detail
                     cond_.wait_until(l, at, "future_data::wait_until", ec);
                 if (ec) return future_status::uninitialized;
 
-                return (reason == threads::wait_signaled) ?
-                    future_status::timeout : future_status::ready; //-V110
+                if (reason == threads::wait_signaled)
+                    return future_status::timeout;
+
+                HPX_ASSERT(state_ != empty);
+                return future_status::ready;
             }
 
             if (&ec != &throws)
@@ -412,12 +424,6 @@ namespace detail
         {
             typename mutex_type::scoped_lock l(mtx_);
             return state_ != empty && data_.stores_error();
-        }
-
-        BOOST_SCOPED_ENUM(future_status) get_status() const
-        {
-            typename mutex_type::scoped_lock l(mtx_);
-            return state_ != empty ? future_status::ready : future_status::deferred; //-V110
         }
 
     protected:
@@ -469,8 +475,8 @@ namespace detail
 
             error_code ec;
             threads::thread_id_type id = threads::register_thread_nullary(
-                HPX_STD_BIND(&timed_future_data::set_data, this_,
-                    std::forward<Result_>(init)),
+                util::bind(util::one_shot(&timed_future_data::set_data),
+                    this_, std::forward<Result_>(init)),
                 "timed_future_data<Result>::timed_future_data",
                 threads::suspended, true, threads::thread_priority_normal,
                 std::size_t(-1), threads::thread_stacksize_default, ec);
@@ -481,7 +487,7 @@ namespace detail
 
             // start new thread at given point in time
             threads::set_thread_state(id, tpoint, threads::pending,
-                threads::wait_timeout, threads::thread_priority_critical, ec);
+                threads::wait_timeout, threads::thread_priority_boost, ec);
             if (ec) {
                 // thread scheduling failed, report error to the new future
                 this->base_type::set_exception(hpx::detail::access_exception(ec));
@@ -518,7 +524,8 @@ namespace detail
         {}
 
         task_base(threads::executor& sched)
-          : started_(false), id_(threads::invalid_thread_id), sched_(&sched)
+          : started_(false), id_(threads::invalid_thread_id),
+            sched_(sched ? &sched : 0)
         {}
 
         // retrieving the value
@@ -539,18 +546,30 @@ namespace detail
         }
 
         virtual BOOST_SCOPED_ENUM(future_status)
-        wait_for(boost::posix_time::time_duration const& /*p*/, error_code& /*ec*/ = throws)
+        wait_for(boost::posix_time::time_duration const& p, error_code& ec = throws)
         {
-            return future_status::deferred; //-V110
+            if (!started_test())
+                return future_status::deferred; //-V110
+            else
+                return this->future_data<Result>::wait_for(p, ec);
         }
 
         virtual BOOST_SCOPED_ENUM(future_status)
-        wait_until(boost::posix_time::ptime const& /*at*/, error_code& /*ec*/ = throws)
+        wait_until(boost::posix_time::ptime const& at, error_code& ec = throws)
         {
-            return future_status::deferred; //-V110
+            if (!started_test())
+                return future_status::deferred; //-V110
+            else
+                return this->future_data<Result>::wait_until(at, ec);
         };
 
     private:
+        bool started_test() const
+        {
+            typename mutex_type::scoped_lock l(this->mtx_);
+            return started_;
+        }
+
         bool started_test_and_set()
         {
             typename mutex_type::scoped_lock l(this->mtx_);
@@ -582,7 +601,8 @@ namespace detail
         }
 
         // run in a separate thread
-        void apply(threads::thread_priority priority,
+        void apply(BOOST_SCOPED_ENUM(launch) policy,
+            threads::thread_priority priority,
             threads::thread_stacksize stacksize, error_code& ec)
         {
             check_started();
@@ -593,13 +613,20 @@ namespace detail
                 hpx::threads::get_self_id());
 
             if (sched_) {
-                sched_->add(HPX_STD_BIND(&task_base::run_impl, this_),
+                sched_->add(util::bind(&task_base::run_impl, this_),
                     desc ? desc : "task_base::apply", threads::pending, false,
+                    stacksize, ec);
+            }
+            else if (policy == launch::fork) {
+                threads::register_thread_plain(
+                    util::bind(&task_base::run_impl, this_),
+                    desc ? desc : "task_base::apply", threads::pending, false,
+                    threads::thread_priority_boost, get_worker_thread_num(),
                     stacksize, ec);
             }
             else {
                 threads::register_thread_plain(
-                    HPX_STD_BIND(&task_base::run_impl, this_),
+                    util::bind(&task_base::run_impl, this_),
                     desc ? desc : "task_base::apply", threads::pending, false,
                     priority, std::size_t(-1), stacksize, ec);
             }
@@ -629,17 +656,6 @@ namespace detail
         }
 
     public:
-        void deleting_owner()
-        {
-            typename mutex_type::scoped_lock l(this->mtx_);
-            if (!started_) {
-                started_ = true;
-                l.unlock();
-                this->set_error(broken_task, "task_base::deleting_owner",
-                    "deleting task owner before future has become ready");
-            }
-        }
-
         template <typename T>
         void set_data(T && result)
         {

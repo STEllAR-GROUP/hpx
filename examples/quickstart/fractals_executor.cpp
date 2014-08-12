@@ -56,7 +56,7 @@ int hpx_main()
 
         int const max_iteration = 255;
 
-        vector<future<int>> iteration;
+        vector<future<int> > iteration;
         iteration.reserve(sizeX*sizeY);
 
         hpx::cout << "Initial setup completed in " 

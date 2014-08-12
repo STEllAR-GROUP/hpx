@@ -130,11 +130,11 @@ void test_server1<ComponentBase>::test()
 
 void ensure_garbage_collect()
 {
-    hpx::this_thread::sleep_for(boost::posix_time::millisec(500));
+    hpx::this_thread::sleep_for(boost::chrono::milliseconds(500));
     hpx::agas::garbage_collect();
-    hpx::this_thread::sleep_for(boost::posix_time::millisec(500));
+    hpx::this_thread::sleep_for(boost::chrono::milliseconds(500));
     hpx::agas::garbage_collect();
-    hpx::this_thread::sleep_for(boost::posix_time::millisec(500));
+    hpx::this_thread::sleep_for(boost::chrono::milliseconds(500));
     hpx::agas::garbage_collect();
 }
 

@@ -32,15 +32,77 @@ inline std::size_t idx(std::size_t i, std::size_t size)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Use a special allocator for the partition data to remove a major contention
+// point - the constant allocation and deallocation of the data arrays.
+template <typename T>
+struct partition_allocator
+{
+private:
+    typedef hpx::lcos::local::spinlock mutex_type;
+
+public:
+    partition_allocator(std::size_t max_size = std::size_t(-1))
+      : max_size_(max_size)
+    {
+    }
+
+    ~partition_allocator()
+    {
+        mutex_type::scoped_lock l(mtx_);
+        while (!heap_.empty())
+        {
+            T* p = heap_.top();
+            heap_.pop();
+            delete [] p;
+        }
+    }
+
+    T* allocate(std::size_t n)
+    {
+        mutex_type::scoped_lock l(mtx_);
+        if (heap_.empty())
+            return new T[n];
+
+        T* next = heap_.top();
+        heap_.pop();
+        return next;
+    }
+
+    void deallocate(T* p)
+    {
+        mutex_type::scoped_lock l(mtx_);
+        if (max_size_ == std::atomic_size_t(-1) || heap_.size() < max_size_)
+            heap_.push(p);
+        else
+            delete [] p;
+    }
+
+private:
+    mutex_type mtx_;
+    std::size_t max_size_;
+    std::stack<T*> heap_;
+};
+
+///////////////////////////////////////////////////////////////////////////////
 // Our partition data type
 struct partition_data
 {
+private:
+    static partition_allocator<double> alloc_;
+
+    static void deallocate(double* p)
+    {
+        alloc_.deallocate(p);
+    }
+
+public:
     partition_data(std::size_t size)
-      : data_(new double [size]), size_(size)
+      : data_(alloc_.allocate(size), &partition_data::deallocate), size_(size)
     {}
 
     partition_data(std::size_t size, double initial_value)
-      : data_(new double [size]), size_(size)
+      : data_(alloc_.allocate(size), &partition_data::deallocate),
+        size_(size)
     {
         double base_value = double(initial_value * size);
         for (std::size_t i = 0; i != size; ++i)
@@ -56,6 +118,8 @@ private:
     boost::shared_array<double> data_;
     std::size_t size_;
 };
+
+partition_allocator<double> partition_data::alloc_;
 
 std::ostream& operator<<(std::ostream& os, partition_data const& c)
 {
@@ -159,20 +223,18 @@ int hpx_main(boost::program_options::variables_map& vm)
     // Execute nt time steps on nx grid points and print the final solution.
     hpx::future<stepper::space> result = step.do_work(np, nx, nt);
 
-    // Print the final solution
     stepper::space solution = result.get();
+    hpx::wait_all(solution);
+
+    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+
+    // Print the final solution
     if (vm.count("results"))
     {
         for (std::size_t i = 0; i != np; ++i)
             std::cout << "U[" << i << "] = " << solution[i].get() << std::endl;
     }
-    else
-    {
-        hpx::wait_all(solution);
-    }
 
-    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
-    
     boost::uint64_t const os_thread_count = hpx::get_os_thread_count();
     print_time_results(os_thread_count, elapsed, nx, np, nt, header);
 

@@ -61,7 +61,7 @@ extern "C" void worker_func(
     void*
     )
 {
-    worker_timed(delay);
+    worker_timed(delay * 1000);
 
     swarm_satisfy(&flag, 1);
 }

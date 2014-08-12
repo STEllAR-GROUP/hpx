@@ -70,7 +70,7 @@
 
 #define USE_CLEANING_THREAD
 
-std::vector<std::vector<hpx::future<int>>> ActiveFutures;
+std::vector<std::vector<hpx::future<int> > > ActiveFutures;
 boost::array<boost::atomic<int>, 64>       FuturesWaiting;
 
 #ifdef USE_CLEANING_THREAD
@@ -328,8 +328,8 @@ int RemoveCompletions()
     {
         {
             hpx::lcos::local::spinlock::scoped_lock lk(FuturesMutex);
-            for(std::vector<hpx::future<int>> &futvec : ActiveFutures) {
-                for(std::vector<hpx::future<int>>::iterator fut = futvec.begin();
+            for(std::vector<hpx::future<int> > &futvec : ActiveFutures) {
+                for(std::vector<hpx::future<int> >::iterator fut = futvec.begin();
                     fut != futvec.end(); /**/)
                 {
                     if(fut->is_ready()){
@@ -345,7 +345,7 @@ int RemoveCompletions()
                 }
             }
         }
-        hpx::this_thread::suspend(boost::posix_time::microseconds(10));
+        hpx::this_thread::suspend(boost::chrono::microseconds(10));
     }
     return num_removed;
 }
@@ -353,10 +353,10 @@ int RemoveCompletions()
 
 //----------------------------------------------------------------------------
 // Take a vector of futures representing pass/fail and reduce to a single pass fail
-int reduce(hpx::future<std::vector<hpx::future<int>>> futvec)
+int reduce(hpx::future<std::vector<hpx::future<int> > > futvec)
 {
     int res = TEST_SUCCESS;
-    std::vector<hpx::future<int>> vfs = futvec.get();
+    std::vector<hpx::future<int> > vfs = futvec.get();
     for(hpx::future<int>& f : vfs) {
         if(f.get() == TEST_FAIL) return TEST_FAIL;
     }
@@ -484,7 +484,7 @@ void test_write(
 #endif
         //
         hpx::util::high_resolution_timer movetimer;
-        std::vector<hpx::future<int>> final_list;
+        std::vector<hpx::future<int> > final_list;
         for(uint64_t i = 0; i < nranks; i++) {
             // move the contents of intermediate vector into final list
             final_list.reserve(final_list.size() + ActiveFutures[i].size());
@@ -593,8 +593,9 @@ void test_read(
             else {
               send_rank = static_cast<int>(i % nranks);
             }
+
             // get the pointer to the current packet send buffer
-            char *buffer = &local_storage[i*options.transfer_size_B];
+//            char *buffer = &local_storage[i*options.transfer_size_B];
 
             // Get the HPX locality from the dest rank
             hpx::id_type locality = hpx::naming::get_id_from_locality_id(send_rank);
@@ -653,7 +654,7 @@ void test_read(
 #endif
         //
         hpx::util::high_resolution_timer movetimer;
-        std::vector<hpx::future<int>> final_list;
+        std::vector<hpx::future<int> > final_list;
         for(uint64_t i = 0; i < nranks; i++) {
             // move the contents of intermediate vector into final list
             final_list.reserve(final_list.size() + ActiveFutures[i].size());
@@ -771,7 +772,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     ActiveFutures.reserve(nranks);
     for(uint64_t i = 0; i < nranks; i++) {
         FuturesWaiting[i].store(0);
-        ActiveFutures.push_back(std::vector<hpx::future<int>>());
+        ActiveFutures.push_back(std::vector<hpx::future<int> >());
     }
 
     test_write(rank, nranks, num_transfer_slots, gen, random_rank, random_slot, options);

@@ -221,9 +221,9 @@ namespace hpx { namespace parcelset
         ///                 id (if not already set).
         BOOST_FORCEINLINE void put_parcel(parcel& p)
         {
-            using HPX_STD_PLACEHOLDERS::_1;
-            using HPX_STD_PLACEHOLDERS::_2;
-            put_parcel(p, HPX_STD_BIND(&parcelhandler::default_write_handler,
+            using util::placeholders::_1;
+            using util::placeholders::_2;
+            put_parcel(p, util::bind(&parcelhandler::default_write_handler,
                 this, _1, _2));
         }
 
@@ -453,6 +453,10 @@ namespace hpx { namespace parcelset
 
         boost::int64_t get_connection_cache_statistics(connection_type pp_type,
             parcelport::connection_cache_statistics_type stat_type, bool) const;
+
+        static void list_parcelports(util::osstream& strm);
+        static void list_parcelport(util::osstream& strm, connection_type t,
+            bool available = true);
 
     protected:
         std::size_t get_incoming_queue_length(bool /*reset*/) const

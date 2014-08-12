@@ -51,20 +51,20 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
         hpx::apply_c_cb<action_type>(this->get_gid(), gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
-        hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+        hpx::apply_c_cb<action_type>(this->get_gid(), std::move(addr), gid,
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
@@ -75,21 +75,22 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
         hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
         naming::id_type const& gid, threads::thread_priority priority,
         HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
-        hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
-                HPX_STD_PLACEHOLDERS::_1),
+        hpx::apply_c_p_cb<action_type>(this->get_gid(), std::move(addr),
+            gid, priority,
+            util::bind(&packaged_action::parcel_write_handler,
+                this->impl_, util::placeholders::_1),
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 

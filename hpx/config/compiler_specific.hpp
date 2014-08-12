@@ -52,5 +52,9 @@
 #  endif
 #endif
 
+#if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION == 1400
+#   define HPX_INTEL14_WORKAROUND
+#endif
+
 #endif
 

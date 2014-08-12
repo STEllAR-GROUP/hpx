@@ -86,7 +86,7 @@ struct worker_func : tbb::task
 {
     tbb::task* execute()
     {
-        worker_timed(delay);
+        worker_timed(delay * 1000);
         return 0;
     }
 };

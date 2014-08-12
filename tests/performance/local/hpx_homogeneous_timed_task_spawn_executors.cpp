@@ -111,13 +111,16 @@ int hpx_main(
         if (0 == vm.count("no-stack")) {
             // schedule normal threads
             for (boost::uint64_t i = 0; i < tasks; ++i)
-                executors[i % num_executors].add(HPX_STD_BIND(&worker_timed, delay));
+                executors[i % num_executors].add(
+                    hpx::util::bind(&worker_timed, delay * 1000));
         }
         else {
             // schedule stackless threads
             for (boost::uint64_t i = 0; i < tasks; ++i)
-                executors[i % num_executors].add(HPX_STD_BIND(&worker_timed, delay),
-                    "", hpx::threads::pending, true, hpx::threads::thread_stacksize_nostack);
+                executors[i % num_executors].add(
+                    hpx::util::bind(&worker_timed, delay * 1000),
+                    "", hpx::threads::pending, true,
+                    hpx::threads::thread_stacksize_nostack);
         }
 
     // destructors of executors will wait for all tasks to finish executing

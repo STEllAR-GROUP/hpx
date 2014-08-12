@@ -8,8 +8,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/date_time_chrono.hpp>
+#include <hpx/util/unique_function.hpp>
 #include <hpx/util/safe_bool.hpp>
-#include <hpx/util/detail/unique_function.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
@@ -76,9 +76,7 @@ namespace hpx { namespace threads
         class executor_base
         {
         public:
-            typedef
-                util::detail::unique_function<void(), void, void>
-                closure_type;
+            typedef util::unique_function_nonser<void()> closure_type;
 
             executor_base() : count_(0) {}
             virtual ~executor_base() {}
@@ -94,6 +92,10 @@ namespace hpx { namespace threads
 
             // Return an estimate of the number of waiting closures.
             virtual std::size_t num_pending_closures(error_code& ec) const = 0;
+
+            // Return the requested policy element
+            virtual std::size_t get_policy_element(
+                threads::detail::executor_parameter p, error_code& ec) const = 0;
 
         private:
             // reference counting
@@ -148,6 +150,8 @@ namespace hpx { namespace threads
     //
     class HPX_EXPORT executor
     {
+        friend std::size_t hpx::get_os_thread_count(threads::executor& exec);
+
     protected:
         // generic executors can't be created directly
         executor(detail::executor_base* data)

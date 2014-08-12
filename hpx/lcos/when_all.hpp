@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,7 +11,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/when_n.hpp>
+#include <hpx/lcos/when_some.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
@@ -58,7 +58,7 @@ namespace hpx { namespace lcos
         if (lazy_values.empty())
             return lcos::make_ready_future(result_type());
 
-        return lcos::when_n(lazy_values.size(), lazy_values, ec);
+        return lcos::when_some(lazy_values.size(), lazy_values, ec);
     }
 
     template <typename Future>
@@ -84,6 +84,13 @@ namespace hpx { namespace lcos
         std::transform(begin, end, std::back_inserter(lazy_values_),
             detail::when_acquire_future<future_type>());
         return lcos::when_all(lazy_values_, ec);
+    }
+
+    template <typename Iterator>
+    lcos::future<Iterator> when_all_n(Iterator begin, std::size_t count,
+        error_code& ec = throws)
+    {
+        return when_some_n(count, begin, count, ec);
     }
 
     inline lcos::future<HPX_STD_TUPLE<> > //-V524
@@ -117,6 +124,7 @@ namespace hpx { namespace lcos
 namespace hpx
 {
     using lcos::when_all;
+    using lcos::when_all_n;
 }
 
 #endif
@@ -126,7 +134,7 @@ namespace hpx
 
 #define N BOOST_PP_ITERATION()
 
-#define HPX_WHEN_N_DECAY_FUTURE(Z, N, D)                                      \
+#define HPX_WHEN_SOME_DECAY_FUTURE(Z, N, D)                                   \
     typename util::decay<BOOST_PP_CAT(T, N)>::type                            \
     /**/
 
@@ -134,14 +142,14 @@ namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
     template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-    lcos::future<HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_N_DECAY_FUTURE, _)> >
+    lcos::future<HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_SOME_DECAY_FUTURE, _)> >
     when_all(HPX_ENUM_FWD_ARGS(N, T, f), error_code& ec = throws)
     {
-        return lcos::when_n(N, HPX_ENUM_FORWARD_ARGS(N, T, f), ec);
+        return lcos::when_some(N, HPX_ENUM_FORWARD_ARGS(N, T, f), ec);
     }
 }}
 
-#undef HPX_WHEN_N_DECAY_FUTURE
+#undef HPX_WHEN_SOME_DECAY_FUTURE
 #undef N
 
 #endif

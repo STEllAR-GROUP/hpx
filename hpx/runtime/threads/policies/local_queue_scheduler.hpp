@@ -325,7 +325,7 @@ namespace hpx { namespace threads { namespace policies
 
                     HPX_ASSERT(idx != num_thread);
 
-                    if (!test(this_numa_domain, idx) && !test(numa_domain, idx))
+                    if (!test(this_numa_domain, idx) && !test(numa_domain, idx)) //-V560 //-V600
                         continue;
 
                     thread_queue_type* q = queues_[idx];
@@ -374,7 +374,11 @@ namespace hpx { namespace threads { namespace policies
         void schedule_thread_last(threads::thread_data_base* thrd, std::size_t num_thread,
             thread_priority priority = thread_priority_normal)
         {
-            local_queue_scheduler::schedule_thread(thrd, num_thread, priority);
+            if (std::size_t(-1) == num_thread)
+                num_thread = ++curr_queue_ % queues_.size();
+
+            HPX_ASSERT(num_thread < queues_.size());
+            queues_[num_thread]->schedule_thread(thrd, true);
         }
 
         /// Destroy the passed thread as it has been terminated
@@ -426,6 +430,7 @@ namespace hpx { namespace threads { namespace policies
                 case thread_priority_default:
                 case thread_priority_low:
                 case thread_priority_normal:
+                case thread_priority_boost:
                 case thread_priority_critical:
                     return queues_[num_thread]->get_thread_count(state);
 
@@ -446,6 +451,7 @@ namespace hpx { namespace threads { namespace policies
             case thread_priority_default:
             case thread_priority_low:
             case thread_priority_normal:
+            case thread_priority_boost:
             case thread_priority_critical:
                 {
                     for (std::size_t i = 0; i != queues_.size(); ++i)
@@ -539,7 +545,7 @@ namespace hpx { namespace threads { namespace policies
                 // steal work items: first try to steal from other cores in
                 // the same NUMA node
 #if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
-                if (test(steals_in_numa_domain_, num_thread))
+                if (test(steals_in_numa_domain_, num_thread)) //-V600
 #endif
                 {
                     mask_cref_type numa_domain_mask =
@@ -551,7 +557,7 @@ namespace hpx { namespace threads { namespace policies
 
                         HPX_ASSERT(idx != num_thread);
 
-                        if (!test(numa_domain_mask, topology_.get_pu_number(idx)))
+                        if (!test(numa_domain_mask, topology_.get_pu_number(idx))) //-V600
                             continue;
 
                         result = queues_[num_thread]->wait_or_add_new(running,
@@ -567,7 +573,7 @@ namespace hpx { namespace threads { namespace policies
 
 #if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
                 // if nothing found, ask everybody else
-                if (test(steals_outside_numa_domain_, num_thread)) {
+                if (test(steals_outside_numa_domain_, num_thread)) { //-V600
                     mask_cref_type numa_domain_mask =
                         outside_numa_domain_masks_[num_thread];
                     for (std::size_t i = 1; i != queues_size; ++i)
@@ -577,7 +583,7 @@ namespace hpx { namespace threads { namespace policies
 
                         HPX_ASSERT(idx != num_thread);
 
-                        if (!test(numa_domain_mask, topology_.get_pu_number(idx)))
+                        if (!test(numa_domain_mask, topology_.get_pu_number(idx))) //-V600
                             continue;
 
                         result = queues_[num_thread]->wait_or_add_new(running,

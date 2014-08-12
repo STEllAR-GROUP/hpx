@@ -87,7 +87,7 @@ file f("out.txt", file_settings.initial_overwrite(true).do_append(false) );
 
 
 namespace detail {
-    template<class self_type, class type> struct flag_with_self_type {
+    template<class self_type, class type> struct flag_with_self_type { //-V690
         flag_with_self_type(self_type * self, const type& val = type() ) : m_val(val), m_self(self) {}
         flag_with_self_type(const flag_with_self_type & other) : m_val(other.m_val) {}
 
