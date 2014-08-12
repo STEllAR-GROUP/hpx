@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,11 +6,13 @@
 #if !defined(BOOST_CACHE_LOCAL_STATISTICS_NOV_20_2008_1148AM)
 #define BOOST_CACHE_LOCAL_STATISTICS_NOV_20_2008_1148AM
 
+#include <boost/cache/statistics/no_statistics.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost { namespace cache { namespace statistics
 {
     ///////////////////////////////////////////////////////////////////////////
-    class local_statistics
+    class local_statistics : public no_statistics
     {
     public:
         local_statistics()

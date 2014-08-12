@@ -16,7 +16,7 @@
 #include <boost/make_shared.hpp>
 #include <boost/cache/entries/lfu_entry.hpp>
 #include <boost/cache/local_cache.hpp>
-#include <boost/cache/statistics/local_statistics.hpp>
+#include <boost/cache/statistics/local_full_statistics.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/dynamic_bitset.hpp>
@@ -75,7 +75,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         std::less<gva_entry_type>,
         boost::cache::policies::always<gva_entry_type>,
         std::map<gva_cache_key, gva_entry_type>,
-        boost::cache::statistics::local_statistics
+        boost::cache::statistics::local_full_statistics
     > gva_cache_type;
     // }}}
 
@@ -263,6 +263,16 @@ private:
     std::size_t get_cache_misses(bool);
     std::size_t get_cache_evictions(bool);
     std::size_t get_cache_insertions(bool);
+
+    std::size_t get_cache_get_entry_count(bool reset);
+    std::size_t get_cache_insert_entry_count(bool reset);
+    std::size_t get_cache_update_entry_count(bool reset);
+    std::size_t get_cache_erase_entry_count(bool reset);
+
+    std::size_t get_cache_get_entry_time(bool reset);
+    std::size_t get_cache_insert_entry_time(bool reset);
+    std::size_t get_cache_update_entry_time(bool reset);
+    std::size_t get_cache_erase_entry_time(bool reset);
 
 public:
     response service(
