@@ -18,6 +18,7 @@ set(tests
     find
     findend
     findfirstof
+	findfirstof_binary
     findif
     findifnot
     foreach
