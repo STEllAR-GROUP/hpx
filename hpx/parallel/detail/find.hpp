@@ -576,9 +576,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           The \a find_end algorithm returns an iterator to the beginning of
     ///           the last subsequence [first2, last2) in range [first, last).
     ///           If the length of the subsequence [first2, last2) is greater
-    ///           than the length of the range [first1, last1), last1 is returned.
+    ///           than the length of the range [first1, last1), \a last1 is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
-    ///           is found, last1 is also returned.
+    ///           is found, \a last1 is also returned.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
     inline typename boost::enable_if<
@@ -673,9 +673,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           The \a find_end algorithm returns an iterator to the beginning of
     ///           the last subsequence [first2, last2) in range [first, last).
     ///           If the length of the subsequence [first2, last2) is greater
-    ///           than the length of the range [first1, last1), last1 is returned.
+    ///           than the length of the range [first1, last1), \a last1 is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
-    ///           is found, last1 is also returned.
+    ///           is found, \a last1 is also returned.
     ///
     /// This overload of \a find_end is available if the user decides to provide the
     /// algorithm their own predicate \a f.
@@ -797,6 +797,59 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         };
     }
 
+    /// Searches the range [first, last) for any elements in the range [s_first, s_last).
+    /// Uses opeartor== to compare elements.
+    ///
+    /// \note   Complexity: at most (S*N) comparisons where
+    ///         \a S = distance(s_first, s_last) and
+    ///         \a N = distance(first, last).
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam InIter      The type of the source iterators used for the
+    ///                     first range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam FwdIter     The type of the source iterators used for the
+    ///                     second range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of the first range the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     the first range the algorithm will be applied to.
+    /// \param s_first      Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be searching for.
+    /// \param s_last       Refers to the end of the sequence of elements of
+    ///                     the algorithm will be searching for.
+    ///
+    /// The comparison operations in the parallel \a find_first_of algorithm invoked
+    /// with an execution policy object of type \a sequential_execution_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a find_first_of algorithm invoked
+    /// with an execution policy object of type \a parallel_execution_policy
+    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a find_first_of algorithm returns a \a hpx::future<InIter> if the
+    ///           execution policy is of type \a task_execution_policy and
+    ///           returns \a InIter otherwise.
+    ///           The \a find_first_of algorithm returns an iterator to the beginning of
+    ///           the last subsequence [s_first, s_last) in range [first, last).
+    ///           If the length of the subsequence [s_first, s_last) is greater
+    ///           than the length of the range [first, last), \a last is returned.
+    ///           Additionally if the size of the subsequence is empty or no subsequence
+    ///           is found, \a last is also returned.
+    ///           
+    ///           This overload of \a find_end is available if the user decides to provide the
+    ///           algorithm their own predicate \a f.
     template <typename ExPolicy, typename InIter, typename FwdIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
@@ -912,6 +965,65 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         };
     }
 
+    /// Searches the range [first, last) for any elements in the range [s_first, s_last).
+    /// Uses binary predicate p to compare elements
+    ///
+    /// \note   Complexity: at most (S*N) comparisons where
+    ///         \a S = distance(s_first, s_last) and
+    ///         \a N = distance(first, last).
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam InIter      The type of the source iterators used for the
+    ///                     first range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam FwdIter     The type of the source iterators used for the
+    ///                     second range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a equal requires \a Pred to meet the
+    ///                     requirements of \a CopyConstructible.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of the first range the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     the first range the algorithm will be applied to.
+    /// \param s_first      Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be searching for.
+    /// \param s_last       Refers to the end of the sequence of elements of
+    ///                     the algorithm will be searching for.
+    /// \param p            The binary predicate which returns \code true \endcode
+    ///                     if the elements should be treated as equal. The signature
+    ///                     should be equivalent to the following:
+    ///                     \code bool pred(const Type1 &a, const Type2 &b); \endcode
+    ///
+    /// The comparison operations in the parallel \a find_first_of algorithm invoked
+    /// with an execution policy object of type \a sequential_execution_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a find_first_of algorithm invoked
+    /// with an execution policy object of type \a parallel_execution_policy
+    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a find_first_of algorithm returns a \a hpx::future<InIter> if the
+    ///           execution policy is of type \a task_execution_policy and
+    ///           returns \a InIter otherwise.
+    ///           The \a find_first_of algorithm returns an iterator to the beginning of
+    ///           the last subsequence [s_first, s_last) in range [first, last).
+    ///           If the length of the subsequence [s_first, s_last) is greater
+    ///           than the length of the range [first, last), \a last is returned.
+    ///           Additionally if the size of the subsequence is empty or no subsequence
+    ///           is found, \a last is also returned.
+    ///
     template <typename ExPolicy, typename InIter, typename FwdIter, typename Pred>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
