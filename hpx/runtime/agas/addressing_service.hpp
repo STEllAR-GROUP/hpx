@@ -264,15 +264,15 @@ private:
     std::size_t get_cache_evictions(bool);
     std::size_t get_cache_insertions(bool);
 
-    std::size_t addressing_service::get_cache_get_entry_count(bool reset);
-    std::size_t addressing_service::get_cache_insert_entry_count(bool reset);
-    std::size_t addressing_service::get_cache_update_entry_count(bool reset);
-    std::size_t addressing_service::get_cache_erase_entry_count(bool reset);
+    std::size_t get_cache_get_entry_count(bool reset);
+    std::size_t get_cache_insert_entry_count(bool reset);
+    std::size_t get_cache_update_entry_count(bool reset);
+    std::size_t get_cache_erase_entry_count(bool reset);
 
-    std::size_t addressing_service::get_cache_get_entry_time(bool reset);
-    std::size_t addressing_service::get_cache_insert_entry_time(bool reset);
-    std::size_t addressing_service::get_cache_update_entry_time(bool reset);
-    std::size_t addressing_service::get_cache_erase_entry_time(bool reset);
+    std::size_t get_cache_get_entry_time(bool reset);
+    std::size_t get_cache_insert_entry_time(bool reset);
+    std::size_t get_cache_update_entry_time(bool reset);
+    std::size_t get_cache_erase_entry_time(bool reset);
 
 public:
     response service(
