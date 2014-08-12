@@ -16,6 +16,33 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 void print_time_results(
+    boost::uint32_t num_localities
+  , boost::uint64_t num_os_threads
+  , boost::uint64_t elapsed
+  , boost::uint64_t nx
+  , boost::uint64_t np
+  , boost::uint64_t nt
+  , bool header
+    )
+{
+    if (header)
+        std::cout << "Localities,OS_Threads,Execution_Time_sec,"
+                "Points_per_Partition,Partitions,Time_Steps\n"
+             << std::flush;
+
+    std::string const locs_str = boost::str(boost::format("%u,") % num_localities);
+    std::string const threads_str = boost::str(boost::format("%lu,") % num_os_threads);
+    std::string const nx_str = boost::str(boost::format("%lu,") % nx);
+    std::string const np_str = boost::str(boost::format("%lu,") % np);
+    std::string const nt_str = boost::str(boost::format("%lu ") % nt);
+
+    std::cout << ( boost::format("%-6s %-6s %.14g %-21s %-21s %-21s\n")
+            % locs_str % threads_str % (elapsed / 1e9) %nx_str % np_str
+            % nt_str) << std::flush;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void print_time_results(
     boost::uint64_t num_os_threads
   , boost::uint64_t elapsed
   , boost::uint64_t nx
