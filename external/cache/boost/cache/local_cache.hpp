@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -54,7 +54,7 @@ namespace boost { namespace cache
     ///                       instance. The type must conform to the
     ///                       CacheStatistics concept. The default value is
     ///                       the type \a statistics#no_statistics which does
-    ///                       not collect any numbers, but provides empty stubs 
+    ///                       not collect any numbers, but provides empty stubs
     ///                       allowing the code to compile.
     template <
         typename Key, typename Entry,
@@ -106,6 +106,8 @@ namespace boost { namespace cache
         typedef typename heap_type::iterator heap_iterator;
 
         typedef adapt<UpdatePolicy, iterator> adapted_update_policy_type;
+
+        typedef typename statistics_type::update_on_exit update_on_exit;
 
     public:
         ///////////////////////////////////////////////////////////////////////
@@ -216,6 +218,8 @@ namespace boost { namespace cache
         ///               referenced entry, otherwise it returns \a false.
         bool get_entry(key_type const& k, key_type& realkey, entry_type& val)
         {
+            update_on_exit update(statistics_, statistics::method_get_entry);
+
             // locate the requested entry
             iterator it = store_.find(k);
             if (it == store_.end()) {
@@ -255,6 +259,8 @@ namespace boost { namespace cache
         ///               referenced entry, otherwise it returns \a false.
         bool get_entry(key_type const& k, entry_type& val)
         {
+            update_on_exit update(statistics_, statistics::method_get_entry);
+
             // locate the requested entry
             iterator it = store_.find(k);
             if (it == store_.end()) {
@@ -293,6 +299,8 @@ namespace boost { namespace cache
         ///               referenced entry, otherwise it returns \a false.
         bool get_entry(key_type const& k, value_type& val)
         {
+            update_on_exit update(statistics_, statistics::method_get_entry);
+
             // locate the requested entry
             iterator it = store_.find(k);
             if (it == store_.end()) {
@@ -368,6 +376,8 @@ namespace boost { namespace cache
         ///               \a false.
         bool insert(key_type const& k, entry_type& e)
         {
+            update_on_exit update(statistics_, statistics::method_insert_entry);
+
             // ask entry if it really wants to be inserted
             if (!insert_policy_(e) || !e.insert())
                 return false;
@@ -423,6 +433,8 @@ namespace boost { namespace cache
         ///               the corresponding insert operation.
         bool update(key_type const& k, value_type const& val)
         {
+            update_on_exit update(statistics_, statistics::method_update_entry);
+
             iterator it = store_.find(k);
             if (it == store_.end()) {
                 // doesn't exist in this cache
@@ -477,6 +489,8 @@ namespace boost { namespace cache
         >
         bool update_if(key_type const& k, value_type const& val, F f)
         {
+            update_on_exit update(statistics_, statistics::method_update_entry);
+
             iterator it = store_.find(k);
             if (it == store_.end()) {
                 // doesn't exist in this cache
@@ -526,6 +540,8 @@ namespace boost { namespace cache
         ///               the corresponding insert operation.
         bool update(key_type const& k, entry_type& e)
         {
+            update_on_exit update(statistics_, statistics::method_update_entry);
+
             iterator it = store_.find(k);
             if (it == store_.end()) {
                 // doesn't exist in this cache
@@ -576,6 +592,8 @@ namespace boost { namespace cache
         template <typename Func>
         size_type erase(Func const& ep = policies::always<storage_value_type>())
         {
+            update_on_exit update(statistics_, statistics::method_erase_entry);
+
             size_type erased = 0;
             for (heap_iterator it = entry_heap_.begin();
                  it != entry_heap_.end(); /**/)

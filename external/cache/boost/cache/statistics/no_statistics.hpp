@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,6 +9,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost { namespace cache { namespace statistics
 {
+    ///////////////////////////////////////////////////////////////////////////
+    enum method
+    {
+        method_get_entry = 0,
+        method_insert_entry = 1,
+        method_update_entry = 2,
+        method_erase_entry = 3
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     class no_statistics
     {
@@ -33,6 +42,68 @@ namespace boost { namespace cache { namespace statistics
 
         /// \brief Reset all statistics
         void clear() {}
+
+        /// Helper class to update timings and counts on function exit
+        struct update_on_exit
+        {
+            update_on_exit(no_statistics const&, method) {}
+        };
+
+        /// The function \a get_get_entry_count returns the number of
+        /// invocations of the get_entry() API function of the cache.
+        boost::int64_t get_get_entry_count(bool)
+        {
+            return 0;
+        }
+
+        /// The function \a get_insert_entry_count returns the number of
+        /// invocations of the insert_entry() API function of the cache.
+        boost::int64_t get_insert_entry_count(bool)
+        {
+            return 0;
+        }
+
+        /// The function \a get_update_entry_count returns the number of
+        /// invocations of the update_entry() API function of the cache.
+        boost::int64_t get_update_entry_count(bool)
+        {
+            return 0;
+        }
+
+        /// The function \a get_erase_entry_count returns the number of
+        /// invocations of the erase() API function of the cache.
+        boost::int64_t get_erase_entry_count(bool)
+        {
+            return 0;
+        }
+
+        /// The function \a get_get_entry_time returns the overall time spent
+        /// executing of the get_entry() API function of the cache.
+        boost::int64_t get_get_entry_time(bool)
+        {
+            return 0;
+        }
+
+        /// The function \a get_insert_entry_time returns the overall time
+        /// spent executing of the insert_entry() API function of the cache.
+        boost::int64_t get_insert_entry_time(bool)
+        {
+            return 0;
+        }
+
+        /// The function \a get_update_entry_time returns the overall time
+        /// spent executing of the update_entry() API function of the cache.
+        boost::int64_t get_update_entry_time(bool)
+        {
+            return 0;
+        }
+
+        /// The function \a get_erase_entry_time returns the overall time spent
+        /// executing of the erase() API function of the cache.
+        boost::int64_t get_erase_entry_time(bool)
+        {
+            return 0;
+        }
     };
 
 }}}
