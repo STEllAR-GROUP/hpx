@@ -725,6 +725,162 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             std::forward<ExPolicy>(policy),
             first1, last1, first2, last2, std::forward<F>(f), is_seq());
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // find_first_of
+    namespace detail
+    {
+        /// \cond NOINTERNAL
+        template<typename FwdIter>
+        struct find_first_of: public detail::algorithm<find_first_of<FwdIter>, FwdIter>
+        {
+            find_first_of()
+                : find_first_of::algorithm("find_first_of")
+            {}
+
+            template <typename ExPolicy, typename FwdIter2>
+            static FwdIter
+            sequential(ExPolicy const&, FwdIter first, FwdIter last, FwdIter2 s_first,
+                FwdIter2 s_last)
+            {
+                if(first == last)
+                    return last;
+                for(;first != last; ++first) {
+                    for(FwdIter2 iter = s_first; iter != s_last; ++iter) {
+                        if(*first == *iter) {
+                            return first;
+                        }
+                    }
+                }
+                return last;
+            }
+
+            template <typename ExPolicy, typename FwdIter2>
+            static typename detail::algorithm_result<ExPolicy,FwdIter>::type
+            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+                FwdIter2 s_first, FwdIter2 s_last)
+            {
+                typedef typename std::iterator_traits<FwdIter>::reference reference;
+                typedef typename std::iterator_traits<FwdIter>::difference_type
+                    difference_type;
+                typedef typename std::iterator_traits<FwdIter2>::difference_type
+                    s_difference_type;
+
+                s_difference_type diff = std::distance(s_first, s_last);
+                if(diff <= 0) {
+                    return detail::algorithm_result<ExPolicy, FwdIter>::get(
+                        std::move(last));
+                }
+
+                difference_type count = std::distance(first, last);
+                if(diff > count) {
+                    return detail::algorithm_result<ExPolicy, FwdIter>::get(
+                        std::move(last));
+                }
+
+                util::cancellation_token<difference_type> tok(count);
+
+                return util::partitioner<ExPolicy, FwdIter, void>::call_with_index(
+                    policy, first, count,
+                    [s_first, s_last, tok](std::size_t base_idx, FwdIter it,
+                        std::size_t part_size) mutable
+                {
+                    util::loop_idx_n(
+                        base_idx, it, part_size, tok,
+                        [&tok, &s_first, &s_last](reference v, std::size_t i)
+                        {
+                            for(FwdIter2 iter = s_first; iter != s_last; ++iter) {
+                                if(v == *iter)
+                                    tok.cancel(i);
+                            }
+                        });
+                },
+                [=](std::vector<hpx::future<void> > &&) mutable
+                {
+                    std::size_t find_first_of_res = tok.get_data();
+                    if(find_first_of_res != count)
+                        std::advance(first, find_first_of_res);
+                    else
+                        first = last;
+
+                    return std::move(first);
+                });
+
+            }
+        };
+    }
+
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
+    inline typename boost::enable_if<
+        is_execution_policy<ExPolicy>,
+        typename detail::algorithm_result<ExPolicy, FwdIter1>::type
+    >::type
+    find_first_of(ExPolicy && policy, FwdIter1 first, FwdIter1 last,
+        FwdIter2 s_first, FwdIter2 s_last)
+    {
+        typedef typename std::iterator_traits<FwdIter1>::iterator_category
+            iterator_category;
+
+        BOOST_STATIC_ASSERT_MSG(
+            (boost::is_base_of<
+                std::forward_iterator_tag, iterator_category
+            >::value),
+            "Requires at least forward iterator.");
+
+        typedef is_sequential_execution_policy<ExPolicy> is_seq;
+
+        return detail::find_first_of<FwdIter1>().call(
+            std::forward<ExPolicy>(policy),
+            first, last, s_first, s_last, is_seq());
+    }
+    /*
+    ///////////////////////////////////////////////////////////////////////////
+    // find_first_of_binary
+    namespace detail
+    {
+        /// \cond NOINTERNAL
+        template <typename FwdIter>
+        struct find_first_of_binary : public detail::algorithm<find_first_of_binary<FwdIter>, FwdIter>
+        {
+            find_first_of_binary()
+                : find_first_of_binary::algorithm("first_find_of_binary")
+            {}
+
+            template <typename ExPolicy, typename FwdIter2, typename Pred>
+            static FwdIter
+            sequential(ExPolicy const&, FwdIter first, FwdIter last, FwdIter2 s_first,
+                FwdIter2 s_last, Pred && p)
+            {
+                for(; first != last; ++first) {
+                    for(FwdIter2 iter = s_first; iter != s_last; ++iter) {
+                        if(p(*first,*iter)) {
+                            return first;
+                        }
+                    }
+                }
+            }
+
+            template <typename ExPolicy, typename FwdIter2, typename Pred>
+            static typename detail::algorithm_result<ExPolicy, FwdIter>::type
+            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+                FwdIter2 s_first, FwdIter2 s_last, Pred && p)
+            {
+
+            }
+        };
+    }
+
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename Pred>
+    inline typename boost::enable_if<
+        is_execution_policy<ExPolicy>,
+        typename detail::algorithm_result<ExPolicy, FwdIter1>::type
+    >::type
+    find_first_of(ExPolicy && policy, FwdIter1 first, FwdIter1 last,
+        FwdIter2 s_first, FwdIter2 s_last, Pred && op)
+    {
+
+    }
+    */
 }}}
 
 #endif
