@@ -1047,6 +1047,45 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         };
     }
 
+    /// Searches the range [first, last) for two consecutive identical elements.
+    /// This version uses operator== to compare the elements
+    ///
+    /// \note   Complexity: Exactly the smaller of (result - first) + 1 and
+    ///                     (last - first) - 1 applications of operator==
+    ///                     where \a result is the return value
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter     The type of the source iterators used for the
+    ///                     range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of the range the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     the range the algorithm will be applied to.
+    ///
+    /// The comparison operations in the parallel \a adjacent_find algorithm invoked
+    /// with an execution policy object of type \a sequential_execution_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a adjacent_find algorithm invoked
+    /// with an execution policy object of type \a parallel_execution_policy
+    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a adjacent_find algorithm returns a \a hpx::future<FwdIter> if the
+    ///           execution policy is of type \a task_execution_policy and
+    ///           returns \a FwdIter otherwise.
+    ///           The \a adjacent_find algorithm returns an iterator to first of the 
+    ///           identical elements. If no such elements are found,\a last is returned
+    ///
     template <typename ExPolicy, typename FwdIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
@@ -1071,6 +1110,56 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             is_seq());
     }
 
+    /// Searches the range [first, last) for two consecutive identical elements.
+    /// This version uses the given binary predicate op
+    ///
+    /// \note   Complexity: Exactly the smaller of (result - first) + 1 and
+    ///                     (last - first) - 1 application of the prediate
+    ///                     where \a result is the value returned
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter     The type of the source iterators used for the
+    ///                     range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a adjacent_find requires \a Pred to meet the
+    ///                     requirements of \a CopyConstructible.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of the range the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     the range the algorithm will be applied to.
+    /// \param p            The binary predicate which returns \code true \endcode
+    ///                     if the elements should be treated as equal. The signature
+    ///                     should be equivalent to the following:
+    ///                     \code bool pred(const Type1 &a, const Type2 &b); \endcode
+    ///
+    /// The comparison operations in the parallel \a adjacent_find invoked
+    /// with an execution policy object of type \a sequential_execution_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a adjacent_find invoked
+    /// with an execution policy object of type \a parallel_execution_policy
+    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a adjacent_find algorithm returns a \a hpx::future<InIter> if the
+    ///           execution policy is of type \a task_execution_policy and
+    ///           returns \a InIter otherwise.
+    ///           The \a adjacent_find algorithm returns an iterator to the first of the
+    ///           identical elements. If no such elements are found, \a last is returned.
+    ///
+    ///           This overload of \a adjacent_find is available if the user decides to 
+    ///           provide their algorithm their own binary predicate \a op.
+    ///
     template <typename ExPolicy, typename FwdIter, typename Pred>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
