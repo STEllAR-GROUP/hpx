@@ -1059,7 +1059,96 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             first, last, s_first, s_last, std::forward<Pred>(op),
             is_seq());
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // adjacent_find =
+    namespace detail
+    {
+        /// \cond NOINTERNAL
+        template <typename FwdIter>
+        struct adjacent_find: public detail::algorithm<adjacent_find<FwdIter>, FwdIter>
+        {
+            adjacent_find()
+                : adjacent_find::algorithm("adjacent_find")
+            {}
+
+            template <typename ExPolicy, typename Pred>
+            static FwdIter
+            sequential(ExPolicy const&, FwdIter first, FwdIter last, Pred && op)
+            {
+                return std::adjacent_find(first,last,op);
+            }
     
+            template <typename ExPolicy, typename Pred>
+            static typename detail::algorithm_result<ExPolicy, FwdIter>::type
+            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+                Pred && op)
+            {
+                typedef hpx::util::zip_iterator<FwdIter, FwdIter> zip_iterator;
+                typedef typename zip_iterator::reference reference;
+                typedef typename std::iterator_traits<FwdIter>::difference_type
+                    difference_type;
+
+                if(first == last)
+                {
+                    return detail::algorithm_result<ExPolicy, FwdIter>::get(
+                        std::move(last));
+                }
+
+                FwdIter next = first;
+                ++next;
+                difference_type count = std::distance(first,last);
+                util::cancellation_token<difference_type> tok(count);
+
+                return util::partitioner<ExPolicy, FwdIter, void>::call_with_index(
+                    policy, hpx::util::make_zip_iterator(first,next), count-1,
+                    [op, tok](std::size_t base_idx, zip_iterator it, std::size_t part_size) mutable
+                    {
+                        util::loop_idx_n(
+                            base_idx, it, part_size, tok,
+                            [&op, &tok](reference t, std::size_t i)
+                            {
+                                if(op(hpx::util::get<0>(t),hpx::util::get<1>(t)))
+                                    tok.cancel(i);
+                            });
+                    },
+                    [=](std::vector<hpx::future<void> > &&) mutable
+                    {
+                        difference_type adj_find_res = tok.get_data();
+                        if(adj_find_res != count)
+                            std::advance(first, adj_find_res);
+                        else
+                            first = last;
+
+                        return std::move(first);
+                    });
+            }
+        };
+    }
+
+    template <typename ExPolicy, typename FwdIter>
+    inline typename boost::enable_if<
+        is_execution_policy<ExPolicy>,
+        typename detail::algorithm_result<ExPolicy, FwdIter>::type
+    >::type
+    adjacent_find(ExPolicy && policy, FwdIter first, FwdIter last)
+    {
+        typedef typename std::iterator_traits<FwdIter>::iterator_category
+            iterator_category;
+
+        BOOST_STATIC_ASSERT_MSG(
+            (boost::is_base_of<
+                std::forward_iterator_tag, iterator_category
+            >::value),
+            "Requires at least forward iterator");
+
+        typedef is_sequential_execution_policy<ExPolicy> is_seq;
+
+        return detail::adjacent_find<FwdIter>().call(
+            std::forward<ExPolicy>(policy),
+            first, last, detail::equal_to(),
+            is_seq());
+    }
 }}}
 
 #endif
