@@ -725,16 +725,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 : find_first_of::algorithm("find_first_of")
             {}
 
-            template <typename ExPolicy, typename FwdIter>
+            template <typename ExPolicy, typename FwdIter, typename Pred>
             static InIter
             sequential(ExPolicy const&, InIter first, InIter last, FwdIter s_first,
-                FwdIter s_last)
+                FwdIter s_last, Pred && op)
             {
                 if(first == last)
                     return last;
                 for(;first != last; ++first) {
                     for(FwdIter iter = s_first; iter != s_last; ++iter) {
-                        if(*first == *iter) {
+                        if(op(*first,*iter)) {
                             return first;
                         }
                     }
@@ -742,10 +742,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return last;
             }
 
-            template <typename ExPolicy, typename FwdIter>
+            template <typename ExPolicy, typename FwdIter, typename Pred>
             static typename detail::algorithm_result<ExPolicy,InIter>::type
             parallel(ExPolicy const& policy, InIter first, InIter last,
-                FwdIter s_first, FwdIter s_last)
+                FwdIter s_first, FwdIter s_last, Pred && op)
             {
                 typedef typename std::iterator_traits<InIter>::reference reference;
                 typedef typename std::iterator_traits<InIter>::difference_type
@@ -769,15 +769,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::partitioner<ExPolicy, InIter, void>::call_with_index(
                     policy, first, count,
-                    [s_first, s_last, tok](std::size_t base_idx, InIter it,
+                    [s_first, s_last, tok, op](std::size_t base_idx, InIter it,
                         std::size_t part_size) mutable
                 {
                     util::loop_idx_n(
                         base_idx, it, part_size, tok,
-                        [&tok, &s_first, &s_last](reference v, std::size_t i)
+                        [&tok, &s_first, &s_last, &op](reference v, std::size_t i)
                         {
                             for(FwdIter iter = s_first; iter != s_last; ++iter) {
-                                if(v == *iter)
+                                if(op(v,*iter))
                                     tok.cancel(i);
                             }
                         });
@@ -882,87 +882,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         return detail::find_first_of<InIter>().call(
             std::forward<ExPolicy>(policy),
-            first, last, s_first, s_last, is_seq());
-    }
-    
-    ///////////////////////////////////////////////////////////////////////////
-    // find_first_of_binary
-    namespace detail
-    {
-        /// \cond NOINTERNAL
-        template <typename InIter>
-        struct find_first_of_binary : public detail::algorithm<find_first_of_binary<InIter>, InIter>
-        {
-            find_first_of_binary()
-                : find_first_of_binary::algorithm("first_find_of_binary")
-            {}
-
-            template <typename ExPolicy, typename FwdIter, typename Pred>
-            static InIter
-            sequential(ExPolicy const&, InIter first, InIter last, FwdIter s_first,
-                FwdIter s_last, Pred && p)
-            {
-                for(; first != last; ++first) {
-                    for(FwdIter iter = s_first; iter != s_last; ++iter) {
-                        if(p(*first,*iter)) {
-                            return first;
-                        }
-                    }
-                }
-            }
-
-            template <typename ExPolicy, typename FwdIter, typename Pred>
-            static typename detail::algorithm_result<ExPolicy, InIter>::type
-            parallel(ExPolicy const& policy, InIter first, InIter last,
-                FwdIter s_first, FwdIter s_last, Pred && p)
-            {
-                typedef typename std::iterator_traits<InIter>::reference reference;
-                typedef typename std::iterator_traits<InIter>::difference_type
-                    difference_type;
-                typedef typename std::iterator_traits<FwdIter>::difference_type
-                    s_difference_type;
-
-                s_difference_type diff = std::distance(s_first, s_last);
-                if(diff <= 0) {
-                    return detail::algorithm_result<ExPolicy, InIter>::get(
-                        std::move(last));
-                }
-
-                difference_type count = std::distance(first, last);
-                if(diff > count) {
-                    return detail::algorithm_result<ExPolicy, InIter>::get(
-                        std::move(last));
-                }
-
-                util::cancellation_token<difference_type> tok(count);
-
-                return util::partitioner<ExPolicy, InIter, void>::call_with_index(
-                    policy, first, count,
-                    [s_first, s_last, tok, p](std::size_t base_idx, InIter it,
-                        std::size_t part_size) mutable
-                    {
-                        util::loop_idx_n(
-                            base_idx, it, part_size, tok,
-                            [&tok, &s_first, &s_last, &p](reference v, std::size_t i)
-                            {
-                                for(FwdIter iter = s_first; iter != s_last; ++iter) {
-                                    if(p(v,*iter))
-                                        tok.cancel(i);
-                                }
-                            });
-                    },
-                    [=](std::vector<hpx::future<void> > &&) mutable
-                    {
-                        std::size_t find_first_of_res = tok.get_data();
-                        if(find_first_of_res != count)
-                            std::advance(first, find_first_of_res);
-                        else
-                            first = last;
-
-                        return std::move(first);
-                    });
-            }
-        };
+            first, last, s_first, s_last,
+            detail::equal_to(), is_seq());
     }
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
@@ -1054,7 +975,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category>
         >::type is_seq;
 
-        return detail::find_first_of_binary<InIter>().call(
+        return detail::find_first_of<InIter>().call(
             std::forward<ExPolicy>(policy),
             first, last, s_first, s_last, std::forward<Pred>(op),
             is_seq());
