@@ -58,7 +58,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
             ~reset_queue_entry()
             {
-                if (e_.id_)
+                if (e_.id_ != threads::invalid_thread_id_repr)
                     q_.erase(last_);     // remove entry from queue
             }
 
@@ -237,15 +237,16 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             queue_.push_back(f);
 
             reset_queue_entry r(f, queue_);
+            threads::thread_state_ex_enum reason = threads::wait_unknown;
             {
                 // yield this thread
                 util::scoped_unlock<Lock> unlock(lock);
-                threads::thread_state_ex_enum const reason =
-                    this_thread::suspend(rel_time, description, ec);
+                reason = this_thread::suspend(rel_time, description, ec);
                 if (ec) return threads::wait_unknown;
-
-                return reason;
             }
+
+            return (f.id_ == threads::invalid_thread_id_repr) ?
+                threads::wait_timeout : reason;
         }
 
         template <typename Lock>
@@ -270,15 +271,16 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             queue_.push_back(f);
 
             reset_queue_entry r(f, queue_);
+            threads::thread_state_ex_enum reason = threads::wait_unknown;
             {
                 // yield this thread
                 util::scoped_unlock<Lock> unlock(lock);
-                threads::thread_state_ex_enum const reason =
-                    this_thread::suspend(abs_time, description, ec);
+                reason = this_thread::suspend(abs_time, description, ec);
                 if (ec) return threads::wait_unknown;
-
-                return reason;
             }
+
+            return (f.id_ == threads::invalid_thread_id_repr) ?
+                threads::wait_timeout : reason;
         }
 
         template <typename Lock>

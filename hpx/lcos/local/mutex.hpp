@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/itt_notify.hpp>
@@ -30,81 +31,6 @@ namespace hpx { namespace lcos { namespace local
     private:
         typedef lcos::local::spinlock mutex_type;
 
-        // define data structures needed for intrusive slist container used for
-        // the queues
-        struct queue_entry
-        {
-            typedef boost::intrusive::slist_member_hook<
-                boost::intrusive::link_mode<boost::intrusive::normal_link>
-            > hook_type;
-
-            queue_entry(threads::thread_id_repr_type const& id)
-              : id_(id)
-            {}
-
-            threads::thread_id_repr_type id_;
-            hook_type slist_hook_;
-        };
-
-        typedef boost::intrusive::member_hook<
-            queue_entry, queue_entry::hook_type,
-            &queue_entry::slist_hook_
-        > slist_option_type;
-
-        typedef boost::intrusive::slist<
-            queue_entry, slist_option_type,
-            boost::intrusive::cache_last<true>,
-            boost::intrusive::constant_time_size<false>
-        > queue_type;
-
-        struct reset_queue_entry
-        {
-            reset_queue_entry(queue_entry& e, queue_type& q)
-              : e_(e), q_(q), last_(q.last())
-            {}
-
-            ~reset_queue_entry()
-            {
-                if (e_.id_)
-                    q_.erase(last_);     // remove entry from queue
-            }
-
-            queue_entry& e_;
-            queue_type& q_;
-            queue_type::const_iterator last_;
-        };
-
-        void abort_all()
-        {
-            while (!queue_.empty())
-            {
-                threads::thread_id_type id(
-                    reinterpret_cast<threads::thread_data_base*>(queue_.front().id_));
-                queue_.front().id_ = threads::invalid_thread_id_repr;
-                queue_.pop_front();
-
-                // we know that the id is actually the pointer to the thread
-                LERR_(fatal)
-                        << "mutex::abort_all:"
-                        << " pending thread: "
-                        << get_thread_state_name(threads::get_thread_state(id))
-                        << "(" << id << "): " << threads::get_thread_description(id);
-
-                // forcefully abort thread, do not throw
-                error_code ec(lightweight);
-                threads::set_thread_state(id, threads::pending,
-                    threads::wait_abort, threads::thread_priority_default, ec);
-                if (ec)
-                {
-                    LERR_(fatal)
-                        << "mutex::abort_all:"
-                        << " could not abort thread: "
-                        << get_thread_state_name(threads::get_thread_state(id))
-                        << "(" << id << "): " << threads::get_thread_description(id);
-                }
-            }
-        }
-
     public:
         typedef boost::unique_lock<mutex> scoped_lock;
         typedef boost::detail::try_lock_wrapper<mutex> scoped_try_lock;
@@ -120,12 +46,6 @@ namespace hpx { namespace lcos { namespace local
         ~mutex()
         {
             HPX_ITT_SYNC_DESTROY(this);
-            if (!queue_.empty())
-            {
-                LERR_(fatal) << "~mutex: queue is not empty, aborting threads";
-
-                abort_all();
-            }
         }
 
         void lock(char const* description, error_code& ec = throws)
@@ -136,34 +56,24 @@ namespace hpx { namespace lcos { namespace local
             mutex_type::scoped_lock l(mtx_);
 
             threads::thread_id_repr_type self_id = threads::get_self_id().get();
-            if (owner_id_ == threads::invalid_thread_id_repr)
+            if(owner_id_ == self_id)
             {
-                util::register_lock(this);
-                HPX_ITT_SYNC_ACQUIRED(this);
-                owner_id_ = self_id;
-            } else if(owner_id_ == self_id) {
                 HPX_ITT_SYNC_CANCEL(this);
                 HPX_THROWS_IF(ec, deadlock,
                     "mutex::unlock",
                     "The calling thread already owns the mutex");
                 return;
-            } else {
-                // enqueue the request and block this thread
-                queue_entry f(self_id);
-                queue_.push_back(f);
-
-                reset_queue_entry r(f, queue_);
-                {
-                    // yield this thread
-                    util::scoped_unlock<mutex_type::scoped_lock> unlock(l);
-                    this_thread::suspend(threads::suspended, description, ec);
-                    if (ec) { HPX_ITT_SYNC_CANCEL(this); return; }
-
-                    util::register_lock(this);
-                    HPX_ITT_SYNC_ACQUIRED(this);
-                    HPX_ASSERT(owner_id_ == f.id_);
-                }
             }
+
+            if (owner_id_ != threads::invalid_thread_id_repr)
+            {
+                cond_.wait(l, ec);
+                if (ec) { HPX_ITT_SYNC_CANCEL(this); return; }
+            }
+
+            util::register_lock(this);
+            HPX_ITT_SYNC_ACQUIRED(this);
+            owner_id_ = self_id;
         }
 
         void lock(error_code& ec = throws)
@@ -207,29 +117,14 @@ namespace hpx { namespace lcos { namespace local
             threads::thread_id_repr_type self_id = threads::get_self_id().get();
             if (owner_id_ != threads::invalid_thread_id_repr)
             {
-                // enqueue the request and block this thread
-                queue_entry f(self_id);
-                queue_.push_back(f);
+                threads::thread_state_ex_enum const reason =
+                    cond_.wait_until(l, abs_time, ec);
+                if (ec) { HPX_ITT_SYNC_CANCEL(this); return false; }
 
-                reset_queue_entry r(f, queue_);
+                if (reason == threads::wait_signaled) //-V110
                 {
-                    // yield this thread
-                    util::scoped_unlock<mutex_type::scoped_lock> unlock(l);
-                    threads::thread_state_ex_enum const reason =
-                        this_thread::suspend(abs_time, description, ec);
-                    if (ec) { HPX_ITT_SYNC_CANCEL(this); return false; }
-
-                    // if the timer has hit, the waiting period timed out
-                    if (reason == threads::wait_signaled) //-V110
-                    {
-                        HPX_ITT_SYNC_CANCEL(this);
-                        return false;
-                    }
-
-                    util::register_lock(this);
-                    HPX_ITT_SYNC_ACQUIRED(this);
-                    HPX_ASSERT(owner_id_ == f.id_);
-                    return true;
+                    HPX_ITT_SYNC_CANCEL(this);
+                    return false;
                 }
             }
 
@@ -274,29 +169,14 @@ namespace hpx { namespace lcos { namespace local
             threads::thread_id_repr_type self_id = threads::get_self_id().get();
             if (owner_id_ != threads::invalid_thread_id_repr)
             {
-                // enqueue the request and block this thread
-                queue_entry f(self_id);
-                queue_.push_back(f);
+                threads::thread_state_ex_enum const reason =
+                    cond_.wait_for(l, rel_time, ec);
+                if (ec) { HPX_ITT_SYNC_CANCEL(this); return false; }
 
-                reset_queue_entry r(f, queue_);
+                if (reason == threads::wait_signaled) //-V110
                 {
-                    // yield this thread
-                    util::scoped_unlock<mutex_type::scoped_lock> unlock(l);
-                    threads::thread_state_ex_enum const reason =
-                        this_thread::suspend(rel_time, description, ec);
-                    if (ec) { HPX_ITT_SYNC_CANCEL(this); return false; }
-
-                    // if the timer has hit, the waiting period timed out
-                    if (reason == threads::wait_signaled) //-V110
-                    {
-                        HPX_ITT_SYNC_CANCEL(this);
-                        return false;
-                    }
-
-                    util::register_lock(this);
-                    HPX_ITT_SYNC_ACQUIRED(this);
-                    HPX_ASSERT(owner_id_ == f.id_);
-                    return true;
+                    HPX_ITT_SYNC_CANCEL(this);
+                    return false;
                 }
             }
 
@@ -346,38 +226,17 @@ namespace hpx { namespace lcos { namespace local
                 return;
             }
 
-            if (!queue_.empty())
-            {
-                util::unregister_lock(this);
-                HPX_ITT_SYNC_RELEASED(this);
-                owner_id_ = queue_.front().id_;
-                if (HPX_UNLIKELY(owner_id_ == threads::invalid_thread_id_repr))
-                {
-                    HPX_THROWS_IF(ec, null_thread_id,
-                        "mutex::unlock",
-                        "NULL thread id encountered");
-                    return;
-                }
-                queue_.front().id_ = threads::invalid_thread_id_repr;
-                queue_.pop_front();
+            util::unregister_lock(this);
+            HPX_ITT_SYNC_RELEASED(this);
+            owner_id_ = threads::invalid_thread_id_repr;
 
-                util::scoped_unlock<mutex_type::scoped_lock> unlock(l);
-                threads::set_thread_state(threads::thread_id_type(
-                    reinterpret_cast<threads::thread_data_base*>(owner_id_)),
-                    threads::pending, threads::wait_timeout,
-                    threads::thread_priority_default, ec);
-                if (!ec) return;
-            } else {
-                util::unregister_lock(this);
-                HPX_ITT_SYNC_RELEASED(this);
-                owner_id_ = threads::invalid_thread_id_repr;
-            }
+            cond_.notify_one(l, ec);
         }
 
     private:
         mutable mutex_type mtx_;
         threads::thread_id_repr_type owner_id_;
-        queue_type queue_;
+        detail::condition_variable cond_;
     };
 
     typedef mutex timed_mutex;
