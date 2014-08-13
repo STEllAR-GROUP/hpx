@@ -848,8 +848,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           Additionally if the size of the subsequence is empty or no subsequence
     ///           is found, \a last is also returned.
     ///           
-    ///           This overload of \a find_end is available if the user decides to provide the
-    ///           algorithm their own predicate \a f.
     template <typename ExPolicy, typename InIter, typename FwdIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
@@ -944,6 +942,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           than the length of the range [first, last), \a last is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
     ///           is found, \a last is also returned.
+    ///           This overload of \a find_end is available if the user decides to provide the
+    ///           algorithm their own predicate \a f.
     ///
     template <typename ExPolicy, typename InIter, typename FwdIter, typename Pred>
     inline typename boost::enable_if<
@@ -982,7 +982,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // adjacent_find =
+    // adjacent_find
     namespace detail
     {
         /// \cond NOINTERNAL
