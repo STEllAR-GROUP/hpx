@@ -5,6 +5,7 @@
 
 set(tests
 	adjacentfind
+	adjacentfind_binary
     all_of
     any_of
     copy

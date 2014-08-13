@@ -1149,6 +1149,30 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             first, last, detail::equal_to(),
             is_seq());
     }
+
+    template <typename ExPolicy, typename FwdIter, typename Pred>
+    inline typename boost::enable_if<
+        is_execution_policy<ExPolicy>,
+        typename detail::algorithm_result<ExPolicy, FwdIter>::type
+    >::type
+    adjacent_find(ExPolicy && policy, FwdIter first, FwdIter last, Pred && op)
+    {
+        typedef typename std::iterator_traits<FwdIter>::iterator_category
+            iterator_category;
+
+        BOOST_STATIC_ASSERT_MSG(
+            (boost::is_base_of<
+                std::forward_iterator_tag, iterator_category
+            >::value),
+            "Requires at least forward iterator");
+
+        typedef is_sequential_execution_policy<ExPolicy> is_seq;
+
+        return detail::adjacent_find<FwdIter>().call(
+            std::forward<ExPolicy>(policy),
+            first, last, op,
+            is_seq());
+    }
 }}}
 
 #endif
