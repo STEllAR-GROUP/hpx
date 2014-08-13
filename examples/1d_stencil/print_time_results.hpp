@@ -36,7 +36,7 @@ void print_time_results(
     std::string const np_str = boost::str(boost::format("%lu,") % np);
     std::string const nt_str = boost::str(boost::format("%lu ") % nt);
 
-    std::cout << ( boost::format("%-6s %-6s %.14g %-21s %-21s %-21s\n")
+    std::cout << ( boost::format("%-6s %-6s %.14g, %-21s %-21s %-21s\n")
             % locs_str % threads_str % (elapsed / 1e9) %nx_str % np_str
             % nt_str) << std::flush;
 }
