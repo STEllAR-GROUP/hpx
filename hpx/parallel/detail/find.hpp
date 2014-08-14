@@ -454,7 +454,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             sequential(ExPolicy const&, FwdIter first1, FwdIter last1,
                 FwdIter2 first2, FwdIter2 last2, Pred && op)
             {
-                return std::find_end(first1,last1,first2,last2,op);
+                return std::find_end(first1, last1, first2, last2, op);
             }
 
             template <typename ExPolicy, typename FwdIter2, typename Pred>
@@ -770,7 +770,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return util::partitioner<ExPolicy, InIter, void>::call_with_index(
                     policy, first, count,
                     [s_first, s_last, tok, op](std::size_t base_idx, InIter it,
-                        std::size_t part_size) mutable
+                        std::size_t part_size)
                 {
                     util::loop_idx_n(
                         base_idx, it, part_size, tok,
@@ -997,7 +997,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static FwdIter
             sequential(ExPolicy const&, FwdIter first, FwdIter last, Pred && op)
             {
-                return std::adjacent_find(first,last,op);
+                return std::adjacent_find(first, last, op);
             }
     
             template <typename ExPolicy, typename Pred>
@@ -1023,13 +1023,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::partitioner<ExPolicy, FwdIter, void>::call_with_index(
                     policy, hpx::util::make_zip_iterator(first,next), count-1,
-                    [op, tok](std::size_t base_idx, zip_iterator it, std::size_t part_size) mutable
+                    [op, tok](std::size_t base_idx, zip_iterator it, std::size_t part_size)
                     {
                         util::loop_idx_n(
                             base_idx, it, part_size, tok,
                             [&op, &tok](reference t, std::size_t i)
                             {
-                                if(op(hpx::util::get<0>(t),hpx::util::get<1>(t)))
+                                if(op(hpx::util::get<0>(t), hpx::util::get<1>(t)))
                                     tok.cancel(i);
                             });
                     },
