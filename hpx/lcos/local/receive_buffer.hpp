@@ -86,7 +86,7 @@ namespace hpx { namespace lcos { namespace local
             if(this != &other)
             {
                 mtx_ = std::move(other.mtx_);
-                buffer_map_(std::move(other.buffer_map_);
+                buffer_map_ = std::move(other.buffer_map_);
             }
             return *this;
         }
@@ -246,7 +246,7 @@ namespace hpx { namespace lcos { namespace local
             if(this != &other)
             {
                 mtx_ = std::move(other.mtx_);
-                buffer_map_(std::move(other.buffer_map_);
+                buffer_map_ = std::move(other.buffer_map_);
             }
             return *this;
         }
