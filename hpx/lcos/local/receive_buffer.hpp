@@ -81,7 +81,7 @@ namespace hpx { namespace lcos { namespace local
             }
         }
 
-        receive_buffer& operator=(receiver_buffer && other)
+        receive_buffer& operator=(receive_buffer && other)
         {
             if(this != &other)
             {
@@ -241,7 +241,7 @@ namespace hpx { namespace lcos { namespace local
             }
         }
 
-        receive_buffer& operator=(receiver_buffer && other)
+        receive_buffer& operator=(receive_buffer && other)
         {
             if(this != &other)
             {
