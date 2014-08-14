@@ -50,7 +50,7 @@ namespace hpx { namespace lcos { namespace local
             template <typename Val>
             void set_value(Val && val)
             {
-                return promise_.set_value(std::forward<Val>(val));
+                promise_.set_value(std::forward<Val>(val));
             }
 
             buffer_promise_type promise_;
@@ -79,6 +79,16 @@ namespace hpx { namespace lcos { namespace local
                 if ((*it).second.promise_.valid())
                     (*it).second.get_future();
             }
+        }
+
+        receive_buffer& operator=(receiver_buffer && other)
+        {
+            if(this != &other)
+            {
+                mtx_ = std::move(other.mtx_);
+                buffer_map_(std::move(other.buffer_map_);
+            }
+            return *this;
         }
 
         hpx::future<T> receive(std::size_t step)
@@ -200,7 +210,7 @@ namespace hpx { namespace lcos { namespace local
 
             void set_value()
             {
-                return promise_.set_value();
+                promise_.set_value();
             }
 
             buffer_promise_type promise_;
@@ -231,6 +241,16 @@ namespace hpx { namespace lcos { namespace local
             }
         }
 
+        receive_buffer& operator=(receiver_buffer && other)
+        {
+            if(this != &other)
+            {
+                mtx_ = std::move(other.mtx_);
+                buffer_map_(std::move(other.buffer_map_);
+            }
+            return *this;
+        }
+
         hpx::future<void> receive(std::size_t step)
         {
             typename mutex_type::scoped_lock l(mtx_);
@@ -240,7 +260,7 @@ namespace hpx { namespace lcos { namespace local
         void store_received(std::size_t step)
         {
             typename mutex_type::scoped_lock l(mtx_);
-            return store_received_locked(step);
+            store_received_locked(step);
         }
 
     protected:
