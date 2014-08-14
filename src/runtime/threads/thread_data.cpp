@@ -133,11 +133,13 @@ namespace hpx { namespace threads
 
     bool thread_data_base::interruption_point(bool throw_on_interrupt)
     {
-        mutex_type::scoped_lock l(this);
+        // We do not protect enabled_interrupt_ and requested_interrupt_
+        // from concurrent access here (which creates a benign data race) in
+        // order to avoid infinite recursion. This function is called by
+        // this_thread::suspend which causes problems if the lock would call
+        // suspend itself.
         if (enabled_interrupt_ && requested_interrupt_)
         {
-            l.unlock();
-
             // Verify that there are no more registered locks for this
             // OS-thread. This will throw if there are still any locks
             // held.

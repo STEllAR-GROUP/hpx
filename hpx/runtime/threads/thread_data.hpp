@@ -18,7 +18,7 @@
 #include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/spinlock_pool.hpp>
+#include <hpx/lcos/local/spinlock_pool.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/coroutine/coroutine.hpp>
@@ -128,7 +128,7 @@ namespace hpx { namespace threads
         typedef thread_function_type function_type;
 
         struct tag {};
-        typedef util::spinlock_pool<tag> mutex_type;
+        typedef lcos::local::spinlock_pool<tag> mutex_type;
 
         /// Construct a new \a thread
         thread_data_base(thread_init_data& init_data, thread_state_enum newstate)
