@@ -17,6 +17,9 @@
 #include <utility>
 #include <map>
 
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
+
 namespace hpx { namespace lcos { namespace local
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -57,53 +60,10 @@ namespace hpx { namespace lcos { namespace local
             bool can_be_deleted_;
         };
 
-        typedef std::map<std::size_t, entry_data> buffer_map_type;
+        typedef std::map<std::size_t, boost::shared_ptr<entry_data> >
+            buffer_map_type;
         typedef typename buffer_map_type::iterator iterator;
 
-    private:
-        HPX_MOVABLE_BUT_NOT_COPYABLE(receive_buffer)
-
-    public:
-        receive_buffer() {}
-
-        receive_buffer(receive_buffer && other)
-          : mtx_(std::move(mtx_))
-          , buffer_map_(std::move(buffer_map_))
-        {}
-
-        ~receive_buffer()
-        {
-            iterator end = buffer_map_.end();
-            for (iterator it = buffer_map_.begin(); it != end; ++it)
-            {
-                if ((*it).second.promise_.valid())
-                    (*it).second.get_future();
-            }
-        }
-
-        receive_buffer& operator=(receive_buffer && other)
-        {
-            if(this != &other)
-            {
-                mtx_ = std::move(other.mtx_);
-                buffer_map_ = std::move(other.buffer_map_);
-            }
-            return *this;
-        }
-
-        hpx::future<T> receive(std::size_t step)
-        {
-            typename mutex_type::scoped_lock l(mtx_);
-            return receive_locked(step);
-        }
-
-        void store_received(std::size_t step, T && val)
-        {
-            typename mutex_type::scoped_lock l(mtx_);
-            return store_received_locked(step, std::move(val));
-        }
-
-    protected:
         struct erase_on_exit
         {
             erase_on_exit(buffer_map_type& buffer_map, iterator it)
@@ -119,51 +79,84 @@ namespace hpx { namespace lcos { namespace local
             iterator it_;
         };
 
-        hpx::future<T> receive_locked(std::size_t step)
+    private:
+        HPX_MOVABLE_BUT_NOT_COPYABLE(receive_buffer)
+
+    public:
+        receive_buffer() {}
+
+        receive_buffer(receive_buffer && other)
+          : buffer_map_(std::move(other.buffer_map_))
+        {}
+
+        receive_buffer& operator=(receive_buffer && other)
         {
+            if(this != &other)
+            {
+                buffer_map_ = std::move(other.buffer_map_);
+            }
+            return *this;
+        }
+
+        hpx::future<T> receive(std::size_t step)
+        {
+            typename mutex_type::scoped_lock l(mtx_);
+
             iterator it = get_buffer_entry(step);
             HPX_ASSERT(it != buffer_map_.end());
 
             // if the value was already set we delete the entry after
             // retrieving the future
-            if (it->second.can_be_deleted_)
+            if (it->second->can_be_deleted_)
             {
                 erase_on_exit t(buffer_map_, it);
-                return it->second.get_future();
+                return it->second->get_future();
             }
 
             // otherwise mark the entry as to be deleted once the value was set
-            it->second.can_be_deleted_ = true;
-            return it->second.get_future();
+            it->second->can_be_deleted_ = true;
+            return it->second->get_future();
         }
 
-        void store_received_locked(std::size_t step, T && val)
+        void store_received(std::size_t step, T && val)
         {
-            iterator it = get_buffer_entry(step);
-            HPX_ASSERT(it != buffer_map_.end());
+            boost::shared_ptr<entry_data> entry;
 
-            // set value in promise
-            it->second.set_value(std::move(val));
-
-            if (!it->second.can_be_deleted_)
             {
-                // if the future was not retrieved yet mark the entry as to be
-                // deleted after it was be retrieved
-                it->second.can_be_deleted_ = true;
-                return;
+                typename mutex_type::scoped_lock l(mtx_);
+
+                iterator it = get_buffer_entry(step);
+                HPX_ASSERT(it != buffer_map_.end());
+
+                entry = it->second;
+
+                if (!entry->can_be_deleted_)
+                {
+                    // if the future was not retrieved yet mark the entry as
+                    // to be deleted after it was be retrieved
+                    entry->can_be_deleted_ = true;
+                }
+                else
+                {
+                    // if the future was already retrieved we can delete the
+                    // entry now
+                    buffer_map_.erase(it);
+                }
             }
 
-            // if the future was already retrieved we can delete the entry
-            buffer_map_.erase(it);
+            // set value in promise, but only after the lock went out of scope
+            entry->set_value(std::move(val));
         }
 
+    protected:
         iterator get_buffer_entry(std::size_t step)
         {
             iterator it = buffer_map_.find(step);
             if (it == buffer_map_.end())
             {
                 std::pair<iterator, bool> res =
-                    buffer_map_.insert(std::make_pair(step, entry_data()));
+                    buffer_map_.insert(
+                        std::make_pair(step, boost::make_shared<entry_data>()));
                 if (!res.second)
                 {
                     HPX_THROW_EXCEPTION(invalid_status,
@@ -217,53 +210,10 @@ namespace hpx { namespace lcos { namespace local
             bool can_be_deleted_;
         };
 
-        typedef std::map<std::size_t, entry_data> buffer_map_type;
+        typedef std::map<std::size_t, boost::shared_ptr<entry_data> >
+            buffer_map_type;
         typedef typename buffer_map_type::iterator iterator;
 
-    private:
-        HPX_MOVABLE_BUT_NOT_COPYABLE(receive_buffer)
-
-    public:
-        receive_buffer() {}
-
-        receive_buffer(receive_buffer && other)
-          : mtx_(std::move(mtx_))
-          , buffer_map_(std::move(buffer_map_))
-        {}
-
-        ~receive_buffer()
-        {
-            iterator end = buffer_map_.end();
-            for (iterator it = buffer_map_.begin(); it != end; ++it)
-            {
-                if ((*it).second.promise_.valid())
-                    (*it).second.get_future();
-            }
-        }
-
-        receive_buffer& operator=(receive_buffer && other)
-        {
-            if(this != &other)
-            {
-                mtx_ = std::move(other.mtx_);
-                buffer_map_ = std::move(other.buffer_map_);
-            }
-            return *this;
-        }
-
-        hpx::future<void> receive(std::size_t step)
-        {
-            typename mutex_type::scoped_lock l(mtx_);
-            return receive_locked(step);
-        }
-
-        void store_received(std::size_t step)
-        {
-            typename mutex_type::scoped_lock l(mtx_);
-            store_received_locked(step);
-        }
-
-    protected:
         struct erase_on_exit
         {
             erase_on_exit(buffer_map_type& buffer_map, iterator it)
@@ -279,51 +229,84 @@ namespace hpx { namespace lcos { namespace local
             iterator it_;
         };
 
-        hpx::future<void> receive_locked(std::size_t step)
+    private:
+        HPX_MOVABLE_BUT_NOT_COPYABLE(receive_buffer)
+
+    public:
+        receive_buffer() {}
+
+        receive_buffer(receive_buffer && other)
+          : buffer_map_(std::move(other.buffer_map_))
+        {}
+
+        receive_buffer& operator=(receive_buffer && other)
         {
+            if(this != &other)
+            {
+                buffer_map_ = std::move(other.buffer_map_);
+            }
+            return *this;
+        }
+
+        hpx::future<void> receive(std::size_t step)
+        {
+            typename mutex_type::scoped_lock l(mtx_);
+
             iterator it = get_buffer_entry(step);
             HPX_ASSERT(it != buffer_map_.end());
 
             // if the value was already set we delete the entry after
             // retrieving the future
-            if (it->second.can_be_deleted_)
+            if (it->second->can_be_deleted_)
             {
                 erase_on_exit t(buffer_map_, it);
-                return it->second.get_future();
+                return it->second->get_future();
             }
 
             // otherwise mark the entry as to be deleted once the value was set
-            it->second.can_be_deleted_ = true;
-            return it->second.get_future();
+            it->second->can_be_deleted_ = true;
+            return it->second->get_future();
         }
 
-        void store_received_locked(std::size_t step)
+        void store_received(std::size_t step)
         {
-            iterator it = get_buffer_entry(step);
-            HPX_ASSERT(it != buffer_map_.end());
+            boost::shared_ptr<entry_data> entry;
 
-            // set value in promise
-            it->second.set_value();
-
-            if (!it->second.can_be_deleted_)
             {
-                // if the future was not retrieved yet mark the entry as to be
-                // deleted after it was be retrieved
-                it->second.can_be_deleted_ = true;
-                return;
+                typename mutex_type::scoped_lock l(mtx_);
+
+                iterator it = get_buffer_entry(step);
+                HPX_ASSERT(it != buffer_map_.end());
+
+                entry = it->second;
+
+                if (!entry->can_be_deleted_)
+                {
+                    // if the future was not retrieved yet mark the entry as
+                    // to be deleted after it was be retrieved
+                    entry->can_be_deleted_ = true;
+                }
+                else
+                {
+                    // if the future was already retrieved we can delete the
+                    // entry now
+                    buffer_map_.erase(it);
+                }
             }
 
-            // if the future was already retrieved we can delete the entry
-            buffer_map_.erase(it);
+            // set value in promise, but only after the lock went out of scope
+            entry->set_value();
         }
 
+    protected:
         iterator get_buffer_entry(std::size_t step)
         {
             iterator it = buffer_map_.find(step);
             if (it == buffer_map_.end())
             {
                 std::pair<iterator, bool> res =
-                    buffer_map_.insert(std::make_pair(step, entry_data()));
+                    buffer_map_.insert(
+                        std::make_pair(step, boost::make_shared<entry_data>()));
                 if (!res.second)
                 {
                     HPX_THROW_EXCEPTION(invalid_status,
