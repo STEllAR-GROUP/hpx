@@ -344,8 +344,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         BOOST_FORCEINLINE
         void await_next(Iter iter, boost::mpl::true_, boost::mpl::true_)
         {
-            BOOST_STATIC_ASSERT_MSG(false,
-                "current element can't be both, a future and a future range");
+//             BOOST_STATIC_ASSERT_MSG(false,
+//                 "current element can't be both, a future and a future range");
         }
 
         ///////////////////////////////////////////////////////////////////////
