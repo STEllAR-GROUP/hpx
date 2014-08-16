@@ -17,10 +17,17 @@ namespace hpx { namespace traits
 {
     template <typename Policy>
     struct is_launch_policy
-      : boost::mpl::or_<
-            boost::is_same<BOOST_SCOPED_ENUM(launch), Policy>
-          , boost::is_base_and_derived<threads::executor, Policy>
-        >
+      : boost::is_same<BOOST_SCOPED_ENUM(launch), Policy>
+    {};
+
+    template <typename Policy>
+    struct is_executor
+      : boost::is_base_and_derived<threads::executor, Policy>
+    {};
+
+    template <typename Policy>
+    struct is_launch_policy_or_executor
+      : boost::mpl::or_<is_launch_policy<Policy>, is_executor<Policy> >
     {};
 }}
 

@@ -11,11 +11,11 @@
 namespace hpx { namespace lcos { namespace local
 {
     
-    template <typename Func, typename F0>
+    template <typename Policy, typename Func, typename F0>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_launch_policy<
+            typename util::decay<Policy>::type
         >
       , detail::dataflow_frame<
             BOOST_SCOPED_ENUM(launch)
@@ -26,7 +26,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        BOOST_SCOPED_ENUM(launch) policy
+        Policy && policy
       , Func && func
       , F0 && f0
     )
@@ -41,7 +41,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                policy
+                std::forward<Policy>(policy)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ))
             ));
@@ -49,11 +49,11 @@ namespace hpx { namespace lcos { namespace local
         using traits::future_access;
         return future_access<typename frame_type::type>::create(std::move(p));
     }
-    template <typename Func, typename F0>
+    template <typename Executor, typename Func, typename F0>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_executor<
+            typename util::decay<Executor>::type
         >
       , detail::dataflow_frame<
             threads::executor
@@ -64,7 +64,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        threads::executor& sched
+        Executor && sched
       , Func && func
       , F0 && f0
     )
@@ -79,7 +79,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                sched
+                std::forward<Executor>(sched)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ))
             ));
@@ -90,7 +90,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        traits::is_launch_policy<
+        traits::is_launch_policy_or_executor<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -125,11 +125,11 @@ namespace hpx { namespace lcos { namespace local
 namespace hpx { namespace lcos { namespace local
 {
     
-    template <typename Func, typename F0 , typename F1>
+    template <typename Policy, typename Func, typename F0 , typename F1>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_launch_policy<
+            typename util::decay<Policy>::type
         >
       , detail::dataflow_frame<
             BOOST_SCOPED_ENUM(launch)
@@ -140,7 +140,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        BOOST_SCOPED_ENUM(launch) policy
+        Policy && policy
       , Func && func
       , F0 && f0 , F1 && f1
     )
@@ -155,7 +155,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                policy
+                std::forward<Policy>(policy)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ))
             ));
@@ -163,11 +163,11 @@ namespace hpx { namespace lcos { namespace local
         using traits::future_access;
         return future_access<typename frame_type::type>::create(std::move(p));
     }
-    template <typename Func, typename F0 , typename F1>
+    template <typename Executor, typename Func, typename F0 , typename F1>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_executor<
+            typename util::decay<Executor>::type
         >
       , detail::dataflow_frame<
             threads::executor
@@ -178,7 +178,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        threads::executor& sched
+        Executor && sched
       , Func && func
       , F0 && f0 , F1 && f1
     )
@@ -193,7 +193,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                sched
+                std::forward<Executor>(sched)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ))
             ));
@@ -204,7 +204,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        traits::is_launch_policy<
+        traits::is_launch_policy_or_executor<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -239,11 +239,11 @@ namespace hpx { namespace lcos { namespace local
 namespace hpx { namespace lcos { namespace local
 {
     
-    template <typename Func, typename F0 , typename F1 , typename F2>
+    template <typename Policy, typename Func, typename F0 , typename F1 , typename F2>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_launch_policy<
+            typename util::decay<Policy>::type
         >
       , detail::dataflow_frame<
             BOOST_SCOPED_ENUM(launch)
@@ -254,7 +254,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        BOOST_SCOPED_ENUM(launch) policy
+        Policy && policy
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2
     )
@@ -269,7 +269,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                policy
+                std::forward<Policy>(policy)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ))
             ));
@@ -277,11 +277,11 @@ namespace hpx { namespace lcos { namespace local
         using traits::future_access;
         return future_access<typename frame_type::type>::create(std::move(p));
     }
-    template <typename Func, typename F0 , typename F1 , typename F2>
+    template <typename Executor, typename Func, typename F0 , typename F1 , typename F2>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_executor<
+            typename util::decay<Executor>::type
         >
       , detail::dataflow_frame<
             threads::executor
@@ -292,7 +292,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        threads::executor& sched
+        Executor && sched
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2
     )
@@ -307,7 +307,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                sched
+                std::forward<Executor>(sched)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ))
             ));
@@ -318,7 +318,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        traits::is_launch_policy<
+        traits::is_launch_policy_or_executor<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -353,11 +353,11 @@ namespace hpx { namespace lcos { namespace local
 namespace hpx { namespace lcos { namespace local
 {
     
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3>
+    template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_launch_policy<
+            typename util::decay<Policy>::type
         >
       , detail::dataflow_frame<
             BOOST_SCOPED_ENUM(launch)
@@ -368,7 +368,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        BOOST_SCOPED_ENUM(launch) policy
+        Policy && policy
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3
     )
@@ -383,7 +383,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                policy
+                std::forward<Policy>(policy)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ))
             ));
@@ -391,11 +391,11 @@ namespace hpx { namespace lcos { namespace local
         using traits::future_access;
         return future_access<typename frame_type::type>::create(std::move(p));
     }
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3>
+    template <typename Executor, typename Func, typename F0 , typename F1 , typename F2 , typename F3>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_executor<
+            typename util::decay<Executor>::type
         >
       , detail::dataflow_frame<
             threads::executor
@@ -406,7 +406,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        threads::executor& sched
+        Executor && sched
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3
     )
@@ -421,7 +421,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                sched
+                std::forward<Executor>(sched)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ))
             ));
@@ -432,7 +432,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        traits::is_launch_policy<
+        traits::is_launch_policy_or_executor<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -467,11 +467,11 @@ namespace hpx { namespace lcos { namespace local
 namespace hpx { namespace lcos { namespace local
 {
     
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4>
+    template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_launch_policy<
+            typename util::decay<Policy>::type
         >
       , detail::dataflow_frame<
             BOOST_SCOPED_ENUM(launch)
@@ -482,7 +482,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        BOOST_SCOPED_ENUM(launch) policy
+        Policy && policy
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4
     )
@@ -497,7 +497,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                policy
+                std::forward<Policy>(policy)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ))
             ));
@@ -505,11 +505,11 @@ namespace hpx { namespace lcos { namespace local
         using traits::future_access;
         return future_access<typename frame_type::type>::create(std::move(p));
     }
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4>
+    template <typename Executor, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_executor<
+            typename util::decay<Executor>::type
         >
       , detail::dataflow_frame<
             threads::executor
@@ -520,7 +520,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        threads::executor& sched
+        Executor && sched
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4
     )
@@ -535,7 +535,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                sched
+                std::forward<Executor>(sched)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ))
             ));
@@ -546,7 +546,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        traits::is_launch_policy<
+        traits::is_launch_policy_or_executor<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -581,11 +581,11 @@ namespace hpx { namespace lcos { namespace local
 namespace hpx { namespace lcos { namespace local
 {
     
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5>
+    template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_launch_policy<
+            typename util::decay<Policy>::type
         >
       , detail::dataflow_frame<
             BOOST_SCOPED_ENUM(launch)
@@ -596,7 +596,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        BOOST_SCOPED_ENUM(launch) policy
+        Policy && policy
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5
     )
@@ -611,7 +611,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                policy
+                std::forward<Policy>(policy)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ))
             ));
@@ -619,11 +619,11 @@ namespace hpx { namespace lcos { namespace local
         using traits::future_access;
         return future_access<typename frame_type::type>::create(std::move(p));
     }
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5>
+    template <typename Executor, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_executor<
+            typename util::decay<Executor>::type
         >
       , detail::dataflow_frame<
             threads::executor
@@ -634,7 +634,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        threads::executor& sched
+        Executor && sched
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5
     )
@@ -649,7 +649,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                sched
+                std::forward<Executor>(sched)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ))
             ));
@@ -660,7 +660,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        traits::is_launch_policy<
+        traits::is_launch_policy_or_executor<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -695,11 +695,11 @@ namespace hpx { namespace lcos { namespace local
 namespace hpx { namespace lcos { namespace local
 {
     
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6>
+    template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_launch_policy<
+            typename util::decay<Policy>::type
         >
       , detail::dataflow_frame<
             BOOST_SCOPED_ENUM(launch)
@@ -710,7 +710,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        BOOST_SCOPED_ENUM(launch) policy
+        Policy && policy
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6
     )
@@ -725,7 +725,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                policy
+                std::forward<Policy>(policy)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ))
             ));
@@ -733,11 +733,11 @@ namespace hpx { namespace lcos { namespace local
         using traits::future_access;
         return future_access<typename frame_type::type>::create(std::move(p));
     }
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6>
+    template <typename Executor, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_executor<
+            typename util::decay<Executor>::type
         >
       , detail::dataflow_frame<
             threads::executor
@@ -748,7 +748,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        threads::executor& sched
+        Executor && sched
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6
     )
@@ -763,7 +763,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                sched
+                std::forward<Executor>(sched)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ))
             ));
@@ -774,7 +774,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        traits::is_launch_policy<
+        traits::is_launch_policy_or_executor<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -809,11 +809,11 @@ namespace hpx { namespace lcos { namespace local
 namespace hpx { namespace lcos { namespace local
 {
     
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7>
+    template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_launch_policy<
+            typename util::decay<Policy>::type
         >
       , detail::dataflow_frame<
             BOOST_SCOPED_ENUM(launch)
@@ -824,7 +824,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        BOOST_SCOPED_ENUM(launch) policy
+        Policy && policy
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7
     )
@@ -839,7 +839,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                policy
+                std::forward<Policy>(policy)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ))
             ));
@@ -847,11 +847,11 @@ namespace hpx { namespace lcos { namespace local
         using traits::future_access;
         return future_access<typename frame_type::type>::create(std::move(p));
     }
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7>
+    template <typename Executor, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_executor<
+            typename util::decay<Executor>::type
         >
       , detail::dataflow_frame<
             threads::executor
@@ -862,7 +862,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        threads::executor& sched
+        Executor && sched
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7
     )
@@ -877,7 +877,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                sched
+                std::forward<Executor>(sched)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ))
             ));
@@ -888,7 +888,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        traits::is_launch_policy<
+        traits::is_launch_policy_or_executor<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -923,11 +923,11 @@ namespace hpx { namespace lcos { namespace local
 namespace hpx { namespace lcos { namespace local
 {
     
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8>
+    template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_launch_policy<
+            typename util::decay<Policy>::type
         >
       , detail::dataflow_frame<
             BOOST_SCOPED_ENUM(launch)
@@ -938,7 +938,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        BOOST_SCOPED_ENUM(launch) policy
+        Policy && policy
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8
     )
@@ -953,7 +953,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                policy
+                std::forward<Policy>(policy)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ))
             ));
@@ -961,11 +961,11 @@ namespace hpx { namespace lcos { namespace local
         using traits::future_access;
         return future_access<typename frame_type::type>::create(std::move(p));
     }
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8>
+    template <typename Executor, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_executor<
+            typename util::decay<Executor>::type
         >
       , detail::dataflow_frame<
             threads::executor
@@ -976,7 +976,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        threads::executor& sched
+        Executor && sched
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8
     )
@@ -991,7 +991,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                sched
+                std::forward<Executor>(sched)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ))
             ));
@@ -1002,7 +1002,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        traits::is_launch_policy<
+        traits::is_launch_policy_or_executor<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -1037,11 +1037,11 @@ namespace hpx { namespace lcos { namespace local
 namespace hpx { namespace lcos { namespace local
 {
     
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9>
+    template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_launch_policy<
+            typename util::decay<Policy>::type
         >
       , detail::dataflow_frame<
             BOOST_SCOPED_ENUM(launch)
@@ -1052,7 +1052,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        BOOST_SCOPED_ENUM(launch) policy
+        Policy && policy
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9
     )
@@ -1067,7 +1067,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                policy
+                std::forward<Policy>(policy)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ))
             ));
@@ -1075,11 +1075,11 @@ namespace hpx { namespace lcos { namespace local
         using traits::future_access;
         return future_access<typename frame_type::type>::create(std::move(p));
     }
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9>
+    template <typename Executor, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_executor<
+            typename util::decay<Executor>::type
         >
       , detail::dataflow_frame<
             threads::executor
@@ -1090,7 +1090,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        threads::executor& sched
+        Executor && sched
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9
     )
@@ -1105,7 +1105,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                sched
+                std::forward<Executor>(sched)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ))
             ));
@@ -1116,7 +1116,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        traits::is_launch_policy<
+        traits::is_launch_policy_or_executor<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -1151,11 +1151,11 @@ namespace hpx { namespace lcos { namespace local
 namespace hpx { namespace lcos { namespace local
 {
     
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10>
+    template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_launch_policy<
+            typename util::decay<Policy>::type
         >
       , detail::dataflow_frame<
             BOOST_SCOPED_ENUM(launch)
@@ -1166,7 +1166,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        BOOST_SCOPED_ENUM(launch) policy
+        Policy && policy
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10
     )
@@ -1181,7 +1181,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                policy
+                std::forward<Policy>(policy)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ))
             ));
@@ -1189,11 +1189,11 @@ namespace hpx { namespace lcos { namespace local
         using traits::future_access;
         return future_access<typename frame_type::type>::create(std::move(p));
     }
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10>
+    template <typename Executor, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_executor<
+            typename util::decay<Executor>::type
         >
       , detail::dataflow_frame<
             threads::executor
@@ -1204,7 +1204,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        threads::executor& sched
+        Executor && sched
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10
     )
@@ -1219,7 +1219,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                sched
+                std::forward<Executor>(sched)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ))
             ));
@@ -1230,7 +1230,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        traits::is_launch_policy<
+        traits::is_launch_policy_or_executor<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -1265,11 +1265,11 @@ namespace hpx { namespace lcos { namespace local
 namespace hpx { namespace lcos { namespace local
 {
     
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11>
+    template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_launch_policy<
+            typename util::decay<Policy>::type
         >
       , detail::dataflow_frame<
             BOOST_SCOPED_ENUM(launch)
@@ -1280,7 +1280,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        BOOST_SCOPED_ENUM(launch) policy
+        Policy && policy
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11
     )
@@ -1295,7 +1295,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                policy
+                std::forward<Policy>(policy)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ))
             ));
@@ -1303,11 +1303,11 @@ namespace hpx { namespace lcos { namespace local
         using traits::future_access;
         return future_access<typename frame_type::type>::create(std::move(p));
     }
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11>
+    template <typename Executor, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_executor<
+            typename util::decay<Executor>::type
         >
       , detail::dataflow_frame<
             threads::executor
@@ -1318,7 +1318,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        threads::executor& sched
+        Executor && sched
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11
     )
@@ -1333,7 +1333,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                sched
+                std::forward<Executor>(sched)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ))
             ));
@@ -1344,7 +1344,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        traits::is_launch_policy<
+        traits::is_launch_policy_or_executor<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -1379,11 +1379,11 @@ namespace hpx { namespace lcos { namespace local
 namespace hpx { namespace lcos { namespace local
 {
     
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12>
+    template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_launch_policy<
+            typename util::decay<Policy>::type
         >
       , detail::dataflow_frame<
             BOOST_SCOPED_ENUM(launch)
@@ -1394,7 +1394,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        BOOST_SCOPED_ENUM(launch) policy
+        Policy && policy
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12
     )
@@ -1409,7 +1409,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                policy
+                std::forward<Policy>(policy)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ))
             ));
@@ -1417,11 +1417,11 @@ namespace hpx { namespace lcos { namespace local
         using traits::future_access;
         return future_access<typename frame_type::type>::create(std::move(p));
     }
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12>
+    template <typename Executor, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_executor<
+            typename util::decay<Executor>::type
         >
       , detail::dataflow_frame<
             threads::executor
@@ -1432,7 +1432,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        threads::executor& sched
+        Executor && sched
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12
     )
@@ -1447,7 +1447,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                sched
+                std::forward<Executor>(sched)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ))
             ));
@@ -1458,7 +1458,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        traits::is_launch_policy<
+        traits::is_launch_policy_or_executor<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -1493,11 +1493,11 @@ namespace hpx { namespace lcos { namespace local
 namespace hpx { namespace lcos { namespace local
 {
     
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13>
+    template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_launch_policy<
+            typename util::decay<Policy>::type
         >
       , detail::dataflow_frame<
             BOOST_SCOPED_ENUM(launch)
@@ -1508,7 +1508,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        BOOST_SCOPED_ENUM(launch) policy
+        Policy && policy
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13
     )
@@ -1523,7 +1523,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                policy
+                std::forward<Policy>(policy)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ))
             ));
@@ -1531,11 +1531,11 @@ namespace hpx { namespace lcos { namespace local
         using traits::future_access;
         return future_access<typename frame_type::type>::create(std::move(p));
     }
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13>
+    template <typename Executor, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_executor<
+            typename util::decay<Executor>::type
         >
       , detail::dataflow_frame<
             threads::executor
@@ -1546,7 +1546,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        threads::executor& sched
+        Executor && sched
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13
     )
@@ -1561,7 +1561,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                sched
+                std::forward<Executor>(sched)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ))
             ));
@@ -1572,7 +1572,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        traits::is_launch_policy<
+        traits::is_launch_policy_or_executor<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -1607,11 +1607,11 @@ namespace hpx { namespace lcos { namespace local
 namespace hpx { namespace lcos { namespace local
 {
     
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14>
+    template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_launch_policy<
+            typename util::decay<Policy>::type
         >
       , detail::dataflow_frame<
             BOOST_SCOPED_ENUM(launch)
@@ -1622,7 +1622,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        BOOST_SCOPED_ENUM(launch) policy
+        Policy && policy
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14
     )
@@ -1637,7 +1637,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                policy
+                std::forward<Policy>(policy)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ))
             ));
@@ -1645,11 +1645,11 @@ namespace hpx { namespace lcos { namespace local
         using traits::future_access;
         return future_access<typename frame_type::type>::create(std::move(p));
     }
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14>
+    template <typename Executor, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_executor<
+            typename util::decay<Executor>::type
         >
       , detail::dataflow_frame<
             threads::executor
@@ -1660,7 +1660,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        threads::executor& sched
+        Executor && sched
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14
     )
@@ -1675,7 +1675,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                sched
+                std::forward<Executor>(sched)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ))
             ));
@@ -1686,7 +1686,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        traits::is_launch_policy<
+        traits::is_launch_policy_or_executor<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -1721,11 +1721,11 @@ namespace hpx { namespace lcos { namespace local
 namespace hpx { namespace lcos { namespace local
 {
     
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15>
+    template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_launch_policy<
+            typename util::decay<Policy>::type
         >
       , detail::dataflow_frame<
             BOOST_SCOPED_ENUM(launch)
@@ -1736,7 +1736,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        BOOST_SCOPED_ENUM(launch) policy
+        Policy && policy
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14 , F15 && f15
     )
@@ -1751,7 +1751,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                policy
+                std::forward<Policy>(policy)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ) , std::forward<F15>( f15 ))
             ));
@@ -1759,11 +1759,11 @@ namespace hpx { namespace lcos { namespace local
         using traits::future_access;
         return future_access<typename frame_type::type>::create(std::move(p));
     }
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15>
+    template <typename Executor, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_executor<
+            typename util::decay<Executor>::type
         >
       , detail::dataflow_frame<
             threads::executor
@@ -1774,7 +1774,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        threads::executor& sched
+        Executor && sched
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14 , F15 && f15
     )
@@ -1789,7 +1789,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                sched
+                std::forward<Executor>(sched)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ) , std::forward<F15>( f15 ))
             ));
@@ -1800,7 +1800,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        traits::is_launch_policy<
+        traits::is_launch_policy_or_executor<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -1835,11 +1835,11 @@ namespace hpx { namespace lcos { namespace local
 namespace hpx { namespace lcos { namespace local
 {
     
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16>
+    template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_launch_policy<
+            typename util::decay<Policy>::type
         >
       , detail::dataflow_frame<
             BOOST_SCOPED_ENUM(launch)
@@ -1850,7 +1850,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        BOOST_SCOPED_ENUM(launch) policy
+        Policy && policy
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14 , F15 && f15 , F16 && f16
     )
@@ -1865,7 +1865,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                policy
+                std::forward<Policy>(policy)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ) , std::forward<F15>( f15 ) , std::forward<F16>( f16 ))
             ));
@@ -1873,11 +1873,11 @@ namespace hpx { namespace lcos { namespace local
         using traits::future_access;
         return future_access<typename frame_type::type>::create(std::move(p));
     }
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16>
+    template <typename Executor, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_executor<
+            typename util::decay<Executor>::type
         >
       , detail::dataflow_frame<
             threads::executor
@@ -1888,7 +1888,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        threads::executor& sched
+        Executor && sched
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14 , F15 && f15 , F16 && f16
     )
@@ -1903,7 +1903,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                sched
+                std::forward<Executor>(sched)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ) , std::forward<F15>( f15 ) , std::forward<F16>( f16 ))
             ));
@@ -1914,7 +1914,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        traits::is_launch_policy<
+        traits::is_launch_policy_or_executor<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -1949,11 +1949,11 @@ namespace hpx { namespace lcos { namespace local
 namespace hpx { namespace lcos { namespace local
 {
     
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16 , typename F17>
+    template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16 , typename F17>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_launch_policy<
+            typename util::decay<Policy>::type
         >
       , detail::dataflow_frame<
             BOOST_SCOPED_ENUM(launch)
@@ -1964,7 +1964,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        BOOST_SCOPED_ENUM(launch) policy
+        Policy && policy
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14 , F15 && f15 , F16 && f16 , F17 && f17
     )
@@ -1979,7 +1979,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                policy
+                std::forward<Policy>(policy)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ) , std::forward<F15>( f15 ) , std::forward<F16>( f16 ) , std::forward<F17>( f17 ))
             ));
@@ -1987,11 +1987,11 @@ namespace hpx { namespace lcos { namespace local
         using traits::future_access;
         return future_access<typename frame_type::type>::create(std::move(p));
     }
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16 , typename F17>
+    template <typename Executor, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16 , typename F17>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_executor<
+            typename util::decay<Executor>::type
         >
       , detail::dataflow_frame<
             threads::executor
@@ -2002,7 +2002,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        threads::executor& sched
+        Executor && sched
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14 , F15 && f15 , F16 && f16 , F17 && f17
     )
@@ -2017,7 +2017,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                sched
+                std::forward<Executor>(sched)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ) , std::forward<F15>( f15 ) , std::forward<F16>( f16 ) , std::forward<F17>( f17 ))
             ));
@@ -2028,7 +2028,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16 , typename F17>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        traits::is_launch_policy<
+        traits::is_launch_policy_or_executor<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -2063,11 +2063,11 @@ namespace hpx { namespace lcos { namespace local
 namespace hpx { namespace lcos { namespace local
 {
     
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16 , typename F17 , typename F18>
+    template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16 , typename F17 , typename F18>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_launch_policy<
+            typename util::decay<Policy>::type
         >
       , detail::dataflow_frame<
             BOOST_SCOPED_ENUM(launch)
@@ -2078,7 +2078,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        BOOST_SCOPED_ENUM(launch) policy
+        Policy && policy
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14 , F15 && f15 , F16 && f16 , F17 && f17 , F18 && f18
     )
@@ -2093,7 +2093,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                policy
+                std::forward<Policy>(policy)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ) , std::forward<F15>( f15 ) , std::forward<F16>( f16 ) , std::forward<F17>( f17 ) , std::forward<F18>( f18 ))
             ));
@@ -2101,11 +2101,11 @@ namespace hpx { namespace lcos { namespace local
         using traits::future_access;
         return future_access<typename frame_type::type>::create(std::move(p));
     }
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16 , typename F17 , typename F18>
+    template <typename Executor, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16 , typename F17 , typename F18>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_executor<
+            typename util::decay<Executor>::type
         >
       , detail::dataflow_frame<
             threads::executor
@@ -2116,7 +2116,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        threads::executor& sched
+        Executor && sched
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14 , F15 && f15 , F16 && f16 , F17 && f17 , F18 && f18
     )
@@ -2131,7 +2131,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                sched
+                std::forward<Executor>(sched)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ) , std::forward<F15>( f15 ) , std::forward<F16>( f16 ) , std::forward<F17>( f17 ) , std::forward<F18>( f18 ))
             ));
@@ -2142,7 +2142,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16 , typename F17 , typename F18>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        traits::is_launch_policy<
+        traits::is_launch_policy_or_executor<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
@@ -2177,11 +2177,11 @@ namespace hpx { namespace lcos { namespace local
 namespace hpx { namespace lcos { namespace local
 {
     
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16 , typename F17 , typename F18 , typename F19>
+    template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16 , typename F17 , typename F18 , typename F19>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_launch_policy<
+            typename util::decay<Policy>::type
         >
       , detail::dataflow_frame<
             BOOST_SCOPED_ENUM(launch)
@@ -2192,7 +2192,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        BOOST_SCOPED_ENUM(launch) policy
+        Policy && policy
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14 , F15 && f15 , F16 && f16 , F17 && f17 , F18 && f18 , F19 && f19
     )
@@ -2207,7 +2207,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                policy
+                std::forward<Policy>(policy)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ) , std::forward<F15>( f15 ) , std::forward<F16>( f16 ) , std::forward<F17>( f17 ) , std::forward<F18>( f18 ) , std::forward<F19>( f19 ))
             ));
@@ -2215,11 +2215,11 @@ namespace hpx { namespace lcos { namespace local
         using traits::future_access;
         return future_access<typename frame_type::type>::create(std::move(p));
     }
-    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16 , typename F17 , typename F18 , typename F19>
+    template <typename Executor, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16 , typename F17 , typename F18 , typename F19>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_executor<
+            typename util::decay<Executor>::type
         >
       , detail::dataflow_frame<
             threads::executor
@@ -2230,7 +2230,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        threads::executor& sched
+        Executor && sched
       , Func && func
       , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14 , F15 && f15 , F16 && f16 , F17 && f17 , F18 && f18 , F19 && f19
     )
@@ -2245,7 +2245,7 @@ namespace hpx { namespace lcos { namespace local
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                sched
+                std::forward<Executor>(sched)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ) , std::forward<F15>( f15 ) , std::forward<F16>( f16 ) , std::forward<F17>( f17 ) , std::forward<F18>( f18 ) , std::forward<F19>( f19 ))
             ));
@@ -2256,7 +2256,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16 , typename F17 , typename F18 , typename F19>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        traits::is_launch_policy<
+        traits::is_launch_policy_or_executor<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
