@@ -338,16 +338,6 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             );
         }
 
-        // Current element can't be a future and a range of futures at the
-        // same time
-        template <typename Iter>
-        BOOST_FORCEINLINE
-        void await_next(Iter iter, boost::mpl::true_, boost::mpl::true_)
-        {
-//             BOOST_STATIC_ASSERT_MSG(false,
-//                 "current element can't be both, a future and a future range");
-        }
-
         ///////////////////////////////////////////////////////////////////////
         template <typename Iter>
         BOOST_FORCEINLINE
