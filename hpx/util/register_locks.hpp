@@ -39,6 +39,27 @@ namespace hpx { namespace util
     HPX_API_EXPORT void reset_ignored(void const* lock);
 
     ///////////////////////////////////////////////////////////////////////////
+#if !defined(BOOST_NO_CXX11_DECLTYPE_N3276) && !defined(BOOST_NO_SFINAE_EXPR)
+    template <typename Lock>
+    struct ignore_while_checking<Lock,
+        typename util::always_void<
+            decltype(boost::declval<Lock>().mutex())
+        >::type>
+    {
+        ignore_while_checking(Lock const* lock)
+          : lock_(lock->mutex())
+        {
+            ignore_lock(lock_);
+        }
+
+        ~ignore_while_checking()
+        {
+            reset_ignored(lock_);
+        }
+
+        void const* lock_;
+    };
+#else
     template <typename Mutex>
     struct ignore_while_checking<boost::unique_lock<Mutex> >
     {
@@ -77,27 +98,6 @@ namespace hpx { namespace util
     struct ignore_while_checking<boost::shared_lock<Mutex> >
     {
         ignore_while_checking(boost::shared_lock<Mutex> const* lock)
-          : lock_(lock->mutex())
-        {
-            ignore_lock(lock_);
-        }
-
-        ~ignore_while_checking()
-        {
-            reset_ignored(lock_);
-        }
-
-        void const* lock_;
-    };
-
-#if !defined(BOOST_NO_CXX11_DECLTYPE_N3276) && !defined(BOOST_NO_SFINAE_EXPR)
-    template <typename Lock>
-    struct ignore_while_checking<Lock,
-        typename util::always_void<
-            decltype(boost::declval<Lock>().mutex())
-        >::type>
-    {
-        ignore_while_checking(Lock const* lock)
           : lock_(lock->mutex())
         {
             ignore_lock(lock_);
