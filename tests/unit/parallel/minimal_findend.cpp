@@ -16,7 +16,7 @@ void find_end_failing_test()
 
     bool caught_exception = false;
     try {
-        hpx::parallel::find_end( hpx::parallel::seq,
+        std::find_end(
             decorated_iterator(
                 boost::begin(c),
                 [](){ throw std::runtime_error("error"); }),
@@ -27,9 +27,6 @@ void find_end_failing_test()
     }
     catch(hpx::exception_list const& e) {
         caught_exception = true;
-        test::test_num_exceptions<hpx::parallel::v1::sequential_execution_policy, 
-                std::random_access_iterator_tag>
-            ::call(hpx::parallel::seq,e);
     }
     catch(...) {
         HPX_TEST(false);
