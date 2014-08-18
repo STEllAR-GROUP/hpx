@@ -27,6 +27,7 @@ set(tests
     foreachn
     generate
     generaten
+    minimal_findend
     mismatch
     mismatch_binary
     move
