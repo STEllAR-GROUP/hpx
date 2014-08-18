@@ -93,7 +93,9 @@ namespace hpx { namespace util
 #if !defined(BOOST_NO_CXX11_DECLTYPE_N3276) && !defined(BOOST_NO_SFINAE_EXPR)
     template <typename Lock>
     struct ignore_while_checking<Lock,
-        typename util::always_void<decltype(declval<Lock>().mutex())>::type>
+        typename util::always_void<
+            decltype(boost::declval<Lock>().mutex())
+        >::type>
     {
         ignore_while_checking(Lock const* lock)
           : lock_(lock->mutex())
