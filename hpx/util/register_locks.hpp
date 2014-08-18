@@ -11,6 +11,7 @@
 #include <hpx/util/always_void.hpp>
 
 #include <boost/thread/locks.hpp>
+#include <boost/utility/declval.hpp>
 
 namespace hpx { namespace util
 {
