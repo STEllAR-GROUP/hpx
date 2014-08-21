@@ -75,14 +75,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
               : min_element::algorithm("min_element")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename F>
+            template <typename ExPolicy, typename F>
             static FwdIter
             sequential(ExPolicy const&, FwdIter first, FwdIter last, F && f)
             {
                 return std::min_element(first, last, std::forward<F>(f));
             }
 
-            template <typename ExPolicy, typename FwdIter, typename F>
+            template <typename ExPolicy, typename F>
             static typename detail::algorithm_result<ExPolicy, FwdIter>::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
                 F && f)
@@ -300,14 +300,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
               : max_element::algorithm("max_element")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename F>
+            template <typename ExPolicy, typename F>
             static FwdIter
             sequential(ExPolicy const&, FwdIter first, FwdIter last, F && f)
             {
                 return std::max_element(first, last, std::forward<F>(f));
             }
 
-            template <typename ExPolicy, typename FwdIter, typename F>
+            template <typename ExPolicy, typename F>
             static typename detail::algorithm_result<ExPolicy, FwdIter>::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
                 F && f)
@@ -535,14 +535,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
               : minmax_element::algorithm("minmax_element")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename F>
+            template <typename ExPolicy, typename F>
             static std::pair<FwdIter, FwdIter>
             sequential(ExPolicy const&, FwdIter first, FwdIter last, F && f)
             {
                 return std::minmax_element(first, last, std::forward<F>(f));
             }
 
-            template <typename ExPolicy, typename FwdIter, typename F>
+            template <typename ExPolicy, typename F>
             static typename detail::algorithm_result<
                 ExPolicy, std::pair<FwdIter, FwdIter>
             >::type
