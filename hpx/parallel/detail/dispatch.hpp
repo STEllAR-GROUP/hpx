@@ -85,7 +85,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 #define N BOOST_PP_ITERATION()
 
     template <typename ExPolicy, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    typename parallel::v1::detail::algorithm_result<ExPolicy, result_type>::type
+    typename parallel::v1::detail::algorithm_result<
+        ExPolicy, result_type
+    >::type
     call(ExPolicy const& policy, HPX_ENUM_FWD_ARGS(N, Arg, arg),
         boost::mpl::true_)
     {
@@ -98,17 +100,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         }
     }
 
-    template <typename ExPolicy, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    typename parallel::v1::detail::algorithm_result<ExPolicy, result_type>::type
+    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    typename parallel::v1::detail::algorithm_result<
+        task_execution_policy, result_type
+    >::type
     call(task_execution_policy const& policy, HPX_ENUM_FWD_ARGS(N, Arg, arg),
         boost::mpl::true_)
     {
         try {
-            return detail::algorithm_result<ExPolicy, result_type>::get(
-                Derived::sequential(policy, HPX_ENUM_FORWARD_ARGS(N, Arg, arg)));
+            return detail::algorithm_result<
+                    task_execution_policy, result_type
+                >::get(Derived::sequential(policy,
+                    HPX_ENUM_FORWARD_ARGS(N, Arg, arg)));
         }
         catch (...) {
-            return detail::handle_exception<ExPolicy, result_type>::call();
+            return detail::handle_exception<
+                    task_execution_policy, result_type
+                >::call();
         }
     }
 
