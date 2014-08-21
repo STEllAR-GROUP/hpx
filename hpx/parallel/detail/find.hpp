@@ -646,6 +646,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     second range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
+    /// \tparam F           The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a replace requires \a F to meet the
+    ///                     requirements of \a CopyConstructible.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.

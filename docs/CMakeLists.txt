@@ -56,6 +56,7 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/parallel/detail/mismatch.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/detail/move.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/detail/reduce.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/detail/replace.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/detail/reverse.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/detail/rotate.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/detail/swap_ranges.hpp"

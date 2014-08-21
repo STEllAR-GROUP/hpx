@@ -29,6 +29,10 @@ set(tests
     move
     none_of
     reduce_
+    replace
+    replace_if
+    replace_copy
+    replace_copy_if
     reverse
     reverse_copy
     rotate
