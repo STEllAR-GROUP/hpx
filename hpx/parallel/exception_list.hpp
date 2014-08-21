@@ -17,7 +17,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename ExPolicy>
+        template <typename ExPolicy, typename Result = void>
         struct handle_exception
         {
             HPX_ATTRIBUTE_NORETURN static void call()
@@ -36,12 +36,35 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
         };
 
-        template <>
-        struct handle_exception<parallel_vector_execution_policy>
+        template <typename Result>
+        struct handle_exception<task_execution_policy, Result>
+        {
+            static future<Result> call()
+            {
+                try {
+                    try {
+                        throw; //-V667
+                    }
+                    catch(std::bad_alloc const& e) {
+                        boost::throw_exception(e);
+                    }
+                    catch (...) {
+                        boost::throw_exception(
+                            hpx::exception_list(boost::current_exception())
+                        );
+                    }
+                }
+                catch (...) {
+                    return make_error_future<Result>(boost::current_exception());
+                }
+            }
+        };
+
+        template <typename Result>
+        struct handle_exception<parallel_vector_execution_policy, Result>
         {
             HPX_ATTRIBUTE_NORETURN static void call()
             {
-                std::cout << "terminated";
                 // any exceptions thrown by algorithms executed with the
                 // parallel_vector_execution_policy are to call terminate.
                 hpx::terminate();
