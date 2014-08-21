@@ -31,6 +31,7 @@
 #include <boost/ref.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/utility/enable_if.hpp>
+#include <boost/static_assert.hpp>
 
 #include <boost/preprocessor/enum.hpp>
 #include <boost/preprocessor/enum_params.hpp>
@@ -52,16 +53,25 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
         template <typename Future>
         BOOST_FORCEINLINE
-        void operator()(Future& future) const
+        typename boost::enable_if<is_future_or_future_range<Future> >::type
+        operator()(Future& future) const
         {
             future = Future();
         }
 
         template <typename Future>
         BOOST_FORCEINLINE
-        void operator()(boost::reference_wrapper<Future>& future) const
+        typename boost::enable_if<is_future_or_future_range<Future> >::type
+        operator()(boost::reference_wrapper<Future>& future) const
         {
             future.get() = Future();
+        }
+
+        template <typename Future>
+        BOOST_FORCEINLINE
+        typename boost::disable_if<is_future_or_future_range<Future> >::type
+        operator()(Future& future) const
+        {
         }
     };
 
@@ -104,11 +114,10 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         dataflow_frame(
             Policy policy
           , FFunc && func
-          , FFutures && futures
-        )
-          : policy_(std::move(policy))
-          , func_(std::forward<FFunc>(func))
-          , futures_(std::forward<FFutures>(futures))
+          , FFutures && futures)
+              : policy_(std::move(policy))
+              , func_(std::forward<FFunc>(func))
+              , futures_(std::forward<FFutures>(futures))
         {}
 
         BOOST_FORCEINLINE
@@ -146,6 +155,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             }
         }
 
+        ///////////////////////////////////////////////////////////////////////
         template <typename Iter>
         BOOST_FORCEINLINE
         void await(
@@ -170,6 +180,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
               , true
               , threads::thread_priority_boost);
         }
+
         template <typename Iter>
         BOOST_FORCEINLINE
         void await(
@@ -178,9 +189,29 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             typedef
                 boost::mpl::bool_<boost::is_void<result_type>::value>
                 is_void;
+
             execute_function_type f = &dataflow_frame::execute;
             boost::intrusive_ptr<dataflow_frame> this_(this);
             hpx::apply(sched, f, this_, is_void());
+        }
+
+        // Current element is a not a future or future range, e.g. a just plain
+        // value.
+        template <typename Iter>
+        BOOST_FORCEINLINE
+        void await_next(Iter iter, boost::mpl::false_, boost::mpl::false_)
+        {
+            typedef
+                typename boost::fusion::result_of::next<Iter>::type
+                next_type;
+
+            await(
+                policy_
+              , boost::fusion::next(iter)
+              , boost::mpl::bool_<
+                    boost::is_same<next_type, end_type>::value
+                >()
+            );
         }
 
         template <typename TupleIter, typename Iter>
@@ -237,9 +268,10 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             );
         }
 
+        // Current element is a range (vector) of futures
         template <typename Iter>
         BOOST_FORCEINLINE
-        void await_next(Iter iter, boost::mpl::true_)
+        void await_next(Iter iter, boost::mpl::false_, boost::mpl::true_)
         {
             await_range(
                 iter
@@ -248,9 +280,10 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             );
         }
 
+        // Current element is a simple future
         template <typename Iter>
         BOOST_FORCEINLINE
-        void await_next(Iter iter, boost::mpl::false_)
+        void await_next(Iter iter, boost::mpl::true_, boost::mpl::false_)
         {
             typedef
                 typename boost::fusion::result_of::next<Iter>::type
@@ -268,7 +301,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
             if(!f_.is_ready())
             {
-                void (dataflow_frame::*f)(Iter, boost::mpl::false_)
+                void (dataflow_frame::*f)(Iter, boost::mpl::true_, boost::mpl::false_)
                     = &dataflow_frame::await_next;
 
                 typedef
@@ -288,6 +321,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                         f
                       , this_
                       , std::move(iter)
+                      , boost::mpl::true_()
                       , boost::mpl::false_()
                     )
                 );
@@ -304,6 +338,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             );
         }
 
+        ///////////////////////////////////////////////////////////////////////
         template <typename Iter>
         BOOST_FORCEINLINE
         void await(Policy&, Iter iter, boost::mpl::false_)
@@ -316,11 +351,15 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 >::type
                 future_type;
 
+            typedef typename traits::is_future<
+                future_type
+            >::type is_future;
+
             typedef typename traits::is_future_range<
                 future_type
             >::type is_range;
 
-            await_next(std::move(iter), is_range());
+            await_next(std::move(iter), is_future(), is_range());
         }
 
         BOOST_FORCEINLINE void await()
@@ -380,11 +419,11 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 namespace hpx { namespace lcos { namespace local
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Func, BOOST_PP_ENUM_PARAMS(N, typename F)>
+    template <typename Policy, typename Func, BOOST_PP_ENUM_PARAMS(N, typename F)>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_launch_policy<
+            typename util::decay<Policy>::type
         >
       , detail::dataflow_frame<
             BOOST_SCOPED_ENUM(launch)
@@ -395,7 +434,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        BOOST_SCOPED_ENUM(launch) policy
+        Policy && policy
       , Func && func
       , HPX_ENUM_FWD_ARGS(N, F, f)
     )
@@ -411,7 +450,7 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
 
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                policy
+                std::forward<Policy>(policy)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, F, f))
             ));
@@ -421,11 +460,11 @@ namespace hpx { namespace lcos { namespace local
         return future_access<typename frame_type::type>::create(std::move(p));
     }
 
-    template <typename Func, BOOST_PP_ENUM_PARAMS(N, typename F)>
+    template <typename Executor, typename Func, BOOST_PP_ENUM_PARAMS(N, typename F)>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        detail::is_future_or_future_range<
-            typename util::decay<Func>::type
+    typename boost::lazy_enable_if<
+        traits::is_executor<
+            typename util::decay<Executor>::type
         >
       , detail::dataflow_frame<
             threads::executor
@@ -436,7 +475,7 @@ namespace hpx { namespace lcos { namespace local
         >
     >::type
     dataflow(
-        threads::executor& sched
+        Executor && sched
       , Func && func
       , HPX_ENUM_FWD_ARGS(N, F, f)
     )
@@ -452,7 +491,7 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
 
         boost::intrusive_ptr<frame_type> p(new frame_type(
-                sched
+                std::forward<Executor>(sched)
               , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, F, f))
             ));
@@ -465,7 +504,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Func, BOOST_PP_ENUM_PARAMS(N, typename F)>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        traits::is_launch_policy<
+        traits::is_launch_policy_or_executor<
             typename util::decay<Func>::type
         >
       , detail::dataflow_frame<
