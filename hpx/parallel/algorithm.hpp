@@ -20,6 +20,7 @@
 #include <hpx/parallel/detail/find.hpp>
 #include <hpx/parallel/detail/for_each.hpp>
 #include <hpx/parallel/detail/generate.hpp>
+#include <hpx/parallel/detail/minmax.hpp>
 #include <hpx/parallel/detail/mismatch.hpp>
 #include <hpx/parallel/detail/move.hpp>
 #include <hpx/parallel/detail/reverse.hpp>

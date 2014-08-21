@@ -100,6 +100,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 
     template <typename ExPolicy, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     typename parallel::v1::detail::algorithm_result<ExPolicy, result_type>::type
+    call(task_execution_policy const& policy, HPX_ENUM_FWD_ARGS(N, Arg, arg),
+        boost::mpl::true_)
+    {
+        try {
+            return detail::algorithm_result<ExPolicy, result_type>::get(
+                Derived::sequential(policy, HPX_ENUM_FORWARD_ARGS(N, Arg, arg)));
+        }
+        catch (...) {
+            return detail::handle_exception<ExPolicy, result_type>::call();
+        }
+    }
+
+    template <typename ExPolicy, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    typename parallel::v1::detail::algorithm_result<ExPolicy, result_type>::type
     call(ExPolicy const& policy, HPX_ENUM_FWD_ARGS(N, Arg, arg),
         boost::mpl::false_)
     {

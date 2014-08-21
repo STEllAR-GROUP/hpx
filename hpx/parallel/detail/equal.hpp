@@ -103,11 +103,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     {
                         util::loop_n(
                             it, part_count, tok,
-                            [&f, &tok](reference t)
+                            [&f, &tok](zip_iterator const& curr)
                             {
-                                if (!f(hpx::util::get<0>(t), hpx::util::get<1>(t))){
+                                using hpx::util::get;
+                                reference t = *curr;
+                                if (!f(get<0>(t), get<1>(t)))
                                     tok.cancel();
-                                }
                             });
                         return !tok.was_cancelled();
                     },
@@ -355,9 +356,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     {
                         util::loop_n(
                             it, part_count, tok,
-                            [&f, &tok](reference t)
+                            [&f, &tok](zip_iterator const& curr)
                             {
-                                if (!f(hpx::util::get<0>(t), hpx::util::get<1>(t)))
+                                reference t = *curr;
+                                using hpx::util::get;
+                                if (!f(get<0>(t), get<1>(t)))
                                     tok.cancel();
                             });
                         return !tok.was_cancelled();
