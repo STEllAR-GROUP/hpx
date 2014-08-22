@@ -110,7 +110,7 @@ set(serialization_overhead_FLAGS DEPENDENCIES iostreams_component)
 set(future_overhead_FLAGS DEPENDENCIES iostreams_component)
 set(sizeof_FLAGS DEPENDENCIES iostreams_component)
 
-if(HPX_HAVE_CXX11_LAMBDAS)
+if(HPX_WITH_CXX11_LAMBDAS)
   set(benchmarks ${benchmarks}
       foreach_scaling
       spinlock_overhead1

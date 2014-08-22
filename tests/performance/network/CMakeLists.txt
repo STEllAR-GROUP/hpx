@@ -7,7 +7,7 @@ set(subdirs
     osu
    )
 
-if(HPX_HAVE_CXX11_LAMBDAS)
+if(HPX_WITH_CXX11_LAMBDAS)
   set(subdirs
     ${subdirs}
     network_storage
