@@ -4,46 +4,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    adjacentfind
-    adjacentfind_binary
-    all_of
-    any_of
-    copy
-    copyif
-    copyn
-    count
-    countif
-    equal
-    equal_binary
-    fill
-    filln
-    find
-    findend
-    findfirstof
-    findfirstof_binary
-    findif
-    findifnot
-    foreach
-    foreachn
-    generate
-    generaten
-    mismatch
-    mismatch_binary
-    move
-    none_of
-    reduce_
-    reverse
-    reverse_copy
-    rotate
-    rotate_copy
-    swapranges
-    task_region
-    transform
-    transform_binary
-    transform_reduce
+    minimal_findend
    )
-
-set(task_region_FLAGS DEPENDENCIES iostreams_component)
 
 foreach(test ${tests})
   set(sources
@@ -57,7 +19,7 @@ foreach(test ${tests})
   add_hpx_executable(${test}_test
                      SOURCES ${sources}
                      ${${test}_FLAGS}
-                     FOLDER "Tests/Unit/Parallel/")
+                     FOLDER "Tests/Regressions/Parallel/")
 
   add_hpx_unit_test("parallel" ${test} ${${test}_PARAMETERS})
 

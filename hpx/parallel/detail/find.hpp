@@ -455,22 +455,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 FwdIter2 first2, FwdIter2 last2, Pred && op)
             {
                 return std::find_end(first1, last1, first2, last2, op);
-                /*
-                if(first2 == last2)
-                    return last1;
-                FwdIter result = last1;
-                while(1) {
-                    FwdIter new_result = std::search(first1, last1, first2, last2, op);
-                    if(new_result == last1) {
-                        return result;
-                    } else {
-                        result = new_result;
-                        first1 = result;
-                        ++first1;
-                    }
-                }
-                return result;
-                */
             }
 
             template <typename ExPolicy, typename FwdIter2, typename Pred>
@@ -811,6 +795,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             }
         };
+        /// \endcond
     }
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
@@ -934,10 +919,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     the algorithm will be searching for.
     /// \param s_last       Refers to the end of the sequence of elements of
     ///                     the algorithm will be searching for.
-    /// \param p            The binary predicate which returns \code true \endcode
+    /// \param op           The binary predicate which returns \a true
     ///                     if the elements should be treated as equal. The signature
     ///                     should be equivalent to the following:
-    ///                     \code bool pred(const Type1 &a, const Type2 &b); \endcode
+    ///                     \code 
+    ///                     bool pred(const Type1 &a, const Type2 &b); 
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The types \a Type1 and \a Type2 must be such
+    ///                     that objects of types \a FwdIter1 and \a FwdIter2
+    ///                     can be dereferenced and then implicitly converted
+    ///                     to \a Type1 and \a Type2 respectively.
     ///
     /// The comparison operations in the parallel \a find_first_of algorithm invoked
     /// with an execution policy object of type \a sequential_execution_policy
@@ -1061,6 +1054,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     });
             }
         };
+        /// \endcond
     }
 
     /// Searches the range [first, last) for two consecutive identical elements.
@@ -1152,10 +1146,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     of the range the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements of
     ///                     the range the algorithm will be applied to.
-    /// \param p            The binary predicate which returns \code true \endcode
+    /// \param p            The binary predicate which returns \a true
     ///                     if the elements should be treated as equal. The signature
     ///                     should be equivalent to the following:
-    ///                     \code bool pred(const Type1 &a, const Type2 &b); \endcode
+    ///                     \code 
+    ///                     bool pred(const Type1 &a, const Type2 &b); 
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The types \a Type1 and \a Type2 must be such
+    ///                     that objects of types \a FwdIter1 and \a FwdIter2
+    ///                     can be dereferenced and then implicitly converted
+    ///                     to \a Type1 and \a Type2 respectively.
     ///
     /// The comparison operations in the parallel \a adjacent_find invoked
     /// with an execution policy object of type \a sequential_execution_policy
