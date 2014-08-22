@@ -743,7 +743,8 @@ namespace hpx
         // initialize thread affinity settings in the scheduler
         if (affinity_init_.used_cores_ == 0) {
             // correct used_cores from config data if appropriate
-            affinity_init_.used_cores_ = std::size_t(this->get_config().get_used_cores());
+            affinity_init_.used_cores_ = std::size_t(
+                this->get_config().get_first_used_core());
         }
 
         return static_cast<boost::uint32_t>(

@@ -72,6 +72,36 @@ namespace hpx { namespace parcelset
         return "<unknown>";
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    bool connection_type_available(connection_type t)
+    {
+        switch(t) {
+#if defined(HPX_HAVE_PARCELPORT_TCP)
+        case connection_tcp:
+            return true;
+#endif
+#if defined(HPX_HAVE_PARCELPORT_IPC)
+        case connection_ipc:
+            return true;
+#endif
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+        case connection_ibverbs:
+            return true;
+#endif
+#if defined(HPX_HAVE_PARCELPORT_PORTALS4)
+        case connection_portals4:
+            return true;
+#endif
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+        case connection_mpi:
+            return true;
+#endif
+        default:
+            break;
+        }
+        return false;
+    }
+
     connection_type get_connection_type_from_name(std::string const& t)
     {
         if (!std::strcmp(t.c_str(), "tcp"))
@@ -192,6 +222,10 @@ namespace hpx { namespace parcelset
 
         for(int i = 0; i < connection_type::connection_last; ++i)
         {
+            // skip this configuration if the parcelport is available
+            if (!connection_type_available(connection_type(i)))
+                continue;
+
             std::pair<std::vector<std::string>, bool> pp_ini_defs =
                 parcelport::runtime_configuration(i);
             std::string name = get_connection_type_name(connection_type(i));
@@ -226,7 +260,6 @@ namespace hpx { namespace parcelset
             // add the pp specific configuration parameter
             ini_defs.insert(ini_defs.end(),
                 pp_ini_defs.first.begin(), pp_ini_defs.first.end());
-
         }
 
         return ini_defs;
