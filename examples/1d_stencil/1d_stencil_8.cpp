@@ -563,6 +563,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     // Gather results from all localities
     if (0 == hpx::get_locality_id())
     {
+        boost::uint64_t const num_worker_threads = hpx::get_num_worker_threads();
+
         hpx::future<std::vector<stepper_server::space> > overall_result =
             hpx::lcos::gather_here(gather_basename, std::move(result), nl);
 
@@ -591,9 +593,7 @@ int hpx_main(boost::program_options::variables_map& vm)
             }
         }
 
-        boost::uint64_t const num_worker_threads = hpx::get_num_worker_threads();
-        hpx::future<boost::uint32_t> locs = hpx::get_num_localities();
-        print_time_results(locs.get(),num_worker_threads, elapsed, nx, np, nt, header);
+        print_time_results(nl, num_worker_threads, elapsed, nx, np, nt, header);
     }
     else
     {
