@@ -204,8 +204,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category2>
         >::type is_seq;
 
-        typedef typename std::iterator_traits<InIter1>::value_type value_type;
-
         return detail::equal_binary().call(
             std::forward<ExPolicy>(policy),
             first1, last1, first2, last2, detail::equal_to(), is_seq());
@@ -306,8 +304,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category1>,
             boost::is_same<std::input_iterator_tag, iterator_category2>
         >::type is_seq;
-
-        typedef typename std::iterator_traits<InIter1>::value_type value_type;
 
         return detail::equal_binary().call(
             std::forward<ExPolicy>(policy),
@@ -451,8 +447,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category2>
         >::type is_seq;
 
-        typedef typename std::iterator_traits<InIter1>::value_type value_type;
-
         return detail::equal().call(
             std::forward<ExPolicy>(policy),
             first1, last1, first2, detail::equal_to(), is_seq());
@@ -549,8 +543,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category1>,
             boost::is_same<std::input_iterator_tag, iterator_category2>
         >::type is_seq;
-
-        typedef typename std::iterator_traits<InIter1>::value_type value_type;
 
         return detail::equal().call(
             std::forward<ExPolicy>(policy),

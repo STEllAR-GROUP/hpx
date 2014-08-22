@@ -49,8 +49,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             parallel(ExPolicy const& policy, InIter first, InIter last,
                 T const& val)
             {
-                typedef typename std::iterator_traits<InIter>::iterator_category
-                    category;
                 typedef typename std::iterator_traits<InIter>::value_type type;
 
                 std::size_t count = std::distance(first, last);
@@ -175,8 +173,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename detail::algorithm_result<ExPolicy, FwdIter>::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last, F && f)
             {
-                typedef typename std::iterator_traits<FwdIter>::iterator_category
-                    category;
                 typedef typename std::iterator_traits<FwdIter>::value_type type;
 
                 std::size_t count = std::distance(first, last);
@@ -320,8 +316,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename detail::algorithm_result<ExPolicy, FwdIter>::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last, F && f)
             {
-                typedef typename std::iterator_traits<FwdIter>::iterator_category
-                    category;
                 typedef typename std::iterator_traits<FwdIter>::value_type type;
 
                 std::size_t count = std::distance(first, last);
