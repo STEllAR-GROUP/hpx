@@ -593,7 +593,8 @@ int hpx_main(boost::program_options::variables_map& vm)
             }
         }
 
-        print_time_results(nl, num_worker_threads, elapsed, nx, np, nt, header);
+        print_time_results(boost::uint32_t(nl), num_worker_threads, elapsed,
+            nx, np, nt, header);
     }
     else
     {
