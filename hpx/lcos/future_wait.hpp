@@ -72,6 +72,8 @@ namespace hpx { namespace lcos
                     // reactivate waiting thread only if it's not us
                     if (id != threads::get_self_id())
                         threads::set_thread_state(id, threads::pending);
+                    else
+                        goal_reached_by_main_thread_ = true;
                 }
             }
 
@@ -158,6 +160,7 @@ namespace hpx { namespace lcos
             result_type operator()()
             {
                 ready_count_.store(0);
+                goal_reached_by_main_thread_ = false;
 
                 // set callback functions to executed when future is ready
                 std::size_t size = lazy_values_.size();
@@ -177,7 +180,7 @@ namespace hpx { namespace lcos
                 // If all of the requested futures are already set then our
                 // callback above has already been called, otherwise we suspend
                 // ourselves.
-                if (ready_count_ < size)
+                if (!goal_reached_by_main_thread_)
                 {
                     // wait for all of the futures to return to become ready
                     this_thread::suspend(threads::suspended,
@@ -194,6 +197,7 @@ namespace hpx { namespace lcos
             boost::atomic<std::size_t> ready_count_;
             typename boost::remove_reference<F>::type f_;
             boost::atomic<std::size_t>* success_counter_;
+            bool goal_reached_by_main_thread_;
         };
     }
 
