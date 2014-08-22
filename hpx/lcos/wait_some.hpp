@@ -68,7 +68,7 @@ namespace hpx { namespace lcos
                 else {
                     if (wait_.count_.fetch_add(1) + 1 == wait_.needed_count_)
                     {
-                        wait_.reached_goal_on_calling_thread_ = true;
+                        wait_.goal_reached_on_calling_thread_ = true;
                     }
                 }
             }
@@ -112,7 +112,7 @@ namespace hpx { namespace lcos
                     if (id != threads::get_self_id())
                         threads::set_thread_state(id, threads::pending);
                     else
-                        reached_goal_on_calling_thread_ = true;
+                        goal_reached_on_calling_thread_ = true;
                 }
             }
 
@@ -129,7 +129,7 @@ namespace hpx { namespace lcos
               : lazy_values_(std::move(lazy_values))
               , count_(0)
               , needed_count_(n)
-              , reached_goal_on_calling_thread_(false)
+              , goal_reached_on_calling_thread_(false)
             {}
 
             result_type operator()()
@@ -143,7 +143,7 @@ namespace hpx { namespace lcos
                 // if all of the requested futures are already set, our
                 // callback above has already been called often enough, otherwise
                 // we suspend ourselves
-                if (!reached_goal_on_calling_thread_)
+                if (!goal_reached_on_calling_thread_)
                 {
                     // wait for any of the futures to return to become ready
                     this_thread::suspend(threads::suspended,
@@ -157,7 +157,7 @@ namespace hpx { namespace lcos
             argument_type lazy_values_;
             boost::atomic<std::size_t> count_;
             std::size_t const needed_count_;
-            bool reached_goal_on_calling_thread_;
+            bool goal_reached_on_calling_thread_;
         };
 
         ///////////////////////////////////////////////////////////////////////

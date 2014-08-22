@@ -42,7 +42,7 @@ namespace hpx { namespace lcos
                     if (id != threads::get_self_id())
                         threads::set_thread_state(id, threads::pending);
                     else
-                        when->goal_reached_by_main_thread_ = true;
+                        when->goal_reached_on_calling_thread_ = true;
                 }
             }
 
@@ -68,7 +68,7 @@ namespace hpx { namespace lcos
                 else {
                     if (when_->count_.fetch_add(1) + 1 == when_->needed_count_)
                     {
-                        when_->goal_reached_by_main_thread = true;
+                        when_->goal_reached_on_calling_thread_ = true;
                     }
                     when_->f_(std::move(future));    // invoke callback right away
                 }
@@ -118,13 +118,13 @@ namespace hpx { namespace lcos
                 count_(0),
                 f_(std::forward<F>(f)),
                 needed_count_(n),
-                goal_reached_by_main_thread_(false)
+                goal_reached_on_calling_thread_(false)
             {}
 
             result_type operator()()
             {
                 count_.store(0);
-                goal_reached_by_main_thread_ = false;
+                goal_reached_on_calling_thread_ = false;
 
                 // set callback functions to executed when future is ready
                 set_on_completed_callback(this->shared_from_this());
@@ -132,7 +132,7 @@ namespace hpx { namespace lcos
                 // If all of the requested futures are already set then our
                 // callback above has already been called, otherwise we suspend
                 // ourselves.
-                if (!goal_reached_by_main_thread_)
+                if (!goal_reached_on_calling_thread_)
                 {
                     // wait for all of the futures to return to become ready
                     this_thread::suspend(threads::suspended,
@@ -147,7 +147,7 @@ namespace hpx { namespace lcos
             boost::atomic<std::size_t> count_;
             F f_;
             std::size_t const needed_count_;
-            bool goal_reached_by_main_thread_;
+            bool goal_reached_on_calling_thread_;
         };
     }
 
