@@ -8,7 +8,47 @@
 #include <hpx/include/parallel_find.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include "test_utils.hpp"
+namespace test
+{
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename BaseIterator, typename IteratorTag>
+    struct decorated_iterator
+      : boost::iterator_adaptor<
+            decorated_iterator<BaseIterator, IteratorTag>,
+            BaseIterator, boost::use_default, IteratorTag>
+    {
+    private:
+        typedef boost::iterator_adaptor<
+            decorated_iterator<BaseIterator, IteratorTag>,
+            BaseIterator, boost::use_default, IteratorTag>
+        base_type;
+
+    public:
+        decorated_iterator()
+        {}
+
+        decorated_iterator(BaseIterator base)
+          : base_type(base)
+        {}
+
+        decorated_iterator(BaseIterator base, std::function<void()> f)
+          : base_type(base), m_callback(f)
+        {}
+
+    private:
+        friend class boost::iterator_core_access;
+
+        typename base_type::reference dereference() const
+        {
+            if (m_callback)
+                m_callback();
+            return *(this->base());
+        }
+
+    private:
+        std::function<void()> m_callback;
+    };
+}
 
 void find_end_failing_test()
 {
@@ -29,10 +69,11 @@ void find_end_failing_test()
                 boost::end(c),
                 [](){ throw std::runtime_error("error"); }),
             boost::begin(h), boost::end(h));
-        //should never reach this point
+
+        // should never reach this point
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch(hpx::exception_list const&) {
         caught_exception = true;
     }
     catch(...) {
