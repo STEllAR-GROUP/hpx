@@ -24,13 +24,13 @@ foreach(test ${tests})
   add_hpx_unit_test("parallel" ${test} ${${test}_PARAMETERS})
 
   # add a custom target for this example
-  add_hpx_pseudo_target(tests.unit.parallel.${test})
+  add_hpx_pseudo_target(tests.regressions.parallel.${test})
 
   # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.parallel
-                              tests.unit.parallel.${test})
+  add_hpx_pseudo_dependencies(tests.regressions.parallel
+                              tests.regressions.parallel.${test})
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.parallel.${test}
+  add_hpx_pseudo_dependencies(tests.regressions.parallel.${test}
                               ${test}_test_exe)
 endforeach()
