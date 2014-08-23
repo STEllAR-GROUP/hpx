@@ -53,8 +53,6 @@ namespace test
           : base_type(base), m_callback(f)
         {}
 
-        decorated_iterator() :base_type() {}
-
     private:
         friend class boost::iterator_core_access;
 
