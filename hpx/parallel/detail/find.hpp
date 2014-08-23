@@ -782,7 +782,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 },
                 [=](std::vector<hpx::future<void> > &&) mutable
                 {
-                    std::size_t find_first_of_res = tok.get_data();
+                    difference_type find_first_of_res = tok.get_data();
                     if(find_first_of_res != count)
                         std::advance(first, find_first_of_res);
                     else
