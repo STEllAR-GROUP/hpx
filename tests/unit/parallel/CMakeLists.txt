@@ -4,6 +4,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    adjacentfind
+    adjacentfind_binary
     all_of
     any_of
     copy
@@ -18,6 +20,7 @@ set(tests
     find
     findend
     findfirstof
+    findfirstof_binary
     findif
     findifnot
     foreach

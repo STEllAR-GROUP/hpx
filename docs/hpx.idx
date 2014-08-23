@@ -81,7 +81,9 @@ parallel::fill_n                      "fill_n" "hpx\.parallel\.v1\.fill_n.*"
 parallel::find                        "find" "hpx\.parallel\.v1\.find$"
 parallel::find_if                     "find_if" "hpx\.parallel\.v1\.find_if$"
 parallel::find_if_not                 "find_if_not" "hpx\.parallel\.v1\.find_if_not.*"
-parallel::find_end                    "find_end" "hpx\.parallel\.v1\.find_end_id.*"
+parallel::find_end                    "find_end" "hpx\.parallel\.v1\.find_end.*"
+parallel::find_first_of               "find_first_of" "hpx\.parallel\.v1\.find_first_of.*"
+parallel::adjacent_find               "adjacent_find" "hpx\.parallel\.v1\.adjacent_find.*"
 
 # hpx/parallel/detail/for_each.hpp
 parallel::for_each                    "for_each" "hpx\.parallel\.v1\.for_each$"

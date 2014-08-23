@@ -5,6 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/parallel/algorithm.hpp>
 #include <hpx/include/parallel_find.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
@@ -27,9 +28,14 @@ void test_find_first_of(ExPolicy const& policy, IteratorTag)
     std::size_t h[] = {1, 7, 18, 3};
     c[find_first_of_pos] = h[random_sub_seq_pos];
 
+    auto op = [](std::size_t a, std::size_t b)
+    {
+        return !(a != b);
+    };
+
     iterator index = hpx::parallel::find_first_of(policy,
         iterator(boost::begin(c)), iterator(boost::end(c)),
-        boost::begin(h), boost::end(h));
+        boost::begin(h), boost::end(h), op);
 
     base_iterator test_index = boost::begin(c) + find_first_of_pos;
 
@@ -51,10 +57,15 @@ void test_find_first_of(hpx::parallel::task_execution_policy, IteratorTag)
     std::size_t h[] = {1, 7, 18, 3};
     c[find_first_of_pos] = h[random_sub_seq_pos];
 
+    auto op = [](std::size_t a, std::size_t b)
+    {
+        return !(a != b);
+    };
+
     hpx::future<iterator> f =
         hpx::parallel::find_first_of(hpx::parallel::task,
             iterator(boost::begin(c)), iterator(boost::end(c)),
-            boost::begin(h), boost::end(h));
+            boost::begin(h), boost::end(h),op);
     f.wait();
 
     // create iterator at position of value to be found
@@ -102,6 +113,11 @@ void test_find_first_of_exception(ExPolicy const& policy, IteratorTag)
 
     std::size_t h[] = { 1, 2 };
 
+    auto op = [](std::size_t a, std::size_t b)
+    {
+        return !(a != b);
+    };
+
     bool caught_exception = false;
     try {
         hpx::parallel::find_first_of(policy,
@@ -109,7 +125,7 @@ void test_find_first_of_exception(ExPolicy const& policy, IteratorTag)
                 boost::begin(c),
                 [](){ throw std::runtime_error("test"); }),
             decorated_iterator(boost::end(c)),
-            boost::begin(h), boost::end(h));
+            boost::begin(h), boost::end(h),op);
         HPX_TEST(false);
     }
     catch(hpx::exception_list const& e) {
@@ -136,6 +152,11 @@ void test_find_first_of_exception(hpx::parallel::task_execution_policy, Iterator
 
     std::size_t h[] = { 1, 2 };
 
+    auto op = [](std::size_t a, std::size_t b)
+    {
+        return !(a != b);
+    };
+
     bool caught_exception = false;
     try {
         hpx::future<decorated_iterator> f =
@@ -144,7 +165,7 @@ void test_find_first_of_exception(hpx::parallel::task_execution_policy, Iterator
                     boost::begin(c),
                     [](){ throw std::runtime_error("test"); }),
                 decorated_iterator(boost::end(c)),
-                boost::begin(h), boost::end(h));
+                boost::begin(h), boost::end(h),op);
         f.get();
 
         HPX_TEST(false);
@@ -201,6 +222,11 @@ void test_find_first_of_bad_alloc(ExPolicy const& policy, IteratorTag)
 
     std::size_t h[] = { 1, 2 };
 
+    auto op = [](std::size_t a, std::size_t b)
+    {
+        return !(a != b);
+    };
+
     bool caught_bad_alloc = false;
     try {
         hpx::parallel::find_first_of(policy,
@@ -208,7 +234,7 @@ void test_find_first_of_bad_alloc(ExPolicy const& policy, IteratorTag)
                 boost::begin(c),
                 [](){ throw std::bad_alloc(); }),
             decorated_iterator(boost::end(c)),
-            boost::begin(h), boost::end(h));
+            boost::begin(h), boost::end(h),op);
         HPX_TEST(false);
     }
     catch(std::bad_alloc const&) {
@@ -234,6 +260,11 @@ void test_find_first_of_bad_alloc(hpx::parallel::task_execution_policy, Iterator
 
     std::size_t h[] = { 1, 2 };
 
+    auto op = [](std::size_t a, std::size_t b)
+    {
+        return !(a != b);
+    };
+
     bool caught_bad_alloc = false;
     try {
         hpx::future<decorated_iterator> f =
@@ -242,7 +273,7 @@ void test_find_first_of_bad_alloc(hpx::parallel::task_execution_policy, Iterator
                     boost::begin(c),
                     [](){ throw std::bad_alloc(); }),
                 decorated_iterator(boost::end(c)),
-                boost::begin(h), boost::end(h));
+                boost::begin(h), boost::end(h),op);
 
         f.get();
 
