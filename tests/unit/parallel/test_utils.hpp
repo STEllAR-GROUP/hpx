@@ -152,9 +152,7 @@ namespace test
     {
         std::vector<std::size_t> c(size);
         std::iota(boost::begin(c), boost::end(c), 0);
-        int num = std::rand();
-        while (num-- != 0)
-            std::next_permutation(boost::begin(c), boost::end(c));
+        std::random_shuffle(boost::begin(c), boost::end(c));
         return c;
     }
 
