@@ -42,6 +42,9 @@ namespace test
         base_type;
 
     public:
+        decorated_iterator()
+        {}
+
         decorated_iterator(BaseIterator base)
           : base_type(base)
         {}

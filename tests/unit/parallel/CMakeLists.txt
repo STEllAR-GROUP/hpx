@@ -27,6 +27,9 @@ set(tests
     foreachn
     generate
     generaten
+    max_element
+    min_element
+    minmax_element
     mismatch
     mismatch_binary
     move

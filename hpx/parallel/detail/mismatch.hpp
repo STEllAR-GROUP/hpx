@@ -102,7 +102,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             base_idx, it, part_count, tok,
                             [&f, &tok](reference t, std::size_t i)
                             {
-                                if (!f(hpx::util::get<0>(t), hpx::util::get<1>(t)))
+                                using hpx::util::get;
+                                if (!f(get<0>(t), get<1>(t)))
                                     tok.cancel(i);
                             });
                     },
@@ -368,7 +369,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             base_idx, it, part_count, tok,
                             [&f, &tok](reference t, std::size_t i)
                             {
-                                if (!f(hpx::util::get<0>(t), hpx::util::get<1>(t)))
+                                using hpx::util::get;
+                                if (!f(get<0>(t), get<1>(t)))
                                     tok.cancel(i);
                             });
                     },

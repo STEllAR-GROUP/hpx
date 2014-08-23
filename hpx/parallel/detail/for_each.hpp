@@ -45,7 +45,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static Iter
             sequential(ExPolicy const&, Iter first, std::size_t count, F && f)
             {
-                return util::loop_n(first, count, std::forward<F>(f));
+                return util::loop_n(first, count,
+                    [f](Iter const& curr)
+                    {
+                        f(*curr);
+                    });
             }
 
             template <typename ExPolicy, typename F>
@@ -59,7 +63,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         policy, first, count,
                         [f](Iter part_begin, std::size_t part_size)
                         {
-                            util::loop_n(part_begin, part_size, f);
+                            util::loop_n(part_begin, part_size,
+                                [&f](Iter const& curr)
+                                {
+                                    f(*curr);
+                                });
                         });
                 }
 
