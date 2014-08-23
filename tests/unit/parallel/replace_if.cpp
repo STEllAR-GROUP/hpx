@@ -126,7 +126,7 @@ void test_replace_if_exception(ExPolicy const& policy, IteratorTag)
                 boost::begin(c),
                 [](){ throw std::runtime_error("test"); }),
             decorated_iterator(boost::end(c)),
-            equal_f(42), 43);
+            equal_f(42), std::size_t(43));
         HPX_TEST(false);
     }
     catch (hpx::exception_list const& e) {
@@ -158,7 +158,7 @@ void test_replace_if_exception(hpx::parallel::task_execution_policy, IteratorTag
                     boost::begin(c),
                     [](){ throw std::runtime_error("test"); }),
                 decorated_iterator(boost::end(c)),
-                equal_f(42), 43);
+                equal_f(42), std::size_t(43));
         f.get();
 
         HPX_TEST(false);
@@ -219,7 +219,7 @@ void test_replace_if_bad_alloc(ExPolicy const& policy, IteratorTag)
                 boost::begin(c),
                 [](){ throw std::bad_alloc(); }),
             decorated_iterator(boost::end(c)),
-            equal_f(42), 43);
+            equal_f(42), std::size_t(43));
         HPX_TEST(false);
     }
     catch (std::bad_alloc const&) {
@@ -250,7 +250,7 @@ void test_replace_if_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag
                     boost::begin(c),
                     [](){ throw std::bad_alloc(); }),
                 decorated_iterator(boost::end(c)),
-                equal_f(42), 43);
+                equal_f(42), std::size_t(43));
         f.get();
 
         HPX_TEST(false);
