@@ -77,40 +77,40 @@ void test_none_of()
 {
     using namespace hpx::parallel;
 
-//     test_none_of(seq, IteratorTag());
+    test_none_of(seq, IteratorTag());
     test_none_of(par, IteratorTag());
-//     test_none_of(par_vec, IteratorTag());
-//     test_none_of(task, IteratorTag());
+    test_none_of(par_vec, IteratorTag());
+    test_none_of(task, IteratorTag());
+
+    test_none_of(execution_policy(seq), IteratorTag());
+    test_none_of(execution_policy(par), IteratorTag());
+    test_none_of(execution_policy(par_vec), IteratorTag());
+    test_none_of(execution_policy(task), IteratorTag());
+}
+
+// template <typename IteratorTag>
+// void test_none_of_exec()
+// {
+//     using namespace hpx::parallel;
 //
-//     test_none_of(execution_policy(seq), IteratorTag());
-//     test_none_of(execution_policy(par), IteratorTag());
-//     test_none_of(execution_policy(par_vec), IteratorTag());
-//     test_none_of(execution_policy(task), IteratorTag());
-}
-
-template <typename IteratorTag>
-void test_none_of_exec()
-{
-    using namespace hpx::parallel;
-
-    {
-        hpx::threads::executors::local_priority_queue_executor exec;
-        test_none_of(par(exec), IteratorTag());
-    }
-    {
-        hpx::threads::executors::local_priority_queue_executor exec;
-        test_none_of(task(exec), IteratorTag());
-    }
-
-    {
-        hpx::threads::executors::local_priority_queue_executor exec;
-        test_none_of(execution_policy(par(exec)), IteratorTag());
-    }
-    {
-        hpx::threads::executors::local_priority_queue_executor exec;
-        test_none_of(execution_policy(task(exec)), IteratorTag());
-    }
-}
+//     {
+//         hpx::threads::executors::local_priority_queue_executor exec;
+//         test_none_of(par(exec), IteratorTag());
+//     }
+//     {
+//         hpx::threads::executors::local_priority_queue_executor exec;
+//         test_none_of(task(exec), IteratorTag());
+//     }
+//
+//     {
+//         hpx::threads::executors::local_priority_queue_executor exec;
+//         test_none_of(execution_policy(par(exec)), IteratorTag());
+//     }
+//     {
+//         hpx::threads::executors::local_priority_queue_executor exec;
+//         test_none_of(execution_policy(task(exec)), IteratorTag());
+//     }
+// }
 
 void none_of_test()
 {
@@ -118,9 +118,9 @@ void none_of_test()
     test_none_of<std::forward_iterator_tag>();
     test_none_of<std::input_iterator_tag>();
 
-    test_none_of_exec<std::random_access_iterator_tag>();
-    test_none_of_exec<std::forward_iterator_tag>();
-    test_none_of_exec<std::input_iterator_tag>();
+//     test_none_of_exec<std::random_access_iterator_tag>();
+//     test_none_of_exec<std::forward_iterator_tag>();
+//     test_none_of_exec<std::input_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

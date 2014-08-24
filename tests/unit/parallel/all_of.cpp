@@ -88,29 +88,29 @@ void test_all_of()
     test_all_of(execution_policy(task), IteratorTag());
 }
 
-template <typename IteratorTag>
-void test_all_of_exec()
-{
-    using namespace hpx::parallel;
-
-    {
-        hpx::threads::executors::local_priority_queue_executor exec;
-        test_all_of(par(exec), IteratorTag());
-    }
-    {
-        hpx::threads::executors::local_priority_queue_executor exec;
-        test_all_of(task(exec), IteratorTag());
-    }
-
-    {
-        hpx::threads::executors::local_priority_queue_executor exec;
-        test_all_of(execution_policy(par(exec)), IteratorTag());
-    }
-    {
-        hpx::threads::executors::local_priority_queue_executor exec;
-        test_all_of(execution_policy(task(exec)), IteratorTag());
-    }
-}
+// template <typename IteratorTag>
+// void test_all_of_exec()
+// {
+//     using namespace hpx::parallel;
+//
+//     {
+//         hpx::threads::executors::local_priority_queue_executor exec;
+//         test_all_of(par(exec), IteratorTag());
+//     }
+//     {
+//         hpx::threads::executors::local_priority_queue_executor exec;
+//         test_all_of(task(exec), IteratorTag());
+//     }
+//
+//     {
+//         hpx::threads::executors::local_priority_queue_executor exec;
+//         test_all_of(execution_policy(par(exec)), IteratorTag());
+//     }
+//     {
+//         hpx::threads::executors::local_priority_queue_executor exec;
+//         test_all_of(execution_policy(task(exec)), IteratorTag());
+//     }
+// }
 
 void all_of_test()
 {
@@ -118,9 +118,9 @@ void all_of_test()
     test_all_of<std::forward_iterator_tag>();
     test_all_of<std::input_iterator_tag>();
 
-    test_all_of_exec<std::random_access_iterator_tag>();
-    test_all_of_exec<std::forward_iterator_tag>();
-    test_all_of_exec<std::input_iterator_tag>();
+//     test_all_of_exec<std::random_access_iterator_tag>();
+//     test_all_of_exec<std::forward_iterator_tag>();
+//     test_all_of_exec<std::input_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
