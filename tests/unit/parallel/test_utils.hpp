@@ -8,6 +8,8 @@
 
 #include <boost/iterator/iterator_adaptor.hpp>
 
+#include <random>
+
 namespace test
 {
     ///////////////////////////////////////////////////////////////////////////

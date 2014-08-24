@@ -10,6 +10,9 @@
 
 #include "test_utils.hpp"
 
+#include <iostream>
+#include <ctime>
+
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
 void test_min_element(ExPolicy const& policy, IteratorTag)
@@ -398,23 +401,40 @@ void min_element_bad_alloc_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main()
+int hpx_main(boost::program_options::variables_map& vm)
 {
+    unsigned int seed = (unsigned int)std::time(0);
+    if (vm.count("seed"))
+        seed = vm["seed"].as<unsigned int>();
+
+    std::cout << "using seed: " << seed << std::endl;
+    std::srand(seed);
+
     min_element_test();
     min_element_exception_test();
     min_element_bad_alloc_test();
+
     return hpx::finalize();
 }
 
 int main(int argc, char* argv[])
 {
+    // add command line option which controls the random number generator seed
+    using namespace boost::program_options;
+    options_description desc_commandline(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
+
+    desc_commandline.add_options()
+        ("seed,s", value<unsigned int>(),
+         "the random number generator seed to use for this run")
+        ;
+
     // By default this test should run on all available cores
     std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency()));
+    cfg.push_back("hpx.os_threads=all");
 
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,
+    HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,
         "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
