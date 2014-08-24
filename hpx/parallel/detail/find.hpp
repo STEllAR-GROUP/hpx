@@ -49,8 +49,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             parallel(ExPolicy const& policy, InIter first, InIter last,
                 T const& val)
             {
-                typedef typename std::iterator_traits<InIter>::iterator_category
-                    category;
                 typedef typename std::iterator_traits<InIter>::value_type type;
 
                 std::size_t count = std::distance(first, last);
@@ -175,8 +173,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename detail::algorithm_result<ExPolicy, FwdIter>::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last, F && f)
             {
-                typedef typename std::iterator_traits<FwdIter>::iterator_category
-                    category;
                 typedef typename std::iterator_traits<FwdIter>::value_type type;
 
                 std::size_t count = std::distance(first, last);
@@ -320,8 +316,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename detail::algorithm_result<ExPolicy, FwdIter>::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last, F && f)
             {
-                typedef typename std::iterator_traits<FwdIter>::iterator_category
-                    category;
                 typedef typename std::iterator_traits<FwdIter>::value_type type;
 
                 std::size_t count = std::distance(first, last);
@@ -454,20 +448,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             sequential(ExPolicy const&, FwdIter first1, FwdIter last1,
                 FwdIter2 first2, FwdIter2 last2, Pred && op)
             {
-                if(first2 == last2)
-                    return last1;
-                FwdIter result = last1;
-                while(1) {
-                    FwdIter new_result = std::search(first1, last1, first2, last2, op);
-                    if (new_result == last1) {
-                        return result;
-                    } else {
-                        result = new_result;
-                        first1 = result;
-                        ++first1;
-                    }
-                }
-                return result;
+                return std::find_end(first1, last1, first2, last2, op);
             }
 
             template <typename ExPolicy, typename FwdIter2, typename Pred>
@@ -589,9 +570,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           The \a find_end algorithm returns an iterator to the beginning of
     ///           the last subsequence [first2, last2) in range [first, last).
     ///           If the length of the subsequence [first2, last2) is greater
-    ///           than the length of the range [first1, last1), last1 is returned.
+    ///           than the length of the range [first1, last1), \a last1 is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
-    ///           is found, last1 is also returned.
+    ///           is found, \a last1 is also returned.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
     inline typename boost::enable_if<
@@ -690,9 +671,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           The \a find_end algorithm returns an iterator to the beginning of
     ///           the last subsequence [first2, last2) in range [first, last).
     ///           If the length of the subsequence [first2, last2) is greater
-    ///           than the length of the range [first1, last1), last1 is returned.
+    ///           than the length of the range [first1, last1), \a last1 is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
-    ///           is found, last1 is also returned.
+    ///           is found, \a last1 is also returned.
     ///
     /// This overload of \a find_end is available if the user decides to provide the
     /// algorithm their own predicate \a f.
@@ -728,6 +709,495 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         return detail::find_end<FwdIter1>().call(
             std::forward<ExPolicy>(policy),
             first1, last1, first2, last2, std::forward<F>(f), is_seq());
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // find_first_of
+    namespace detail
+    {
+        /// \cond NOINTERNAL
+        template<typename InIter>
+        struct find_first_of: public detail::algorithm<find_first_of<InIter>, InIter>
+        {
+            find_first_of()
+                : find_first_of::algorithm("find_first_of")
+            {}
+
+            template <typename ExPolicy, typename FwdIter, typename Pred>
+            static InIter
+            sequential(ExPolicy const&, InIter first, InIter last, FwdIter s_first,
+                FwdIter s_last, Pred && op)
+            {
+                if(first == last)
+                    return last;
+                for(;first != last; ++first) {
+                    for(FwdIter iter = s_first; iter != s_last; ++iter) {
+                        if(op(*first,*iter)) {
+                            return first;
+                        }
+                    }
+                }
+                return last;
+            }
+
+            template <typename ExPolicy, typename FwdIter, typename Pred>
+            static typename detail::algorithm_result<ExPolicy,InIter>::type
+            parallel(ExPolicy const& policy, InIter first, InIter last,
+                FwdIter s_first, FwdIter s_last, Pred && op)
+            {
+                typedef typename std::iterator_traits<InIter>::reference reference;
+                typedef typename std::iterator_traits<InIter>::difference_type
+                    difference_type;
+                typedef typename std::iterator_traits<FwdIter>::difference_type
+                    s_difference_type;
+
+                s_difference_type diff = std::distance(s_first, s_last);
+                if(diff <= 0) {
+                    return detail::algorithm_result<ExPolicy, InIter>::get(
+                        std::move(last));
+                }
+
+                difference_type count = std::distance(first, last);
+                if(diff > count) {
+                    return detail::algorithm_result<ExPolicy, InIter>::get(
+                        std::move(last));
+                }
+
+                util::cancellation_token<difference_type> tok(count);
+
+                return util::partitioner<ExPolicy, InIter, void>::call_with_index(
+                    policy, first, count,
+                    [s_first, s_last, tok, op](std::size_t base_idx, InIter it,
+                        std::size_t part_size) mutable
+                {
+                    util::loop_idx_n(
+                        base_idx, it, part_size, tok,
+                        [&tok, &s_first, &s_last, &op](reference v, std::size_t i)
+                        {
+                            for(FwdIter iter = s_first; iter != s_last; ++iter) {
+                                if(op(v,*iter))
+                                    tok.cancel(i);
+                            }
+                        });
+                },
+                [=](std::vector<hpx::future<void> > &&) mutable
+                {
+                    difference_type find_first_of_res = tok.get_data();
+                    if(find_first_of_res != count)
+                        std::advance(first, find_first_of_res);
+                    else
+                        first = last;
+
+                    return std::move(first);
+                });
+
+            }
+        };
+        /// \endcond
+    }
+
+    /// Searches the range [first, last) for any elements in the range [s_first, s_last).
+    /// Uses opeartor== to compare elements.
+    ///
+    /// \note   Complexity: at most (S*N) comparisons where
+    ///         \a S = distance(s_first, s_last) and
+    ///         \a N = distance(first, last).
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam InIter      The type of the source iterators used for the
+    ///                     first range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam FwdIter     The type of the source iterators used for the
+    ///                     second range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of the first range the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     the first range the algorithm will be applied to.
+    /// \param s_first      Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be searching for.
+    /// \param s_last       Refers to the end of the sequence of elements of
+    ///                     the algorithm will be searching for.
+    ///
+    /// The comparison operations in the parallel \a find_first_of algorithm invoked
+    /// with an execution policy object of type \a sequential_execution_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a find_first_of algorithm invoked
+    /// with an execution policy object of type \a parallel_execution_policy
+    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a find_first_of algorithm returns a \a hpx::future<InIter> if the
+    ///           execution policy is of type \a task_execution_policy and
+    ///           returns \a InIter otherwise.
+    ///           The \a find_first_of algorithm returns an iterator to the beginning of
+    ///           the last subsequence [s_first, s_last) in range [first, last).
+    ///           If the length of the subsequence [s_first, s_last) is greater
+    ///           than the length of the range [first, last), \a last is returned.
+    ///           Additionally if the size of the subsequence is empty or no subsequence
+    ///           is found, \a last is also returned.
+    ///           
+    template <typename ExPolicy, typename InIter, typename FwdIter>
+    inline typename boost::enable_if<
+        is_execution_policy<ExPolicy>,
+        typename detail::algorithm_result<ExPolicy, InIter>::type
+    >::type
+    find_first_of(ExPolicy && policy, InIter first, InIter last,
+        FwdIter s_first, FwdIter s_last)
+    {
+        typedef typename std::iterator_traits<InIter>::iterator_category
+            iterator_category;
+        typedef typename std::iterator_traits<FwdIter>::iterator_category
+            s_iterator_category;
+
+        BOOST_STATIC_ASSERT_MSG(
+            (boost::is_base_of<
+                std::input_iterator_tag, iterator_category
+            >::value),
+            "Requires at least input iterator.");
+
+        BOOST_STATIC_ASSERT_MSG(
+            (boost::is_base_of<
+                std::forward_iterator_tag, s_iterator_category
+            >::value),
+            "Subsequence requires at least forward iterator.");
+
+        typedef typename boost::mpl::or_<
+            is_sequential_execution_policy<ExPolicy>,
+            boost::is_same<std::input_iterator_tag, iterator_category>
+        >::type is_seq;
+
+        return detail::find_first_of<InIter>().call(
+            std::forward<ExPolicy>(policy),
+            first, last, s_first, s_last,
+            detail::equal_to(), is_seq());
+    }
+
+    /// Searches the range [first, last) for any elements in the range [s_first, s_last).
+    /// Uses binary predicate p to compare elements
+    ///
+    /// \note   Complexity: at most (S*N) comparisons where
+    ///         \a S = distance(s_first, s_last) and
+    ///         \a N = distance(first, last).
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam InIter      The type of the source iterators used for the
+    ///                     first range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam FwdIter     The type of the source iterators used for the
+    ///                     second range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a equal requires \a Pred to meet the
+    ///                     requirements of \a CopyConstructible.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of the first range the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     the first range the algorithm will be applied to.
+    /// \param s_first      Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be searching for.
+    /// \param s_last       Refers to the end of the sequence of elements of
+    ///                     the algorithm will be searching for.
+    /// \param op           The binary predicate which returns \a true
+    ///                     if the elements should be treated as equal. The signature
+    ///                     should be equivalent to the following:
+    ///                     \code 
+    ///                     bool pred(const Type1 &a, const Type2 &b); 
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The types \a Type1 and \a Type2 must be such
+    ///                     that objects of types \a FwdIter1 and \a FwdIter2
+    ///                     can be dereferenced and then implicitly converted
+    ///                     to \a Type1 and \a Type2 respectively.
+    ///
+    /// The comparison operations in the parallel \a find_first_of algorithm invoked
+    /// with an execution policy object of type \a sequential_execution_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a find_first_of algorithm invoked
+    /// with an execution policy object of type \a parallel_execution_policy
+    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a find_first_of algorithm returns a \a hpx::future<InIter> if the
+    ///           execution policy is of type \a task_execution_policy and
+    ///           returns \a InIter otherwise.
+    ///           The \a find_first_of algorithm returns an iterator to the beginning of
+    ///           the last subsequence [s_first, s_last) in range [first, last).
+    ///           If the length of the subsequence [s_first, s_last) is greater
+    ///           than the length of the range [first, last), \a last is returned.
+    ///           Additionally if the size of the subsequence is empty or no subsequence
+    ///           is found, \a last is also returned.
+    ///           This overload of \a find_end is available if the user decides to provide the
+    ///           algorithm their own predicate \a f.
+    ///
+    template <typename ExPolicy, typename InIter, typename FwdIter, typename Pred>
+    inline typename boost::enable_if<
+        is_execution_policy<ExPolicy>,
+        typename detail::algorithm_result<ExPolicy, InIter>::type
+    >::type
+    find_first_of(ExPolicy && policy, InIter first, InIter last,
+        FwdIter s_first, FwdIter s_last, Pred && op)
+    {
+        typedef typename std::iterator_traits<InIter>::iterator_category
+            iterator_category;
+        typedef typename std::iterator_traits<FwdIter>::iterator_category
+            s_iterator_category;
+
+        BOOST_STATIC_ASSERT_MSG(
+            (boost::is_base_of<
+                std::input_iterator_tag, iterator_category
+            >::value),
+            "Requires at least input iterator.");
+
+        BOOST_STATIC_ASSERT_MSG(
+            (boost::is_base_of<
+                std::forward_iterator_tag, s_iterator_category
+            >::value),
+            "Subsequence requires at least forward iterator.");
+
+        typedef typename boost::mpl::or_<
+            is_sequential_execution_policy<ExPolicy>,
+            boost::is_same<std::input_iterator_tag, iterator_category>
+        >::type is_seq;
+
+        return detail::find_first_of<InIter>().call(
+            std::forward<ExPolicy>(policy),
+            first, last, s_first, s_last, std::forward<Pred>(op),
+            is_seq());
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // adjacent_find
+    namespace detail
+    {
+        /// \cond NOINTERNAL
+        template <typename FwdIter>
+        struct adjacent_find: public detail::algorithm<adjacent_find<FwdIter>, FwdIter>
+        {
+            adjacent_find()
+                : adjacent_find::algorithm("adjacent_find")
+            {}
+
+            template <typename ExPolicy, typename Pred>
+            static FwdIter
+            sequential(ExPolicy const&, FwdIter first, FwdIter last, Pred && op)
+            {
+                return std::adjacent_find(first, last, op);
+            }
+    
+            template <typename ExPolicy, typename Pred>
+            static typename detail::algorithm_result<ExPolicy, FwdIter>::type
+            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+                Pred && op)
+            {
+                typedef hpx::util::zip_iterator<FwdIter, FwdIter> zip_iterator;
+                typedef typename zip_iterator::reference reference;
+                typedef typename std::iterator_traits<FwdIter>::difference_type
+                    difference_type;
+
+                if(first == last)
+                {
+                    return detail::algorithm_result<ExPolicy, FwdIter>::get(
+                        std::move(last));
+                }
+
+                FwdIter next = first;
+                ++next;
+                difference_type count = std::distance(first,last);
+                util::cancellation_token<difference_type> tok(count);
+
+                return util::partitioner<ExPolicy, FwdIter, void>::call_with_index(
+                    policy, hpx::util::make_zip_iterator(first,next), count-1,
+                    [op, tok](std::size_t base_idx, zip_iterator it, std::size_t part_size) mutable
+                    {
+                        util::loop_idx_n(
+                            base_idx, it, part_size, tok,
+                            [&op, &tok](reference t, std::size_t i)
+                            {
+                                if(op(hpx::util::get<0>(t), hpx::util::get<1>(t)))
+                                    tok.cancel(i);
+                            });
+                    },
+                    [=](std::vector<hpx::future<void> > &&) mutable
+                    {
+                        difference_type adj_find_res = tok.get_data();
+                        if(adj_find_res != count)
+                            std::advance(first, adj_find_res);
+                        else
+                            first = last;
+
+                        return std::move(first);
+                    });
+            }
+        };
+        /// \endcond
+    }
+
+    /// Searches the range [first, last) for two consecutive identical elements.
+    /// This version uses operator== to compare the elements
+    ///
+    /// \note   Complexity: Exactly the smaller of (result - first) + 1 and
+    ///                     (last - first) - 1 applications of operator==
+    ///                     where \a result is the return value
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter     The type of the source iterators used for the
+    ///                     range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of the range the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     the range the algorithm will be applied to.
+    ///
+    /// The comparison operations in the parallel \a adjacent_find algorithm invoked
+    /// with an execution policy object of type \a sequential_execution_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a adjacent_find algorithm invoked
+    /// with an execution policy object of type \a parallel_execution_policy
+    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a adjacent_find algorithm returns a \a hpx::future<FwdIter> if the
+    ///           execution policy is of type \a task_execution_policy and
+    ///           returns \a FwdIter otherwise.
+    ///           The \a adjacent_find algorithm returns an iterator to first of the 
+    ///           identical elements. If no such elements are found,\a last is returned
+    ///
+    template <typename ExPolicy, typename FwdIter>
+    inline typename boost::enable_if<
+        is_execution_policy<ExPolicy>,
+        typename detail::algorithm_result<ExPolicy, FwdIter>::type
+    >::type
+    adjacent_find(ExPolicy && policy, FwdIter first, FwdIter last)
+    {
+        typedef typename std::iterator_traits<FwdIter>::iterator_category
+            iterator_category;
+
+        BOOST_STATIC_ASSERT_MSG(
+            (boost::is_base_of<
+                std::forward_iterator_tag, iterator_category
+            >::value),
+            "Requires at least forward iterator");
+
+        typedef is_sequential_execution_policy<ExPolicy> is_seq;
+
+        return detail::adjacent_find<FwdIter>().call(
+            std::forward<ExPolicy>(policy),
+            first, last, detail::equal_to(),
+            is_seq());
+    }
+
+    /// Searches the range [first, last) for two consecutive identical elements.
+    /// This version uses the given binary predicate op
+    ///
+    /// \note   Complexity: Exactly the smaller of (result - first) + 1 and
+    ///                     (last - first) - 1 application of the prediate
+    ///                     where \a result is the value returned
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter     The type of the source iterators used for the
+    ///                     range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a adjacent_find requires \a Pred to meet the
+    ///                     requirements of \a CopyConstructible.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of the range the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     the range the algorithm will be applied to.
+    /// \param p            The binary predicate which returns \a true
+    ///                     if the elements should be treated as equal. The signature
+    ///                     should be equivalent to the following:
+    ///                     \code 
+    ///                     bool pred(const Type1 &a, const Type2 &b); 
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The types \a Type1 and \a Type2 must be such
+    ///                     that objects of types \a FwdIter1 and \a FwdIter2
+    ///                     can be dereferenced and then implicitly converted
+    ///                     to \a Type1 and \a Type2 respectively.
+    ///
+    /// The comparison operations in the parallel \a adjacent_find invoked
+    /// with an execution policy object of type \a sequential_execution_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a adjacent_find invoked
+    /// with an execution policy object of type \a parallel_execution_policy
+    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a adjacent_find algorithm returns a \a hpx::future<InIter> if the
+    ///           execution policy is of type \a task_execution_policy and
+    ///           returns \a InIter otherwise.
+    ///           The \a adjacent_find algorithm returns an iterator to the first of the
+    ///           identical elements. If no such elements are found, \a last is returned.
+    ///
+    ///           This overload of \a adjacent_find is available if the user decides to 
+    ///           provide their algorithm their own binary predicate \a op.
+    ///
+    template <typename ExPolicy, typename FwdIter, typename Pred>
+    inline typename boost::enable_if<
+        is_execution_policy<ExPolicy>,
+        typename detail::algorithm_result<ExPolicy, FwdIter>::type
+    >::type
+    adjacent_find(ExPolicy && policy, FwdIter first, FwdIter last, Pred && op)
+    {
+        typedef typename std::iterator_traits<FwdIter>::iterator_category
+            iterator_category;
+
+        BOOST_STATIC_ASSERT_MSG(
+            (boost::is_base_of<
+                std::forward_iterator_tag, iterator_category
+            >::value),
+            "Requires at least forward iterator");
+
+        typedef is_sequential_execution_policy<ExPolicy> is_seq;
+
+        return detail::adjacent_find<FwdIter>().call(
+            std::forward<ExPolicy>(policy),
+            first, last, op,
+            is_seq());
     }
 }}}
 

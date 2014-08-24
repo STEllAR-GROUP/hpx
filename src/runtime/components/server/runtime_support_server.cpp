@@ -804,6 +804,9 @@ namespace hpx { namespace components { namespace server
         if (!shutdown_all_invoked_.compare_exchange_strong(flag, true))
             return;
 
+        LRT_(info) << "runtime_support::shutdown_all: "
+            "initialiting application shutdown";
+
         applier::applier& appl = hpx::applier::get_applier();
         naming::resolver_client& agas_client = appl.get_agas_client();
 
@@ -814,9 +817,15 @@ namespace hpx { namespace components { namespace server
         std::vector<naming::id_type> locality_ids = find_all_localities();
         dijkstra_termination_detection(locality_ids);
 
+        LRT_(info) << "runtime_support::shutdown_all: "
+            "passed termination detection";
+
         // execute registered shutdown functions on all localities
         invoke_shutdown_functions(locality_ids, true);
         invoke_shutdown_functions(locality_ids, false);
+
+        LRT_(info) << "runtime_support::shutdown_all: "
+            "invoked shutdown functions";
 
         // Shut down all localities except the the local one, we can't use
         // broadcast here as we have to handle the back parcel in a special
@@ -838,6 +847,9 @@ namespace hpx { namespace components { namespace server
 
         // wait for all localities to be stopped
         wait_all(lazy_actions);
+
+        LRT_(info) << "runtime_support::shutdown_all: "
+            "all localities have been shut down";
 
         // Now make sure this local locality gets shut down as well.
         // There is no need to respond...

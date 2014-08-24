@@ -148,8 +148,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             parallel(ExPolicy const& policy, OutIter first, std::size_t count,
                 T val)
             {
-                typedef typename std::iterator_traits<OutIter>::iterator_category
-                    category;
                 typedef typename std::iterator_traits<OutIter>::value_type type;
 
                 return

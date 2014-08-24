@@ -39,10 +39,10 @@
 [def __version__                __0_9_9__]
 
 [def __hpx__                    /HPX/]
-[def __stellar__                [@http://stellar.cct.lsu.edu STE||AR]]
+[def __stellar__                [@http://stellar-group.org STE||AR]]
 [def __stellar_list__           [@email:hpx-users@stellar.cct.lsu.edu hpx-users@stellar.cct.lsu.edu]]
 [def __stellar_irc__            [@irc://irc.freenode.net:6667/#ste||ar #ste||ar at Freenode]]
-[def __stellar_hpx_download__   [@http://stellar.cct.lsu.edu/downloads/ __hpx__ Downloads]]
+[def __stellar_hpx_download__   [@http://stellar-group.org/downloads/ __hpx__ Downloads]]
 [def __stellar_hpx_github__     [@http://github.com/STEllAR-GROUP/hpx/ Github]]
 [def __stellar_hpx_github_issues__     [@http://github.com/STEllAR-GROUP/hpx/issues __hpx__ Issues]]
 [def __stellar_hpx_buildbot__   [@http://hermione.cct.lsu.edu/ HPX Buildbot Website]]

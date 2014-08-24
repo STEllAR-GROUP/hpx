@@ -24,6 +24,15 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1232] - Fixing race in wait_xxx
+* [issue 1231] - Parallel minmax
+* [issue 1226] - Warning about struct/class thread_counters
+* [issue 1225] - Adding parallel::replace etc
+* [issue 1224] - Extending dataflow to pass through non-future arguments
+* [issue 1223] - Remaining find algorithms implemented, N4071
+* [issue 1222] - Merging all the changes
+* [issue 1221] - No error output when using mpirun with hpx
+* [issue 1219] - Adding new AGAS cache performance counters
 * [issue 1216] - Fixing using futures (clients) as arguments to actions
 * [issue 1215] - Error compiling simple component
 * [issue 1214] - Stencil docs

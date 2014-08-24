@@ -78,7 +78,6 @@ void test_find_end1()
     test_find_end1(execution_policy(par), IteratorTag());
     test_find_end1(execution_policy(par_vec), IteratorTag());
     test_find_end1(execution_policy(task), IteratorTag());
-
 }
 
 void find_end_test1()
@@ -201,14 +200,14 @@ void test_find_end3(hpx::parallel::task_execution_policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     // fill vector with random values above 6
     std::fill(boost::begin(c), boost::end(c), (std::rand() % 100) + 7);
-    // create subsequence large enoush to always be split into multiple partitions
+    // create subsequence large enough to always be split into multiple partitions
     std::iota(boost::begin(c), boost::begin(c) + c.size()/16+1, 1);
     std::size_t sub_size = c.size()/16 + 1;
     std::vector<std::size_t> h(sub_size);
     std::iota(boost::begin(h), boost::end(h), 1);
 
     // create only two partitions, splitting the desired sub sequence into
-    // seperate partitions.
+    // separate partitions.
     hpx::future<iterator> f =
         hpx::parallel::find_end(hpx::parallel::task,
             iterator(boost::begin(c)), iterator(boost::end(c)),
@@ -311,7 +310,6 @@ void test_find_end4()
     test_find_end4(par_vec, IteratorTag());
     test_find_end4(task, IteratorTag());
 
-
     test_find_end4(execution_policy(seq), IteratorTag());
     test_find_end4(execution_policy(par), IteratorTag());
     test_find_end4(execution_policy(par_vec), IteratorTag());
@@ -324,7 +322,6 @@ void find_end_test4()
     test_find_end4<std::forward_iterator_tag>();
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
 void test_find_end_exception(ExPolicy const& policy, IteratorTag)
@@ -336,9 +333,12 @@ void test_find_end_exception(ExPolicy const& policy, IteratorTag)
         decorated_iterator;
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand() + 1);
-    c[c.size()/2] = 0;
+    c[c.size()/2] = 1;
+    c[c.size()/2+1] = 2;
 
-    std::size_t h[] = { 1, 2 };
+    std::vector<std::size_t> h;
+    h.push_back(1);
+    h.push_back(2);
 
     bool caught_exception = false;
     try {
@@ -346,7 +346,9 @@ void test_find_end_exception(ExPolicy const& policy, IteratorTag)
             decorated_iterator(
                 boost::begin(c),
                 [](){ throw std::runtime_error("test"); }),
-            decorated_iterator(boost::end(c)),
+            decorated_iterator(
+                boost::end(c),
+                [](){ throw std::runtime_error("test"); }),
             boost::begin(h), boost::end(h));
         HPX_TEST(false);
     }
@@ -370,7 +372,8 @@ void test_find_end_exception(hpx::parallel::task_execution_policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand() + 1);
-    c[c.size()/2] = 0;
+    c[c.size()/2] = 1;
+    c[c.size()/2+1] = 2;
 
     std::size_t h[] = { 1, 2 };
 
@@ -381,8 +384,10 @@ void test_find_end_exception(hpx::parallel::task_execution_policy, IteratorTag)
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::runtime_error("test"); }),
-                decorated_iterator(boost::end(c)),
-                boost::begin(h), boost::end(h));
+                decorated_iterator(
+                    boost::end(c),
+                    [](){ throw std::runtime_error("test"); }),
+            boost::begin(h), boost::end(h));
         f.get();
 
         HPX_TEST(false);
@@ -407,11 +412,9 @@ void test_find_end_exception()
     //If the execution policy object is of type vector_execution_policy,
     //  std::terminate shall be called. therefore we do not test exceptions
     //  with a vector execution policy
-    test_find_end_exception(seq, IteratorTag());
     test_find_end_exception(par, IteratorTag());
     test_find_end_exception(task, IteratorTag());
 
-    test_find_end_exception(execution_policy(seq), IteratorTag());
     test_find_end_exception(execution_policy(par), IteratorTag());
     test_find_end_exception(execution_policy(task), IteratorTag());
 }
@@ -444,7 +447,9 @@ void test_find_end_bad_alloc(ExPolicy const& policy, IteratorTag)
             decorated_iterator(
                 boost::begin(c),
                 [](){ throw std::bad_alloc(); }),
-            decorated_iterator(boost::end(c)),
+            decorated_iterator(
+                boost::end(c),
+                [](){ throw std::bad_alloc(); }),
             boost::begin(h), boost::end(h));
         HPX_TEST(false);
     }
@@ -478,7 +483,9 @@ void test_find_end_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::bad_alloc(); }),
-                decorated_iterator(boost::end(c)),
+                decorated_iterator(
+                    boost::end(c),
+                    [](){ throw std::bad_alloc(); }),
                 boost::begin(h), boost::end(h));
 
         f.get();
@@ -499,24 +506,23 @@ template <typename IteratorTag>
 void test_find_end_bad_alloc()
 {
     using namespace hpx::parallel;
-    //If the execution policy object is of type vector_execution_policy,
-    //  std::terminate shall be called. therefore we do not test exceptions
-    //  with a vector execution policy
-    test_find_end_bad_alloc(seq, IteratorTag());
+
+    // If the execution policy object is of type vector_execution_policy,
+    // std::terminate shall be called. therefore we do not test exceptions
+    // with a vector execution policy
     test_find_end_bad_alloc(par, IteratorTag());
+    test_find_end_bad_alloc(seq, IteratorTag());
     test_find_end_bad_alloc(task, IteratorTag());
 
-    test_find_end_bad_alloc(execution_policy(seq), IteratorTag());
     test_find_end_bad_alloc(execution_policy(par), IteratorTag());
+    test_find_end_bad_alloc(execution_policy(seq), IteratorTag());
     test_find_end_bad_alloc(execution_policy(task), IteratorTag());
 }
 
 void find_end_bad_alloc_test()
 {
-
     test_find_end_bad_alloc<std::random_access_iterator_tag>();
     test_find_end_bad_alloc<std::forward_iterator_tag>();
-
 }
 
 int hpx_main()
