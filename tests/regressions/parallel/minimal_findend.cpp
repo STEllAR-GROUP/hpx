@@ -73,7 +73,7 @@ void find_end_failing_test()
         // should never reach this point
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const&) {
+    catch(std::runtime_error const&) {
         caught_exception = true;
     }
     catch(...) {
