@@ -34,6 +34,11 @@
 extern char **environ;
 #endif
 
+namespace hpx
+{
+    char const* get_runtime_state_name(runtime::state state);
+}
+
 namespace hpx { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -106,7 +111,7 @@ namespace hpx { namespace detail
         boost::uint32_t node, std::string const& hostname_, boost::int64_t pid_,
         std::size_t shepherd, std::size_t thread_id,
         std::string const& thread_name, std::string const& env,
-        std::string const& config)
+        std::string const& config, std::string const& state_name)
     {
         // create a boost::exception_ptr object encapsulating the Exception to
         // be thrown and annotate it with all the local information we have
@@ -124,12 +129,13 @@ namespace hpx { namespace detail
                     << hpx::detail::throw_file(file)
                     << hpx::detail::throw_line(static_cast<int>(line))
                     << hpx::detail::throw_env(env)
-                    << hpx::detail::throw_config(config));
+                    << hpx::detail::throw_config(config)
+                    << hpx::detail::throw_state(state_name));
         }
         catch (...) {
             return boost::current_exception();
         }
-        
+
         // need this return to silence a warning with icc
         HPX_ASSERT(false);
         return boost::exception_ptr();
@@ -152,7 +158,7 @@ namespace hpx { namespace detail
         catch (...) {
             return boost::current_exception();
         }
-        
+
         // need this return to silence a warning with icc
         HPX_ASSERT(false);
         return boost::exception_ptr();
@@ -169,7 +175,7 @@ namespace hpx { namespace detail
         catch (...) {
             return boost::current_exception();
         }
-        
+
         // need this return to silence a warning with icc
         HPX_ASSERT(false);
         return boost::exception_ptr();
@@ -198,17 +204,24 @@ namespace hpx { namespace detail
         if (is_of_lightweight_hpx_category(e))
             return construct_lightweight_exception(e, func, file, line);
 
-        boost::int64_t pid_ = ::getpid();
+        boost::int64_t pid = ::getpid();
         std::string back_trace(backtrace());
 
-        std::string hostname_;
+        std::string state_name("not running");
+        std::string hostname;
         hpx::runtime* rt = get_runtime_ptr();
-        if (rt && rt->get_state() >= runtime::state_initialized &&
-                  rt->get_state() < runtime::state_stopped)
+        if (rt)
         {
-            util::osstream strm;
-            strm << get_runtime().here();
-            hostname_ = util::osstream_get_string(strm);
+            runtime::state rts_state = rt->get_state();
+            state_name = get_runtime_state_name(rts_state);
+
+            if (rts_state >= runtime::state_initialized &&
+                rts_state < runtime::state_stopped)
+            {
+                util::osstream strm;
+                strm << get_runtime().here();
+                hostname = util::osstream_get_string(strm);
+            }
         }
 
         // if this is not a HPX thread we do not need to query neither for
@@ -232,9 +245,10 @@ namespace hpx { namespace detail
 
         std::string env(get_execution_environment());
         std::string config(configuration_string());
+
         return construct_exception(e, func, file, line, back_trace, node,
-            hostname_, pid_, shepherd, reinterpret_cast<std::size_t>(thread_id.get()),
-            thread_name, env, config);
+            hostname, pid, shepherd, reinterpret_cast<std::size_t>(thread_id.get()),
+            thread_name, env, config, state_name);
     }
 
     template <typename Exception>
@@ -471,6 +485,11 @@ namespace hpx
             boost::get_error_info<hpx::detail::throw_thread_name>(e);
         if (thread_description && !thread_description->empty())
             strm << "{thread-description}: " << *thread_description << "\n";
+
+        std::string const* state =
+            boost::get_error_info<hpx::detail::throw_state>(e);
+        if (line)
+            strm << "{state}: " << *state << "\n";
 
         // add full build information
         strm << full_build_string();
@@ -1022,6 +1041,42 @@ namespace hpx
     std::string get_error_config(hpx::error_code const& e)
     {
         return get_error_config(detail::access_exception(e));
+    }
+
+    /// Return the HPX runtime state information at which the exception was
+    /// thrown.
+    std::string get_error_state(boost::exception const& e)
+    {
+        std::string const* state_info =
+            boost::get_error_info<hpx::detail::throw_state>(e);
+        if (state_info && !state_info->empty())
+            return *state_info;
+        return std::string();
+    }
+
+    std::string get_error_state(boost::exception_ptr const& e)
+    {
+        if (!e) return std::string();
+
+        try {
+            boost::rethrow_exception(e);
+        }
+        catch (boost::exception const& be) {
+            return get_error_state(be);
+        }
+        catch (...) {
+            return std::string();
+        }
+    }
+
+    std::string get_error_state(hpx::exception const& e)
+    {
+        return get_error_state(dynamic_cast<boost::exception const&>(e));
+    }
+
+    std::string get_error_state(hpx::error_code const& e)
+    {
+        return get_error_state(detail::access_exception(e));
     }
 }
 

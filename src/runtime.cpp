@@ -173,6 +173,29 @@ namespace hpx
         return runtime_mode_invalid;
     }
 
+    namespace strings
+    {
+        char const* const runtime_state_names[] =
+        {
+            "invalid",      // -1
+            "initialized",  // 0
+            "pre_startup",  // 1
+            "startup",      // 2
+            "pre_main",     // 3
+            "running",      // 4
+            "pre_shutdown"  // 5
+            "shutdown",     // 6
+            "stopped"       // 7
+        };
+    }
+
+    char const* get_runtime_state_name(runtime::state state)
+    {
+        if (state < runtime::state_invalid || state >= runtime::state_last)
+            return "invalid (value out of bounds)";
+        return strings::runtime_state_names[state+1];
+    }
+
 #if defined(HPX_HAVE_SECURITY)
     namespace detail
     {
