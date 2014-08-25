@@ -300,9 +300,6 @@ void test_mismatch_binary_exception(hpx::parallel::task_execution_policy, Iterat
     std::iota(boost::begin(c1), boost::end(c1), first_value);
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 
-    iterator begin1 = iterator(boost::begin(c1));
-    iterator end1 = iterator(boost::end(c1));
-
     bool caught_exception = false;
     try {
         hpx::future<return_type> f =
@@ -411,9 +408,6 @@ void test_mismatch_binary_bad_alloc(hpx::parallel::task_execution_policy, Iterat
     std::size_t first_value = std::rand(); //-V101
     std::iota(boost::begin(c1), boost::end(c1), first_value);
     std::iota(boost::begin(c2), boost::end(c2), first_value);
-
-    iterator begin1 = iterator(boost::begin(c1));
-    iterator end1 = iterator(boost::end(c1));
 
     bool caught_bad_alloc = false;
     try {
