@@ -152,7 +152,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         public hpx::components::managed_component_base<papi_counter>,
         protected papi_counter_base
     {
-        friend class thread_counters;
+        friend struct thread_counters;
 
         // PAPI event associated with the counter and index into counter array
         int const event_;

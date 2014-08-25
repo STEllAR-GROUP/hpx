@@ -1,5 +1,4 @@
 //  Copyright (c) 2014 Hartmut Kaiser
-//  Copyright (c) 2014 Patricia Grubel
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -70,7 +69,7 @@ public:
     void deallocate(T* p)
     {
         mutex_type::scoped_lock l(mtx_);
-        if (max_size_ == std::atomic_size_t(-1) || heap_.size() < max_size_)
+        if (max_size_ == static_cast<std::size_t>(-1) || heap_.size() < max_size_)
             heap_.push(p);
         else
             delete [] p;
@@ -564,6 +563,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     // Gather results from all localities
     if (0 == hpx::get_locality_id())
     {
+        boost::uint64_t const num_worker_threads = hpx::get_num_worker_threads();
+
         hpx::future<std::vector<stepper_server::space> > overall_result =
             hpx::lcos::gather_here(gather_basename, std::move(result), nl);
 
@@ -592,8 +593,8 @@ int hpx_main(boost::program_options::variables_map& vm)
             }
         }
 
-        boost::uint64_t const os_thread_count = hpx::get_os_thread_count();
-        print_time_results(os_thread_count, elapsed, nx, np, nt, header);
+        print_time_results(boost::uint32_t(nl), num_worker_threads, elapsed,
+            nx, np, nt, header);
     }
     else
     {

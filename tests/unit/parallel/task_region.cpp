@@ -221,7 +221,7 @@ void task_region_exceptions_test4()
         HPX_TEST(false);
     }
     catch (hpx::exception const& e) {
-        HPX_TEST_EQ(e.get_error(), hpx::task_region_not_active);
+        HPX_TEST_EQ(int(e.get_error()), int(hpx::task_region_not_active));
     }
     catch (...) {
         HPX_TEST(false);

@@ -54,6 +54,7 @@ boost::uint64_t tasks = 500000;
 boost::uint64_t suspended_tasks = 0;
 boost::uint64_t delay = 0;
 bool header = true;
+bool csv_header = false;
 std::string scaling("weak");
 std::string distribution("static-balanced");
 
@@ -84,6 +85,12 @@ void print_results(
 
     if (ac)
         counter_values = ac->evaluate_counters_sync();
+    
+    if (csv_header)
+    {
+        header = false;
+        cout << "Delay,Tasks,STasks,OS_Threads,WTIME,WARMUP\n";
+    }
 
     if (header)
     {
@@ -113,7 +120,7 @@ void print_results(
         {
             cout << "## "
                  << (i + 1 + last_index) << ":"
-                 << counter_shortnames[i] << ":"
+    << counter_shortnames[i] << ":"
                  << ac->name(i);
 
             if (!ac->unit_of_measure(i).empty())
@@ -338,6 +345,9 @@ int hpx_main(
     {
         if (vm.count("no-header"))
             header = false;
+        
+        if (vm.count("csv-header"))
+            csv_header = true;
 
         if (0 == tasks)
             throw std::invalid_argument("count of 0 tasks specified\n");
@@ -539,6 +549,9 @@ int main(
 
         ( "no-header"
         , "do not print out the header")
+        
+        ( "csv-header"
+        , "print out csv header")
         ;
 
     // Initialize and run HPX.

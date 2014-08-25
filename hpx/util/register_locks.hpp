@@ -8,6 +8,10 @@
 #define HPX_UTIL_REGISTER_LOCKS_JUN_26_2012_1029AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/always_void.hpp>
+
+#include <boost/thread/locks.hpp>
+#include <boost/utility/declval.hpp>
 
 namespace hpx { namespace util
 {
@@ -16,7 +20,15 @@ namespace hpx { namespace util
     // Always provide function exports, which guarantees ABI compatibility of
     // Debug and Release builds.
 
+    template <typename Lock, typename Enable = void>
+    struct ignore_while_checking
+    {
+        ignore_while_checking(void const* lock) {}
+    };
+
 #if defined(HPX_HAVE_VERIFY_LOCKS) || defined(HPX_EXPORTS)
+
+    ///////////////////////////////////////////////////////////////////////////
     HPX_API_EXPORT bool register_lock(void const* lock,
         register_lock_data* data = 0);
     HPX_API_EXPORT bool unregister_lock(void const* lock);
@@ -25,6 +37,81 @@ namespace hpx { namespace util
     HPX_API_EXPORT void enable_lock_detection();
     HPX_API_EXPORT void ignore_lock(void const* lock);
     HPX_API_EXPORT void reset_ignored(void const* lock);
+
+    ///////////////////////////////////////////////////////////////////////////
+#if !defined(BOOST_NO_CXX11_DECLTYPE_N3276) && !defined(BOOST_NO_SFINAE_EXPR)
+    template <typename Lock>
+    struct ignore_while_checking<Lock,
+        typename util::always_void<
+            decltype(boost::declval<Lock>().mutex())
+        >::type>
+    {
+        ignore_while_checking(Lock const* lock)
+          : lock_(lock->mutex())
+        {
+            ignore_lock(lock_);
+        }
+
+        ~ignore_while_checking()
+        {
+            reset_ignored(lock_);
+        }
+
+        void const* lock_;
+    };
+#else
+    template <typename Mutex>
+    struct ignore_while_checking<boost::unique_lock<Mutex> >
+    {
+        ignore_while_checking(boost::unique_lock<Mutex> const* lock)
+          : lock_(lock->mutex())
+        {
+            ignore_lock(lock_);
+        }
+
+        ~ignore_while_checking()
+        {
+            reset_ignored(lock_);
+        }
+
+        void const* lock_;
+    };
+
+    template <typename Mutex>
+    struct ignore_while_checking<boost::upgrade_lock<Mutex> >
+    {
+        ignore_while_checking(boost::upgrade_lock<Mutex> const* lock)
+          : lock_(lock->mutex())
+        {
+            ignore_lock(lock_);
+        }
+
+        ~ignore_while_checking()
+        {
+            reset_ignored(lock_);
+        }
+
+        void const* lock_;
+    };
+
+    template <typename Mutex>
+    struct ignore_while_checking<boost::shared_lock<Mutex> >
+    {
+        ignore_while_checking(boost::shared_lock<Mutex> const* lock)
+          : lock_(lock->mutex())
+        {
+            ignore_lock(lock_);
+        }
+
+        ~ignore_while_checking()
+        {
+            reset_ignored(lock_);
+        }
+
+        void const* lock_;
+    };
+#endif
+
 #else
     inline bool register_lock(void const*, util::register_lock_data* = 0)
     {
@@ -50,22 +137,6 @@ namespace hpx { namespace util
     {
     }
 #endif
-
-    struct ignore_while_checking
-    {
-        ignore_while_checking(void const* lock)
-          : lock_(lock)
-        {
-            ignore_lock(lock);
-        }
-
-        ~ignore_while_checking()
-        {
-            reset_ignored(lock_);
-        }
-
-        void const* lock_;
-    };
 }}
 
 #endif

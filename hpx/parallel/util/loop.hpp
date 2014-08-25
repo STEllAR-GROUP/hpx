@@ -149,7 +149,7 @@ namespace hpx { namespace parallel { namespace util
             static Iter call(Iter it, std::size_t count, F && f)
             {
                 for (/**/; count != 0; --count, ++it)
-                    f(*it);
+                    f(it);
                 return it;
             }
 
@@ -159,45 +159,13 @@ namespace hpx { namespace parallel { namespace util
             {
                 for (/**/; count != 0; --count, ++it)
                 {
-                    f(*it);
+                    f(it);
                     if (tok.was_cancelled())
                         break;
                 }
                 return it;
             }
         };
-
-        // specialization for random access iterators
-//         template <>
-//         struct loop_n<std::random_access_iterator_tag>
-//         {
-//             ///////////////////////////////////////////////////////////////////
-//             // handle sequences of non-futures
-//             template <typename Iter, typename F>
-//             static Iter call(Iter it, std::size_t count, F && f)
-//             {
-//                 for (std::size_t i = 0; i != count; ++i)
-//                     f(it[i]);
-//
-//                 std::advance(it, count);
-//                 return it;
-//             }
-//
-//             template <typename Iter, typename CancelToken, typename F>
-//             static Iter call(Iter it, std::size_t count, CancelToken& tok,
-//                 F && func)
-//             {
-//                 std::size_t i = 0;
-//                 for (/**/; i != count; ++i)
-//                 {
-//                     func(it[i]);
-//                     if (tok.was_cancelled())
-//                         break;
-//                 }
-//                 std::advance(it, i);
-//                 return it;
-//             }
-//         };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -252,39 +220,6 @@ namespace hpx { namespace parallel { namespace util
                 return it;
             }
         };
-
-        // specialization for random access iterators
-        template <>
-        struct loop_idx_n<std::random_access_iterator_tag>
-        {
-            ///////////////////////////////////////////////////////////////////
-            // handle sequences of non-futures
-            template <typename Iter, typename F>
-            static Iter
-            call(std::size_t base_idx, Iter it, std::size_t count, F && f)
-            {
-                for (std::size_t i = 0; i != count; ++i, ++base_idx)
-                    f(it[i], base_idx);
-
-                std::advance(it, count);
-                return it;
-            }
-
-            template <typename Iter, typename CancelToken, typename F>
-            static Iter call(std::size_t base_idx, Iter it, std::size_t count,
-                CancelToken& tok, F && func)
-            {
-                std::size_t i = 0;
-                for (/**/; i != count; ++i, ++base_idx)
-                {
-                    func(it[i], base_idx);
-                    if (tok.was_cancelled(base_idx))
-                        break;
-                }
-                std::advance(it, i);
-                return it;
-            }
-        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -324,19 +259,6 @@ namespace hpx { namespace parallel { namespace util
                 return init;
             }
         };
-
-//         // specialization for random access iterators
-//         template <>
-//         struct accumulate_n<std::random_access_iterator_tag>
-//         {
-//             template <typename Iter, typename T, typename Pred>
-//             static T call(Iter it, std::size_t count, T init, Pred && f)
-//             {
-//                 for (std::size_t i = 0; i != count; ++i)
-//                     init = f(init, it[i]);
-//                 return init;
-//             }
-//         };
     }
 
     ///////////////////////////////////////////////////////////////////////////

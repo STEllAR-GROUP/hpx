@@ -477,7 +477,7 @@ cell compute(boost::uint64_t timestep, boost::uint64_t location)
       else
           time_step_complete=false;
   }
-  if(time_step_complete&&!grid.time_array.at(nt-1).physics_time>=ptime)
+  if(time_step_complete&&!(grid.time_array.at(nt-1).physics_time>=ptime))
   {
       grid.remove_bottom_time_step();
       grid.addNewTimeStep();

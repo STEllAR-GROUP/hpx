@@ -81,7 +81,9 @@ parallel::fill_n                      "fill_n" "hpx\.parallel\.v1\.fill_n.*"
 parallel::find                        "find" "hpx\.parallel\.v1\.find$"
 parallel::find_if                     "find_if" "hpx\.parallel\.v1\.find_if$"
 parallel::find_if_not                 "find_if_not" "hpx\.parallel\.v1\.find_if_not.*"
-parallel::find_end                    "find_end" "hpx\.parallel\.v1\.find_end_id.*"
+parallel::find_end                    "find_end" "hpx\.parallel\.v1\.find_end.*"
+parallel::find_first_of               "find_first_of" "hpx\.parallel\.v1\.find_first_of.*"
+parallel::adjacent_find               "adjacent_find" "hpx\.parallel\.v1\.adjacent_find.*"
 
 # hpx/parallel/detail/for_each.hpp
 parallel::for_each                    "for_each" "hpx\.parallel\.v1\.for_each$"
@@ -91,6 +93,11 @@ parallel::for_each_n                  "for_each_n" "hpx\.parallel\.v1\.for_each_
 parallel::generate                    "generate" "hpx\.parallel\.v1\.generate$"
 parallel::generate_n                  "generate_n" "hpx\.parallel\.v1\.generate_n.*"
 
+# hpx/parallel/detail/minmax.hpp
+parallel::max_element                 "max_element" "hpx\.parallel\.v1\.max_element.*"
+parallel::min_element                 "min_element" "hpx\.parallel\.v1\.min_element.*"
+parallel::minmax_element              "minmax_element" "hpx\.parallel\.v1\.minmax_element.*"
+
 # hpx/parallel/detail/mismatch.hpp
 parallel::mismatch                    "mismatch" "hpx\.parallel\.v1\.mismatch_id.*"
 
@@ -99,6 +106,12 @@ parallel::move                        "move" "hpx\.parallel\.v1\.move$"
 
 # hpx/parallel/detail/reduce.hpp
 parallel::reduce                      "reduce" "hpx\.parallel\.v1\.reduce.*"
+
+# hpx/parallel/detail/replace.hpp
+parallel::replace                     "replace" "hpx\.parallel\.v1\.replace$"
+parallel::replace_if                  "replace_if" "hpx\.parallel\.v1\.replace_if.*"
+parallel::replace_copy                "replace_copy" "hpx\.parallel\.v1\.replace_copy$"
+parallel::replace_copy_if             "replace_copy_if" "hpx\.parallel\.v1\.replace_copy_if.*"
 
 # hpx/parallel/detail/reverse.hpp
 parallel::reverse                     "reverse" "hpx\.parallel\.v1\.reverse$"
@@ -148,21 +161,22 @@ throws                                "" "header\.hpx\.exception_hpp"
 make_error_code                       "" "header\.hpx\.exception_hpp"
 make_success_code                     "" "header\.hpx\.exception_hpp"
 
-diagnostic_information                "" "hpx\.diagnostic_information.*"
-get_error_locality_id                 "" "hpx\.get_error_locality_id.*"
-get_error_error                       "" "hpx\.get_error_error.*"
-get_error_host_name                   "" "hpx\.get_error_host_name.*"
-get_error_process_id                  "" "hpx\.get_error_process_id.*"
-get_error_function_name               "" "hpx\.get_error_function_name.*"
-get_error_file_name                   "" "hpx\.get_error_file_name.*"
-get_error_line_number                 "" "hpx\.get_error_line_number.*"
-get_error_os_thread                   "" "hpx\.get_error_os_thread.*"
-get_error_thread_id                   "" "hpx\.get_error_thread_id.*"
-get_error_thread_description          "" "hpx\.get_error_thread_description.*"
-get_error_backtrace                   "" "hpx\.get_error_backtrace.*"
+diagnostic_information                "" "hpx\.diagnostic_inform.*"
+get_error_locality_id                 "" "hpx\.get_error_localit.*"
+get_error                             "" "hpx\.get_error_id.*"
+get_error_host_name                   "" "hpx\.get_error_ho.*"
+get_error_process_id                  "" "hpx\.get_error_process.*"
+get_error_function_name               "" "hpx\.get_error_functio.*"
+get_error_file_name                   "" "hpx\.get_error_file_na.*"
+get_error_line_number                 "" "hpx\.get_error_line_nu.*"
+get_error_os_thread                   "" "hpx\.get_error_os_thre.*"
+get_error_thread_id                   "" "hpx\.get_error_thread_.*"
+get_error_thread_description          "" "hpx\.get_error_thread_.*"
+get_error_backtrace                   "" "hpx\.get_error_backtra.*"
 get_error_what                        "" "hpx\.get_error_what.*"
 get_error_env                         "" "hpx\.get_error_env.*"
 get_error_config                      "" "hpx\.get_error_config.*"
+get_error_state                       "" "hpx\.get_error_state.*"
 
 
 # hpx/error.hpp
@@ -220,6 +234,10 @@ bad_plugin_type                       "" "hpx\.error"
 filesystem_error                      "" "hpx\.error"
 bad_function_call                     "" "hpx\.error"
 security_error                        "" "hpx\.error"
+filesystem_error                      "" "hpx\.error"
+bad_function_call                     "" "hpx\.error"
+task_canceled_exception               "" "hpx\.error"
+task_region_not_active                "" "hpx\.error"
 
 # hpx/runtime/naming/unmanaged.hpp
 unmanaged                             "" "header\.hpx\.runtime\.naming\.unmanaged.*"

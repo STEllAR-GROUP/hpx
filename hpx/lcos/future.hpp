@@ -574,7 +574,7 @@ namespace hpx { namespace lcos { namespace detail
         //     returns.
         template <typename F>
         typename boost::lazy_disable_if<
-            traits::is_launch_policy<
+            traits::is_launch_policy_or_executor<
                 typename util::decay<F>::type
             >
           , future_then_result<Derived, F>
@@ -918,7 +918,7 @@ namespace hpx { namespace lcos
 
         template <typename F>
         typename boost::lazy_disable_if<
-            traits::is_launch_policy<
+            traits::is_launch_policy_or_executor<
                 typename util::decay<F>::type
             >
           , detail::future_then_result<future, F>

@@ -275,12 +275,12 @@ namespace hpx { namespace util { namespace detail
         //
         void construct_value(value_type const& v)
         {
-            ::new (get_value_address()) value_type(v);
+            ::new ((void*)get_value_address()) value_type(v);
         }
 
         void construct_value(value_type && v) //-V659
         {
-            ::new (get_value_address()) value_type(std::move(v));
+            ::new ((void*)get_value_address()) value_type(std::move(v));
         }
 
         void construct_error(error_type const& e)
@@ -590,12 +590,12 @@ namespace hpx { namespace util { namespace detail
         //
         void construct_value(value_type v)
         {
-            ::new (get_value_address()) T*(&v);
+            ::new ((void*)get_value_address()) T*(&v);
         }
 
         void construct_error(error_type const& e)
         {
-            ::new (get_error_address()) error_type(e);
+            ::new ((void*)get_error_address()) error_type(e);
         }
 
         //

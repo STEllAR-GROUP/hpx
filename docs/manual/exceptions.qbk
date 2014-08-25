@@ -84,41 +84,41 @@ instance can be used in a very similar way as the
 retrieves all available diagnostic information from the error code instance as
 a formatted string.
 
-As for handling exceptions, when working with error codes, under certain 
+As for handling exceptions, when working with error codes, under certain
 circumstances it is desireable to output only some of the
 diagnostics, or to output those using different formatting. For this case, __hpx__
-exposes a set of lower level functions usable with error codes as demonstrated 
+exposes a set of lower level functions usable with error codes as demonstrated
 in the following code snippet:
 
 [error_handling_diagnostic_elements]
 
 For more information please refer to the documentation of
-[funcref hpx::get_error_what `hpx::get_error_what()`],
-[funcref hpx::get_error_locality_id `hpx::get_error_locality_id()`],
-[funcref hpx::get_error_host_name `hpx::get_error_host_name()`],
-[funcref hpx::get_error_process_id `hpx::get_error_process_id()`],
-[funcref hpx::get_error_function_name `hpx::get_error_function_name()`],
-[funcref hpx::get_error_file_name `hpx::get_error_file_name()`],
-[funcref hpx::get_error_line_number `hpx::get_error_line_number()`],
-[funcref hpx::get_error_os_thread `hpx::get_error_os_thread()`],
-[funcref hpx::get_error_thread_id `hpx::get_error_thread_id()`], and
-[funcref hpx::get_error_thread_description `hpx::get_error_thread_description()`]
-[funcref hpx::get_error_backtrace `hpx::get_error_backtrace()`]
-[funcref hpx::get_error_env `hpx::get_error_env()`]
-for more details.
+[funcref hpx::get_error_what `hpx::get_error_what`],
+[funcref hpx::get_error_locality_id `hpx::get_error_locality_id`],
+[funcref hpx::get_error_host_name `hpx::get_error_host_name`],
+[funcref hpx::get_error_process_id `hpx::get_error_process_id`],
+[funcref hpx::get_error_function_name `hpx::get_error_function_name`],
+[funcref hpx::get_error_file_name `hpx::get_error_file_name`],
+[funcref hpx::get_error_line_number `hpx::get_error_line_number`],
+[funcref hpx::get_error_os_thread `hpx::get_error_os_thread`],
+[funcref hpx::get_error_thread_id `hpx::get_error_thread_id`],
+[funcref hpx::get_error_thread_description `hpx::get_error_thread_description`],
+[funcref hpx::get_error_backtrace `hpx::get_error_backtrace`],
+[funcref hpx::get_error_env `hpx::get_error_env`], and
+[funcref hpx::get_error_state `hpx::get_error_state`].
 
 [heading:lightweight_error_code Lightweight error Codes]
 
-Sometimes it is not desireable to collect all the ambient information about the 
-error at the point where it happened as this might impose too much overhead for 
-simple scenarious. In this case, __hpx__ provides a lightweight error code 
-facility which will hold the error code only. The following snippet demonstrates 
+Sometimes it is not desireable to collect all the ambient information about the
+error at the point where it happened as this might impose too much overhead for
+simple scenarious. In this case, __hpx__ provides a lightweight error code
+facility which will hold the error code only. The following snippet demonstrates
 its use:
 
 [lightweight_error_handling_diagnostic_information]
 
-All functions which retrieve other diagnostic elements from the 
-[classref hpx::error_code `hpx::error_code`] will fail if called with a 
+All functions which retrieve other diagnostic elements from the
+[classref hpx::error_code `hpx::error_code`] will fail if called with a
 lightweight error_code instance.
 
 [endsect] [/ Working with Exceptions]

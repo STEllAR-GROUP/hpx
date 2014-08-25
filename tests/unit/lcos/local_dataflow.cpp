@@ -211,10 +211,77 @@ void future_function_pointers()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+boost::atomic<boost::uint32_t> void_f4_count;
+boost::atomic<boost::uint32_t> int_f4_count;
+
+void void_f4(int) { ++void_f4_count; }
+int int_f4(int i) { ++int_f4_count; return i+42; }
+
+boost::atomic<boost::uint32_t> void_f5_count;
+boost::atomic<boost::uint32_t> int_f5_count;
+
+void void_f5(int, hpx::future<int>) { ++void_f5_count; }
+int int_f5(int i, hpx::future<int> j) { ++int_f5_count; return i+j.get()+42; }
+
+void plain_arguments()
+{
+    void_f4_count.store(0);
+    int_f4_count.store(0);
+
+    {
+        future<void> f1 = dataflow(&void_f4, 42);
+        future<int> f2 = dataflow(&int_f4, 42);
+
+        f1.wait();
+        HPX_TEST_EQ(void_f4_count, 1u);
+
+        HPX_TEST_EQ(f2.get(), 84);
+        HPX_TEST_EQ(int_f4_count, 1u);
+    }
+
+    {
+        future<void> f1 = dataflow(hpx::launch::async, &void_f4, 42);
+        future<int> f2 = dataflow(hpx::launch::async, &int_f4, 42);
+
+        f1.wait();
+        HPX_TEST_EQ(void_f4_count, 2u);
+
+        HPX_TEST_EQ(f2.get(), 84);
+        HPX_TEST_EQ(int_f4_count, 2u);
+    }
+
+    void_f5_count.store(0);
+    int_f5_count.store(0);
+
+    {
+        future<void> f1 = dataflow(&void_f5, 42, async(&int_f));
+        future<int> f2 = dataflow(&int_f5, 42, async(&int_f));
+
+        f1.wait();
+        HPX_TEST_EQ(void_f5_count, 1u);
+
+        HPX_TEST_EQ(f2.get(), 126);
+        HPX_TEST_EQ(int_f5_count, 1u);
+    }
+
+    {
+        future<void> f1 = dataflow(hpx::launch::async, &void_f5, 42, async(&int_f));
+        future<int> f2 = dataflow(hpx::launch::async, &int_f5, 42, async(&int_f));
+
+        f1.wait();
+        HPX_TEST_EQ(void_f5_count, 2u);
+
+        HPX_TEST_EQ(f2.get(), 126);
+        HPX_TEST_EQ(int_f5_count, 2u);
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map&)
 {
     function_pointers();
     future_function_pointers();
+    plain_arguments();
 
     return hpx::finalize();
 }

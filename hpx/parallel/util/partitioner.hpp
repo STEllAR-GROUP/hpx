@@ -73,12 +73,11 @@ namespace hpx { namespace parallel { namespace util
             }
         };
 
-        ///////////////////////////////////////////////////////////////////////
         template <>
         struct handle_local_exceptions<parallel_vector_execution_policy>
         {
-            static void call(boost::exception_ptr const&,
-                std::list<boost::exception_ptr>&)
+            HPX_ATTRIBUTE_NORETURN static void call(
+                boost::exception_ptr const&, std::list<boost::exception_ptr>&)
             {
                 std::terminate();
             }
@@ -267,9 +266,12 @@ namespace hpx { namespace parallel { namespace util
                         std::advance(first, count);
                     }
                 }
+                catch (std::bad_alloc const&) {
+                    return hpx::make_error_future<FwdIter>(
+                        boost::current_exception());
+                }
                 catch (...) {
-                    detail::handle_local_exceptions<task_execution_policy>::call(
-                        boost::current_exception(), errors);
+                    errors.push_back(boost::current_exception());
                 }
 
                 // wait for all tasks to finish
@@ -568,9 +570,12 @@ namespace hpx { namespace parallel { namespace util
                         std::advance(first, count);
                     }
                 }
+                catch (std::bad_alloc const&) {
+                    return hpx::make_error_future<R>(
+                        boost::current_exception());
+                }
                 catch (...) {
-                    detail::handle_local_exceptions<task_execution_policy>::call(
-                        boost::current_exception(), errors);
+                    errors.push_back(boost::current_exception());
                 }
 
                 // wait for all tasks to finish
@@ -636,9 +641,12 @@ namespace hpx { namespace parallel { namespace util
                         std::advance(first, count);
                     }
                 }
+                catch (std::bad_alloc const&) {
+                    return hpx::make_error_future<R>(
+                        boost::current_exception());
+                }
                 catch (...) {
-                    detail::handle_local_exceptions<task_execution_policy>::call(
-                        boost::current_exception(), errors);
+                    errors.push_back(boost::current_exception());
                 }
 
                 // wait for all tasks to finish

@@ -101,7 +101,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(gid,
                 std::move(addr), priority,
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-            cb(boost::system::error_code(), 0);     // invoke callback
+            cb(boost::system::error_code(), parcelset::parcel());     // invoke callback
             return result;
         }
 
@@ -190,7 +190,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(c, gid,
                 std::move(addr), priority,
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-            cb(boost::system::error_code(), 0);     // invoke callback
+            cb(boost::system::error_code(), parcelset::parcel());     // invoke callback
             return result;
         }
 
@@ -220,7 +220,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(c, gid,
                 std::move(addr), priority,
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-            cb(boost::system::error_code(), 0);     // invoke callback
+            cb(boost::system::error_code(), parcelset::parcel());     // invoke callback
             return result;
         }
 

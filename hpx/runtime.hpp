@@ -78,7 +78,8 @@ namespace hpx
             state_running = 4,
             state_pre_shutdown = 5,
             state_shutdown = 6,
-            state_stopped = 7
+            state_stopped = 7,
+            state_last = state_stopped
         };
 
         state get_state() const { return state_.load(); }

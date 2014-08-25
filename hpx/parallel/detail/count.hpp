@@ -59,9 +59,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             parallel(ExPolicy const& policy, Iter first, Iter last,
                 T const& value)
             {
-                typedef typename std::iterator_traits<Iter>::value_type
-                    value_type;
-
                 if (first == last)
                     return detail::algorithm_result<ExPolicy, difference_type>::get(0);
 
@@ -71,9 +68,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     {
                         difference_type ret = 0;
                         util::loop_n(part_begin, part_size,
-                            [&value, &ret](value_type const& val)
+                            [&value, &ret](Iter const& curr)
                             {
-                                if (value == val)
+                                if (value == *curr)
                                     ++ret;
                             });
                         return ret;
@@ -187,9 +184,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename detail::algorithm_result<ExPolicy, difference_type>::type
             parallel(ExPolicy const& policy, Iter first, Iter last, Pred && op)
             {
-                typedef typename std::iterator_traits<Iter>::value_type
-                    value_type;
-
                 if (first == last)
                     return detail::algorithm_result<ExPolicy, difference_type>::get(0);
 
@@ -199,9 +193,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     {
                         difference_type ret = 0;
                         util::loop_n(part_begin, part_size,
-                            [&op, &ret](value_type const& val)
+                            [&op, &ret](Iter const& curr)
                             {
-                                if (op(val))
+                                if (op(*curr))
                                     ++ret;
                             });
                         return ret;

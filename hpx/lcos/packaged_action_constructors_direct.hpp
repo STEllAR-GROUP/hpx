@@ -68,7 +68,7 @@
             hpx::applier::detail::apply_c_cb<action_type>(
                 std::move(addr), this->get_gid(), gid,
                 util::bind(&packaged_action::parcel_write_handler,
-                    this->impl_, util::placeholders::_1),
+                    this->impl_, util::placeholders::_1, util::placeholders::_2),
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
     }
@@ -94,7 +94,7 @@
             hpx::applier::detail::apply_c_cb<action_type>(
                 std::move(addr), this->get_gid(), gid,
                 util::bind(&packaged_action::parcel_write_handler,
-                    this->impl_, util::placeholders::_1),
+                    this->impl_, util::placeholders::_1, util::placeholders::_2),
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
     }

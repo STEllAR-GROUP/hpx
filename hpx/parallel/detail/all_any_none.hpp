@@ -55,9 +55,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (first == last)
                     return detail::algorithm_result<ExPolicy, bool>::get(true);
 
-                typedef typename std::iterator_traits<FwdIter>::value_type
-                    value_type;
-
                 util::cancellation_token<> tok;
                 return util::partitioner<ExPolicy, bool>::call(
                     policy, first, std::distance(first, last),
@@ -65,9 +62,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     {
                         util::loop_n(
                             part_begin, part_count, tok,
-                            [&op, &tok](value_type const& val)
+                            [&op, &tok](FwdIter const& curr)
                             {
-                                if (op(val))
+                                if (op(*curr))
                                     tok.cancel();
                             });
                         return !tok.was_cancelled();
@@ -192,9 +189,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (first == last)
                     return detail::algorithm_result<ExPolicy, bool>::get(false);
 
-                typedef typename std::iterator_traits<FwdIter>::value_type
-                    value_type;
-
                 util::cancellation_token<> tok;
                 return util::partitioner<ExPolicy, bool>::call(
                     policy, first, std::distance(first, last),
@@ -202,9 +196,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     {
                         util::loop_n(
                             part_begin, part_count, tok,
-                            [&op, &tok](value_type const& val)
+                            [&op, &tok](FwdIter const& curr)
                             {
-                                if (op(val))
+                                if (op(*curr))
                                     tok.cancel();
                             });
                         return tok.was_cancelled();
@@ -329,9 +323,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (first == last)
                     return detail::algorithm_result<ExPolicy, bool>::get(true);
 
-                typedef typename std::iterator_traits<FwdIter>::value_type
-                    value_type;
-
                 util::cancellation_token<> tok;
                 return util::partitioner<ExPolicy, bool>::call(
                     policy, first, std::distance(first, last),
@@ -339,9 +330,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     {
                         util::loop_n(
                             part_begin, part_count, tok,
-                            [&op, &tok](value_type const& val)
+                            [&op, &tok](FwdIter const& curr)
                             {
-                                if (!op(val))
+                                if (!op(*curr))
                                     tok.cancel();
                             });
                         return !tok.was_cancelled();

@@ -311,8 +311,9 @@ int hpx_main(boost::program_options::variables_map& vm)
         }
     }
 
-    boost::uint64_t const os_thread_count = hpx::get_os_thread_count();
-    print_time_results(os_thread_count, elapsed, nx, np, nt, header);
+    boost::uint64_t const num_worker_threads = hpx::get_num_worker_threads();
+    hpx::future<boost::uint32_t> locs = hpx::get_num_localities();
+    print_time_results(locs.get(),num_worker_threads, elapsed, nx, np, nt, header);
 
     return hpx::finalize();
 }

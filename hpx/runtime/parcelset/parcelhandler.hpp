@@ -39,7 +39,7 @@ namespace hpx { namespace parcelset
     private:
         // default callback for put_parcel
         void default_write_handler(boost::system::error_code const&,
-            std::size_t /*size*/);
+            parcel const& p);
 
         void parcel_sink(parcel const& p);
 

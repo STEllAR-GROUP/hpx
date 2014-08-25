@@ -8,6 +8,8 @@
 
 #include <boost/iterator/iterator_adaptor.hpp>
 
+#include <random>
+
 namespace test
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -42,6 +44,9 @@ namespace test
         base_type;
 
     public:
+        decorated_iterator()
+        {}
+
         decorated_iterator(BaseIterator base)
           : base_type(base)
         {}
@@ -149,9 +154,7 @@ namespace test
     {
         std::vector<std::size_t> c(size);
         std::iota(boost::begin(c), boost::end(c), 0);
-        int num = std::rand();
-        while (num-- != 0)
-            std::next_permutation(boost::begin(c), boost::end(c));
+        std::random_shuffle(boost::begin(c), boost::end(c));
         return c;
     }
 

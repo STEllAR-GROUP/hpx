@@ -47,7 +47,7 @@ namespace hpx { namespace lcos { namespace local
         template <class Lock>
         void wait(Lock& lock, error_code& ec = throws)
         {
-            util::ignore_while_checking ignore_lock(&lock);
+            util::ignore_while_checking<Lock> ignore_lock(&lock);
             mutex_type::scoped_lock l(mtx_);
             util::scoped_unlock<Lock> unlock(lock);
             cond_.wait(l, ec);
@@ -68,7 +68,7 @@ namespace hpx { namespace lcos { namespace local
         wait_until(Lock& lock,
             boost::posix_time::ptime const& at, error_code& ec = throws)
         {
-            util::ignore_while_checking ignore_lock(&lock);
+            util::ignore_while_checking<Lock> ignore_lock(&lock);
             mutex_type::scoped_lock l(mtx_);
             util::scoped_unlock<Lock> unlock(lock);
 
@@ -118,7 +118,7 @@ namespace hpx { namespace lcos { namespace local
             boost::posix_time::time_duration const& p,
             error_code& ec = throws)
         {
-            util::ignore_while_checking ignore_lock(&lock);
+            util::ignore_while_checking<Lock> ignore_lock(&lock);
             mutex_type::scoped_lock l(mtx_);
             util::scoped_unlock<Lock> unlock(lock);
 

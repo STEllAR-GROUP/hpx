@@ -72,6 +72,36 @@ namespace hpx { namespace parcelset
         return "<unknown>";
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    bool connection_type_available(connection_type t)
+    {
+        switch(t) {
+#if defined(HPX_HAVE_PARCELPORT_TCP)
+        case connection_tcp:
+            return true;
+#endif
+#if defined(HPX_HAVE_PARCELPORT_IPC)
+        case connection_ipc:
+            return true;
+#endif
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+        case connection_ibverbs:
+            return true;
+#endif
+#if defined(HPX_HAVE_PARCELPORT_PORTALS4)
+        case connection_portals4:
+            return true;
+#endif
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+        case connection_mpi:
+            return true;
+#endif
+        default:
+            break;
+        }
+        return false;
+    }
+
     connection_type get_connection_type_from_name(std::string const& t)
     {
         if (!std::strcmp(t.c_str(), "tcp"))
@@ -110,7 +140,7 @@ namespace hpx { namespace parcelset
     {
         wait_for_put_parcel() : sema_(new lcos::local::counting_semaphore) {}
 
-        void operator()(boost::system::error_code const&, std::size_t)
+        void operator()(boost::system::error_code const&, parcel const&)
         {
             sema_->signal();
         }
@@ -197,36 +227,44 @@ namespace hpx { namespace parcelset
             std::string name = get_connection_type_name(connection_type(i));
             std::string name_uc = boost::to_upper_copy(name);
             std::string enable = pp_ini_defs.second ? "1" : "0";
+
             // Load some defaults
-            ini_defs +=
-                "[hpx.parcel." + name + "]",
-                "enable = ${HPX_HAVE_PARCELPORT_" + name_uc + ":" + enable + "}",
-                "io_pool_size = ${HPX_PARCEL_" + name_uc + "_IO_POOL_SIZE:"
-                    "$[hpx.threadpools.parcel_pool_size]}",
-                "max_connections =  ${HPX_PARCEL_" + name_uc + "_MAX_CONNECTIONS:"
-                    "$[hpx.parcel.max_connections]}",
-                "max_connections_per_locality = "
-                    "${HPX_PARCEL_" + name_uc + "_MAX_CONNECTIONS_PER_LOCALITY:"
-                    "$[hpx.parcel.max_connections_per_locality]}",
-                "max_message_size =  ${HPX_PARCEL_" + name_uc +
-                    "_MAX_MESSAGE_SIZE:$[hpx.parcel.max_message_size]}",
-                "array_optimization = ${HPX_PARCEL_" + name_uc +
-                    "_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}",
-                "zero_copy_optimization = ${HPX_PARCEL_" + name_uc +
-                    "_ZERO_COPY_OPTIMIZATION:"
-                    "$[hpx.parcel.zero_copy_optimization]}",
-                "enable_security = ${HPX_PARCEL_" + name_uc +
-                    "_ENABLE_SECURITY:"
-                    "$[hpx.parcel.enable_security]}",
-                "async_serialization = ${HPX_PARCEL_" + name_uc +
-                    "_ASYNC_SERIALIZATION:"
-                    "$[hpx.parcel.async_serialization]}"
-                ;
+            ini_defs += "[hpx.parcel." + name + "]";
+            if (!connection_type_available(connection_type(i)))
+            {
+                // skip this configuration if the parcelport is not available
+                ini_defs += "enable = 0";
+            }
+            else
+            {
+                ini_defs +=
+                    "enable = ${HPX_HAVE_PARCELPORT_" + name_uc + ":" + enable + "}",
+                    "io_pool_size = ${HPX_PARCEL_" + name_uc + "_IO_POOL_SIZE:"
+                        "$[hpx.threadpools.parcel_pool_size]}",
+                    "max_connections =  ${HPX_PARCEL_" + name_uc + "_MAX_CONNECTIONS:"
+                        "$[hpx.parcel.max_connections]}",
+                    "max_connections_per_locality = "
+                        "${HPX_PARCEL_" + name_uc + "_MAX_CONNECTIONS_PER_LOCALITY:"
+                        "$[hpx.parcel.max_connections_per_locality]}",
+                    "max_message_size =  ${HPX_PARCEL_" + name_uc +
+                        "_MAX_MESSAGE_SIZE:$[hpx.parcel.max_message_size]}",
+                    "array_optimization = ${HPX_PARCEL_" + name_uc +
+                        "_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}",
+                    "zero_copy_optimization = ${HPX_PARCEL_" + name_uc +
+                        "_ZERO_COPY_OPTIMIZATION:"
+                        "$[hpx.parcel.zero_copy_optimization]}",
+                    "enable_security = ${HPX_PARCEL_" + name_uc +
+                        "_ENABLE_SECURITY:"
+                        "$[hpx.parcel.enable_security]}",
+                    "async_serialization = ${HPX_PARCEL_" + name_uc +
+                        "_ASYNC_SERIALIZATION:"
+                        "$[hpx.parcel.async_serialization]}"
+                    ;
+            }
 
             // add the pp specific configuration parameter
             ini_defs.insert(ini_defs.end(),
                 pp_ini_defs.first.begin(), pp_ini_defs.first.end());
-
         }
 
         return ini_defs;
@@ -568,11 +606,10 @@ namespace hpx { namespace parcelset
         // until after the data has been reliably sent (which is needed for zero
         // copy serialization).
         void parcel_sent_handler(boost::system::error_code const& ec,
-            std::size_t size, parcelhandler::write_handler_type const& f,
-            parcel const& p)
+            parcelhandler::write_handler_type const& f, parcel const& p)
         {
             // invoke the original handler
-            f(ec, size);
+            f(ec, p);
 
             // inform termination detection of a sent message
             if (!p.does_termination_detection())
@@ -622,9 +659,8 @@ namespace hpx { namespace parcelset
         if (resolved_locally) {
             // re-wrap the given parcel-sent handler
             using util::placeholders::_1;
-            using util::placeholders::_2;
             write_handler_type wrapped_f =
-                util::bind(&detail::parcel_sent_handler, _1, _2, f, p);
+                util::bind(&detail::parcel_sent_handler, _1, f, p);
 
             // dispatch to the message handler which is associated with the
             // encapsulated action
@@ -660,12 +696,13 @@ namespace hpx { namespace parcelset
     ///////////////////////////////////////////////////////////////////////////
     // default callback for put_parcel
     void parcelhandler::default_write_handler(
-        boost::system::error_code const& ec, std::size_t)
+        boost::system::error_code const& ec, parcel const& p)
     {
         if (ec) {
             boost::exception_ptr exception =
                 hpx::detail::get_exception(hpx::exception(ec),
-                    "parcelhandler::default_write_handler", __FILE__, __LINE__);
+                    "parcelhandler::default_write_handler", __FILE__,
+                    __LINE__, parcelset::dump_parcel(p));
 
             // store last error for now only
             mutex_type::scoped_lock l(mtx_);

@@ -103,11 +103,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     {
                         util::loop_n(
                             it, part_count, tok,
-                            [&f, &tok](reference t)
+                            [&f, &tok](zip_iterator const& curr)
                             {
-                                if (!f(hpx::util::get<0>(t), hpx::util::get<1>(t))){
+                                using hpx::util::get;
+                                reference t = *curr;
+                                if (!f(get<0>(t), get<1>(t)))
                                     tok.cancel();
-                                }
                             });
                         return !tok.was_cancelled();
                     },
@@ -203,8 +204,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category1>,
             boost::is_same<std::input_iterator_tag, iterator_category2>
         >::type is_seq;
-
-        typedef typename std::iterator_traits<InIter1>::value_type value_type;
 
         return detail::equal_binary().call(
             std::forward<ExPolicy>(policy),
@@ -307,8 +306,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category2>
         >::type is_seq;
 
-        typedef typename std::iterator_traits<InIter1>::value_type value_type;
-
         return detail::equal_binary().call(
             std::forward<ExPolicy>(policy),
             first1, last1, first2, last2, std::forward<F>(f), is_seq());
@@ -355,9 +352,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     {
                         util::loop_n(
                             it, part_count, tok,
-                            [&f, &tok](reference t)
+                            [&f, &tok](zip_iterator const& curr)
                             {
-                                if (!f(hpx::util::get<0>(t), hpx::util::get<1>(t)))
+                                reference t = *curr;
+                                using hpx::util::get;
+                                if (!f(get<0>(t), get<1>(t)))
                                     tok.cancel();
                             });
                         return !tok.was_cancelled();
@@ -450,8 +449,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category1>,
             boost::is_same<std::input_iterator_tag, iterator_category2>
         >::type is_seq;
-
-        typedef typename std::iterator_traits<InIter1>::value_type value_type;
 
         return detail::equal().call(
             std::forward<ExPolicy>(policy),
@@ -549,8 +546,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category1>,
             boost::is_same<std::input_iterator_tag, iterator_category2>
         >::type is_seq;
-
-        typedef typename std::iterator_traits<InIter1>::value_type value_type;
 
         return detail::equal().call(
             std::forward<ExPolicy>(policy),

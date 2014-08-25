@@ -660,25 +660,26 @@ namespace hpx { namespace util
         }
     }
 
-    boost::uint32_t runtime_configuration::get_used_cores() const
+    boost::uint32_t runtime_configuration::get_first_used_core() const
     {
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
                 return boost::lexical_cast<boost::uint32_t>(
-                    sec->get_entry("used_cores", 0));
+                    sec->get_entry("first_used_core", 0));
             }
         }
         return 0;
     }
 
-    void runtime_configuration::set_used_cores(boost::uint32_t used_cores)
+    void runtime_configuration::set_first_used_core(
+        boost::uint32_t first_used_core)
     {
         if (has_section("hpx")) {
             util::section* sec = get_section("hpx");
             if (NULL != sec) {
-                sec->add_entry("used_cores",
-                    boost::lexical_cast<std::string>(used_cores));
+                sec->add_entry("first_used_core",
+                    boost::lexical_cast<std::string>(first_used_core));
             }
         }
     }

@@ -51,7 +51,7 @@ namespace hpx { namespace parcelset
 
     public:
         typedef HPX_STD_FUNCTION<
-            void(boost::system::error_code const&, std::size_t)
+            void(boost::system::error_code const&, parcel const&)
         > write_handler_type;
 
         typedef HPX_STD_FUNCTION<
