@@ -32,7 +32,7 @@ namespace hpx { namespace naming
 
         std::string port_str(boost::lexical_cast<std::string>(loc.get_port()));
 
-#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+#if defined(HPX_PARCELPORT_IBVERBS)
         std::string address = ibverbs ? loc.get_ibverbs_address() : loc.get_address();
 #else
         std::string address = loc.get_address();
@@ -98,7 +98,7 @@ namespace hpx { namespace naming
         exception_list errors;
 
         std::string port_str(boost::lexical_cast<std::string>(loc.get_port()));
-#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+#if defined(HPX_PARCELPORT_IBVERBS)
         std::string address = ibverbs ? loc.get_ibverbs_address() : loc.get_address();
 #else
         std::string address = loc.get_address();
@@ -149,12 +149,12 @@ namespace hpx { namespace naming
     void locality::save(Archive& ar, const unsigned int version) const
     {
         ar.save(address_);
-#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+#if defined(HPX_PARCELPORT_IBVERBS)
         ar.save(ibverbs_address_);
 #endif
         ar.save(port_);
 
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
         HPX_ASSERT(HPX_LOCALITY_VERSION_MPI == version);
         ar.save(rank_);
 #endif
@@ -172,12 +172,12 @@ namespace hpx { namespace naming
         }
 
         ar.load(address_);
-#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+#if defined(HPX_PARCELPORT_IBVERBS)
         ar.load(ibverbs_address_);
 #endif
         ar.load(port_);
 
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
         // try to read rank only if the sender knows about MPI
         if (version > HPX_LOCALITY_VERSION_NO_MPI)
             ar.load(rank_);

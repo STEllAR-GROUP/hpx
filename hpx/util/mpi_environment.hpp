@@ -8,7 +8,7 @@
 
 #include <hpx/config/defines.hpp>
 
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
 #include <hpx/hpx_fwd.hpp>
 #include <cstdlib>
 

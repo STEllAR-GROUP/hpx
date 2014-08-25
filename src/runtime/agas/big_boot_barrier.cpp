@@ -795,7 +795,7 @@ void big_boot_barrier::wait_hosted(std::string const& locality_name,
 
     naming::gid_type suggested_prefix;
 
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
     // if MPI parcelport is enabled we use the MPI rank as the suggested locality_id
     if (util::mpi_environment::rank() != -1)
     {

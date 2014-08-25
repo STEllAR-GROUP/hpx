@@ -6,28 +6,28 @@
 
 // This is needed to make everything work with the Intel MPI library header
 #include <hpx/config/defines.hpp>
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
 #include <mpi.h>
 #endif
 
 #include <hpx/hpx_fwd.hpp>
 
-#if defined(HPX_HAVE_PARCELPORT_TCP)
+#if defined(HPX_PARCELPORT_TCP)
 #include <hpx/runtime/parcelset/policies/tcp/connection_handler.hpp>
 #include <hpx/runtime/parcelset/policies/tcp/receiver.hpp>
 #include <hpx/runtime/parcelset/policies/tcp/sender.hpp>
 #endif
-#if defined(HPX_HAVE_PARCELPORT_IPC)
+#if defined(HPX_PARCELPORT_IPC)
 #include <hpx/runtime/parcelset/policies/ipc/connection_handler.hpp>
 #include <hpx/runtime/parcelset/policies/ipc/receiver.hpp>
 #include <hpx/runtime/parcelset/policies/ipc/sender.hpp>
 #endif
-#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+#if defined(HPX_PARCELPORT_IBVERBS)
 #include <hpx/runtime/parcelset/policies/ibverbs/connection_handler.hpp>
 #include <hpx/runtime/parcelset/policies/ibverbs/receiver.hpp>
 #include <hpx/runtime/parcelset/policies/ibverbs/sender.hpp>
 #endif
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
 #include <hpx/runtime/parcelset/policies/mpi/connection_handler.hpp>
 #include <hpx/runtime/parcelset/policies/mpi/receiver.hpp>
 #include <hpx/runtime/parcelset/policies/mpi/sender.hpp>
@@ -63,20 +63,20 @@ namespace hpx { namespace parcelset
         typedef std::pair<std::vector<std::string>, bool> return_type;
         switch(type) {
         case connection_tcp:
-#if defined(HPX_HAVE_PARCELPORT_TCP)
+#if defined(HPX_PARCELPORT_TCP)
             return return_type(
                 policies::tcp::connection_handler::runtime_configuration()
               , true);
 #endif
         case connection_ipc:
-#if defined(HPX_HAVE_PARCELPORT_IPC)
+#if defined(HPX_PARCELPORT_IPC)
             return return_type(
                 policies::ipc::connection_handler::runtime_configuration()
               , false);
 #endif
             break;
         case connection_ibverbs:
-#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+#if defined(HPX_PARCELPORT_IBVERBS)
             return return_type(
                 policies::ibverbs::connection_handler::runtime_configuration()
               , false);
@@ -87,7 +87,7 @@ namespace hpx { namespace parcelset
             break;
 
         case connection_mpi:
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
             return return_type(
                 policies::mpi::connection_handler::runtime_configuration()
               , true);
@@ -109,7 +109,7 @@ namespace hpx { namespace parcelset
         switch(type) {
         case connection_tcp:
             {
-#if defined(HPX_HAVE_PARCELPORT_TCP)
+#if defined(HPX_PARCELPORT_TCP)
                 std::string enable_tcp =
                     cfg.get_entry("hpx.parcel.tcp.enable", "1");
 
@@ -126,7 +126,7 @@ namespace hpx { namespace parcelset
 
         case connection_ipc:
             {
-#if defined(HPX_HAVE_PARCELPORT_IPC)
+#if defined(HPX_PARCELPORT_IPC)
                 // Create ipc based parcelport only if allowed by the
                 // configuration info.
                 std::string enable_ipc =
@@ -144,7 +144,7 @@ namespace hpx { namespace parcelset
             break;
 
         case connection_ibverbs:
-#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+#if defined(HPX_PARCELPORT_IBVERBS)
             {
                 // Create ibverbs based parcelport only if allowed by the
                 // configuration info.
@@ -168,7 +168,7 @@ namespace hpx { namespace parcelset
             break;
 
         case connection_mpi:
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
             {
                 // Create MPI based parcelport only if allowed by the
                 // configuration info.

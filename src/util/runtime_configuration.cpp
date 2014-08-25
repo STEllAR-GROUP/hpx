@@ -464,11 +464,11 @@ namespace hpx { namespace util
                 return
                     naming::locality(
                         sec->get_entry("address", HPX_INITIAL_IP_ADDRESS)
-#if defined(HPX_HAVE_PARCELPORT_IBVERBS) // FIXME
+#if defined(HPX_PARCELPORT_IBVERBS) // FIXME
                       , ""
 #endif
                       , boost::lexical_cast<boost::uint16_t>(cfg_port)
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
                       , mpi_environment::enabled() ? 0 : -1
 #endif
                     );
@@ -477,11 +477,11 @@ namespace hpx { namespace util
         return
             naming::locality(
                 HPX_INITIAL_IP_ADDRESS
-#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+#if defined(HPX_PARCELPORT_IBVERBS)
               , ""
 #endif
               , HPX_INITIAL_IP_PORT
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
               , mpi_environment::enabled() ? 0 : -1
 #endif
             );
@@ -510,7 +510,7 @@ namespace hpx { namespace util
 
                 return naming::locality(
                     sec->get_entry("address", HPX_INITIAL_IP_ADDRESS)
-#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+#if defined(HPX_PARCELPORT_IBVERBS)
                   , get_ibverbs_address()
 #endif
                   , boost::lexical_cast<boost::uint16_t>(cfg_port)
@@ -520,7 +520,7 @@ namespace hpx { namespace util
         return
             naming::locality(
                 HPX_INITIAL_IP_ADDRESS
-#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+#if defined(HPX_PARCELPORT_IBVERBS)
               , get_ibverbs_address()
 #endif
               , HPX_INITIAL_IP_PORT
@@ -529,7 +529,7 @@ namespace hpx { namespace util
 
     std::string runtime_configuration::get_ibverbs_address() const
     {
-#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+#if defined(HPX_PARCELPORT_IBVERBS)
         if(has_section("hpx.parcel.ibverbs"))
         {
             util::section const * sec = get_section("hpx.parcel.ibverbs");

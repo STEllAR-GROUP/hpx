@@ -9,7 +9,7 @@
 
 #include <hpx/config/defines.hpp>
 
-#if defined(HPX_HAVE_PARCELPORT_TCP)
+#if defined(HPX_PARCELPORT_TCP)
 
 #include <hpx/exception_list.hpp>
 #include <hpx/runtime/naming/locality.hpp>

@@ -136,15 +136,15 @@ namespace hpx
 #else
         strm << "  HPX_HAVE_PARCEL_COALESCING=OFF\n";
 #endif
-#if defined(HPX_HAVE_PARCELPORT_IPC)
-        strm << "  HPX_HAVE_PARCELPORT_IPC=ON\n";
+#if defined(HPX_PARCELPORT_IPC)
+        strm << "  HPX_PARCELPORT_IPC=ON\n";
 #else
-        strm << "  HPX_HAVE_PARCELPORT_IPC=OFF\n";
+        strm << "  HPX_PARCELPORT_IPC=OFF\n";
 #endif
-#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
-        strm << "  HPX_HAVE_PARCELPORT_IBVERBS=ON\n";
+#if defined(HPX_PARCELPORT_IBVERBS)
+        strm << "  HPX_PARCELPORT_IBVERBS=ON\n";
 #else
-        strm << "  HPX_HAVE_PARCELPORT_IBVERBS=OFF\n";
+        strm << "  HPX_PARCELPORT_IBVERBS=OFF\n";
 #endif
 #if defined(HPX_HAVE_VERIFY_LOCKS)
         strm << "  HPX_HAVE_VERIFY_LOCKS=ON\n";
@@ -215,7 +215,7 @@ namespace hpx
         strm << "  HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD="
              << HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD << "\n";
 #endif
-#if defined(HPX_HAVE_PARCELPORT_IPC) && defined(HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE)
+#if defined(HPX_PARCELPORT_IPC) && defined(HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE)
         strm << "  HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE="
              << HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE << "\n";
 #endif
