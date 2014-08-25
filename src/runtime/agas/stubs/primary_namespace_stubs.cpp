@@ -58,7 +58,8 @@ template lcos::future<naming::id_type>
 void primary_namespace::service_non_blocking(
     naming::id_type const& gid
   , request const& req
-  , HPX_STD_FUNCTION<void(boost::system::error_code const&, std::size_t)> const& f
+  , HPX_STD_FUNCTION<void(boost::system::error_code const&,
+        parcelset::parcel const&)> const& f
   , threads::thread_priority priority
     )
 {
@@ -76,7 +77,7 @@ void primary_namespace::service_non_blocking(
     hpx::apply_p<action_type>(gid, priority, req);
 }
 
-lcos::future<std::vector<response> > 
+lcos::future<std::vector<response> >
     primary_namespace::bulk_service_async(
         naming::id_type const& gid
       , std::vector<request> const& reqs

@@ -13,7 +13,7 @@ namespace hpx { namespace parcelset { namespace policies
     struct message_handler
     {
         typedef HPX_STD_FUNCTION<
-            void(boost::system::error_code const&, std::size_t)
+            void(boost::system::error_code const&, parcel const&)
         > write_handler_type;
 
         virtual ~message_handler() {}

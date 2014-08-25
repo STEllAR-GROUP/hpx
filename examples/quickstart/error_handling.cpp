@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
-//  This example is documented in the Manual under the title "Error Handling" 
+//  This example is documented in the Manual under the title "Error Handling"
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
@@ -63,6 +63,7 @@ int hpx_main()
             hpx::cout << "{thread-id}: "   << std::hex << hpx::get_error_thread_id(e) << "\n";
             hpx::cout << "{thread-description}: "
                 << hpx::get_error_thread_description(e) << "\n";
+            hpx::cout << "{state}: "       << std::hex << hpx::get_error_state(e) << "\n";
             hpx::cout << "{stack-trace}: " << hpx::get_error_backtrace(e) << "\n";
             hpx::cout << "{env}: "         << hpx::get_error_env(e) << "\n";
         }
@@ -125,6 +126,7 @@ int hpx_main()
                 hpx::cout << "{thread-id}: "   << std::hex << hpx::get_error_thread_id(ec) << "\n";
                 hpx::cout << "{thread-description}: "
                     << hpx::get_error_thread_description(ec) << "\n\n";
+                hpx::cout << "{state}: "       << std::hex << hpx::get_error_state(ec) << "\n";
                 hpx::cout << "{stack-trace}: " << hpx::get_error_backtrace(ec) << "\n";
                 hpx::cout << "{env}: "         << hpx::get_error_env(ec) << "\n";
             }

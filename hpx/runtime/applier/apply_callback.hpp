@@ -61,7 +61,7 @@ namespace hpx
         if (agas::is_local_address_cached(gid, addr)) {
             bool result = applier::detail::apply_l_p<Action>(gid, gid,
                 std::move(addr), priority);         // apply locally
-            cb(boost::system::error_code(), 0);     // invoke callback
+            cb(boost::system::error_code(), parcelset::parcel());     // invoke callback
             return result;
         }
 
@@ -134,7 +134,7 @@ namespace hpx
         if (addr.locality_ == hpx::get_locality()) {
             bool result = applier::detail::apply_l_p<Action>(c, gid,
                 std::move(addr), priority);
-            cb(boost::system::error_code(), 0);     // invoke callback
+            cb(boost::system::error_code(), parcelset::parcel());     // invoke callback
             return result;
         }
 
@@ -158,7 +158,7 @@ namespace hpx
         if (agas::is_local_address_cached(gid, addr)) {
             bool result = applier::detail::apply_l_p<Action>(c, gid,
                 std::move(addr), priority);
-            cb(boost::system::error_code(), 0);     // invoke callback
+            cb(boost::system::error_code(), parcelset::parcel());     // invoke callback
             return result;
         }
 

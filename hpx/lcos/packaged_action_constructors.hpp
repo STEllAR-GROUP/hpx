@@ -52,7 +52,7 @@
 
         hpx::apply_c_cb<action_type>(this->get_gid(), gid,
             util::bind(&packaged_action::parcel_write_handler,
-                this->impl_, util::placeholders::_1),
+                this->impl_, util::placeholders::_1, util::placeholders::_2),
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
@@ -64,7 +64,7 @@
 
         hpx::apply_c_cb<action_type>(this->get_gid(), std::move(addr), gid,
             util::bind(&packaged_action::parcel_write_handler,
-                this->impl_, util::placeholders::_1),
+                this->impl_, util::placeholders::_1, util::placeholders::_2),
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
@@ -76,7 +76,7 @@
 
         hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
             util::bind(&packaged_action::parcel_write_handler,
-                this->impl_, util::placeholders::_1),
+                this->impl_, util::placeholders::_1, util::placeholders::_2),
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
@@ -90,7 +90,7 @@
         hpx::apply_c_p_cb<action_type>(this->get_gid(), std::move(addr),
             gid, priority,
             util::bind(&packaged_action::parcel_write_handler,
-                this->impl_, util::placeholders::_1),
+                this->impl_, util::placeholders::_1, util::placeholders::_2),
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 

@@ -45,6 +45,8 @@ namespace boost { namespace serialization
         int throw_line_ = 0;
         std::string throw_env_;
         std::string throw_config_;
+        std::string throw_state_;
+        std::string throw_auxinfo_;
 
         // retrieve information related to boost::exception
         try {
@@ -124,6 +126,16 @@ namespace boost { namespace serialization
                 boost::get_error_info<hpx::detail::throw_config>(e);
             if (config_)
                 throw_config_ = *config_;
+
+            std::string const* state_ =
+                boost::get_error_info<hpx::detail::throw_state>(e);
+            if (state_)
+                throw_state_ = *state_;
+
+            std::string const* auxinfo_ =
+                boost::get_error_info<hpx::detail::throw_auxinfo>(e);
+            if (auxinfo_)
+                throw_auxinfo_ = *auxinfo_;
         }
 
         // figure out concrete underlying exception type
@@ -196,7 +208,7 @@ namespace boost { namespace serialization
         ar & type & what & throw_function_ & throw_file_ & throw_line_
            & throw_locality_ & throw_hostname_ & throw_pid_ & throw_shepherd_
            & throw_thread_id_ & throw_thread_name_ & throw_back_trace_
-           & throw_env_ & throw_config_;
+           & throw_env_ & throw_config_ & throw_state_ & throw_auxinfo_;
 
         if (hpx::util::hpx_exception == type) {
             ar & err_value;
@@ -228,11 +240,13 @@ namespace boost { namespace serialization
         int throw_line_ = 0;
         std::string throw_env_;
         std::string throw_config_;
+        std::string throw_state_;
+        std::string throw_auxinfo_;
 
         ar & type & what & throw_function_ & throw_file_ & throw_line_
            & throw_locality_ & throw_hostname_ & throw_pid_ & throw_shepherd_
            & throw_thread_id_ & throw_thread_name_ & throw_back_trace_
-           & throw_env_ & throw_config_;
+           & throw_env_ & throw_config_ & throw_state_ & throw_auxinfo_;
 
         if (hpx::util::hpx_exception == type) {
             ar & err_value;
@@ -250,7 +264,7 @@ namespace boost { namespace serialization
                     throw_function_, throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_,
-                    throw_env_, throw_config_);
+                    throw_env_, throw_config_, throw_state_, throw_auxinfo_);
             break;
 
         // standard exceptions
@@ -260,7 +274,7 @@ namespace boost { namespace serialization
                     throw_function_, throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_,
-                    throw_env_, throw_config_);
+                    throw_env_, throw_config_, throw_state_, throw_auxinfo_);
             break;
 
         case hpx::util::std_invalid_argument:
@@ -269,7 +283,7 @@ namespace boost { namespace serialization
                     throw_function_, throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_,
-                    throw_env_, throw_config_);
+                    throw_env_, throw_config_, throw_state_, throw_auxinfo_);
             break;
 
         case hpx::util::std_out_of_range:
@@ -278,7 +292,7 @@ namespace boost { namespace serialization
                     throw_function_, throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_,
-                    throw_env_, throw_config_);
+                    throw_env_, throw_config_, throw_state_, throw_auxinfo_);
             break;
 
         case hpx::util::std_logic_error:
@@ -287,7 +301,7 @@ namespace boost { namespace serialization
                     throw_function_, throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_,
-                    throw_env_, throw_config_);
+                    throw_env_, throw_config_, throw_state_, throw_auxinfo_);
             break;
 
         case hpx::util::std_bad_alloc:
@@ -296,7 +310,7 @@ namespace boost { namespace serialization
                     throw_function_, throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_,
-                    throw_env_, throw_config_);
+                    throw_env_, throw_config_, throw_state_, throw_auxinfo_);
             break;
 
 #ifndef BOOST_NO_TYPEID
@@ -306,7 +320,7 @@ namespace boost { namespace serialization
                     throw_function_, throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_,
-                    throw_env_, throw_config_);
+                    throw_env_, throw_config_, throw_state_, throw_auxinfo_);
             break;
 
         case hpx::util::std_bad_typeid:
@@ -314,7 +328,7 @@ namespace boost { namespace serialization
                     throw_function_, throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_,
-                    throw_env_, throw_config_);
+                    throw_env_, throw_config_, throw_state_, throw_auxinfo_);
             break;
 #endif
         case hpx::util::std_bad_exception:
@@ -323,7 +337,7 @@ namespace boost { namespace serialization
                     throw_function_, throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_,
-                    throw_env_, throw_config_);
+                    throw_env_, throw_config_, throw_state_, throw_auxinfo_);
             break;
 
         // boost exceptions
@@ -345,7 +359,7 @@ namespace boost { namespace serialization
                   , throw_function_, throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_,
-                    throw_env_, throw_config_);
+                    throw_env_, throw_config_, throw_state_, throw_auxinfo_);
             break;
 
         // hpx::exception
@@ -356,12 +370,13 @@ namespace boost { namespace serialization
                     throw_function_, throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_,
-                    throw_env_, throw_config_);
+                    throw_env_, throw_config_, throw_state_, throw_auxinfo_);
             break;
 
         // hpx::thread_interrupted
         case hpx::util::hpx_thread_interrupted_exception:
-            e = hpx::detail::construct_lightweight_exception(hpx::thread_interrupted());
+            e = hpx::detail::construct_lightweight_exception(
+                hpx::thread_interrupted());
             break;
         }
     }

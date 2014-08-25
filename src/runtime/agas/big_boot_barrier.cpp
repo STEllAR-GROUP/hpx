@@ -113,6 +113,7 @@ struct registration_header
       , boost::uint64_t primary_ns_ptr_
       , boost::uint64_t symbol_ns_ptr_
       , boost::uint32_t cores_needed_
+      , boost::uint32_t num_threads_
       , std::string const& hostname_
       , naming::gid_type prefix_ = naming::gid_type()
     ) :
@@ -120,6 +121,7 @@ struct registration_header
       , primary_ns_ptr(primary_ns_ptr_)
       , symbol_ns_ptr(symbol_ns_ptr_)
       , cores_needed(cores_needed_)
+      , num_threads(num_threads_)
       , hostname(hostname_)
       , prefix(prefix_)
     {}
@@ -128,6 +130,7 @@ struct registration_header
     boost::uint64_t primary_ns_ptr;
     boost::uint64_t symbol_ns_ptr;
     boost::uint32_t cores_needed;
+    boost::uint32_t num_threads;
     std::string hostname;           // hostname of locality
     naming::gid_type prefix;        // suggested prefix (optional)
 
@@ -138,6 +141,7 @@ struct registration_header
         ar & primary_ns_ptr;
         ar & symbol_ns_ptr;
         ar & cores_needed;
+        ar & num_threads;
         ar & hostname;
         ar & prefix;
     }
@@ -349,7 +353,7 @@ void register_worker(registration_header const& header)
         return;
     }
 
-    if (!agas_client.register_locality(header.locality, prefix, header.cores_needed))
+    if (!agas_client.register_locality(header.locality, prefix, header.num_threads))
     {
         HPX_THROW_EXCEPTION(internal_server_error
             , "agas::register_worker"
@@ -563,7 +567,7 @@ void notify_worker(notification_header const& header)
     cfg.set_num_localities(header.num_localities);
 
     // store number of used cores by other localities
-    cfg.set_used_cores(header.used_cores);
+    cfg.set_first_used_core(header.used_cores);
     rt.assign_cores();
 
 #if defined(HPX_HAVE_SECURITY)
@@ -782,16 +786,22 @@ void big_boot_barrier::wait_hosted(std::string const& locality_name,
     HPX_ASSERT(0 != symbol_ns_server);
 
     runtime& rt = get_runtime();
+
     // get the number of cores we need for our locality. This respects the
     // affinity description. Cores that are partially used are counted as well
     boost::uint32_t cores_needed = rt.assign_cores();
+    boost::uint32_t num_threads =
+        boost::uint32_t(rt.get_config().get_os_thread_count());
 
     naming::gid_type suggested_prefix;
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
     // if MPI parcelport is enabled we use the MPI rank as the suggested locality_id
     if (util::mpi_environment::rank() != -1)
-        suggested_prefix = naming::get_gid_from_locality_id(util::mpi_environment::rank());
+    {
+        suggested_prefix = naming::get_gid_from_locality_id(
+            util::mpi_environment::rank());
+    }
 #endif
 
     // contact the bootstrap AGAS node
@@ -800,6 +810,7 @@ void big_boot_barrier::wait_hosted(std::string const& locality_name,
         , reinterpret_cast<boost::uint64_t>(primary_ns_server)
         , reinterpret_cast<boost::uint64_t>(symbol_ns_server)
         , cores_needed
+        , num_threads
         , locality_name
         , suggested_prefix);
 

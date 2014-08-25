@@ -60,7 +60,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -142,7 +142,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(c, gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -169,7 +169,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(c, gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -347,7 +347,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -429,7 +429,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(c, gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -456,7 +456,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(c, gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -634,7 +634,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -716,7 +716,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(c, gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -743,7 +743,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(c, gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -921,7 +921,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -1003,7 +1003,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(c, gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -1030,7 +1030,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(c, gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -1208,7 +1208,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -1290,7 +1290,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(c, gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -1317,7 +1317,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(c, gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -1495,7 +1495,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -1577,7 +1577,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(c, gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -1604,7 +1604,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(c, gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -1782,7 +1782,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -1864,7 +1864,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(c, gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -1891,7 +1891,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(c, gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -2069,7 +2069,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -2151,7 +2151,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(c, gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -2178,7 +2178,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(c, gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -2356,7 +2356,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -2438,7 +2438,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(c, gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -2465,7 +2465,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(c, gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -2643,7 +2643,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -2725,7 +2725,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(c, gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         
@@ -2752,7 +2752,7 @@ namespace hpx
             bool result = applier::detail::apply_l_p<Action>(c, gid,
                 std::move(addr), priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
-            cb(boost::system::error_code(), 0); 
+            cb(boost::system::error_code(), parcelset::parcel()); 
             return result;
         }
         

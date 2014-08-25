@@ -314,10 +314,11 @@ void addressing_service::launch_bootstrap(
 
     // store number of cores used by other processes
     boost::uint32_t cores_needed = rt.assign_cores();
-    boost::uint32_t used_cores = rt.assign_cores(
+    boost::uint32_t first_used_core = rt.assign_cores(
         pp.get_locality_name(), cores_needed);
+
     util::runtime_configuration& cfg = rt.get_config();
-    cfg.set_used_cores(used_cores);
+    cfg.set_first_used_core(first_used_core);
     cfg.set_agas_locality(ini_.get_parcelport_address());
     rt.assign_cores();
 
@@ -1679,7 +1680,8 @@ bool addressing_service::resolve_cached(
 ///////////////////////////////////////////////////////////////////////////////
 void addressing_service::route(
     parcelset::parcel const& p
-  , HPX_STD_FUNCTION<void(boost::system::error_code const&, std::size_t)> const& f
+  , HPX_STD_FUNCTION<void(boost::system::error_code const&,
+        parcelset::parcel const&)> const& f
     )
 {
     // compose request
@@ -1699,7 +1701,7 @@ void addressing_service::route(
         // route through the local AGAS service instance
         applier::detail::apply_l_p<action_type>(
             target, addr, action_priority_, req);
-        f(boost::system::error_code(), 0);      // invoke callback
+        f(boost::system::error_code(), parcelset::parcel());      // invoke callback
         return;
     }
 

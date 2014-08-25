@@ -173,6 +173,29 @@ namespace hpx
         return runtime_mode_invalid;
     }
 
+    namespace strings
+    {
+        char const* const runtime_state_names[] =
+        {
+            "invalid",      // -1
+            "initialized",  // 0
+            "pre_startup",  // 1
+            "startup",      // 2
+            "pre_main",     // 3
+            "running",      // 4
+            "pre_shutdown"  // 5
+            "shutdown",     // 6
+            "stopped"       // 7
+        };
+    }
+
+    char const* get_runtime_state_name(runtime::state state)
+    {
+        if (state < runtime::state_invalid || state >= runtime::state_last)
+            return "invalid (value out of bounds)";
+        return strings::runtime_state_names[state+1];
+    }
+
 #if defined(HPX_HAVE_SECURITY)
     namespace detail
     {
@@ -743,7 +766,8 @@ namespace hpx
         // initialize thread affinity settings in the scheduler
         if (affinity_init_.used_cores_ == 0) {
             // correct used_cores from config data if appropriate
-            affinity_init_.used_cores_ = std::size_t(this->get_config().get_used_cores());
+            affinity_init_.used_cores_ = std::size_t(
+                this->get_config().get_first_used_core());
         }
 
         return static_cast<boost::uint32_t>(
