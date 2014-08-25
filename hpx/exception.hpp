@@ -164,7 +164,8 @@ namespace hpx
             get_exception(Exception const& e,
                 std::string const& func = "<unknown>",
                 std::string const& file = "<unknown>",
-                long line = -1);
+                long line = -1,
+                std::string const& auxinfo = "");
     }
     /// \endcond
 
@@ -682,6 +683,7 @@ namespace hpx
         struct tag_throw_env {};
         struct tag_throw_config {};
         struct tag_throw_state {};
+        struct tag_throw_auxinfo {};
 
         // Stores the information about the locality id the exception has been
         // raised on. This information will show up in error messages under the
@@ -759,6 +761,12 @@ namespace hpx
         typedef boost::error_info<detail::tag_throw_state, std::string>
             throw_state;
 
+        // Stores additional auxiliary information (such as information about
+        // the current parcel). This information will show up in error messages
+        // under the [auxinfo] tag.
+        typedef boost::error_info<detail::tag_throw_auxinfo, std::string>
+            throw_auxinfo;
+
         // construct an exception, internal helper
         template <typename Exception>
         HPX_EXPORT boost::exception_ptr
@@ -769,7 +777,7 @@ namespace hpx
                 std::size_t shepherd = ~0, std::size_t thread_id = 0,
                 std::string const& thread_name = "",
                 std::string const& env = "", std::string const& config = "",
-                std::string const& state = "");
+                std::string const& state = "", std::string const& auxinfo = "");
 
         template <typename Exception>
         HPX_EXPORT boost::exception_ptr

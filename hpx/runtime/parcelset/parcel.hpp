@@ -756,6 +756,9 @@ namespace hpx { namespace parcelset
     private:
         boost::intrusive_ptr<detail::parcel_data> data_;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_EXPORT std::string dump_parcel(parcel const& p);
 }}
 
 namespace hpx { namespace traits

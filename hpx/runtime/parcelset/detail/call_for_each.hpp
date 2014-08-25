@@ -21,18 +21,29 @@ namespace hpx { namespace parcelset
 
             typedef std::vector<parcelport::write_handler_type> data_type;
             data_type fv_;
+            parcelset::parcel p_;
 
-            call_for_each(data_type&& fv)
-              : fv_(std::move(fv))
+            call_for_each(data_type&& fv, parcelset::parcel const& p)
+              : fv_(std::move(fv)), p_(p)
             {}
 
             result_type operator()(
                 boost::system::error_code const& e,
-                std::size_t bytes_written) const
+                parcel const& p) const
             {
                 BOOST_FOREACH(parcelport::write_handler_type f, fv_)
                 {
-                    f(e, bytes_written);
+                    f(e, p);
+                }
+            }
+
+            result_type operator()(
+                boost::system::error_code const& e,
+                std::size_t) const
+            {
+                BOOST_FOREACH(parcelport::write_handler_type f, fv_)
+                {
+                    f(e, p_);
                 }
             }
         };

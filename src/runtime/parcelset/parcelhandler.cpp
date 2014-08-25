@@ -140,7 +140,7 @@ namespace hpx { namespace parcelset
     {
         wait_for_put_parcel() : sema_(new lcos::local::counting_semaphore) {}
 
-        void operator()(boost::system::error_code const&, std::size_t)
+        void operator()(boost::system::error_code const&, parcel const&)
         {
             sema_->signal();
         }
@@ -606,11 +606,10 @@ namespace hpx { namespace parcelset
         // until after the data has been reliably sent (which is needed for zero
         // copy serialization).
         void parcel_sent_handler(boost::system::error_code const& ec,
-            std::size_t size, parcelhandler::write_handler_type const& f,
-            parcel const& p)
+            parcelhandler::write_handler_type const& f, parcel const& p)
         {
             // invoke the original handler
-            f(ec, size);
+            f(ec, p);
 
             // inform termination detection of a sent message
             if (!p.does_termination_detection())
@@ -660,9 +659,8 @@ namespace hpx { namespace parcelset
         if (resolved_locally) {
             // re-wrap the given parcel-sent handler
             using util::placeholders::_1;
-            using util::placeholders::_2;
             write_handler_type wrapped_f =
-                util::bind(&detail::parcel_sent_handler, _1, _2, f, p);
+                util::bind(&detail::parcel_sent_handler, _1, f, p);
 
             // dispatch to the message handler which is associated with the
             // encapsulated action
@@ -698,12 +696,13 @@ namespace hpx { namespace parcelset
     ///////////////////////////////////////////////////////////////////////////
     // default callback for put_parcel
     void parcelhandler::default_write_handler(
-        boost::system::error_code const& ec, std::size_t)
+        boost::system::error_code const& ec, parcel const& p)
     {
         if (ec) {
             boost::exception_ptr exception =
                 hpx::detail::get_exception(hpx::exception(ec),
-                    "parcelhandler::default_write_handler", __FILE__, __LINE__);
+                    "parcelhandler::default_write_handler", __FILE__,
+                    __LINE__, parcelset::dump_parcel(p));
 
             // store last error for now only
             mutex_type::scoped_lock l(mtx_);

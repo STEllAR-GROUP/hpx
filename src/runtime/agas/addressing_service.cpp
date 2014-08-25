@@ -1680,7 +1680,8 @@ bool addressing_service::resolve_cached(
 ///////////////////////////////////////////////////////////////////////////////
 void addressing_service::route(
     parcelset::parcel const& p
-  , HPX_STD_FUNCTION<void(boost::system::error_code const&, std::size_t)> const& f
+  , HPX_STD_FUNCTION<void(boost::system::error_code const&,
+        parcelset::parcel const&)> const& f
     )
 {
     // compose request
@@ -1700,7 +1701,7 @@ void addressing_service::route(
         // route through the local AGAS service instance
         applier::detail::apply_l_p<action_type>(
             target, addr, action_priority_, req);
-        f(boost::system::error_code(), 0);      // invoke callback
+        f(boost::system::error_code(), parcelset::parcel());      // invoke callback
         return;
     }
 

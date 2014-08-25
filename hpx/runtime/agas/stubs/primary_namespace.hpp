@@ -41,7 +41,8 @@ struct HPX_EXPORT primary_namespace
     static void service_non_blocking(
         naming::id_type const& gid
       , request const& req
-      , HPX_STD_FUNCTION<void(boost::system::error_code const&, std::size_t)> const& f
+      , HPX_STD_FUNCTION<void(boost::system::error_code const&,
+            parcelset::parcel const&)> const& f
       , threads::thread_priority priority = threads::thread_priority_default
         );
 
