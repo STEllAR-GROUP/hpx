@@ -75,6 +75,7 @@ macro(add_hpx_config_test variable)
       set(_msg "${_msg} - ${_run_msg}")
     else()
       set(_msg "${_msg} - Failed")
+      set(_msg "${_msg} \n ${${variable}_OUTPUT}")
     endif()
 
     set(${variable} ${${variable}_RESULT} CACHE BOOL INTERNAL)

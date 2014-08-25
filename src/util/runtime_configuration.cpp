@@ -35,6 +35,18 @@
 #include <sys/types.h>
 #endif
 
+#if !defined(BOOST_WINDOWS)
+#  if defined(HPX_DEBUG)
+#    define HPX_DLL_STRING  "libhpxd" HPX_SHARED_LIB_EXTENSION
+#  else
+#    define HPX_DLL_STRING  "libhpx" HPX_SHARED_LIB_EXTENSION
+#  endif
+#elif defined(HPX_DEBUG)
+#  define HPX_DLL_STRING   "hpxd" HPX_SHARED_LIB_EXTENSION
+#else
+#  define HPX_DLL_STRING   "hpx" HPX_SHARED_LIB_EXTENSION
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
 namespace hpx { namespace util { namespace coroutines { namespace detail { namespace posix

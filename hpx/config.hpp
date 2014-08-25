@@ -406,17 +406,13 @@
 #if !defined(BOOST_WINDOWS)
 #  if defined(HPX_DEBUG)
 #    define HPX_MAKE_DLL_STRING(n)  "lib" + n + "d" + HPX_SHARED_LIB_EXTENSION
-#    define HPX_MAKE_DLL_STRING2(n) "lib"   n   "d"   HPX_SHARED_LIB_EXTENSION
 #  else
 #    define HPX_MAKE_DLL_STRING(n)  "lib" + n + HPX_SHARED_LIB_EXTENSION
-#    define HPX_MAKE_DLL_STRING2(n) "lib"   n   HPX_SHARED_LIB_EXTENSION
 #  endif
 #elif defined(HPX_DEBUG)
 #  define HPX_MAKE_DLL_STRING(n)   n + "d" + HPX_SHARED_LIB_EXTENSION
-#  define HPX_MAKE_DLL_STRING2(n)  n   "d"   HPX_SHARED_LIB_EXTENSION
 #else
 #  define HPX_MAKE_DLL_STRING(n)   n + HPX_SHARED_LIB_EXTENSION
-#  define HPX_MAKE_DLL_STRING2(n)  n   HPX_SHARED_LIB_EXTENSION
 #endif
 
 #if defined(HPX_DEBUG)
@@ -455,9 +451,6 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_DLL_STRING)
-#  define HPX_DLL_STRING HPX_MAKE_DLL_STRING2(HPX_COMPONENT_STRING)
-#endif
 
 #if !defined(HPX_APPLICATION_STRING)
 #  if defined(HPX_APPLICATION_NAME)
