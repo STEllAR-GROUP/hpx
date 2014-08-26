@@ -812,6 +812,16 @@ namespace hpx { namespace lcos
           : base_type(other.valid() ? detail::unwrap(std::move(other)) : 0)
         {}
 
+        // Effects: constructs a future object by moving the instance referred
+        //          to by rhs and unwrapping the inner future.
+        // Postconditions:
+        //   - valid() returns the same value as other.valid() prior to the
+        //     constructor invocation.
+        //   - other.valid() == false.
+        future(future<shared_future<R> > && other) BOOST_NOEXCEPT
+          : base_type(other.valid() ? detail::unwrap(std::move(other)) : 0)
+        {}
+
         // Effects: constructs a future<void> object that will be ready when
         //          the given future is ready
         // Postconditions:
