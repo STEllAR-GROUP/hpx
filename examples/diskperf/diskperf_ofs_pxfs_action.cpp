@@ -166,7 +166,7 @@ RESULT write_files_test(ofs_test_info_type ofs_test_info, int proc)
 
    // set the PVFS2TAB_FILE env
    std::string ofs_env_str = "PVFS2TAB_FILE=" + pvfs2tab_file;
-   putenv((char*)ofs_env_str.c_str());
+   putenv(const_cast<char*>(ofs_env_str.c_str()));
 
    boost::shared_array<int> fd_array(new int[wfiles]);
    boost::shared_array<char> buf(new char[bufsiz]);
@@ -292,7 +292,7 @@ RESULT read_files_test(ofs_test_info_type ofs_test_info, int proc)
 
    // set the PVFS2TAB_FILE env
    std::string ofs_env_str = "PVFS2TAB_FILE=" + pvfs2tab_file;
-   putenv((char*)ofs_env_str.c_str());
+   putenv(const_cast<char*>(ofs_env_str.c_str()));
 
    boost::shared_array<int> fd_array(new int[rfiles]);
    boost::shared_array<char> buf_array(new char[bufsiz * count]);

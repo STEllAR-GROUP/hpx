@@ -9,6 +9,7 @@ set(subdirs
     binpacking_factory
     dataflow
     distributing_factory
+    io
     iostreams
     memory
     papi_counters
