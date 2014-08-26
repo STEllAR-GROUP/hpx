@@ -8,6 +8,7 @@ set(tests
     command_line_arguments_706
     function_argument
     function_serialization_728
+    iarchive_1237
     protect_with_nullary_pfo
     serialize_buffer_1069
     tuple_serialization_803
@@ -15,10 +16,8 @@ set(tests
    )
 
 set(function_argument_FLAGS DEPENDENCIES iostreams_component)
-
-set(function_serialization_728_dependencies
-  iostreams_component)
-
+set(function_serialization_728_dependencies iostreams_component)
+set(iarchive_1237_FLAGS DEPENDENCIES iostreams_component)
 set(serialize_buffer_1069_FLAGS DEPENDENCIES iostreams_component)
 
 if(HPX_HAVE_COMPRESSION_ZLIB AND ZLIB_FOUND)

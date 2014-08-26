@@ -270,20 +270,20 @@ public:
     template <typename Container>
     portable_binary_iarchive(Container const& buffer,
             boost::uint64_t inbound_data_size, unsigned flags_value = 0)
-      : primitive_base_t(buffer, inbound_data_size),
+      : primitive_base_t(buffer, inbound_data_size, flags_value),
         archive_base_t(flags_value)
     {
-        this->set_flags(init(flags_value));
+        init(flags_value);
     }
 
     template <typename Container>
     portable_binary_iarchive(Container const& buffer,
             std::vector<serialization_chunk> const* chunks,
             boost::uint64_t inbound_data_size, unsigned flags_value = 0)
-      : primitive_base_t(buffer, chunks, inbound_data_size),
+      : primitive_base_t(buffer, chunks, inbound_data_size, flags_value),
         archive_base_t(flags_value)
     {
-        this->set_flags(init(flags_value));
+        init(flags_value);
     }
 
     // the optimized load_array dispatches to load_binary
