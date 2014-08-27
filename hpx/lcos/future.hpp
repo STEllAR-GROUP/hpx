@@ -336,6 +336,14 @@ namespace hpx { namespace lcos { namespace detail
         typedef Future<result_type> type;
     };
 
+    template <template <typename> class Future, typename R>
+    struct future_unwrap_result<Future<shared_future<R> > >
+    {
+        typedef R result_type;
+
+        typedef Future<result_type> type;
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter>
     struct future_iterator_traits
