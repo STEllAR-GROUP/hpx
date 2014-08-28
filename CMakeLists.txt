@@ -238,6 +238,11 @@ hpx_option(HPX_THREAD_MANAGER_IDLE_BACKOFF BOOL
 hpx_option(HPX_WITH_STACKTRACES BOOL "Attach backtraces to HPX exceptions (default: ON)"
   ON CATEGORY "Thread Manager" ADVANCED)
 
+hpx_option(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION BOOL
+  "Enable thread stack back trace being captured on suspension (default: OFF)"
+  OFF
+  CATEGORY "Thread Manager" ADVANCED)
+
 if(HPX_WITH_STACKTRACES OR HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION)
   hpx_info("Stack traces are enabled.")
   hpx_add_config_define(HPX_HAVE_STACKTRACES)
@@ -245,11 +250,6 @@ if(HPX_WITH_STACKTRACES OR HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION)
     hpx_libraries(dbghelp)
   endif()
 endif()
-
-hpx_option(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION BOOL
-  "Enable thread stack back trace being captured on suspension (default: OFF)"
-  OFF
-  CATEGORY "Thread Manager" ADVANCED)
 
 hpx_option(HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH STRING
   "Thread stack back trace depth being captured on suspension (default: 5)"

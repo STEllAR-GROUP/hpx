@@ -277,6 +277,12 @@ set(hpx_targets ${hpx_targets} hpx)
 
 ################################################################################
 # libhpx_init
+
+# hpx/hpx_init_impl.hpp needs HPX_PREFIX, d'oh *FIXME*
+set(_prefix ${HPX_PREFIX})
+if(MSVC)
+  string(REPLACE ";" ":" _prefix "${_prefix}")
+endif()
 if(NOT HPX_STATIC_LINKING)
   if(HPX_BUILD_DEFAULT_TARGETS)
     add_library(hpx_init STATIC
@@ -284,11 +290,6 @@ if(NOT HPX_STATIC_LINKING)
   else()
     add_library(hpx_init STATIC EXCLUDE_FROM_ALL
       ${hpx_init_SOURCES} ${hpx_init_HEADERS})
-  endif()
-
-  set(_prefix ${HPX_PREFIX})
-  if(MSVC)
-    string(REPLACE ";" ":" _prefix "${_prefix}")
   endif()
 
   set_property(TARGET hpx_init APPEND
@@ -301,6 +302,9 @@ if(NOT HPX_STATIC_LINKING)
   set_property(TARGET hpx_init PROPERTY FOLDER "Core")
   set(hpx_targets ${hpx_targets} hpx_init)
 else()
+  set_property(TARGET hpx APPEND
+    PROPERTY COMPILE_DEFINITIONS
+    "HPX_PREFIX=\"${_prefix}\"")
 endif()
 
 set(_optional)
