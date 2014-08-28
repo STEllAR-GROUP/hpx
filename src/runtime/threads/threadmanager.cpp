@@ -294,7 +294,7 @@ namespace hpx { namespace threads
     std::ptrdiff_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         get_stack_size(thread_id_type const& thrd) const
     {
-        return thrd ? thrd->get_stack_size() : thread_stacksize_unknown;
+        return thrd ? thrd->get_stack_size() : static_cast<std::ptrdiff_t>(thread_stacksize_unknown);
     }
 
     /// The get_description function is part of the thread related API and
