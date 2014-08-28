@@ -229,8 +229,8 @@ RESULT write_files_test(ofs_test_info_type ofs_test_info, int proc)
 
    }
 
-   hpx::lcos::wait_each(futures,
-           hpx::util::unwrapped([&](std::size_t idx, int rt)
+   hpx::wait(futures,
+           [&](std::size_t idx, int rt)
            {
            if (rt != 0)
            {
@@ -244,7 +244,7 @@ RESULT write_files_test(ofs_test_info_type ofs_test_info, int proc)
            hpx::cerr<<"loc " << hpx::get_locality_id() << " proc " << proc << ": error! not writing all bytes of " << idx%count <<"th block of "
            << idx/count << "th file."<<hpx::endl;
            }
-           }));
+           });
 
    end = times(&t2);
    r.real = ((double) end - (double) start) / (double) sysconf(_SC_CLK_TCK);
@@ -346,8 +346,8 @@ RESULT read_files_test(ofs_test_info_type ofs_test_info, int proc)
        }
    }
 
-   hpx::lcos::wait_each(futures,
-           hpx::util::unwrapped([&](std::size_t idx, int rt)
+   hpx::wait(futures,
+           [&](std::size_t idx, int rt)
            {
            if (rt != 0)
            {
@@ -361,7 +361,7 @@ RESULT read_files_test(ofs_test_info_type ofs_test_info, int proc)
            hpx::cerr<<"loc " << hpx::get_locality_id() << " proc " << proc << ": error! not reading all bytes of " << idx%count <<"th block of "
            << idx/count << "th file."<<hpx::endl;
            }
-           }));
+           });
 
    end = times(&t2);
    r.real = ((double) end - (double) start) / (double) sysconf(_SC_CLK_TCK);
@@ -487,12 +487,12 @@ int hpx_main(variables_map& vm)
             }
         }
 
-        hpx::lcos::wait_each(futures,
-                hpx::util::unwrapped([&](std::size_t ii, RESULT r) {
+        hpx::lcos::wait(futures,
+                [&](std::size_t ii, RESULT r) {
                 r_ptr[ii].real = r.real;
                 r_ptr[ii].user = r.user;
                 r_ptr[ii].sys = r.sys;
-                }));
+                });
 
         // overall performance
         double tt = t.elapsed();
