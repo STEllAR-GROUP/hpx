@@ -500,8 +500,10 @@ int hpx_main(variables_map& vm)
             }
         }
 
+        hpx::lcos::local::spinlock mtx;
         hpx::lcos::wait_each(futures,
                 hpx::util::unwrapped([&](RESULT r) {
+                    hpx::lcos::local::spinlock::scoped_lock lk(mtx);
                     result_vector.push_back(r);
                 }));
 
