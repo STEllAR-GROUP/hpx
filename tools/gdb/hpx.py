@@ -244,9 +244,6 @@ class HPXThread():
 
     self.frame = frame
 
-    if frame.is_valid():
-      print "yay"
-
     prev_context.switch()
 
   def deref_stack(self, addr):
