@@ -24,8 +24,16 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1239] - fix wait_each in examples.diskperf
+* [issue 1238] - Fixed #1237: hpx::util::portable_binary_iarchive failed
+* [issue 1237] - hpx::util::portable_binary_iarchive faileds
+* [issue 1235] - Fixing clang warnings and errors
+* [issue 1233] - Making sure the correct number of threads is registered with
+                 AGAS
 * [issue 1232] - Fixing race in wait_xxx
 * [issue 1231] - Parallel minmax
+* [issue 1230] - Distributed run of 1d_stencil_8 uses less threads than spec.
+                 & sometimes gives errors
 * [issue 1226] - Warning about struct/class thread_counters
 * [issue 1225] - Adding parallel::replace etc
 * [issue 1224] - Extending dataflow to pass through non-future arguments
