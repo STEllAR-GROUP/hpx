@@ -336,6 +336,14 @@ namespace hpx { namespace lcos { namespace detail
         typedef Future<result_type> type;
     };
 
+    template <typename R>
+    struct future_unwrap_result<future<shared_future<R> > >
+    {
+        typedef R result_type;
+
+        typedef future<result_type> type;
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter>
     struct future_iterator_traits
@@ -809,6 +817,16 @@ namespace hpx { namespace lcos
         //     constructor invocation.
         //   - other.valid() == false.
         future(future<future> && other) BOOST_NOEXCEPT
+          : base_type(other.valid() ? detail::unwrap(std::move(other)) : 0)
+        {}
+
+        // Effects: constructs a future object by moving the instance referred
+        //          to by rhs and unwrapping the inner future.
+        // Postconditions:
+        //   - valid() returns the same value as other.valid() prior to the
+        //     constructor invocation.
+        //   - other.valid() == false.
+        future(future<shared_future<R> > && other) BOOST_NOEXCEPT
           : base_type(other.valid() ? detail::unwrap(std::move(other)) : 0)
         {}
 

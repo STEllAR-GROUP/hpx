@@ -160,22 +160,26 @@ namespace hpx { namespace util
 
         template <typename Container>
         basic_binary_iprimitive(Container const& buffer,
-                boost::uint64_t inbound_data_size)
-          : flags_(0),
+                boost::uint64_t inbound_data_size, unsigned flags)
+          : flags_(flags),
             size_(0),
             buffer_(boost::make_shared<detail::icontainer_type<Container> >(
                 buffer, inbound_data_size))
-        {}
+        {
+            init(flags);
+        }
 
         template <typename Container>
         basic_binary_iprimitive(Container const& buffer,
                 std::vector<serialization_chunk> const* chunks,
-                boost::uint64_t inbound_data_size)
-          : flags_(0),
+                boost::uint64_t inbound_data_size, unsigned flags)
+          : flags_(flags),
             size_(0),
             buffer_(boost::make_shared<detail::icontainer_type<Container> >(
                 buffer, chunks, inbound_data_size))
-        {}
+        {
+            init(flags);
+        }
 
     public:
         // we provide an optimized load for all fundamental types
@@ -207,11 +211,6 @@ namespace hpx { namespace util
         boost::uint32_t flags() const
         {
             return flags_;
-        }
-        void set_flags(boost::uint32_t flags_value)
-        {
-            flags_ = flags_value;
-            init(flags_);
         }
 
     protected:

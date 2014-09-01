@@ -230,23 +230,29 @@ RESULT write_files_test(ofs_test_info_type ofs_test_info, int proc)
    }
 
    hpx::lcos::wait_each(futures,
-           hpx::util::unwrapped([&](std::size_t idx, int rt)
+           hpx::util::unwrapped([&](int rt)
            {
            if (rt != 0)
            {
-           hpx::cerr<<"loc " << hpx::get_locality_id() << " proc " << proc << ": error " << rt << " in writing "
-           << idx%count <<"th block of "<<
-           idx/count << "th file." <<hpx::endl;
+           hpx::cerr<<"loc " << hpx::get_locality_id() << " proc " << proc
+           << ": error " << rt << " in writing one block of the file."
+           <<hpx::endl;
            }
 
-           if(num_written_array[idx] != bufsiz)
-           {
-           hpx::cerr<<"loc " << hpx::get_locality_id() << " proc " << proc << ": error! not writing all bytes of " << idx%count <<"th block of "
-           << idx/count << "th file."<<hpx::endl;
-           }
            }));
 
    end = times(&t2);
+
+   for (uint64_t idx = 0; idx < count * wfiles; ++idx)
+   {
+       if(num_written_array[idx] != bufsiz)
+       {
+           hpx::cerr << "loc " << hpx::get_locality_id() << " proc " << proc
+               << ": error! not writing all bytes of " << idx%count <<
+               "th block of " << idx/count << "th file."<<hpx::endl;
+       }
+   }
+
    r.real = ((double) end - (double) start) / (double) sysconf(_SC_CLK_TCK);
    r.user = ((double) t2.tms_utime - (double) t1.tms_utime) / (double) sysconf(_SC_CLK_TCK);
    r.sys = ((double) t2.tms_stime - (double) t1.tms_stime) / (double) sysconf(_SC_CLK_TCK);
@@ -347,23 +353,29 @@ RESULT read_files_test(ofs_test_info_type ofs_test_info, int proc)
    }
 
    hpx::lcos::wait_each(futures,
-           hpx::util::unwrapped([&](std::size_t idx, int rt)
+           hpx::util::unwrapped([&](int rt)
            {
            if (rt != 0)
            {
-           hpx::cerr<<"loc " << hpx::get_locality_id() << " proc " << proc << ": error " << rt << " in reading "
-           << idx%count <<"th block of "<<
-           idx/count << "th file." <<hpx::endl;
-           }
-
-           if(num_read_array[idx] != bufsiz)
-           {
-           hpx::cerr<<"loc " << hpx::get_locality_id() << " proc " << proc << ": error! not reading all bytes of " << idx%count <<"th block of "
-           << idx/count << "th file."<<hpx::endl;
+           hpx::cerr<<"loc " << hpx::get_locality_id() << " proc " << proc
+           << ": error " << rt << " in reading one block of the file."
+           <<hpx::endl;
            }
            }));
 
    end = times(&t2);
+
+   for (uint64_t idx = 0; idx < count * rfiles; ++idx)
+   {
+       if(num_read_array[idx] != bufsiz)
+       {
+           hpx::cerr << "loc " << hpx::get_locality_id() << " proc " << proc
+               << ": error! not reading all bytes of " << idx%count
+               <<"th block of " << idx/count << "th file."<<hpx::endl;
+       }
+   }
+
+
    r.real = ((double) end - (double) start) / (double) sysconf(_SC_CLK_TCK);
    r.user = ((double) t2.tms_utime - (double) t1.tms_utime) / (double) sysconf(_SC_CLK_TCK);
    r.sys = ((double) t2.tms_stime - (double) t1.tms_stime) / (double) sysconf(_SC_CLK_TCK);
@@ -451,7 +463,8 @@ int hpx_main(variables_map& vm)
         std::vector<hpx::lcos::future<RESULT> > futures;
         futures.reserve(procs * localities.size());
 
-        boost::shared_array<RESULT> r_ptr (new RESULT[procs * localities.size()]);
+        std::vector<RESULT> result_vector;
+        result_vector.reserve(procs * localities.size());
         double min_time = -1.0, max_time = -1.0;
 
         // Keep track of the time required to execute.
@@ -487,11 +500,11 @@ int hpx_main(variables_map& vm)
             }
         }
 
+        hpx::lcos::local::spinlock mtx;
         hpx::lcos::wait_each(futures,
-                hpx::util::unwrapped([&](std::size_t ii, RESULT r) {
-                r_ptr[ii].real = r.real;
-                r_ptr[ii].user = r.user;
-                r_ptr[ii].sys = r.sys;
+                hpx::util::unwrapped([&](RESULT r) {
+                    hpx::lcos::local::spinlock::scoped_lock lk(mtx);
+                    result_vector.push_back(r);
                 }));
 
         // overall performance
@@ -509,19 +522,22 @@ int hpx_main(variables_map& vm)
         char const* fmt = " with count %1% x buffer size %2%M: \n";
         hpx::cout << (boost::format(fmt) % count % (bufsiz*1.0 /(1024*1024)) );
 
-        for(int idx=0; idx < (localities.size() * procs); idx++)
+        for(uint64_t idx=0; idx < (localities.size() * procs); idx++)
         {
             int loc = idx / procs;
             int pr = idx % procs;
 
-            hpx::cout << (boost::format("locality %1% thread %2% time: Real %3% [s], User %4% [s], System %5% [s]\n") % loc % pr % r_ptr[idx].real % r_ptr[idx].user % r_ptr[idx].sys);
-            if ((min_time < 0) || (r_ptr[idx].real < min_time) )
+            hpx::cout << (boost::format("locality %1% thread %2% time:"
+                        " Real %3% [s], User %4% [s], System %5% [s]\n") %
+                    loc % pr % result_vector[idx].real %
+                    result_vector[idx].user % result_vector[idx].sys);
+            if ((min_time < 0) || (result_vector[idx].real < min_time) )
             {
-                min_time = r_ptr[idx].real;
+                min_time = result_vector[idx].real;
             }
-            if ((max_time < 0) || (r_ptr[idx].real > max_time) )
+            if ((max_time < 0) || (result_vector[idx].real > max_time) )
             {
-                max_time = r_ptr[idx].real;
+                max_time = result_vector[idx].real;
             }
         }
 
