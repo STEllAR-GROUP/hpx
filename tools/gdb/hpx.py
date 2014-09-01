@@ -270,7 +270,9 @@ class HPXListThreads(gdb.Command):
     return addr.reinterpret_cast(gdb.lookup_type("std::size_t").pointer()).dereference()
 
   def invoke(self, arg, from_tty):
-    thread_manager_ptr = gdb.parse_and_eval("&hpx::threads::get_thread_manager()")
+
+    runtime = gdb.selected_frame().read_var("hpx::runtime::runtime_::ptr_").dereference()#["ptr_"]
+    thread_manager_ptr = runtime.cast(runtime.dynamic_type)["thread_manager_"]['px']
     thread_manager = thread_manager_ptr.cast(thread_manager_ptr.dynamic_type).dereference();
 
     scheduler = thread_manager['scheduler_']
@@ -378,9 +380,39 @@ class HPXContinue(gdb.Command):
     super(HPXContinue, self).__init__("hpx continue", gdb.COMMAND_USER, gdb.COMPLETE_NONE, False)
 
   def invoke(self, arg, from_tty):
+    argv = gdb.string_to_argv(arg)
     state.restore()
-    print "Continuing"
-    gdb.execute("continue")
+
+    #gdb.execute("thread 15", False, True)
+    #cur_os_thread = gdb.selected_thread().num
+
+    frame = gdb.newest_frame()
+
+    handle_attach = False
+    count = 0
+    while True:
+        function = frame.function()
+        if function and function.name == "hpx::util::command_line_handling::handle_attach_debugger()":
+          handle_attach = True
+          break
+        frame = frame.older()
+        if not frame or count > 5:
+          break
+        count = count + 1
+
+    if handle_attach:
+      frame.select()
+      gdb.execute("set var i = 1", True)
+
+
+    #gdb.execute("thread %d" % cur_os_thread, False, True)
+
+    if len(argv) == 0:
+      print "Continuing..."
+      gdb.execute("continue")
+    else:
+      if argv[0] != "hook":
+          print "wrong argument ..."
 
 HPX()
 HPXList()
