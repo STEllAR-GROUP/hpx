@@ -231,8 +231,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         // We let the message handling loop spin for another 2 seconds to avoid the
         // costs involved with posting it to asio
-        while(bootstrapping || (!stopped_ && has_work) || (!has_work && t.elapsed() < 2.0))
+        while(bootstrapping || has_work || (!has_work && t.elapsed() < 2.0))
         {
+            if(stopped_) break;
             // break the loop if someone requested to pause the parcelport
             if(!enable_parcel_handling_) break;
 
