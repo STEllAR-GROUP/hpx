@@ -305,7 +305,7 @@ namespace hpx { namespace util
             std::cout << util::osstream_get_string(output) << std::flush;
         }
         else {
-            std::ofstream out(destination_, std::ios_base::app);
+            std::ofstream out(destination_.c_str(), std::ofstream::app);
             out << util::osstream_get_string(output);
         }
 
