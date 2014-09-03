@@ -9,10 +9,6 @@ if(NOT GIT_FOUND)
   message(FATAL_ERROR "Could not find git. git is needed to download and update the GitHub pages.")
 endif()
 
-if(NOT GIT_REPOSITORY)
-  set(GIT_REPOSITORY "git@github.com:STEllAR-GROUP/hpx.git --branch gh-pages")
-endif()
-
 if(EXISTS "${CMAKE_BINARY_DIR}/gh-pages")
   execute_process(
     COMMAND "${GIT_EXECUTABLE}" pull --rebase
@@ -23,7 +19,7 @@ if(EXISTS "${CMAKE_BINARY_DIR}/gh-pages")
   endif()
 else()
   execute_process(
-    COMMAND "${GIT_EXECUTABLE} clone ${GIT_REPOSITORY} gh-pages"
+    COMMAND "${GIT_EXECUTABLE} clone git@github.com:STEllAR-GROUP/hpx.git --branch gh-pages gh-pages"
     RESULT_VARIABLE git_clone_result)
   if(NOT "${git_clone_result}" EQUAL "0")
     message(FATAL_ERROR "Cloning the GitHub pages branch failed. Trying to clone ${GIT_REPOSITORY}")
