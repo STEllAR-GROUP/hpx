@@ -68,11 +68,8 @@ if("${HPX_MALLOC_UPPER}" STREQUAL "TBBMALLOC")
 endif()
 
 if("${HPX_MALLOC_UPPER}" MATCHES "SYSTEM")
-  hpx_info("malloc" "Using system allocator.")
-
   if(NOT MSVC)
-    hpx_warn("malloc"
-      "HPX will perform poorly without tcmalloc or jemalloc. See docs for more info.")
+    hpx_warn("HPX will perform poorly without tcmalloc or jemalloc. See docs for more info.")
   endif()
   set(_use_custom_allocator FALSE)
 endif()
