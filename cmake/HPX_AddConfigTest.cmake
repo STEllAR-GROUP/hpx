@@ -61,16 +61,16 @@ macro(add_hpx_config_test variable)
 
     if(${variable}_RESULT)
       set(_run_msg "Success")
-      if(NOT CMAKE_CROSS_COMPILING)
-        execute_process(
-          COMMAND "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/${variable_lc}"
-            ${${variable}_ARGS}
-            RESULT_VARIABLE test_result OUTPUT_QUIET ERROR_QUIET)
-        if(NOT test_result STREQUAL "0")
-          set(${variable}_RESULT OFF)
-          set(_run_msg "Failed executing.")
-        endif()
-      endif()
+      #if(NOT CMAKE_CROSSCOMPILING)
+      #  execute_process(
+      #    COMMAND "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/${variable_lc}"
+      #      ${${variable}_ARGS}
+      #      RESULT_VARIABLE test_result OUTPUT_QUIET ERROR_QUIET)
+      #  if(NOT test_result STREQUAL "0")
+      #    set(${variable}_RESULT OFF)
+      #    set(_run_msg "Failed executing.")
+      #  endif()
+      #endif()
 
       set(_msg "${_msg} - ${_run_msg}")
     else()
