@@ -15,7 +15,7 @@ in the `cmake/toolchains` directory:
 
 [teletype]
 
-To use them pass the `-T <toolchain>` argument to the cmake invocation.
+To use them pass the `-DCMAKE_TOOLCHAIN_FILE=<toolchain>` argument to the cmake invocation.
 
 @HPX_CMAKE_TOOLCHAINS@
 
