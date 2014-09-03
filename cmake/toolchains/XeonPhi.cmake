@@ -24,7 +24,7 @@ set(CMAKE_Fortran_FLAGS_INIT "-mmic" CACHE STRING "Initial compiler flags used t
 
 # Disable searches in the default system paths. We are cross compiling after all
 # and cmake might pick up wrong libraries that way
-set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM BOTH)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
@@ -36,7 +36,7 @@ set(CMAKE_CROSSCOMPILING ON)
 set(HPX_PLATFORM "XeonPhi")
 
 # Always disable the ibverbs parcelport as it is nonfunctional on the MIC.
-set(WITH_IBVERBS_PARCELPORT OFF)
+set(HPX_IBVERBS_PARCELPORT OFF)
 
 # We have a bunch of cores on the MIC ... increase the default
 set(HPX_MAX_CPU_COUNT "256")
