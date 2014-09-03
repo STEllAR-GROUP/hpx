@@ -16,4 +16,6 @@ endif()
 
 add_hpx_pseudo_dependencies(components.binpacking_factory
                             binpacking_factory_component)
+add_hpx_pseudo_dependencies(core
+                          components.binpacking_factory)
 

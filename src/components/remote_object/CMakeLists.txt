@@ -16,6 +16,8 @@ endif()
 
 add_hpx_pseudo_dependencies(components.remote_object
                             remote_object_component)
+add_hpx_pseudo_dependencies(core
+                          components.remote_object)
 
 ################################################################################
 # add headers to partial_preprocessing

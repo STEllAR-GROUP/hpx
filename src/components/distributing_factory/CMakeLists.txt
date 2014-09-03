@@ -16,4 +16,6 @@ endif()
 
 add_hpx_pseudo_dependencies(components.distributing_factory
                             distributing_factory_component)
+add_hpx_pseudo_dependencies(core
+                          components.distributing_factory)
 

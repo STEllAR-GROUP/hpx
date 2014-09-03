@@ -15,4 +15,6 @@ endif()
 
 add_hpx_pseudo_dependencies(components.memory
                             memory_component)
+add_hpx_pseudo_dependencies(core
+                          components.memory)
 

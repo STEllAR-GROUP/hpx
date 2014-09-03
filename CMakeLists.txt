@@ -1137,6 +1137,7 @@ if(HPX_BUILD_TOOLS)
   add_subdirectory(tools)
 endif()
 
+add_hpx_pseudo_target(core)
 add_subdirectory(src)
 
 if(HPX_BUILD_EXAMPLES)

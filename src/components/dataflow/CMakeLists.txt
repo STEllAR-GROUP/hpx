@@ -14,6 +14,8 @@ endif()
 
 add_hpx_pseudo_dependencies(components.dataflow
                             dataflow_component)
+add_hpx_pseudo_dependencies(core
+                          components.dataflow)
 
 ################################################################################
 if(Boost_VERSION GREATER 105000)

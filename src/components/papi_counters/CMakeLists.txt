@@ -30,5 +30,7 @@ if(HPX_WITH_PAPI)
 
   add_hpx_pseudo_dependencies(
     components.papi_counters papi_counters_component)
+  add_hpx_pseudo_dependencies(core
+                            components.papi_counters)
 
 endif()

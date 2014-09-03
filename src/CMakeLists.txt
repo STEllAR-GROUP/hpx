@@ -324,3 +324,7 @@ install(
 )
 
 hpx_export_targets(${hpx_targets})
+
+foreach(target ${hpx_targets})
+  add_hpx_pseudo_dependencies(core ${target})
+endforeach()

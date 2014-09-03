@@ -23,4 +23,6 @@ endif()
 
 add_hpx_pseudo_dependencies(components.iostreams
                             iostreams_component)
+add_hpx_pseudo_dependencies(core
+                          components.iostreams)
 
