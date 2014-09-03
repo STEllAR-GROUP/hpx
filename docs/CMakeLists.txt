@@ -297,16 +297,11 @@ set_source_files_properties(${documentation_files}
 
 ###############################################################################
 # handle generating docs for github pages
-if(NOT DOC_GIT_REPOSITORY)
-  set(DOC_GIT_REPOSITORY "git@github.com:STEllAR-GROUP/hpx.git --branch gh-pages" CACHE STRING "Git repository to use for documentation upload." ADVANCED)
-endif()
-
 add_custom_target(git_docs
   COMMAND "${CMAKE_COMMAND}"
     -DHPX_SOURCE_DIR:PATH=${CMAKE_SOURCE_DIR}
     -DHPX_VERSION:STRING=${HPX_VERSION}
     -DHPX_DOCUMENTATION_FILES=\"${documentation_dependencies}\"
-    -DGIT_REPOSITORY=\"${DOC_GIT_REPOSITORY}\"
     -P "${CMAKE_SOURCE_DIR}/cmake/HPX_UpdateGitDocs.cmake"
   VERBATIM)
 
