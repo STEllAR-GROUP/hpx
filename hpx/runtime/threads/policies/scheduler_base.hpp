@@ -82,11 +82,19 @@ namespace hpx { namespace threads { namespace policies
 #if defined(HPX_THREAD_BACKOFF_ON_IDLE)
             // Put this thread to sleep for some time, additionally it gets
             // woken up on new work.
+#if BOOST_VERSION < 105000
+            boost::posix_time::millisec period(++wait_count_);
+
+            boost::mutex::scoped_lock l(mtx_);
+            policies::detail::reset_on_exit w(waiting_);
+            cond_.timed_wait(l, period);
+#else
             boost::chrono::milliseconds period(++wait_count_);
 
             boost::mutex::scoped_lock l(mtx_);
             policies::detail::reset_on_exit w(waiting_);
             cond_.wait_for(l, period);
+#endif
 #endif
         }
 
