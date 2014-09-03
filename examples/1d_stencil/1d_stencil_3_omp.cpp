@@ -24,7 +24,6 @@
 #include <omp.h>
 
 #include "print_time_results.hpp"
-
 ///////////////////////////////////////////////////////////////////////////////
 // Timer with nanosecond resolution
 inline boost::uint64_t now()
@@ -176,9 +175,11 @@ int hpx_main(boost::program_options::variables_map& vm)
         for (std::size_t i = 0; i != np; ++i)
             std::cout << "U[" << i << "] = " << solution[i] << std::endl;
     }
+//  boost::uint64_t const os_thread_count = omp_get_num_threads();
+    # pragma omp parallel
+    # pragma omp master
+    print_time_results(omp_get_num_threads(), elapsed, nx, np, nt, header);
 
-    boost::uint64_t const os_thread_count = omp_get_num_threads();
-    print_time_results(os_thread_count, elapsed, nx, np, nt, header);
 
     return 0;
 }
