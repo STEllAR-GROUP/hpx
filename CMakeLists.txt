@@ -1347,23 +1347,21 @@ if(HPX_PLATFORM_UC STREQUAL "XEONPHI")
 endif()
 
 if(Boost_VERSION LESS 105300)
-  if(${BOOST_MINOR_VERSION} LESS 53)
-    # Install Boost.Atomic library for older Boost versions only
-    install(
-      DIRECTORY external/atomic/boost
-      DESTINATION include/hpx/external
-      COMPONENT core
-      FILES_MATCHING PATTERN "*.hpp"
-      PATTERN ".git" EXCLUDE)
+  # Install Boost.Atomic library for older Boost versions only
+  install(
+    DIRECTORY external/atomic/boost
+    DESTINATION include/hpx/external
+    COMPONENT core
+    FILES_MATCHING PATTERN "*.hpp"
+    PATTERN ".git" EXCLUDE)
 
-    # Install Boost.Lockfree library for older Boost versions only
-    install(
-      DIRECTORY external/lockfree/boost
-      DESTINATION include/hpx/external
-      COMPONENT core
-      FILES_MATCHING PATTERN "*.hpp"
-      PATTERN ".git" EXCLUDE)
-  endif()
+  # Install Boost.Lockfree library for older Boost versions only
+  install(
+    DIRECTORY external/lockfree/boost
+    DESTINATION include/hpx/external
+    COMPONENT core
+    FILES_MATCHING PATTERN "*.hpp"
+    PATTERN ".git" EXCLUDE)
 endif()
 
 install(
