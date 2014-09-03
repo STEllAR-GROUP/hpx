@@ -915,7 +915,7 @@ else()
 
   # Check if our libraries have unresolved symbols
   if(NOT APPLE)
-    hpx_add_link_flag_if_available(-Wl,-z,defs)
+    hpx_add_link_flag_if_available(-Wl,-z,defs TARGETS SHARED EXE)
   endif()
 
   if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
@@ -924,7 +924,7 @@ else()
 
   if(HPX_HIDDEN_VISIBILITY)
     hpx_add_compile_flag_if_available(-fvisibility=hidden LANGUAGES CXX C Fortran)
-    hpx_add_link_flag_if_available(-fvisibility=hidden LANGUAGES CXX C Fortran)
+    hpx_add_link_flag_if_available(-fvisibility=hidden TARGETS SHARED EXE)
     hpx_add_config_define(HPX_ELF_HIDDEN_VISIBILITY)
     hpx_add_config_define(HPX_COROUTINE_GCC_HAVE_VISIBILITY)
     hpx_add_config_define(HPX_PLUGIN_GCC_HAVE_VISIBILITY)
