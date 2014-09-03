@@ -15,4 +15,5 @@ foreach(tool ${tools})
     SOURCES ${tool}.cpp ${${tool}}
     FOLDER "Tools/${tool}")
   add_hpx_pseudo_dependencies(tools ${tool}_exe)
+  target_link_libraries(${tool}_exe ${Boost_LIBRARIES})
 endforeach()
