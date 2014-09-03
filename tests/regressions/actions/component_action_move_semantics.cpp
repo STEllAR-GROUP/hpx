@@ -18,6 +18,7 @@
 using hpx::test::movable_object;
 using hpx::test::non_movable_object;
 
+
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Action, typename Object>
 std::size_t pass_object(hpx::naming::id_type id)
@@ -151,7 +152,7 @@ void test_actions()
                 >(id)
             ), 0u);
         }
-        
+
         // test non_movable_object()
         if (is_local)
         {
@@ -196,7 +197,7 @@ void test_direct_actions()
     BOOST_FOREACH(hpx::naming::id_type id, localities)
     {
         bool is_local = id == hpx::find_here();
-        
+
         // test std::size_t(movable_object const& obj)
         if (is_local)
         {
@@ -224,7 +225,7 @@ void test_direct_actions()
                 >(id)
             ), 0u);
         }
-        
+
         // test std::size_t(non_movable_object const& obj)
         if (is_local)
         {
@@ -252,7 +253,7 @@ void test_direct_actions()
                 >(id)
             ), 3u); // transfer_action + bind + function
         }
-        
+
         // test movable_object()
         if (is_local)
         {
@@ -268,7 +269,7 @@ void test_direct_actions()
                 >(id)
             ), 0u);
         }
-        
+
         // test non_movable_object()
         if (is_local)
         {

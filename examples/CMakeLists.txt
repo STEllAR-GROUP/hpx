@@ -29,11 +29,11 @@ set(subdirs
     throttle
    )
 
-if(HPX_HAVE_CXX11_LAMBDAS)
+ if(HPX_WITH_CXX11_LAMBDAS)
   set(subdirs ${subdirs}
-      1d_stencil
-      diskperf
-      tuplespace
+     1d_stencil
+     diskperf
+     tuplespace
       )
 endif()
 

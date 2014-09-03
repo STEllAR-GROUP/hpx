@@ -1,0 +1,154 @@
+[/==============================================================================
+    Copyright (C) 2014 Thomas Heller
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+===============================================================================/]
+
+[section:cmake_toolchains CMake Toolchains shipped with HPX]
+
+In order to compile HPX for various platforms, we provide a variety of Toolchain files that
+take care of setting up various __cmake__ variables like compilers etc. They are located
+in the `cmake/toolchains` directory:
+
+* [link hpx.manual.build_system.building_hpx.cmake_toolchains.XeonPhi XeonPhi]
+* [link hpx.manual.build_system.building_hpx.cmake_toolchains.BGQ BGQ]
+* [link hpx.manual.build_system.building_hpx.cmake_toolchains.OSX_clang OSX-clang]
+
+
+[teletype]
+
+To use them pass the `-T <toolchain>` argument to the cmake invocation.
+
+[heading:XeonPhi XeonPhi]
+
+``
+    # Copyright (c) 2014 Thomas Heller
+    #
+    # Distributed under the Boost Software License, Version 1.0. (See accompanying
+    # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+    #
+    # This is the default toolchain file to be used with Intel Xeon PHIs. It sets
+    # the appropriate compile flags and compiler such that HPX will compile.
+    # Note that you still need to provide Boost, hwloc and other utility libraries
+    # like a custom allocator yourself.
+    #
+    set(CMAKE_SYSTEM_NAME Linux)
+    # Set the Intel Compiler
+    set(CMAKE_CXX_COMPILER icpc)
+    set(CMAKE_C_COMPILER icc)
+    set(CMAKE_Fortran_COMPILER ifort)
+    # Add the -mmic compile flag such that everything will be compiled for the correct
+    # platform
+    set(CMAKE_CXX_FLAGS_INIT "-mmic" CACHE STRING "Initial compiler flags used to compile for the Xeon Phi")
+    set(CMAKE_C_FLAGS_INIT "-mmic" CACHE STRING "Initial compiler flags used to compile for the Xeon Phi")
+    set(CMAKE_Fortran_FLAGS_INIT "-mmic" CACHE STRING "Initial compiler flags used to compile for the Xeon Phi")
+    # Disable searches in the default system paths. We are cross compiling after all
+    # and cmake might pick up wrong libraries that way
+    set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY)
+    set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+    set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+    set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+    # We do a cross compilation here ...
+    set(CMAKE_CROSSCOMPILING ON)
+    # Set our platform name
+    set(HPX_PLATFORM "XeonPhi")
+    # Always disable the ibverbs parcelport as it is nonfunctional on the MIC.
+    set(WITH_IBVERBS_PARCELPORT OFF)
+    # We have a bunch of cores on the MIC ... increase the default
+    set(HPX_MAX_CPU_COUNT "256")
+    # We default to tbbmalloc as our allocator on the MIC
+    if(NOT DEFINED HPX_MALLOC)
+      set(HPX_MALLOC "tbbmalloc")
+    endif()
+    # Set the TBBMALLOC_PLATFORM correctly so that find_package(TBBMalloc) sets the
+    # right hints
+    set(TBBMALLOC_PLATFORM "mic")
+    set(HPX_HIDDEN_VISIBILITY OFF)
+``
+
+[heading:BGQ BGQ]
+
+``
+    # Copyright (c) 2014 Thomas Heller
+    #
+    # Distributed under the Boost Software License, Version 1.0. (See accompanying
+    # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+    #
+    # This is the default toolchain file to be used with CNK on a BlueGene/Q. It sets
+    # the appropriate compile flags and compiler such that HPX will compile.
+    # Note that you still need to provide Boost, hwloc and other utility libraries
+    # like a custom allocator yourself.
+    #
+    set(CMAKE_SYSTEM_NAME Linux)
+    # Set the Intel Compiler
+    set(CMAKE_CXX_COMPILER bgclang++11)
+    set(CMAKE_C_COMPILER bgclang)
+    #set(CMAKE_Fortran_COMPILER)
+    # Add the -mmic compile flag such that everything will be compiled for the correct
+    # platform
+    set(CMAKE_CXX_FLAGS_INIT "-mmic" CACHE STRING "Initial compiler flags used to compile for the Bluegene/Q")
+    set(CMAKE_C_FLAGS_INIT "-mmic" CACHE STRING "Initial compiler flags used to compile for the Bluegene/Q")
+    set(CMAKE_Fortran_FLAGS_INIT "-mmic" CACHE STRING "Initial compiler flags used to compile for the Bluegene/Q")
+    # Disable searches in the default system paths. We are cross compiling after all
+    # and cmake might pick up wrong libraries that way
+    set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY)
+    set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+    set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+    set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+    # We do a cross compilation here ...
+    set(CMAKE_CROSSCOMPILING ON)
+    # Set our platform name
+    set(HPX_PLATFORM "BlueGeneQ")
+    # Always disable the ibverbs parcelport as it is nonfunctional on the BGQ.
+    set(WITH_IBVERBS_PARCELPORT OFF)
+    # Always disable the tcp parcelport as it is nonfunctional on the BGQ.
+    set(WITH_TCP_PARCELPORT OFF)
+    # Always enable the tcp parcelport as it is currently the only way to communicate on the BGQ.
+    set(WITH_MPI_PARCELPORT OFF)
+    # We have a bunch of cores on the BGQ ...
+    set(HPX_MAX_CPU_COUNT "64")
+    # We default to tbbmalloc as our allocator on the MIC
+    if(NOT DEFINED HPX_MALLOC)
+      set(HPX_MALLOC "system")
+    endif()
+``
+
+[heading:OSX_clang OSX-clang]
+
+``
+    # Copyright (c) 2014 Thomas Heller
+    #
+    # Distributed under the Boost Software License, Version 1.0. (See accompanying
+    # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+    #
+    # This is the default toolchain file to be used with OSX building HPX with clang. It sets
+    # the appropriate compile flags and compiler such that HPX will compile.
+    # Note that you still need to provide Boost, hwloc and other utility libraries
+    # like a custom allocator yourself.
+    #
+    # Set the Clang Compiler
+    set(CMAKE_CXX_COMPILER clang++)
+    set(CMAKE_C_COMPILER clang)
+    #set(CMAKE_Fortran_COMPILER)
+    # Add the -stdlib=libc++ compile flag such that everything will be compiled for the correct
+    # platform
+    set(CMAKE_CXX_FLAGS_INIT "-stdlib=libc++" CACHE STRING "Initial compiler flags used to compile for OSX")
+    # HWLOC isn't working on OSX
+    set(HPX_WITH_HWLOC OFF CACHE BOOL
+      "Use Hwloc for hardware topolgy information and thread pinning. If disabled, performance might be reduced.")
+    # APPLEs clang doesn't know how to deal with native tls properly
+    set(HPX_NATIVE_TLS OFF CACHE BOOL "Use native TLS support if available (default: ON)")
+    # Clang doesn't know about hidden visibility
+    set(HPX_HIDDEN_VISIBILITY OFF CACHE BOOL
+      "Use -fvisibility=hidden for builds on platforms which support it (default ON)")
+    # We don't do cross compilation here ...
+    set(CMAKE_CROSSCOMPILING OFF)
+``
+
+
+
+[c++]
+
+[endsect] [/ CMake Toolchains shipped with HPX]
+

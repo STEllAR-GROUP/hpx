@@ -7,7 +7,7 @@
 #if !defined(HPX_NAMING_LOCALITY_MAR_24_2008_0942AM)
 #define HPX_NAMING_LOCALITY_MAR_24_2008_0942AM
 
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
 #include <hpx/util/mpi_environment.hpp>
 #endif
 
@@ -39,7 +39,7 @@
 #  define HPX_LOCALITY_VERSION_NO_MPI   0x10
 #  define HPX_LOCALITY_VERSION_MPI      0x20
 
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
 #  define HPX_LOCALITY_VERSION          HPX_LOCALITY_VERSION_MPI
 #else
 #  define HPX_LOCALITY_VERSION          HPX_LOCALITY_VERSION_NO_MPI
@@ -80,25 +80,25 @@ namespace hpx { namespace naming
     public:
         locality()
           : port_(boost::uint16_t(-1))
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
           , rank_(-1)
 #endif
         {}
 
-#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+#if defined(HPX_PARCELPORT_IBVERBS)
         locality(std::string const& addr, std::string const & ibverbs_addr, boost::uint16_t port)
           : address_(addr), ibverbs_address_(ibverbs_addr), port_(port)
 #else
         locality(std::string const& addr, boost::uint16_t port)
           : address_(addr), port_(port)
 #endif
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
           , rank_(util::mpi_environment::rank())
 #endif
         {}
 
-#if defined(HPX_HAVE_PARCELPORT_MPI)
-#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+#if defined(HPX_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_IBVERBS)
         locality(std::string const& addr, std::string const & ibverbs_addr, boost::uint16_t port, int rank)
           : address_(addr), ibverbs_address_(ibverbs_addr), port_(port), rank_(rank)
 #else
@@ -114,7 +114,7 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         friend bool operator==(locality const& lhs, locality const& rhs)
         {
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
             if(util::mpi_environment::enabled() && lhs.rank_ != -1 && rhs.rank_ != -1)
                 return lhs.rank_ == rhs.rank_;
 #endif
@@ -128,7 +128,7 @@ namespace hpx { namespace naming
 
         friend bool operator< (locality const& lhs, locality const& rhs)
         {
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
             if(util::mpi_environment::enabled() && lhs.rank_ != -1 && rhs.rank_ != -1)
                 return lhs.rank_ < rhs.rank_;
 #endif
@@ -144,7 +144,7 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         operator util::safe_bool<locality>::result_type() const
         {
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
             if(util::mpi_environment::enabled())
                 return util::safe_bool<locality>()(rank_ != -1);
 #endif
@@ -154,7 +154,7 @@ namespace hpx { namespace naming
         std::string const& get_address() const { return address_; }
         void set_address(char const* address) { address_ = address; }
 
-#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+#if defined(HPX_PARCELPORT_IBVERBS)
         std::string const& get_ibverbs_address() const { return ibverbs_address_; }
         void set_ibverbs_address(char const* address) { ibverbs_address_ = address; }
 #endif
@@ -162,7 +162,7 @@ namespace hpx { namespace naming
         boost::uint16_t get_port() const { return port_; }
         void set_port(boost::uint16_t port) { port_ = port; }
 
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
         boost::int16_t get_rank() const { return rank_; }
         void set_rank(boost::int16_t rank) { rank_ = rank; }
 #else
@@ -172,7 +172,7 @@ namespace hpx { namespace naming
 
         parcelset::connection_type get_type() const
         {
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
             if(rank_ != -1)
                 return parcelset::connection_mpi;
 #endif
@@ -196,11 +196,11 @@ namespace hpx { namespace naming
 
     private:
         std::string address_;
-#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+#if defined(HPX_PARCELPORT_IBVERBS)
         std::string ibverbs_address_;
 #endif
         boost::uint16_t port_;
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
         boost::int16_t rank_;
 #endif
     };
@@ -209,10 +209,10 @@ namespace hpx { namespace naming
     {
         boost::io::ios_flags_saver ifs(os);
         os << l.address_ << ":" << l.port_;
-#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+#if defined(HPX_PARCELPORT_IBVERBS)
         os << "ibverbs:" << l.ibverbs_address_;
 #endif
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
         if (l.rank_ != -1)
             os << ":" << l.rank_;
 #endif

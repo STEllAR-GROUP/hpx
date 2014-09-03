@@ -31,7 +31,7 @@ set(tests ${tests}
     dataflow_future_swap
     dataflow_791
    )
-if(HPX_HAVE_CXX11_LAMBDAS)
+ if(HPX_WITH_CXX11_LAMBDAS)
   set(tests ${tests}
       dataflow_const_functor_773
       dataflow_future_swap2
@@ -50,7 +50,7 @@ set(lifetime_588_1_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 
 set(set_hpx_limit_771_FLAGS DEPENDENCIES dataflow_component)
 
-if(HPX_HAVE_CXX11_LAMBDAS)
+if(HPX_WITH_CXX11_LAMBDAS)
   set(future_hang_on_wait_with_callback_629_PARAMETERS THREADS_PER_LOCALITY 4)
   set(tests
     ${tests}
@@ -67,6 +67,8 @@ foreach(test ${tests})
   add_hpx_executable(${test}_test
                      SOURCES ${sources}
                      ${${test}_FLAGS}
+                     EXCLUDE_FROM_ALL
+                     HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Tests/Regressions/LCOs")
 
   add_hpx_regression_test("lcos" ${test} ${${test}_PARAMETERS})

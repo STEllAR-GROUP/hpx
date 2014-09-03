@@ -11,16 +11,10 @@ set(subdirs
     distributing_factory
     iostreams
     memory
+    papi_counters
     remote_object
+    security
    )
-
-if(PAPI_FOUND)
-  set(subdirs ${subdirs} papi_counters)
-endif()
-
-if(SODIUM_FOUND)
-  set(subdirs ${subdirs} security)
-endif()
 
 add_hpx_pseudo_target(components)
 
@@ -30,3 +24,4 @@ foreach(subdir ${subdirs})
   add_hpx_pseudo_dependencies(components components.${subdir})
 endforeach()
 
+set(HPX_CONFIG_DEFINITIONS ${HPX_CONFIG_DEFINITIONS} PARENT_SCOPE)

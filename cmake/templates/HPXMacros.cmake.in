@@ -1,0 +1,52 @@
+# Copyright (c) 2014 Thomas Heller
+#
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "@HPX_CMAKE_MODULE_PATH@")
+include(HPX_Utils)
+
+function(hpx_check_compiler_compatibility)
+  if(HPX_IGNORE_COMPILER_COMPATIBILITY)
+    return()
+  endif()
+
+  if(NOT CMAKE_CXX_COMPILER STREQUAL HPX_CXX_COMPILER)
+    hpx_error("Compilers do not match. In order to compile HPX application it is"
+              " recommended to use the same compiler as you did for HPX. "
+              "HPX_CXX_COMPILER=${HPX_CXX_COMPILER}, "
+              "CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}. To "
+              "disable this message set HPX_IGNORE_COMPILER_COMPATIBILITY to On."
+    )
+  endif()
+endfunction()
+
+function(hpx_check_boost_compatibility)
+  if(HPX_IGNORE_BOOST_COMPATIBILITY)
+    return()
+  endif()
+  if(NOT DEFINED BOOST_ROOT)
+    return()
+  endif()
+  if(NOT HPX_BOOST_ROOT STREQUAL BOOST_ROOT)
+    hpx_error("The specified BOOST_ROOT differs from what has been used when"
+              " configuring and building HPX. Please use the same Boost "
+              "versions"
+    )
+  endif()
+endfunction()
+
+function(hpx_setup_allocator)
+  if(HPX_DISABLE_CUSTOM_ALLOCATOR)
+    return()
+  endif()
+  if(DEFINED HPX_MALLOC)
+    string(TOUPPER "${HPX_MALLOC}" HPX_MALLOC_UPPER)
+    string(TOUPPER "${HPX_MALLOC}" HPX_MALLOC_UPPER)
+    if(NOT HPX_MALLOC_UPPER STREQUAL HPX_MALLOC_UPPER)
+      hpx_error("The specified allocators do not match. This Project is configured with ${HPX_MALLOC} and HPX was configured with ${HPX_MALLOC}.")
+    endif()
+  endif()
+  set(HPX_MALLOC ${HPX_MALLOC} CACHE STRING "Define which allocator should be linked in. Options are: system, tcmalloc, jemalloc and tbbmalloc (default is: tcmalloc)")
+  include(HPX_SetupAllocator)
+endfunction()

@@ -3,22 +3,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-################################################################################
-# Find dependencies
-################################################################################
-#find_package(HPX_Qthreads)
-#find_package(HPX_TBB)
-#find_package(HPX_SWARM)
-#find_package(HPX_OpenMP)
-
-if(MSVC)
-  set(boost_library_dependencies)
-else()
-  set(boost_library_dependencies
-      ${BOOST_PROGRAM_OPTIONS_LIBRARY}
-      ${BOOST_SYSTEM_LIBRARY}
-      ${BOOST_DATE_TIME_LIBRARY}
-      ${BOOST_CHRONO_LIBRARY})
+if(NOT MSVC)
+  set(boost_library_dependencies ${Boost_LIBRARIES})
 endif()
 
 set(benchmarks
@@ -57,6 +43,8 @@ foreach(benchmark ${benchmarks})
   add_hpx_executable(${benchmark}
                      SOURCES ${sources}
                      ${${benchmark}_FLAGS}
+                     EXCLUDE_FROM_ALL
+                     HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Benchmarks/HTTS v2/${benchmark}")
 
   # add a custom target for this example

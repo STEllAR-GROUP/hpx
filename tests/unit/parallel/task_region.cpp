@@ -135,7 +135,7 @@ void task_region_exceptions_test1()
         HPX_TEST(false);
     }
     catch (hpx::parallel::exception_list const& e) {
-        HPX_TEST_EQ(e.size(), std::size_t(3));
+        HPX_TEST_EQ(e.size(), 3u);
     }
     catch(...) {
         HPX_TEST(false);
@@ -165,7 +165,7 @@ void task_region_exceptions_test2()
         HPX_TEST(false);
     }
     catch (hpx::parallel::exception_list const& e) {
-        HPX_TEST_EQ(e.size(), std::size_t(3));
+        HPX_TEST_EQ(e.size(), 3u);
     }
     catch(...) {
         HPX_TEST(false);

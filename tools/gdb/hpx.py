@@ -188,6 +188,7 @@ class HPXThread():
 
     assert thread_data_base == context_impl['m_thread_id']
     self.id = thread_data_base#context_impl['m_thread_id']
+    self.parent_id = self.thread_data['parent_thread_id_']
     self.description = self.thread_data['description_']
     self.lco_description = self.thread_data['lco_description_']
 
@@ -253,10 +254,11 @@ class HPXThread():
     print " Thread 0x%x" % self.id
     if self.m_sp.reinterpret_cast(self.m_sp.dereference().type) > self.stack_end:
       print " This thread has a stack overflow"
+    print "  parent thread = %s" % self.parent_id
     print "  description = " + self.description.string()
     print "  lco_description = " + self.lco_description.string()
-    print "  state = %s " % self.state
-    print "  state_ex = %s " % self.state_ex
+    print "  state = %s" % self.state
+    print "  state_ex = %s" % self.state_ex
     print "  pc = %s" % self.pc_string
 
 class HPXListThreads(gdb.Command):

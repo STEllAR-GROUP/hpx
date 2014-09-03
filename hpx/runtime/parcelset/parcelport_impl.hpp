@@ -700,8 +700,7 @@ namespace hpx { namespace parcelset
             }
 #endif
             // encode the parcels
-            boost::shared_ptr<parcel_buffer<typename connection::buffer_type> >
-                buffer = encode_parcels(parcels, *sender_connection,
+            encode_parcels(parcels, *sender_connection,
                     archive_flags_, this->enable_security());
 
             // send them asynchronously

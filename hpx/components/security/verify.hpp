@@ -20,8 +20,9 @@
 
 namespace hpx { namespace components { namespace security
 {
+    template <typename Buffer>
     bool verify(certificate_store const & certificate_store,
-                std::vector<char> const& parcel_data,
+                Buffer const& parcel_data,
                 naming::gid_type& parcel_id,
                 error_code& ec = throws)
     {

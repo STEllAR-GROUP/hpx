@@ -1,0 +1,116 @@
+# Copyright (c) 2014 Thomas Heller
+#
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+# We first try to find the required minimum set of Boost libraries. This will
+# also give us the version of the found boost installation
+if(HPX_STATIC_LINKING)
+  set(Boost_USE_STATIC_LIBS ON)
+endif()
+find_package(Boost
+  1.49
+  REQUIRED
+  COMPONENTS
+  chrono
+  date_time
+  filesystem
+  program_options
+  regex
+  serialization
+  system
+  thread
+  )
+
+if(NOT Boost_FOUND)
+  hpx_error("Could not find Boost. Please set BOOST_ROOT to point to your Boost installation.")
+endif()
+
+set(Boost_TMP_LIBRARIES ${Boost_LIBRARIES})
+if(UNIX AND NOT CYGWIN)
+  find_library(BOOST_THREAD_LIBRARY NAMES pthread DOC "The threading library used by boost.thread")
+  if(NOT BOOST_THREAD_LIBRARY AND (HPX_PLATFORM_UC STREQUAL "XEONPHI"))
+    set(BOOST_THREAD_LIBRARY "-pthread")
+  endif()
+  set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${BOOST_THREAD_LIBRARY})
+endif()
+
+# Set configuration option to use Boost.Context or not. This depends on the Boost
+# version (Boost.Context was included with 1.51) and the Platform
+if(Boost_VERSION GREATER 105000)
+  find_package(Boost 1.50 QUIET COMPONENTS context)
+  if(Boost_CONTEXT_FOUND)
+    hpx_info("  context")
+  endif()
+  set(use_generic_coroutine_context OFF)
+  if(APPLE)
+    set(use_generic_coroutine_context ON)
+  endif()
+  if(HPX_PLATFORM_UC STREQUAL "BLUEGENEQ" AND Boost_VERSION GREATER 105500)
+    set(use_generic_coroutine_context ON)
+  endif()
+endif()
+
+option(
+  HPX_GENERIC_COROUTINE_CONTEXT
+  "Use Boost.Context as the underlying coroutines context switch implementation."
+  ${use_generic_coroutine_context}
+)
+
+set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
+
+if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB)
+  find_package(Boost 1.49 QUIET COMPONENTS iostreams)
+  if(Boost_IOSTREAMS_FOUND)
+    hpx_info("  iostreams")
+  else()
+    hpx_error("Could not find Boost.Iostreams but HPX_WITH_COMPRESSION_BZIP2=On or HPX_WITH_COMPRESSION_LIB=On. Either set it to off or provide a boost installation including the iostreams library")
+  endif()
+  set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
+endif()
+
+# If the found Boost installation is < 1.53, we need to include our packaged
+# atomic library
+if(Boost_VERSION LESS 105300)
+  set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} "${hpx_SOURCE_DIR}/external/atomic")
+  set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} "${hpx_SOURCE_DIR}/external/lockfree")
+else()
+  find_package(Boost 1.53 QUIET REQUIRED COMPONENTS atomic)
+  if(Boost_ATOMIC_FOUND)
+    hpx_info("  atomic")
+  endif()
+
+  set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
+endif()
+
+set(Boost_LIBRARIES ${Boost_TMP_LIBRARIES})
+set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} ${hpx_SOURCE_DIR}/external/cache)
+set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} ${hpx_SOURCE_DIR}/external/endian)
+
+# If we compile natively for the MIC, we need some workarounds for certain
+# Boost headers
+# FIXME: push changes upstream
+if(HPX_PLATFORM_UC STREQUAL "XEONPHI")
+  set(Boost_INCLUDE_DIRS ${hpx_SOURCE_DIR}/external/asio ${Boost_INCLUDE_DIRS})
+endif()
+
+# Boost preprocessor definitions
+hpx_add_config_define(BOOST_PARAMETER_MAX_ARITY 7)
+hpx_add_config_define(HPX_COROUTINE_ARG_MAX 1)
+if(NOT MSVC)
+  hpx_add_config_define(HPX_COROUTINE_NO_SEPARATE_CALL_SITES)
+endif()
+hpx_add_config_define(HPX_LOG_NO_TSS)
+hpx_add_config_define(HPX_LOG_NO_TS)
+hpx_add_config_define(BOOST_BIGINT_HAS_NATIVE_INT64)
+
+# Disable usage of std::atomics in lockfree
+if(Boost_VERSION LESS 105300)
+  hpx_add_config_define(BOOST_NO_0X_HDR_ATOMIC)
+endif()
+
+include_directories(${Boost_INCLUDE_DIRS})
+link_directories(${Boost_LIBRARY_DIRS})
+if(NOT MSVC)
+  hpx_libraries(${Boost_LIBRARIES})
+endif()

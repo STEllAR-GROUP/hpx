@@ -56,5 +56,10 @@
 #   define HPX_INTEL14_WORKAROUND
 #endif
 
+// Identify if we compile for the MIC
+#if defined(__MIC)
+#   define HPX_NATIVE_MIC
+#endif
+
 #endif
 

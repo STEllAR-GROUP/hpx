@@ -20,6 +20,7 @@ endif()
 if(HPX_LOCAL_SCHEDULER OR HPX_ALL_SCHEDULERS)
   set(tests ${tests}
     thread_pool_executor_1114
+#    thread_pool_executor_1127
     )
 endif()
 
@@ -39,6 +40,8 @@ foreach(test ${tests})
   add_hpx_executable(${test}_test
                      SOURCES ${sources}
                      ${${test}_FLAGS}
+                     EXCLUDE_FROM_ALL
+                     HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Tests/Regressions/Threads")
 
   add_hpx_regression_test("threads" ${test} ${${test}_PARAMETERS})

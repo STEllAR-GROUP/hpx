@@ -56,10 +56,10 @@ namespace hpx { namespace applier { namespace detail
                     std::forward<Arguments>(args));
             }
 
-#if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
+#if defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
             data.lva = lva;
 #endif
-#if HPX_THREAD_MAINTAIN_DESCRIPTION
+#if defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
             data.description = actions::detail::get_action_name<Action>();
 #endif
             data.priority = fix_priority<Action>(priority);
@@ -85,10 +85,10 @@ namespace hpx { namespace applier { namespace detail
             threads::thread_init_data data;
             data.func = Action::construct_thread_function(c, lva,
                 std::forward<Arguments>(args));
-#if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
+#if defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
             data.lva = lva;
 #endif
-#if HPX_THREAD_MAINTAIN_DESCRIPTION
+#if defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
             data.description = actions::detail::get_action_name<Action>();
 #endif
             data.priority = fix_priority<Action>(priority);

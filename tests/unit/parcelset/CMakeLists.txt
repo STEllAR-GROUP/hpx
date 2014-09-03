@@ -21,6 +21,8 @@ foreach(test ${tests})
   add_hpx_executable(${test}_test
                      SOURCES ${sources}
                      ${${test}_FLAGS}
+                     EXCLUDE_FROM_ALL
+                     HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Tests/Unit/LCOs")
 
   add_hpx_unit_test("parcelset" ${test} ${${test}_PARAMETERS})

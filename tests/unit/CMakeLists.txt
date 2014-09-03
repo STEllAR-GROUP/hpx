@@ -7,6 +7,7 @@
 set(subdirs
     actions
     agas
+    build
     components
     diagnostics
     lcos
@@ -17,12 +18,12 @@ set(subdirs
     util
    )
 
-if(NOT HPX_HAVE_SECURITY AND SODIUM_FOUND)
-    set(subdirs ${subdirs} security)
+if(HPX_WITH_SECURITY)
+  set(subdirs ${subdirs} security)
 endif()
 
-if(HPX_HAVE_CXX11_LAMBDAS)
-    set(subdirs ${subdirs} parallel)
+if(HPX_WITH_CXX11_LAMBDAS)
+  set(subdirs ${subdirs} parallel)
 endif()
 
 foreach(subdir ${subdirs})

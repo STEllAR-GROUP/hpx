@@ -437,7 +437,10 @@ namespace hpx
     ///                     runtime system will not support any of the default
     ///                     command line options as described in the section
     ///                     'HPX Command Line Options'.
-    inline int init(int argc = 0, char** argv = 0,
+#if !defined(HPX_STATIC_LINKING)
+    inline
+#endif
+    int init(int argc = 0, char** argv = 0,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
     /// \brief Main entry point for launching the HPX runtime system.

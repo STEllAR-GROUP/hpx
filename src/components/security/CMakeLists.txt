@@ -4,14 +4,17 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 ###############################################################################
-set(root "${hpx_SOURCE_DIR}/hpx/components/security")
+if(HPX_WITH_SECURITY)
 
-add_hpx_component(security
-  FOLDER "Core/Components"
-  HEADER_ROOT ${root}
-  AUTOGLOB
-  ESSENTIAL)
+  set(root "${hpx_SOURCE_DIR}/hpx/components/security")
 
-add_hpx_pseudo_dependencies(components.security
-                            security_component)
+  add_hpx_component(security
+    FOLDER "Core/Components"
+    HEADER_ROOT ${root}
+    AUTOGLOB)
 
+  add_hpx_pseudo_dependencies(components.security
+                              security_component)
+
+  set(HPX_CONFIG_DEFINITIONS ${HPX_CONFIG_DEFINITIONS} PARENT_SCOPE)
+endif()

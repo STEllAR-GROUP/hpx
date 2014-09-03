@@ -77,4 +77,12 @@
 # define HPX_ALWAYS_EXPORT       HPX_SYMBOL_IMPORT
 #endif
 
+// Boost.Serialization fails to export some symbols correctly on gcc with hidden visibility if
+// we don't manually define these macros
+#if !defined(BOOST_MSVC) && !defined(BOOST_INTEL_WIN) && defined(HPX_SERIALIZATION_EXPORTS)
+#  define BOOST_ARCHIVE_DECL(T) HPX_ALWAYS_EXPORT T
+#  define BOOST_WARCHIVE_DECL(T) HPX_ALWAYS_EXPORT T
+#  define BOOST_ARCHIVE_OR_WARCHIVE_DECL(T) HPX_ALWAYS_EXPORT T
+#endif
+
 #endif

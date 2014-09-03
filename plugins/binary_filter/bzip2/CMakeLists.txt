@@ -5,40 +5,32 @@
 
 include(HPX_AddLibrary)
 
-hpx_option(HPX_HAVE_COMPRESSION_BZIP2 BOOL "Enable bzip2 compression for parcel data (default: OFF)." OFF ADVANCED)
-if(HPX_HAVE_COMPRESSION_BZIP2)
+if(HPX_WITH_COMPRESSION_BZIP2)
   if(MSVC)
     set(BOOST_LIBRARIES ${BOOST_LIBRARIES} iostreams bzip2)
     set(BZIP2_FOUND ON CACHE INTERNAL "BZIP2_FOUND")
   else()
-    find_package(HPX_BZip2)
-    if(BZIP2_FOUND)
-      set(BOOST_LIBRARIES ${BOOST_LIBRARIES} iostreams)
+    find_package(BZip2)
+    if(NOT BZIP2_FOUND)
+      hpx_error("BZip2 could not be found and HPX_WITH_COMPRESSION_BZIP2=ON, please specify BZIP2_ROOT to point to the correct location or set HPX_WITH_COMPRESSION_BZIP2 to OFF")
     endif()
   endif()
 endif()
 
 macro(add_bzip2_module)
   hpx_debug("add_bzip2_module" "BZIP2_FOUND: ${BZIP2_FOUND}")
-  if(HPX_HAVE_COMPRESSION_BZIP2 AND BZIP2_FOUND)
-    hpx_include_sys_directories("${BZIP2_INCLUDE_DIR}")
-    hpx_link_sys_directories("${BZIP2_LIBRARY_DIR}")
+  if(HPX_WITH_COMPRESSION_BZIP2)
+    if(NOT MSVC)
+      include_directories(${BZIP2_INCLUDE_DIR})
+    endif()
 
     add_hpx_library(compress_bzip2
+      PLUGIN
       SOURCES "${hpx_SOURCE_DIR}/plugins/binary_filter/bzip2/bzip2_serialization_filter.cpp"
       HEADERS "${hpx_SOURCE_DIR}/hpx/plugins/binary_filter/bzip2_serialization_filter.hpp"
       FOLDER "Core/Plugins/Compression"
-      DEPENDENCIES "${BZIP2_LIBRARY}")
-
-    set_property(TARGET compress_bzip2_lib APPEND
-      PROPERTY COMPILE_DEFINITIONS
-      "HPX_LIBRARY_EXPORTS"
-      "HPX_PLUGIN_NAME=compress_bzip2")
+      DEPENDENCIES ${BZIP2_LIBRARIES})
 
     add_hpx_pseudo_dependencies(plugins.binary_filter.bzip2 compress_bzip2_lib)
-
-    if(NOT HPX_NO_INSTALL)
-      hpx_library_install(compress_bzip2_lib ${LIB}/hpx)
-    endif()
   endif()
 endmacro()

@@ -4,11 +4,12 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-find_package(HPX_HDF5)
+find_package(HDF5 COMPONENTS CXX)
 
-if(HDF5_CPP_FOUND)
-  if(HDF5_FOUND)
-    include_directories("${HDF5_INCLUDE_DIR}" "${HDF5_CPP_INCLUDE_DIR}")
+if(HDF5_FOUND)
+  if(HDF5_CXX_LIBRARIES AND HDF5_IS_PARALLEL)
+
+    include_directories(${HDF5_INCLUDE_DIRS})
 
     # just recurse into all components subdirectories and execute the scripts there
     set(subdirs
@@ -43,7 +44,7 @@ if(HDF5_CPP_FOUND)
 
     add_hpx_executable(create_1d_testdata
       SOURCES create_testdata.cpp
-      DEPENDENCIES ${HDF5_LIBRARY} ${HDF5_CPP_LIBRARY}
+      DEPENDENCIES ${HDF5_LIBRARIES}
       NOLIBS
       FOLDER "Examples/Interpolate1D")
 

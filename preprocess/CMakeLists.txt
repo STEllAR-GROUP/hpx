@@ -11,6 +11,7 @@
 # add headers to preprocessing
 set(function_argument_limit_preprocessing_files
   "hpx/util/detail/basic_function.hpp"
+  "hpx/util/detail/basic_function.hpp"
   "hpx/util/detail/define_bind_action_function_operators.hpp"
   "hpx/util/detail/define_bind_function_operators.hpp"
   "hpx/util/detail/empty_function.hpp"

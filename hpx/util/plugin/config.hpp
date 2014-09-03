@@ -57,7 +57,7 @@ inline std::string HPX_PLUGIN_OSSTREAM_GETSTRING(std::ostrstream& ss)
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-//  The HPX_PLUGIN_ARGUMENT_LIMIT defines the upper limit of possible arguments 
+//  The HPX_PLUGIN_ARGUMENT_LIMIT defines the upper limit of possible arguments
 //  to the virtual constructors.
 //
 ///////////////////////////////////////////////////////////////////////////////
@@ -74,10 +74,10 @@ inline std::string HPX_PLUGIN_OSSTREAM_GETSTRING(std::ostrstream& ss)
 #if !defined(HPX_PLUGIN_SYMBOLS_PREFIX)
 # if defined(HPX_DEBUG)
 #   define HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC hpxd
-#   define HPX_PLUGIN_SYMBOLS_PREFIX         hpxstaticd
+#   define HPX_PLUGIN_SYMBOLS_PREFIX         hpxd
 # else
 #   define HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC hpx
-#   define HPX_PLUGIN_SYMBOLS_PREFIX         hpxstatic
+#   define HPX_PLUGIN_SYMBOLS_PREFIX         hpx
 # endif
 #endif
 

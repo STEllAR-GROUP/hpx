@@ -26,7 +26,7 @@ namespace hpx { namespace util
         ignore_while_checking(void const* lock) {}
     };
 
-#if HPX_HAVE_VERIFY_LOCKS || defined(HPX_EXPORTS)
+#if defined(HPX_HAVE_VERIFY_LOCKS) || defined(HPX_EXPORTS)
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_API_EXPORT bool register_lock(void const* lock,

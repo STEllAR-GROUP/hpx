@@ -6,7 +6,7 @@
 
 #include <hpx/config/defines.hpp>
 
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
 #include <mpi.h>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/parcelset/policies/mpi/connection_handler.hpp>
@@ -234,6 +234,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         while(bootstrapping || has_work || (!has_work && t.elapsed() < 2.0))
         {
             if(stopped_) break;
+
             // break the loop if someone requested to pause the parcelport
             if(!enable_parcel_handling_) break;
 

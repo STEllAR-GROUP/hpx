@@ -38,7 +38,7 @@ namespace hpx { namespace threads { namespace detail
             }
         }
 
-#if HPX_THREAD_MAINTAIN_DESCRIPTION
+#ifdef HPX_THREAD_MAINTAIN_DESCRIPTION
         if (0 == data.description)
         {
             HPX_THROWS_IF(ec, bad_parameter,
@@ -49,7 +49,7 @@ namespace hpx { namespace threads { namespace detail
 
         thread_self* self = get_self_ptr();
 
-#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#ifdef HPX_THREAD_MAINTAIN_PARENT_REFERENCE
         if (0 == data.parent_id) {
             if (self)
             {
@@ -78,7 +78,7 @@ namespace hpx { namespace threads { namespace detail
         LTM_(info) << "register_thread(" << newid << "): initial_state("
                    << get_thread_state_name(initial_state) << "), "
                    << "run_now(" << (run_now ? "true" : "false")
-#if HPX_THREAD_MAINTAIN_DESCRIPTION
+#ifdef HPX_THREAD_MAINTAIN_DESCRIPTION
                    << "), description(" << data.description
 #endif
                    << ")";

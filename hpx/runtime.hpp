@@ -10,12 +10,17 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/static_reinit.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/lcos/local/spinlock.hpp>
+#endif
+
+#if defined(HPX_HAVE_SECURITY)
+#include <hpx/components/security/certificate_store.hpp>
 #endif
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -342,7 +347,9 @@ namespace hpx
             components::security::parcel_suffix const& suffix,
             components::security::signed_parcel_suffix& signed_suffix,
             error_code& ec) const;
-        bool verify_parcel_suffix(std::vector<char> const& data,
+
+        template <typename Buffer>
+        bool verify_parcel_suffix(Buffer const& data,
             naming::gid_type& parcel_id, error_code& ec) const;
 
         components::security::signed_certificate_signing_request
@@ -404,6 +411,7 @@ namespace hpx
         // allocate dynamically to reduce dependencies
         mutable lcos::local::spinlock security_mtx_;
         HPX_STD_UNIQUE_PTR<detail::manage_security_data> security_data_;
+        components::security::certificate_store const * cert_store(error_code& ec) const;
 #endif
     };
 
@@ -414,6 +422,19 @@ namespace hpx
     /// loading of external libraries.
     HPX_EXPORT bool keep_factory_alive(components::component_type type);
 }   // namespace hpx
+
+#if defined(HPX_HAVE_SECURITY)
+#include <hpx/components/security/verify.hpp>
+namespace hpx {
+    template <typename Buffer>
+    bool runtime::verify_parcel_suffix(Buffer const& data,
+        naming::gid_type& parcel_id, error_code& ec) const
+    {
+        lcos::local::spinlock::scoped_lock l(security_mtx_);
+        return components::security::verify(*cert_store(ec), data, parcel_id);
+    }
+}
+#endif
 
 #include <hpx/config/warnings_suffix.hpp>
 

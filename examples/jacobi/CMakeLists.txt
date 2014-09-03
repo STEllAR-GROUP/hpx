@@ -3,7 +3,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(HPX_HAVE_CXX11_LAMBDAS)
+if(HPX_WITH_CXX11_LAMBDAS)
 
   add_definitions(-DHPX_LIMIT=8)
 
@@ -13,9 +13,8 @@ if(HPX_HAVE_CXX11_LAMBDAS)
       jacobi.cpp)
 
   set(jacobi_FLAGS
-      DEPENDENCIES iostreams_component
-                   jacobi_component
-                   distributing_factory_component)
+      COMPONENT_DEPENDENCIES
+      iostreams jacobi distributing_factory)
 
   # add jacobi executable
   add_hpx_executable(jacobi

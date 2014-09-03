@@ -6,6 +6,9 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/hpx_init.hpp>
 
+#if defined(HPX_STATIC_LINKING)
+#include <hpx/hpx_init_impl.hpp>
+#endif
 #include <vector>
 #include <string>
 

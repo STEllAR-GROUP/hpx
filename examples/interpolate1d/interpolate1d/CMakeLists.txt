@@ -5,7 +5,7 @@
 
 set(dependencies
     distributing_factory_component
-    ${HDF5_LIBRARY} ${HDF5_CPP_LIBRARY})
+    ${HDF5_LIBRARIES})
 
 add_hpx_component(interpolate1d
   DEPENDENCIES ${dependencies}

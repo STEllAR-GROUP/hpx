@@ -7,7 +7,7 @@
 set(example_programs
    )
 
-if(HPX_HAVE_CXX11_LAMBDAS)
+if(HPX_WITH_CXX11_LAMBDAS)
   set(example_programs
       ${example_programs}
       1d_hydro_upwind)

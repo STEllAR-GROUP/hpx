@@ -9,7 +9,7 @@
 
 #include <hpx/config/defines.hpp>
 
-#if defined(HPX_HAVE_PARCELPORT_TCP)
+#if defined(HPX_PARCELPORT_TCP)
 
 #include <hpx/exception_list.hpp>
 #include <hpx/runtime/naming/locality.hpp>
@@ -41,13 +41,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
     connection_handler::~connection_handler()
     {
-        if(acceptor_ != NULL)
-        {
-            boost::system::error_code ec;
-            acceptor_->close(ec);
-            delete acceptor_;
-            acceptor_ = NULL;
-        }
+        HPX_ASSERT(acceptor_ == NULL);
     }
 
     bool connection_handler::do_run()
@@ -114,9 +108,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             write_connections_.clear();
 #endif
         }
-
-        // cancel all pending accept operations
-        if (NULL != acceptor_)
+        if(acceptor_ != NULL)
         {
             boost::system::error_code ec;
             acceptor_->close(ec);

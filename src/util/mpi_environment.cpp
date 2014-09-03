@@ -5,7 +5,7 @@
 
 #include <hpx/config/defines.hpp>
 
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
 #include <mpi.h>
 #endif
 
@@ -65,7 +65,7 @@ namespace hpx { namespace util
     }
 }}
 
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
 namespace hpx { namespace util
 {
     bool mpi_environment::enabled_ = false;
@@ -235,7 +235,7 @@ namespace hpx { namespace util
         {
             throw std::runtime_error("mpi_environment::init: "
                 "HPX is not compiled for MPI, but 'hpx.parcel.mpi.enable=1'. "
-                "Please set HPX_HAVE_PARCELPORT_MPI=ON while configuring using cmake.");
+                "Please set HPX_PARCELPORT_MPI=ON while configuring using cmake.");
         }
 
         // Report error, if the application was run using mpirun or similar but no
@@ -247,7 +247,7 @@ namespace hpx { namespace util
         {
             throw std::runtime_error("mpi_environment::init: "
                 "HPX is not compiled for MPI, but the application was run using mpirun. "
-                "Please set HPX_HAVE_PARCELPORT_MPI=ON while configuring using cmake.");
+                "Please set HPX_PARCELPORT_MPI=ON while configuring using cmake.");
         }
 
         return node;

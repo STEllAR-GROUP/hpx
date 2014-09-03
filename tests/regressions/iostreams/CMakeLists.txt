@@ -8,7 +8,7 @@ set(tests
    )
 
 set(no_output_1173_PARAMETERS LOCALITIES 2)
-set(no_output_1173_FLAGS DEPENDENCIES iostreams_component)
+set(no_output_1173_FLAGS COMPONENT_DEPENDENCIES iostreams)
 
 foreach(test ${tests})
   set(sources
@@ -20,6 +20,8 @@ foreach(test ${tests})
   add_hpx_executable(${test}_test
                      SOURCES ${sources}
                      ${${test}_FLAGS}
+                     EXCLUDE_FROM_ALL
+                     HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Tests/Regressions/Iostreams")
 
   add_hpx_regression_test("iostreams" ${test} ${${test}_PARAMETERS})

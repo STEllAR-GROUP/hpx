@@ -4,24 +4,12 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(HPX_ADDLIBRARY_LOADED TRUE)
-
-include(HPX_Include)
-
-hpx_include(Message
-            ParseArguments
-            AppendProperty
-            Install)
-
 macro(add_hpx_library name)
   # retrieve arguments
-  hpx_parse_arguments(${name}
-    "SOURCES;HEADERS;DEPENDENCIES;COMPONENT_DEPENDENCIES;COMPILE_FLAGS;LINK_FLAGS;FOLDER;SOURCE_ROOT;HEADER_ROOT;SOURCE_GLOB;HEADER_GLOB;OUTPUT_SUFFIX;INSTALL_SUFFIX;LANGUAGE"
-    "ESSENTIAL;NOLIBS;AUTOGLOB;STATIC" ${ARGN})
-
-  if(NOT ${name}_LANGUAGE)
-    set(${name}_LANGUAGE CXX)
-  endif()
+  set(options EXCLUDE_FROM_ALL NOLIBS AUTOGLOB STATIC PLUGIN)
+  set(one_value_args FOLDER SOURCE_ROOT HEADER_ROOT SOURCE_GLOB HEADER_GLOB OUTPUT_SUFFIX INSTALL_SUFFIX)
+  set(multi_value_args SOURCES HEADERS DEPENDENCIES COMPONENT_DEPENDENCIES COMPILER_FLAGS LINK_FLAGS)
+  cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   if(NOT ${name}_SOURCE_ROOT)
     set(${name}_SOURCE_ROOT ".")
@@ -98,158 +86,84 @@ macro(add_hpx_library name)
   hpx_print_list("DEBUG" "add_library.${name}" "Dependencies for ${name}" ${name}_DEPENDENCIES)
   hpx_print_list("DEBUG" "add_library.${name}" "Component dependencies for ${name}" ${name}_COMPONENT_DEPENDENCIES)
 
+  set(exclude_from_all)
+  set(install_options)
+
+  if(${name}_EXCLUDE_FROM_ALL)
+    set(exclude_from_all EXCLUDE_FROM_ALL)
+  else()
+    if(${name}_PLUGIN AND NOT HPX_STATIC_LINKING)
+      set(install_destination ${LIB}/hpx)
+      set(${name}_OUTPUT_SUFFIX hpx)
+    else()
+      if(NOT LIB)
+        set(LIB "lib/")
+      endif()
+      set(install_destination ${LIB})
+    endif()
+    if(${name}_INSTALL_SUFFIX)
+      set(install_destination ${${name}_INSTALL_SUFFIX})
+    endif()
+    set(_target_flags ${_target_flags}
+      INSTALL
+      INSTALL_FLAGS
+        DESTINATION ${install_destination}
+    )
+  endif()
+
+  if(${name}_PLUGIN)
+    set(_target_flags ${_target_flags} PLUGIN)
+  endif()
+
   if(${${name}_STATIC})
     set(${name}_lib_linktype STATIC)
   else()
-    set(${name}_lib_linktype SHARED)
-  endif()
-
-  if(NOT HPX_EXTERNAL_CMAKE)
-    set(exclude_from_all EXCLUDE_FROM_ALL)
-  endif()
-
-  if(${name}_ESSENTIAL)
-    add_library(${name}_lib ${${name}_lib_linktype}
-      ${${name}_SOURCES} ${${name}_HEADERS})
-  else()
-    add_library(${name}_lib ${${name}_lib_linktype} ${exclude_from_all}
-      ${${name}_SOURCES} ${${name}_HEADERS})
-  endif()
-
-  hpx_handle_component_dependencies(${name}_COMPONENT_DEPENDENCIES)
-
-  if(HPX_EXTERNAL_CMAKE AND "${HPX_BUILD_TYPE}" STREQUAL "Debug")
-    set(hpx_lib hpx${HPX_DEBUG_POSTFIX} hpx_serialization${HPX_DEBUG_POSTFIX})
-  else()
-    set(hpx_lib hpx hpx_serialization)
-  endif()
-
-  if(NOT MSVC)
-    if(NOT ${name}_NOLIBS)
-      target_link_libraries(${name}_lib
-        ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} ${hpx_lib})
-      set_property(TARGET ${name}_lib APPEND
-                   PROPERTY COMPILE_DEFINITIONS
-                   "HPX_ENABLE_ASSERT_HANDLER")
+    if(HPX_STATIC_LINKING)
+      set(${name}_lib_linktype STATIC)
     else()
-      target_link_libraries(${name}_lib
-        ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES})
-    endif()
-  else()
-    if(NOT ${name}_NOLIBS)
-      target_link_libraries(${name}_lib
-        ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} ${hpx_lib})
-    else()
-      target_link_libraries(${name}_lib
-        ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES})
+      set(${name}_lib_linktype SHARED)
     endif()
   endif()
 
-  # set properties of generated shared library
-  if("${HPX_PLATFORM}" STREQUAL "Android")
-    set_target_properties(${name}_lib PROPERTIES
-      # allow creating static and shared libs without conflicts
-      CLEAN_DIRECT_OUTPUT 1
-      OUTPUT_NAME ${name})
-  else()
-    set_target_properties(${name}_lib PROPERTIES
-      # create *nix style library versions + symbolic links
-      VERSION ${HPX_VERSION}
-      SOVERSION ${HPX_SOVERSION}
-      # allow creating static and shared libs without conflicts
-      CLEAN_DIRECT_OUTPUT 1
-      OUTPUT_NAME ${name})
-  endif()
+  add_library(${name}_lib ${${name}_lib_linktype} ${exclude_from_all}
+    ${${name}_SOURCES} ${${name}_HEADERS})
 
-  if(MSVC AND (NOT ${${name}_STATIC}) AND HPX_LINK_FLAG_TARGET_PROPERTIES)
-    set_target_properties(${name}_lib PROPERTIES LINK_FLAGS "${HPX_LINK_FLAG_TARGET_PROPERTIES}")
-  endif()
-
-  if(HPX_SET_OUTPUT_PATH AND NOT ${name}_OUTPUT_SUFFIX)
+  if(${name}_OUTPUT_SUFFIX)
     if(MSVC)
       set_target_properties("${name}_lib" PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${HPX_LIBRARY_OUTPUT_DIRECTORY_RELEASE}"
-        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${HPX_LIBRARY_OUTPUT_DIRECTORY_DEBUG}"
-        RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${HPX_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}"
-        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${HPX_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO}"
-        ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${HPX_ARCHIVE_OUTPUT_DIRECTORY_RELEASE}"
-        ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${HPX_ARCHIVE_OUTPUT_DIRECTORY_DEBUG}"
-        ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL "${HPX_ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL}"
-        ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "${HPX_ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO}"
-        LIBRARY_OUTPUT_DIRECTORY_RELEASE "${HPX_LIBRARY_OUTPUT_DIRECTORY_RELEASE}"
-        LIBRARY_OUTPUT_DIRECTORY_DEBUG "${HPX_LIBRARY_OUTPUT_DIRECTORY_DEBUG}"
-        LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL "${HPX_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}"
-        LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${HPX_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO}")
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release/bin/${${name}_OUTPUT_SUFFIX}"
+        LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release/lib/${${name}_OUTPUT_SUFFIX}"
+        ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release/lib/${${name}_OUTPUT_SUFFIX}"
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/Debug/bin/${${name}_OUTPUT_SUFFIX}"
+        LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/Debug/lib/${${name}_OUTPUT_SUFFIX}"
+        ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/Debug/lib/${${name}_OUTPUT_SUFFIX}"
+        RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}/MinSizeRel/bin/${${name}_OUTPUT_SUFFIX}"
+        LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}/MinSizeRel/lib/${${name}_OUTPUT_SUFFIX}"
+        ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}/MinSizeRel/lib/${${name}_OUTPUT_SUFFIX}"
+        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/RelWithDebInfo/bin/${${name}_OUTPUT_SUFFIX}"
+        LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/RelWithDebInfo/lib/${${name}_OUTPUT_SUFFIX}"
+        ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/RelWithDebInfo/lib/${${name}_OUTPUT_SUFFIX}")
     else()
       set_target_properties("${name}_lib" PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${HPX_LIBRARY_OUTPUT_DIRECTORY}"
-        ARCHIVE_OUTPUT_DIRECTORY "${HPX_LIBRARY_OUTPUT_DIRECTORY}"
-        LIBRARY_OUTPUT_DIRECTORY "${HPX_LIBRARY_OUTPUT_DIRECTORY}")
-    endif()
-  elseif(${name}_OUTPUT_SUFFIX)
-    if(MSVC)
-      set_target_properties("${name}_lib" PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release/${${name}_OUTPUT_SUFFIX}"
-        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/Debug/${${name}_OUTPUT_SUFFIX}"
-        RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}/MinSizeRel/${${name}_OUTPUT_SUFFIX}"
-        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/RelWithDebInfo/${${name}_OUTPUT_SUFFIX}"
-        ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release/${${name}_OUTPUT_SUFFIX}"
-        ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/Debug/${${name}_OUTPUT_SUFFIX}"
-        ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}/MinSizeRel/${${name}_OUTPUT_SUFFIX}"
-        ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/RelWithDebInfo/${${name}_OUTPUT_SUFFIX}"
-        LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release/${${name}_OUTPUT_SUFFIX}"
-        LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/Debug/${${name}_OUTPUT_SUFFIX}"
-        LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}/MinSizeRel/${${name}_OUTPUT_SUFFIX}"
-        LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/RelWithDebInfo/${${name}_OUTPUT_SUFFIX}")
-    else()
-      set_target_properties("${name}_lib" PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${${name}_OUTPUT_SUFFIX}"
-        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${${name}_OUTPUT_SUFFIX}"
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${${name}_OUTPUT_SUFFIX}")
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${${name}_OUTPUT_SUFFIX}"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/${${name}_OUTPUT_SUFFIX}"
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/${${name}_OUTPUT_SUFFIX}")
     endif()
   endif()
 
-  if(${name}_COMPILE_FLAGS)
-    hpx_append_property(${name}_lib COMPILE_FLAGS ${${name}_COMPILE_FLAGS})
-  endif()
+  hpx_setup_target(
+    ${name}_lib
+    TYPE LIBRARY
+    NAME ${name}
+    EXPORT
+    FOLDER ${${name}_FOLDER}
+    COMPILE_FLAGS ${${name}_COMPILE_FLAGS}
+    LINK_FLAGS ${${name}_LINK_FLAGS}
+    DEPENDENCIES ${${name}_DEPENDENCIES}
+    COMPONENT_DEPENDENCIES ${${name}_COMPONENT_DEPENDENCIES}
+    ${_target_flags}
+    ${install_optional}
+  )
 
-  if(${name}_LINK_FLAGS)
-    hpx_append_property(${name}_lib LINK_FLAGS ${${name}_LINK_FLAGS})
-  endif()
-
-  if(HPX_HAVE_PARCELPORT_MPI AND MPI_FOUND)
-    hpx_append_property(${name}_lib LINK_FLAGS ${MPI_${${name}_LANGUAGE}_LINK_FLAGS})
-  endif()
-
-  if(HPX_${${name}_LANGUAGE}_COMPILE_FLAGS)
-    hpx_append_property(${name}_lib COMPILE_FLAGS ${HPX_${${name}_LANGUAGE}_COMPILE_FLAGS})
-    if(NOT MSVC)
-      hpx_append_property(${name}_lib LINK_FLAGS ${HPX_${${name}_LANGUAGE}_COMPILE_FLAGS})
-    endif()
-  endif()
-
-  if(NOT MSVC)
-    set_target_properties(${name}_lib
-                          PROPERTIES SKIP_BUILD_RPATH TRUE
-                                     BUILD_WITH_INSTALL_RPATH TRUE
-                                     INSTALL_RPATH_USE_LINK_PATH TRUE
-                                     INSTALL_RPATH "${HPX_RPATH}")
-  endif()
-
-  if(${name}_FOLDER)
-    set_target_properties(${name}_lib PROPERTIES FOLDER "${${name}_FOLDER}")
-  endif()
-
-  set_property(TARGET ${name}_lib APPEND
-               PROPERTY COMPILE_DEFINITIONS
-                 "HPX_LIBRARY_EXPORTS")
-
-  if(NOT HPX_NO_INSTALL)
-    if(${name}_INSTALL_SUFFIX)
-      hpx_library_install("${name}_lib" "${${name}_INSTALL_SUFFIX}")
-    else()
-      hpx_library_install(${name}_lib ${LIB}/hpx)
-    endif()
-  endif()
 endmacro()
 

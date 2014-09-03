@@ -27,7 +27,7 @@
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
-#include <hpx/runtime/components/static_component_data.hpp>
+#include <hpx/runtime/components/static_factory_data.hpp>
 #include <hpx/runtime/components/server/create_component_with_args.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
@@ -354,15 +354,9 @@ namespace hpx { namespace components { namespace server
         // Load all components from the ini files found in the configuration
         bool load_components(util::section& ini, naming::gid_type const& prefix,
             naming::resolver_client& agas_client);
-        bool load_component(hpx::util::plugin::dll& d,
-            util::section& ini, std::string const& instance,
-            std::string const& component, boost::filesystem::path const& lib,
-            naming::gid_type const& prefix, naming::resolver_client& agas_client,
-            bool isdefault, bool isenabled,
-            boost::program_options::options_description& options,
-            std::set<std::string>& startup_handled);
 
-        bool load_component_static(
+#if !defined(HPX_STATIC_LINKING)
+        bool load_component(hpx::util::plugin::dll& d,
             util::section& ini, std::string const& instance,
             std::string const& component, boost::filesystem::path const& lib,
             naming::gid_type const& prefix, naming::resolver_client& agas_client,
@@ -382,7 +376,15 @@ namespace hpx { namespace components { namespace server
         bool load_commandline_options(hpx::util::plugin::dll& d,
             boost::program_options::options_description& options,
             error_code& ec);
+#endif
 
+        bool load_component_static(
+            util::section& ini, std::string const& instance,
+            std::string const& component, boost::filesystem::path const& lib,
+            naming::gid_type const& prefix, naming::resolver_client& agas_client,
+            bool isdefault, bool isenabled,
+            boost::program_options::options_description& options,
+            std::set<std::string>& startup_handled);
         bool load_startup_shutdown_functions_static(std::string const& module,
             error_code& ec);
         bool load_commandline_options_static(
@@ -392,9 +394,12 @@ namespace hpx { namespace components { namespace server
 
         // Load all plugins from the ini files found in the configuration
         bool load_plugins(util::section& ini);
+
+#if !defined(HPX_STATIC_LINKING)
         bool load_plugin(util::section& ini, std::string const& instance,
             std::string const& component, boost::filesystem::path const& lib,
             bool isenabled);
+#endif
 
         // the name says it all
         void dijkstra_termination_detection(

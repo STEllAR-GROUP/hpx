@@ -6,6 +6,9 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 
+HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_COMPONENT_PREFIX, factory)
+HPX_REGISTER_REGISTRY_MODULE()
+
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////

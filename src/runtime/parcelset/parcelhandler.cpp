@@ -76,23 +76,23 @@ namespace hpx { namespace parcelset
     bool connection_type_available(connection_type t)
     {
         switch(t) {
-#if defined(HPX_HAVE_PARCELPORT_TCP)
+#if defined(HPX_PARCELPORT_TCP)
         case connection_tcp:
             return true;
 #endif
-#if defined(HPX_HAVE_PARCELPORT_IPC)
+#if defined(HPX_PARCELPORT_IPC)
         case connection_ipc:
             return true;
 #endif
-#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+#if defined(HPX_PARCELPORT_IBVERBS)
         case connection_ibverbs:
             return true;
 #endif
-#if defined(HPX_HAVE_PARCELPORT_PORTALS4)
+#if defined(HPX_PARCELPORT_PORTALS4)
         case connection_portals4:
             return true;
 #endif
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
         case connection_mpi:
             return true;
 #endif
@@ -238,7 +238,7 @@ namespace hpx { namespace parcelset
             else
             {
                 ini_defs +=
-                    "enable = ${HPX_HAVE_PARCELPORT_" + name_uc + ":" + enable + "}",
+                    "enable = ${HPX_PARCELPORT_" + name_uc + ":" + enable + "}",
                     "io_pool_size = ${HPX_PARCEL_" + name_uc + "_IO_POOL_SIZE:"
                         "$[hpx.threadpools.parcel_pool_size]}",
                     "max_connections =  ${HPX_PARCEL_" + name_uc + "_MAX_CONNECTIONS:"
@@ -284,7 +284,7 @@ namespace hpx { namespace parcelset
         attach_parcelport(pp, false);
 
         util::io_service_pool *pool = 0;
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
         bool tcp_bootstrap = (get_config_entry("hpx.parcel.bootstrap", "tcp") == "tcp");
         if (tcp_bootstrap)
         {
@@ -300,7 +300,7 @@ namespace hpx { namespace parcelset
         HPX_ASSERT(0 != pool);
 
 
-#if defined(HPX_HAVE_PARCELPORT_IPC)
+#if defined(HPX_PARCELPORT_IPC)
         std::string enable_ipc =
             get_config_entry("hpx.parcel.ipc.enable", "0");
 
@@ -311,7 +311,7 @@ namespace hpx { namespace parcelset
                 pool->get_on_start_thread(), pool->get_on_stop_thread()));
         }
 #endif
-#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+#if defined(HPX_PARCELPORT_IBVERBS)
         std::string enable_ibverbs =
             get_config_entry("hpx.parcel.ibverbs.enable", "0");
 
@@ -322,7 +322,7 @@ namespace hpx { namespace parcelset
                 pool->get_on_start_thread(), pool->get_on_stop_thread()));
         }
 #endif
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
         if (tcp_bootstrap)
         {
             if (util::mpi_environment::enabled()) {
@@ -371,22 +371,22 @@ namespace hpx { namespace parcelset
     {
         list_parcelport(strm, connection_tcp);
 
-#if defined(HPX_HAVE_PARCELPORT_IPC)
+#if defined(HPX_PARCELPORT_IPC)
         list_parcelport(strm, connection_ipc);
 #else
         list_parcelport(strm, connection_ipc, false);
 #endif
-// #if defined(HPX_HAVE_PARCELPORT_PORTALS4)
+// #if defined(HPX_PARCELPORT_PORTALS4)
 //         list_parcelport(strm, connection_portals4);
 // #else
 //         list_parcelport(strm, connection_portals4, false);
 // #endif
-#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+#if defined(HPX_PARCELPORT_IBVERBS)
         list_parcelport(strm, connection_ibverbs);
 #else
         list_parcelport(strm, connection_ibverbs, false);
 #endif
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
         list_parcelport(strm, connection_mpi);
 #else
         list_parcelport(strm, connection_mpi, false);
@@ -509,7 +509,7 @@ namespace hpx { namespace parcelset
     {
         connection_type dest_type = dest.get_type();
 
-#if defined(HPX_HAVE_PARCELPORT_IPC)
+#if defined(HPX_PARCELPORT_IPC)
         if (dest_type == connection_tcp || dest_type == connection_mpi) {
             std::string enable_ipc =
                 get_config_entry("hpx.parcel.ipc.enable", "0");
@@ -525,7 +525,7 @@ namespace hpx { namespace parcelset
             }
         }
 #endif
-#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+#if defined(HPX_PARCELPORT_IBVERBS)
         // FIXME: add check if ibverbs are really available for this destination.
 
         if (dest_type == connection_tcp || dest_type == connection_mpi) {
@@ -539,7 +539,7 @@ namespace hpx { namespace parcelset
             }
         }
 #endif
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
         // FIXME: add check if MPI is really available for this destination.
 
         if (dest_type == connection_tcp || dest_type == connection_mpi) {
@@ -978,13 +978,13 @@ namespace hpx { namespace parcelset
     {
         // register connection specific counters
         register_counter_types(connection_tcp);
-#if defined(HPX_HAVE_PARCELPORT_IPC)
+#if defined(HPX_PARCELPORT_IPC)
         register_counter_types(connection_ipc);
 #endif
-#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+#if defined(HPX_PARCELPORT_IBVERBS)
         register_counter_types(connection_ibverbs);
 #endif
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
         register_counter_types(connection_mpi);
 #endif
 

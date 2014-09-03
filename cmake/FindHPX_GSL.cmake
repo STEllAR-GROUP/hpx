@@ -4,10 +4,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT HPX_FINDPACKAGE_LOADED)
-  include(HPX_FindPackage)
-endif()
-
 # This if statement is specific to GSL, and should not be copied into other
 # Find cmake scripts.
 if(NOT GSL_ROOT AND NOT $ENV{HOME_GSL} STREQUAL "")
@@ -23,7 +19,7 @@ if(GSL_ROOT)
 endif()
 
 hpx_find_package(GSL
-  LIBRARIES gsl libgsl 
+  LIBRARIES gsl libgsl
   LIBRARY_PATHS lib64 lib
   HEADERS gsl/gsl_test.h
   HEADER_PATHS include)

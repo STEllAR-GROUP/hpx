@@ -21,9 +21,6 @@
 #include <boost/serialization/export.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_COMPONENT_MODULE();
-
-///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the memory_block actions
 HPX_REGISTER_ACTION(
     hpx::components::server::detail::memory_block::get_action,

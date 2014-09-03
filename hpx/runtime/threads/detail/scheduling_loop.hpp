@@ -161,7 +161,7 @@ namespace hpx { namespace threads { namespace detail
         bool need_restore_state_;
     };
 
-#if HPX_THREAD_MAINTAIN_IDLE_RATES
+#ifdef HPX_THREAD_MAINTAIN_IDLE_RATES
     struct idle_collect_rate
     {
         idle_collect_rate(boost::uint64_t& tfunc_time, boost::uint64_t& exec_time)
@@ -286,7 +286,7 @@ namespace hpx { namespace threads { namespace detail
                             // thread returns new required state
                             // store the returned state in the thread
                             {
-#if HPX_HAVE_ITTNOTIFY != 0
+#ifdef HPX_HAVE_ITTNOTIFY
                                 util::itt::caller_context cctx(ctx);
                                 util::itt::undo_frame_context undoframe(fctx);
                                 util::itt::task task(domain, thrd->get_description());
@@ -297,7 +297,7 @@ namespace hpx { namespace threads { namespace detail
                                 thrd_stat = (*thrd)();
                             }
 
-#if HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS
+#ifdef HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS
                             ++executed_thread_phases;
 #endif
                         }
@@ -365,7 +365,7 @@ namespace hpx { namespace threads { namespace detail
                 // REVIEW: what has to be done with depleted HPX threads?
                 if (state_val == depleted || state_val == terminated)
                 {
-#if HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS
+#ifdef HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS
                     ++executed_threads;
 #endif
                     scheduler.SchedulingPolicy::destroy_thread(thrd, busy_loop_count);

@@ -74,6 +74,14 @@ public:
     , values_(o.values_)
   {}
 
+  basic_resolver_iterator(basic_resolver_iterator && o)
+    : index_(o.index_)
+    , values_(std::move(o.values_))
+  {
+      o.values_.reset();
+      o.index_ = 0;
+  }
+
   /// Create an iterator from an addrinfo list returned by getaddrinfo.
   static basic_resolver_iterator create(
       boost::asio::detail::addrinfo_type* address_info,
@@ -81,7 +89,7 @@ public:
   {
     basic_resolver_iterator iter;
     if (!address_info)
-      return iter;
+      return std::move(iter);
 
     std::string actual_host_name = host_name;
     if (address_info->ai_canonname)
@@ -106,7 +114,7 @@ public:
       address_info = address_info->ai_next;
     }
 
-    return iter;
+    return std::move(iter);
   }
 
   /// Create an iterator from an endpoint, host name and service name.
@@ -119,7 +127,7 @@ public:
     iter.values_->push_back(
         basic_resolver_entry<InternetProtocol>(
           endpoint, host_name, service_name));
-    return iter;
+    return std::move(iter);
   }
 
   /// Dereference an iterator.
@@ -190,7 +198,7 @@ private:
 
   std::size_t index_;
   typedef std::vector<basic_resolver_entry<InternetProtocol> > values_type;
-  boost::asio::detail::shared_ptr<values_type> values_;
+  boost::shared_ptr<values_type> values_;
 };
 
 } // namespace ip

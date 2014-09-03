@@ -1,0 +1,57 @@
+[/==============================================================================
+    Copyright (C) 2014 Thomas Heller
+    Copyright (C) 2007-2013 Hartmut Kaiser
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+===============================================================================/]
+
+[section:windows_installation How to Install __hpx__ on Windows]
+
+[heading Installation of Required Prerequisites]
+
+* Download the Boost c++ libraries from __boost_downloads__
+* Install the boost library as explained in the section __boost_installation__
+* Download the latest version of __cmake__ binaries, which are located under
+  the platform section of the downloads page at __cmake_download__.
+* Download the latest version of __hpx__ from the __stellar__ website:
+  __stellar_hpx_download__
+
+[heading Installation of the __hpx__ Library]
+
+* Create a build folder. __hpx__ requires an out-of-tree-build. This means that you
+  will be unable to run CMake in the __hpx__ source folder.
+* Open up the CMake GUI. In the input box labelled "Where is the source code:",
+  enter the full path to the source folder. The source directory is one where the
+  sources were checked out. CMakeLists.txt files in the source directory as well as the
+  subdirectories describe the build to CMake. In addition to this, there are CMake
+  scripts (usually ending in .cmake) stored in a special CMake directory. CMake does not
+  alter any file in the source directory and   doesn't add new ones either. In the input
+  box labelled "Where to build the binaries:", enter the full path to the build folder you
+  created before. The build directory is one where all compiler outputs are stored, which
+  includes object files and final executables.
+* Add CMake variable definitions (if any) by clicking the "Add Entry" button.
+  There are two required variables you need to define: `BOOST_ROOT` and
+  `HWLOC_ROOT`. These (PATH) variables need to be set to point to the root
+  folder of your __boost__ and __hwloc__ installations.
+  It is recommended to set the variable `CMAKE_INSTALL_PREFIX` as
+  well. This determines where the HPX libraries will be built and installed.
+  If this (PATH) variable is set, it has to refer to the directory where the
+  built __hpx__ files should be installed to.
+* Press the "Configure" button. A window will pop up asking you which compilers
+  to use. Select the Visual Studio 10 (64Bit) compiler (it usually is
+  the default if available). The Visual Studio 2012 (64Bit) and Visual Studio
+  2013 (64Bit) compilers are
+  supported as well. Note that while it is possible to build HPX for x86,
+  we don't recommend doing so as 32 bit runs are severely restricted by a 32 bit
+  Windows system limitation affecting the number of HPX threads you can create.
+* Press "Configure" again. Repeat this step until the "Generate" button becomes
+  clickable (and until no variable definitions are marked red anymore).
+* Press "Generate".
+* Open up the build folder, and double-click hpx.sln.
+* Build the INSTALL target.
+
+For more detailed information about using __cmake__ please refer its documentation
+and also the section __cmake_hpx__.
+
+[endsect] [/ How to Install __hpx__ on Windows]

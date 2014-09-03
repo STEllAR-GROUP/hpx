@@ -35,7 +35,7 @@
 #include <io.h>
 #endif
 
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
 #include <hpx/util/mpi_environment.hpp>
 #endif
 
@@ -219,7 +219,7 @@ namespace hpx {
         // unload libraries
         //runtime_support_->tidy();
 
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_PARCELPORT_MPI)
         util::mpi_environment::finalize();
 #endif
 

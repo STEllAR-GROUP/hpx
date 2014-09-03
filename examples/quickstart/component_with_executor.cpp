@@ -39,7 +39,7 @@ struct hello_world_server
         hpx::threads::thread_state_enum initial_state)
     {
         char const* desc = 0;
-#if HPX_THREAD_MAINTAIN_DESCRIPTION
+#ifdef HPX_THREAD_MAINTAIN_DESCRIPTION
         desc = data.description;
 #endif
 

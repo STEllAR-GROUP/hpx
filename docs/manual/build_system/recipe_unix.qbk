@@ -1,0 +1,74 @@
+[/==============================================================================
+    Copyright (C) 2014 Thomas Heller
+    Copyright (C) 2007-2013 Hartmut Kaiser
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+===============================================================================/]
+
+[section:unix_installation How to Install __hpx__ on Unix Variants]
+
+[teletype]
+
+* Create a build directory. __hpx__ requires an out-of-tree build. This means you
+  will be unable to run CMake in the __hpx__ source tree.
+
+``
+    cd hpx
+    mkdir my_hpx_build
+    cd my_hpx_build
+``
+
+* Invoke CMake from your build directory, pointing the CMake driver to the root
+  of your __hpx__ source tree.
+
+``
+    cmake -DBOOST_ROOT=/root/of/boost/installation \
+          -DHWLOC_ROOT=/root/of/hwloc/installation
+          [other CMake variable definitions] \
+          /path/to/source/tree
+``
+
+[:for instance:]
+
+``
+    cmake -DBOOST_ROOT=~/packages/boost -DHWLOC_ROOT=/packages/hwloc -DCMAKE_INSTALL_PREFIX=~/packages/hpx ~/downloads/hpx_0.9.9
+``
+
+* Invoke GNU make. If you are on a machine with multiple cores, add the -jN flag to
+  your make invocation, where N is the number of parallel processes __hpx__ gets compiled with.
+
+``
+    gmake -j4
+``
+
+[caution Compiling and linking __hpx__ needs a considerable amount of memory. It is advisable that
+    approximately 2 GB of memory per parallel process is available.]
+
+[note Many Linux distributions use `make` as an alias for `gmake`]
+
+* To complete the build and install __hpx__:
+
+``
+    gmake install
+``
+
+[important These commands will build and install the essential core components of
+           __hpx__ only. In order to build and run the tests, please invoke:
+           ``
+               gmake tests
+           ``
+           and in order to build (and install) all examples invoke:
+           ``
+               cmake -DHPX_BUILD_EXAMPLES=On .
+               gmake examples
+               gmake install
+           ``
+           ]
+[c++]
+
+For more detailed information about using __cmake__ please refer its documentation
+and also the section __cmake_hpx__. Please pay special attention to the section about
+HPX_MALLOC as this is crucial for getting decent performance.
+
+[endsect] [/ How to Install __hpx__ on Unix Variants]

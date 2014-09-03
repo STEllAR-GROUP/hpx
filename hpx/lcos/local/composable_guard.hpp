@@ -22,22 +22,22 @@ typedef boost::atomic<hpx::lcos::local::guard_task *> guard_atomic;
 
 const int DEBUG_MAGIC = 0x2cab;
 struct DebugObject {
-#if HPX_DEBUG
+#ifdef HPX_DEBUG
     int magic;
 #endif
     DebugObject()
-#if HPX_DEBUG
+#ifdef HPX_DEBUG
     : magic(DEBUG_MAGIC)
 #endif
     {}
     ~DebugObject() {
         check();
-#if HPX_DEBUG
+#ifdef HPX_DEBUG
         magic = ~DEBUG_MAGIC;
 #endif
     }
     void check() {
-#if HPX_DEBUG
+#ifdef HPX_DEBUG
         HPX_ASSERT(magic != ~DEBUG_MAGIC);
         HPX_ASSERT(magic == DEBUG_MAGIC);
 #endif
