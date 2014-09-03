@@ -998,7 +998,7 @@ namespace hpx
         int result = 0;
         set_error_handlers();
 
-#if defined(HPX_NATIVE_MIC) || defined(__bgq__)
+#if defined(HPX_NATIVE_MIC) || defined(__bgq__) || defined(__bgqion__)
         unsetenv("LANG");
         unsetenv("LC_CTYPE");
         unsetenv("LC_NUMERIC");

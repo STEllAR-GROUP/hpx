@@ -116,7 +116,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #error Boost.Context is available only with Boost V1.51 or later
 #endif
 
-#elif (defined(__linux) || defined(linux) || defined(__linux__)) && !defined(__bgq__)
+#elif (defined(__linux) || defined(linux) || defined(__linux__)) && !defined(__bgq__) && !defined(__powerpc__)
 
 #include <hpx/util/coroutine/detail/context_linux_x86.hpp>
 namespace hpx { namespace util { namespace coroutines { namespace detail
@@ -124,7 +124,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     typedef lx::context_impl default_context_impl;
 }}}}
 
-#elif defined(_POSIX_VERSION) || defined(__bgq__)
+#elif defined(_POSIX_VERSION) || defined(__bgq__) || defined(__powerpc__)
 
 #include <hpx/util/coroutine/detail/context_posix.hpp>
 namespace hpx { namespace util { namespace coroutines { namespace detail
