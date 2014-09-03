@@ -32,5 +32,6 @@ macro(add_zlib_module)
       DEPENDENCIES ${ZLIB_LIBRARIES})
 
     add_hpx_pseudo_dependencies(plugins.binary_filter.zlib compress_zlib_lib)
+    add_hpx_pseudo_dependencies(core plugins.binary_filter.zlib)
   endif()
 endmacro()

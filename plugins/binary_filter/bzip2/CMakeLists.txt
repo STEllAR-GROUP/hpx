@@ -32,5 +32,6 @@ macro(add_bzip2_module)
       DEPENDENCIES ${BZIP2_LIBRARIES})
 
     add_hpx_pseudo_dependencies(plugins.binary_filter.bzip2 compress_bzip2_lib)
+    add_hpx_pseudo_dependencies(core plugins.binary_filter.bzip2)
   endif()
 endmacro()

@@ -17,5 +17,6 @@ macro(add_coalescing_module)
       )
 
   add_hpx_pseudo_dependencies(plugins.parcel.coalescing parcel_coalescing_lib)
+  add_hpx_pseudo_dependencies(core plugins.parcel.coalescing)
 endmacro()
 
