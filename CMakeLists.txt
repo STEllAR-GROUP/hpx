@@ -54,6 +54,11 @@ endif()
 ################################################################################
 set(CMAKE_MODULE_PATH "${hpx_SOURCE_DIR}/cmake")
 
+# We safe the passed compiler flag to a special variable. This is needed for our
+# build system unit tests. Some flags might influence the created symbols (
+# _GLIBCXX_DEBUG i look at you)
+set(CMAKE_CXX_FLAGS_SAFE ${CMAKE_CXX_FLAGS})
+
 include(CheckCXXCompilerFlag)
 include(CMakeDependentOption)
 

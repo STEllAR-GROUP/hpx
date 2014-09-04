@@ -15,11 +15,13 @@ else
   debug_suffix =
 endif
 
-APP_CFLAGS = $(shell PKG_CONFIG_PATH=$(HPX_DIR) $(PKG_CONFIG) --cflags --libs $(hpx_application))
+APP_CFLAGS = $(CXX_FLAGS)
+APP_CFLAGS += $(shell PKG_CONFIG_PATH=$(HPX_DIR) $(PKG_CONFIG) --cflags --libs $(hpx_application))
 APP_CFLAGS += -liostreams$(debug_suffix)
 APP_CFLAGS += -DHPX_APPLICATION_NAME=test
 
-COMP_CFLAGS = $(shell PKG_CONFIG_PATH=$(HPX_DIR) $(PKG_CONFIG) --cflags --libs $(hpx_component))
+COMP_CFLAGS = $(CXX_FLAGS)
+COMP_CFLAGS += $(shell PKG_CONFIG_PATH=$(HPX_DIR) $(PKG_CONFIG) --cflags --libs $(hpx_component))
 COMP_CFLAGS += -DHPX_COMPONENT_NAME=test_component
 
 ifneq ($(wildcard $(HPX_DIR)/*),)

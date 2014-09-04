@@ -64,7 +64,8 @@ macro(create_pkgconfig_test name hpx_dir)
       SRC_DIR=${hpx_SOURCE_DIR}/tests/unit/build/src
       HPX_DIR=${hpx_dir}
       CXX=${CMAKE_CXX_COMPILER}
-      PKGCONFIG=${PKGCONFIG_EXECUTABLE}
+      CXX_FLAGS=${CMAKE_CXX_FLAGS_SAFE}
+      PKG_CONFIG=${PKG_CONFIG_EXECUTABLE}
       BUILD_TYPE=$<CONFIGURATION> VERBATIM)
   add_dependencies(${name}.make_compile ${name}.make_build_dir hpx iostreams_component)
   if(NOT HPX_STATIC_LINKING)
@@ -89,7 +90,7 @@ create_cmake_test(
 )
 
 find_package(PkgConfig)
-if(PKGCONFIG_FOUND)
+if(PKGCONFIG_FOUND AND NOT MSVC)
   create_pkgconfig_test(
     pkgconfig_build_dir_test
     "${CMAKE_BINARY_DIR}/lib/pkgconfig")
