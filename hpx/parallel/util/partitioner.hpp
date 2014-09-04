@@ -127,7 +127,7 @@ namespace hpx { namespace parallel { namespace util
             count -= test_chunk_size;
 
             // return chunk size which will create 80 microseconds of work
-            return t == 0 ? 0 : (std::min)(count, 80000 / t);
+            return t == 0 ? 0 : (std::min)(count, (std::size_t)(80000 / t));
         }
 
         template <typename ExPolicy, typename Result, typename F1,
@@ -376,7 +376,7 @@ namespace hpx { namespace parallel { namespace util
             count -= test_chunk_size;
 
             // return chunk size which will create 80 microseconds of work
-            return t == 0 ? 0 : (std::min)(count, 80000 / t);
+            return t == 0 ? 0 : (std::min)(count, (std::size_t)(80000 / t));
         }
 
         template <typename ExPolicy, typename Result, typename F1,
