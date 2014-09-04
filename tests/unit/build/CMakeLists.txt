@@ -42,10 +42,10 @@ macro(create_cmake_test name hpx_dir)
     set_target_properties(${name}.make_compile PROPERTIES
       FOLDER "Tests/Unit/Build")
   endif()
-  add_hpx_unit_test(
-    "build" ${name}
-    EXECUTABLE "${build_dir}/test"
-  )
+#  add_hpx_unit_test(
+#    "build" ${name}
+#    EXECUTABLE "${build_dir}/test"
+#  )
 endmacro()
 
 macro(create_pkgconfig_test name hpx_dir)
