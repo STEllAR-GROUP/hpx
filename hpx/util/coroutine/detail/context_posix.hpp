@@ -239,9 +239,15 @@ namespace hpx { namespace util { namespace coroutines {
         static void thread_startup(char const* thread_type) {}
         static void thread_shutdown() {}
 
-        void reset_stack() {}
+        void reset_stack() {
+          if(m_stack) {
+            if(posix::reset_stack(m_stack, static_cast<std::size_t>(m_stack_size)))
+              increment_stack_unbind_count();
+          }
+        }
         void rebind_stack()
         {
+//          std::cout << "Entering rebind stack on posix version " << std::endl;
             if (m_stack)
                 increment_stack_recycle_count();
         }
@@ -267,6 +273,15 @@ namespace hpx { namespace util { namespace coroutines {
             return ++get_stack_recycle_counter();
         }
 
+        static counter_type& get_stack_unbind_counter()
+        {
+            static counter_type counter(0);
+            return counter;
+        }
+        static boost::uint64_t increment_stack_unbind_count()
+        {
+            return ++get_stack_unbind_counter();
+        }
     private:
         // declare m_stack_size first so we can use it to initialize m_stack
         std::ptrdiff_t m_stack_size;
