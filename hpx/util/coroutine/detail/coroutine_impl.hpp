@@ -200,7 +200,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     HPX_COROUTINE_EXPORT static void init_self();
     HPX_COROUTINE_EXPORT static void reset_self();
 
-#if defined(HPX_GENERIC_COROUTINES)
+#if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
   protected:
     boost::optional<result_slot_type> m_result_last;
 
@@ -301,7 +301,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         try {
           this->check_exit_state();
 
-#if defined(HPX_GENERIC_COROUTINES)
+#if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
           do_call<result_type>();
 #else
           HPX_ASSERT(this->count() > 0);
@@ -376,7 +376,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
   public:
 
-#if defined(HPX_GENERIC_COROUTINES)
+#if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
     //GCC workaround as per enable_if docs
     template <int> struct dummy { dummy(int) {} };
 

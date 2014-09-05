@@ -234,7 +234,7 @@ namespace hpx { namespace util { namespace coroutines
 
 #undef HPX_COROUTINE_GENERATE_ARGUMENT_N_TYPE
 
-#if defined(HPX_GENERIC_COROUTINES)
+#if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
 
 #define HPX_COROUTINE_PARAM_WITH_DEFAULT(z, n, type_prefix)                   \
     typename boost::call_traits<                                              \
@@ -336,7 +336,7 @@ namespace hpx { namespace util { namespace coroutines
       return !empty() && !exited() && !waiting();
     }
 
-#if defined(HPX_GENERIC_COROUTINES)
+#if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
     result_type call_impl(arg_slot_type args) {
       HPX_ASSERT(m_pimpl);
       m_pimpl->bind_args(&args);

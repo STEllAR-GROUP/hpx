@@ -77,7 +77,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     typedef typename coroutine_type::yield_traits yield_traits;
     typedef typename coroutine_type::thread_id_repr_type thread_id_repr_type;
 
-#if defined(HPX_GENERIC_COROUTINES)
+#if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
 
 #define HPX_COROUTINE_PARAM_WITH_DEFAULT(z, n, type_prefix)                   \
     typename boost::call_traits<                                              \
@@ -220,7 +220,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     }
 #endif
 
-#if defined(HPX_GENERIC_COROUTINES)
+#if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
   private:
     coroutine_self(impl_type * pimpl, detail::init_from_impl_tag)
       : m_pimpl(pimpl), next_self_(0)
