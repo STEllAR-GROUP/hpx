@@ -48,7 +48,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/atomic.hpp>
 
-#if HPX_HAVE_SWAP_CONTEXT_EMULATION != 0
+#if defined(HPX_HAVE_SWAP_CONTEXT_EMULATION)
 extern "C" void switch_to_fiber(void* lpFiber) throw();
 #endif
 
@@ -138,7 +138,7 @@ namespace hpx { namespace util { namespace coroutines
           from.m_ctx = ConvertThreadToFiber(0);
           HPX_ASSERT(from.m_ctx != 0);
 
-#if HPX_HAVE_SWAP_CONTEXT_EMULATION != 0
+#if defined(HPX_HAVE_SWAP_CONTEXT_EMULATION)
           switch_to_fiber(to.m_ctx);
 #else
           SwitchToFiber(to.m_ctx);
@@ -151,7 +151,7 @@ namespace hpx { namespace util { namespace coroutines
           bool call_from_main = from.m_ctx == 0;
           if(call_from_main)
             from.m_ctx = GetCurrentFiber();
-#if HPX_HAVE_SWAP_CONTEXT_EMULATION != 0
+#if defined(HPX_HAVE_SWAP_CONTEXT_EMULATION)
           switch_to_fiber(to.m_ctx);
 #else
           SwitchToFiber(to.m_ctx);
