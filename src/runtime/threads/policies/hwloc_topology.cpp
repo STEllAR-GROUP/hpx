@@ -260,6 +260,9 @@ namespace hpx { namespace threads
       , error_code& ec
         ) const
     { // {{{
+
+#if !defined(__APPLE__)
+        // setting thread affinities is not supported by OSX
         hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
 
         for (std::size_t i = 0; i < mask_size(mask); ++i)
@@ -278,13 +281,17 @@ namespace hpx { namespace threads
                 // Strict binding not supported or failed, try weak binding.
                 if (hwloc_set_cpubind(topo, cpuset, HWLOC_CPUBIND_THREAD))
                 {
+                    char* buff = 0;
+                    hwloc_bitmap_asprintf(&buff, cpuset);
                     hwloc_bitmap_free(cpuset);
+
+                    boost::scoped_ptr<char> buffer(buff);
 
                     HPX_THROWS_IF(ec, kernel_error
                       , "hpx::threads::hwloc_topology::set_thread_affinity_mask"
                       , boost::str(boost::format(
-                            "failed to set thread %x affinity mask")
-                            % mask));
+                            "failed to set thread affinity mask (0x%x) for cpuset %s")
+                            % mask % buff));
 
                     if (ec)
                         return;
@@ -294,8 +301,8 @@ namespace hpx { namespace threads
 #if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
         sleep(0);   // Allow the OS to pick up the change.
 #endif
-
         hwloc_bitmap_free(cpuset);
+#endif  // __APPLE__
 
         if (&ec != &throws)
             ec = make_success_code();
