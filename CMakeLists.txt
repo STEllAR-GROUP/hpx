@@ -1198,12 +1198,14 @@ endif()
 ################################################################################
 # Configure the header to include all compile definitions
 ################################################################################
-list(SORT HPX_CONFIG_DEFINITIONS)
-list(REMOVE_DUPLICATES HPX_CONFIG_DEFINITIONS)
+get_property(HPX_CONFIG_DEFINITIONS_VAR GLOBAL PROPERTY HPX_CONFIG_DEFINITIONS)
+
+list(SORT HPX_CONFIG_DEFINITIONS_VAR)
+list(REMOVE_DUPLICATES HPX_CONFIG_DEFINITIONS_VAR)
 
 set(hpx_config_defines "\n")
-foreach(def ${HPX_CONFIG_DEFINITIONS})
-    set(hpx_config_defines "${hpx_config_defines}#define ${def} ${${def}_define}\n")#"
+foreach(def ${HPX_CONFIG_DEFINITIONS_VAR})
+  set(hpx_config_defines "${hpx_config_defines}#define ${def} ${${def}_define}\n")#"
 endforeach()
 
 configure_file("${hpx_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"

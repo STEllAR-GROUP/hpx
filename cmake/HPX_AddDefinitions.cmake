@@ -4,13 +4,17 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT DEFINED HPX_CONFIG_DEFINITIONS)
-  set(HPX_CONFIG_DEFINITIONS "" CACHE INTERNAL "" FORCE)
-endif()
+# on startup, this is unset, but we'll set it to an empty string anyway
+set_property(GLOBAL PROPERTY HPX_CONFIG_DEFINITIONS "")
 
-macro(hpx_add_config_define definition)
-  if(NOT DEFINED ${definition}_define)
-    set(${definition}_define ${ARGN} CACHE INTERNAL "${definition}" FORCE)
-    set(HPX_CONFIG_DEFINITIONS ${HPX_CONFIG_DEFINITIONS} ${definition} CACHE INTERNAL "" FORCE)
+function(hpx_add_config_define definition)
+ 
+  if(ARGN)
+    set_property(GLOBAL APPEND PROPERTY HPX_CONFIG_DEFINITIONS "${definition} ${ARGN}")
+  else()
+    set_property(GLOBAL APPEND PROPERTY HPX_CONFIG_DEFINITIONS "${definition}")
   endif()
-endmacro()
+
+  get_property(HPX_CONFIG_DEFINITIONS_VAR GLOBAL PROPERTY HPX_CONFIG_DEFINITIONS)
+
+endfunction()
