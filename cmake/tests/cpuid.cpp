@@ -7,98 +7,82 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <cstdlib>
 #include <string>
+using namespace std;
 
-enum { eax,ebx,ecx,edx };
+struct registers_t { uint32_t eax, ebx, ecx, edx; };
 
-#if defined(__GNUC__)
-void __cpuid( int CPUInfo[4],int InfoType)
+#if defined __GNUC__
+void __cpuid(registers_t& CPUInfo, uint32_t InfoType)
 {
   __asm__ __volatile__
-  (
-    "cpuid":\
-    "=a" (CPUInfo[eax]), "=b" (CPUInfo[ebx])
-  , "=c" (CPUInfo[ecx]), "=d" (CPUInfo[edx])
-  : "a" (InfoType)
-  );
+    (
+     "cpuid":
+       "=a" (CPUInfo.eax), "=b" (CPUInfo.ebx)
+     , "=c" (CPUInfo.ecx), "=d" (CPUInfo.edx)
+     : "a" (InfoType)
+     );
 }
 
-void __cpuidex(int CPUInfo[4],int InfoType,int ECXValue)
-{
-  __asm__ __volatile__
-  (
-    "cpuid":\
-    "=a" (CPUInfo[eax]), "=b" (CPUInfo[ebx])
-  , "=c" (CPUInfo[ecx]), "=d" (CPUInfo[edx])
-  : "a" (InfoType), "c" (ECXValue)
-  );
-}
-
-#elif defined(_MSC_VER)
+#elif defined _MSC_VER
 #include <intrin.h>
 #endif
 
-bool has_bit_set(int value, int bit)
+bool has_bit_set(uint32_t value, uint32_t bit)
 {
-  return (value & (1<<bit)) != 0;
+  return (value & (1U<<bit)) != 0;
 }
 
 struct matcher
 {
-  int function,reg,bit;
+  uint32_t function;
+  uint32_t registers_t::* reg;
+  uint32_t bit;
+  const char* target;
 }
 options[] =
-{
-    {0x00000001,edx,19} // CLFLUSH
-  , {0x00000001,edx,8}  // CMPXCHG8B
-  , {0x00000001,ecx,13} // CMPXCHG16B
-  , {0x00000001,edx,15} // CMOVcc
-  , {0x00000001,edx,5}  // RDMSR and WRMSR
-  , {0x00000001,edx,4}  // RDTSC
-  , {0x80000001,edx,27} // RDTSCP
-  , {0x00000001,edx,23} // MMX
-  , {0x00000001,edx,25} // SSE
-  , {0x00000001,edx,26} // SSE2
-  , {0x00000001,ecx,0}  // SSE3
-  , {0x00000001,ecx,9}  // SSSE3
-  , {0x00000001,ecx,19} // SSE4.1
-  , {0x00000001,ecx,20} // SSE4.2
-  , {0x00000001,ecx,28} // AVX
-  , {0x80000001,edx,11} // XOP
-  , {0x80000001,edx,16} // FMA
+  {
+    {0x00000001U, &registers_t::edx, 19, "clflush"}
+  , {0x00000001U, &registers_t::edx,  8, "cx8"    }
+  , {0x00000001U, &registers_t::ecx, 13, "cx16"   }
+  , {0x00000001U, &registers_t::edx, 15, "cmov"   }
+  , {0x00000001U, &registers_t::edx,  5, "msr"    }
+  , {0x00000001U, &registers_t::edx,  4, "rdtsc"  }
+  , {0x80000001U, &registers_t::edx, 27, "rdtscp" }
+  , {0x00000001U, &registers_t::edx, 23, "mmx"    }
+  , {0x00000001U, &registers_t::edx, 25, "sse"    }
+  , {0x00000001U, &registers_t::edx, 26, "sse2"   }
+  , {0x00000001U, &registers_t::ecx,  0, "sse3"   }
+  , {0x00000001U, &registers_t::ecx,  9, "ssse3"  }
+  , {0x00000001U, &registers_t::ecx, 19, "sse4.1" }
+  , {0x00000001U, &registers_t::ecx, 20, "sse4.2" }
+  , {0x00000001U, &registers_t::ecx, 28, "avx"    }
+  , {0x80000001U, &registers_t::edx, 11, "xop"    }
+  , {0x80000001U, &registers_t::edx, 16, "fma4"   }
 };
+const size_t noptions = sizeof options / sizeof options[0];
 
 int main(int argc, char** argv)
 {
-  int registers[4];
-  if(argc < 2) return -1;
+  registers_t registers;
+  if (argc < 2) return -1;
 
-  std::string target(argv[1]);
+  string target(argv[1]);
   __cpuid(registers,0x00000000);
 
   matcher m;
+  size_t i = 0;
+  for (i=0; i<noptions; ++i) {
+    if (target == options[i].target) {
+      m = options[i];
+      break;
+    }
+  }
+  if (i >= noptions) return -2;
 
-       if(target == "clflush") m = options[0];
-  else if(target == "cx8"    ) m = options[1];
-  else if(target == "cx16"   ) m = options[2];
-  else if(target == "cmov"   ) m = options[3];
-  else if(target == "msr"    ) m = options[4];
-  else if(target == "rdtsc"  ) m = options[5];
-  else if(target == "rdtscp" ) m = options[6];
-  else if(target == "mmx"    ) m = options[7];
-  else if(target == "sse"    ) m = options[8];
-  else if(target == "sse2"   ) m = options[9];
-  else if(target == "sse3"   ) m = options[10];
-  else if(target == "ssse3"  ) m = options[11];
-  else if(target == "sse4.1" ) m = options[12];
-  else if(target == "sse4.2" ) m = options[13];
-  else if(target == "avx"    ) m = options[14];
-  else if(target == "xop"    ) m = options[15];
-  else if(target == "fma4"   ) m = options[16];
-
-  __cpuid(registers,m.function);
+  __cpuid(registers, m.function);
 
   // exit with 0 if the bit is set
-  return !has_bit_set(registers[m.reg],m.bit);
+  return !has_bit_set(registers.*m.reg, m.bit);
 }
-
