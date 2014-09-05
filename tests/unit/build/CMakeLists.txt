@@ -3,8 +3,12 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# Try building an external cmake based project ...
+# If build of build tests is disabled, exit now
+if(NOT HPX_BUILD_TESTS_BUILD)
+  return()
+endif()
 
+# Try building an external cmake based project ...
 macro(create_cmake_test name hpx_dir)
   set(build_dir "${CMAKE_CURRENT_BINARY_DIR}/${name}")
   add_custom_target(${name}.remove_build_dir
