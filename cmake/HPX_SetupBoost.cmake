@@ -53,9 +53,9 @@ endif()
 
 hpx_option(
   HPX_GENERIC_COROUTINE_CONTEXT
+  BOOL
   "Use Boost.Context as the underlying coroutines context switch implementation."
-  ${use_generic_coroutine_context}
-)
+  ${use_generic_coroutine_context} ADVANCED)
 
 set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
 
