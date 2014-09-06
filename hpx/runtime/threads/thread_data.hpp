@@ -637,7 +637,7 @@ namespace hpx { namespace threads
 #endif
 
 #ifdef HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
-# ifndef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+# ifdef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
         char const* backtrace_;
 # else
         util::backtrace const* backtrace_;
