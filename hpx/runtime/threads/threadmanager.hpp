@@ -232,11 +232,11 @@ namespace hpx { namespace threads
         ///                   parameter. If the thread is not known to the
         ///                   thread-manager the return value will be the zero.
 #ifdef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
-        virtual char const* get_backtrace(thread_id_type const& id) const = 0;
-        virtual char const* set_backtrace(thread_id_type const& id, char const* bt = 0) = 0;
-#else
         virtual util::backtrace const* get_backtrace(thread_id_type const& id) const = 0;
         virtual util::backtrace const* set_backtrace(thread_id_type const& id, util::backtrace const* bt = 0) = 0;
+#else
+        virtual char const* get_backtrace(thread_id_type const& id) const = 0;
+        virtual char const* set_backtrace(thread_id_type const& id, char const* bt = 0) = 0;
 #endif
 
         /// The function \a register_work adds a new work item to the thread

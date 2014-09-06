@@ -421,11 +421,11 @@ namespace hpx { namespace threads
         ///                   parameter. If the thread is not known to the
         ///                   thread-manager the return value will be the zero.
 #ifdef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
-        char const* get_backtrace(thread_id_type const& id) const;
-        char const* set_backtrace(thread_id_type const& id, char const* bt = 0);
-#else
         util::backtrace const* get_backtrace(thread_id_type const& id) const;
         util::backtrace const* set_backtrace(thread_id_type const& id, util::backtrace const* bt = 0);
+#else
+        char const* get_backtrace(thread_id_type const& id) const;
+        char const* set_backtrace(thread_id_type const& id, char const* bt = 0);
 #endif
 
 #ifdef HPX_THREAD_MAINTAIN_LOCAL_STORAGE

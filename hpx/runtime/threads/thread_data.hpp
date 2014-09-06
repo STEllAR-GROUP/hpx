@@ -490,20 +490,6 @@ namespace hpx { namespace threads
 #else  // defined(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
 
 # ifdef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
-        char const* get_backtrace() const
-        {
-            mutex_type::scoped_lock l(this);
-            return backtrace_;
-        }
-        char const* set_backtrace(char const* value)
-        {
-            mutex_type::scoped_lock l(this);
-
-            char const* bt = backtrace_;
-            backtrace_ = value;
-            return bt;
-        }
-# else
         util::backtrace const* get_backtrace() const
         {
             mutex_type::scoped_lock l(this);
@@ -517,6 +503,20 @@ namespace hpx { namespace threads
             backtrace_ = value;
             return bt;
         }
+# else
+        char const* get_backtrace() const
+        {
+            mutex_type::scoped_lock l(this);
+            return backtrace_;
+        }
+        char const* set_backtrace(char const* value)
+        {
+            mutex_type::scoped_lock l(this);
+
+            char const* bt = backtrace_;
+            backtrace_ = value;
+            return bt;
+        }
 # endif
 
         // Generate full backtrace for captured stack
@@ -527,10 +527,10 @@ namespace hpx { namespace threads
             if (0 != backtrace_)
             {
 # ifdef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
-                bt = *backtrace_;
-#else
                 bt = backtrace_->trace();
-#endif
+# else
+                bt = *backtrace_;
+# endif
             }
             return bt;
         }
@@ -637,10 +637,10 @@ namespace hpx { namespace threads
 #endif
 
 #ifdef HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
-# ifndef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
-        char const* backtrace_;
-# else
+# ifdef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
         util::backtrace const* backtrace_;
+# else
+        char const* backtrace_;
 # endif
 #endif
 

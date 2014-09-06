@@ -373,9 +373,9 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
 #ifdef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
-    char const* get_thread_backtrace(thread_id_type const& id, error_code& ec)
-#else
     util::backtrace const* get_thread_backtrace(thread_id_type const& id, error_code& ec)
+#else
+    char const* get_thread_backtrace(thread_id_type const& id, error_code& ec)
 #endif
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
@@ -394,11 +394,11 @@ namespace hpx { namespace threads
     }
 
 #ifdef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
-    char const* set_thread_backtrace(thread_id_type const& id,
-        char const* bt, error_code& ec)
-#else
     util::backtrace const* set_thread_backtrace(thread_id_type const& id,
         util::backtrace const* bt, error_code& ec)
+#else
+    char const* set_thread_backtrace(thread_id_type const& id,
+        char const* bt, error_code& ec)
 #endif
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
