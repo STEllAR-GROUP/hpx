@@ -759,8 +759,8 @@ if(MSVC)
     CONFIGURATIONS Debug LANGUAGES CXX C)
 
   # VS2012 and above has a special flag for improving the debug experience by
-  # adding more symbol information to the build
-  hpx_add_compile_flag(-ZI
+  # adding more symbol information to the build (-d2Zi)
+  hpx_add_compile_flag(-d2Zi+
     CONFIGURATIONS RelWithDebInfo)
 
   # VS2013 and above know how to do link time constant data segment folding
