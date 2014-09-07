@@ -75,7 +75,7 @@
 [def __boost_atomic__           [@http://www.boost.org/doc/libs/release/doc/html/atomic.html Boost.Atomic]]
 [def __boost_serialization__    [@http://www.boost.org/doc/libs/release/libs/serialization/doc/index.html Boost.Serialization]]
 
-[def __hwloc_downloads__        [@http://www.open-mpi.org/software/hwloc/v1.7/ hwloc Downloads]]
+[def __hwloc_downloads__        [@http://www.open-mpi.org/software/hwloc/v1.7/ hwloc]]
 [def __doxygen__                [@http://www.doxygen.org Doxygen]]
 
 [def __macports__               [@http://www.macports.org/ MacPorts]]
@@ -121,8 +121,9 @@
 [def __cpp11_n3632__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3632.html N3632]]
 [def __cpp11_n3634__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3857.pdf N3857]]
 [def __cpp11_n3562__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3562.pdf N3562]]
-[def __cpp11_n4071__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4071.htm N4071]]
-[def __cpp11_n4088__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4088.pdf N4088ppl]]
+[def __cpp11_n4088__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4088.pdf N4088]]
+[def __cpp11_n4104__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4104.html N4104]]
+[def __cpp11_n4107__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4107.html N4107]]
 
 
 [def __ini_file_format__        [@http://en.wikipedia.org/wiki/INI_file Windows INI file format]]

@@ -13,8 +13,8 @@ implements (and extends) some of those proposals. This is well aligned with
 our strategy to align the APIs exposed from __hpx__ with current and future
 C++ Standards.
 
-At this point, __hpx__ implements two of the C++ Standardization working papers,
-namely __cpp11_n4071__ (Working Draft, Technical Specification for C++
+At this point, __hpx__ implements several of the C++ Standardization working papers,
+most notably __cpp11_n4104__ (Working Draft, Technical Specification for C++
 Extensions for Parallelism) and __cpp11_n4088__ (Task Regions).
 
 

@@ -19,6 +19,25 @@
   type `hpx::unique_future` we support the configuration variable
   `HPX_UNIQUE_FUTURE_ALIAS`. If this variable is set to `ON` while running
   cmake it will additionally define a template alias for this type.
+* We rewrote and significantly changed our build system. Please have a look at
+  the new (now generated) documentation here:
+  [link hpx.manual.build_system __hpx__ build system]. Please revisit your
+  build scripts to adapt to the changes. The most notable changes are:
+   * `HPX_NO_INSTALL` is no longer necessary.
+   * For external builds, you need to set `HPX_DIR` instead of `HPX_ROOT` as
+      described here: [link hpx.manual.build_system.using_hpx.using_hpx_cmake Using CMake].
+   * IDEs that support multiple configurations (Visual Studio and XCode) can
+     now be used as intended. that means no build dir.
+   * Building HPX statically (without dynamic libraries) is now supported
+     (`-DHPX_STATIC_LINKING=On`)
+   * Please note that many variables used to configure the build process have
+     been renamed to unify the naming conventions.
+   * This also fixes a long list of issues, for more information see [issue 1204].
+* We started to implement various proposals to the C++ Standardization committee
+  related to parallelism and concurrency, most notably __cpp11_n4104__ (Working
+  Draft, Technical Specification for C++ Extensions for Parallelism),
+  __cpp11_n4088__ (Task Region Rev. 3), and __cpp11_n4107__ (Working Draft,
+  Technical Specification for C++ Extensions for Concurrency).
 
 [heading Bug Fixes (Closed Tickets)]
 
