@@ -141,7 +141,7 @@ hpx_option(HPX_WAVE_ADDITIONAL_INCLUDE_DIRS STRING "Additional (compiler specifi
 # to how components are loaded.
 ################################################################################
 hpx_option(HPX_STATIC_LINKING BOOL
-  "Compile HPX staticly linked libraries (Default: OFF)" OFF ADVANCED)
+  "Compile HPX statically linked libraries (Default: OFF)" OFF ADVANCED)
 if(HPX_STATIC_LINKING)
   hpx_add_config_define(HPX_STATIC_LINKING)
   set(hpx_library_link_mode STATIC)
@@ -157,6 +157,7 @@ hpx_option(HPX_BUILD_TESTS BOOL "Build the HPX tests (default ON)" ON CATEGORY "
 hpx_option(HPX_BUILD_TESTS_BENCHMARKS BOOL "Build HPX benchmark tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_BUILD_TESTS_REGRESSIONS BOOL "Build HPX regression tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_BUILD_TESTS_UNIT BOOL "Build HPX unit tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
+hpx_option(HPX_BUILD_TESTS_EXTERNAL_BUILD BOOL "Build external cmake build tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_BUILD_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_BUILD_RUNTIME BOOL "Build HPX runtime (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 

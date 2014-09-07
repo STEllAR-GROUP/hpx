@@ -3,8 +3,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# If build of build tests is disabled, exit now
-if(NOT HPX_BUILD_TESTS_BUILD)
+# If build of external build tests is disabled, exit now
+if(NOT HPX_BUILD_TESTS_EXTERNAL_BUILD)
   return()
 endif()
 
