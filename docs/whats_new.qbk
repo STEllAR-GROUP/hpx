@@ -12,6 +12,12 @@
 
 [heading General Changes]
 
+We have had over 1300 commits since the last release and we have closed
+over 140 tickets (bugs, feature requests, etc.). These are by far the largest
+numbers of commits and resolved issues for any of the __hpx__ releases so far.
+We are especially happy about the large number of people who contributed for
+the first time to __hpx__.
+
 * We completed the transition from the older (non-conforming) implementation
   of `hpx::future` to the new and fully conforming version by removing the
   old code and by renaming the type `hpx::unique_future` to `hpx::future`. In
@@ -25,11 +31,12 @@
   build scripts to adapt to the changes. The most notable changes are:
    * `HPX_NO_INSTALL` is no longer necessary.
    * For external builds, you need to set `HPX_DIR` instead of `HPX_ROOT` as
-      described here: [link hpx.manual.build_system.using_hpx.using_hpx_cmake Using CMake].
+     described here:
+     [link hpx.manual.build_system.using_hpx.using_hpx_cmake Using CMake].
    * IDEs that support multiple configurations (Visual Studio and XCode) can
      now be used as intended. that means no build dir.
    * Building HPX statically (without dynamic libraries) is now supported
-     (`-DHPX_STATIC_LINKING=On`)
+     (`-DHPX_STATIC_LINKING=On`).
    * Please note that many variables used to configure the build process have
      been renamed to unify the naming conventions.
    * This also fixes a long list of issues, for more information see [issue 1204].
@@ -98,8 +105,8 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1181] - Adding `all_of`, `any_of`, and `none_of` and corresponding
                  documentation
 * [issue 1180] - `hpx::cout` defect
-* [issue 1179] - `hpx::async` does not work for member function pointers when called
-                 on types with self-defined unary `operator*`
+* [issue 1179] - `hpx::async` does not work for member function pointers when
+                 called on types with self-defined unary `operator*`
 * [issue 1178] - Implemented variadic `hpx::util::zip_iterator`
 * [issue 1177] - MPI parcelport defect
 * [issue 1176] - `HPX_DEFINE_COMPONENT_CONST_ACTION_TPL` does not have a
