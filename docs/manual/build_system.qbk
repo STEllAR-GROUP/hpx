@@ -23,11 +23,11 @@ and how to use HPX in your own projects.
 [include build_system/cmake_variables.qbk]
 
 [/
-[section:cmake_modules Costum CMake Modules shipped with HPX]
+[section:cmake_modules Custom CMake Modules shipped with HPX]
 
 TODO...
 
-[endsect] [/ Costum CMake Modules shipped with HPX]
+[endsect] [/ Custom CMake Modules shipped with HPX]
 
 [include build_system/cmake_toolchains.qbk]
 

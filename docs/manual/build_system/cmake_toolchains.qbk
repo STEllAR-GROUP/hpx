@@ -5,6 +5,9 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ===============================================================================/]
 
+[/ This file has been automatically generated using the CMake tool.            /]
+[/ Do not edit manually.                                                       /]
+
 [section:cmake_toolchains CMake Toolchains shipped with HPX]
 
 In order to compile HPX for various platforms, we provide a variety of Toolchain files that

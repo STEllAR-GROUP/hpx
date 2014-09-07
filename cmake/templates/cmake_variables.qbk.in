@@ -5,6 +5,9 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ===============================================================================/]
 
+[/ This file has been automatically generated using the CMake tool.            /]
+[/ Do not edit manually.                                                       /]
+
 [section:cmake_variables CMake Variables used to configure __hpx__]
 
 In order to configure HPX, you can set a variety of options to allow cmake to generate
