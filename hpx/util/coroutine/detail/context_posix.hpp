@@ -210,7 +210,7 @@ namespace hpx { namespace util { namespace coroutines {
          */
         template<typename Functor>
         explicit ucontext_context_impl(Functor& cb, std::ptrdiff_t stack_size)
-          : m_stack_size(stack_size == -1? default_stack_size: stack_size),
+          : m_stack_size(stack_size == -1 ? (std::ptrdiff_t)default_stack_size : stack_size),
             m_stack(alloc_stack(m_stack_size))
         {
             HPX_ASSERT(m_stack);
