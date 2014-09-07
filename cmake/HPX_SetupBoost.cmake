@@ -52,7 +52,7 @@ if(Boost_VERSION GREATER 105000)
 endif()
 
 hpx_option(
-  HPX_GENERIC_COROUTINE_CONTEXT
+  HPX_WITH_GENERIC_CONTEXT_COROUTINES
   BOOL
   "Use Boost.Context as the underlying coroutines context switch implementation."
   ${use_generic_coroutine_context} ADVANCED)

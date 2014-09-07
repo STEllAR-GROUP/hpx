@@ -4,7 +4,7 @@
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2011 Vinay C Amatya
 # Copyright (c)      2013 Jeroen Habraken
-# Copyright (c)      2014 Andreas Schäfer
+# Copyright (c)      2014 Andreas Sch��fer
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -803,7 +803,7 @@ if(MSVC)
 
   hpx_add_config_define(BOOST_USE_WINDOWS_H)
   hpx_add_config_define(BOOST_SERIALIZATION_DYN_LINK)
-  if(NOT HPX_GENERIC_COROUTINE_CONTEXT)
+  if(NOT HPX_WITH_GENERIC_CONTEXT_COROUTINES)
     hpx_add_config_define(HPX_HAVE_FIBER_BASED_COROUTINES)
   endif()
   hpx_add_config_define(PSAPI_VERSION 1)
@@ -1019,7 +1019,7 @@ hpx_check_for_cxx11_std_initializer_list(
 # with incompatible options with the currently selected platform.
 #
 
-if(HPX_GENERIC_COROUTINE_CONTEXT)
+if(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
   # Check if we can use generic coroutine contexts without any problems
   if(NOT Boost_CONTEXT_FOUND)
     hpx_error("The usage of Boost.Context was selected but Boost.Context was not found (Version 1.51 or higher is required).")

@@ -38,7 +38,7 @@ set(CMAKE_CROSSCOMPILING OFF)
 # Set our platform name
 set(HPX_PLATFORM "native")
 
-set(HPX_GENERIC_COROUTINE_CONTEXT OFF CACHE BOOL "diable generic coroutines")
+set(HPX_WITH_GENERIC_CONTEXT_COROUTINES OFF CACHE BOOL "diable generic coroutines")
 
 # Always disable the ibverbs parcelport as it is nonfunctional on the BGQ.
 set(HPX_PARCELPORT_IBVERBS OFF CACHE BOOL "")
