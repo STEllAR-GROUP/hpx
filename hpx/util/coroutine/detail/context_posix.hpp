@@ -247,7 +247,6 @@ namespace hpx { namespace util { namespace coroutines {
         }
         void rebind_stack()
         {
-//          std::cout << "Entering rebind stack on posix version " << std::endl;
             if (m_stack)
                 increment_stack_recycle_count();
         }
