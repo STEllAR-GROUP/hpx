@@ -100,8 +100,8 @@ The options are split into these categories:
 ] [/ Build Targets Options]
 
 [#build_system.cmake_variables.Thread_Manager][h3 Thread Manager Options]
+* [link build_system.cmake_variables.HPX_HAVE_SWAP_CONTEXT_EMULATION HPX_HAVE_SWAP_CONTEXT_EMULATION]
 * [link build_system.cmake_variables.HPX_MAX_CPU_COUNT HPX_MAX_CPU_COUNT]
-* [link build_system.cmake_variables.HPX_SWAP_CONTEXT_EMULATION HPX_SWAP_CONTEXT_EMULATION]
 * [link build_system.cmake_variables.HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH]
 * [link build_system.cmake_variables.HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION]
 * [link build_system.cmake_variables.HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES]
@@ -118,8 +118,8 @@ The options are split into these categories:
 * [link build_system.cmake_variables.HPX_WITH_STACKTRACES HPX_WITH_STACKTRACES]
 
 [variablelist
+        [[[#build_system.cmake_variables.HPX_HAVE_SWAP_CONTEXT_EMULATION] `HPX_HAVE_SWAP_CONTEXT_EMULATION:BOOL`][Emulate SwapContext API for coroutines (default: OFF)]]
         [[[#build_system.cmake_variables.HPX_MAX_CPU_COUNT] `HPX_MAX_CPU_COUNT:STRING`][HPX applications will not use more that this number of OS-Threads (default: 64)]]
-        [[[#build_system.cmake_variables.HPX_SWAP_CONTEXT_EMULATION] `HPX_SWAP_CONTEXT_EMULATION:BOOL`][Emulate SwapContext API for coroutines (default: OFF)]]
         [[[#build_system.cmake_variables.HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH] `HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH:STRING`][Thread stack back trace depth being captured on suspension (default: 5)]]
         [[[#build_system.cmake_variables.HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION] `HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION:BOOL`][Enable thread stack back trace being captured on suspension (default: OFF)]]
         [[[#build_system.cmake_variables.HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES] `HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES:BOOL`][Enable measuring thread creation and cleanup times (default: OFF)]]
