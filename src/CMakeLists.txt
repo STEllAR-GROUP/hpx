@@ -273,6 +273,19 @@ set_property(TARGET hpx APPEND
   "HPX_LIMIT=5"
   "HPX_ENABLE_ASSERT_HANDLER"
   "HPX_COROUTINE_EXPORTS") # Do we still need this?
+
+
+################################################################################
+# Emulation of SwapContext on Windows
+################################################################################
+if(MSVC)
+  if(HPX_HAVE_SWAP_CONTEXT_EMULATION)
+    set_property(TARGET hpx APPEND
+      PROPERTY LINK_FLAGS
+      "/EXPORT:switch_to_fiber")
+  endif()
+endif()
+
 set(hpx_targets ${hpx_targets} hpx)
 
 ################################################################################
