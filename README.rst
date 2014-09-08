@@ -20,7 +20,7 @@ onto new computer system architectures. We want to use real world applications
 to drive the development of the runtime system, coining out required
 functionalities and converging onto a stable API which will provide a
 smooth migration path for developers. The API exposed by HPX is modelled
-after the interfaces defined by the C++11 ISO standard and adheres to the
+after the interfaces defined by the C++11/14 ISO standard and adheres to the
 programming guidelines used by the Boost collection of C++ libraries.
 
 ****************************
@@ -344,7 +344,8 @@ LSU HPC, LONI, XSEDE, and the Gauss Center for Supercomputing.
 HPX is currently funded by:
 
 The National Science Foundation through awards 1117470 (APX) 
-and 1240655 (STAR). Any opinions, findings, and conclusions or 
+1240655 (STAR), 1447831 (PXFS), 1339782 (STORM). 
+Any opinions, findings, and conclusions or 
 recommendations expressed in this material are those of the author(s) 
 and do not necessarily reflect the views of the National Science Foundation.
 
