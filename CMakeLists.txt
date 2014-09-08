@@ -321,8 +321,8 @@ if(HPX_THREAD_MAINTAIN_STEALING_COUNTS)
 endif()
 
 hpx_option(HPX_THREAD_MAINTAIN_LOCAL_STORAGE BOOL
-  "Enable thread local storage for all HPX threads (default: ON)"
-  ON CATEGORY "Thread Manager" ADVANCED)
+  "Enable thread local storage for all HPX threads (default: OFF)"
+  OFF CATEGORY "Thread Manager" ADVANCED)
 
 if(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
