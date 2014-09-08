@@ -343,8 +343,8 @@ LSU HPC, LONI, XSEDE, and the Gauss Center for Supercomputing.
 
 HPX is currently funded by:
 
-The National Science Foundation through awards 1117470 (APX) 
-1240655 (STAR), 1447831 (PXFS), 1339782 (STORM). 
+The National Science Foundation through awards 1117470 (APX), 
+1240655 (STAR), 1447831 (PXFS), and 1339782 (STORM). 
 Any opinions, findings, and conclusions or 
 recommendations expressed in this material are those of the author(s) 
 and do not necessarily reflect the views of the National Science Foundation.
