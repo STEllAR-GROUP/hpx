@@ -328,7 +328,7 @@ if(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
 endif()
 
-hpx_option(HPX_SWAP_CONTEXT_EMULATION BOOL "Emulate SwapContext API for coroutines (default: OFF)"
+hpx_option(HPX_HAVE_SWAP_CONTEXT_EMULATION BOOL "Emulate SwapContext API for coroutines (default: OFF)"
   OFF CATEGORY "Thread Manager" ADVANCED)
 
 ################################################################################
@@ -1036,9 +1036,9 @@ endif()
 # Emulation of SwapContext on Windows
 ################################################################################
 if(MSVC)
-  if(HPX_SWAP_CONTEXT_EMULATION)
+  if(HPX_HAVE_SWAP_CONTEXT_EMULATION)
     if(NOT CMAKE_ASM_MASM_COMPILER)
-      hpx_error("SwitchToFiber emulation can not be enabled. The masm compiler could not be found. Try setting the ASM_MASM environment variable to the assembler executable (ml.exe/ml64.exe) or disable the emulation by setting HPX_SWAP_CONTEXT_EMULATION to Off")
+      hpx_error("SwitchToFiber emulation can not be enabled. The masm compiler could not be found. Try setting the ASM_MASM environment variable to the assembler executable (ml.exe/ml64.exe) or disable the emulation by setting HPX_HAVE_SWAP_CONTEXT_EMULATION to Off")
     else()
       hpx_info("SwitchToFiber emulation is enabled, using compiler: '${CMAKE_ASM_MASM_COMPILER}'")
       hpx_add_link_flag(/EXPORT:switch_to_fiber)
