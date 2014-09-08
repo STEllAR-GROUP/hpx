@@ -190,11 +190,7 @@ macro(hpx_xslfo_to_pdf name)
   set(multi_value_args DEPENDENCIES FOP_ARGS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
-  if(WIN32)
-    set(DOCS_OUTPUT_DIR "/${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/share/hpx-${HPX_VERSION}/docs/")
-  else()
-    set(DOCS_OUTPUT_DIR "/${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/")
-  endif()
+  set(DOCS_OUTPUT_DIR "/${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/")
 
   add_custom_command(OUTPUT "${name}.pdf"
     COMMAND "${FOP_EXECUTABLE}" ${${name}_FOP_ARGS}
@@ -217,11 +213,7 @@ macro(hpx_docbook_to_html name)
     set(BOOST_ROOT_FOR_DOCS "${BOOST_ROOT}")
   endif()
 
-  if(WIN32)
-    set(DOCS_OUTPUT_DIR "file:///${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/share/hpx-${HPX_VERSION}/docs/html")
-  else()
-    set(DOCS_OUTPUT_DIR "file:///${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/html")
-  endif()
+  set(DOCS_OUTPUT_DIR "file:///${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/html")
 
   if(${${name}_SINGLEPAGE})
     set(main_xsl_script "html-single.xsl")
