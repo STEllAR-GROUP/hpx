@@ -42,7 +42,7 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     thread_id_type set_thread_state(thread_id_type const& id,
-        boost::posix_time::ptime const& at_time, thread_state_enum state,
+        util::steady_time_point const& abs_time, thread_state_enum state,
         thread_state_ex_enum stateex, thread_priority priority, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
@@ -57,29 +57,8 @@ namespace hpx { namespace threads
         if (&ec != &throws)
             ec = make_success_code();
 
-        return app->get_thread_manager().set_state(at_time, id, state,
-            stateex, priority, ec);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    thread_id_type set_thread_state(thread_id_type const& id,
-        boost::posix_time::time_duration const& after, thread_state_enum state,
-        thread_state_ex_enum stateex, thread_priority priority, error_code& ec)
-    {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
-                "hpx::threads::set_thread_state",
-                "global applier object is not accessible");
-            return invalid_thread_id;
-        }
-
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return app->get_thread_manager().set_state(after, id, state,
-            stateex, priority, ec);
+        return app->get_thread_manager().set_state(abs_time.value(), id,
+            state, stateex, priority, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -542,7 +521,8 @@ namespace hpx { namespace this_thread
         return statex;
     }
 
-    threads::thread_state_ex_enum suspend(boost::posix_time::ptime const& at_time,
+    threads::thread_state_ex_enum suspend(
+        util::steady_time_point const& abs_time,
         char const* description, error_code& ec)
     {
         // schedule a thread waking us up at_time
@@ -568,7 +548,7 @@ namespace hpx { namespace this_thread
             detail::reset_backtrace bt(id, ec);
 #endif
             threads::set_thread_state(id,
-                at_time, threads::pending, threads::wait_signaled,
+                abs_time.value(), threads::pending, threads::wait_signaled,
                 threads::thread_priority_boost, ec);
             if (ec) return threads::wait_unknown;
 
@@ -578,61 +558,6 @@ namespace hpx { namespace this_thread
 
         // handle interruption, if needed
         threads::interruption_point(id, ec);
-        if (ec) return threads::wait_unknown;
-
-        // handle interrupt and abort
-        if (statex == threads::wait_abort) {
-            hpx::util::osstream strm;
-            strm << "thread(" << threads::get_self_id() << ", "
-                  << threads::get_thread_description(id)
-                  << ") aborted (yield returned wait_abort)";
-            HPX_THROWS_IF(ec, yield_aborted, description,
-                hpx::util::osstream_get_string(strm));
-        }
-
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return statex;
-    }
-
-    threads::thread_state_ex_enum suspend(
-        boost::posix_time::time_duration const& after_duration,
-        char const* description, error_code& ec)
-    {
-        // schedule a thread waking us up after_duration
-        threads::thread_self& self = threads::get_self();
-        threads::thread_id_type id = threads::get_self_id();
-
-        // handle interruption, if needed
-        threads::interruption_point(id, ec);
-        if (ec) return threads::wait_unknown;
-
-        // let the thread manager do other things while waiting
-        threads::thread_state_ex_enum statex = threads::wait_unknown;
-
-        {
-#ifdef HPX_HAVE_VERIFY_LOCKS
-            // verify that there are no more registered locks for this OS-thread
-            util::verify_no_locks();
-#endif
-#ifdef HPX_THREAD_MAINTAIN_DESCRIPTION
-            detail::reset_lco_description desc(id, description, ec);
-#endif
-#ifdef HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
-            detail::reset_backtrace bt(id, ec);
-#endif
-            threads::set_thread_state(id,
-                after_duration, threads::pending, threads::wait_signaled,
-                threads::thread_priority_boost, ec);
-            if (ec) return threads::wait_unknown;
-
-            // suspend the HPX-thread
-            statex = self.yield(threads::suspended);
-        }
-
-        // handle interruption, if needed
-        threads::interruption_point(id);
         if (ec) return threads::wait_unknown;
 
         // handle interrupt and abort

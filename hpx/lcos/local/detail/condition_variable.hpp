@@ -13,7 +13,6 @@
 #include <hpx/util/scoped_unlock.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
-#include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/intrusive/slist.hpp>
 #include <boost/noncopyable.hpp>
 
@@ -226,7 +225,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
         template <typename Lock>
         threads::thread_state_ex_enum
-        wait_for(Lock& lock, boost::posix_time::time_duration const& rel_time,
+        wait_until(Lock& lock, util::steady_time_point const& abs_time,
             char const* description, error_code& ec = throws)
         {
             HPX_ASSERT(threads::get_self_ptr() != 0);
@@ -241,7 +240,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             {
                 // yield this thread
                 util::scoped_unlock<Lock> unlock(lock);
-                reason = this_thread::suspend(rel_time, description, ec);
+                reason = this_thread::suspend(abs_time.value(), description, ec);
                 if (ec) return threads::wait_unknown;
             }
 
@@ -251,45 +250,28 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
         template <typename Lock>
         threads::thread_state_ex_enum
-        wait_for(Lock& lock, boost::posix_time::time_duration const& rel_time,
-            error_code& ec = throws)
-        {
-            return wait_for(lock, rel_time,
-                "condition_variable::wait_for", ec);
-        }
-
-        template <typename Lock>
-        threads::thread_state_ex_enum
-        wait_until(Lock& lock, boost::posix_time::ptime const& abs_time,
-            char const* description, error_code& ec = throws)
-        {
-            HPX_ASSERT(threads::get_self_ptr() != 0);
-            HPX_ASSERT_OWNS_LOCK(lock);
-
-            // enqueue the request and block this thread
-            queue_entry f(threads::get_self_id().get());
-            queue_.push_back(f);
-
-            reset_queue_entry r(f, queue_);
-            threads::thread_state_ex_enum reason = threads::wait_unknown;
-            {
-                // yield this thread
-                util::scoped_unlock<Lock> unlock(lock);
-                reason = this_thread::suspend(abs_time, description, ec);
-                if (ec) return threads::wait_unknown;
-            }
-
-            return (f.id_ == threads::invalid_thread_id_repr) ?
-                threads::wait_timeout : reason;
-        }
-
-        template <typename Lock>
-        threads::thread_state_ex_enum
-        wait_until(Lock& lock, boost::posix_time::ptime const& abs_time,
+        wait_until(Lock& lock, util::steady_time_point const& abs_time,
             error_code& ec = throws)
         {
             return wait_until(lock, abs_time,
                 "condition_variable::wait_until", ec);
+        }
+
+        template <typename Lock>
+        threads::thread_state_ex_enum
+        wait_for(Lock& lock, util::steady_duration const& rel_time,
+            char const* description, error_code& ec = throws)
+        {
+            return wait_until(lock, rel_time.from_now(), description, ec);
+        }
+
+        template <typename Lock>
+        threads::thread_state_ex_enum
+        wait_for(Lock& lock, util::steady_duration const& rel_time,
+            error_code& ec = throws)
+        {
+            return wait_until(lock, rel_time.from_now(),
+                "condition_variable::wait_for", ec);
         }
 
     private:

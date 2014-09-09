@@ -9,8 +9,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
-#include <boost/date_time/posix_time/posix_time.hpp>
-
 #include <string>
 #include <vector>
 

@@ -212,7 +212,7 @@ namespace hpx { namespace util
 
         // schedule this thread to be run after the given amount of seconds
         threads::set_thread_state(id,
-            boost::posix_time::microseconds(microsecs_),
+            boost::chrono::microseconds(microsecs_),
             threads::pending, threads::wait_signaled,
             threads::thread_priority_boost, ec);
 

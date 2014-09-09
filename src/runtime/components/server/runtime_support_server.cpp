@@ -627,7 +627,7 @@ namespace hpx { namespace components { namespace server
 
         while (tm.get_thread_count() > 1)
         {
-            this_thread::sleep_for(boost::posix_time::millisec(100));
+            this_thread::sleep_for(boost::chrono::milliseconds(100));
             this_thread::yield();
         }
 
@@ -694,7 +694,7 @@ namespace hpx { namespace components { namespace server
 
         while (tm.get_thread_count() > 1)
         {
-            this_thread::sleep_for(boost::posix_time::millisec(100));
+            this_thread::sleep_for(boost::chrono::milliseconds(100));
             this_thread::yield();
         }
 

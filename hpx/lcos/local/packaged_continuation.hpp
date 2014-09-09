@@ -352,7 +352,7 @@ namespace hpx { namespace lcos { namespace detail
             else
                 cb = &continuation::async;
 
-            if (future.wait_for(boost::posix_time::seconds(0)) == future_status::deferred)
+            if (future.wait_for(boost::chrono::seconds(0)) == future_status::deferred)
                 future.wait();
 
             shared_state_ptr const& state =
@@ -372,7 +372,7 @@ namespace hpx { namespace lcos { namespace detail
             void (continuation::*cb)(shared_state_ptr const&, threads::executor&) =
                 &continuation::async;
 
-            if (future.wait_for(boost::posix_time::seconds(0)) == future_status::deferred)
+            if (future.wait_for(boost::chrono::seconds(0)) == future_status::deferred)
                 future.wait();
 
             shared_state_ptr const& state =
@@ -497,7 +497,7 @@ namespace hpx { namespace lcos { namespace detail
                 outer_shared_state_ptr const&) =
                     &unwrap_continuation::on_outer_ready<Future>;
 
-            if (future.wait_for(boost::posix_time::seconds(0)) == future_status::deferred)
+            if (future.wait_for(boost::chrono::seconds(0)) == future_status::deferred)
                 future.wait();
 
             outer_shared_state_ptr const& outer_state =
@@ -555,7 +555,7 @@ namespace hpx { namespace lcos { namespace detail
             void (void_continuation::*ready)(shared_state_ptr const&) =
                 &void_continuation::on_ready<Future>;
 
-            if (future.wait_for(boost::posix_time::seconds(0)) == future_status::deferred)
+            if (future.wait_for(boost::chrono::seconds(0)) == future_status::deferred)
                 future.wait();
 
             shared_state_ptr const& state =

@@ -44,14 +44,16 @@ namespace hpx { namespace threads { namespace executors
             // Schedule given function for execution in this executor no sooner
             // than time abs_time. This call never blocks, and may violate
             // bounds on the executor's queue size.
-            void add_at(boost::posix_time::ptime const& abs_time,
+            void add_at(
+                boost::chrono::steady_clock::time_point const& abs_time,
                 closure_type && f, char const* description,
                 threads::thread_stacksize stacksize, error_code& ec);
 
             // Schedule given function for execution in this executor no sooner
             // than time rel_time from now. This call never blocks, and may
             // violate bounds on the executor's queue size.
-            void add_after(boost::posix_time::time_duration const& rel_time,
+            void add_after(
+                boost::chrono::steady_clock::duration const& rel_time,
                 closure_type && f, char const* description,
                 threads::thread_stacksize stacksize, error_code& ec);
 

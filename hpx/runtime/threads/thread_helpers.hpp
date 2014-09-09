@@ -9,14 +9,13 @@
 #define HPX_THREAD_HELPERS_NOV_15_2008_0504PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/backtrace.hpp>
+#include <hpx/util/date_time_chrono.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 
-#include <boost/date_time/posix_time/posix_time_duration.hpp>
-#include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/exception_ptr.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -90,7 +89,7 @@ namespace hpx { namespace threads
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     HPX_API_EXPORT thread_id_type set_thread_state(thread_id_type const& id,
-        boost::posix_time::ptime const& at_time,
+        util::steady_time_point const& abs_time,
         thread_state_enum state = pending,
         thread_state_ex_enum stateex = wait_timeout,
         thread_priority priority = thread_priority_normal,
@@ -134,12 +133,16 @@ namespace hpx { namespace threads
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    HPX_API_EXPORT thread_id_type set_thread_state(thread_id_type const& id,
-        boost::posix_time::time_duration const& after_duration,
+    inline thread_id_type set_thread_state(thread_id_type const& id,
+        util::steady_duration const& rel_time,
         thread_state_enum state = pending,
         thread_state_ex_enum stateex = wait_timeout,
         thread_priority priority = thread_priority_normal,
-        error_code& ec = throws);
+        error_code& ec = throws)
+    {
+        return set_thread_state(id, rel_time.from_now(), state, stateex,
+            priority, ec);
+    }
 
     template <typename Rep, typename Period>
     thread_id_type set_thread_state(thread_id_type const& id,
@@ -481,7 +484,7 @@ namespace hpx { namespace this_thread
     ///         \a hpx#invalid_status.
     ///
     HPX_API_EXPORT threads::thread_state_ex_enum suspend(
-        boost::posix_time::ptime const&,
+        util::steady_time_point const& abs_time,
         char const* description = "this_thread::suspend",
         error_code& ec = throws);
 
@@ -511,10 +514,13 @@ namespace hpx { namespace this_thread
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
     ///
-    HPX_API_EXPORT threads::thread_state_ex_enum suspend(
-        boost::posix_time::time_duration const&,
+    inline threads::thread_state_ex_enum suspend(
+        util::steady_duration const& rel_time,
         char const* description = "this_thread::suspend",
-        error_code& ec = throws);
+        error_code& ec = throws)
+    {
+        return suspend(rel_time.from_now(), description, ec);
+    }
 
     template <typename Rep, typename Period>
     threads::thread_state_ex_enum suspend(
@@ -546,7 +552,7 @@ namespace hpx { namespace this_thread
         boost::uint64_t ms, char const* description = "this_thread::suspend",
         error_code& ec = throws)
     {
-        return suspend(boost::posix_time::milliseconds(ms), description, ec);
+        return suspend(boost::chrono::milliseconds(ms), description, ec);
     }
 }}
 

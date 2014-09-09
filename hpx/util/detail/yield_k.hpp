@@ -61,7 +61,7 @@ namespace hpx { namespace util { namespace detail {
             else
             {
                 hpx::this_thread::suspend(
-                    boost::posix_time::microseconds(1), thread_name);
+                    boost::chrono::microseconds(1), thread_name);
             }
         }
     }

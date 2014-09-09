@@ -10,20 +10,19 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/cstdint.hpp>
-#include <boost/exception_ptr.hpp>
-#include <boost/date_time/posix_time/ptime.hpp>
-#include <boost/date_time/posix_time/posix_time_config.hpp>
-
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util/backtrace.hpp>
+#include <hpx/util/date_time_chrono.hpp>
+#include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
+
+#include <boost/cstdint.hpp>
+#include <boost/exception_ptr.hpp>
 
 // TODO: add branch prediction and function heat
 
@@ -39,14 +38,6 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     struct threadmanager_base : private boost::noncopyable
     {
-    protected:
-        // we use the boost::posix_time::ptime type for time representation
-        typedef boost::posix_time::ptime time_type;
-
-        // we use the boost::posix_time::time_duration type as the duration
-        // representation
-        typedef boost::posix_time::time_duration duration_type;
-
     public:
         virtual ~threadmanager_base() {}
 
@@ -163,7 +154,7 @@ namespace hpx { namespace threads
         ///
         /// \param id         [in] The thread id of the thread the state should
         ///                   be modified for.
-        /// \param at_time
+        /// \param abs_time
         /// \param state      [in] The new state to be set for the thread
         ///                   referenced by the \a id parameter.
         /// \param newstate_ex [in] The new extended state to be set for the
@@ -172,7 +163,8 @@ namespace hpx { namespace threads
         ///                   executed if the parameter \a newstate is pending.
         ///
         /// \returns
-        virtual thread_id_type set_state (time_type const& expire_at,
+        virtual thread_id_type set_state (
+            util::steady_time_point const& abs_time,
             thread_id_type const& id, thread_state_enum newstate = pending,
             thread_state_ex_enum newstate_ex = wait_timeout,
             thread_priority priority = thread_priority_default,
@@ -186,7 +178,7 @@ namespace hpx { namespace threads
         ///
         /// \param id         [in] The thread id of the thread the state should
         ///                   be modified for.
-        /// \param after_duration
+        /// \param rel_time
         /// \param state      [in] The new state to be set for the thread
         ///                   referenced by the \a id parameter.
         /// \param newstate_ex [in] The new extended state to be set for the
@@ -195,7 +187,8 @@ namespace hpx { namespace threads
         ///                   executed if the parameter \a newstate is pending.
         ///
         /// \returns
-        virtual thread_id_type set_state (duration_type const& expire_from_now,
+        virtual thread_id_type set_state (
+            util::steady_duration const& rel_time,
             thread_id_type const& id, thread_state_enum newstate = pending,
             thread_state_ex_enum newstate_ex = wait_timeout,
             thread_priority priority = thread_priority_default,

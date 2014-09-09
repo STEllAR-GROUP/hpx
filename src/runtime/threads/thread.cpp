@@ -354,14 +354,9 @@ namespace hpx
             threads::interruption_point(threads::get_self_id());
         }
 
-        void sleep_until(boost::posix_time::ptime const& at)
+        void sleep_until(boost::chrono::steady_clock::time_point const& abs_time)
         {
-            this_thread::suspend(at, "this_thread::sleep_until");
-        }
-
-        void sleep_for(boost::posix_time::time_duration const& p)
-        {
-            this_thread::suspend(p, "this_thread::sleep_for");
+            this_thread::suspend(abs_time, "this_thread::sleep_until");
         }
 
         ///////////////////////////////////////////////////////////////////////
