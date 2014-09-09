@@ -6,13 +6,15 @@
 find_package(OrangeFS)
 
 if(ORANGEFS_FOUND)
-    set(example_programs
-         diskperf_ofs_pxfs_action)
+
+    if(HPX_WITH_CXX11_LAMBDAS)
+      set(example_programs
+          diskperf_ofs_pxfs_action)
+      set(diskperf_ofs_pxfs_action_FLAGS DEPENDENCIES iostreams_component
+          ${ORANGEFS_LIBRARIES} pthread dl rt crypto)
+    endif()
 
     foreach(example_program ${example_programs})
-
-      set(${example_program}_FLAGS COMPONENT_DEPENDENCIES iostreams)
-      set(${example_program}_FLAGS DEPENDENCIES ${ORANGEFS_LIBRARIES} pthread dl rt crypto)
 
       set(sources ${example_program}.cpp)
 

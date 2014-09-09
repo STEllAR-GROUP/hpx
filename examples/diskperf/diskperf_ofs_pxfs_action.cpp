@@ -16,7 +16,6 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/runtime.hpp>
 
-#include <iostream>
 #include <fstream>
 #include <cstdlib>
 #include <ctime>
