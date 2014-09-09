@@ -846,7 +846,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           than the length of the range [first, last), \a last is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
     ///           is found, \a last is also returned.
-    ///           
+    ///
     template <typename ExPolicy, typename InIter, typename FwdIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
@@ -920,8 +920,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param op           The binary predicate which returns \a true
     ///                     if the elements should be treated as equal. The signature
     ///                     should be equivalent to the following:
-    ///                     \code 
-    ///                     bool pred(const Type1 &a, const Type2 &b); 
+    ///                     \code
+    ///                     bool pred(const Type1 &a, const Type2 &b);
     ///                     \endcode \n
     ///                     The signature does not need to have const &, but
     ///                     the function must not modify the objects passed to
@@ -1006,7 +1006,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 return std::adjacent_find(first, last, op);
             }
-    
+
             template <typename ExPolicy, typename Pred>
             static typename detail::algorithm_result<ExPolicy, FwdIter>::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
@@ -1091,7 +1091,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \returns  The \a adjacent_find algorithm returns a \a hpx::future<FwdIter> if the
     ///           execution policy is of type \a task_execution_policy and
     ///           returns \a FwdIter otherwise.
-    ///           The \a adjacent_find algorithm returns an iterator to first of the 
+    ///           The \a adjacent_find algorithm returns an iterator to first of the
     ///           identical elements. If no such elements are found,\a last is returned
     ///
     template <typename ExPolicy, typename FwdIter>
@@ -1144,11 +1144,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     of the range the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements of
     ///                     the range the algorithm will be applied to.
-    /// \param p            The binary predicate which returns \a true
+    /// \param op           The binary predicate which returns \a true
     ///                     if the elements should be treated as equal. The signature
     ///                     should be equivalent to the following:
-    ///                     \code 
-    ///                     bool pred(const Type1 &a, const Type2 &b); 
+    ///                     \code
+    ///                     bool pred(const Type1 &a, const Type2 &b);
     ///                     \endcode \n
     ///                     The signature does not need to have const &, but
     ///                     the function must not modify the objects passed to
@@ -1173,7 +1173,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           The \a adjacent_find algorithm returns an iterator to the first of the
     ///           identical elements. If no such elements are found, \a last is returned.
     ///
-    ///           This overload of \a adjacent_find is available if the user decides to 
+    ///           This overload of \a adjacent_find is available if the user decides to
     ///           provide their algorithm their own binary predicate \a op.
     ///
     template <typename ExPolicy, typename FwdIter, typename Pred>
