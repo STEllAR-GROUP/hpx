@@ -193,6 +193,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
     namespace detail
     {
+        /// \cond NOINTERNAL
         template <typename T>
         struct is_execution_policy
           : boost::mpl::false_
@@ -223,6 +224,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct is_execution_policy<execution_policy>
           : boost::mpl::true_
         {};
+        // \endcond
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -244,6 +246,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
+        /// \cond NOINTERNAL
         template <typename T>
         struct is_parallel_execution_policy
           : boost::mpl::false_
@@ -263,6 +266,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct is_parallel_execution_policy<task_execution_policy>
           : boost::mpl::true_
         {};
+        // \endcond
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -286,6 +290,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
+        /// \cond NOINTERNAL
         template <typename T>
         struct is_sequential_execution_policy
           : boost::mpl::false_
@@ -295,6 +300,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct is_sequential_execution_policy<sequential_execution_policy>
           : boost::mpl::true_
         {};
+        // \endcond
     }
 
     ///////////////////////////////////////////////////////////////////////////
