@@ -278,9 +278,8 @@ namespace hpx { namespace parallel { namespace util
                 return hpx::lcos::local::dataflow(
                     [first, errors](std::vector<hpx::future<Result> > && r) mutable
                     {
-                        detail::handle_local_exceptions<task_execution_policy>
-                            ::call(r, errors);
-                        return first;
+                        return detail::handle_local_exceptions<task_execution_policy>
+                            ::call(r, errors), first;
                     },
                     std::move(workitems));
             }
@@ -582,9 +581,8 @@ namespace hpx { namespace parallel { namespace util
                 return hpx::lcos::local::dataflow(
                     [f2, errors](std::vector<hpx::future<Result> > && r) mutable
                     {
-                        detail::handle_local_exceptions<task_execution_policy>
-                            ::call(r, errors);
-                        return f2(std::move(r));
+                        return detail::handle_local_exceptions<task_execution_policy>
+                            ::call(r, errors), f2(std::move(r));
                     },
                     std::move(workitems));
             }
@@ -653,9 +651,8 @@ namespace hpx { namespace parallel { namespace util
                 return hpx::lcos::local::dataflow(
                     [f2, errors](std::vector<hpx::future<Result> > && r) mutable
                     {
-                        detail::handle_local_exceptions<task_execution_policy>
-                            ::call(r, errors);
-                        return f2(std::move(r));
+                        return detail::handle_local_exceptions<task_execution_policy>
+                            ::call(r, errors), f2(std::move(r));
                     },
                     std::move(workitems));
             }

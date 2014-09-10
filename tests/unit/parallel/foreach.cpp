@@ -132,9 +132,7 @@ void test_for_each_exception(ExPolicy const& policy, IteratorTag)
     try {
         hpx::parallel::for_each(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)),
-            [](std::size_t& v) {
-                throw std::runtime_error("test");
-            });
+            [](std::size_t& v) { throw std::runtime_error("test"); });
 
         HPX_TEST(false);
     }
@@ -163,9 +161,7 @@ void test_for_each_exception(hpx::parallel::task_execution_policy, IteratorTag)
         hpx::future<void> f =
             hpx::parallel::for_each(hpx::parallel::task,
                 iterator(boost::begin(c)), iterator(boost::end(c)),
-                [](std::size_t& v) {
-                    throw std::runtime_error("test");
-                });
+                [](std::size_t& v) { throw std::runtime_error("test"); });
         f.get();
 
         HPX_TEST(false);

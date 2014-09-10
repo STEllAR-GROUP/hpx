@@ -110,8 +110,7 @@ void test_transform_exception(ExPolicy const& policy, IteratorTag)
         hpx::parallel::transform(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
             [](std::size_t v) {
-                throw std::runtime_error("test");
-                return v;
+                return throw std::runtime_error("test"), v;
             });
 
         HPX_TEST(false);
@@ -144,8 +143,7 @@ void test_transform_exception(hpx::parallel::task_execution_policy, IteratorTag)
                 iterator(boost::begin(c)), iterator(boost::end(c)),
                 boost::begin(d),
                 [](std::size_t v) {
-                    throw std::runtime_error("test");
-                    return v;
+                    return throw std::runtime_error("test"), v;
                 });
         f.get();
 

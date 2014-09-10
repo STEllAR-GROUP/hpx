@@ -131,8 +131,7 @@ void test_transform_binary_exception(ExPolicy const& policy, IteratorTag)
             iterator(boost::begin(c1)), iterator(boost::end(c1)),
             boost::begin(c2), boost::begin(d1),
             [](std::size_t v1, std::size_t v2) {
-                throw std::runtime_error("test");
-                return v1 + v2;
+                return throw std::runtime_error("test"), v1 + v2;
             });
 
         HPX_TEST(false);
@@ -167,8 +166,7 @@ void test_transform_binary_exception(hpx::parallel::task_execution_policy, Itera
                 iterator(boost::begin(c1)), iterator(boost::end(c1)),
                 boost::begin(c2), boost::begin(d1),
                 [](std::size_t v1, std::size_t v2) {
-                    throw std::runtime_error("test");
-                    return v1 + v2;
+                    return throw std::runtime_error("test"), v1 + v2;
                 });
         f.get();
 

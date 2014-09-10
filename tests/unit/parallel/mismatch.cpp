@@ -263,8 +263,7 @@ void test_mismatch_exception(ExPolicy const& policy, IteratorTag)
             iterator(boost::begin(c1)), iterator(boost::end(c1)),
             boost::begin(c2),
             [](std::size_t v1, std::size_t v2) {
-                throw std::runtime_error("test");
-                return true;
+                return throw std::runtime_error("test"), true;
             });
 
         HPX_TEST(false);
@@ -303,8 +302,7 @@ void test_mismatch_exception(hpx::parallel::task_execution_policy, IteratorTag)
                 iterator(boost::begin(c1)), iterator(boost::end(c1)),
                 boost::begin(c2),
                 [](std::size_t v1, std::size_t v2) {
-                    throw std::runtime_error("test");
-                    return true;
+                    return throw std::runtime_error("test"), true;
                 });
 
         f.get();

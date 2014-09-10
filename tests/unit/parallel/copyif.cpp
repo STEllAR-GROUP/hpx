@@ -194,8 +194,7 @@ void test_copy_if_exception(ExPolicy const& policy, IteratorTag)
         hpx::parallel::copy_if(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
             [](std::size_t v) {
-                throw std::runtime_error("test");
-                return v;
+                return throw std::runtime_error("test"), v != 0;
             });
         HPX_TEST(false);
     }
@@ -227,8 +226,7 @@ void test_copy_if_exception(hpx::parallel::task_execution_policy, IteratorTag)
                 iterator(boost::begin(c)), iterator(boost::end(c)),
                 boost::begin(d),
                 [](std::size_t v) {
-                    throw std::runtime_error("test");
-                    return v;
+                    return throw std::runtime_error("test"), v != 0;
                 });
         f.get();
 

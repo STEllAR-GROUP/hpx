@@ -228,8 +228,7 @@ void test_reduce_exception(ExPolicy const& policy, IteratorTag)
             iterator(boost::begin(c)), iterator(boost::end(c)),
             std::size_t(42),
             [](std::size_t v1, std::size_t v2) {
-                throw std::runtime_error("test");
-                return v1 + v2;
+                return throw std::runtime_error("test"), v1 + v2;
             });
 
         HPX_TEST(false);
@@ -261,8 +260,7 @@ void test_reduce_exception(hpx::parallel::task_execution_policy, IteratorTag)
                 iterator(boost::begin(c)), iterator(boost::end(c)),
                 std::size_t(42),
                 [](std::size_t v1, std::size_t v2) {
-                    throw std::runtime_error("test");
-                    return v1 + v2;
+                    return throw std::runtime_error("test"), v1 + v2;
                 });
         f.get();
 
