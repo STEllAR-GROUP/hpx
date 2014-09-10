@@ -13,6 +13,7 @@
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/lcos/local/condition_variable.hpp>
 
 #include <boost/thread/thread.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -31,10 +32,9 @@ namespace hpx
     class HPX_EXPORT thread
     {
         typedef lcos::local::spinlock mutex_type;
+        void terminate(const char * function, const char * reason) const;
 
     public:
-        static threads::thread_id_type const uninitialized;
-
         class id;
         typedef threads::thread_id_type native_handle_type;
 
@@ -42,7 +42,7 @@ namespace hpx
 
         template <typename F>
         explicit thread(F && f)
-          : id_(uninitialized)
+          : id_(threads::invalid_thread_id)
         {
             start_thread(util::deferred_call(std::forward<F>(f)));
         }
@@ -75,14 +75,14 @@ namespace hpx
         bool joinable() const BOOST_NOEXCEPT
         {
             mutex_type::scoped_lock l(mtx_);
-            return threads::invalid_thread_id != id_ && uninitialized != id_;
+            return joinable_locked();
         }
 
         void join();
         void detach()
         {
             mutex_type::scoped_lock l(mtx_);
-            id_ = threads::invalid_thread_id;
+            detach_locked();
         }
 
         id get_id() const BOOST_NOEXCEPT;
@@ -109,9 +109,17 @@ namespace hpx
 #endif
 
     private:
+        bool joinable_locked() const BOOST_NOEXCEPT
+        {
+            return threads::invalid_thread_id != id_;
+        }
+        void detach_locked()
+        {
+            id_ = threads::invalid_thread_id;
+        }
         void start_thread(HPX_STD_FUNCTION<void()> && func);
         static threads::thread_state_enum thread_function_nullary(
-            HPX_STD_FUNCTION<void()> const& func);
+            HPX_STD_FUNCTION<void()> const& func, hpx::lcos::local::condition_variable &);
 
         mutable mutex_type mtx_;
         threads::thread_id_type id_;
@@ -142,7 +150,7 @@ namespace hpx
         friend class thread;
 
     public:
-        id() BOOST_NOEXCEPT : id_(thread::uninitialized) {}
+        id() BOOST_NOEXCEPT : id_(threads::invalid_thread_id) {}
         explicit id(threads::thread_id_type i) BOOST_NOEXCEPT : id_(i) {}
     };
 
@@ -262,7 +270,7 @@ namespace hpx
 
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     thread(F && f, HPX_ENUM_FWD_ARGS(N, Arg, arg))
-      : id_(uninitialized)
+      : id_(threads::invalid_thread_id)
     {
         start_thread(util::deferred_call(std::forward<F>(f),
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg)));

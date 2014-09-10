@@ -582,7 +582,7 @@ void test_wait_until_with_predicate_times_out()
     hpx::lcos::local::spinlock m;
 
     boost::unique_lock<hpx::lcos::local::spinlock> lock(m);
-    boost::chrono::system_clock::time_point const start = 
+    boost::chrono::system_clock::time_point const start =
         boost::chrono::system_clock::now();
     boost::chrono::system_clock::time_point const timeout = start + delay;
 
@@ -600,12 +600,12 @@ void test_relative_wait_until_with_predicate_times_out()
     hpx::lcos::local::spinlock m;
 
     boost::unique_lock<hpx::lcos::local::spinlock> lock(m);
-    boost::chrono::system_clock::time_point const start = 
+    boost::chrono::system_clock::time_point const start =
         boost::chrono::system_clock::now();
 
     bool const res = cond.wait_for(lock, delay, fake_predicate);
 
-    boost::chrono::system_clock::time_point const end = 
+    boost::chrono::system_clock::time_point const end =
         boost::chrono::system_clock::now();
     HPX_TEST(!res);
     HPX_TEST_LTE(delay - timeout_resolution, end - start);
@@ -622,7 +622,7 @@ void test_wait_until_relative_times_out()
 
     while(cond.wait_for(lock, delay) == hpx::lcos::local::cv_status::no_timeout) {}
 
-    boost::chrono::system_clock::time_point const end = 
+    boost::chrono::system_clock::time_point const end =
         boost::chrono::system_clock::now();
     HPX_TEST_LTE(delay - timeout_resolution, end - start);
 }

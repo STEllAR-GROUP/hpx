@@ -91,15 +91,15 @@ namespace hpx { namespace threads
     void thread_data_base::run_thread_exit_callbacks()
     {
         mutex_type::scoped_lock l(this);
-        while (exit_funcs_)
+
+        while(!exit_funcs_.empty())
         {
-            detail::thread_exit_callback_node* const current_node = exit_funcs_;
-            exit_funcs_ = current_node->next_;
-            if (!current_node->f_.empty())
             {
-                (current_node->f_)();
+                hpx::util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+                if(!exit_funcs_.back().empty())
+                    exit_funcs_.back()();
             }
-            delete current_node;
+            exit_funcs_.pop_back();
         }
         ran_exit_funcs_ = true;
     }
@@ -108,11 +108,12 @@ namespace hpx { namespace threads
     {
         mutex_type::scoped_lock l(this);
         if (ran_exit_funcs_ || get_state() == terminated)
+        {
             return false;
+        }
 
-        detail::thread_exit_callback_node* new_node =
-            new detail::thread_exit_callback_node(f, exit_funcs_);
-        exit_funcs_ = new_node;
+        exit_funcs_.push_back(f);
+
         return true;
     }
 
@@ -121,14 +122,9 @@ namespace hpx { namespace threads
         mutex_type::scoped_lock l(this);
 
         // Exit functions should have been executed.
-        HPX_ASSERT(!exit_funcs_ || ran_exit_funcs_);
+        HPX_ASSERT(!exit_funcs_.empty() || ran_exit_funcs_);
 
-        while (exit_funcs_)
-        {
-            detail::thread_exit_callback_node* const current_node = exit_funcs_;
-            exit_funcs_ = current_node->next_;
-            delete current_node;
-        }
+        exit_funcs_.clear();
     }
 
     bool thread_data_base::interruption_point(bool throw_on_interrupt)

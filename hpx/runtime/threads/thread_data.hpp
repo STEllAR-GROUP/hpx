@@ -156,7 +156,6 @@ namespace hpx { namespace threads
             requested_interrupt_(false),
             enabled_interrupt_(true),
             ran_exit_funcs_(false),
-            exit_funcs_(0),
             scheduler_base_(init_data.scheduler_base),
             count_(0),
             stacksize_(init_data.stacksize)
@@ -208,7 +207,7 @@ namespace hpx { namespace threads
             requested_interrupt_ = false;
             enabled_interrupt_ = true;
             ran_exit_funcs_ = false;
-            exit_funcs_ = 0;
+            exit_funcs_.clear();
             scheduler_base_ = init_data.scheduler_base;
 
             HPX_ASSERT(init_data.stacksize == get_stack_size());
@@ -652,7 +651,8 @@ namespace hpx { namespace threads
         bool ran_exit_funcs_;
 
         // Singly linked list (heap-allocated)
-        detail::thread_exit_callback_node* exit_funcs_;
+        // FIXME: replace with forward_list eventually.
+        std::deque<HPX_STD_FUNCTION<void()> > exit_funcs_;
 
         // reference to scheduler which created/manages this thread
         policies::scheduler_base* scheduler_base_;
