@@ -251,7 +251,6 @@ namespace hpx { namespace util { namespace coroutines {
             // just reset the context stack pointer to its initial value at the stack start
             m_ctx.uc_stack.ss_sp = (char*)m_stack;
             m_ctx.uc_stack.ss_size = m_stack_size;
-            m_ctx.
             increment_stack_recycle_count();
           }
         }
