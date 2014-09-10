@@ -67,7 +67,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                     tok.cancel(i);
                             });
                     },
-                    [=](std::vector<hpx::future<void> > &&) mutable
+                    [=](std::vector<hpx::future<void> > &&) mutable -> InIter
                     {
                         std::size_t find_res = tok.get_data();
                         if(find_res != count)
@@ -191,7 +191,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             tok.cancel(i);
                     });
                 },
-                [=](std::vector<hpx::future<void> > &&) mutable
+                [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
                 {
                     std::size_t find_res = tok.get_data();
                     if(find_res != count)
@@ -334,7 +334,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     });
 
                 },
-                [=](std::vector<hpx::future<void> > &&) mutable
+                [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
                 {
                     std::size_t find_res = tok.get_data();
                     if(find_res != count)
@@ -508,7 +508,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                 }
                             });
                 },
-                [=](std::vector<hpx::future<void> > &&) mutable
+                [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
                 {
                     difference_type find_end_res = tok.get_data();
                     if (find_end_res != count)
@@ -780,7 +780,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             }
                         });
                 },
-                [=](std::vector<hpx::future<void> > &&) mutable
+                [=](std::vector<hpx::future<void> > &&) mutable -> InIter
                 {
                     difference_type find_first_of_res = tok.get_data();
                     if(find_first_of_res != count)

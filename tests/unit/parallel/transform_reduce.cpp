@@ -220,8 +220,7 @@ void test_transform_reduce_bad_alloc(ExPolicy const& policy, IteratorTag)
             iterator(boost::begin(c)), iterator(boost::end(c)),
             std::size_t(42),
             [](std::size_t v1, std::size_t v2) {
-                throw std::bad_alloc();
-                return v1 + v2;
+                return throw std::bad_alloc(), v1 + v2;
             },
             [](std::size_t v){return v;}
         );
@@ -254,8 +253,7 @@ void test_transform_reduce_bad_alloc(hpx::parallel::task_execution_policy, Itera
                 iterator(boost::begin(c)), iterator(boost::end(c)),
                 std::size_t(42),
                 [](std::size_t v1, std::size_t v2) {
-                    throw std::bad_alloc();
-                    return v1 + v2;
+                    return throw std::bad_alloc(), v1 + v2;
                 },
                 [](std::size_t v){return v;}
         );

@@ -64,7 +64,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::partitioner<ExPolicy, difference_type>::call(
                     policy, first, std::distance(first, last),
-                    [value](Iter part_begin, std::size_t part_size)
+                    [value](Iter part_begin, std::size_t part_size) -> difference_type
                     {
                         difference_type ret = 0;
                         util::loop_n(part_begin, part_size,
@@ -189,7 +189,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::partitioner<ExPolicy, difference_type>::call(
                     policy, first, std::distance(first, last),
-                    [op](Iter part_begin, std::size_t part_size)
+                    [op](Iter part_begin, std::size_t part_size) -> difference_type
                     {
                         difference_type ret = 0;
                         util::loop_n(part_begin, part_size,

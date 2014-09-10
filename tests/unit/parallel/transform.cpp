@@ -32,7 +32,7 @@ void test_transform(ExPolicy const& policy, IteratorTag)
     // verify values
     std::size_t count = 0;
     HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
-        [&count](std::size_t v1, std::size_t v2) {
+        [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1 + 1, v2);
             ++count;
             return v1 + 1 == v2;
@@ -61,7 +61,7 @@ void test_transform(hpx::parallel::task_execution_policy, IteratorTag)
     // verify values
     std::size_t count = 0;
     HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
-        [&count](std::size_t v1, std::size_t v2) {
+        [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1 + 1, v2);
             ++count;
             return v1 + 1 == v2;
@@ -203,8 +203,7 @@ void test_transform_bad_alloc(ExPolicy const& policy, IteratorTag)
         hpx::parallel::transform(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
             [](std::size_t v) {
-                throw std::bad_alloc();
-                return v;
+                return throw std::bad_alloc(), v;
             });
 
         HPX_TEST(false);
@@ -236,8 +235,7 @@ void test_transform_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
                 iterator(boost::begin(c)), iterator(boost::end(c)),
                 boost::begin(d),
                 [](std::size_t v) {
-                    throw std::bad_alloc();
-                    return v;
+                    return throw std::bad_alloc(), v;
                 });
         f.get();
 

@@ -238,8 +238,7 @@ void test_none_of_bad_alloc(ExPolicy const& policy, IteratorTag)
             hpx::parallel::none_of(policy,
                 iterator(boost::begin(c)), iterator(boost::end(c)),
                 [](std::size_t v) {
-                    throw std::bad_alloc();
-                    return v != 0;
+                    return throw std::bad_alloc(), v != 0;
                 });
 
             HPX_TEST(false);
@@ -272,8 +271,7 @@ void test_none_of_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
                 hpx::parallel::none_of(hpx::parallel::task,
                     iterator(boost::begin(c)), iterator(boost::end(c)),
                     [](std::size_t v) {
-                        throw std::bad_alloc();
-                        return v != 0;
+                        return throw std::bad_alloc(), v != 0;
                     });
             f.get();
 
