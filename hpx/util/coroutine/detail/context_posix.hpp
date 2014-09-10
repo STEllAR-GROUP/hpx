@@ -247,8 +247,13 @@ namespace hpx { namespace util { namespace coroutines {
         }
         void rebind_stack()
         {
-            if (m_stack)
-                increment_stack_recycle_count();
+          if (m_stack) {
+            // just reset the context stack pointer to its initial value at the stack start
+            m_ctx.uc_stack.ss_sp = (char*)m_stack;
+            m_ctx.uc_stack.ss_size = m_stack_size;
+            m_ctx.
+            increment_stack_recycle_count();
+          }
         }
 
         typedef boost::atomic<boost::int64_t> counter_type;
