@@ -94,11 +94,10 @@ namespace hpx
     }
 
     threads::thread_state_enum thread::thread_function_nullary(
-        HPX_STD_FUNCTION<void()> const& func, hpx::lcos::local::condition_variable & cv)
+        HPX_STD_FUNCTION<void()> const& func)
     {
         try {
             // Now notify our calling thread that we started execution.
-            cv.notify_all();
             func();
         }
         catch (hpx::thread_interrupted const&) { //-V565
@@ -138,36 +137,21 @@ namespace hpx
 
     void thread::start_thread(HPX_STD_FUNCTION<void()> && func)
     {
-        // This cv is used to synchronize the starting of the thread as required
-        // by 30.3.1.2 thread constructors:
-        // "Synchronization: The completion of the invocation of the constructor synchronizes with the beginning
-        // of the invocation of the copy of f."
-        hpx::lcos::local::condition_variable cv;
         mutex_type::scoped_lock l(mtx_);
         threads::thread_init_data data(
             util::bind(util::one_shot(&thread::thread_function_nullary),
-                std::move(func), boost::ref(cv)),
+                std::move(func)),
             "thread::thread_function_nullary");
 
         error_code ec(lightweight);
+        // now start the thread
         id_ = hpx::get_runtime().get_thread_manager().
-            register_thread(data, threads::suspended, true, ec);
+            register_thread(data, threads::pending, true, ec);
         if (ec) {
             HPX_THROW_EXCEPTION(thread_resource_error, "thread::start_thread",
                 "Could not create thread");
             return;
         }
-
-        // now start the thread
-        set_thread_state(id_, threads::pending, threads::wait_signaled,
-            threads::thread_priority_normal, ec);
-        if (ec) {
-            HPX_THROWS_IF(ec, thread_resource_error, "thread::start_thread",
-                "Could not start newly created thread");
-            return;
-        }
-        // Wait until the start of func
-        cv.wait(l);
     }
 
     static void resume_thread(threads::thread_id_type const& id)

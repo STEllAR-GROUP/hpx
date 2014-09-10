@@ -13,7 +13,6 @@
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/lcos/local/condition_variable.hpp>
 
 #include <boost/thread/thread.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -119,7 +118,7 @@ namespace hpx
         }
         void start_thread(HPX_STD_FUNCTION<void()> && func);
         static threads::thread_state_enum thread_function_nullary(
-            HPX_STD_FUNCTION<void()> const& func, hpx::lcos::local::condition_variable &);
+            HPX_STD_FUNCTION<void()> const& func);
 
         mutable mutex_type mtx_;
         threads::thread_id_type id_;

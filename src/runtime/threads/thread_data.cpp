@@ -122,7 +122,7 @@ namespace hpx { namespace threads
         mutex_type::scoped_lock l(this);
 
         // Exit functions should have been executed.
-        HPX_ASSERT(!exit_funcs_.empty() || ran_exit_funcs_);
+        HPX_ASSERT(exit_funcs_.empty() || ran_exit_funcs_);
 
         exit_funcs_.clear();
     }
