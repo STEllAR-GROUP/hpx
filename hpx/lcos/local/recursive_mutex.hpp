@@ -25,7 +25,7 @@ namespace hpx { namespace lcos { namespace local
         {
             typedef std::size_t thread_id_type;
 
-            static thread_id_type const invalid_id = thread_id_type(~0u);
+            static thread_id_type invalid_id() { return thread_id_type(~0u); }
 
             static thread_id_type call()
             {
@@ -42,7 +42,7 @@ namespace hpx { namespace lcos { namespace local
         {
             typedef std::size_t thread_id_type;
 
-            static thread_id_type const invalid_id = thread_id_type(~0u);
+            static thread_id_type invalid_id() { return thread_id_type(~0u); }
 
             static thread_id_type call()
             {
@@ -68,7 +68,7 @@ namespace hpx { namespace lcos { namespace local
         public:
             recursive_mutex_impl(char const* const desc = "recursive_mutex_impl")
               : recursion_count(0)
-              , locking_thread_id(thread_id_from_mutex<Mutex>::invalid_id)
+              , locking_thread_id(thread_id_from_mutex<Mutex>::invalid_id())
               , mtx(desc)
             {}
 
@@ -81,7 +81,7 @@ namespace hpx { namespace lcos { namespace local
             bool try_lock()
             {
                 thread_id_type const id = thread_id_from_mutex<Mutex>::call();
-                HPX_ASSERT(id != thread_id_from_mutex<Mutex>::invalid_id);
+                HPX_ASSERT(id != thread_id_from_mutex<Mutex>::invalid_id());
 
                 return try_recursive_lock(id) || try_basic_lock(id);
             }
@@ -96,7 +96,7 @@ namespace hpx { namespace lcos { namespace local
             void lock()
             {
                 thread_id_type const id = thread_id_from_mutex<Mutex>::call();
-                HPX_ASSERT(id != thread_id_from_mutex<Mutex>::invalid_id);
+                HPX_ASSERT(id != thread_id_from_mutex<Mutex>::invalid_id());
 
                 if (!try_recursive_lock(id))
                 {
@@ -155,7 +155,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 if (0 == --recursion_count)
                 {
-                    locking_thread_id.exchange(thread_id_from_mutex<Mutex>::invalid_id);
+                    locking_thread_id.exchange(thread_id_from_mutex<Mutex>::invalid_id());
                     mtx.unlock();
                 }
             }
