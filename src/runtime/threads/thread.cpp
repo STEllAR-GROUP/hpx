@@ -144,12 +144,21 @@ namespace hpx
             "thread::thread_function_nullary");
 
         error_code ec(lightweight);
-        // now start the thread
+        // register thread in a suspended state to make sure id_ is valid when "func" starts
         id_ = hpx::get_runtime().get_thread_manager().
-            register_thread(data, threads::pending, true, ec);
+            register_thread(data, threads::suspended, true, ec);
         if (ec) {
             HPX_THROW_EXCEPTION(thread_resource_error, "thread::start_thread",
                 "Could not create thread");
+            return;
+        }
+
+        // now start the thread
+        set_thread_state(id_, threads::pending, threads::wait_signaled,
+            threads::thread_priority_normal, ec);
+        if (ec) {
+            HPX_THROWS_IF(ec, thread_resource_error, "thread::start_thread",
+                "Could not start newly created thread");
             return;
         }
     }
