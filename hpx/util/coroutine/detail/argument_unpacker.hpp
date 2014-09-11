@@ -38,7 +38,7 @@
 #include <hpx/util/coroutine/detail/index.hpp>
 #include <hpx/util/coroutine/detail/arg_max.hpp>
 
-namespace hpx { namespace util { namespace coroutines { namespace detail 
+namespace hpx { namespace util { namespace coroutines { namespace detail
 {
   template<typename Traits, int Len>
   struct unpacker_n;
@@ -52,14 +52,14 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     struct unpacker_n<Traits, len> {                                          \
       template<typename Functor, typename Tuple>                              \
       struct result {/*for result_of compatibility*/                          \
-          typedef typename boost::result_of<                                  \
+          typedef typename hpx::util::result_of<                              \
               Functor(BOOST_PP_ENUM_BINARY_PARAMS(len,                        \
                   typename Traits::template at<index_ , >::type               \
                       BOOST_PP_INTERCEPT))>::type type;                       \
       };                                                                      \
       template<typename Functor, typename Tuple>                              \
       typename result<Functor, Tuple>::type operator()(                       \
-          Functor& f, Tuple& parms)                                           \
+          Functor const & f, Tuple& parms)                                    \
       {                                                                       \
               using boost::get; /*tuples::get cannot be found via ADL*/       \
               return f(BOOST_PP_ENUM_BINARY_PARAMS(len, get<index_, >(parms)  \
@@ -73,7 +73,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     struct unpacker_ex_n<Traits, len > {                                      \
       template <typename Functor, typename First, typename Tuple>             \
       struct result {                                                         \
-          typedef typename  boost::result_of<                                 \
+          typedef typename  hpx::util::result_of<                             \
               Functor(First BOOST_PP_COMMA_IF(len)                            \
                  BOOST_PP_ENUM_BINARY_PARAMS(len,                             \
                       typename Traits::template at<index_ , >::type           \
@@ -81,7 +81,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       };                                                                      \
       template <typename Functor, typename First, typename Tuple>             \
       typename result<Functor, First, Tuple>::type                            \
-      operator()(Functor& f, First& arg0, Tuple& parms)                       \
+      operator()(Functor const& f, First& arg0, Tuple& parms)                 \
       {                                                                       \
            using boost::get; /*tuples::get cannot be found via ADL*/          \
            return f(arg0 BOOST_PP_COMMA_IF(len)                               \

@@ -98,7 +98,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     static inline void rebind(type* p, BOOST_FWD_REF(Functor),
         BOOST_RV_REF(naming::id_type) target, thread_id_repr_type = 0);
 
-#ifdef ARGSTUFF_IS_BROKEN 
+#if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES) || HPX_COROUTINE_ARG_MAX > 1
     result_slot_type * result() {
       HPX_ASSERT(m_result);
       HPX_ASSERT(*m_result);
@@ -206,6 +206,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
   private:
     arg_slot_type * m_arg;
+    //arg0_type* m_arg;
     result_slot_type ** m_result;
 #else
   protected:

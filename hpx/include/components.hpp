@@ -34,9 +34,7 @@
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/components/server/abstract_component_base.hpp>
 
-#ifdef HPX_HAVE_GENERIC_CONTEXT_COROUTINES
- #include <hpx/runtime/components/server/locking_hook.hpp>
-#endif
+#include <hpx/runtime/components/server/locking_hook.hpp>
 #include <hpx/runtime/components/server/migration_support.hpp>
 
 #include <hpx/runtime/components/new.hpp>

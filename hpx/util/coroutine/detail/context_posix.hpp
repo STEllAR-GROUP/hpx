@@ -255,11 +255,21 @@ namespace hpx { namespace util { namespace coroutines {
           }
         }
 
+
         typedef boost::atomic<boost::int64_t> counter_type;
 
+        static counter_type& get_stack_unbind_counter()
+        {
+            static counter_type counter(0);
+            return counter;
+        }
         static boost::uint64_t get_stack_unbind_count(bool reset)
         {
-            return 0;
+            return util::get_and_reset_value(get_stack_unbind_counter(), reset);
+        }
+        static boost::uint64_t increment_stack_unbind_count()
+        {
+            return ++get_stack_unbind_counter();
         }
 
         static counter_type& get_stack_recycle_counter()
@@ -274,16 +284,6 @@ namespace hpx { namespace util { namespace coroutines {
         static boost::uint64_t increment_stack_recycle_count()
         {
             return ++get_stack_recycle_counter();
-        }
-
-        static counter_type& get_stack_unbind_counter()
-        {
-            static counter_type counter(0);
-            return counter;
-        }
-        static boost::uint64_t increment_stack_unbind_count()
-        {
-            return ++get_stack_unbind_counter();
         }
     private:
         // declare m_stack_size first so we can use it to initialize m_stack

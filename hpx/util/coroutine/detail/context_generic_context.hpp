@@ -13,6 +13,11 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/coroutine/exception.hpp>
 #include <hpx/util/coroutine/detail/swap_context.hpp>
+
+#if defined(POSIX_VERSION)
+#include <hpx/util/coroutine/detail/posix_utility.hpp>
+#endif
+
 #include <hpx/util/get_and_reset_value.hpp>
 
 #include <boost/version.hpp>
@@ -83,23 +88,26 @@ namespace hpx { namespace util { namespace coroutines
 
             void* allocate(std::size_t size) const
             {
-                HPX_ASSERT(minimum_stacksize() <= size);
-                HPX_ASSERT(maximum_stacksize() >= size);
-
+#if defined(POSIX_VERSION)
+                void* limit = posix::alloc_stack(size);
+                posix::watermark_stack(stack, size);
+#else
                 void* limit = std::calloc(size, sizeof(char));
                 if (!limit) boost::throw_exception(std::bad_alloc());
 
+#endif
                 return static_cast<char*>(limit) + size;
             }
 
             void deallocate(void* vp, std::size_t size) const
             {
                 HPX_ASSERT(vp);
-                HPX_ASSERT(minimum_stacksize() <= size);
-                HPX_ASSERT(maximum_stacksize() >= size);
-
                 void* limit = static_cast<char*>(vp) - size;
+#if defined(POSIX_VERSION)
+                posix::free_stack(limit);
+#else
                 std::free(limit);
+#endif
             }
         };
 #else
@@ -219,6 +227,16 @@ namespace hpx { namespace util { namespace coroutines
             // handle stack operations
             void reset_stack()
             {
+#if BOOST_VERSION < 105600
+                if (ctx_.fc_stack.sp)
+#else
+                if (ctx_)
+#endif
+                {
+#if defined(POSIX_VERSION)
+#else
+#endif
+                }
             }
             void rebind_stack()
             {
@@ -227,10 +245,29 @@ namespace hpx { namespace util { namespace coroutines
 #else
                 if (ctx_)
 #endif
+                {
                     increment_stack_recycle_count();
+#if defined(POSIX_VERSION)
+#else
+#endif
+                }
             }
 
             typedef boost::atomic<boost::int64_t> counter_type;
+
+            static counter_type& get_stack_unbind_counter()
+            {
+                static counter_type counter(0);
+                return counter;
+            }
+            static boost::uint64_t get_stack_unbind_count(bool reset)
+            {
+                return util::get_and_reset_value(get_stack_unbind_counter(), reset);
+            }
+            static boost::uint64_t increment_stack_unbind_count()
+            {
+                return ++get_stack_unbind_counter();
+            }
 
             static counter_type& get_stack_recycle_counter()
             {
