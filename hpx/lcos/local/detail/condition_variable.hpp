@@ -240,7 +240,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             {
                 // yield this thread
                 util::scoped_unlock<Lock> unlock(lock);
-                reason = this_thread::suspend(abs_time.value(), description, ec);
+                reason = this_thread::suspend(abs_time, description, ec);
                 if (ec) return threads::wait_unknown;
             }
 

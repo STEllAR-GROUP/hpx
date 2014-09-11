@@ -95,18 +95,6 @@ namespace hpx { namespace threads
         thread_priority priority = thread_priority_normal,
         error_code& ec = throws);
 
-    template <typename Clock, typename Duration>
-    thread_id_type set_thread_state(thread_id_type const& id,
-        boost::chrono::time_point<Clock, Duration> const& abs_time,
-        thread_state_enum state = pending,
-        thread_state_ex_enum stateex = wait_timeout,
-        thread_priority priority = thread_priority_normal,
-        error_code& ec = throws)
-    {
-        return set_thread_state(id, util::to_ptime(abs_time), state,
-            stateex, priority, ec);
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     /// \brief  Set the thread state of the \a thread referenced by the
     ///         thread_id \a id.
@@ -142,18 +130,6 @@ namespace hpx { namespace threads
     {
         return set_thread_state(id, rel_time.from_now(), state, stateex,
             priority, ec);
-    }
-
-    template <typename Rep, typename Period>
-    thread_id_type set_thread_state(thread_id_type const& id,
-        boost::chrono::duration<Rep, Period> const& rel_time,
-        thread_state_enum state = pending,
-        thread_state_ex_enum stateex = wait_timeout,
-        thread_priority priority = thread_priority_normal,
-        error_code& ec = throws)
-    {
-        return set_thread_state(id, util::to_time_duration(rel_time), state,
-            stateex, priority, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -73,7 +73,7 @@ namespace hpx { namespace lcos { namespace local
             util::scoped_unlock<Lock> unlock(lock);
 
             threads::thread_state_ex_enum const reason =
-                cond_.wait_until(l, abs_time.value(), ec);
+                cond_.wait_until(l, abs_time, ec);
 
             l.unlock();
             if (ec) return cv_status::error;
