@@ -221,10 +221,6 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #endif
 
 #if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
-  private:
-    coroutine_self(impl_type * pimpl, detail::init_from_impl_tag)
-      : m_pimpl(pimpl), next_self_(0)
-    {}
 
     yield_result_type yield_impl(
         typename coroutine_type::result_slot_type result_)
@@ -240,6 +236,11 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       typedef typename coroutine_type::arg_slot_traits traits_type;
       return detail::fix_result<traits_type>(*m_pimpl->args());
     }
+
+  private:
+    coroutine_self(impl_type * pimpl, detail::init_from_impl_tag)
+      : m_pimpl(pimpl), next_self_(0)
+    {}
 
     template <typename TargetCoroutine>
     yield_result_type yield_to_impl(TargetCoroutine& target,
