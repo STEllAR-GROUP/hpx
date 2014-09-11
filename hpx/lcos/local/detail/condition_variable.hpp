@@ -198,8 +198,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         }
 
         template <typename Lock>
-        void wait(Lock& lock,
-            char const* description, error_code& ec = throws)
+        threads::thread_state_ex_enum
+        wait(Lock& lock, char const* description, error_code& ec = throws)
         {
             HPX_ASSERT(threads::get_self_ptr() != 0);
             HPX_ASSERT_OWNS_LOCK(lock);
@@ -209,16 +209,21 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             queue_.push_back(f);
 
             reset_queue_entry r(f, queue_);
+            threads::thread_state_ex_enum reason = threads::wait_unknown;
             {
                 // yield this thread
                 util::scoped_unlock<Lock> unlock(lock);
-                this_thread::suspend(threads::suspended, description, ec);
-                if (ec) return;
+                reason = this_thread::suspend(threads::suspended, description, ec);
+                if (ec) return threads::wait_unknown;
             }
+
+            return (f.id_ == threads::invalid_thread_id_repr) ?
+                threads::wait_timeout : reason;
         }
 
         template <typename Lock>
-        void wait(Lock& lock, error_code& ec = throws)
+        threads::thread_state_ex_enum
+        wait(Lock& lock, error_code& ec = throws)
         {
             return wait(lock, "condition_variable::wait", ec);
         }
