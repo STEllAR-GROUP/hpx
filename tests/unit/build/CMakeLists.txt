@@ -16,6 +16,7 @@ macro(create_cmake_test name hpx_dir)
       "${hpx_SOURCE_DIR}/tests/unit/build/src"
       -DHPX_DIR=${hpx_dir}
       -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+      -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS_SAFE}
       -DCMAKE_BUILD_TYPE=$<CONFIGURATION> VERBATIM)
   add_dependencies(${name}.make_configure ${name}.make_build_dir hpx iostreams_component)
   if(NOT HPX_STATIC_LINKING)
