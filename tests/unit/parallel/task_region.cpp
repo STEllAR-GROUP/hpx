@@ -28,7 +28,7 @@ void task_region_test1()
     {
         parent_flag = true;
 
-        trh.run([=, &task1_flag]() -> void {
+        trh.run([&]() {
             task1_flag = true;
             hpx::cout << "task1: " << s << hpx::endl;
         });
@@ -76,7 +76,7 @@ void task_region_test2()
     {
         parent_flag = true;
 
-        trh.run([=, &task1_flag]() -> void {
+        trh.run([&]() -> void {
             task1_flag = true;
             hpx::cout << "task1: " << s << hpx::endl;
         });

@@ -132,7 +132,7 @@ void test_copy_if_outiter(hpx::parallel::task_execution_policy, IteratorTag)
     f.wait();
 
     HPX_TEST(std::equal(boost::begin(c), middle, boost::begin(d),
-        [](int v1, int v2) {
+        [](int v1, int v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             return v1 == v2;
         }));
