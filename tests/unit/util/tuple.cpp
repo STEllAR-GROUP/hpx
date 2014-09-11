@@ -115,7 +115,7 @@ void construction_test()
 
     hpx::util::tuple<long, double> t8(t6);
     HPX_TEST(hpx::util::get<0>(t8) == 12);
-    HPX_TEST(hpx::util::get<1>(t8) > 5.4f && hpx::util::get<1>(t8) < 5.6f);
+    HPX_TEST(hpx::util::get<1>(t8) > 5.4 && hpx::util::get<1>(t8) < 5.6);
 
     dummy(
         hpx::util::tuple<no_def_constructor, no_def_constructor, no_def_constructor>(

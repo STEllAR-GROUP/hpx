@@ -75,8 +75,8 @@ int hpx_main()
             {
                 hpx::id_type const here = hpx::find_here();
 
-                float x0 = (float) i * 3.5 / (float) sizeX - 2.5;
-                float y0 = (float) j * 2.0 / (float) sizeY - 1.0;
+                float x0 = (float) i * 3.5f / (float) sizeX - 2.5f;
+                float y0 = (float) j * 2.0f / (float) sizeY - 1.0f;
 
                 boost::shared_ptr<FracInfo> Info(new FracInfo);
                 Info->x0 = x0;
