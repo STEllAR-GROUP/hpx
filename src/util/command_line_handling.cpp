@@ -756,8 +756,8 @@ namespace hpx { namespace util
                         "handle_print_bind",
                         boost::str(
                             boost::format("unexpected mismatch between "
-                                "binding reported from HWLOC(%1%) and HPX(%2%)"
-                            ) % boundcpu % pu_mask));
+                                "locality %1%: binding reported from HWLOC(%2%) and HPX(%3%) on thread %4%"
+                            ) % hpx::get_locality_id() % boundcpu % pu_mask % i));
                 }
             }
 

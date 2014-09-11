@@ -29,7 +29,7 @@ void test_generate_n(ExPolicy const& policy, IteratorTag)
     // verify values
     std::size_t count = 0;
     std::for_each(boost::begin(c), boost::end(c),
-        [&count](std::size_t v) {
+        [&count](std::size_t v) -> void {
             HPX_TEST_EQ(v, std::size_t(10));
             ++count;
         });
@@ -54,7 +54,7 @@ void test_generate_n(hpx::parallel::task_execution_policy, IteratorTag)
 
     std::size_t count =0;
     std::for_each(boost::begin(c), boost::end(c),
-        [&count](std::size_t v) {
+        [&count](std::size_t v) -> void {
             HPX_TEST_EQ(v, std::size_t(10));
             ++count;
     });

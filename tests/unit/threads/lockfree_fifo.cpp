@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/config.hpp>
+
 #include <boost/thread/thread.hpp>
 #include <boost/program_options.hpp>
 

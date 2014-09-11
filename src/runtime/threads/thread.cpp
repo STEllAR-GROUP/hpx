@@ -19,25 +19,45 @@
 
 namespace hpx
 {
-    ///////////////////////////////////////////////////////////////////////////
-    threads::thread_id_type const thread::uninitialized =
-        threads::thread_id_type();
+    void thread::terminate(const char * function, const char * reason) const
+    {
+        try {
+            // free all registered exit-callback functions
+            threads::free_thread_exit_callbacks(id_);
+
+            // report the error globally
+            HPX_THROW_EXCEPTION(invalid_status, function, reason);
+        }
+        catch(...) {
+            hpx::report_error(boost::current_exception());
+            /* nothing else we can do */;
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     thread::thread() BOOST_NOEXCEPT
-      : id_(uninitialized)
+      : id_(threads::invalid_thread_id)
     {}
 
     thread::thread(thread && rhs) BOOST_NOEXCEPT
-      : id_(uninitialized)   // the rhs needs to end up with an invalid_id
+      : id_(threads::invalid_thread_id)   // the rhs needs to end up with an invalid_id
     {
-        rhs.swap(*this);
+        mutex_type::scoped_lock l(rhs.mtx_);
+        id_ = rhs.id_;
+        rhs.id_ = threads::invalid_thread_id;
     }
 
     thread& thread::operator=(thread && rhs) BOOST_NOEXCEPT
     {
-        thread tmp(std::move(rhs));
-        swap(tmp);
+        mutex_type::scoped_lock l(mtx_);
+        mutex_type::scoped_lock l2(rhs.mtx_);
+        // If our current thread is joinable, terminate
+        if (joinable_locked())
+        {
+            terminate("thread::operator=", "destroying running thread");
+        }
+        id_ = rhs.id_;
+        rhs.id_ = threads::invalid_thread_id;
         return *this;
     }
 
@@ -45,33 +65,20 @@ namespace hpx
     {
         // If the thread is still running, we terminate the whole application
         // as we have no chance of reporting this error (we can't throw)
-        threads::thread_id_type id = uninitialized;
-
+        if (joinable_locked()) {
+            terminate("thread::~thread", "destroying running thread");
+        }
+        threads::thread_id_type id = threads::invalid_thread_id;
         {
             mutex_type::scoped_lock l(mtx_);
             std::swap(id_, id);
-        }
-
-        // if joinable
-        if (uninitialized != id) {
-            try {
-                // free all registered exit-callback functions
-                threads::free_thread_exit_callbacks(id);
-
-                // report the error globally
-                HPX_THROW_EXCEPTION(invalid_status,
-                  "~thread::thread", "destroying running thread");
-            }
-            catch(...) {
-                hpx::report_error(boost::current_exception());
-                /* nothing else we can do */;
-            }
         }
     }
 
     void thread::swap(thread& rhs) BOOST_NOEXCEPT
     {
         mutex_type::scoped_lock l(mtx_);
+        mutex_type::scoped_lock l2(rhs.mtx_);
         std::swap(id_, rhs.id_);
     }
 
@@ -90,6 +97,7 @@ namespace hpx
         HPX_STD_FUNCTION<void()> const& func)
     {
         try {
+            // Now notify our calling thread that we started execution.
             func();
         }
         catch (hpx::thread_interrupted const&) { //-V565
@@ -129,13 +137,15 @@ namespace hpx
 
     void thread::start_thread(HPX_STD_FUNCTION<void()> && func)
     {
+        mutex_type::scoped_lock l(mtx_);
         threads::thread_init_data data(
             util::bind(util::one_shot(&thread::thread_function_nullary),
                 std::move(func)),
             "thread::thread_function_nullary");
 
         error_code ec(lightweight);
-        threads::thread_id_type ident = hpx::get_runtime().get_thread_manager().
+        // register thread in a suspended state to make sure id_ is valid when "func" starts
+        id_ = hpx::get_runtime().get_thread_manager().
             register_thread(data, threads::suspended, true, ec);
         if (ec) {
             HPX_THROW_EXCEPTION(thread_resource_error, "thread::start_thread",
@@ -143,22 +153,13 @@ namespace hpx
             return;
         }
 
-        // inform ourselves if the thread function exits
-        threads::add_thread_exit_callback(ident, util::bind(&thread::detach, this));
-
         // now start the thread
-        set_thread_state(ident, threads::pending, threads::wait_signaled,
+        set_thread_state(id_, threads::pending, threads::wait_signaled,
             threads::thread_priority_normal, ec);
         if (ec) {
             HPX_THROWS_IF(ec, thread_resource_error, "thread::start_thread",
                 "Could not start newly created thread");
             return;
-        }
-
-        {
-            mutex_type::scoped_lock l(mtx_);
-            if (id_ == uninitialized)
-                id_ = ident;
         }
     }
 
@@ -169,32 +170,32 @@ namespace hpx
 
     void thread::join()
     {
-        if (this_thread::get_id() == get_id())
+        mutex_type::scoped_lock l(mtx_);
+
+        if(!joinable_locked())
+        {
+            terminate("thread::join", "trying to join a non joinable thread");
+        }
+
+        native_handle_type this_id = threads::get_self_id();
+        if (this_id == id_)
         {
             HPX_THROW_EXCEPTION(thread_resource_error, "thread::join",
                 "hpx::thread: trying joining itself");
             return;
         }
-
         this_thread::interruption_point();
 
-        native_handle_type handle = native_handle();
-        if (handle != threads::invalid_thread_id)
-        {
-            // the thread object should have been initialized at this point
-            HPX_ASSERT(uninitialized != handle);
 
-            // register callback function to be called when thread exits
-            native_handle_type this_id = threads::get_self_id();
-            if (threads::add_thread_exit_callback(handle,
-                    util::bind(&resume_thread, this_id)))
-            {
-                // wait for thread to be terminated
-                this_thread::suspend(threads::suspended, "thread::join");
-            }
+        // register callback function to be called when thread exits
+        if (threads::add_thread_exit_callback(id_,
+                util::bind(&resume_thread, this_id)))
+        {
+            // wait for thread to be terminated
+            this_thread::suspend(threads::suspended, "thread::join");
         }
 
-        detach();   // invalidate this object
+        detach_locked();   // invalidate this object
     }
 
     // extensions
@@ -239,7 +240,7 @@ namespace hpx
 
         public:
             thread_task_base(threads::thread_id_type const& id)
-              : id_(thread::uninitialized)
+              : id_(threads::invalid_thread_id)
             {
                 if (threads::add_thread_exit_callback(id,
                         util::bind(&thread_task_base::thread_exit_function,
@@ -251,8 +252,7 @@ namespace hpx
 
             bool valid() const
             {
-                return id_ != threads::invalid_thread_id &&
-                       id_ != thread::uninitialized;
+                return id_ != threads::invalid_thread_id;
             }
 
             // cancellation support
@@ -290,7 +290,7 @@ namespace hpx
 
     lcos::future<void> thread::get_future(error_code& ec)
     {
-        if (id_ == threads::invalid_thread_id || id_ == thread::uninitialized)
+        if (id_ == threads::invalid_thread_id)
         {
             HPX_THROWS_IF(ec, null_thread_id, "thread::get_future",
                 "NULL thread id encountered");

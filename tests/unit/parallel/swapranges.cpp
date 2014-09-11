@@ -30,7 +30,7 @@ void test_swap_ranges(ExPolicy const& policy, IteratorTag)
     //equal begins at one, therefore counter is started at 1
     std::size_t count = 1;
     HPX_TEST(std::equal(boost::begin(c) + 1, boost::end(c), boost::begin(c),
-        [&count](std::size_t v1, std::size_t v2) {
+        [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
             return v1 == v2;
@@ -39,7 +39,7 @@ void test_swap_ranges(ExPolicy const& policy, IteratorTag)
 
     count = 1;
     HPX_TEST(std::equal(boost::begin(d) + 1, boost::end(d), boost::begin(d),
-        [&count](std::size_t v1, std::size_t v2) {
+        [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_NEQ(v1, v2);
             ++count;
             return !(v1 == v2);
@@ -66,7 +66,7 @@ void test_swap_ranges(hpx::parallel::task_execution_policy, IteratorTag)
 
     std::size_t count = 1;
     HPX_TEST(std::equal(boost::begin(c) + 1, boost::end(c), boost::begin(c),
-        [&count](std::size_t v1, std::size_t v2){
+        [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
             return v1 == v2;
@@ -74,7 +74,7 @@ void test_swap_ranges(hpx::parallel::task_execution_policy, IteratorTag)
 
     count = 1;
     HPX_TEST(std::equal(boost::begin(d) + 1, boost::end(d), boost::begin(d),
-        [&count](std::size_t v1, std::size_t v2){
+        [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_NEQ(v1, v2);
             ++count;
             return !(v1 == v2);

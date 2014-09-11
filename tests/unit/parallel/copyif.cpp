@@ -31,7 +31,7 @@ void test_copy_if(ExPolicy const& policy, IteratorTag)
 
     std::size_t count = 0;
     HPX_TEST(std::equal(boost::begin(c), middle, boost::begin(d),
-        [&count](int v1, int v2) {
+        [&count](int v1, int v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
             return v1 == v2;
@@ -39,7 +39,7 @@ void test_copy_if(ExPolicy const& policy, IteratorTag)
 
     HPX_TEST(std::equal(middle,boost::end(c),
         boost::begin(d) + (1 + d.size()/2),
-        [&count](int v1, int v2) {
+        [&count](int v1, int v2) -> bool {
             HPX_TEST_NEQ(v1,v2);
             ++count;
             return v1!=v2;
@@ -68,7 +68,7 @@ void test_copy_if(hpx::parallel::task_execution_policy, IteratorTag)
 
     std::size_t count = 0;
     HPX_TEST(std::equal(boost::begin(c), middle, boost::begin(d),
-        [&count](int v1, int v2) {
+        [&count](int v1, int v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
             return v1 == v2;
@@ -76,7 +76,7 @@ void test_copy_if(hpx::parallel::task_execution_policy, IteratorTag)
 
     HPX_TEST(std::equal(middle,boost::end(c),
         boost::begin(d) + (1 + d.size()/2),
-        [&count](int v1, int v2) {
+        [&count](int v1, int v2) -> bool {
             HPX_TEST_NEQ(v1,v2);
             ++count;
             return v1!=v2;
@@ -104,7 +104,7 @@ void test_copy_if_outiter(ExPolicy const& policy, IteratorTag)
         std::back_inserter(d), [](int i){return !(i<0);});
 
     HPX_TEST(std::equal(boost::begin(c), middle, boost::begin(d),
-        [](int v1, int v2) {
+        [](int v1, int v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             return v1 == v2;
         }));
@@ -132,7 +132,7 @@ void test_copy_if_outiter(hpx::parallel::task_execution_policy, IteratorTag)
     f.wait();
 
     HPX_TEST(std::equal(boost::begin(c), middle, boost::begin(d),
-        [](int v1, int v2) {
+        [](int v1, int v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             return v1 == v2;
         }));
@@ -194,8 +194,7 @@ void test_copy_if_exception(ExPolicy const& policy, IteratorTag)
         hpx::parallel::copy_if(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
             [](std::size_t v) {
-                throw std::runtime_error("test");
-                return v;
+                return throw std::runtime_error("test"), v != 0;
             });
         HPX_TEST(false);
     }
@@ -227,8 +226,7 @@ void test_copy_if_exception(hpx::parallel::task_execution_policy, IteratorTag)
                 iterator(boost::begin(c)), iterator(boost::end(c)),
                 boost::begin(d),
                 [](std::size_t v) {
-                    throw std::runtime_error("test");
-                    return v;
+                    return throw std::runtime_error("test"), v != 0;
                 });
         f.get();
 
@@ -288,8 +286,7 @@ void test_copy_if_bad_alloc(ExPolicy const& policy, IteratorTag)
         hpx::parallel::copy_if(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
             [](std::size_t v) {
-                throw std::bad_alloc();
-                return v;
+                return throw std::bad_alloc(), v;
             });
 
         HPX_TEST(false);
@@ -321,8 +318,7 @@ void test_copy_if_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
             iterator(boost::begin(c)), iterator(boost::end(c)),
             boost::begin(d),
             [](std::size_t v) {
-                throw std::bad_alloc();
-                return v;
+                return throw std::bad_alloc(), v;
             });
 
         f.get();

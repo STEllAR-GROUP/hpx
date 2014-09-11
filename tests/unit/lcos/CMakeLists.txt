@@ -30,15 +30,10 @@ set(tests
    )
 
 # include some of the tests for non-gcc 4.4 only
-set(gcc_version 040500)
-if(GCC_VERSION)
-  set(gcc_version ${GCC_VERSION})
-endif()
-
-set(non_gcc_44 false)
+set(non_gcc_44 true)
 if(CMAKE_COMPILER_IS_GNUCXX AND HPX_GCC_VERSION_CHECK)
   if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.5)
-    set(non_gcc_44 true)
+    set(non_gcc_44 false)
   endif()
 endif()
 

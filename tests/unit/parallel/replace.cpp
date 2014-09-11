@@ -34,7 +34,7 @@ void test_replace(ExPolicy const& policy, IteratorTag)
 
     std::size_t count = 0;
     HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
-        [&count](std::size_t v1, std::size_t v2) {
+        [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
             return v1 == v2;
@@ -65,7 +65,7 @@ void test_replace(hpx::parallel::task_execution_policy, IteratorTag)
 
     std::size_t count = 0;
     HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
-        [&count](std::size_t v1, std::size_t v2) {
+        [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
             return v1 == v2;
