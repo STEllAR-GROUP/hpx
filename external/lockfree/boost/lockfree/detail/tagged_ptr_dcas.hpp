@@ -6,14 +6,13 @@
 //  accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-//  Disclaimer: Not a Boost library.
-
 #ifndef BOOST_LOCKFREE_TAGGED_PTR_DCAS_HPP_INCLUDED
 #define BOOST_LOCKFREE_TAGGED_PTR_DCAS_HPP_INCLUDED
 
-#include <boost/lockfree/detail/branch_hints.hpp>
-
 #include <cstddef>              /* for std::size_t */
+#include <limits>
+
+#include <boost/lockfree/detail/branch_hints.hpp>
 
 namespace boost {
 namespace lockfree {
@@ -26,12 +25,16 @@ public:
     typedef std::size_t tag_t;
 
     /** uninitialized constructor */
-    tagged_ptr(void)//: ptr(0), tag(0)
+    tagged_ptr(void) BOOST_NOEXCEPT//: ptr(0), tag(0)
     {}
 
+#ifdef BOOST_NO_CXX11_DEFAULTED_FUNCTIONS
     tagged_ptr(tagged_ptr const & p):
         ptr(p.ptr), tag(p.tag)
     {}
+#else
+    tagged_ptr(tagged_ptr const & p) = default;
+#endif
 
     explicit tagged_ptr(T * p, tag_t t = 0):
         ptr(p), tag(t)
@@ -39,10 +42,15 @@ public:
 
     /** unsafe set operation */
     /* @{ */
-    void operator= (tagged_ptr const & p)
+#ifdef BOOST_NO_CXX11_DEFAULTED_FUNCTIONS
+    tagged_ptr & operator= (tagged_ptr const & p)
     {
         set(p.ptr, p.tag);
+        return *this;
     }
+#else
+    tagged_ptr & operator= (tagged_ptr const & p) = default;
+#endif
 
     void set(T * p, tag_t t)
     {
@@ -66,12 +74,12 @@ public:
 
     /** pointer access */
     /* @{ */
-    T * get_ptr(void) const volatile
+    T * get_ptr(void) const
     {
         return ptr;
     }
 
-    void set_ptr(T * p) volatile
+    void set_ptr(T * p)
     {
         ptr = p;
     }
@@ -79,12 +87,18 @@ public:
 
     /** tag access */
     /* @{ */
-    tag_t get_tag() const volatile
+    tag_t get_tag() const
     {
         return tag;
     }
 
-    void set_tag(tag_t t) volatile
+    tag_t get_next_tag() const
+    {
+        tag_t next = (get_tag() + 1) & (std::numeric_limits<tag_t>::max)();
+        return next;
+    }
+
+    void set_tag(tag_t t)
     {
         tag = t;
     }

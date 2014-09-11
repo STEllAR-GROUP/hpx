@@ -21,13 +21,11 @@ namespace std
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/any.hpp>
+#include <hpx/util/portable_binary_iarchive.hpp>
+#include <hpx/util/portable_binary_oarchive.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
-#include "serialization_test_tools.hpp"
 #include "small_big_object.hpp"
-
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/level.hpp>
-#include <boost/serialization/nvp.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -43,63 +41,59 @@ using hpx::finalize;
 // BOOST_CLASS_VERSION(A, 2);
 
 template <typename A>
-void out(const char *testfile, A & a)
+void out(std::vector<char> & out_buffer, A & a)
 {
-    test_ostream os(testfile, TEST_STREAM_FLAGS);
-    test_oarchive oa(os, TEST_ARCHIVE_FLAGS);
-    oa << BOOST_SERIALIZATION_NVP(a);
+    hpx::util::portable_binary_oarchive archive(out_buffer);
+    archive << a;
 }
 
 template <typename A>
-void in(const char *testfile, A & a)
+void in(std::vector<char> & in_buffer, A & a)
 {
-    test_istream is(testfile, TEST_STREAM_FLAGS);
-    test_iarchive ia(is, TEST_ARCHIVE_FLAGS);
-    ia >> BOOST_SERIALIZATION_NVP(a);
+    hpx::util::portable_binary_iarchive archive(in_buffer, in_buffer.size());
+    archive >> a;
 }
 
 int hpx_main(variables_map& vm)
 {
-    const char * testfile = boost::archive::tmpnam(NULL);
-    BOOST_REQUIRE(NULL != testfile);
+    typedef
+        basic_any<hpx::util::portable_binary_iarchive, hpx::util::portable_binary_oarchive>
+        any_type;
 
     {
-        if (sizeof(small_object) <= sizeof(void*))
-            std::cout << "object is small\n";
-        else
-            std::cout << "object is large\n";
+        std::vector<char> buffer;
 
         small_object const f(17);
+        HPX_TEST_LTE(sizeof(small_object), sizeof(void*));
 
-        basic_any<test_iarchive, test_oarchive> any(f);
+        any_type any(f);
 
-        out(testfile, any);
-        in(testfile, any);
+        out(buffer, any);
+        any_type any_in;
+        in(buffer, any_in);
+        HPX_TEST(!any_in.empty());
+        HPX_TEST_EQ(any, any_in);
     }
 
     {
-        if (sizeof(big_object) <= sizeof(void*))
-            std::cout << "object is small\n";
-        else
-            std::cout << "object is large\n";
+        std::vector<char> buffer;
 
         big_object const f(5, 12);
+        HPX_TEST_LT(sizeof(void*), sizeof(big_object));
 
-        basic_any<test_iarchive, test_oarchive> any(f);
+        any_type any(f);
 
-        out(testfile, any);
-        in(testfile, any);
+        out(buffer, any);
+        any_type any_in;
+        in(buffer, any_in);
+        HPX_TEST(!any_in.empty());
+        HPX_TEST_EQ(any, any_in);
     }
 
-    std::remove(testfile);
-
-    finalize();
-
-    return 0;
+    return finalize();
 }
 
-int
-test_main( int argc, char* argv[] )
+int main( int argc, char* argv[] )
 {
 
     // Configure application-specific options

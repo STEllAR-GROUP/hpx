@@ -75,7 +75,7 @@
 [def __boost_atomic__           [@http://www.boost.org/doc/libs/release/doc/html/atomic.html Boost.Atomic]]
 [def __boost_serialization__    [@http://www.boost.org/doc/libs/release/libs/serialization/doc/index.html Boost.Serialization]]
 
-[def __hwloc_downloads__        [@http://www.open-mpi.org/software/hwloc/v1.7/ hwloc Downloads]]
+[def __hwloc_downloads__        [@http://www.open-mpi.org/software/hwloc/v1.7/ hwloc]]
 [def __doxygen__                [@http://www.doxygen.org Doxygen]]
 
 [def __macports__               [@http://www.macports.org/ MacPorts]]
@@ -86,6 +86,7 @@
 [def __ctest_doc__              [@http://www.cmake.org/cmake/help/v2.8.11/ctest.html CTest Documentation]]
 [def __cmake_download__         [@http://www.cmake.org/cmake/resources/software.html CMake Downloads]]
 [def __gcc__                    [@http://gcc.gnu.org GNU Compiler Collection (g++)]]
+[def __clang__                  [@http://clang.llvm.org/ clang: a C language family frontend for LLVM]]
 [def __icpc__                   [@http://software.intel.com/en-us/intel-composer-xe/ Intel Composer XE Suites]]
 [def __gmake__                  [@http://www.gnu.org/software/make GNU Make (gmake)]]
 [def __eglibc__                 [@http://eglibc.org/home Embedded GLIBC (EGLIBC)]]
@@ -98,8 +99,8 @@
 [def __libunwind__              [@http://www.nongnu.org/libunwind libunwind]]
 [def __hdf5__                   [@http://www.hdfgroup.org/HDF5 Hierarchical Data Format V5 (HDF5)]]
 [def __lorene__                 [@http://www.lorene.obspm.fr LORENE]]
-[def __papi__                   [@http://icl.cs.utk.edu/papi/ Networking and Cryptography library (NaCl)]]
-[def __sodium__                 [@http://nacl.cr.yp.to/ Performance Application Programming Interface (PAPI)]]
+[def __sodium__                 [@http://icl.cs.utk.edu/papi/ Networking and Cryptography library (NaCl)]]
+[def __papi__                   [@http://nacl.cr.yp.to/ Performance Application Programming Interface (PAPI)]]
 [def __lapack__                 [@http://math-atlas.sourceforge.net/ Linear Algebra PACKage (LAPACK)]]
 [def __blas__                   [@http://math-atlas.sourceforge.net/ Basic Linear Algebra Subroutines 3 (BLAS)]]
 [def __gsl__                    [@http://www.gnu.org/software/gsl/ GNU Scientific Library (GSL)]]
@@ -120,8 +121,9 @@
 [def __cpp11_n3632__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3632.html N3632]]
 [def __cpp11_n3634__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3857.pdf N3857]]
 [def __cpp11_n3562__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3562.pdf N3562]]
-[def __cpp11_n4071__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4071.htm N4071]]
-[def __cpp11_n4088__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4088.pdf N4088ppl]]
+[def __cpp11_n4088__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4088.pdf N4088]]
+[def __cpp11_n4104__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4104.html N4104]]
+[def __cpp11_n4107__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4107.html N4107]]
 
 
 [def __ini_file_format__        [@http://en.wikipedia.org/wiki/INI_file Windows INI file format]]

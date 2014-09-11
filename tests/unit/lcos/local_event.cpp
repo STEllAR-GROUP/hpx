@@ -61,18 +61,21 @@ int hpx_main(variables_map& vm)
 
         boost::atomic<std::size_t> c(0);
 
+        std::vector<hpx::future<void> > futs;
+        futs.reserve(pxthreads);
         // Create the threads which will wait on the event
         for (std::size_t i = 0; i < pxthreads; ++i)
-            register_work(boost::bind
-                (&local_event_test, boost::ref(e), boost::ref(c)));
+        {
+            futs.push_back(
+                hpx::async(&local_event_test, boost::ref(e), boost::ref(c))
+            );
+        }
 
         // Release all the threads.
         e.set();
 
         // Wait for all the our threads to finish executing.
-        do {
-            suspend();
-        } while (get_thread_count(hpx::threads::thread_priority_normal) > 1);
+        hpx::wait_all(futs);
 
         HPX_TEST_EQ(pxthreads, c);
 

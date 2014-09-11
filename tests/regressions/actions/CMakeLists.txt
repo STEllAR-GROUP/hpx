@@ -16,26 +16,26 @@ set(plain_action_move_semantics_FLAGS
     DEPENDENCIES action_move_semantics_component)
 set(plain_action_move_semantics_PARAMETERS
     LOCALITIES 2
-    THREADS_PER_LOCALITY 2)
+    THREADS_PER_LOCALITY 1)
 
 set(plain_action_dataflow_move_semantics_FLAGS
     DEPENDENCIES dataflow_component action_move_semantics_component)
 set(plain_action_dataflow_move_semantics_PARAMETERS
     LOCALITIES 2
-    THREADS_PER_LOCALITY 2)
+    THREADS_PER_LOCALITY 1)
 
 set(component_action_move_semantics_FLAGS
     DEPENDENCIES action_move_semantics_component)
 set(component_action_move_semantics_PARAMETERS
     LOCALITIES 2
-    THREADS_PER_LOCALITY 2)
+    THREADS_PER_LOCALITY 1)
 
 set(remote_object_move_semantics_FLAGS
     DEPENDENCIES iostreams_component dataflow_component
                  action_move_semantics_component remote_object_component)
 set(remote_object_move_semantics_PARAMETERS
     LOCALITIES 2
-    THREADS_PER_LOCALITY 2)
+    THREADS_PER_LOCALITY 1)
 
 foreach(test ${tests})
   set(sources

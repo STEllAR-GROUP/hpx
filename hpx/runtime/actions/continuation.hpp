@@ -34,8 +34,6 @@ namespace hpx
     apply(hpx::actions::action<Component, Result, Arguments, Derived>,
         naming::id_type const&, Arg &&);
 
-    // MSVC complains about async_continue beeing ambiguous if it sees this
-    // forward declaration
     template <typename F, typename Arg1, typename Arg2>
     inline typename boost::enable_if_c<
         traits::detail::is_callable_not_action<F(Arg1, Arg2)>::value

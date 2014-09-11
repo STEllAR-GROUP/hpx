@@ -31,7 +31,7 @@ void test_for_each(ExPolicy const& policy, IteratorTag)
     // verify values
     std::size_t count = 0;
     std::for_each(boost::begin(c), boost::end(c),
-        [&count](std::size_t v) {
+        [&count](std::size_t v) -> void {
             HPX_TEST_EQ(v, std::size_t(42));
             ++count;
         });
@@ -58,7 +58,7 @@ void test_for_each(hpx::parallel::task_execution_policy, IteratorTag)
     // verify values
     std::size_t count = 0;
     std::for_each(boost::begin(c), boost::end(c),
-        [&count](std::size_t v) {
+        [&count](std::size_t v) -> void {
             HPX_TEST_EQ(v, std::size_t(42));
             ++count;
         });
@@ -132,9 +132,7 @@ void test_for_each_exception(ExPolicy const& policy, IteratorTag)
     try {
         hpx::parallel::for_each(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)),
-            [](std::size_t& v) {
-                throw std::runtime_error("test");
-            });
+            [](std::size_t& v) { throw std::runtime_error("test"); });
 
         HPX_TEST(false);
     }
@@ -163,9 +161,7 @@ void test_for_each_exception(hpx::parallel::task_execution_policy, IteratorTag)
         hpx::future<void> f =
             hpx::parallel::for_each(hpx::parallel::task,
                 iterator(boost::begin(c)), iterator(boost::end(c)),
-                [](std::size_t& v) {
-                    throw std::runtime_error("test");
-                });
+                [](std::size_t& v) { throw std::runtime_error("test"); });
         f.get();
 
         HPX_TEST(false);
@@ -222,9 +218,7 @@ void test_for_each_bad_alloc(ExPolicy const& policy, IteratorTag)
     try {
         hpx::parallel::for_each(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)),
-            [](std::size_t& v) {
-                throw std::bad_alloc();
-            });
+            [](std::size_t& v) { throw std::bad_alloc(); });
 
         HPX_TEST(false);
     }
@@ -252,9 +246,7 @@ void test_for_each_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
         hpx::future<void> f =
             hpx::parallel::for_each(hpx::parallel::task,
                 iterator(boost::begin(c)), iterator(boost::end(c)),
-                [](std::size_t& v) {
-                    throw std::bad_alloc();
-                });
+                [](std::size_t& v) { throw std::bad_alloc(); });
         f.get();
 
         HPX_TEST(false);

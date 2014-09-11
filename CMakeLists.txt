@@ -322,14 +322,14 @@ if(HPX_THREAD_MAINTAIN_STEALING_COUNTS)
 endif()
 
 hpx_option(HPX_THREAD_MAINTAIN_LOCAL_STORAGE BOOL
-  "Enable thread local storage for all HPX threads (default: ON)"
-  ON CATEGORY "Thread Manager" ADVANCED)
+  "Enable thread local storage for all HPX threads (default: OFF)"
+  OFF CATEGORY "Thread Manager" ADVANCED)
 
 if(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
 endif()
 
-hpx_option(HPX_SWAP_CONTEXT_EMULATION BOOL "Emulate SwapContext API for coroutines (default: OFF)"
+hpx_option(HPX_HAVE_SWAP_CONTEXT_EMULATION BOOL "Emulate SwapContext API for coroutines (default: OFF)"
   OFF CATEGORY "Thread Manager" ADVANCED)
 
 ################################################################################
@@ -760,8 +760,8 @@ if(MSVC)
     CONFIGURATIONS Debug LANGUAGES CXX C)
 
   # VS2012 and above has a special flag for improving the debug experience by
-  # adding more symbol information to the build
-  hpx_add_compile_flag(-ZI
+  # adding more symbol information to the build (-d2Zi)
+  hpx_add_compile_flag(-d2Zi+
     CONFIGURATIONS RelWithDebInfo)
 
   # VS2013 and above know how to do link time constant data segment folding
@@ -1037,12 +1037,11 @@ endif()
 # Emulation of SwapContext on Windows
 ################################################################################
 if(MSVC)
-  if(HPX_SWAP_CONTEXT_EMULATION)
+  if(HPX_HAVE_SWAP_CONTEXT_EMULATION)
     if(NOT CMAKE_ASM_MASM_COMPILER)
-      hpx_error("SwitchToFiber emulation can not be enabled. The masm compiler could not be found. Try setting the ASM_MASM environment variable to the assembler executable (ml.exe/ml64.exe) or disable the emulation by setting HPX_SWAP_CONTEXT_EMULATION to Off")
+      hpx_error("SwitchToFiber emulation can not be enabled. The masm compiler could not be found. Try setting the ASM_MASM environment variable to the assembler executable (ml.exe/ml64.exe) or disable the emulation by setting HPX_HAVE_SWAP_CONTEXT_EMULATION to Off")
     else()
       hpx_info("SwitchToFiber emulation is enabled, using compiler: '${CMAKE_ASM_MASM_COMPILER}'")
-      hpx_add_link_flag_if_available(/EXPORT:switch_to_fiber)
       hpx_add_config_define(HPX_HAVE_SWAP_CONTEXT_EMULATION)
     endif()
   endif()

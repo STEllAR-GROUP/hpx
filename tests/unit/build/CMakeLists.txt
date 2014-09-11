@@ -11,19 +11,16 @@ endif()
 # Try building an external cmake based project ...
 macro(create_cmake_test name hpx_dir)
   set(build_dir "${CMAKE_CURRENT_BINARY_DIR}/${name}")
-  add_custom_target(${name}.remove_build_dir
-    COMMAND "${CMAKE_COMMAND}" -E remove_directory "${build_dir}" VERBATIM
-  )
   add_custom_target(${name}.make_build_dir
     COMMAND "${CMAKE_COMMAND}" -E make_directory "${build_dir}" VERBATIM
   )
-  add_dependencies(${name}.make_build_dir ${name}.remove_build_dir)
   add_custom_target(${name}.make_configure
     COMMAND
       "${CMAKE_COMMAND}" -E chdir "${build_dir}" "${CMAKE_COMMAND}"
       "${hpx_SOURCE_DIR}/tests/unit/build/src"
       -DHPX_DIR=${hpx_dir}
       -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+      -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS_SAFE}
       -DCMAKE_BUILD_TYPE=$<CONFIGURATION> VERBATIM)
   add_dependencies(${name}.make_configure ${name}.make_build_dir hpx iostreams_component)
   if(NOT HPX_STATIC_LINKING)
@@ -37,8 +34,6 @@ macro(create_cmake_test name hpx_dir)
   add_hpx_pseudo_dependencies(${name} ${name}.make_compile)
 
   if(MSVC)
-    set_target_properties(${name}.remove_build_dir PROPERTIES
-      FOLDER "Tests/Unit/Build")
     set_target_properties(${name}.make_build_dir PROPERTIES
       FOLDER "Tests/Unit/Build")
     set_target_properties(${name}.make_configure PROPERTIES
@@ -54,13 +49,9 @@ endmacro()
 
 macro(create_pkgconfig_test name hpx_dir)
   set(build_dir "${CMAKE_CURRENT_BINARY_DIR}/${name}")
-  add_custom_target(${name}.remove_build_dir
-    COMMAND "${CMAKE_COMMAND}" -E remove_directory "${build_dir}" VERBATIM
-  )
   add_custom_target(${name}.make_build_dir
     COMMAND "${CMAKE_COMMAND}" -E make_directory "${build_dir}" VERBATIM
   )
-  add_dependencies(${name}.make_build_dir ${name}.remove_build_dir)
   add_custom_target(${name}.make_compile
     COMMAND
       "${CMAKE_COMMAND}" -E chdir "${build_dir}" make

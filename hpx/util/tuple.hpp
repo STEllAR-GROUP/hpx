@@ -21,7 +21,7 @@
 #include <boost/fusion/adapted/struct/adapt_struct.hpp>
 #include <utility>
 #include <boost/mpl/bool.hpp>
-#include <boost/mpl/eval_if.hpp>
+#include <boost/mpl/if.hpp>
 #include <boost/mpl/identity.hpp>
 #include <boost/mpl/size_t.hpp>
 #include <boost/preprocessor/cat.hpp>
@@ -42,10 +42,10 @@
 #include <boost/type_traits/add_const.hpp>
 #include <boost/type_traits/add_cv.hpp>
 #include <boost/type_traits/add_volatile.hpp>
-#include <boost/type_traits/is_base_of.hpp>
 #include <boost/type_traits/is_fundamental.hpp>
 #include <boost/type_traits/is_pointer.hpp>
 #include <boost/type_traits/is_reference.hpp>
+#include <boost/type_traits/is_same.hpp>
 #include <boost/type_traits/remove_cv.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/utility/swap.hpp>
@@ -198,6 +198,17 @@ namespace hpx { namespace util
                 tuple_size<typename boost::remove_reference<UTuple>::type>::value == 0
             >::type
         > : boost::mpl::true_
+        {};
+
+        template <typename TTuple, typename UTuple>
+        struct are_tuples_compatible_not_same
+          : boost::mpl::if_c<
+                boost::is_same<
+                    typename decay<TTuple>::type, typename decay<UTuple>::type
+                >::value
+              , boost::mpl::false_
+              , are_tuples_compatible<TTuple, UTuple>
+            >::type
         {};
 
         ///////////////////////////////////////////////////////////////////////
@@ -358,7 +369,7 @@ namespace hpx { namespace util
     template <typename Tuple>
     struct tuple_decay
     {};
-    
+
 #   define HPX_TUPLE_DECAY_ELEM(Z, N, D)                                      \
     typename decay<BOOST_PP_CAT(T, N)>::type                                  \
     /**/
@@ -366,7 +377,7 @@ namespace hpx { namespace util
     struct tuple_decay<tuple<BOOST_PP_ENUM_PARAMS(N, T)> >
     {
         typedef tuple<BOOST_PP_ENUM(N, HPX_TUPLE_DECAY_ELEM, _)> type;
-    };    
+    };
 #undef HPX_TUPLE_DECAY_ELEM
 
     // 20.4.2.6, element access
@@ -993,14 +1004,13 @@ namespace hpx { namespace util
           , typename boost::enable_if_c<
 #       if N == 1
                 boost::mpl::eval_if_c<
-                    boost::is_base_of<
+                    boost::is_same<
                         tuple, typename boost::remove_reference<U0>::type
-                    >::value || detail::are_tuples_compatible<tuple, U0&&>::value
+                    >::value || detail::are_tuples_compatible_not_same<
+                        tuple, U0&&
+                    >::value
                   , boost::mpl::false_
-                  , detail::are_tuples_compatible<
-                        tuple
-                      , tuple<BOOST_PP_ENUM_PARAMS(N, U)>&&
-                    >
+                  , detail::are_tuples_compatible<tuple, tuple<U0>&&>
                 >::type::value
 #       else
                 detail::are_tuples_compatible<
@@ -1050,7 +1060,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<tuple, UTuple&&>::value
+                detail::are_tuples_compatible_not_same<tuple, UTuple&&>::value
             >::type* = 0
         ) : BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_GET_CONSTRUCT, _)
         {}

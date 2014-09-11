@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/mismatch.hpp
+/// \file parallel/detail/mismatch.hpp
 
 #if !defined(HPX_PARALLEL_DETAIL_MISMATCH_JUL_13_2014_0142PM)
 #define HPX_PARALLEL_DETAIL_MISMATCH_JUL_13_2014_0142PM
@@ -107,7 +107,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                     tok.cancel(i);
                             });
                     },
-                    [=](std::vector<hpx::future<void> > &&) mutable
+                    [=](std::vector<hpx::future<void> > &&) mutable -> std::pair<FwdIter1, FwdIter2>
                     {
                         std::size_t mismatched = tok.get_data();
                         if (mismatched != count1) {
@@ -374,7 +374,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                     tok.cancel(i);
                             });
                     },
-                    [=](std::vector<hpx::future<void> > &&) mutable
+                    [=](std::vector<hpx::future<void> > &&) mutable -> std::pair<FwdIter1, FwdIter2>
                     {
                         std::size_t mismatched = tok.get_data();
                         if (mismatched != count)

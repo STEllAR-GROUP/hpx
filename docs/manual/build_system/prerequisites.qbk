@@ -10,14 +10,15 @@
 
 [heading Supported Platforms]
 
-At this time, __hpx__ supports only the following platforms. Other platforms may
+At this time, __hpx__ supports the following platforms. Other platforms may
 work, but we do not test __hpx__ with other platforms, so please be warned.
 
 [table Supported Platforms for __hpx__
-    [[Name   ][Recommended Version][Minimum Version][Architectures ]]
-    [[Linux    ][3.2                ][2.6            ][x86-32, x86-64, k1om]]
-    [[BlueGeneQ][V1R2M0             ][V1R2M0         ][PowerPC A2]          ]
-    [[Windows  ][7, Server 2008 R2  ][Any NT system  ][x86-64]              ]
+    [[Name     ][Recommended Version][Minimum Version   ][Architectures ]]
+    [[Linux    ][3.2                ][2.6               ][x86-32, x86-64, k1om]]
+    [[BlueGeneQ][V1R2M0             ][V1R2M0            ][PowerPC A2]          ]
+    [[Windows  ][7, Server 2008 R2  ][Any Windows system][x86-32, x86-64]      ]
+    [[Mac OSX  ][                   ][Any OSX system    ][x86-64]              ]
 ]
 
 [heading Software and Libraries]
@@ -47,11 +48,11 @@ almost any standards compliant C++ compiler. A compiler supporting the C++11
 Standard is highly recommended. The code base takes advantage of C++11 language
 features when available (move semantics, rvalue references, magic statics, etc.).
 This may speed up the execution of your code significantly. We currently support
-GCC, MSVC, ICPC and clang. For the status of your favorite compiler with __hpx__
-visit __stellar_hpx_buildbot__.
+the following C++ compilers: GCC, MSVC, ICPC and clang. For the status of your
+favorite compiler with __hpx__ visit __stellar_hpx_buildbot__.
 
 [table Software Prerequisites for __hpx__ on Linux systems
-    [[Name                       ][Recommended Version][Minimum Version ]]
+    [[Name                       ][Recommended Version][Minimum Version ][Notes]]
 
     [[[*Compilers]]]
     [[__gcc__                    ][4.6.3 or newer     ][4.4.5           ]]
@@ -65,7 +66,7 @@ visit __stellar_hpx_buildbot__.
     [[__boost_libraries__        ][1.51.0 or newer    ][1.49.0          ]
         [See below for an important limitation when using Boost V1.54.0.]]
     [[__hwloc__                  ][1.8                ][1.2             ]
-        [Used for OS-thread pinning and NUMA awareness.]]
+        [Used for OS-thread pinning and NUMA awareness. This library is optional on Mac OSX.]]
 ]
 
 [important Because of a problem in Boost V1.54.0 this version can't be used
@@ -73,7 +74,7 @@ visit __stellar_hpx_buildbot__.
       an earlier or a later version of Boost with this compiler.]
 
 [table Software Prerequisites for __hpx__ on Windows systems
-    [[Name                       ][Recommended Version][Minimum Version ]]
+    [[Name                       ][Recommended Version][Minimum Version ][Notes]]
 
     [[[*Compilers]]]
     [[__visual_cxx__ (x64)       ][2013               ][2012            ]]
@@ -82,7 +83,8 @@ visit __stellar_hpx_buildbot__.
     [[__cmake__                  ][2.8.4              ][2.8.4           ]]
 
     [[[*Required Libraries]]]
-    [[__boost__                  ][1.51.0 or newer    ][1.49.0          ]]
+    [[__boost__                  ][1.51.0 or newer    ][1.49.0          ]
+     [See below for an important limitation when using Boost V1.55.0.]]
     [[__hwloc__                  ][1.8                ][1.5             ]
         [Used for OS-thread pinning and NUMA awareness.]]
 ]
@@ -90,9 +92,11 @@ visit __stellar_hpx_buildbot__.
 [note You need to build the following Boost libraries for __hpx__:
       Boost.DateTime, Boost.Filesystem, Boost.ProgramOptions, Boost.Regex,
       Boost.Serialization, Boost.System, Boost.Thread, Boost.Chrono (starting
-      Boost 1.49.0), and Boost.Atomic (starting Boost 1.53.0). It is important
-	  to note that MSVC2013 is unable to build Boost 1.55.0, a different boost
-	  version or compiler will be required.]
+      Boost 1.49.0), and Boost.Atomic (starting Boost 1.53.0). ]
+
+[important Because of a problem in Boost V1.55.0 this version can't be used
+      for compiling __hpx__ if you use MSVC2013. Please use either
+      an earlier or a later version of Boost with this compiler.]
 
 Depending on the options you chose while building and installing __hpx__,
 you will find that __hpx__ may depend on several other libraries such as those
@@ -151,6 +155,10 @@ listed below.
       for compiling __hpx__ if you use gcc V4.6.x. Please use either
       an earlier or a later version of Boost with this compiler.]
 
+[important Because of a problem in Boost V1.55.0 this version can't be used
+      for compiling __hpx__ if you use MSVC2013. Please use either
+      an earlier or a later version of Boost with this compiler.]
+
 The easiest way to create a working Boost installation is to compile Boost from
 sources yourself. This is particularly important as many high performance
 resources, even if they have Boost installed, usually only provide you with an
@@ -170,15 +178,15 @@ where: `<where to install boost>` is the directory the built binaries will be
 installed to, and `<N>` is the number of cores to use to build the Boost
 binaries.
 
-After the above sequence of command has been executed (this may take a while!)
+After the above sequence of commands has been executed (this may take a while!)
 you will need to specify the directory where Boost was installed as `BOOST_ROOT`
 (`<where to install boost>`) while executing cmake for __hpx__ as explained in
 detail in the sections __unix_installation__ and __windows_installation__.
 
 [important On Windows, depending on the installed versions of Visual Studio, you
-    might also want to pass the correct toolset to the b2 command depending on
-    which version of the IDE you want to use. In addition, passing address-model=64
-    is always safe]
+    might also want to pass the correct toolset to the `b2` command depending on
+    which version of the IDE you want to use. In addition, passing `address-model=64`
+    is highly recommended.]
 
 [endsect]
 

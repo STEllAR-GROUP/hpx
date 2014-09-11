@@ -65,14 +65,13 @@ namespace hpx { namespace util
             U0 && u0
           , typename boost::enable_if_c<
                 boost::mpl::eval_if_c<
-                    boost::is_base_of<
+                    boost::is_same<
                         tuple, typename boost::remove_reference<U0>::type
-                    >::value || detail::are_tuples_compatible<tuple, U0&&>::value
+                    >::value || detail::are_tuples_compatible_not_same<
+                        tuple, U0&&
+                    >::value
                   , boost::mpl::false_
-                  , detail::are_tuples_compatible<
-                        tuple
-                      , tuple<U0>&&
-                    >
+                  , detail::are_tuples_compatible<tuple, tuple<U0>&&>
                 >::type::value
             >::type* = 0
         ) : _m0 (std::forward<U0>(u0))
@@ -100,7 +99,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<tuple, UTuple&&>::value
+                detail::are_tuples_compatible_not_same<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other)))
         {}
@@ -358,7 +357,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<tuple, UTuple&&>::value
+                detail::are_tuples_compatible_not_same<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other)))
         {}
@@ -616,7 +615,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<tuple, UTuple&&>::value
+                detail::are_tuples_compatible_not_same<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other)))
         {}
@@ -895,7 +894,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<tuple, UTuple&&>::value
+                detail::are_tuples_compatible_not_same<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other)))
         {}
@@ -1171,7 +1170,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<tuple, UTuple&&>::value
+                detail::are_tuples_compatible_not_same<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other)))
         {}
@@ -1450,7 +1449,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<tuple, UTuple&&>::value
+                detail::are_tuples_compatible_not_same<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other))) , _m5(util::get< 5>(std::forward<UTuple>(other)))
         {}
@@ -1726,7 +1725,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<tuple, UTuple&&>::value
+                detail::are_tuples_compatible_not_same<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other))) , _m5(util::get< 5>(std::forward<UTuple>(other))) , _m6(util::get< 6>(std::forward<UTuple>(other)))
         {}
@@ -2005,7 +2004,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<tuple, UTuple&&>::value
+                detail::are_tuples_compatible_not_same<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other))) , _m5(util::get< 5>(std::forward<UTuple>(other))) , _m6(util::get< 6>(std::forward<UTuple>(other))) , _m7(util::get< 7>(std::forward<UTuple>(other)))
         {}
@@ -2281,7 +2280,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<tuple, UTuple&&>::value
+                detail::are_tuples_compatible_not_same<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other))) , _m5(util::get< 5>(std::forward<UTuple>(other))) , _m6(util::get< 6>(std::forward<UTuple>(other))) , _m7(util::get< 7>(std::forward<UTuple>(other))) , _m8(util::get< 8>(std::forward<UTuple>(other)))
         {}
@@ -2560,7 +2559,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<tuple, UTuple&&>::value
+                detail::are_tuples_compatible_not_same<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other))) , _m5(util::get< 5>(std::forward<UTuple>(other))) , _m6(util::get< 6>(std::forward<UTuple>(other))) , _m7(util::get< 7>(std::forward<UTuple>(other))) , _m8(util::get< 8>(std::forward<UTuple>(other))) , _m9(util::get< 9>(std::forward<UTuple>(other)))
         {}
@@ -2836,7 +2835,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<tuple, UTuple&&>::value
+                detail::are_tuples_compatible_not_same<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other))) , _m5(util::get< 5>(std::forward<UTuple>(other))) , _m6(util::get< 6>(std::forward<UTuple>(other))) , _m7(util::get< 7>(std::forward<UTuple>(other))) , _m8(util::get< 8>(std::forward<UTuple>(other))) , _m9(util::get< 9>(std::forward<UTuple>(other))) , _m10(util::get< 10>(std::forward<UTuple>(other)))
         {}
@@ -3115,7 +3114,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<tuple, UTuple&&>::value
+                detail::are_tuples_compatible_not_same<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other))) , _m5(util::get< 5>(std::forward<UTuple>(other))) , _m6(util::get< 6>(std::forward<UTuple>(other))) , _m7(util::get< 7>(std::forward<UTuple>(other))) , _m8(util::get< 8>(std::forward<UTuple>(other))) , _m9(util::get< 9>(std::forward<UTuple>(other))) , _m10(util::get< 10>(std::forward<UTuple>(other))) , _m11(util::get< 11>(std::forward<UTuple>(other)))
         {}
@@ -3391,7 +3390,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<tuple, UTuple&&>::value
+                detail::are_tuples_compatible_not_same<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other))) , _m5(util::get< 5>(std::forward<UTuple>(other))) , _m6(util::get< 6>(std::forward<UTuple>(other))) , _m7(util::get< 7>(std::forward<UTuple>(other))) , _m8(util::get< 8>(std::forward<UTuple>(other))) , _m9(util::get< 9>(std::forward<UTuple>(other))) , _m10(util::get< 10>(std::forward<UTuple>(other))) , _m11(util::get< 11>(std::forward<UTuple>(other))) , _m12(util::get< 12>(std::forward<UTuple>(other)))
         {}

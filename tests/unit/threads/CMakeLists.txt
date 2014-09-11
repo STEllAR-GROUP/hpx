@@ -66,3 +66,7 @@ foreach(test ${tests})
                               ${test}_test_exe)
 endforeach()
 
+set_property(TARGET lockfree_fifo_test_exe APPEND
+    PROPERTY COMPILE_DEFINITIONS
+    "HPX_NO_VERSION_CHECK")
+

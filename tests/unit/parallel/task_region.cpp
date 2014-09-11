@@ -28,18 +28,17 @@ void task_region_test1()
     {
         parent_flag = true;
 
-        trh.run([=, &task1_flag]{
+        trh.run([&]() {
             task1_flag = true;
             hpx::cout << "task1: " << s << hpx::endl;
         });
 
-        trh.run([&]{
+        trh.run([&]() -> void {
             task2_flag = true;
             hpx::cout << "task2" << hpx::endl;
 
-            task_region([&](task_region_handle& trh)
-            {
-                trh.run([&]{
+            task_region([&](task_region_handle& trh) -> void {
+                trh.run([&]() -> void {
                     task21_flag = true;
                     hpx::cout << "task2.1" << hpx::endl;
                 });
@@ -47,7 +46,7 @@ void task_region_test1()
         });
 
         int i = 0, j = 10, k = 20;
-        trh.run([=, &task3_flag]{
+        trh.run([=, &task3_flag]() -> void {
             task3_flag = true;
             hpx::cout << "task3: " << i << " " << j << " " << k << hpx::endl;
         });
@@ -77,18 +76,17 @@ void task_region_test2()
     {
         parent_flag = true;
 
-        trh.run([=, &task1_flag]{
+        trh.run([&]() -> void {
             task1_flag = true;
             hpx::cout << "task1: " << s << hpx::endl;
         });
 
-        trh.run([&]{
+        trh.run([&]() -> void {
             task2_flag = true;
             hpx::cout << "task2" << hpx::endl;
 
-            task_region([&](task_region_handle& trh)
-            {
-                trh.run([&]{
+            task_region([&](task_region_handle& trh) -> void {
+                trh.run([&]() -> void {
                     task21_flag = true;
                     hpx::cout << "task2.1" << hpx::endl;
                 });
@@ -96,7 +94,7 @@ void task_region_test2()
         });
 
         int i = 0, j = 10, k = 20;
-        trh.run([=, &task3_flag]{
+        trh.run([=, &task3_flag]() -> void {
             task3_flag = true;
             hpx::cout << "task3: " << i << " " << j << " " << k << hpx::endl;
         });
@@ -116,14 +114,13 @@ void task_region_test2()
 void task_region_exceptions_test1()
 {
     try {
-        task_region([](task_region_handle& trh)
-        {
-            trh.run([]{
+        task_region([](task_region_handle& trh) -> void {
+            trh.run([]() -> void {
                 hpx::cout << "task1" << hpx::endl;
                 throw 1;
             });
 
-            trh.run([]{
+            trh.run([]() -> void {
                 hpx::cout << "task2" << hpx::endl;
                 throw 2;
             });
@@ -146,12 +143,12 @@ void task_region_exceptions_test2()
 {
     hpx::future<void> f = async_task_region([](task_region_handle& trh)
     {
-        trh.run([]{
+        trh.run([]() -> void {
             hpx::cout << "task1" << hpx::endl;
             throw 1;
         });
 
-        trh.run([]{
+        trh.run([]() -> void {
             hpx::cout << "task2" << hpx::endl;
             throw 2;
         });
@@ -178,10 +175,10 @@ void task_region_exceptions_test3()
     try {
         task_region([&](task_region_handle& trh)
         {
-            trh.run([&]()
+            trh.run([&]() -> void
             {
                 // Error: tr is not active
-                trh.run([]
+                trh.run([]() -> void
                 {
                     HPX_TEST(false);    // should not be called
                 });
@@ -204,10 +201,10 @@ void task_region_exceptions_test4()
 {
     hpx::future<void> f = async_task_region([&](task_region_handle& trh)
     {
-        trh.run([&]()
+        trh.run([&]() -> void
         {
             // Error: tr is not active
-            trh.run([]
+            trh.run([]() -> void
             {
                 HPX_TEST(false);    // should not be called
             });

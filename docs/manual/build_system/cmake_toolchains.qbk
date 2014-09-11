@@ -5,6 +5,9 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ===============================================================================/]
 
+[/ This file has been automatically generated using the CMake tool.            /]
+[/ Do not edit manually.                                                       /]
+
 [section:cmake_toolchains CMake Toolchains shipped with HPX]
 
 In order to compile HPX for various platforms, we provide a variety of Toolchain files that
@@ -199,18 +202,18 @@ To use them pass the `-DCMAKE_TOOLCHAIN_FILE=<toolchain>` argument to the cmake 
     set(CMAKE_CROSSCOMPILING ON)
     # Set our platform name
     set(HPX_PLATFORM "XeonPhi")
-    # Always disable the ibverbs parcelport as it is nonfunctional on the MIC.
-    set(HPX_IBVERBS_PARCELPORT OFF)
+    # Always disable the ibverbs parcelport as it is nonfunctional on the BGQ.
+    set(HPX_PARCELPORT_IBVERBS OFF CACHE BOOL "Enable the ibverbs based parcelport. This is currently an experimental feature")
     # We have a bunch of cores on the MIC ... increase the default
-    set(HPX_MAX_CPU_COUNT "256")
+    set(HPX_MAX_CPU_COUNT "256" CACHE STRING "")
     # We default to tbbmalloc as our allocator on the MIC
     if(NOT DEFINED HPX_MALLOC)
-      set(HPX_MALLOC "tbbmalloc")
+      set(HPX_MALLOC "tbbmalloc" CACHE STRING "")
     endif()
     # Set the TBBMALLOC_PLATFORM correctly so that find_package(TBBMalloc) sets the
     # right hints
-    set(TBBMALLOC_PLATFORM "mic")
-    set(HPX_HIDDEN_VISIBILITY OFF)
+    set(TBBMALLOC_PLATFORM "mic" CACHE STRING "")
+    set(HPX_HIDDEN_VISIBILITY OFF CACHE BOOL "Use -fvisibility=hidden for builds on platforms which support it")
 ``
 
 

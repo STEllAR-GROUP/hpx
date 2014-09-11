@@ -13,8 +13,8 @@ implements (and extends) some of those proposals. This is well aligned with
 our strategy to align the APIs exposed from __hpx__ with current and future
 C++ Standards.
 
-At this point, __hpx__ implements two of the C++ Standardization working papers,
-namely __cpp11_n4071__ (Working Draft, Technical Specification for C++
+At this point, __hpx__ implements several of the C++ Standardization working papers,
+most notably __cpp11_n4104__ (Working Draft, Technical Specification for C++
 Extensions for Parallelism) and __cpp11_n4088__ (Task Regions).
 
 
@@ -136,8 +136,12 @@ __hpx__ provides implementations of the following parallel algorithms:
      [Finds the first position where two ranges differ]]
     [[ [algoref find] ]
      [Finds the first element equal to a given value]]
+    [[ [algoref find_end] ]
+     [Finds the last sequence of elements in a certain range]]
     [[ [algoref find_if] ]
      [Finds the first element satisfying a specific criteria]]
+    [[ [algoref find_first_of] ]
+     [Searches for any one of a set of elements]]
     [[ [algoref find_if_not] ]
      [Finds the first element not satisfying a specific criteria]]
 ]
@@ -177,8 +181,20 @@ __hpx__ provides implementations of the following parallel algorithms:
      [Swaps two ranges of elements]]
 ]
 
+[table Minimum/maximum operations
+    [[Name]     [Description]]
+    [[ [algoref max_element] ]
+     [Returns the largest element in a range]]
+    [[ [algoref min_element] ]
+     [Returns the smallest element in a range]]
+    [[ [algoref minmax_element] ]
+     [Returns the smallest and the largest element in a range]]
+]
+
 [table Numeric Parallel Algorithms
     [[Name]     [Description]]
+    [[ [algoref adjacent_find] ]
+     [Computes the differences between adjacent elements in a range]]
     [[ [algoref reduce] ]
      [Sums up a range of elements]]
     [[ [algoref transform_reduce] ]

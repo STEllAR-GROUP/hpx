@@ -256,25 +256,28 @@ if __name__ == '__main__':
         proc.wait()
         ret = proc.returncode
         procs_lock.acquire()
-        if procs: procs.pop(which)
-        if not ret_expected(ret):
-            returncode = 1
-            # Output which process failed
-            msg = 'Process ' + str(which) + ' failed with an unexpected error '
-            msg += 'code of ' + str(ret) + ' (expected ' + str(options.expected)
-            msg += ')'
-            print(msg)
-            while procs:
-                term(procs.pop(0))
-        procs_lock.release()
+        try:
+            if not ret_expected(ret):
+                returncode = 1
+                # Output which process failed
+                msg = 'Process ' + str(which) + ' failed with an unexpected error '
+                msg += 'code of ' + str(ret) + ' (expected ' + str(options.expected)
+                msg += ')'
+                print(msg)
+                while procs:
+                    term(procs.pop(0))
+        finally: procs_lock.release()
 
     which = 0
     proc_watchdogs = []
-    for proc in procs:
-        proc_watchdog = threading.Thread(target=wait_on_proc, args=(proc, which))
-        proc_watchdog.start()
-        proc_watchdogs.append(proc_watchdog)
-        which = which + 1
+    procs_lock.acquire()
+    try:
+        for proc in procs:
+            proc_watchdog = threading.Thread(target=wait_on_proc, args=(proc, which))
+            proc_watchdog.start()
+            proc_watchdogs.append(proc_watchdog)
+            which = which + 1
+    finally: procs_lock.release()
 
     for proc_watchdog in proc_watchdogs:
         proc_watchdog.join()
