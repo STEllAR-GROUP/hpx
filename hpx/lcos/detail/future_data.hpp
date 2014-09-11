@@ -148,6 +148,8 @@ namespace detail
           : data_(), state_(empty)
         {}
 
+        virtual void execute_deferred(error_code& ec = throws) {}
+
         // cancellation is disabled by default
         virtual bool cancelable() const
         {
@@ -491,6 +493,12 @@ namespace detail
           : started_(false), id_(threads::invalid_thread_id),
             sched_(sched ? &sched : 0)
         {}
+
+        virtual void execute_deferred(error_code& ec = throws)
+        {
+            if (!started_test_and_set())
+                this->do_run();
+        }
 
         // retrieving the value
         virtual data_type& get_result(error_code& ec = throws)
