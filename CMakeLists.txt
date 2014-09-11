@@ -166,7 +166,11 @@ hpx_option(HPX_FULL_RPATH BOOL "Build and link HPX libraries and executables wit
 ################################################################################
 # Native TLS configuration
 ################################################################################
-hpx_option(HPX_NATIVE_TLS BOOL "Use native TLS support if available (default: ON)" ON ADVANCED)
+set(HPX_NATIVE_TLS_DEFAULT ON)
+if(APPLE)
+  set(HPX_NATIVE_TLS_DEFAULT OFF)
+endif()
+hpx_option(HPX_NATIVE_TLS BOOL "Use native TLS support if available (default: ON)" ${HPX_NATIVE_TLS_DEFAULT} ADVANCED)
 if(HPX_NATIVE_TLS)
   hpx_info("Native TLS is enabled.")
   hpx_add_config_define(HPX_HAVE_NATIVE_TLS)
@@ -204,6 +208,9 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
     set(HPX_HIDDEN_VISIBILITY_DEFAULT OFF)
   endif()
+endif()
+if(APPLE)
+  set(HPX_HIDDEN_VISIBILITY_DEFAULT OFF)
 endif()
 
 hpx_option(HPX_HIDDEN_VISIBILITY BOOL
