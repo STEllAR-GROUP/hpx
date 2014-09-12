@@ -12,9 +12,8 @@
 
 #if defined(HPX_HAVE_STACKTRACES)
 
-#include <hpx/async.hpp>
-
 #define HPX_BACKTRACE_SOURCE
+#include <hpx/async.hpp>
 
 #include <boost/config.hpp>
 #include <boost/lexical_cast.hpp>
