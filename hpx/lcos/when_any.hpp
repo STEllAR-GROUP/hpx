@@ -38,8 +38,8 @@ namespace hpx { namespace lcos
     {
         ///////////////////////////////////////////////////////////////////////
         template <typename Future>
-        struct when_any_swapped //-V690
-          : boost::enable_shared_from_this<when_any_swapped<Future> >
+        struct when_any_back //-V690
+          : boost::enable_shared_from_this<when_any_back<Future> >
         {
         private:
             enum { index_error = -1 };
@@ -58,14 +58,14 @@ namespace hpx { namespace lcos
 
         private:
             // workaround gcc regression wrongly instantiating constructors
-            when_any_swapped();
-            when_any_swapped(when_any_swapped const&);
+            when_any_back();
+            when_any_back(when_any_back const&);
 
         public:
             typedef std::vector<Future> result_type;
             typedef std::vector<Future> argument_type;
 
-            when_any_swapped(argument_type && lazy_values)
+            when_any_back(argument_type && lazy_values)
               : lazy_values_(std::move(lazy_values))
               , index_(static_cast<std::size_t>(index_error))
             {}
@@ -93,7 +93,7 @@ namespace hpx { namespace lcos
                             lcos::detail::get_shared_state(lazy_values_[i]);
 
                         shared_state->set_on_completed(util::bind(
-                            &when_any_swapped::on_future_ready,
+                            &when_any_back::on_future_ready,
                             this->shared_from_this(), i, id));
                     }
                 }
@@ -182,25 +182,25 @@ namespace hpx { namespace lcos
         return lcos::make_ready_future(result_type());
     }
 
-    /// The function \a when_any_swapped is a non-deterministic choice
+    /// The function \a when_any_back is a non-deterministic choice
     /// operator. It OR-composes all future objects given and returns the same
     /// list of futures after one future of that list finishes execution. The
     /// future object that was first detected as being ready swaps its
     /// position with that of the last element of the result collection, so
     /// that the ready future object may be identified in constant time.
     ///
-    /// \note There are two variations of when_any_swapped. The first takes
+    /// \note There are two variations of when_any_back. The first takes
     ///       a pair of InputIterators. The second takes an std::vector of
     ///       future<R>.
     ///
     /// \return   The same list of futures as has been passed to
-    ///           when_any_swapped, where the future object that was first
+    ///           when_any_back, where the future object that was first
     ///           detected as being ready has swapped position with the last
     ///           element in the list.
 
     template <typename Future>
     lcos::future<std::vector<Future> >
-    when_any_swapped(std::vector<Future>& lazy_values,
+    when_any_back(std::vector<Future>& lazy_values,
         error_code& ec = throws)
     {
         typedef std::vector<Future> result_type;
@@ -213,12 +213,12 @@ namespace hpx { namespace lcos
             std::back_inserter(lazy_values_),
             detail::when_acquire_future<Future>());
 
-        boost::shared_ptr<detail::when_any_swapped<Future> > f =
-            boost::make_shared<detail::when_any_swapped<Future> >(
+        boost::shared_ptr<detail::when_any_back<Future> > f =
+            boost::make_shared<detail::when_any_back<Future> >(
                 std::move(lazy_values_));
 
         lcos::local::futures_factory<result_type()> p(
-            util::bind(&detail::when_any_swapped<Future>::operator(), f));
+            util::bind(&detail::when_any_back<Future>::operator(), f));
 
         p.apply();
         return p.get_future();
@@ -226,17 +226,17 @@ namespace hpx { namespace lcos
 
     template <typename Future>
     lcos::future<std::vector<Future> > //-V659
-    when_any_swapped(std::vector<Future> && lazy_values,
+    when_any_back(std::vector<Future> && lazy_values,
         error_code& ec = throws)
     {
-        return lcos::when_any_swapped(lazy_values, ec);
+        return lcos::when_any_back(lazy_values, ec);
     }
 
     template <typename Iterator>
     lcos::future<std::vector<
         typename lcos::detail::future_iterator_traits<Iterator>::type
     > >
-    when_any_swapped(Iterator begin, Iterator end,
+    when_any_back(Iterator begin, Iterator end,
         error_code& ec = throws)
     {
         typedef
@@ -247,12 +247,12 @@ namespace hpx { namespace lcos
         result_type lazy_values_;
         std::transform(begin, end, std::back_inserter(lazy_values_),
             detail::when_acquire_future<future_type>());
-        return lcos::when_any_swapped(lazy_values_, ec);
+        return lcos::when_any_back(lazy_values_, ec);
     }
 
     template <typename Iterator>
     lcos::future<Iterator>
-    when_any_swapped_n(Iterator begin, std::size_t count,
+    when_any_back_n(Iterator begin, std::size_t count,
         error_code& ec = throws)
     {
         typedef
@@ -266,7 +266,7 @@ namespace hpx { namespace lcos
         for (std::size_t i = 0; i != count; ++i)
             lazy_values_.push_back(func(*begin++));
 
-        return lcos::when_any_swapped(lazy_values_, ec);
+        return lcos::when_any_back(lazy_values_, ec);
     }
 }}
 
@@ -292,9 +292,9 @@ namespace hpx { namespace lcos
 namespace hpx
 {
     using lcos::when_any;
-    using lcos::when_any_swapped;
+    using lcos::when_any_back;
     using lcos::when_any_n;
-    using lcos::when_any_swapped_n;
+    using lcos::when_any_back_n;
 }
 
 #endif
