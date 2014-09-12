@@ -59,6 +59,11 @@
 #define EXEC_PAGESIZE PAGE_SIZE
 #endif
 
+#if defined(__APPLE__)
+#include <unistd.h>
+#define EXEC_PAGESIZE sysconf(_SC_PAGESIZE)
+#endif
+
 /**
  * Stack allocation routines and trampolines for setcontext
  */
