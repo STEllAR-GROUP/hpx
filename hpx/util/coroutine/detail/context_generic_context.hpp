@@ -203,9 +203,9 @@ namespace hpx { namespace util { namespace coroutines
             ~fcontext_context_impl()
             {
 #if BOOST_VERSION < 105600
-                if (ctx_.fc_stack.sp)
+                if (ctx_.fc_stack.sp && stack_pointer_)
 #else
-                if (ctx_)
+                if (ctx_ && stack_pointer_)
 #endif
                 {
                     alloc_.deallocate(stack_pointer_, stack_size_);
