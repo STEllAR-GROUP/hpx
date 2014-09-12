@@ -45,6 +45,11 @@ the first time to __hpx__.
   Draft, Technical Specification for C++ Extensions for Parallelism),
   __cpp11_n4088__ (Task Region Rev. 3), and __cpp11_n4107__ (Working Draft,
   Technical Specification for C++ Extensions for Concurrency).
+* We completely remodeled our automatic build system to run builds and unit tests
+  on various systems and compilers. This allows us to find most bugs right as
+  they were introduced and helps to maintain a high level of quality and
+  compatibility.
+  The newest build logs can be found at [http://hermione.cct.lsu.edu/console].
 
 [heading Bug Fixes (Closed Tickets)]
 
