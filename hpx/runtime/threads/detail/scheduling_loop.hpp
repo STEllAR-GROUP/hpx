@@ -172,10 +172,12 @@ namespace hpx { namespace threads { namespace detail
     struct idle_collect_rate
     {
         idle_collect_rate(boost::uint64_t& tfunc_time, boost::uint64_t& exec_time)
-          : start_timestamp_(policies::maintain_idle_rates ? util::hardware::timestamp() : 0)
+          : start_timestamp_(util::hardware::timestamp())
           , tfunc_time_(tfunc_time)
           , exec_time_(exec_time)
-        {}
+        {
+            tfunc_time_ = 0;
+        }
 
         void collect_exec_time(boost::uint64_t timestamp)
         {
@@ -196,17 +198,20 @@ namespace hpx { namespace threads { namespace detail
 
     struct exec_time_wrapper
     {
-        exec_time_wrapper(idle_collect_rate& idle_rate)
-          : timestamp_(policies::maintain_idle_rates ? util::hardware::timestamp() : 0)
+        exec_time_wrapper(idle_collect_rate& idle_rate, bool active)
+          : timestamp_(active ? util::hardware::timestamp() : 0)
           , idle_rate_(idle_rate)
+          , active_(active)
         {}
         ~exec_time_wrapper()
         {
-            idle_rate_.collect_exec_time(timestamp_);
+            if (active_)
+                idle_rate_.collect_exec_time(timestamp_);
         }
 
         boost::uint64_t timestamp_;
         idle_collect_rate& idle_rate_;
+        bool active_;
     };
 
     struct tfunc_time_wrapper
@@ -286,7 +291,8 @@ namespace hpx { namespace threads { namespace detail
 #endif
                                 // Record time elapsed in thread changing state
                                 // and add to aggregate execution time.
-                                exec_time_wrapper exec_time_collector(idle_rate);
+                                exec_time_wrapper exec_time_collector(idle_rate,
+                                    policies::maintain_idle_rates);
                                 thrd_stat = (*thrd)();
                             }
 
