@@ -77,7 +77,11 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     typedef typename coroutine_type::yield_traits yield_traits;
     typedef typename coroutine_type::thread_id_repr_type thread_id_repr_type;
 
-#if defined(HPX_GENERIC_COROUTINES)
+    typedef typename yield_traits::arg0_type arg0_type;
+    typedef util::function_nonser<yield_result_type(arg0_type)>
+        yield_decorator_type;
+
+#if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
 
 #define HPX_COROUTINE_PARAM_WITH_DEFAULT(z, n, type_prefix)                   \
     typename boost::call_traits<                                              \
@@ -89,7 +93,8 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     yield_result_type yield(BOOST_PP_ENUM(HPX_COROUTINE_ARG_MAX,
         HPX_COROUTINE_PARAM_WITH_DEFAULT, typename yield_traits::arg))
     {
-        return yield_impl(typename coroutine_type::result_slot_type(
+        return !yield_decorator_.empty() ? yield_decorator_(arg0)
+          : yield_impl(typename coroutine_type::result_slot_type(
             BOOST_PP_ENUM_PARAMS(HPX_COROUTINE_ARG_MAX, arg)));
     }
 
@@ -106,10 +111,6 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #undef  HPX_COROUTINE_PARAM_WITH_DEFAULT
 
 #else
-
-    typedef typename yield_traits::arg0_type arg0_type;
-    typedef util::function_nonser<yield_result_type(arg0_type)>
-        yield_decorator_type;
 
     yield_result_type yield(arg0_type arg0 = arg0_type())
     {
@@ -128,6 +129,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
       return *m_pimpl->args();
     }
+#endif
 
     template <typename F>
     yield_decorator_type decorate_yield(F && f)
@@ -156,8 +158,6 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         std::swap(tmp, yield_decorator_);
         return std::move(tmp);
     }
-
-#endif
 
     HPX_ATTRIBUTE_NORETURN void exit() {
       m_pimpl -> exit_self();
@@ -220,11 +220,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     }
 #endif
 
-#if defined(HPX_GENERIC_COROUTINES)
-  private:
-    coroutine_self(impl_type * pimpl, detail::init_from_impl_tag)
-      : m_pimpl(pimpl), next_self_(0)
-    {}
+#if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
 
     yield_result_type yield_impl(
         typename coroutine_type::result_slot_type result_)
@@ -240,6 +236,11 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       typedef typename coroutine_type::arg_slot_traits traits_type;
       return detail::fix_result<traits_type>(*m_pimpl->args());
     }
+
+  private:
+    coroutine_self(impl_type * pimpl, detail::init_from_impl_tag)
+      : m_pimpl(pimpl), next_self_(0)
+    {}
 
     template <typename TargetCoroutine>
     yield_result_type yield_to_impl(TargetCoroutine& target,
@@ -259,12 +260,10 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       return detail::fix_result<traits_type>(*m_pimpl->args());
     }
 
-#else
+#endif
 
   private:
     yield_decorator_type yield_decorator_;
-
-#endif
 
     impl_ptr get_impl()
     {

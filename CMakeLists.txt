@@ -141,7 +141,7 @@ hpx_option(HPX_WAVE_ADDITIONAL_INCLUDE_DIRS STRING "Additional (compiler specifi
 # to how components are loaded.
 ################################################################################
 hpx_option(HPX_STATIC_LINKING BOOL
-  "Compile HPX staticly linked libraries (Default: OFF)" OFF ADVANCED)
+  "Compile HPX statically linked libraries (Default: OFF)" OFF ADVANCED)
 if(HPX_STATIC_LINKING)
   hpx_add_config_define(HPX_STATIC_LINKING)
   set(hpx_library_link_mode STATIC)
@@ -157,6 +157,7 @@ hpx_option(HPX_BUILD_TESTS BOOL "Build the HPX tests (default ON)" ON CATEGORY "
 hpx_option(HPX_BUILD_TESTS_BENCHMARKS BOOL "Build HPX benchmark tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_BUILD_TESTS_REGRESSIONS BOOL "Build HPX regression tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_BUILD_TESTS_UNIT BOOL "Build HPX unit tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
+hpx_option(HPX_BUILD_TESTS_EXTERNAL_BUILD BOOL "Build external cmake build tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_BUILD_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_BUILD_RUNTIME BOOL "Build HPX runtime (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 
@@ -165,7 +166,11 @@ hpx_option(HPX_FULL_RPATH BOOL "Build and link HPX libraries and executables wit
 ################################################################################
 # Native TLS configuration
 ################################################################################
-hpx_option(HPX_NATIVE_TLS BOOL "Use native TLS support if available (default: ON)" ON ADVANCED)
+set(HPX_NATIVE_TLS_DEFAULT ON)
+if(APPLE)
+  set(HPX_NATIVE_TLS_DEFAULT OFF)
+endif()
+hpx_option(HPX_NATIVE_TLS BOOL "Use native TLS support if available (default: ON)" ${HPX_NATIVE_TLS_DEFAULT} ADVANCED)
 if(HPX_NATIVE_TLS)
   hpx_info("Native TLS is enabled.")
   hpx_add_config_define(HPX_HAVE_NATIVE_TLS)
@@ -203,6 +208,12 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
     set(HPX_HIDDEN_VISIBILITY_DEFAULT OFF)
   endif()
+endif()
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  set(HPX_HIDDEN_VISIBILITY_DEFAULT OFF)
+endif()
+if(APPLE)
+  set(HPX_HIDDEN_VISIBILITY_DEFAULT OFF)
 endif()
 
 hpx_option(HPX_HIDDEN_VISIBILITY BOOL
@@ -803,7 +814,7 @@ if(MSVC)
 
   hpx_add_config_define(BOOST_USE_WINDOWS_H)
   hpx_add_config_define(BOOST_SERIALIZATION_DYN_LINK)
-  if(NOT HPX_USE_GENERIC_COROUTINE_CONTEXT)
+  if(NOT HPX_WITH_GENERIC_CONTEXT_COROUTINES)
     hpx_add_config_define(HPX_HAVE_FIBER_BASED_COROUTINES)
   endif()
   hpx_add_config_define(PSAPI_VERSION 1)
@@ -1019,7 +1030,7 @@ hpx_check_for_cxx11_std_initializer_list(
 # with incompatible options with the currently selected platform.
 #
 
-if(HPX_GENERIC_COROUTINE_CONTEXT)
+if(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
   # Check if we can use generic coroutine contexts without any problems
   if(NOT Boost_CONTEXT_FOUND)
     hpx_error("The usage of Boost.Context was selected but Boost.Context was not found (Version 1.51 or higher is required).")
@@ -1197,12 +1208,14 @@ endif()
 ################################################################################
 # Configure the header to include all compile definitions
 ################################################################################
-list(SORT HPX_CONFIG_DEFINITIONS)
-list(REMOVE_DUPLICATES HPX_CONFIG_DEFINITIONS)
+get_property(HPX_CONFIG_DEFINITIONS_VAR GLOBAL PROPERTY HPX_CONFIG_DEFINITIONS)
+
+list(SORT HPX_CONFIG_DEFINITIONS_VAR)
+list(REMOVE_DUPLICATES HPX_CONFIG_DEFINITIONS_VAR)
 
 set(hpx_config_defines "\n")
-foreach(def ${HPX_CONFIG_DEFINITIONS})
-    set(hpx_config_defines "${hpx_config_defines}#define ${def} ${${def}_define}\n")#"
+foreach(def ${HPX_CONFIG_DEFINITIONS_VAR})
+  set(hpx_config_defines "${hpx_config_defines}#define ${def} ${${def}_define}\n")#"
 endforeach()
 
 configure_file("${hpx_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"

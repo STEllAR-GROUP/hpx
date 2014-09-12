@@ -18,5 +18,4 @@ if(HPX_WITH_SECURITY)
   add_hpx_pseudo_dependencies(core
                             components.security)
 
-  set(HPX_CONFIG_DEFINITIONS ${HPX_CONFIG_DEFINITIONS} PARENT_SCOPE)
 endif()
