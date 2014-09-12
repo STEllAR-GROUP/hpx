@@ -206,7 +206,6 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
   private:
     arg_slot_type * m_arg;
-    //arg0_type* m_arg;
     result_slot_type ** m_result;
 #else
   protected:
