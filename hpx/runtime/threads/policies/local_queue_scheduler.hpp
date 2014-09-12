@@ -259,7 +259,7 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         // create a new thread and schedule it if the initial state is equal to
         // pending
-        thread_id_type create_thread(thread_init_data& data,
+        void create_thread(thread_init_data& data, thread_id_type* id,
             thread_state_enum initial_state, bool run_now, error_code& ec,
             std::size_t num_thread)
         {
@@ -282,7 +282,7 @@ namespace hpx { namespace threads { namespace policies
                 num_thread %= queue_size;
 
             HPX_ASSERT(num_thread < queue_size);
-            return queues_[num_thread]->create_thread(data, initial_state,
+            queues_[num_thread]->create_thread(data, id, initial_state,
                 run_now, ec);
         }
 
@@ -325,7 +325,7 @@ namespace hpx { namespace threads { namespace policies
 
                     HPX_ASSERT(idx != num_thread);
 
-                    if (!test(this_numa_domain, idx) && !test(numa_domain, idx)) //-V560 //-V600
+                    if (!test(this_numa_domain, idx) && !test(numa_domain, idx)) //-V560 //-V600 //-V111
                         continue;
 
                     thread_queue_type* q = queues_[idx];
@@ -545,7 +545,7 @@ namespace hpx { namespace threads { namespace policies
                 // steal work items: first try to steal from other cores in
                 // the same NUMA node
 #if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
-                if (test(steals_in_numa_domain_, num_thread)) //-V600
+                if (test(steals_in_numa_domain_, num_thread)) //-V600 //-V111
 #endif
                 {
                     mask_cref_type numa_domain_mask =
@@ -573,7 +573,7 @@ namespace hpx { namespace threads { namespace policies
 
 #ifndef HPX_NATIVE_MIC        // we know that the MIC has one NUMA domain only
                 // if nothing found, ask everybody else
-                if (test(steals_outside_numa_domain_, num_thread)) { //-V600
+                if (test(steals_outside_numa_domain_, num_thread)) { //-V600 //-V111
                     mask_cref_type numa_domain_mask =
                         outside_numa_domain_masks_[num_thread];
                     for (std::size_t i = 1; i != queues_size; ++i)

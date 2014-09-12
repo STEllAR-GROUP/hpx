@@ -75,8 +75,10 @@ namespace hpx { namespace applier
             util::bind(util::one_shot(&thread_function_nullary), std::move(func)),
             desc ? desc : "<unknown>", 0, priority, os_thread,
             threads::get_stack_size(stacksize));
-        return app->get_thread_manager().
-            register_thread(data, state, run_now, ec);
+
+        threads::thread_id_type id = threads::invalid_thread_id;
+        app->get_thread_manager().register_thread(data, id, state, run_now, ec);
+        return id;
     }
 
     threads::thread_id_type register_thread(
@@ -98,8 +100,10 @@ namespace hpx { namespace applier
             util::bind(util::one_shot(&thread_function), std::move(func)),
             desc ? desc : "<unknown>", 0, priority, os_thread,
             threads::get_stack_size(stacksize));
-        return app->get_thread_manager().
-            register_thread(data, state, run_now, ec);
+
+        threads::thread_id_type id = threads::invalid_thread_id;
+        app->get_thread_manager().register_thread(data, id, state, run_now, ec);
+        return id;
     }
 
     threads::thread_id_type register_non_suspendable_thread(
@@ -121,8 +125,10 @@ namespace hpx { namespace applier
             util::bind(util::one_shot(&thread_function), std::move(func)),
             desc ? desc : "<unknown>", 0, priority, os_thread,
             threads::get_stack_size(threads::thread_stacksize_nostack));
-        return app->get_thread_manager().
-            register_thread(data, state, run_now, ec);
+
+        threads::thread_id_type id = threads::invalid_thread_id;
+        app->get_thread_manager().register_thread(data, id, state, run_now, ec);
+        return id;
     }
 
     threads::thread_id_type register_thread_plain(
@@ -143,8 +149,10 @@ namespace hpx { namespace applier
         threads::thread_init_data data(
             std::move(func), desc ? desc : "<unknown>", 0, priority,
             os_thread, threads::get_stack_size(stacksize));
-        return app->get_thread_manager().
-            register_thread(data, state, run_now, ec);
+
+        threads::thread_id_type id = threads::invalid_thread_id;
+        app->get_thread_manager().register_thread(data, id, state, run_now, ec);
+        return id;
     }
 
     threads::thread_id_type register_thread_plain(
@@ -160,8 +168,9 @@ namespace hpx { namespace applier
             return threads::invalid_thread_id;
         }
 
-        return app->get_thread_manager().
-            register_thread(data, state, run_now, ec);
+        threads::thread_id_type id = threads::invalid_thread_id;
+        app->get_thread_manager().register_thread(data, id, state, run_now, ec);
+        return id;
     }
 
     ///////////////////////////////////////////////////////////////////////////

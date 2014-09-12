@@ -340,7 +340,7 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         // create a new thread and schedule it if the initial state is equal to
         // pending
-        thread_id_type create_thread(thread_init_data& data,
+        void create_thread(thread_init_data& data, thread_id_type* id,
             thread_state_enum initial_state, bool run_now, error_code& ec,
             std::size_t num_thread)
         {
@@ -365,24 +365,27 @@ namespace hpx { namespace threads { namespace policies
             // now create the thread
             if (data.priority == thread_priority_critical) {
                 std::size_t num = num_thread % high_priority_queues_.size();
-                return high_priority_queues_[num]->create_thread(data,
+                high_priority_queues_[num]->create_thread(data, id,
                     initial_state, run_now, ec);
+                return;
             }
 
             if (data.priority == thread_priority_boost) {
                 data.priority = thread_priority_normal;
                 std::size_t num = num_thread % high_priority_queues_.size();
-                return high_priority_queues_[num]->create_thread(data,
+                high_priority_queues_[num]->create_thread(data, id,
                     initial_state, run_now, ec);
+                return;
             }
 
             if (data.priority == thread_priority_low) {
-                return low_priority_queue_.create_thread(data, initial_state,
+                low_priority_queue_.create_thread(data, id, initial_state,
                     run_now, ec);
+                return;
             }
 
             HPX_ASSERT(num_thread < queue_size);
-            return queues_[num_thread]->create_thread(data, initial_state,
+            queues_[num_thread]->create_thread(data, id, initial_state,
                 run_now, ec);
         }
 
@@ -435,7 +438,7 @@ namespace hpx { namespace threads { namespace policies
 
                     HPX_ASSERT(idx != num_thread);
 
-                    if (!test(this_numa_domain, idx) && !test(numa_domain, idx)) //-V560 //-V600
+                    if (!test(this_numa_domain, idx) && !test(numa_domain, idx)) //-V560 //-V600 //-V111
                         continue;
 
                     if (idx < high_priority_queues_.size())
@@ -817,7 +820,7 @@ namespace hpx { namespace threads { namespace policies
                 // the same NUMA node
 
 #if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
-                if (test(steals_in_numa_domain_, num_thread)) //-V600
+                if (test(steals_in_numa_domain_, num_thread)) //-V600 //-V111
 #endif
                 {
                     mask_cref_type numa_domain_mask =
@@ -862,7 +865,7 @@ namespace hpx { namespace threads { namespace policies
 
 #if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
                 // if nothing found, ask everybody else
-                if (test(steals_outside_numa_domain_, num_thread)) //-V600
+                if (test(steals_outside_numa_domain_, num_thread)) //-V600 //-V111
                 {
                     mask_cref_type numa_domain_mask =
                         outside_numa_domain_masks_[num_thread];

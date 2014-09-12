@@ -55,7 +55,7 @@ namespace hpx
             std::string message(int value) const
             {
                 if (value >= success && value < last_error)
-                    return std::string("HPX(") + error_names[value] + ")";
+                    return std::string("HPX(") + error_names[value] + ")"; //-V108
 
                 return "HPX(unknown_error)";
             }

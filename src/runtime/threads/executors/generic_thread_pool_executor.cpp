@@ -49,7 +49,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             std::move(f)), desc);
         data.stacksize = threads::get_stack_size(stacksize);
 
-        threads::detail::create_thread(scheduler_base_, data,
+        threads::thread_id_type id = threads::invalid_thread_id;
+        threads::detail::create_thread(scheduler_base_, data, id,
             initial_state, run_now, ec);
         if (ec) return;
 
