@@ -48,14 +48,22 @@ the first time to __hpx__.
 * We completely remodeled our automatic build system to run builds and unit tests
   on various systems and compilers. This allows us to find most bugs right as
   they were introduced and helps to maintain a high level of quality and
-  compatibility.
-  The newest build logs can be found at [http://hermione.cct.lsu.edu/console].
+  compatibility. The newest build logs can be found at __stellar_hpx_buildbot__.
 
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1257] - Adding additional parameter to create_thread
+* [issue 1256] - added buildbot changes to release notes
+* [issue 1253] - hpx::thread defects
+* [issue 1250] - switch_to_fiber_emulation does not work properly
+* [issue 1249] - Documentation is generated under Release folder
+* [issue 1248] - Fix usage of hpx_generic_coroutine_context and get tests
+                 passing on powerpc
+* [issue 1246] - Make cpuid.cpp C++11 compliant
 * [issue 1245] - HPX fails on startup (setting thread affinity mask)
+* [issue 1244] - HPX_WITH_RDTSC configure test fails, but should succeed
 * [issue 1243] - CTest dashboard info for CSCS CDash drop location
 * [issue 1242] - Mac fixes
 * [issue 1240] - fix a race condition in examples.diskperf
