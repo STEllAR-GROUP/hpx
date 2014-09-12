@@ -88,6 +88,8 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1216] - Fixing using futures (clients) as arguments to actions
 * [issue 1215] - Error compiling simple component
 * [issue 1214] - Stencil docs
+* [issue 1213] - Using more than a few dozen MPI processes on SuperMike results
+                 in a seg fault before getting to hpx_main
 * [issue 1212] - Parallel rotate
 * [issue 1211] - Direct actions cause the future's shared_state to be leaked
 * [issue 1210] - Refactored local::promise to be standard conformant
@@ -103,6 +105,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1200] - Error when querying time performance counters
 * [issue 1199] - library path is now configurable (again)
 * [issue 1198] - Error when querying performance counters
+* [issue 1197] - tests fail with intel compiler
 * [issue 1196] - Silence several warnings
 * [issue 1195] - Rephrase initializers to work with VC++ 2012
 * [issue 1194] - Simplify parallel algorithms
