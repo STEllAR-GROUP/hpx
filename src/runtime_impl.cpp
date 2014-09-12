@@ -310,7 +310,9 @@ namespace hpx {
                 boost::ref(result_)),
             "run_helper", 0, threads::thread_priority_normal, std::size_t(-1),
             threads::get_stack_size(threads::thread_stacksize_large));
-        thread_manager_->register_thread(data);
+
+        threads::thread_id_type id = threads:: invalid_thread_id;
+        thread_manager_->register_thread(data, id);
         this->runtime::starting();
         // }}}
 
