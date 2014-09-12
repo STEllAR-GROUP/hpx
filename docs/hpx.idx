@@ -263,9 +263,11 @@ inverse_fold_with_index               "" "header\.hpx\.lcos\.fold.*"
 
 # hpx/lcos/wait_all.hpp
 wait_all                              "" "header\.hpx\.lcos\.wait_all.*"
+wait_all_n                            "" "header\.hpx\.lcos\.wait_all.*"
 
 # hpx/lcos/when_all.hpp
 when_all                              "" "header\.hpx\.lcos\.when_all.*"
+when_all_n                            "" "header\.hpx\.lcos\.when_all.*"
 
 # hpx/hpx_finalize.hpp
 finalize                              "" "hpx\.finalize.*"

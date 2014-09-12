@@ -14,6 +14,13 @@ namespace hpx { namespace lcos
     /// returns a new future object representing the same list of futures
     /// after they finished executing.
     ///
+    /// \param first    The iterator pointing to the first element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a when_all should wait.
+    /// \param last     The iterator pointing to the last element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a when_all should wait.
+    ///
     /// \return   Returns a future holding the same list of futures as has
     ///           been passed to \a when_all.
     ///           - future<vector<future<R>>>: If the input cardinality is
@@ -37,6 +44,10 @@ namespace hpx { namespace lcos
     /// returns a new future object representing the same list of futures
     /// after they finished executing.
     ///
+    /// \param futures  A vector holding an arbitrary amount of \a future or
+    ///                 \a shared_future objects for which \a when_all should
+    ///                 wait.
+    ///
     /// \return   Returns a future holding the same list of futures as has
     ///           been passed to when_all.
     ///           - future<vector<future<R>>>: If the input cardinality is
@@ -59,6 +70,10 @@ namespace hpx { namespace lcos
     /// returns a new future object representing the same list of futures
     /// after they finished executing.
     ///
+    /// \param futures  An arbitrary number of \a future or \a shared_future
+    ///                 objects, possibly holding different types for which
+    ///                 \a when_all should wait.
+    ///
     /// \return   Returns a future holding the same list of futures as has
     ///           been passed to \a when_all.
     ///           - future<tuple<future<T0>, future<T1>, future<T2>...>>: If
@@ -74,6 +89,38 @@ namespace hpx { namespace lcos
     ///       but the futures held in the output collection may.
     template <typename ...T>
     future<tuple<future<T>...>> when_all(T &&... futures);
+
+    /// The function \a when_all is a operator allowing to join on the result
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns a new future object representing the same list of futures
+    /// after they finished executing.
+    ///
+    /// \param begin    The iterator pointing to the first element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a wait_all_n should wait.
+    /// \param count    The number of elements in the sequence starting at
+    ///                 \a first.
+    /// \param ec   [in,out] this represents the error status on exit, if
+    ///             this is pre-initialized to \a hpx#throws the function
+    ///             will throw on error instead.
+    ///
+    /// \return   Returns a future holding the iterator referring to the first
+    ///           element in the input sequence after the last processed
+    ///           element.
+    ///
+    /// \throws This function will throw errors which are encountered while
+    ///         setting up the requested operation only. Errors encountered
+    ///         while executing the operations delivering the results to be
+    ///         stored in the futures are reported through the futures
+    ///         themselves.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
+    template <typename InputIter>
+    future<InputIter> when_all_n(InputIter begin, std::size_t count,
+        error_code& ec = throws);
 }}
 #else
 

@@ -4,6 +4,48 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file lcos/when_any.hpp
+
+#if defined(DOXYGEN)
+namespace hpx { namespace lcos
+{
+    /// The function \a when_any is a non-deterministic choice operator. It
+    /// OR-composes all future objects given and returns a new future object
+    /// representing the same list of futures after one future of that list
+    /// finishes execution.
+    ///
+    /// \note There are three variations of when_any. The first takes a pair
+    ///       of InputIterators. The second takes an std::vector of future<R>.
+    ///       The third takes any arbitrary number of future<R>, where R need
+    ///       not be the same type.
+    ///
+    /// \return   Returns a future holding the same list of futures as has
+    ///           been passed to when_any.
+    ///           - future<vector<future<R>>>: If the input cardinality is
+    ///             unknown at compile time and the futures are all of the
+    ///             same type.
+    ///           - future<tuple<future<R0>, future<R1>, future<R2>...>>: If
+    ///             inputs are fixed in number and are of heterogeneous types.
+    ///             The inputs can be any arbitrary number of future objects.
+
+    /// The function \a when_any_back is a non-deterministic choice
+    /// operator. It OR-composes all future objects given and returns the same
+    /// list of futures after one future of that list finishes execution. The
+    /// future object that was first detected as being ready swaps its
+    /// position with that of the last element of the result collection, so
+    /// that the ready future object may be identified in constant time.
+    ///
+    /// \note There are two variations of when_any_back. The first takes
+    ///       a pair of InputIterators. The second takes an std::vector of
+    ///       future<R>.
+    ///
+    /// \return   The same list of futures as has been passed to
+    ///           when_any_back, where the future object that was first
+    ///           detected as being ready has swapped position with the last
+    ///           element in the list.
+}}
+#else
+
 #if !BOOST_PP_IS_ITERATING
 
 #if !defined(HPX_LCOS_WHEN_ANY_APR_17_2012_1143AM)
@@ -118,25 +160,6 @@ namespace hpx { namespace lcos
         };
     }
 
-    /// The function \a when_any is a non-deterministic choice operator. It
-    /// OR-composes all future objects given and returns a new future object
-    /// representing the same list of futures after one future of that list
-    /// finishes execution.
-    ///
-    /// \note There are three variations of when_any. The first takes a pair
-    ///       of InputIterators. The second takes an std::vector of future<R>.
-    ///       The third takes any arbitrary number of future<R>, where R need
-    ///       not be the same type.
-    ///
-    /// \return   Returns a future holding the same list of futures as has
-    ///           been passed to when_any.
-    ///           - future<vector<future<R>>>: If the input cardinality is
-    ///             unknown at compile time and the futures are all of the
-    ///             same type.
-    ///           - future<tuple<future<R0>, future<R1>, future<R2>...>>: If
-    ///             inputs are fixed in number and are of heterogeneous types.
-    ///             The inputs can be any arbitrary number of future objects.
-
     template <typename Future>
     lcos::future<std::vector<Future> >
     when_any(std::vector<Future>& lazy_values,
@@ -181,22 +204,6 @@ namespace hpx { namespace lcos
 
         return lcos::make_ready_future(result_type());
     }
-
-    /// The function \a when_any_back is a non-deterministic choice
-    /// operator. It OR-composes all future objects given and returns the same
-    /// list of futures after one future of that list finishes execution. The
-    /// future object that was first detected as being ready swaps its
-    /// position with that of the last element of the result collection, so
-    /// that the ready future object may be identified in constant time.
-    ///
-    /// \note There are two variations of when_any_back. The first takes
-    ///       a pair of InputIterators. The second takes an std::vector of
-    ///       future<R>.
-    ///
-    /// \return   The same list of futures as has been passed to
-    ///           when_any_back, where the future object that was first
-    ///           detected as being ready has swapped position with the last
-    ///           element in the list.
 
     template <typename Future>
     lcos::future<std::vector<Future> >
@@ -324,3 +331,4 @@ namespace hpx { namespace lcos
 
 #endif
 
+#endif
