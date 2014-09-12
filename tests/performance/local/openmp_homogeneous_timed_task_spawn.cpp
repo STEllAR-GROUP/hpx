@@ -96,11 +96,15 @@ int omp_main(
     #pragma omp single
     {
         for (boost::uint64_t i = 0; i < tasks; ++i)
+            #if _OPENMP>=200805
             #pragma omp task untied
+            #endif
             worker_timed(delay * 1000);
 
         // Yield until all work is done.
+        #if _OPENMP>=200805
         #pragma omp taskwait
+        #endif
 
         print_results(omp_get_num_threads(), t.elapsed());
     }
