@@ -1,3 +1,4 @@
+//  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2012 Hartmut Kaiser
 //  Copyright (c) 2009 Oliver Kowalke
 //
@@ -11,10 +12,11 @@
 #include <hpx/config.hpp>
 #include <hpx/config/forceinline.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/coroutine/detail/config.hpp>
 #include <hpx/util/coroutine/exception.hpp>
 #include <hpx/util/coroutine/detail/swap_context.hpp>
 
-#if defined(POSIX_VERSION)
+#if defined(_POSIX_VERSION)
 #include <hpx/util/coroutine/detail/posix_utility.hpp>
 #endif
 
@@ -88,9 +90,9 @@ namespace hpx { namespace util { namespace coroutines
 
             void* allocate(std::size_t size) const
             {
-#if defined(POSIX_VERSION)
+#if defined(_POSIX_VERSION)
                 void* limit = posix::alloc_stack(size);
-                posix::watermark_stack(stack, size);
+                posix::watermark_stack(limit, size);
 #else
                 void* limit = std::calloc(size, sizeof(char));
                 if (!limit) boost::throw_exception(std::bad_alloc());
@@ -103,8 +105,8 @@ namespace hpx { namespace util { namespace coroutines
             {
                 HPX_ASSERT(vp);
                 void* limit = static_cast<char*>(vp) - size;
-#if defined(POSIX_VERSION)
-                posix::free_stack(limit);
+#if defined(_POSIX_VERSION)
+                posix::free_stack(limit, size);
 #else
                 std::free(limit);
 #endif
@@ -168,6 +170,7 @@ namespace hpx { namespace util { namespace coroutines
 
             fcontext_context_impl()
               : cb_(0)
+              , funp_(0)
 #if BOOST_VERSION > 105500
               , ctx_(0)
 #endif
@@ -184,16 +187,16 @@ namespace hpx { namespace util { namespace coroutines
                 )
               , stack_pointer_(alloc_.allocate(stack_size_))
             {
-                void (*fn)(intptr_t) = &trampoline<Functor>;
+                funp_ = &trampoline<Functor>;
 
 #if BOOST_VERSION < 105600
                 boost::context::fcontext_t* ctx =
-                    boost::context::make_fcontext(stack_pointer_, stack_size_, fn);
+                    boost::context::make_fcontext(stack_pointer_, stack_size_, funp_);
 
                 std::swap(*ctx, ctx_);
 #else
                 ctx_ =
-                    boost::context::make_fcontext(stack_pointer_, stack_size_, fn);
+                    boost::context::make_fcontext(stack_pointer_, stack_size_, funp_);
 #endif
             }
 
@@ -225,63 +228,18 @@ namespace hpx { namespace util { namespace coroutines
             static void thread_shutdown() {}
 
             // handle stack operations
-            void reset_stack()
-            {
-#if BOOST_VERSION < 105600
-                if (ctx_.fc_stack.sp)
-#else
-                if (ctx_)
-#endif
-                {
-#if defined(POSIX_VERSION)
-#else
-#endif
-                }
-            }
-            void rebind_stack()
-            {
-#if BOOST_VERSION < 105600
-                if (ctx_.fc_stack.sp)
-#else
-                if (ctx_)
-#endif
-                {
-                    increment_stack_recycle_count();
-#if defined(POSIX_VERSION)
-#else
-#endif
-                }
-            }
+            HPX_COROUTINE_EXPORT void reset_stack();
+            HPX_COROUTINE_EXPORT void rebind_stack();
 
             typedef boost::atomic<boost::int64_t> counter_type;
 
-            static counter_type& get_stack_unbind_counter()
-            {
-                static counter_type counter(0);
-                return counter;
-            }
-            static boost::uint64_t get_stack_unbind_count(bool reset)
-            {
-                return util::get_and_reset_value(get_stack_unbind_counter(), reset);
-            }
-            static boost::uint64_t increment_stack_unbind_count()
-            {
-                return ++get_stack_unbind_counter();
-            }
+            HPX_COROUTINE_EXPORT static counter_type& get_stack_unbind_counter();
+            HPX_COROUTINE_EXPORT static boost::uint64_t get_stack_unbind_count(bool reset);
+            HPX_COROUTINE_EXPORT static boost::uint64_t increment_stack_unbind_count();
 
-            static counter_type& get_stack_recycle_counter()
-            {
-                static counter_type counter(0);
-                return counter;
-            }
-            static boost::uint64_t get_stack_recycle_count(bool reset)
-            {
-                return util::get_and_reset_value(get_stack_recycle_counter(), reset);
-            }
-            static boost::uint64_t increment_stack_recycle_count()
-            {
-                return ++get_stack_recycle_counter();
-            }
+            HPX_COROUTINE_EXPORT static counter_type& get_stack_recycle_counter();
+            HPX_COROUTINE_EXPORT static boost::uint64_t get_stack_recycle_count(bool reset);
+            HPX_COROUTINE_EXPORT static boost::uint64_t increment_stack_recycle_count();
 
         private:
             friend void swap_context(fcontext_context_impl& from,
@@ -305,6 +263,7 @@ namespace hpx { namespace util { namespace coroutines
 
         private:
             intptr_t cb_;
+            void (*funp_)(intptr_t);
             boost::context::fcontext_t ctx_;
             stack_allocator alloc_;
             std::size_t stack_size_;

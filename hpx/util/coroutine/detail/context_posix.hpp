@@ -211,13 +211,13 @@ namespace hpx { namespace util { namespace coroutines {
         template<typename Functor>
         explicit ucontext_context_impl(Functor& cb, std::ptrdiff_t stack_size)
           : m_stack_size(stack_size == -1 ? (std::ptrdiff_t)default_stack_size : stack_size),
-            m_stack(alloc_stack(m_stack_size))
+            m_stack(alloc_stack(m_stack_size)),
+            cb_(cb)
         {
             HPX_ASSERT(m_stack);
-            typedef void cb_type(Functor*);
-            cb_type * cb_ptr = &trampoline<Functor>;
+            funp_ = &trampoline<Functor>;
             int error = HPX_COROUTINE_MAKE_CONTEXT(
-                &m_ctx, m_stack, m_stack_size, (void (*)(void*))(cb_ptr), &cb, NULL);
+                &m_ctx, m_stack, m_stack_size, (void (*)(void*))(funp_), &cb_, NULL);
             HPX_UNUSED(error);
             HPX_ASSERT(error == 0);
         }
@@ -249,9 +249,11 @@ namespace hpx { namespace util { namespace coroutines {
         {
           if (m_stack) {
             // just reset the context stack pointer to its initial value at the stack start
-            m_ctx.uc_stack.ss_sp = (char*)m_stack;
-            m_ctx.uc_stack.ss_size = m_stack_size;
             increment_stack_recycle_count();
+            int error = HPX_COROUTINE_MAKE_CONTEXT(
+                &m_ctx, m_stack, m_stack_size, (void (*)(void*))(funp_), &cb_, NULL);
+            HPX_UNUSED(error);
+            HPX_ASSERT(error == 0);
           }
         }
 
@@ -289,6 +291,8 @@ namespace hpx { namespace util { namespace coroutines {
         // declare m_stack_size first so we can use it to initialize m_stack
         std::ptrdiff_t m_stack_size;
         void * m_stack;
+        void * cb_;
+        void (*funp_)(Functor*);
     };
 
     typedef ucontext_context_impl context_impl;
