@@ -74,6 +74,8 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/lcos/broadcast.hpp"
     "${hpx_SOURCE_DIR}/hpx/lcos/fold.hpp"
     "${hpx_SOURCE_DIR}/hpx/lcos/reduce.hpp"
+    "${hpx_SOURCE_DIR}/hpx/lcos/wait_all.hpp"
+    "${hpx_SOURCE_DIR}/hpx/lcos/when_all.hpp"
     "${hpx_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp")
 
 

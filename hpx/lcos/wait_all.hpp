@@ -4,6 +4,58 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file lcos/wait_all.hpp
+
+#if defined(DOXYGEN)
+namespace hpx { namespace lcos
+{
+    /// The function \a wait_all is a operator allowing to join on the result
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns the same list of futures after they finished executing.
+    ///
+    /// \param first    The iterator pointing to the first element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a wait_all should wait.
+    /// \param last     The iterator pointing to the last element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a wait_all should wait.
+    ///
+    /// \note The function \a wait_all returns after all futures have become
+    ///       ready. All input futures are still valid after \a wait_all
+    ///       returns.
+    template <typename InputIter>
+    void wait_all(InputIter first, InputIter last);
+
+    /// The function \a wait_all is a operator allowing to join on the result
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns the same list of futures after they finished executing.
+    ///
+    /// \param futures  A vector holding an arbitrary amount of \a future or
+    ///                 \a shared_future objects for which \a wait_all should
+    ///                 wait.
+    ///
+    /// \note The function \a wait_all returns after all futures have become
+    ///       ready. All input futures are still valid after \a wait_all
+    ///       returns.
+    template <typename R>
+    void wait_all(std::vector<future<R>>&& futures);
+
+    /// The function \a wait_all is a operator allowing to join on the result
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns the same list of futures after they finished executing.
+    ///
+    /// \param futures  An arbitrary number of \a future or \a shared_future
+    ///                 objects, possibly holding different types for which
+    ///                 \a wait_all should wait.
+    ///
+    /// \note The function \a wait_all returns after all futures have become
+    ///       ready. All input futures are still valid after \a wait_all
+    ///       returns.
+    template <typename ...T>
+    void wait_all(T &&... futures);
+}}
+#else
+
 #if !BOOST_PP_IS_ITERATING
 
 #if !defined(HPX_LCOS_WAIT_ALL_APR_19_2012_1140AM)
@@ -29,25 +81,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
 {
-    /// The function \a wait_all is a operator allowing to join on the result
-    /// of all given futures. It AND-composes all future objects given and
-    /// returns the same list of futures after they finished executing.
-    ///
-    /// \a wait_all returns after all futures have been triggered.
-    ///
-    /// \note There are three variations of wait_all. The first takes a pair
-    ///       of InputIterators. The second takes an std::vector of future<R>.
-    ///       The third takes any arbitrary number of future<R>, where R need
-    ///       not be the same type.
-    ///
-    /// \return   The same list of futures as has been passed to wait_all.
-    ///           - future<vector<future<R>>>: If the input cardinality is
-    ///             unknown at compile time and the futures are all of the
-    ///             same type.
-    ///           - future<tuple<future<R0>, future<R1>, future<R2>...>>: If
-    ///             inputs are fixed in number and are of heterogeneous types.
-    ///             The inputs can be any arbitrary number of future objects.
-
     template <typename Future>
     void wait_all(std::vector<Future> const& lazy_values,
         error_code& ec = throws)
@@ -156,3 +189,4 @@ namespace hpx { namespace lcos
 
 #endif
 
+#endif
