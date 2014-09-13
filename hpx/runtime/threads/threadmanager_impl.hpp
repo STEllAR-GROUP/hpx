@@ -452,10 +452,11 @@ namespace hpx { namespace threads
             std::size_t data, error_code& ec = throws);
 #endif
 
+#ifdef HPX_THREAD_MAINTAIN_IDLE_RATES
         /// Get percent maintenance time in main thread-manager loop.
         boost::int64_t avg_idle_rate(bool reset);
         boost::int64_t avg_idle_rate(std::size_t num_thread, bool reset);
-
+#endif
 #ifdef HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
         boost::int64_t avg_creation_idle_rate(bool reset);
         boost::int64_t avg_cleanup_idle_rate(bool reset);
@@ -540,9 +541,10 @@ namespace hpx { namespace threads
             performance_counters::counter_info const& info, error_code& ec);
         naming::gid_type thread_counts_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
+#ifdef HPX_THREAD_MAINTAIN_IDLE_RATES
         naming::gid_type idle_rate_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
-
+#endif
 #ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
         naming::gid_type thread_wait_time_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);

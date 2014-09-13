@@ -60,10 +60,6 @@ namespace hpx { namespace threads { namespace policies
     // startup code
     extern bool minimal_deadlock_detection;
 #endif
-    // We control whether to collect idle rates using this global bool.
-    // It will be set by any of the related performance counters. Once set it
-    // stays set, thus no race conditions will occur.
-    extern bool maintain_idle_rates;
 
     ///////////////////////////////////////////////////////////////////////////
     // // Queue back-end interface:
