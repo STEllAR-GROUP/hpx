@@ -16,9 +16,6 @@
 #include <boost/mpl/identity.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/or.hpp>
-#include <boost/preprocessor/repetition/enum_params.hpp>
-#include <boost/preprocessor/repetition/enum_trailing_params.hpp>
-#include <boost/preprocessor/repetition/repeat.hpp>
 #include <boost/ref.hpp>
 #include <boost/type_traits/is_function.hpp>
 #include <boost/type_traits/is_member_function_pointer.hpp>
@@ -69,39 +66,23 @@ namespace hpx { namespace util
           : boost::result_of<F>
         {};
 
-#       define HPX_UTIL_RESULT_OF_IMPL(Z, N, D)                               \
-        template <typename FD                                                 \
-          , typename F BOOST_PP_ENUM_TRAILING_PARAMS(N, typename Arg)>        \
-        struct result_of_impl<FD, F(BOOST_PP_ENUM_PARAMS(N, Arg))             \
-          , typename boost::enable_if<boost::is_reference_wrapper<FD> >::type \
-        > : boost::result_of<                                                 \
-                typename boost::unwrap_reference<FD>::type&                   \
-                    (BOOST_PP_ENUM_PARAMS(N, Arg))                            \
-            >                                                                 \
-        {};                                                                   \
-                                                                              \
-        /* workaround for tricking result_of into using decltype */           \
-        template <typename FD                                                 \
-          , typename F BOOST_PP_ENUM_TRAILING_PARAMS(N, typename Arg)>        \
-        struct result_of_impl<FD, F(BOOST_PP_ENUM_PARAMS(N, Arg))             \
-          , typename boost::enable_if<                                        \
-                boost::mpl::or_<                                              \
-                    boost::is_function<typename boost::remove_pointer<FD>::type>\
-                  , boost::is_member_function_pointer<FD>                     \
-                >                                                             \
-            >::type                                                           \
-        > : boost::result_of<                                                 \
-                FD(BOOST_PP_ENUM_PARAMS(N, Arg))                              \
-            >                                                                 \
-        {};                                                                   \
-        /**/
+        template <typename FD, typename F, typename ...Ts>
+        struct result_of_impl<FD, F(Ts...)
+          , typename boost::enable_if<boost::is_reference_wrapper<FD> >::type
+        > : boost::result_of<typename boost::unwrap_reference<FD>::type&(Ts...)>
+        {};
 
-        BOOST_PP_REPEAT(
-            HPX_FUNCTION_ARGUMENT_LIMIT
-          , HPX_UTIL_RESULT_OF_IMPL, _
-        );
-
-#       undef HPX_UTIL_RESULT_OF_IMPL
+        /* workaround for tricking result_of into using decltype */
+        template <typename FD, typename F, typename ...Ts>
+        struct result_of_impl<FD, F(Ts...)
+          , typename boost::enable_if<
+                boost::mpl::or_<
+                    boost::is_function<typename boost::remove_pointer<FD>::type>
+                  , boost::is_member_function_pointer<FD>
+                >
+            >::type
+        > : boost::result_of<FD(Ts...)>
+        {};
 
         template <typename FD, typename F, typename Class>
         struct result_of_impl<FD, F(Class)
@@ -114,22 +95,10 @@ namespace hpx { namespace util
     template <typename F>
     struct result_of;
 
-#   define HPX_UTIL_RESULT_OF(Z, N, D)                                        \
-    template <typename F BOOST_PP_ENUM_TRAILING_PARAMS(N, typename Arg)>      \
-    struct result_of<F(BOOST_PP_ENUM_PARAMS(N, Arg))>                         \
-      : detail::result_of_impl<                                               \
-            typename util::decay<F>::type                                     \
-          , F(BOOST_PP_ENUM_PARAMS(N, Arg))                                   \
-        >                                                                     \
-    {};                                                                       \
-    /**/
-
-    BOOST_PP_REPEAT(
-        HPX_FUNCTION_ARGUMENT_LIMIT
-      , HPX_UTIL_RESULT_OF, _
-    );
-
-#   undef HPX_UTIL_RESULT_OF
+    template <typename F, typename ...Ts>
+    struct result_of<F(Ts...)>
+      : detail::result_of_impl<typename util::decay<F>::type, F(Ts...)>
+    {};
 
     namespace detail
     {
