@@ -352,7 +352,7 @@ namespace hpx { namespace util
         };
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7>
-    class zip_iterator
+    class zip_iterator<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7>
       : public detail::zip_iterator_base<tuple<
             T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7
         > >

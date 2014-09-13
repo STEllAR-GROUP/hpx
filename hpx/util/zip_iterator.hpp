@@ -24,67 +24,29 @@
 
 #include <iterator>
 
-#define N HPX_TUPLE_LIMIT
-
 namespace hpx { namespace util
 {
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
-        template <typename T>
-        struct zip_iterator_value_impl
-        {
-            typedef typename std::iterator_traits<T>::value_type type;
-        };
-
-        template <>
-        struct zip_iterator_value_impl<void>
-        {
-            typedef void type;
-        };
-
         template <typename IteratorTuple>
         struct zip_iterator_value;
 
-#       define HPX_PARALLEL_UTIL_ZIP_ITERATOR_VALUE(Z, N, D)                  \
-            typename zip_iterator_value_impl<BOOST_PP_CAT(T, N)>::type        \
-        /**/
-        template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-        struct zip_iterator_value<tuple<BOOST_PP_ENUM_PARAMS(N, T)> >
+        template <typename ...Ts>
+        struct zip_iterator_value<tuple<Ts...> >
         {
-            typedef tuple<
-                BOOST_PP_ENUM(N, HPX_PARALLEL_UTIL_ZIP_ITERATOR_VALUE, _)
-            > type;
+            typedef tuple<typename std::iterator_traits<Ts>::value_type...> type;
         };
-#       undef HPX_PARALLEL_UTIL_ZIP_ITERATOR_VALUE
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename T>
-        struct zip_iterator_reference_impl
-        {
-            typedef typename std::iterator_traits<T>::reference type;
-        };
-
-        template <>
-        struct zip_iterator_reference_impl<void>
-        {
-            typedef void type;
-        };
-
         template <typename IteratorTuple>
         struct zip_iterator_reference;
 
-#       define HPX_PARALLEL_UTIL_ZIP_ITERATOR_REFERENCE(Z, N, D)              \
-            typename zip_iterator_reference_impl<BOOST_PP_CAT(T, N)>::type    \
-        /**/
-        template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-        struct zip_iterator_reference<tuple<BOOST_PP_ENUM_PARAMS(N, T)> >
+        template <typename ...Ts>
+        struct zip_iterator_reference<tuple<Ts...> >
         {
-            typedef tuple<
-                BOOST_PP_ENUM(N, HPX_PARALLEL_UTIL_ZIP_ITERATOR_REFERENCE, _)
-            > type;
+            typedef tuple<typename std::iterator_traits<Ts>::reference...> type;
         };
-#       undef HPX_PARALLEL_UTIL_ZIP_ITERATOR_REFERENCE
 
         ///////////////////////////////////////////////////////////////////////
         template <typename T, typename U>
@@ -250,29 +212,20 @@ namespace hpx { namespace util
             >
         {};
 
-#       define HPX_PARALLEL_UTIL_ZIP_ITERATOR_CATEGORY(Z, N, D)               \
-            typename zip_iterator_reference_impl<BOOST_PP_CAT(T, N)>::type    \
-        /**/
-        template <typename T, typename U,
-            BOOST_PP_ENUM_PARAMS(BOOST_PP_SUB(N, 2), typename T)>
+        template <typename T, typename U, typename ...Tail>
         struct zip_iterator_category<
-            tuple<T, U, BOOST_PP_ENUM_PARAMS(BOOST_PP_SUB(N, 2), T)>
+            tuple<T, U, Tail...>
           , typename boost::enable_if_c<
-                (tuple_size<tuple<
-                    T, U, BOOST_PP_ENUM_PARAMS(BOOST_PP_SUB(N, 2), T)
-                > >::value > 2)
+                (tuple_size<tuple<T, U, Tail...> >::value > 2)
             >::type
         > : zip_iterator_category_impl<
                 typename zip_iterator_category_impl<
                     typename std::iterator_traits<T>::iterator_category
                   , typename std::iterator_traits<U>::iterator_category
                 >::type
-              , typename zip_iterator_category<tuple<
-                    BOOST_PP_ENUM_PARAMS(BOOST_PP_SUB(N, 2), T)
-                > >::type
+              , typename zip_iterator_category<tuple<Tail...> >::type
             >
         {};
-#       undef HPX_PARALLEL_UTIL_ZIP_ITERATOR_CATEGORY
 
         ///////////////////////////////////////////////////////////////////////
         template <typename IteratorTuple>
@@ -388,13 +341,9 @@ namespace hpx { namespace util
         };
     }
 
-    template<
-        BOOST_PP_ENUM_BINARY_PARAMS(N, typename T, = void BOOST_PP_INTERCEPT)
-    >
+    template<typename ...Ts>
     class zip_iterator;
 }}
-
-#undef N
 
 #   if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #       include <hpx/util/preprocessed/zip_iterator.hpp>
@@ -454,11 +403,7 @@ namespace hpx { namespace util
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-#   if N != HPX_TUPLE_LIMIT
     class zip_iterator<BOOST_PP_ENUM_PARAMS(N, T)>
-#   else
-    class zip_iterator
-#   endif
       : public detail::zip_iterator_base<tuple<
             BOOST_PP_ENUM_PARAMS(N, T)
         > >

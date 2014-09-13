@@ -14,12 +14,11 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/serialize_sequence.hpp>
-#include <hpx/util/detail/pp_strip_parens.hpp>
+#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/detail/qualify_as.hpp>
 
 #include <boost/array.hpp>
 #include <boost/fusion/adapted/struct/adapt_struct.hpp>
-#include <utility>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/identity.hpp>
@@ -35,7 +34,6 @@
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
-#include <boost/preprocessor/repetition/enum_binary_params.hpp>
 #include <boost/preprocessor/repetition/repeat.hpp>
 #include <boost/ref.hpp>
 #include <boost/serialization/is_bitwise_serializable.hpp>
@@ -51,7 +49,7 @@
 #include <boost/utility/swap.hpp>
 
 #include <cstddef> // for size_t
-#include <utility> // for pair
+#include <utility>
 
 #if defined(BOOST_NO_SFINAE_EXPR) ||                                          \
     (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40800)
@@ -62,13 +60,9 @@
     /**/
 #endif
 
-#define N HPX_TUPLE_LIMIT
-
 namespace hpx { namespace util
 {
-    template <
-        BOOST_PP_ENUM_BINARY_PARAMS(N, typename T, = void BOOST_PP_INTERCEPT)
-    >
+    template <typename ...Ts>
     class tuple;
 
     template <class T>
@@ -76,6 +70,30 @@ namespace hpx { namespace util
 
     template <std::size_t I, typename T>
     struct tuple_element; // undefined
+    
+    template <std::size_t I, typename Tuple>
+    BOOST_CONSTEXPR BOOST_FORCEINLINE
+    typename detail::qualify_as<
+        typename tuple_element<I, Tuple>::type
+      , Tuple&
+    >::type
+    get(Tuple& t) BOOST_NOEXCEPT;
+
+    template <std::size_t I, typename Tuple>
+    BOOST_CONSTEXPR BOOST_FORCEINLINE
+    typename detail::qualify_as<
+        typename tuple_element<I, Tuple>::type
+      , Tuple const&
+    >::type
+    get(Tuple const& t) BOOST_NOEXCEPT;
+
+    template <std::size_t I, typename Tuple>
+    BOOST_CONSTEXPR BOOST_FORCEINLINE
+    typename detail::qualify_as<
+        typename tuple_element<I, Tuple>::type
+      , Tuple &&
+    >::type
+    get(Tuple && t) BOOST_NOEXCEPT;
 
     namespace detail
     {
@@ -186,18 +204,46 @@ namespace hpx { namespace util
 #       endif
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename Indices, typename TTuple, typename UTuple>
+        struct are_tuples_compatible_impl;
+
+        template <std::size_t ...Is, typename ...Ts, typename UTuple>
+        struct are_tuples_compatible_impl<
+            detail::pack_c<std::size_t, Is...>, tuple<Ts...>, UTuple
+        >
+        {
+            typedef char(&no_type)[1];
+            typedef char(&yes_type)[2];
+
+            static no_type call(...);
+            static yes_type call(Ts...);
+
+            static bool const value =
+                sizeof(
+                    call(util::get<Is>(boost::declval<UTuple>())...)
+                ) == sizeof(yes_type);
+
+            typedef boost::mpl::bool_<value> type;
+            int m_;
+        };
+
         template <typename TTuple, typename UTuple, typename Enable = void>
         struct are_tuples_compatible
           : boost::mpl::false_
         {};
 
-        template <typename UTuple>
+        template <typename ...Ts, typename UTuple>
         struct are_tuples_compatible<
-            tuple<>, UTuple
+            tuple<Ts...>, UTuple
           , typename boost::enable_if_c<
-                tuple_size<typename boost::remove_reference<UTuple>::type>::value == 0
+                tuple_size<
+                    typename boost::remove_reference<UTuple>::type
+                >::value == tuple_size<tuple<Ts...> >::value
             >::type
-        > : boost::mpl::true_
+        > : are_tuples_compatible_impl<
+                typename detail::make_index_pack<sizeof...(Ts)>::type
+              , tuple<Ts...>, UTuple
+            >
         {};
 
         template <typename TTuple, typename UTuple>
@@ -292,9 +338,9 @@ namespace hpx { namespace util
       : tuple_size<T>
     {};
 
-    template <>
-    struct tuple_size<tuple<> >
-      : boost::mpl::size_t<0>
+    template <typename ...Ts>
+    struct tuple_size<tuple<Ts...> >
+      : boost::mpl::size_t<sizeof...(Ts)>
     {};
 
     template <typename T0, typename T1>
@@ -340,6 +386,7 @@ namespace hpx { namespace util
             return tuple.first;
         }
     };
+
     template <typename T0, typename T1>
     struct tuple_element<1, std::pair<T0, T1> >
       : boost::mpl::identity<T1>
@@ -370,15 +417,11 @@ namespace hpx { namespace util
     struct tuple_decay
     {};
 
-#   define HPX_TUPLE_DECAY_ELEM(Z, N, D)                                      \
-    typename decay<BOOST_PP_CAT(T, N)>::type                                  \
-    /**/
-    template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-    struct tuple_decay<tuple<BOOST_PP_ENUM_PARAMS(N, T)> >
+    template <typename ...Ts>
+    struct tuple_decay<tuple<Ts...> >
     {
-        typedef tuple<BOOST_PP_ENUM(N, HPX_TUPLE_DECAY_ELEM, _)> type;
+        typedef tuple<typename decay<Ts>::type...> type;
     };
-#undef HPX_TUPLE_DECAY_ELEM
 
     // 20.4.2.6, element access
 
@@ -430,24 +473,13 @@ namespace hpx { namespace util
 
     // template<class... Types>
     // constexpr tuple<VTypes...> make_tuple(Types&&... t);
-    namespace detail
-    {
-        template <typename T, typename U = typename decay<T>::type>
-        struct make_tuple_element
-          : boost::mpl::identity<U>
-        {};
-
-        template <typename T, typename X>
-        struct make_tuple_element<T, boost::reference_wrapper<X> >
-          : boost::mpl::identity<X&>
-        {};
-    }
-
+    template <typename ...Ts>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
-    tuple<>
-    make_tuple()
+    tuple<typename detail::decay_unwrap<Ts>::type...>
+    make_tuple(Ts&&... vs)
     {
-        return tuple<>();
+        return tuple<typename detail::decay_unwrap<Ts>::type...>(
+            std::forward<Ts>(vs)...);
     }
 
     // template<class... Types>
@@ -456,163 +488,141 @@ namespace hpx { namespace util
     // forwarding as arguments to a function. Because the result may contain
     // references to temporary variables, a program shall ensure that the
     // return value of this function does not outlive any of its arguments.
+    template <typename ...Ts>
     BOOST_FORCEINLINE
-    tuple<>
-    forward_as_tuple() BOOST_NOEXCEPT
+    tuple<Ts&&...>
+    forward_as_tuple(Ts&&... vs) BOOST_NOEXCEPT
     {
-        return tuple<>();
+        return tuple<Ts&&...>(std::forward<Ts>(vs)...);
     }
 
     // template<class... Types>
     // tuple<Types&...> tie(Types&... t) noexcept;
+    template <typename ...Ts>
     BOOST_FORCEINLINE
-    tuple<>
-    tie() BOOST_NOEXCEPT
+    tuple<Ts&...>
+    tie(Ts&... vs) BOOST_NOEXCEPT
     {
-        return tuple<>();
+        return tuple<Ts&...>(vs...);
     }
 
     //template <class... Tuples>
     //constexpr tuple<Ctypes ...> tuple_cat(Tuples&&...);
     namespace detail
     {
-        template <
-            std::size_t I, typename T0, typename T1
-          , typename Enable = void
-        >
-        struct tuple_cat_element
-        {
-            typedef void type;
-        };
+        template <std::size_t Size, typename Tuples>
+        struct tuple_cat_size_impl;
 
-        template <std::size_t I, typename T0, typename T1>
+        template <std::size_t Size>
+        struct tuple_cat_size_impl<Size, detail::pack<> >
+          : boost::mpl::size_t<Size>
+        {};
+
+        template <std::size_t Size, typename HeadTuple, typename ...TailTuples>
+        struct tuple_cat_size_impl<
+            Size, detail::pack<HeadTuple, TailTuples...>
+        > : tuple_cat_size_impl<
+                (Size + tuple_size<HeadTuple>::value), detail::pack<TailTuples...>
+            >
+        {};
+
+        template <typename ...Tuples>
+        struct tuple_cat_size
+          : tuple_cat_size_impl<0, detail::pack<Tuples...> >
+        {};
+
+        ///////////////////////////////////////////////////////////////////////
+        template <std::size_t I, typename Tuples, typename Enable = void>
+        struct tuple_cat_element;
+
+        template <std::size_t I, typename HeadTuple, typename ...TailTuples>
         struct tuple_cat_element<
-            I, T0, T1
+            I, detail::pack<HeadTuple, TailTuples...>
           , typename boost::enable_if_c<
-                (I < tuple_size<T0>::value)
+                (I < tuple_size<HeadTuple>::value)
             >::type
-        >
+        > : tuple_element<I, HeadTuple>
         {
-            typedef
-                typename tuple_element<
-                    I
-                  , typename boost::remove_cv<T0>::type
-                >::type
-                type;
+            typedef tuple_element<I, HeadTuple> base_type;
 
-            template <typename TTuple, typename UTuple>
-            static BOOST_FORCEINLINE
-            typename detail::qualify_as<type, TTuple&&>::type
-            call(TTuple && t, UTuple && u)
+            template <typename HeadTuple_, typename ...TailTuples_>
+            static BOOST_CONSTEXPR BOOST_FORCEINLINE
+            typename detail::qualify_as<
+                typename base_type::type
+              , HeadTuple_&
+            >::type
+            get(HeadTuple_& head, TailTuples_& ...tail) BOOST_NOEXCEPT
             {
-                return util::get<I>(std::forward<TTuple>(t));
+                return base_type::get(head);
             }
         };
 
-        template <std::size_t I, typename T0, typename T1>
+        template <std::size_t I, typename HeadTuple, typename ...TailTuples>
         struct tuple_cat_element<
-            I, T0, T1
+            I, detail::pack<HeadTuple, TailTuples...>
           , typename boost::enable_if_c<
-                (I >= tuple_size<T0>::value)
-             && (I < tuple_size<T1>::value + tuple_size<T0>::value)
+                (I >= tuple_size<HeadTuple>::value)
             >::type
-        >
+        > : tuple_cat_element<
+                I - tuple_size<HeadTuple>::value
+              , detail::pack<TailTuples...>
+            >
         {
-            static const std::size_t offset =
-                tuple_size<T0>::value;
+            typedef tuple_cat_element<
+                I - tuple_size<HeadTuple>::value
+              , detail::pack<TailTuples...>
+            > base_type;
 
-            typedef
-                typename tuple_element<
-                    I - offset
-                  , typename boost::remove_cv<T1>::type
-                >::type
-                type;
-
-            template <typename TTuple, typename UTuple>
-            static BOOST_FORCEINLINE
-            typename detail::qualify_as<type, UTuple&&>::type
-            call(TTuple && t, UTuple && u)
+            template <typename HeadTuple_, typename ...TailTuples_>
+            static BOOST_CONSTEXPR BOOST_FORCEINLINE
+            typename detail::qualify_as<
+                typename base_type::type
+              , HeadTuple_&
+            >::type
+            get(HeadTuple_& head, TailTuples_& ...tail) BOOST_NOEXCEPT
             {
-                return util::get<I - offset>(std::forward<UTuple>(u));
+                return base_type::get(tail...);
             }
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <
-            BOOST_PP_ENUM_BINARY_PARAMS(N, typename T, = void BOOST_PP_INTERCEPT)
-          , typename Enable = void
-        >
-        struct tuple_cat_result;
+        template <typename Indices, typename Tuples>
+        struct tuple_cat_result_impl;
 
-        template <>
-        struct tuple_cat_result<>
-        {
-            typedef tuple<> type;
-        };
-
-        template <typename Tuple>
-        struct tuple_cat_result<
-            Tuple
-          , typename boost::enable_if_c<tuple_size<Tuple>::value == 0>::type
+        template <std::size_t ...Is, typename ...Tuples>
+        struct tuple_cat_result_impl<
+            detail::pack_c<std::size_t, Is...>, detail::pack<Tuples...>
         >
         {
-            typedef tuple<> type;
+            typedef tuple<
+                typename tuple_cat_element<Is, detail::pack<Tuples...> >::type...
+            > type;
+
+            template <typename ...Tuples_>
+            static BOOST_CONSTEXPR BOOST_FORCEINLINE
+            type make(Tuples_&&... tuples)
+            {
+                return type(tuple_cat_element<Is, detail::pack<Tuples...> >::get(
+                    std::forward<Tuples_>(tuples)...)...);
+            }
         };
 
-#       define HPX_UTIL_TUPLE_CAT_ELEMENT(Z, N, D)                            \
-        typename tuple_cat_element<N, TTuple, UTuple>::type                   \
-        /**/
-        template <typename TTuple, typename UTuple>
-        struct tuple_cat_result<TTuple, UTuple>
-        {
-            typedef tuple<BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_CAT_ELEMENT, _)> type;
-        };
-#       undef HPX_UTIL_TUPLE_CAT_ELEMENT
+        template <typename ...Tuples>
+        struct tuple_cat_result
+          : tuple_cat_result_impl<
+                typename make_index_pack<tuple_cat_size<Tuples...>::value>::type
+              , detail::pack<Tuples...>
+            >
+        {};
     }
 
+    template <typename ...Tuples>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
-    tuple<>
-    tuple_cat()
+    typename detail::tuple_cat_result<Tuples...>::type
+    tuple_cat(Tuples&&... tuples)
     {
-        return tuple<>();
-    }
-
-    template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-    BOOST_CONSTEXPR BOOST_FORCEINLINE
-    tuple<BOOST_PP_ENUM_PARAMS(N, T)>
-    tuple_cat(tuple<BOOST_PP_ENUM_PARAMS(N, T)> const& t)
-    {
-        return t;
-    }
-    template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-    BOOST_CONSTEXPR BOOST_FORCEINLINE
-    tuple<BOOST_PP_ENUM_PARAMS(N, T)>
-    tuple_cat(tuple<BOOST_PP_ENUM_PARAMS(N, T)> && t)
-    {
-        return std::move(t);
-    }
-
-    template <typename Tuple>
-    BOOST_CONSTEXPR BOOST_FORCEINLINE
-    typename boost::enable_if_c<
-        tuple_size<typename boost::remove_reference<Tuple>::type>::value == 0
-      , tuple<>
-    >::type
-    tuple_cat(Tuple && t)
-    {
-        return tuple<>();
-    }
-
-    template <typename TTuple, typename UTuple>
-    BOOST_CONSTEXPR BOOST_FORCEINLINE
-    typename boost::enable_if_c<
-        tuple_size<typename boost::remove_reference<TTuple>::type>::value
-      + tuple_size<typename boost::remove_reference<UTuple>::type>::value == 0
-      , tuple<>
-    >::type
-    tuple_cat(TTuple && /*t*/, UTuple && /*u*/)
-    {
-        return tuple<>();
+        return detail::tuple_cat_result<Tuples...>::make(
+            std::forward<Tuples>(tuples)...);
     }
 
     // 20.4.2.7, relational operators
@@ -650,44 +660,21 @@ namespace hpx { namespace util
         };
     }
 
-    template <
-        BOOST_PP_ENUM_PARAMS(N, typename T)
-      , BOOST_PP_ENUM_PARAMS(N, typename U)
-    >
+    template <typename ...Ts, typename ...Us>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
-    typename boost::enable_if_c<
-        tuple_size<tuple<BOOST_PP_ENUM_PARAMS(N, T)> >::value
-     == tuple_size<tuple<BOOST_PP_ENUM_PARAMS(N, U)> >::value
-      , bool
-    >::type
-    operator==(
-        tuple<BOOST_PP_ENUM_PARAMS(N, T)> const& t
-      , tuple<BOOST_PP_ENUM_PARAMS(N, U)> const& u
-    )
+    typename boost::enable_if_c<sizeof...(Ts) == sizeof...(Us), bool>::type
+    operator==(tuple<Ts...> const& t, tuple<Us...> const& u)
     {
-        return
-            detail::tuple_equal_to<
-                0, tuple_size<tuple<BOOST_PP_ENUM_PARAMS(N, T)> >::value
-            >::call(t, u);
+        return detail::tuple_equal_to<0, sizeof...(Ts)>::call(t, u);
     }
 
     // template<class... TTypes, class... UTypes>
     // constexpr bool operator!=
     //     (const tuple<TTypes...>& t, const tuple<UTypes...>& u);
-    template <
-        BOOST_PP_ENUM_PARAMS(N, typename T)
-      , BOOST_PP_ENUM_PARAMS(N, typename U)
-    >
+    template <typename ...Ts, typename ...Us>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
-    typename boost::enable_if_c<
-        tuple_size<tuple<BOOST_PP_ENUM_PARAMS(N, T)> >::value
-     == tuple_size<tuple<BOOST_PP_ENUM_PARAMS(N, U)> >::value
-      , bool
-    >::type
-    operator!=(
-        tuple<BOOST_PP_ENUM_PARAMS(N, T)> const& t
-      , tuple<BOOST_PP_ENUM_PARAMS(N, U)> const& u
-    )
+    typename boost::enable_if_c<sizeof...(Ts) == sizeof...(Us), bool>::type
+    operator!=(tuple<Ts...> const& t, tuple<Us...> const& u)
     {
         return !(t == u);
     }
@@ -729,44 +716,21 @@ namespace hpx { namespace util
         };
     }
 
-    template <
-        BOOST_PP_ENUM_PARAMS(N, typename T)
-      , BOOST_PP_ENUM_PARAMS(N, typename U)
-    >
+    template <typename ...Ts, typename ...Us>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
-    typename boost::enable_if_c<
-        tuple_size<tuple<BOOST_PP_ENUM_PARAMS(N, T)> >::value
-     == tuple_size<tuple<BOOST_PP_ENUM_PARAMS(N, U)> >::value
-      , bool
-    >::type
-    operator<(
-        tuple<BOOST_PP_ENUM_PARAMS(N, T)> const& t
-      , tuple<BOOST_PP_ENUM_PARAMS(N, U)> const& u
-    )
+    typename boost::enable_if_c<sizeof...(Ts) == sizeof...(Us), bool>::type
+    operator<(tuple<Ts...> const& t, tuple<Us...> const& u)
     {
-        return
-            detail::tuple_less_than<
-                0, tuple_size<tuple<BOOST_PP_ENUM_PARAMS(N, T)> >::value
-            >::call(t, u);
+        return detail::tuple_less_than<0, sizeof...(Ts)>::call(t, u);
     }
 
     // template<class... TTypes, class... UTypes>
     // constexpr bool operator>
     //     (const tuple<TTypes...>& t, const tuple<UTypes...>& u);
-    template <
-        BOOST_PP_ENUM_PARAMS(N, typename T)
-      , BOOST_PP_ENUM_PARAMS(N, typename U)
-    >
+    template <typename ...Ts, typename ...Us>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
-    typename boost::enable_if_c<
-        tuple_size<tuple<BOOST_PP_ENUM_PARAMS(N, T)> >::value
-     == tuple_size<tuple<BOOST_PP_ENUM_PARAMS(N, U)> >::value
-      , bool
-    >::type
-    operator>(
-        tuple<BOOST_PP_ENUM_PARAMS(N, T)> const& t
-      , tuple<BOOST_PP_ENUM_PARAMS(N, U)> const& u
-    )
+    typename boost::enable_if_c<sizeof...(Ts) == sizeof...(Us), bool>::type
+    operator>(tuple<Ts...> const& t, tuple<Us...> const& u)
     {
         return u < t;
     }
@@ -774,20 +738,10 @@ namespace hpx { namespace util
     // template<class... TTypes, class... UTypes>
     // constexpr bool operator<=
     //     (const tuple<TTypes...>& t, const tuple<UTypes...>& u);
-    template <
-        BOOST_PP_ENUM_PARAMS(N, typename T)
-      , BOOST_PP_ENUM_PARAMS(N, typename U)
-    >
+    template <typename ...Ts, typename ...Us>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
-    typename boost::enable_if_c<
-        tuple_size<tuple<BOOST_PP_ENUM_PARAMS(N, T)> >::value
-     == tuple_size<tuple<BOOST_PP_ENUM_PARAMS(N, U)> >::value
-      , bool
-    >::type
-    operator<=(
-        tuple<BOOST_PP_ENUM_PARAMS(N, T)> const& t
-      , tuple<BOOST_PP_ENUM_PARAMS(N, U)> const& u
-    )
+    typename boost::enable_if_c<sizeof...(Ts) == sizeof...(Us), bool>::type
+    operator<=(tuple<Ts...> const& t, tuple<Us...> const& u)
     {
         return !(u < t);
     }
@@ -795,20 +749,10 @@ namespace hpx { namespace util
     // template<class... TTypes, class... UTypes>
     // constexpr bool operator>=
     //     (const tuple<TTypes...>& t, const tuple<UTypes...>& u);
-    template <
-        BOOST_PP_ENUM_PARAMS(N, typename T)
-      , BOOST_PP_ENUM_PARAMS(N, typename U)
-    >
+    template <typename ...Ts, typename ...Us>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
-    typename boost::enable_if_c<
-        tuple_size<tuple<BOOST_PP_ENUM_PARAMS(N, T)> >::value
-     == tuple_size<tuple<BOOST_PP_ENUM_PARAMS(N, U)> >::value
-      , bool
-    >::type
-    operator>=(
-        tuple<BOOST_PP_ENUM_PARAMS(N, T)> const& t
-      , tuple<BOOST_PP_ENUM_PARAMS(N, U)> const& u
-    )
+    typename boost::enable_if_c<sizeof...(Ts) == sizeof...(Us), bool>::type
+    operator>=(tuple<Ts...> const& t, tuple<Us...> const& u)
     {
         return !(t < u);
     }
@@ -818,14 +762,9 @@ namespace hpx { namespace util
     // template <class... Types>
     // void swap(tuple<Types...>& x, tuple<Types...>& y) noexcept(x.swap(y));
     // x.swap(y)
-    template <
-        BOOST_PP_ENUM_PARAMS(N, typename T)
-    >
+    template <typename ...Ts>
     BOOST_FORCEINLINE
-    void swap(
-        tuple<BOOST_PP_ENUM_PARAMS(N, T)>& x
-      , tuple<BOOST_PP_ENUM_PARAMS(N, T)>& y
-    )
+    void swap(tuple<Ts...>& x, tuple<Ts...>& y)
         BOOST_NOEXCEPT_IF(BOOST_NOEXCEPT_EXPR((x.swap(y))))
     {
         x.swap(y);
@@ -837,45 +776,26 @@ namespace hpx { namespace util
 namespace boost { namespace serialization
 {
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        template <typename T>
-        struct is_tuple_element_bitwise_serializable
-          : boost::serialization::is_bitwise_serializable<T>
-        {};
-
-        template <>
-        struct is_tuple_element_bitwise_serializable<void>
-          : boost::mpl::true_
-        {};
-    }
-
-#   define HPX_UTIL_TUPLE_IS_BITWISE_SERIALIZABLE(Z, N, D)                    \
-     && detail::is_tuple_element_bitwise_serializable<BOOST_PP_CAT(T, N)>::value\
-    /**/
-    template <BOOST_PP_ENUM_PARAMS(N, typename T)>
+    template <typename ...Ts>
     struct is_bitwise_serializable<
-        ::hpx::util::tuple<BOOST_PP_ENUM_PARAMS(N, T)>
-    > : boost::mpl::bool_<
-            true BOOST_PP_REPEAT(N, HPX_UTIL_TUPLE_IS_BITWISE_SERIALIZABLE, _)
-        >
+        ::hpx::util::tuple<Ts...>
+    > : ::hpx::util::detail::all_of< ::hpx::util::detail::pack<
+            boost::serialization::is_bitwise_serializable<Ts>...
+        > >
     {};
-#   undef HPX_UTIL_TUPLE_IS_BITWISE_SERIALIZABLE
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Archive, BOOST_PP_ENUM_PARAMS(N, typename T)>
+    template <typename Archive, typename ...Ts>
     BOOST_FORCEINLINE
     void serialize(
         Archive& ar
-      , ::hpx::util::tuple<BOOST_PP_ENUM_PARAMS(N, T)>& t
+      , ::hpx::util::tuple<Ts...>& t
       , unsigned int const version
     )
     {
         ::hpx::util::serialize_sequence(ar, t);
     }
 }}
-
-#undef N
 
 #   if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #       include <hpx/util/preprocessed/tuple.hpp>
@@ -910,43 +830,9 @@ namespace boost { namespace serialization
 
 namespace hpx { namespace util
 {
-    namespace detail
-    {
-        template <BOOST_PP_ENUM_PARAMS(N, typename T), typename UTuple>
-        struct are_tuples_compatible<
-            tuple<BOOST_PP_ENUM_PARAMS(N, T)>, UTuple
-          , typename boost::enable_if_c<
-                tuple_size<tuple<BOOST_PP_ENUM_PARAMS(N, T)> >::value == N
-             && tuple_size<typename boost::remove_reference<UTuple>::type>::value == N
-            >::type
-        >
-        {
-            typedef char(&no_type)[1];
-            typedef char(&yes_type)[2];
-
-            static no_type call(...);
-            static yes_type call(BOOST_PP_ENUM_PARAMS(N, T));
-
-#           define HPX_UTIL_TUPLE_GET(Z, N, D)                                \
-            util::get<N>(boost::declval<UTuple>())                            \
-            /**/
-            static bool const value =
-                sizeof(
-                    call(BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_GET, _))
-                ) == sizeof(yes_type);
-#           undef HPX_UTIL_TUPLE_GET
-
-            typedef boost::mpl::bool_<value> type;
-        };
-    }
-
     // 20.4.2, class template tuple
     template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-#   if N != HPX_TUPLE_LIMIT
     class tuple<BOOST_PP_ENUM_PARAMS(N, T)>
-#   else
-    class tuple
-#   endif
     {
     public: // exposition-only
 #       define HPX_UTIL_TUPLE_MEMBER(Z, N, D)                                 \
@@ -1176,19 +1062,12 @@ namespace hpx { namespace util
 
     // 20.4.2.5, tuple helper classes
 
-    // template <class Tuple>
-    // class tuple_size
-    template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-    struct tuple_size<tuple<BOOST_PP_ENUM_PARAMS(N, T)> >
-      : boost::mpl::size_t<N>
-    {};
-
     // template <size_t I, class Tuple>
     // class tuple_element
-    template <BOOST_PP_ENUM_PARAMS(HPX_TUPLE_LIMIT, typename T)>
+    template <BOOST_PP_ENUM_PARAMS(N, typename T), typename ...Tail>
     struct tuple_element<
         BOOST_PP_DEC(N)
-      , tuple<BOOST_PP_ENUM_PARAMS(HPX_TUPLE_LIMIT, T)>
+      , tuple<BOOST_PP_ENUM_PARAMS(N, T), Tail...>
     > : boost::mpl::identity<BOOST_PP_CAT(T, BOOST_PP_DEC(N))>
     {
         template <typename Tuple>
@@ -1202,184 +1081,6 @@ namespace hpx { namespace util
             return tuple.BOOST_PP_CAT(_m, BOOST_PP_DEC(N))._value;
         }
     };
-
-    // 20.4.2.4, tuple creation functions
-
-    // template<class... Types>
-    // constexpr tuple<VTypes...> make_tuple(Types&&... t);
-#   define HPX_UTIL_TUPLE_MAKE_ELEMENT(Z, N, D)                               \
-    typename detail::make_tuple_element<BOOST_PP_CAT(T, N)>::type             \
-    /**/
-    template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-    BOOST_CONSTEXPR BOOST_FORCEINLINE
-    tuple<BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_MAKE_ELEMENT, _)>
-    make_tuple(HPX_ENUM_FWD_ARGS(N, T, v))
-    {
-        return
-            tuple<BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_MAKE_ELEMENT, _)>(
-                HPX_ENUM_FORWARD_ARGS(N, T, v)
-            );
-    }
-#   undef HPX_UTIL_TUPLE_MAKE_ELEMENT
-
-    // template<class... Types>
-    // tuple<Types&&...> forward_as_tuple(Types&&... t) noexcept;
-    // Constructs a tuple of references to the arguments in t suitable for
-    // forwarding as arguments to a function. Because the result may contain
-    // references to temporary variables, a program shall ensure that the
-    // return value of this function does not outlive any of its arguments.
-#   define HPX_UTIL_FORWARD_AS_TUPLE_ELEMENT(Z, N, D)                         \
-    BOOST_PP_CAT(T, N) &&                                                     \
-    /**/
-    template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-    BOOST_FORCEINLINE
-    tuple<BOOST_PP_ENUM(N, HPX_UTIL_FORWARD_AS_TUPLE_ELEMENT, _)>
-    forward_as_tuple(HPX_ENUM_FWD_ARGS(N, T, v)) BOOST_NOEXCEPT
-    {
-        return
-            tuple<BOOST_PP_ENUM(N, HPX_UTIL_FORWARD_AS_TUPLE_ELEMENT, _)>(
-                HPX_ENUM_FORWARD_ARGS(N, T, v)
-            );
-    }
-#   undef HPX_UTIL_FORWARD_AS_TUPLE_ELEMENT
-
-    // template<class... Types>
-    // tuple<Types&...> tie(Types&... t) noexcept;
-#   define HPX_UTIL_TIE_ELEMENT(Z, N, D)                                      \
-    BOOST_PP_CAT(T, N) &                                                      \
-    /**/
-    template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-    BOOST_FORCEINLINE
-    tuple<BOOST_PP_ENUM(N, HPX_UTIL_TIE_ELEMENT, _)>
-    tie(BOOST_PP_ENUM_BINARY_PARAMS(N, T, & v)) BOOST_NOEXCEPT
-    {
-        return
-            tuple<BOOST_PP_ENUM(N, HPX_UTIL_TIE_ELEMENT, _)>(
-                BOOST_PP_ENUM_PARAMS(N, v)
-            );
-    }
-#   undef HPX_UTIL_TIE_ELEMENT
-
-    //template <class... Tuples>
-    //constexpr tuple<Ctypes ...> tuple_cat(Tuples&&...);
-    namespace detail
-    {
-#       if N > 2
-#       define HPX_UTIL_TUPLE_CAT_RESULT(Z, N, D)                             \
-        BOOST_PP_COMMA_IF(N) typename tuple_cat_result<                       \
-            BOOST_PP_CAT(T, BOOST_PP_MUL(N, 2))                               \
-          , BOOST_PP_CAT(T, BOOST_PP_INC(BOOST_PP_MUL(N, 2)))                 \
-        >::type                                                               \
-        /**/
-        template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-        struct tuple_cat_result<BOOST_PP_ENUM_PARAMS(N, T)>
-          : tuple_cat_result<
-                BOOST_PP_REPEAT(BOOST_PP_DIV(N, 2), HPX_UTIL_TUPLE_CAT_RESULT, _)
-#           if N % 2 != 0
-              , BOOST_PP_CAT(T, BOOST_PP_DEC(N))
-#           endif
-            >
-        {};
-#       undef HPX_UTIL_TUPLE_CAT_RESULT
-#       endif
-
-#       define HPX_UTIL_TUPLE_CAT_ELEMENT_TYPE(Z, N, D)                       \
-        typename tuple_element<N, Tuple>::type                                \
-        /**/
-        template <typename Tuple>
-        struct tuple_cat_result<
-            Tuple
-          , typename boost::enable_if_c<tuple_size<Tuple>::value == N>::type
-        >
-        {
-            typedef
-                tuple<BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_CAT_ELEMENT_TYPE, _)>
-                type;
-        };
-#       undef HPX_UTIL_TUPLE_CAT_ELEMENT_TYPE
-    }
-
-#   define HPX_UTIL_TUPLE_CAT_ELEMENT_CALL(Z, N, D)                           \
-    util::get<N>(std::forward<Tuple>(t))                                      \
-    /**/
-    template <typename Tuple>
-    BOOST_CONSTEXPR BOOST_FORCEINLINE
-    typename boost::lazy_enable_if_c<
-        tuple_size<typename boost::remove_reference<Tuple>::type>::value == N
-      , detail::tuple_cat_result<
-            typename boost::remove_reference<Tuple>::type
-        >
-    >::type
-    tuple_cat(Tuple && t)
-    {
-        return
-            typename detail::tuple_cat_result<
-                typename boost::remove_reference<Tuple>::type
-            >::type(
-                BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_CAT_ELEMENT_CALL, _)
-            );
-    }
-#   undef HPX_UTIL_TUPLE_CAT_ELEMENT_CALL
-
-#   define HPX_UTIL_TUPLE_CAT_ELEMENT_CALL(Z, N, D)                           \
-    detail::tuple_cat_element<                                                \
-        N                                                                     \
-      , typename boost::remove_reference<TTuple>::type                        \
-      , typename boost::remove_reference<UTuple>::type                        \
-    >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))                 \
-    /**/
-    template <typename TTuple, typename UTuple>
-    BOOST_CONSTEXPR BOOST_FORCEINLINE
-    typename boost::lazy_enable_if_c<
-        tuple_size<typename boost::remove_reference<TTuple>::type>::value
-      + tuple_size<typename boost::remove_reference<UTuple>::type>::value == N
-      , detail::tuple_cat_result<
-            typename boost::remove_reference<TTuple>::type
-          , typename boost::remove_reference<UTuple>::type
-        >
-    >::type
-    tuple_cat(TTuple && t, UTuple && u)
-    {
-        return
-            typename detail::tuple_cat_result<
-                typename boost::remove_reference<TTuple>::type
-              , typename boost::remove_reference<UTuple>::type
-            >::type(
-                BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_CAT_ELEMENT_CALL, _)
-            );
-    }
-#   undef HPX_UTIL_TUPLE_CAT_ELEMENT_CALL
-
-#   if N > 2
-#   define HPX_UTIL_TUPLE_CAT_RESULT_ELEMENT(Z, N, D)                         \
-    typename boost::remove_reference<BOOST_PP_CAT(T, N)>::type                \
-    /**/
-#   define HPX_UTIL_TUPLE_CAT(Z, N, D)                                        \
-    BOOST_PP_COMMA_IF(N) util::tuple_cat(                                     \
-        std::forward<BOOST_PP_CAT(T, BOOST_PP_MUL(N, 2))>                     \
-            (BOOST_PP_CAT(t, BOOST_PP_MUL(N, 2)))                             \
-      , std::forward<BOOST_PP_CAT(T, BOOST_PP_INC(BOOST_PP_MUL(N, 2)))>       \
-            (BOOST_PP_CAT(t, BOOST_PP_INC(BOOST_PP_MUL(N, 2)))))              \
-    /**/
-    template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-    BOOST_CONSTEXPR BOOST_FORCEINLINE
-    typename detail::tuple_cat_result<
-        BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_CAT_RESULT_ELEMENT, _)
-    >::type
-    tuple_cat(HPX_ENUM_FWD_ARGS(N, T, t))
-    {
-        return
-            util::tuple_cat(
-                BOOST_PP_REPEAT(BOOST_PP_DIV(N, 2), HPX_UTIL_TUPLE_CAT, _)
-#           if N % 2 != 0
-              , std::forward<BOOST_PP_CAT(T, BOOST_PP_DEC(N))>
-                    (BOOST_PP_CAT(t, BOOST_PP_DEC(N)))
-#           endif
-            );
-    }
-#   undef HPX_UTIL_TUPLE_CAT_RESULT_ELEMENT
-#   undef HPX_UTIL_TUPLE_CAT
-#   endif
 }}
 
 #undef N
