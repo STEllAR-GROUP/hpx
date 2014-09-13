@@ -40,18 +40,23 @@ namespace hpx { namespace util
 
     namespace detail
     {
-        template <typename T, typename TD = typename decay<T>::type>
-        struct decay_unwrap
+        template <typename TD>
+        struct decay_unwrap_impl
         {
             typedef TD type;
         };
 
-        template <typename T, typename U>
-        struct decay_unwrap<T, boost::reference_wrapper<U> >
+        template <typename X>
+        struct decay_unwrap_impl<boost::reference_wrapper<X> >
         {
-            typedef U& type;
+            typedef X& type;
         };
     }
+
+    template <typename T>
+    struct decay_unwrap
+      : detail::decay_unwrap_impl<typename decay<T>::type>
+    {};
 }}
 
 #endif

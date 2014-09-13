@@ -475,10 +475,10 @@ namespace hpx { namespace util
     // constexpr tuple<VTypes...> make_tuple(Types&&... t);
     template <typename ...Ts>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
-    tuple<typename detail::decay_unwrap<Ts>::type...>
+    tuple<typename decay_unwrap<Ts>::type...>
     make_tuple(Ts&&... vs)
     {
-        return tuple<typename detail::decay_unwrap<Ts>::type...>(
+        return tuple<typename decay_unwrap<Ts>::type...>(
             std::forward<Ts>(vs)...);
     }
 
