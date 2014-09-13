@@ -148,7 +148,7 @@ namespace hpx { namespace parallel { namespace util
             template <typename Iter, typename F>
             static Iter call(Iter it, std::size_t count, F && f)
             {
-                for (/**/; count != 0; --count, ++it)
+                for (/**/; count != 0; (void) --count, ++it)
                     f(it);
                 return it;
             }
@@ -157,7 +157,7 @@ namespace hpx { namespace parallel { namespace util
             static Iter call(Iter it, std::size_t count, CancelToken& tok,
                 F && f)
             {
-                for (/**/; count != 0; --count, ++it)
+                for (/**/; count != 0; (void) --count, ++it)
                 {
                     f(it);
                     if (tok.was_cancelled())
@@ -200,7 +200,7 @@ namespace hpx { namespace parallel { namespace util
             static Iter
             call(std::size_t base_idx, Iter it, std::size_t count, F && f)
             {
-                for (/**/; count != 0; --count, ++it, ++base_idx)
+                for (/**/; count != 0; (void) --count, ++it, ++base_idx)
                     f(*it, base_idx);
 
                 return it;
@@ -211,7 +211,7 @@ namespace hpx { namespace parallel { namespace util
             call(std::size_t base_idx, Iter it, std::size_t count,
                 CancelToken& tok, F && f)
             {
-                for (/**/; count != 0; --count, ++it, ++base_idx)
+                for (/**/; count != 0; (void) --count, ++it, ++base_idx)
                 {
                     f(*it, base_idx);
                     if (tok.was_cancelled(base_idx))
@@ -254,7 +254,7 @@ namespace hpx { namespace parallel { namespace util
             template <typename Iter, typename T, typename Pred>
             static T call(Iter it, std::size_t count, T init, Pred && f)
             {
-                for (/**/; count != 0; --count, ++it)
+                for (/**/; count != 0; (void) --count, ++it)
                     init = f(init, *it);
                 return init;
             }
