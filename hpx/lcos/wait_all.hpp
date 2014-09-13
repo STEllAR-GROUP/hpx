@@ -7,7 +7,7 @@
 /// \file lcos/wait_all.hpp
 
 #if defined(DOXYGEN)
-namespace hpx { namespace lcos
+namespace hpx
 {
     /// The function \a wait_all is a operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
@@ -106,7 +106,7 @@ namespace hpx { namespace lcos
     template <typename InputIter>
     InputIter wait_all_n(InputIter begin, std::size_t count,
         error_code& ec = throws);
-}}
+}
 #else
 
 #if !BOOST_PP_IS_ITERATING
