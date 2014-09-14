@@ -19,7 +19,11 @@ if(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
   set(tests ${tests} tss)
 endif()
 
-set(lockfree_fifo_FLAGS NOLIBS DEPENDENCIES ${Boost_LIBRARIES})
+if(NOT MSVC)
+  set(lockfree_fifo_FLAGS NOLIBS DEPENDENCIES ${Boost_LIBRARIES})
+else()
+  set(lockfree_fifo_FLAGS NOLIBS)
+endif()
 
 set(set_thread_state_PARAMETERS THREADS_PER_LOCALITY 4)
 
