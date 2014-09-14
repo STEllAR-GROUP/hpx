@@ -4,22 +4,15 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !BOOST_PP_IS_ITERATING
-
 #if !defined(HPX_UTIL_ZIP_ITERATOR_MAY_29_2014_0852PM)
 #define HPX_UTIL_ZIP_ITERATOR_MAY_29_2014_0852PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/util/detail/pack.hpp>
 
 #include <boost/fusion/algorithm/iteration/for_each.hpp>
 #include <boost/iterator/iterator_facade.hpp>
-#include <boost/preprocessor/arithmetic/sub.hpp>
-#include <boost/preprocessor/facilities/intercept.hpp>
-#include <boost/preprocessor/iteration/iterate.hpp>
-#include <boost/preprocessor/repetition/enum.hpp>
-#include <boost/preprocessor/repetition/enum_params.hpp>
-#include <boost/preprocessor/repetition/enum_binary_params.hpp>
 #include <boost/utility/enable_if.hpp>
 
 #include <iterator>
@@ -231,6 +224,21 @@ namespace hpx { namespace util
         template <typename IteratorTuple>
         struct dereference_iterator;
 
+        template <typename ...Ts>
+        struct dereference_iterator<tuple<Ts...> >
+        {
+            typedef typename zip_iterator_reference<
+                tuple<Ts...>
+            >::type result_type;
+
+            template <std::size_t ...Is>
+            static result_type call(detail::pack_c<std::size_t, Is...>,
+                tuple<Ts...> const& iterators)
+            {
+                return util::forward_as_tuple(*util::get<Is>(iterators)...);
+            }
+        };
+
         struct increment_iterator
         {
             typedef void result_type;
@@ -310,7 +318,10 @@ namespace hpx { namespace util
 
             typename base_type::reference dereference() const
             {
-                return dereference_iterator<IteratorTuple>::call(iterators_);
+                return dereference_iterator<IteratorTuple>::call(
+                    typename detail::make_index_pack<
+                        util::tuple_size<IteratorTuple>::value
+                    >::type(), iterators_);
             }
 
             void increment()
@@ -342,105 +353,27 @@ namespace hpx { namespace util
     }
 
     template<typename ...Ts>
-    class zip_iterator;
-}}
-
-#   if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#       include <hpx/util/preprocessed/zip_iterator.hpp>
-#   else
-#       if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#           pragma wave option(preserve: 1, line: 0, output: "preprocessed/zip_iterator_" HPX_LIMIT_STR ".hpp")
-#       endif
-
-        ///////////////////////////////////////////////////////////////////////
-#       define BOOST_PP_ITERATION_PARAMS_1                                    \
-        (                                                                     \
-            3                                                                 \
-          , (                                                                 \
-                1                                                             \
-              , HPX_TUPLE_LIMIT                                               \
-              , <hpx/util/zip_iterator.hpp>                                   \
-            )                                                                 \
-        )                                                                     \
-        /**/
-#       include BOOST_PP_ITERATE()
-
-#       if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#           pragma wave option(output: null)
-#       endif
-#   endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-
-#endif
-
-#else // !BOOST_PP_IS_ITERATING
-
-#define N BOOST_PP_ITERATION()
-
-namespace hpx { namespace util
-{
-    namespace detail
+    class zip_iterator
+      : public detail::zip_iterator_base<tuple<Ts...> >
     {
-        template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-        struct dereference_iterator<tuple<
-            BOOST_PP_ENUM_PARAMS(N, T)
-        > >
-        {
-            typedef typename zip_iterator_reference<tuple<
-                BOOST_PP_ENUM_PARAMS(N, T)
-            > >::type result_type;
-
-#           define HPX_PARALLEL_UTIL_ZIP_ITERATOR_GET(Z, N, D)                \
-            *util::get<N>(iterators)                                          \
-            /**/
-            static result_type call(
-                tuple<BOOST_PP_ENUM_PARAMS(N, T)> const& iterators)
-            {
-                return util::forward_as_tuple(
-                    BOOST_PP_ENUM(N, HPX_PARALLEL_UTIL_ZIP_ITERATOR_GET, _));
-            }
-#           undef HPX_PARALLEL_UTIL_ZIP_ITERATOR_GET
-        };
-    }
-
-    template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-    class zip_iterator<BOOST_PP_ENUM_PARAMS(N, T)>
-      : public detail::zip_iterator_base<tuple<
-            BOOST_PP_ENUM_PARAMS(N, T)
-        > >
-    {
-        typedef detail::zip_iterator_base<tuple<
-            BOOST_PP_ENUM_PARAMS(N, T)
-        > > base_type;
+        typedef detail::zip_iterator_base<tuple<Ts...> > base_type;
 
     public:
         zip_iterator() : base_type() {}
 
-#       define HPX_PARALLEL_UTIL_ZIP_ITERATOR_CONST_LVREF_PARAM(Z, N, D)      \
-        BOOST_PP_CAT(T, N) const& BOOST_PP_CAT(v, N)                          \
-        /**/
-        explicit zip_iterator(
-            BOOST_PP_ENUM(N, HPX_PARALLEL_UTIL_ZIP_ITERATOR_CONST_LVREF_PARAM, _)
-        ) : base_type(util::tie(BOOST_PP_ENUM_PARAMS(N, v)))
+        explicit zip_iterator(Ts const&... vs)
+          : base_type(util::tie(vs...))
         {}
-#       undef HPX_PARALLEL_UTIL_ZIP_ITERATOR_CONST_LVREF_PARAM
     };
 
-#   define HPX_PARALLEL_UTIL_ZIP_ITERATOR_DECAY_ELEM(Z, N, D)                 \
-    typename decay<BOOST_PP_CAT(T, N)>::type                                  \
-    /**/
-    template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-    zip_iterator<BOOST_PP_ENUM(N, HPX_PARALLEL_UTIL_ZIP_ITERATOR_DECAY_ELEM, _)>
-    make_zip_iterator(HPX_ENUM_FWD_ARGS(N, T, v))
+    template <typename ...Ts>
+    zip_iterator<typename decay<Ts>::type...>
+    make_zip_iterator(Ts&&... vs)
     {
-        typedef zip_iterator<
-            BOOST_PP_ENUM(N, HPX_PARALLEL_UTIL_ZIP_ITERATOR_DECAY_ELEM, _)
-        > result_type;
+        typedef zip_iterator<typename decay<Ts>::type...> result_type;
 
-        return result_type(HPX_ENUM_FORWARD_ARGS(N, T, v));
+        return result_type(std::forward<Ts>(vs)...);
     }
-#   undef HPX_PARALLEL_UTIL_ZIP_ITERATOR_DECAY_ELEM
 }}
-
-#undef N
 
 #endif
