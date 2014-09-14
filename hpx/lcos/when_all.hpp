@@ -14,10 +14,10 @@ namespace hpx
     /// returns a new future object representing the same list of futures
     /// after they finished executing.
     ///
-    /// \param first    The iterator pointing to the first element of a
+    /// \param first    [in] The iterator pointing to the first element of a
     ///                 sequence of \a future or \a shared_future objects for
     ///                 which \a when_all should wait.
-    /// \param last     The iterator pointing to the last element of a
+    /// \param last     [in] The iterator pointing to the last element of a
     ///                 sequence of \a future or \a shared_future objects for
     ///                 which \a when_all should wait.
     ///
@@ -44,9 +44,9 @@ namespace hpx
     /// returns a new future object representing the same list of futures
     /// after they finished executing.
     ///
-    /// \param futures  A vector holding an arbitrary amount of \a future or
-    ///                 \a shared_future objects for which \a when_all should
-    ///                 wait.
+    /// \param futures  [in] A vector holding an arbitrary amount of \a future
+    ///                 or \a shared_future objects for which \a when_all
+    ///                 should wait.
     ///
     /// \return   Returns a future holding the same list of futures as has
     ///           been passed to when_all.
@@ -70,7 +70,7 @@ namespace hpx
     /// returns a new future object representing the same list of futures
     /// after they finished executing.
     ///
-    /// \param futures  An arbitrary number of \a future or \a shared_future
+    /// \param futures  [in] An arbitrary number of \a future or \a shared_future
     ///                 objects, possibly holding different types for which
     ///                 \a when_all should wait.
     ///
@@ -95,14 +95,14 @@ namespace hpx
     /// returns a new future object representing the same list of futures
     /// after they finished executing.
     ///
-    /// \param begin    The iterator pointing to the first element of a
+    /// \param begin    [in] The iterator pointing to the first element of a
     ///                 sequence of \a future or \a shared_future objects for
     ///                 which \a wait_all_n should wait.
-    /// \param count    The number of elements in the sequence starting at
+    /// \param count    [in] The number of elements in the sequence starting at
     ///                 \a first.
-    /// \param ec   [in,out] this represents the error status on exit, if
-    ///             this is pre-initialized to \a hpx#throws the function
-    ///             will throw on error instead.
+    /// \param ec       [in,out] this represents the error status on exit, if
+    ///                 this is pre-initialized to \a hpx#throws the function
+    ///                 will throw on error instead.
     ///
     /// \return   Returns a future holding the iterator referring to the first
     ///           element in the input sequence after the last processed
@@ -118,6 +118,8 @@ namespace hpx
     ///           function doesn't throw but returns the result code using the
     ///           parameter \a ec. Otherwise it throws an instance of
     ///           hpx::exception.
+    ///
+    /// \note     None of the futures in the input sequence are invalidated.
     template <typename InputIter>
     future<InputIter> when_all_n(InputIter begin, std::size_t count,
         error_code& ec = throws);

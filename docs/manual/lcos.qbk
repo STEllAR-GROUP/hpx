@@ -105,7 +105,7 @@ asynchronous operations to `hpx::future`, `hpx::shared_future`, and
     when the result is ready. Continuations registered using the then function
     will help to avoid blocking waits or wasting threads on polling, greatly
     improving the responsiveness and scalability of an application.]]
- [[unwrap constructor for `hpx::future`]
+ [[unwrapping constructor for `hpx::future`]
   [In some scenarios, you might want to create a future that returns another
    future, resulting in nested futures.
    Although it is possible to write code to unwrap the outer future and retrieve
@@ -135,24 +135,52 @@ absolutely necessary in order to make C++ a powerful asynchronous programming
 language. Not including these functions is synonymous to Boolean algebra
 without AND/OR.
 
+In addition to the extensions proposed by __cpp11_n4107__, __hpx__ adds functions
+allowing to compose several futures in a more flexible way.
+
 [table Facilities for Composing hpx::futures
- [[Facility][Description]]
- [[[funcref hpx::when_any `hpx::when_any`], [funcref hpx::when_any_n `hpx::when_any_n`],[br]
-   [funcref hpx::wait_any `hpx::wait_any`], [funcref hpx::wait_any_n `hpx::wait_any_n`],[br]
-   [funcref hpx::when_any_swapped `hpx::when_any_swapped`], [funcref hpx::when_any_swapped_n `hpx::when_any_swapped_n`]]
+ [[Facility][Description][Comment]]
+ [[[funcref hpx::when_any `hpx::when_any`],[br]
+   [funcref hpx::when_any_n `hpx::when_any_n`],[br]
+   [funcref hpx::when_any_back `hpx::when_any_back`],[br]
+   [funcref hpx::when_any_back_n `hpx::when_any_back_n`]]
   [Asynchronously wait for at least one of multiple future or shared_future
-   objects to finish.]]
- [[[funcref hpx::when_all `hpx::when_all`], [funcref hpx::when_all_n `hpx::when_all_n`],[br]
-   [funcref hpx::wait_all `hpx::wait_all`], [funcref hpx::wait_all_n `hpx::wait_all_n`]]
-  [Asynchronously waits for all future and shared_future objects to finish.]]
- [[[funcref hpx::when_some `hpx::when_some`], [funcref hpx::when_some_n `hpx::when_some_n`],
-   [funcref hpx::wait_some `hpx::wait_some`], [funcref hpx::wait_some_n `hpx::wait_some_n`]]
-  [Asynchronously waits for multiple future and shared_future objects to finish.]]
- [[[funcref hpx::when_each `hpx::when_each`], [funcref hpx::when_each_n `hpx::when_each_n`],[br]
-   [funcref hpx::wait_each `hpx::wait_each`], [funcref hpx::wait_each_n `hpx::wait_each_n`]]
-  [Asynchronously waits for multiple future and shared_future objects to finish
+   objects to finish.][__cpp11_n4107__, `..._n` versions are __hpx__ only]]
+ [[[funcref hpx::wait_any `hpx::wait_any`],[br]
+   [funcref hpx::wait_any_n `hpx::wait_any_n`]]
+  [Synchronously wait for at least one of multiple future or shared_future
+   objects to finish.][__cpp11_n4107__, `..._n` versions are __hpx__ only]]
+
+ [[[funcref hpx::when_all `hpx::when_all`],[br]
+   [funcref hpx::when_all_n `hpx::when_all_n`]]
+  [Asynchronously wait for all future and shared_future objects to finish.]
+  [__cpp11_n4107__, `..._n` versions are __hpx__ only]]
+ [[[funcref hpx::wait_all `hpx::wait_all`],[br]
+   [funcref hpx::wait_all_n `hpx::wait_all_n`]]
+  [Synchronously wait for all future and shared_future objects to finish.]
+  [__cpp11_n4107__, `..._n` versions are __hpx__ only]]
+
+ [[[funcref hpx::when_some `hpx::when_some`],[br]
+   [funcref hpx::when_some_n `hpx::when_some_n`]]
+  [Asynchronously wait for multiple future and shared_future objects to finish.]
+  [__hpx__ only]]
+ [[[funcref hpx::wait_some `hpx::wait_some`],[br]
+   [funcref hpx::wait_some_n `hpx::wait_some_n`]]
+  [Synchronously wait for multiple future and shared_future objects to finish.]
+  [__hpx__ only]]
+
+ [[[funcref hpx::when_each `hpx::when_each`],[br]
+   [funcref hpx::when_each_n `hpx::when_each_n`]]
+  [Asynchronously wait for multiple future and shared_future objects to finish
    and call a function for each of the future objects as soon as it becomes
-   ready.]]
+   ready.]
+  [__hpx__ only]]
+ [[[funcref hpx::wait_each `hpx::wait_each`],[br]
+   [funcref hpx::wait_each_n `hpx::wait_each_n`]]
+  [Synchronously wait for multiple future and shared_future objects to finish
+   and call a function for each of the future objects as soon as it becomes
+   ready.]
+  [__hpx__ only]]
 ]
 
 [endsect]

@@ -236,7 +236,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 927]  - Make hpx/lcos/reduce.hpp accept futures of id_type
 * [issue 926]  - All unit tests that are run with more than one thread with
                  CTest/hpx_run_test should configure hpx.os_threads
-* [issue 925]  - Regression_dataflow_791 needs to be brought in line with HPX
+* [issue 925]  - regression_dataflow_791 needs to be brought in line with HPX
                  standards
 * [issue 879]  - Hung test leads to cascading test failure; make tests should
                  support the MPI parcelport

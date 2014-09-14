@@ -31,6 +31,8 @@ namespace hpx
     ///           function doesn't throw but returns the result code using the
     ///           parameter \a ec. Otherwise it throws an instance of
     ///           hpx::exception.
+    ///
+    /// \note     None of the futures in the input sequence are invalidated.
     template <typename InputIter>
     void wait_all(InputIter first, InputIter last, error_code& ec = throws);
 
@@ -53,6 +55,8 @@ namespace hpx
     ///           function doesn't throw but returns the result code using the
     ///           parameter \a ec. Otherwise it throws an instance of
     ///           hpx::exception.
+    ///
+    /// \note     None of the futures in the input sequence are invalidated.
     template <typename R>
     void wait_all(std::vector<future<R>>&& futures, error_code& ec = throws);
 
@@ -75,6 +79,8 @@ namespace hpx
     ///           function doesn't throw but returns the result code using the
     ///           parameter \a ec. Otherwise it throws an instance of
     ///           hpx::exception.
+    ///
+    /// \note     None of the futures in the input sequence are invalidated.
     template <typename ...T>
     void wait_all(T &&... futures, error_code& ec = throws);
 
@@ -103,6 +109,8 @@ namespace hpx
     ///           function doesn't throw but returns the result code using the
     ///           parameter \a ec. Otherwise it throws an instance of
     ///           hpx::exception.
+    ///
+    /// \note     None of the futures in the input sequence are invalidated.
     template <typename InputIter>
     InputIter wait_all_n(InputIter begin, std::size_t count,
         error_code& ec = throws);

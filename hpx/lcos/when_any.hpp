@@ -7,26 +7,135 @@
 /// \file lcos/when_any.hpp
 
 #if defined(DOXYGEN)
-namespace hpx { namespace lcos
+namespace hpx
 {
     /// The function \a when_any is a non-deterministic choice operator. It
     /// OR-composes all future objects given and returns a new future object
     /// representing the same list of futures after one future of that list
     /// finishes execution.
     ///
-    /// \note There are three variations of when_any. The first takes a pair
-    ///       of InputIterators. The second takes an std::vector of future<R>.
-    ///       The third takes any arbitrary number of future<R>, where R need
-    ///       not be the same type.
+    /// \param first    [in] The iterator pointing to the first element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a when_any should wait.
+    /// \param last     [in] The iterator pointing to the last element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a when_any should wait.
+    /// \param ec       [in,out] this represents the error status on exit, if
+    ///                 this is pre-initialized to \a hpx#throws the function
+    ///                 will throw on error instead.
+    ///
+    /// \note The function \a when_any returns after at least one future has
+    ///       become ready. All input futures are still valid after \a when_any
+    ///       returns.
+    ///
+    /// \return   Returns a future holding the same list of futures as has
+    ///           been passed to when_any.
+    ///           - future<vector<future<R>>>: If the input cardinality is
+    ///             unknown at compile time and the futures are all of the
+    ///             same type. The order of the futures in the output vector
+    ///             will be the same as given by the input iterator.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           \a hpx::exception.
+    template <typename InputIter>
+    future<vector<future<typename std::iterator_traits<InputIter>::value_type>>>
+    when_any(InputIter first, InputIter last, error_code& ec = throws);
+
+    /// The function \a when_any is a non-deterministic choice operator. It
+    /// OR-composes all future objects given and returns a new future object
+    /// representing the same list of futures after one future of that list
+    /// finishes execution.
+    ///
+    /// \param futures  [in] A vector holding an arbitrary amount of \a future or
+    ///                 \a shared_future objects for which \a when_any should
+    ///                 wait.
+    /// \param ec       [in,out] this represents the error status on exit, if
+    ///                 this is pre-initialized to \a hpx#throws the function
+    ///                 will throw on error instead.
+    ///
+    /// \note The function \a when_any returns after at least one future has
+    ///       become ready. All input futures are still valid after \a when_any
+    ///       returns.
     ///
     /// \return   Returns a future holding the same list of futures as has
     ///           been passed to when_any.
     ///           - future<vector<future<R>>>: If the input cardinality is
     ///             unknown at compile time and the futures are all of the
     ///             same type.
-    ///           - future<tuple<future<R0>, future<R1>, future<R2>...>>: If
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           \a hpx::exception.
+    template <typename R>
+    future<std::vector<future<R>> >
+    when_any(std::vector<future<R>>& futures, error_code& ec = throws);
+
+    /// The function \a when_any is a non-deterministic choice operator. It
+    /// OR-composes all future objects given and returns a new future object
+    /// representing the same list of futures after one future of that list
+    /// finishes execution.
+    ///
+    /// \param futures  [in] An arbitrary number of \a future or \a shared_future
+    ///                 objects, possibly holding different types for which
+    ///                 \a when_any should wait.
+    /// \param ec       [in,out] this represents the error status on exit, if
+    ///                 this is pre-initialized to \a hpx#throws the function
+    ///                 will throw on error instead.
+    ///
+    /// \note The function \a when_any returns after at least one future has
+    ///       become ready. All input futures are still valid after \a when_any
+    ///       returns.
+    ///
+    /// \return   Returns a future holding the same list of futures as has
+    ///           been passed to when_any.
+    ///           - future<tuple<future<T0>, future<T1>, future<T2>...>>: If
     ///             inputs are fixed in number and are of heterogeneous types.
     ///             The inputs can be any arbitrary number of future objects.
+    ///           - future<tuple<>> if \a when_any is called with zero arguments.
+    ///             The returned future will be initially ready.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           \a hpx::exception.
+    template <typename ...T>
+    future<tuple<future<T>...>>
+    when_any(T &&... futures, error_code& ec = throws);
+
+    /// The function \a when_any_n is a non-deterministic choice operator. It
+    /// OR-composes all future objects given and returns a new future object
+    /// representing the same list of futures after one future of that list
+    /// finishes execution.
+    ///
+    /// \param first    [in] The iterator pointing to the first element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a when_any_n should wait.
+    /// \param count    [in] The number of elements in the sequence starting at
+    ///                 \a first.
+    /// \param ec       [in,out] this represents the error status on exit, if
+    ///                 this is pre-initialized to \a hpx#throws the function
+    ///                 will throw on error instead.
+    ///
+    /// \note The function \a when_any_n returns after at least one future has
+    ///       become ready. All input futures are still valid after \a when_any_n
+    ///       returns.
+    ///
+    /// \return   Returns a future holding the iterator referring to the first
+    ///           element in the input sequence after the last processed
+    ///           element.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           \a hpx::exception.
+    ///
+    /// \note     None of the futures in the input sequence are invalidated.
+    template <typename InputIter>
+    future<InputIter>
+    when_any_n(InputIter first, std::size_t count, error_code& ec = throws);
 
     /// The function \a when_any_back is a non-deterministic choice
     /// operator. It OR-composes all future objects given and returns the same
@@ -35,15 +144,135 @@ namespace hpx { namespace lcos
     /// position with that of the last element of the result collection, so
     /// that the ready future object may be identified in constant time.
     ///
-    /// \note There are two variations of when_any_back. The first takes
-    ///       a pair of InputIterators. The second takes an std::vector of
-    ///       future<R>.
+    /// \param first    [in] The iterator pointing to the first element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a when_any_back should wait.
+    /// \param last     [in] The iterator pointing to the last element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a when_any_back should wait.
+    /// \param ec       [in,out] this represents the error status on exit, if
+    ///                 this is pre-initialized to \a hpx#throws the function
+    ///                 will throw on error instead.
     ///
-    /// \return   The same list of futures as has been passed to
-    ///           when_any_back, where the future object that was first
-    ///           detected as being ready has swapped position with the last
-    ///           element in the list.
-}}
+    /// \note The function \a when_any_nback returns after at least one future has
+    ///       become ready. All input futures are still valid after \a when_any_back
+    ///       returns.
+    ///
+    /// \return   Returns a future holding the same list of futures as has
+    ///           been passed to when_any.
+    ///           - future<vector<future<R>>>: If the input cardinality is
+    ///             unknown at compile time and the futures are all of the
+    ///             same type. The order of the futures in the output vector
+    ///             will be the same as given by the input iterator.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           \a hpx::exception.
+    template <typename InputIter>
+    future<vector<future<typename std::iterator_traits<InputIter>::value_type>>>
+    when_any_back(InputIter first, InputIter last, error_code& ec = throws);
+
+    /// The function \a when_any_back is a non-deterministic choice
+    /// operator. It OR-composes all future objects given and returns the same
+    /// list of futures after one future of that list finishes execution. The
+    /// future object that was first detected as being ready swaps its
+    /// position with that of the last element of the result collection, so
+    /// that the ready future object may be identified in constant time.
+    ///
+    /// \param futures  [in] A vector holding an arbitrary amount of \a future or
+    ///                 \a shared_future objects for which \a when_any_back should
+    ///                 wait.
+    /// \param ec       [in,out] this represents the error status on exit, if
+    ///                 this is pre-initialized to \a hpx#throws the function
+    ///                 will throw on error instead.
+    ///
+    /// \note The function \a when_any_nback returns after at least one future has
+    ///       become ready. All input futures are still valid after \a when_any_back
+    ///       returns.
+    ///
+    /// \return   Returns a future holding the same list of futures as has
+    ///           been passed to when_any.
+    ///           - future<vector<future<R>>>: If the input cardinality is
+    ///             unknown at compile time and the futures are all of the
+    ///             same type.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           \a hpx::exception.
+    template <typename R>
+    future<std::vector<future<R>> >
+    when_any_back(std::vector<future<R>>& futures, error_code& ec = throws);
+
+    /// The function \a when_any_back is a non-deterministic choice
+    /// operator. It OR-composes all future objects given and returns the same
+    /// list of futures after one future of that list finishes execution. The
+    /// future object that was first detected as being ready swaps its
+    /// position with that of the last element of the result collection, so
+    /// that the ready future object may be identified in constant time.
+    ///
+    /// \param futures  [in] An arbitrary number of \a future or \a shared_future
+    ///                 objects, possibly holding different types for which
+    ///                 \a when_any should wait.
+    /// \param ec       [in,out] this represents the error status on exit, if
+    ///                 this is pre-initialized to \a hpx#throws the function
+    ///                 will throw on error instead.
+    ///
+    /// \note The function \a when_any_nback returns after at least one future has
+    ///       become ready. All input futures are still valid after \a when_any_back
+    ///       returns.
+    ///
+    /// \return   Returns a future holding the same list of futures as has
+    ///           been passed to when_any.
+    ///           - future<tuple<future<T0>, future<T1>, future<T2>...>>: If
+    ///             inputs are fixed in number and are of heterogeneous types.
+    ///             The inputs can be any arbitrary number of future objects.
+    ///           - future<tuple<>> if \a when_any is called with zero arguments.
+    ///             The returned future will be initially ready.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           \a hpx::exception.
+    template <typename ...T>
+    future<tuple<future<T>...>>
+    when_any_back(T &&... futures, error_code& ec = throws);
+
+    /// The function \a when_any_back_n is a non-deterministic choice
+    /// operator. It OR-composes all future objects given and returns the same
+    /// list of futures after one future of that list finishes execution. The
+    /// future object that was first detected as being ready swaps its
+    /// position with that of the last element of the result collection, so
+    /// that the ready future object may be identified in constant time.
+    ///
+    /// \param first    [in] The iterator pointing to the first element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a when_any_back_n should wait.
+    /// \param count    [in] The number of elements in the sequence starting at
+    ///                 \a first.
+    /// \param ec       [in,out] this represents the error status on exit, if
+    ///                 this is pre-initialized to \a hpx#throws the function
+    ///                 will throw on error instead.
+    ///
+    /// \note The function \a when_any_back_n returns after at least one future has
+    ///       become ready. All input futures are still valid after \a when_any_back_n
+    ///       returns.
+    ///
+    /// \return   Returns a future holding the iterator referring to the first
+    ///           element in the input sequence after the last processed
+    ///           element.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           \a hpx::exception.
+    ///
+    /// \note     None of the futures in the input sequence are invalidated.
+    template <typename InputIter>
+    future<InputIter>
+    when_any_back_n(InputIter first, std::size_t count, error_code& ec = throws);
+}
 #else
 
 #if !BOOST_PP_IS_ITERATING
@@ -160,6 +389,7 @@ namespace hpx { namespace lcos
         };
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
     lcos::future<std::vector<Future> >
     when_any(std::vector<Future>& lazy_values,
@@ -190,13 +420,6 @@ namespace hpx { namespace lcos
         return lcos::when_some(1, begin, end, ec);
     }
 
-    template <typename Iterator>
-    lcos::future<Iterator> when_any_n(Iterator begin, std::size_t count,
-        error_code& ec = throws)
-    {
-        return when_some_n(1, begin, count, ec);
-    }
-
     inline lcos::future<HPX_STD_TUPLE<> > //-V524
     when_any(error_code& /*ec*/ = throws)
     {
@@ -205,6 +428,15 @@ namespace hpx { namespace lcos
         return lcos::make_ready_future(result_type());
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Iterator>
+    lcos::future<Iterator> when_any_n(Iterator begin, std::size_t count,
+        error_code& ec = throws)
+    {
+        return when_some_n(1, begin, count, ec);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
     lcos::future<std::vector<Future> >
     when_any_back(std::vector<Future>& lazy_values,
@@ -257,6 +489,7 @@ namespace hpx { namespace lcos
         return lcos::when_any_back(lazy_values_, ec);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator>
     lcos::future<Iterator>
     when_any_back_n(Iterator begin, std::size_t count,
