@@ -234,15 +234,22 @@ Here is a list of the important tickets we closed for this release.
                  0.9.6
 * [issue 934]  - Want to build HPX without dynamic libraries
 * [issue 927]  - Make hpx/lcos/reduce.hpp accept futures of id_type
+* [issue 926]  - All unit tests that are run with more than one thread with
+                 CTest/hpx_run_test should configure hpx.os_threads
+* [issue 925]  - Regression_dataflow_791 needs to be brought in line with HPX
+                 standards
 * [issue 879]  - Hung test leads to cascading test failure; make tests should
                  support the MPI parcelport
 * [issue 865]  - future<T> and friends shall work for movable only Ts
 * [issue 847]  - Dynamic libraries are not installed on OS X
 * [issue 816]  - First Program tutorial pull request
 * [issue 720]  - broken configuration when using ccmake on Ubuntu
+* [issue 622]  - `--hpx:hpx` and `--hpx:debug-hpx-log` is nonsensical
 * [issue 525]  - Extend barrier LCO test to run in distributed
 * [issue 515]  - Multi-destination version of hpx::apply is broken
 * [issue 509]  - Push Boost.Atomic changes upstream
+* [issue 503]  - Running HPX applications on Windows should not require setting
+                 %PATH%
 * [issue 461]  - Add a compilation sanity test
 * [issue 456]  - hpx_run_tests.py should log output from tests that timeout
 * [issue 454]  - Investigate threadmanager performance
