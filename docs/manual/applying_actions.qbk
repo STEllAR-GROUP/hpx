@@ -140,6 +140,8 @@ several ways to apply an action, all of which are described in the following sec
 [def __async_continue__ [link hpx.manual.applying_actions.action_invocation.apply_continue Applying an Action with a Continuation and with Synchronization]]
 [def __sync__           [link hpx.manual.applying_actions.action_invocation.sync Applying an Action Synchronously]]
 
+Generally, __hpx__ actions are very similar to 'normal' C++ functions
+except that actions can be invoked remotely.
 The [link applying_actions.action_invocation.the_api figure] below shows an
 overview of the main API exposed by HPX. This shows the function invocation
 syntax as defined by the C++ language (dark gray), the additional invocation
@@ -415,42 +417,6 @@ are:
 [note All of those operations are implemented by the predefined continuation
       function object which is returned from `hpx::make_continuation`. Any (custom)
       function object used as a continuation should conform to the same interface.]
-
-[endsect]
-
-[section:compare Comparing Actions with C++ Functions]
-
-As mentioned above, __hpx__ actions are very similar to 'normal' C++ functions
-except that actions can be invoked remotely. The following table compares the
-way C++ functions can be invoked with the syntax used to apply an __hpx__
-action. This table assumes that `func` is an arbitrary C++ function or function
-object and `act` is an instance of an __hpx__ action. `R` stands for an
-arbitrary result type.
-
-[table Comparing C++ Functions and __hpx__ Actions
-    [[Invocation] [C++ Function] [__hpx__ Action]]
-    [[Apply (fire & forget)]
-     [`hpx::apply(func, ...);`]
-     [`hpx::apply(act, id, ...);`]
-    ]
-    [[Asynchronous]
-     [``
-        std::future<R> f = std::async(func, ...);
-        R r = f.get();
-
-        hpx::future<R> f = hpx::async(func, ...);
-        R r = f.get();
-     ``]
-     [``
-        hpx::future<R> f = hpx::async(act, id, ...);
-        R r = f.get();
-     ``]
-    ]
-    [[Synchronous]
-     [`R r = f(...)`]
-     [`R r = act(id, ...)`]
-    ]
-]
 
 [endsect]
 
