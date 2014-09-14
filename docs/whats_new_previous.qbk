@@ -8,7 +8,7 @@
 [section:hpx_previous Previous __hpx__ Releases]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:hpx_0_9_8 __hpx__ V0.9.8]
+[section:hpx_0_9_8 __hpx__ V0.9.8 (Mar 24, 2014)]
 
 We have had over 800 commits since the last release and we have closed
 over 65 tickets (bugs, feature requests, etc.).
@@ -21,7 +21,7 @@ focus their time and energy to understanding the data dependencies of their
 algorithms and thereby the core obstacles to an efficient code. Here are some
 of the advantages of using __hpx__:
 
-* __hpx__ is solidly rooted in a sophisticated theoretical execution model -- 
+* __hpx__ is solidly rooted in a sophisticated theoretical execution model --
   ParalleX
 * __hpx__ exposes an API fully conforming to the C++11 and the draft C++14
   standards, extended and applied to distributed computing. Everything
@@ -176,7 +176,7 @@ Here is a list of the important tickets we closed for this release.
 [endsect]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:hpx_0_9_7 __hpx__ V0.9.7]
+[section:hpx_0_9_7 __hpx__ V0.9.7 (Nov 13, 2013)]
 
 We have had over 1000 commits since the last release and we have closed
 over 180 tickets (bugs, feature requests, etc.).
@@ -201,7 +201,7 @@ over 180 tickets (bugs, feature requests, etc.).
   line, such as new modes for `--hpx:bind` (`balanced`, `scattered`, `compact`),
   improved default settings when running multiple localities on the same node.
 * Added experimental executors for simpler thread pooling and scheduling. This API
-  may change in the future as it will stay aligned with the ongoing C++ 
+  may change in the future as it will stay aligned with the ongoing C++
   standardization efforts.
 * Massively improved the performance of the HPX serialization code. Added partial
   support for zero copy serialization of array and bitwise-copyable types.
@@ -222,7 +222,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 999] - Optimize `hpx::when_n`
 * [issue 998] - Fixed const-correctness
 * [issue 997] - Making serialize_buffer::data() type save
-* [issue 996] - Memory leak in hpx::lcos::promise 
+* [issue 996] - Memory leak in hpx::lcos::promise
 * [issue 995] - Race while registering pre-shutdown functions
 * [issue 994] - thread_rescheduling regression test does not compile
 * [issue 992] - Correct comments and messages
@@ -249,7 +249,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 966] - `--hpx:print-bind` physical core numbers are wrong
 * [issue 965] - Deadlock when building in Release mode
 * [issue 963] - Not all worker threads are working
-* [issue 962] - Problem with SLURM integration 
+* [issue 962] - Problem with SLURM integration
 * [issue 961] - `--hpx:print-bind` outputs incorrect information
 * [issue 960] - Fix cut and paste error in documentation of get_thread_priority
 * [issue 959] - Change link to boost.atomic in documentation to point to
@@ -318,7 +318,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 895] - `hpx::get_locality_name` not defined
 * [issue 894] - Race condition at shutdown
 * [issue 893] - `--hpx:print-bind` switches std::cout to hexadecimal mode
-* [issue 892] - `hwloc_topology_load` can be expensive -- don't call multiple times 
+* [issue 892] - `hwloc_topology_load` can be expensive -- don't call multiple times
 * [issue 891] - The documentation for `get_locality_name` is wrong
 * [issue 890] - `--hpx:print-bind` should not exit
 * [issue 889] - `--hpx:debug-hpx-log=FILE` does not work
@@ -330,10 +330,10 @@ Here is a list of the important tickets we closed for this release.
 * [issue 883] - Need help with is_callable_test
 * [issue 882] - tests.regressions.lcos.future_hang_on_get does not terminate
 * [issue 881] - tests/regressions/block_matrix/matrix.hh won't compile with GCC
-                4.8.1 
+                4.8.1
 * [issue 880] - HPX does not work on OS X
 * [issue 878] - `future::unwrap` triggers assertion
-* [issue 877] - "make tests" has build errors on Ubuntu 12.10 
+* [issue 877] - "make tests" has build errors on Ubuntu 12.10
 * [issue 876] - tcmalloc is used by default, even if it is not present
 * [issue 875] - global_fixture is defined in a header file
 * [issue 874] - Some tests take very long
@@ -433,7 +433,7 @@ Here is a list of the important tickets we closed for this release.
 [endsect]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:hpx_0_9_6 __hpx__ V0.9.6]
+[section:hpx_0_9_6 __hpx__ V0.9.6 (Jul 30, 2013)]
 
 We have had over 1200 commits since the last release and we have closed
 roughly 140 tickets (bugs, feature requests, etc.).
@@ -640,7 +640,7 @@ a very long list of newly implemented features and fixed issues.
 [endsect]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:hpx_0_9_5 __hpx__ V0.9.5]
+[section:hpx_0_9_5 __hpx__ V0.9.5 (Jan 16, 2013)]
 
 We have had over 1000 commits since the last release and we have closed
 roughly 150 tickets (bugs, feature requests, etc.).
@@ -865,7 +865,7 @@ HPX' releases so far.
 [endsect]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:hpx_0_9_0 __hpx__ V0.9.0]
+[section:hpx_0_9_0 __hpx__ V0.9.0 (Jul 5, 2012)]
 
 We have had roughly 800 commits since the last release and we have closed
 approximately 80 tickets (bugs, feature requests, etc.).
@@ -1045,7 +1045,7 @@ Here is a list of the important tickets we closed for this release:
 [endsect]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:hpx_0_8_1 __hpx__ V0.8.1]
+[section:hpx_0_8_1 __hpx__ V0.8.1 (Apr 21, 2012)]
 
 This is a point release including important bug fixes for __0_8_0__.
 
@@ -1081,7 +1081,7 @@ Here is a list of the important commits included in this point release:
 [/Phillip LeBlanc 3-13-12]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:hpx_0_8_0 __hpx__ V0.8.0]
+[section:hpx_0_8_0 __hpx__ V0.8.0 (Mar 23, 2012)]
 
 We have had roughly 1000 commits since the last release and we have closed
 approximately 70 tickets (bugs, feature requests, etc.).
@@ -1242,7 +1242,7 @@ Here is a list of the important tickets we closed for this release:
 [/Adrian Serio 3-13-12]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:hpx_0_7_0 __hpx__ V0.7.0]
+[section:hpx_0_7_0 __hpx__ V0.7.0 (Dec 12, 2011)]
 
 We have had roughly 1000 commits since the last release and we have closed
 approximately 120 tickets (bugs, feature requests, etc.).
