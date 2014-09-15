@@ -12,9 +12,10 @@
 
 [heading General Changes]
 
-We have had over 1300 commits since the last release and we have closed
-over 140 tickets (bugs, feature requests, etc.). These are by far the largest
-numbers of commits and resolved issues for any of the __hpx__ releases so far.
+We have had over 1400 commits since the last release and we have closed
+over 180 tickets (bugs, feature requests, pull requests, etc.). These are by
+far the largest numbers of commits and resolved issues for any of the __hpx__
+releases so far.
 We are especially happy about the large number of people who contributed for
 the first time to __hpx__.
 
@@ -54,6 +55,7 @@ the first time to __hpx__.
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1259] - Avoid double-linking Boost on Windows
 * [issue 1257] - Adding additional parameter to create_thread
 * [issue 1256] - added buildbot changes to release notes
 * [issue 1253] - hpx::thread defects
