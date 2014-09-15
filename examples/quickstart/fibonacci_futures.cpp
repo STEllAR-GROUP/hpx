@@ -40,8 +40,8 @@ struct when_all_wrapper
 {
     typedef boost::uint64_t result_type;
     typedef HPX_STD_TUPLE<
-            hpx::future<uint64_t>
-          , hpx::future<uint64_t> > data_type;
+            hpx::future<boost::uint64_t>
+          , hpx::future<boost::uint64_t> > data_type;
 
     boost::uint64_t operator()(
         hpx::future<data_type> data

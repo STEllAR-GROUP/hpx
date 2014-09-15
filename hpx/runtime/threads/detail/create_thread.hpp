@@ -15,9 +15,10 @@
 
 namespace hpx { namespace threads { namespace detail
 {
-    inline threads::thread_id_type create_thread(
-        policies::scheduler_base* scheduler,
-        thread_init_data& data, thread_state_enum initial_state = pending,
+    inline void create_thread(
+        policies::scheduler_base* scheduler, thread_init_data& data,
+        threads::thread_id_type& id,
+        thread_state_enum initial_state = pending,
         bool run_now = true, error_code& ec = throws)
     {
         // verify parameters
@@ -34,7 +35,7 @@ namespace hpx { namespace threads { namespace detail
                 HPX_THROWS_IF(ec, bad_parameter,
                     "threads::detail::create_thread",
                     hpx::util::osstream_get_string(strm));
-                return invalid_thread_id;
+                return;
             }
         }
 
@@ -43,7 +44,7 @@ namespace hpx { namespace threads { namespace detail
         {
             HPX_THROWS_IF(ec, bad_parameter,
                 "threads::detail::create_thread", "description is NULL");
-            return invalid_thread_id;
+            return;
         }
 #endif
 
@@ -72,10 +73,10 @@ namespace hpx { namespace threads { namespace detail
         }
 
         // create the new thread
-        thread_id_type newid = scheduler->create_thread(
-            data, initial_state, run_now, ec, data.num_os_thread);
+        scheduler->create_thread(data, &id, initial_state, run_now, ec,
+            data.num_os_thread);
 
-        LTM_(info) << "register_thread(" << newid << "): initial_state("
+        LTM_(info) << "register_thread(" << id << "): initial_state("
                    << get_thread_state_name(initial_state) << "), "
                    << "run_now(" << (run_now ? "true" : "false")
 #ifdef HPX_THREAD_MAINTAIN_DESCRIPTION
@@ -85,7 +86,6 @@ namespace hpx { namespace threads { namespace detail
 
         // potentially wake up waiting thread
         scheduler->do_some_work(data.num_os_thread);
-        return newid;
     }
 }}}
 

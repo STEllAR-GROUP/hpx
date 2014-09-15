@@ -48,7 +48,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
+#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__) || defined(__APPLE__)
 namespace hpx { namespace util { namespace coroutines { namespace detail { namespace posix
 {
     ///////////////////////////////////////////////////////////////////////////

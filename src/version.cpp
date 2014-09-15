@@ -220,7 +220,7 @@ namespace hpx
              << HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE << "\n";
 #endif
 
-        strm << "  HPX_PREFIX=" << util::hpx_prefix(0) << "\n";
+        strm << "  HPX_PREFIX=" << util::hpx_prefix() << "\n";
 
         return util::osstream_get_string(strm);
     }

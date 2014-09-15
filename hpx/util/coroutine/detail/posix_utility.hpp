@@ -59,6 +59,11 @@
 #define EXEC_PAGESIZE PAGE_SIZE
 #endif
 
+#if defined(__APPLE__)
+#include <unistd.h>
+#define EXEC_PAGESIZE static_cast<std::size_t>(sysconf(_SC_PAGESIZE))
+#endif
+
 /**
  * Stack allocation routines and trampolines for setcontext
  */
@@ -74,7 +79,11 @@ HPX_EXPORT extern bool use_guard_pages;
     void* real_stack = ::mmap(NULL,
                               size + EXEC_PAGESIZE,
                               PROT_EXEC|PROT_READ|PROT_WRITE,
+#if defined(__APPLE__)
+                              MAP_PRIVATE|MAP_ANON|MAP_NORESERVE,
+#else
                               MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESERVE,
+#endif
                               -1,
                               0
                               );

@@ -16,7 +16,6 @@
 
 namespace hpx
 {
-
     /// \brief Main entry point for launching the HPX runtime system.
     ///
     /// This is the main entry point for any HPX application. This function

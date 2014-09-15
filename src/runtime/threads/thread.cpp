@@ -138,27 +138,20 @@ namespace hpx
     void thread::start_thread(HPX_STD_FUNCTION<void()> && func)
     {
         mutex_type::scoped_lock l(mtx_);
+
         threads::thread_init_data data(
             util::bind(util::one_shot(&thread::thread_function_nullary),
                 std::move(func)),
             "thread::thread_function_nullary");
 
+        // create the new thread, note that id_ is guaranteed to be valid
+        // before the thread function is executed
         error_code ec(lightweight);
-        // register thread in a suspended state to make sure id_ is valid when "func" starts
-        id_ = hpx::get_runtime().get_thread_manager().
-            register_thread(data, threads::suspended, true, ec);
+        hpx::get_runtime().get_thread_manager().
+            register_thread(data, id_, threads::pending, true, ec);
         if (ec) {
             HPX_THROW_EXCEPTION(thread_resource_error, "thread::start_thread",
                 "Could not create thread");
-            return;
-        }
-
-        // now start the thread
-        set_thread_state(id_, threads::pending, threads::wait_signaled,
-            threads::thread_priority_normal, ec);
-        if (ec) {
-            HPX_THROWS_IF(ec, thread_resource_error, "thread::start_thread",
-                "Could not start newly created thread");
             return;
         }
     }

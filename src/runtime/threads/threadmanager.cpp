@@ -210,9 +210,9 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    thread_id_type threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        register_thread(thread_init_data& data, thread_state_enum initial_state,
-            bool run_now, error_code& ec)
+    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        register_thread(thread_init_data& data, thread_id_type& id,
+            thread_state_enum initial_state, bool run_now, error_code& ec)
     {
         util::block_profiler_wrapper<register_thread_tag> bp(thread_logger_);
 
@@ -223,10 +223,10 @@ namespace hpx { namespace threads
             HPX_THROWS_IF(ec, invalid_status,
                 "threadmanager_impl::register_thread",
                 "invalid state: thread manager is not running");
-            return invalid_thread_id;
+            return;
         }
 
-        return detail::create_thread(&scheduler_, data, initial_state, run_now, ec); //-V601
+        detail::create_thread(&scheduler_, data, id, initial_state, run_now, ec); //-V601
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -258,7 +258,7 @@ namespace hpx { namespace threads
             thread_state_ex_enum new_state_ex, thread_priority priority,
             error_code& ec)
     {
-        return detail::set_thread_state(id, new_state,
+        return detail::set_thread_state(id, new_state, //-V107
             new_state_ex, priority, get_worker_thread_num(), ec);
     }
 

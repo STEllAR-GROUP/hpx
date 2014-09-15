@@ -708,7 +708,7 @@ void test_wait_swapped_for_either_of_two_futures_list_1()
     pt1();
 
     hpx::lcos::future<std::vector<hpx::lcos::shared_future<int> > > r =
-        hpx::when_any_swapped(futures);
+        hpx::when_any_back(futures);
     std::vector<hpx::lcos::shared_future<int> > t = r.get();
 
     HPX_TEST(futures[0].is_ready());
@@ -730,7 +730,7 @@ void test_wait_swapped_for_either_of_two_futures_list_2()
     pt2();
 
     hpx::lcos::future<std::vector<hpx::lcos::shared_future<int> > > r =
-        hpx::when_any_swapped(futures);
+        hpx::when_any_back(futures);
     std::vector<hpx::lcos::shared_future<int> > t = r.get();
 
     HPX_TEST(!futures[0].is_ready());
@@ -1068,7 +1068,7 @@ void test_wait_swapped_for_either_of_five_futures_1_from_list()
     pt1();
 
     hpx::lcos::future<std::vector<hpx::lcos::shared_future<int> > > r =
-        hpx::when_any_swapped(futures);
+        hpx::when_any_back(futures);
     std::vector<hpx::lcos::shared_future<int> > t = r.get();
 
     HPX_TEST(f1.is_ready());
@@ -1105,7 +1105,7 @@ void test_wait_swapped_for_either_of_five_futures_1_from_list_iterators()
     pt1();
 
     hpx::lcos::future<std::vector<hpx::lcos::shared_future<int> > > r =
-        hpx::when_any_swapped(futures.begin(), futures.end());
+        hpx::when_any_back(futures.begin(), futures.end());
     std::vector<hpx::lcos::shared_future<int> > t = r.get();
 
     HPX_TEST(f1.is_ready());

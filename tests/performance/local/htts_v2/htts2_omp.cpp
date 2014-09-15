@@ -45,12 +45,18 @@ struct omp_driver : htts2::driver
         {
             // One stager per OS-thread.
             for (boost::uint64_t n = 0; n < this->osthreads_; ++n)
+                #if _OPENMP>=200805
                 #pragma omp task untied
+                #endif
                 for (boost::uint64_t m = 0; m < this->tasks_; ++m)
+                    #if _OPENMP>=200805
                     #pragma omp task untied
+                    #endif
                     htts2::payload<BaseClock>(this->payload_duration_ /* = p */);
 
+            #if _OPENMP>=200805
             #pragma omp taskwait
+            #endif
 
             // w_M [nanoseconds]
             results = t.elapsed();

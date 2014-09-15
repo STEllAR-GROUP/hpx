@@ -998,7 +998,7 @@ namespace hpx
         int result = 0;
         set_error_handlers();
 
-#if defined(HPX_NATIVE_MIC) || defined(__bgq__)
+#if defined(HPX_NATIVE_MIC) || defined(__bgq__) || defined(__bgqion__)
         unsetenv("LANG");
         unsetenv("LC_CTYPE");
         unsetenv("LC_NUMERIC");
@@ -1112,7 +1112,7 @@ namespace hpx
         startup_function_type const& startup,
         shutdown_function_type const& shutdown, hpx::runtime_mode mode)
     {
-        HPX_ASSERT(util::hpx_prefix(0));
+        HPX_ASSERT(util::hpx_prefix());
         return run_or_start(f, desc_cmdline, argc, argv, ini_config,
             startup, shutdown, mode, true);
     }
@@ -1124,6 +1124,7 @@ namespace hpx
         startup_function_type const& startup,
         shutdown_function_type const& shutdown, hpx::runtime_mode mode)
     {
+        HPX_ASSERT(util::hpx_prefix());
         return 0 == run_or_start(f, desc_cmdline, argc, argv, ini_config,
             startup, shutdown, mode, false);
     }

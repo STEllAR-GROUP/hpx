@@ -40,7 +40,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         bool sequential_equal_binary(InIter1 first1, InIter1 last1,
             InIter2 first2, InIter2 last2, F && f)
         {
-            for (; first1 != last1 && first2 != last2; ++first1, ++first2)
+            for (; first1 != last1 && first2 != last2; (void) ++first1, ++first2)
             {
                 if (!f(*first1, *first2))
                     return false;

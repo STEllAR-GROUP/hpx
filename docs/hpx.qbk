@@ -11,7 +11,7 @@
     [id hpx]
     [authors [STE||AR Group, The]]
     [version 0.9.9]
-    [copyright 2011 2012 2013 2014 The STE||AR Group, Louisiana State University]
+    [copyright 2011 2012 2013 2014 The STE||AR Group (http://stellar-group.org)]
     [license
         Distributed under the Boost Software License, Version 1.0. (See
         accompanying file [@http://www.boost.org/LICENSE_1_0.txt LICENSE_1_0.txt]
@@ -48,8 +48,9 @@
 [def __stellar_hpx_buildbot__   [@http://hermione.cct.lsu.edu/ HPX Buildbot Website]]
 [def __stellar_support__        [@http://stellar.cct.lsu.edu/support/ Support Website]]
 
-[def __hpxpi__                  [@http://github.com/STEllAR-GROUP/hpx/ HPXPI]]
+[def __hpxpi__                  [@http://github.com/STEllAR-GROUP/hpxpi/ HPXPI]]
 [def __xpi_spec__               [@https://github.com/STEllAR-GROUP/hpxpi/blob/master/spec.pdf?raw=true XPI specification]]
+[def __hpxcl__                  [@http://github.com/STEllAR-GROUP/hpxcl/ HPXCL]]
 
 [def __lsu__                    [@http://www.lsu.edu Louisiana State University (LSU)]]
 [def __cct__                    [@http://www.cct.lsu.edu Center for Computation and Technology (CCT)]]
@@ -59,6 +60,10 @@
 [def __inf3__                   [@http://www3.cs.fau.de Department of Computer Science 3 - Computer Architecture]]
 [def __sandia__                 [@http://www.sandia.gov Sandia National Labs (Albuquerque)]]
 [def __tue__                    [@http://www.tui.nl Technische Universiteit Eindhoven]]
+[def __nmsu__                   [@http://www.nmsu.edu New Mexico State University]]
+[def __unlv__                   [@http://www.unlv.edu University of Nevada, Las Vegas]]
+
+[def __gsoc__                   [@https://developers.google.com/open-source/soc/ Google Summer of Code]]
 
 [def __boost__                  [@http://www.boost.org/ Boost]]
 [def __boost_libraries__        [@http://www.boost.org/ Boost C++ Libraries]]
@@ -116,6 +121,10 @@
 [def __srun__                   [@http://slurm.schedmd.com/srun.html srun]]
 [def __sbatch__                 [@http://slurm.schedmd.com/sbatch.html sbatch]]
 [def __linda__                  [@http://en.wikipedia.org/wiki/Linda_(coordination_language) The Linda Coordination Language]]
+[def __opencl__                 [@https://www.khronos.org/opencl/ OpenCL]]
+[def __pocl__                   [@http://portablecl.org/ POCL]]
+[def __cuda__                   [@http://www.nvidia.com/object/cuda_home_new.html CUDA]]
+[def __nt2__                    [@http://www.numscale.com/nt2/ NT2]]
 
 [def __cpp11__                  [@http://www.open-std.org/jtc1/sc22/wg21 C++11 Standard]]
 [def __cpp11_n3632__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3632.html N3632]]
@@ -152,7 +161,6 @@
 
 [/ template definitions]
 [template cxx_crtp              [@http://en.wikipedia.org/wiki/Curiously_recurring_template_pattern [str]]]
-[template issue[num]            '''<ulink url="http://github.com/STEllAR-GROUP/hpx/issues/'''[num]'''">'''#[num]'''</ulink>''']
 
 [/ Section link shortcuts]
 [def __boost_installation__     [link hpx.manual.build_system.prerequisites.boost_installation Installing Boost Libraries]]
@@ -205,6 +213,7 @@
 [template hpx_link[url txt]     '''<ulink url="'''__hpx_source_dir__'''/'''[url]'''">'''[txt]'''</ulink>''']
 
 [template git_commit_link[commit] '''<ulink url="https://github.com/STEllAR-GROUP/hpx/commit/'''[commit]'''">'''[commit]'''</ulink>''']
+[template issue[num]            '''<ulink url="http://github.com/STEllAR-GROUP/hpx/issues/'''[num]'''">'''#[num]'''</ulink>''']
 
 [/  fig[ref title label]
     Image element with a title.

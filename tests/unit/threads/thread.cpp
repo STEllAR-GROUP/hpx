@@ -85,7 +85,7 @@ void test_sleep()
 
     // Ensure it's in a range instead of checking actual equality due to time
     // lapse
-    HPX_TEST(in_range(now, boost::chrono::seconds(4)));
+    HPX_TEST(in_range(now, boost::chrono::seconds(4))); //-V112
 }
 
 ///////////////////////////////////////////////////////////////////////////////

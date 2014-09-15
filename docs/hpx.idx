@@ -261,6 +261,24 @@ fold_with_index                       "" "header\.hpx\.lcos\.fold.*"
 inverse_fold                          "" "header\.hpx\.lcos\.fold.*"
 inverse_fold_with_index               "" "header\.hpx\.lcos\.fold.*"
 
+# hpx/lcos/wait_all.hpp
+wait_all                              "" "header\.hpx\.lcos\.wait_all.*"
+wait_all_n                            "" "header\.hpx\.lcos\.wait_all.*"
+
+# hpx/lcos/when_all.hpp
+when_all                              "" "header\.hpx\.lcos\.when_all.*"
+when_all_n                            "" "header\.hpx\.lcos\.when_all.*"
+
+# hpx/lcos/wait_any.hpp
+wait_any                              "" "header\.hpx\.lcos\.wait_any.*"
+wait_any_n                            "" "header\.hpx\.lcos\.wait_any.*"
+
+# hpx/lcos/when_any.hpp
+when_any                              "" "header\.hpx\.lcos\.when_any.*"
+when_any_n                            "" "header\.hpx\.lcos\.when_any.*"
+when_any_back                         "" "header\.hpx\.lcos\.when_any.*"
+when_any_back_n                       "" "header\.hpx\.lcos\.when_any.*"
+
 # hpx/hpx_finalize.hpp
 finalize                              "" "hpx\.finalize.*"
 terminate                             "" "hpx\.terminate.*"

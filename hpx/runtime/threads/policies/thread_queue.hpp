@@ -676,11 +676,14 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         // create a new thread and schedule it if the initial state is equal to
         // pending
-        thread_id_type create_thread(thread_init_data& data,
+        void create_thread(thread_init_data& data, thread_id_type* id,
             thread_state_enum initial_state, bool run_now, error_code& ec)
         {
-            if (run_now) {
+            // thread has not been created yet
+            if (id) *id = invalid_thread_id;
 
+            if (run_now)
+            {
                 threads::thread_id_type thrd;
 
                 // The mutex can not be locked while a new thread is getting
@@ -699,23 +702,24 @@ namespace hpx { namespace threads { namespace policies
                         HPX_THROWS_IF(ec, hpx::out_of_memory,
                             "threadmanager::register_thread",
                             "Couldn't add new thread to the map of threads");
-                        return invalid_thread_id;
+                        return;
                     }
                     ++thread_map_count_;
 
-                    // push the new thread in the pending queue thread
-                    if (initial_state == pending)
-                        schedule_thread(thrd.get());
+                    // return the thread_id of the newly created thread
+                    if (id) *id = thrd;
 
                     // this thread has to be in the map now
                     HPX_ASSERT(thread_map_.find(thrd.get()) != thread_map_.end());
                     HPX_ASSERT(thrd->is_created_from(&memory_pool_));
 
+                    // push the new thread in the pending queue thread
+                    if (initial_state == pending)
+                        schedule_thread(thrd.get());
+
                     if (&ec != &throws)
                         ec = make_success_code();
-
-                    // return the thread_id of the newly created thread
-                    return thrd;
+                    return;
                 }
             }
 
@@ -729,13 +733,11 @@ namespace hpx { namespace threads { namespace policies
                 util::high_resolution_clock::now()
             ));
 #else
-            new_tasks_.push(new task_description(
+            new_tasks_.push(new task_description( //-V106
                 std::move(data), initial_state));
 #endif
             if (&ec != &throws)
                 ec = make_success_code();
-
-            return invalid_thread_id;     // thread has not been created yet
         }
 
         void move_work_items_from(thread_queue *src, boost::int64_t count)

@@ -31,7 +31,7 @@ the action type. Here is an example demonstrating this:
 [important The macro [macroref HPX_PLAIN_ACTION `HPX_PLAIN_ACTION`] has to be
            placed in global namespace,
            even if the wrapped function is located in some other namespace. The
-           newly defined action type is placed the in global namespace
+           newly defined action type is placed in the global namespace
            as well.]
 
 If the action type should be defined somewhere not in global namespace, the
@@ -98,19 +98,20 @@ demonstrating this. The first snippet has to go into the header file:
     // Note: The second arguments to the macro below have to be systemwide-unique
     //       C++ identifiers
     ``[macroref HPX_REGISTER_ACTION_DECLARATION
-    `HPX_REGISTER_ACTION_DECLARATION`]``(app::some_component::some_member_action , some_component_some_action );
+    `HPX_REGISTER_ACTION_DECLARATION`]``(app::some_component::some_member_action, some_component_some_action);
 
-The next snippet belongs to the source file (e.g. the main application in the most simple case:
+The next snippet belongs into a source file (e.g. the main application source
+file) in the most simple case:
 
-    typedef hpx::components::simple_component< app::some_component > component_type;
+    typedef hpx::components::simple_component<app::some_component> component_type;
     typedef app::some_component some_component;
 
-    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY( component_type, some_component );
+    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(component_type, some_component);
 
     // The parameters for this macro have to be the same as used in the corresponding
     // HPX_REGISTER_ACTION_DECLARATION() macro invocation above
     typedef some_component::some_member_action some_component_some_action;
-    HPX_REGISTER_ACTION( some_component_some_action );
+    HPX_REGISTER_ACTION(some_component_some_action);
 
 Granted, these macro invocations are a bit more complex than for simple global
 functions, however we believe they are still manageable.
@@ -118,7 +119,7 @@ functions, however we believe they are still manageable.
 The most important macro invocation is the
 [macroref HPX_DEFINE_COMPONENT_ACTION `HPX_DEFINE_COMPONENT_ACTION`]
 in the header file as this defines the action type we need to invoke the
-member function. For a complete example of a simple component action see 
+member function. For a complete example of a simple component action see
 [hpx_link examples/quickstart/component_in_executable.cpp..component_in_executable.cpp]
 
 [endsect] [/ Action Type Definition]
@@ -139,8 +140,24 @@ several ways to apply an action, all of which are described in the following sec
 [def __async_continue__ [link hpx.manual.applying_actions.action_invocation.apply_continue Applying an Action with a Continuation and with Synchronization]]
 [def __sync__           [link hpx.manual.applying_actions.action_invocation.sync Applying an Action Synchronously]]
 
-__hpx__ allows the user to apply actions with a syntax similar to the
-C++ standard. In fact, all action types have an
+Generally, __hpx__ actions are very similar to 'normal' C++ functions
+except that actions can be invoked remotely.
+The [link applying_actions.action_invocation.the_api figure] below shows an
+overview of the main API exposed by HPX. This shows the function invocation
+syntax as defined by the C++ language (dark gray), the additional invocation
+syntax as provided through C++ Standard Library features (medium gray), and
+the extensions added by __hpx__ (light gray). Where: `f`: function to invoke;
+`p...`: (optional) arguments; `R`: return type of `f`;
+`action`: action type defined by
+[macroref HPX_DEFINE_PLAIN_ACTION `HPX_DEFINE_PLAIN_ACTION`] or
+[macroref HPX_DEFINE_COMPONENT_ACTION `HPX_DEFINE_COMPONENT_ACTION`]
+encapsulating `f`; `a`: an instance of the type `action`;
+`id`: the global address the action is applied to.
+
+[fig hpx_the_api.png..Overview of the main API exposed by HPX..applying_actions.action_invocation.the_api]
+
+This figure shows that __hpx__ allows the user to apply actions with a syntax
+similar to the C++ standard. In fact, all action types have an
 overloaded function operator allowing to synchronously apply the action. Further,
 __hpx__ implements `hpx::async`, which semantically works similar to the
 way `std::async` works for plain C++ function.
@@ -155,8 +172,11 @@ way `std::async` works for plain C++ function.
       __hpx__ facilities not only support conventional functions, but can be
       used for actions as well.]
 
-Additionally, __hpx__ exposes `hpx::apply` and `hpx::async_continue`, both of which refine
-and extend the standard C++ facilities.
+Additionally, __hpx__ exposes `hpx::apply` and `hpx::async_continue`, both of
+which refine and extend the standard C++ facilities.
+
+The different ways to invoke a function in __hpx__ will be explained in more
+detail in the following sections
 
 [//////////////////////////////////////////////////////////////////////////////]
 [section:apply Applying an Action Asynchronously without any Synchronization]
@@ -296,13 +316,13 @@ communication latencies.
 [//////////////////////////////////////////////////////////////////////////////]
 [section:async_continue Applying an Action with a Continuation but without any Synchronization]
 
-This method is very similar to the method described in section __apply__. The 
+This method is very similar to the method described in section __apply__. The
 difference is that it allows the user to chain a sequence of asynchronous operations, while
 handing the (intermediate) results from one step to the next step in the chain.
 Where `hpx::apply` invokes a single function using 'fire and forget' semantics,
-`hpx::apply_continue` asynchronously triggers a chain of functions 
-without the need for the execution flow 'to come back' to the 
-invocation site. Each of the asynchronous functions can be executed on a different 
+`hpx::apply_continue` asynchronously triggers a chain of functions
+without the need for the execution flow 'to come back' to the
+invocation site. Each of the asynchronous functions can be executed on a different
 locality.
 
 
@@ -397,42 +417,6 @@ are:
 [note All of those operations are implemented by the predefined continuation
       function object which is returned from `hpx::make_continuation`. Any (custom)
       function object used as a continuation should conform to the same interface.]
-
-[endsect]
-
-[section:compare Comparing Actions with C++ Functions]
-
-As mentioned above, __hpx__ actions are very similar to 'normal' C++ functions
-except that actions can be invoked remotely. The following table compares the
-way C++ functions can be invoked with the syntax used to apply an __hpx__
-action. This table assumes that `func` is an arbitrary C++ function or function
-object and `act` is an instance of an __hpx__ action. `R` stands for an
-arbitrary result type.
-
-[table Comparing C++ Functions and __hpx__ Actions
-    [[Invocation] [C++ Function] [__hpx__ Action]]
-    [[Apply (fire & forget)]
-     [`hpx::apply(func, ...);`]
-     [`hpx::apply(act, id, ...);`]
-    ]
-    [[Asynchronous]
-     [``
-        std::future<R> f = std::async(func, ...);
-        R r = f.get();
-
-        hpx::future<R> f = hpx::async(func, ...);
-        R r = f.get();
-     ``]
-     [``
-        hpx::future<R> f = hpx::async(act, id, ...);
-        R r = f.get();
-     ``]
-    ]
-    [[Synchronous]
-     [`R r = f(...)`]
-     [`R r = act(id, ...)`]
-    ]
-]
 
 [endsect]
 

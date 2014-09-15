@@ -80,7 +80,7 @@ int main(int argc, char **argv)
 
     desc.add_options()
         ( "iterations",
-          boost::program_options::value<boost::uint64_t>()->default_value(100),
+          boost::program_options::value<std::size_t>()->default_value(100),
           "number of times to repeat the test")
         ;
 

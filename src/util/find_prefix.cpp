@@ -34,9 +34,9 @@
 
 namespace hpx { namespace util
 {
-    const char * hpx_prefix(const char * prefix)
+    const char* hpx_prefix(const char * prefix)
     {
-        static const char * prefix_ = prefix;
+        static const char* prefix_ = prefix;
         HPX_ASSERT(prefix_);
         return prefix_;
     }
@@ -51,7 +51,7 @@ namespace hpx { namespace util
             hpx::util::plugin::dll dll(HPX_MAKE_DLL_STRING(library));
 
             dll.load_library(ec);
-            if (ec) return hpx_prefix(0);
+            if (ec) return hpx_prefix();
 
             using boost::filesystem::path;
 
@@ -59,7 +59,7 @@ namespace hpx { namespace util
                 path(dll.get_directory(ec)).parent_path().string();
 
             if (ec || prefix.empty())
-                return hpx_prefix(0);
+                return hpx_prefix();
 
             return prefix;
         }
@@ -67,7 +67,7 @@ namespace hpx { namespace util
             ;   // just ignore loader problems
         }
 #endif
-        return hpx_prefix(0);
+        return hpx_prefix();
     }
 
     std::string find_prefixes(std::string const& suffix, std::string const& library)

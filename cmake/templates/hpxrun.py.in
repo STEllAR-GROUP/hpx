@@ -69,7 +69,7 @@ def run_mpi(cmd, localities, verbose):
         msg += 'Please rerun CMake with HPX_PARCELPORT_MPI=True.'
         print(msg, sys.stderr)
         sys.exit(1)
-    exec_cmd = ['@MPIEXEC@', '-np', str(localities)] + cmd
+    exec_cmd = ['@MPIEXEC@', '@MPIEXEC_NUMPROC_FLAG@', str(localities)] + cmd
     if verbose:
         print('Executing command: ' + ' '.join(exec_cmd))
     subproc(exec_cmd)
@@ -266,6 +266,8 @@ if __name__ == '__main__':
                 print(msg)
                 while procs:
                     term(procs.pop(0))
+        except:
+            pass
         finally: procs_lock.release()
 
     which = 0
@@ -277,6 +279,8 @@ if __name__ == '__main__':
             proc_watchdog.start()
             proc_watchdogs.append(proc_watchdog)
             which = which + 1
+    except:
+        pass
     finally: procs_lock.release()
 
     for proc_watchdog in proc_watchdogs:

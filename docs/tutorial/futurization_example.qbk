@@ -19,7 +19,7 @@ state to some user defined point in the future. It does this by
 breaking each portion of the ring into discrete segments and using
 the current segment's temperature and the temperature of the surrounding
 segments to calculate the temperature of the current segment in the next
-timestep as shown in [link examples.1d_pgf figure] below. 
+timestep as shown by the [link examples.1d_pgf figure] below. 
 
 [fig 1d_stencil_program_flow.png..Heat Diffusion Example Program Flow..examples.1d_pgf]
 

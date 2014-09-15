@@ -497,7 +497,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                                     for (difference_type len = 0;
                                          local_count != diff && len != count;
-                                         ++local_count, ++len, ++mid)
+                                         (void) ++local_count, ++len, ++mid)
                                     {
                                         if (*mid != *++needle)
                                             break;
@@ -730,11 +730,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 if(first == last)
                     return last;
-                for(;first != last; ++first) {
-                    for(FwdIter iter = s_first; iter != s_last; ++iter) {
-                        if(op(*first,*iter)) {
+                for ( ; first != last; ++first) {
+                    for (FwdIter iter = s_first; iter != s_last; ++iter) {
+                        if (op(*first,*iter))
                             return first;
-                        }
                     }
                 }
                 return last;
@@ -1122,7 +1121,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// This version uses the given binary predicate op
     ///
     /// \note   Complexity: Exactly the smaller of (result - first) + 1 and
-    ///                     (last - first) - 1 application of the prediate
+    ///                     (last - first) - 1 application of the predicate
     ///                     where \a result is the value returned
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).

@@ -286,7 +286,9 @@ namespace hpx { namespace threads { namespace detail
                 thrd, newstate, newstate_ex, priority,
                 self_id, triggered),
             "wake_timer", 0, priority);
-        thread_id_type wake_id = create_thread(&scheduler, data, suspended);
+
+        thread_id_type wake_id = invalid_thread_id;
+        create_thread(&scheduler, data, wake_id, suspended);
 
         // create timer firing in correspondence with given time
         typedef boost::asio::basic_deadline_timer<
@@ -341,7 +343,9 @@ namespace hpx { namespace threads { namespace detail
                 priority),
             "at_timer (expire at)", 0, priority, thread_num);
 
-        return create_thread(&scheduler, data, pending, true, ec); //-V601
+        thread_id_type newid = invalid_thread_id;
+        create_thread(&scheduler, data, newid, pending, true, ec); //-V601
+        return newid;
     }
 
     template <typename SchedulingPolicy>

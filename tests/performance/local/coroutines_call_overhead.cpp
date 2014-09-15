@@ -131,7 +131,7 @@ void print_results(
 ///////////////////////////////////////////////////////////////////////////////
 struct kernel
 {
-    thread_state_enum operator()(thread_state_ex_enum)
+    thread_state_enum operator()(thread_state_ex_enum) const
     {
         worker_timed(payload * 1000);
 

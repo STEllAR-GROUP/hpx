@@ -4,6 +4,119 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file lcos/wait_all.hpp
+
+#if defined(DOXYGEN)
+namespace hpx
+{
+    /// The function \a wait_all is a operator allowing to join on the result
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns the same list of futures after they finished executing.
+    ///
+    /// \param first    The iterator pointing to the first element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a wait_all should wait.
+    /// \param last     The iterator pointing to the last element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a wait_all should wait.
+    /// \param ec       [in,out] this represents the error status on exit, if
+    ///                 this is pre-initialized to \a hpx#throws the function
+    ///                 will throw on error instead.
+    ///
+    /// \note The function \a wait_all returns after all futures have become
+    ///       ready. All input futures are still valid after \a wait_all
+    ///       returns.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
+    ///
+    /// \note     None of the futures in the input sequence are invalidated.
+    template <typename InputIter>
+    void wait_all(InputIter first, InputIter last, error_code& ec = throws);
+
+    /// The function \a wait_all is a operator allowing to join on the result
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns the same list of futures after they finished executing.
+    ///
+    /// \param futures  A vector holding an arbitrary amount of \a future or
+    ///                 \a shared_future objects for which \a wait_all should
+    ///                 wait.
+    /// \param ec       [in,out] this represents the error status on exit, if
+    ///                 this is pre-initialized to \a hpx#throws the function
+    ///                 will throw on error instead.
+    ///
+    /// \note The function \a wait_all returns after all futures have become
+    ///       ready. All input futures are still valid after \a wait_all
+    ///       returns.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
+    ///
+    /// \note     None of the futures in the input sequence are invalidated.
+    template <typename R>
+    void wait_all(std::vector<future<R>>&& futures, error_code& ec = throws);
+
+    /// The function \a wait_all is a operator allowing to join on the result
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns the same list of futures after they finished executing.
+    ///
+    /// \param futures  An arbitrary number of \a future or \a shared_future
+    ///                 objects, possibly holding different types for which
+    ///                 \a wait_all should wait.
+    /// \param ec       [in,out] this represents the error status on exit, if
+    ///                 this is pre-initialized to \a hpx#throws the function
+    ///                 will throw on error instead.
+    ///
+    /// \note The function \a wait_all returns after all futures have become
+    ///       ready. All input futures are still valid after \a wait_all
+    ///       returns.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
+    ///
+    /// \note     None of the futures in the input sequence are invalidated.
+    template <typename ...T>
+    void wait_all(T &&... futures, error_code& ec = throws);
+
+    /// The function \a wait_all_n is a operator allowing to join on the result
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns the same list of futures after they finished executing.
+    ///
+    /// \param begin    The iterator pointing to the first element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a wait_all_n should wait.
+    /// \param count    The number of elements in the sequence starting at
+    ///                 \a first.
+    /// \param ec       [in,out] this represents the error status on exit, if
+    ///                 this is pre-initialized to \a hpx#throws the function
+    ///                 will throw on error instead.
+    ///
+    /// \return         The function \a wait_all_n will return an iterator
+    ///                 referring to the first element in the input sequence
+    ///                 after the last processed element.
+    ///
+    /// \note The function \a wait_all_n returns after all futures have become
+    ///       ready. All input futures are still valid after \a wait_all_n
+    ///       returns.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
+    ///
+    /// \note     None of the futures in the input sequence are invalidated.
+    template <typename InputIter>
+    InputIter wait_all_n(InputIter begin, std::size_t count,
+        error_code& ec = throws);
+}
+#else
+
 #if !BOOST_PP_IS_ITERATING
 
 #if !defined(HPX_LCOS_WAIT_ALL_APR_19_2012_1140AM)
@@ -29,25 +142,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
 {
-    /// The function \a wait_all is a operator allowing to join on the result
-    /// of all given futures. It AND-composes all future objects given and
-    /// returns the same list of futures after they finished executing.
-    ///
-    /// \a wait_all returns after all futures have been triggered.
-    ///
-    /// \note There are three variations of wait_all. The first takes a pair
-    ///       of InputIterators. The second takes an std::vector of future<R>.
-    ///       The third takes any arbitrary number of future<R>, where R need
-    ///       not be the same type.
-    ///
-    /// \return   The same list of futures as has been passed to wait_all.
-    ///           - future<vector<future<R>>>: If the input cardinality is
-    ///             unknown at compile time and the futures are all of the
-    ///             same type.
-    ///           - future<tuple<future<R0>, future<R1>, future<R2>...>>: If
-    ///             inputs are fixed in number and are of heterogeneous types.
-    ///             The inputs can be any arbitrary number of future objects.
-
     template <typename Future>
     void wait_all(std::vector<Future> const& lazy_values,
         error_code& ec = throws)
@@ -156,3 +250,4 @@ namespace hpx { namespace lcos
 
 #endif
 
+#endif

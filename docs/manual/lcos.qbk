@@ -1,11 +1,12 @@
 [/=============================================================================
-    Copyright (C) 2012 Bryce Adelstein-Lelbach 
+    Copyright (C) 2012 Bryce Adelstein-Lelbach
 
-    Distributed under the Boost Software License, Version 1.0. (See accompanying     
-    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)            
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================/]
 
 [section:lcos Using LCOs]
+
 Lightweight Control Objects provide synchrhonization for HPX applications. Most
 of them are familiar from other frameworks, but a few of them work in slightly
 special different ways adapted to HPX.
@@ -18,7 +19,7 @@ special different ways adapted to HPX.
 
 # barrier
 
-# and_gate 
+# and_gate
 
 # barrier
 
@@ -65,7 +66,124 @@ to manage what they do, so overhead should be extremely low.
 
 # spinlock_no_backoff
 
-trigger
+# trigger
+
+[section:extend_futures Extended Facilities for Futures]
+
+Concurrency is about both decomposing and composing the program from the parts
+that work well individually and together. It is in the composition of connected
+and multicore components where today's C++ libraries are still lacking.
+
+The functionality of `std::future` offers a partial solution. It allows for the
+separation of the initiation of an operation and the act of waiting for its
+result; however the act of waiting is synchronous. In communication-intensive
+code this act of waiting can be unpredictable, inefficient and simply
+frustrating. The example below illustrates a possible synchronous wait using
+futures.
+
+    #include <future>
+    using namespace std;
+    int main()
+    {
+        future<int> f = async([]() { return 123; });
+        int result = f.get(); // might block
+    }
+
+For this reason, __hpx__ implements a set of extensions to `std::future` (as
+proposed by __cpp11_n4107__). This proposal introduces the following key
+asynchronous operations to `hpx::future`, `hpx::shared_future`, and
+`hpx::async`, which enhance and enrich these facilities.
+
+[table Facilities extending std::future
+ [[Facility][Description]]
+ [[`hpx::future::then`]
+  [In asynchronous programming, it is very common for one
+    asynchronous operation, on completion, to invoke a second operation and pass
+    data to it. The current C++ standard does not allow one to register a
+    continuation to a future. With `then`, instead of waiting for the result, a
+    continuation is "attached" to the asynchronous operation, which is invoked
+    when the result is ready. Continuations registered using the then function
+    will help to avoid blocking waits or wasting threads on polling, greatly
+    improving the responsiveness and scalability of an application.]]
+ [[unwrapping constructor for `hpx::future`]
+  [In some scenarios, you might want to create a future that returns another
+   future, resulting in nested futures.
+   Although it is possible to write code to unwrap the outer future and retrieve
+   the nested future and its result, such code is not easy to write because you
+   must handle exceptions and it may cause a blocking call. Unwrapping can allow
+   us to mitigate this problem by doing an asynchronous call to unwrap the
+   outermost future.]]
+ [[`hpx::future::is_ready`]
+  [There are often situations where a `get()` call on a
+   future may not be a blocking call, or is only a blocking call under certain
+   circumstances. This function gives the ability to test for early completion and
+   allows us to avoid associating a continuation, which needs to be scheduled with
+   some non-trivial overhead and near-certain loss of cache efficiency.]]
+ [[`hpx::make_ready_future`]
+  [Some functions may know the value at the point of construction. In these cases
+   the value is immediately available, but needs to be returned as a future. By
+   using `hpx::make_ready_future` a future can be created which holds a pre-computed
+   result in its shared state. In the current standard it is non-trivial to create
+   a future directly from a value. First a promise must be created, then the promise
+   is set, and lastly the future is retrieved from the promise. This can now be
+   done with one operation.]]
+]
+
+The standard also omits the ability to compose multiple futures. This is a
+common pattern that is ubiquitous in other asynchronous frameworks and is
+absolutely necessary in order to make C++ a powerful asynchronous programming
+language. Not including these functions is synonymous to Boolean algebra
+without AND/OR.
+
+In addition to the extensions proposed by __cpp11_n4107__, __hpx__ adds functions
+allowing to compose several futures in a more flexible way.
+
+[table Facilities for Composing hpx::futures
+ [[Facility][Description][Comment]]
+ [[[funcref hpx::when_any `hpx::when_any`],[br]
+   [funcref hpx::when_any_n `hpx::when_any_n`],[br]
+   [funcref hpx::when_any_back `hpx::when_any_back`],[br]
+   [funcref hpx::when_any_back_n `hpx::when_any_back_n`]]
+  [Asynchronously wait for at least one of multiple future or shared_future
+   objects to finish.][__cpp11_n4107__, `..._n` versions are __hpx__ only]]
+ [[[funcref hpx::wait_any `hpx::wait_any`],[br]
+   [funcref hpx::wait_any_n `hpx::wait_any_n`]]
+  [Synchronously wait for at least one of multiple future or shared_future
+   objects to finish.][__cpp11_n4107__, `..._n` versions are __hpx__ only]]
+
+ [[[funcref hpx::when_all `hpx::when_all`],[br]
+   [funcref hpx::when_all_n `hpx::when_all_n`]]
+  [Asynchronously wait for all future and shared_future objects to finish.]
+  [__cpp11_n4107__, `..._n` versions are __hpx__ only]]
+ [[[funcref hpx::wait_all `hpx::wait_all`],[br]
+   [funcref hpx::wait_all_n `hpx::wait_all_n`]]
+  [Synchronously wait for all future and shared_future objects to finish.]
+  [__cpp11_n4107__, `..._n` versions are __hpx__ only]]
+
+ [[[funcref hpx::when_some `hpx::when_some`],[br]
+   [funcref hpx::when_some_n `hpx::when_some_n`]]
+  [Asynchronously wait for multiple future and shared_future objects to finish.]
+  [__hpx__ only]]
+ [[[funcref hpx::wait_some `hpx::wait_some`],[br]
+   [funcref hpx::wait_some_n `hpx::wait_some_n`]]
+  [Synchronously wait for multiple future and shared_future objects to finish.]
+  [__hpx__ only]]
+
+ [[[funcref hpx::when_each `hpx::when_each`],[br]
+   [funcref hpx::when_each_n `hpx::when_each_n`]]
+  [Asynchronously wait for multiple future and shared_future objects to finish
+   and call a function for each of the future objects as soon as it becomes
+   ready.]
+  [__hpx__ only]]
+ [[[funcref hpx::wait_each `hpx::wait_each`],[br]
+   [funcref hpx::wait_each_n `hpx::wait_each_n`]]
+  [Synchronously wait for multiple future and shared_future objects to finish
+   and call a function for each of the future objects as soon as it becomes
+   ready.]
+  [__hpx__ only]]
+]
+
+[endsect]
 
 [endsect]
 
