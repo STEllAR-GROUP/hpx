@@ -11,6 +11,8 @@ add_hpx_executable(network_storage
   HPX_PREFIX ${HPX_BUILD_PREFIX}
   FOLDER "Benchmarks/Network/network_storage")
 
+target_link_libraries(network_storage_exe iostreams_component)
+
 # add pseudo-target dependencies
 add_hpx_pseudo_target(
   tests.performance.network.network_storage_perf.network_storage_dir)
