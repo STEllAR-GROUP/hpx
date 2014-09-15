@@ -605,7 +605,7 @@ namespace hpx { namespace threads
             thread_state_ex_enum newstate_ex, thread_priority priority,
             error_code& ec)
     {
-        return detail::set_thread_state_timed(scheduler_, abs_time.value(), id,
+        return detail::set_thread_state_timed(scheduler_, abs_time, id,
             newstate, newstate_ex, priority, get_worker_thread_num(), ec);
     }
 

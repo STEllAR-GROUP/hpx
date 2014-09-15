@@ -464,15 +464,6 @@ namespace hpx { namespace this_thread
         char const* description = "this_thread::suspend",
         error_code& ec = throws);
 
-    template <typename Clock, typename Duration>
-    threads::thread_state_ex_enum suspend(
-        boost::chrono::time_point<Clock, Duration> const& abs_time,
-        char const* description = "this_thread::suspend",
-        error_code& ec = throws)
-    {
-        return suspend(util::to_ptime(abs_time), description, ec);
-    }
-
     /// The function \a suspend will return control to the thread manager
     /// (suspends the current thread). It sets the new state of this thread
     /// to \a suspended and schedules a wakeup for this threads after the given
@@ -496,15 +487,6 @@ namespace hpx { namespace this_thread
         error_code& ec = throws)
     {
         return suspend(rel_time.from_now(), description, ec);
-    }
-
-    template <typename Rep, typename Period>
-    threads::thread_state_ex_enum suspend(
-        boost::chrono::duration<Rep, Period> const& rel_time,
-        char const* description = "this_thread::suspend",
-        error_code& ec = throws)
-    {
-        return suspend(util::to_time_duration(rel_time), description, ec);
     }
 
     /// The function \a suspend will return control to the thread manager

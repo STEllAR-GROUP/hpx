@@ -354,7 +354,7 @@ namespace hpx { namespace threads
         ///                   executed if the parameter \a new_state is pending.
         ///
         /// \returns
-        thread_id_type set_state (
+        thread_id_type set_state(
             util::steady_time_point const& abs_time,
             thread_id_type const& id, thread_state_enum newstate = pending,
             thread_state_ex_enum newstate_ex = wait_timeout,
@@ -378,7 +378,7 @@ namespace hpx { namespace threads
         ///                   executed if the parameter \a new_state is pending.
         ///
         /// \returns
-        thread_id_type set_state (
+        thread_id_type set_state(
             util::steady_duration const& rel_time,
             thread_id_type const& id, thread_state_enum newstate = pending,
             thread_state_ex_enum newstate_ex = wait_timeout,

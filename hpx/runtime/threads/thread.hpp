@@ -211,13 +211,7 @@ namespace hpx
 
         HPX_API_EXPORT void interrupt();
 
-        HPX_API_EXPORT void sleep_until(
-            boost::chrono::steady_clock::time_point const& abs_time);
-
-        inline void sleep_until(util::steady_time_point const& abs_time)
-        {
-            sleep_until(abs_time.value());
-        }
+        HPX_API_EXPORT void sleep_until(util::steady_time_point const& abs_time);
 
         inline void sleep_for(util::steady_duration const& rel_time)
         {

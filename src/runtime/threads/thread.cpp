@@ -347,7 +347,7 @@ namespace hpx
             threads::interruption_point(threads::get_self_id());
         }
 
-        void sleep_until(boost::chrono::steady_clock::time_point const& abs_time)
+        void sleep_until(util::steady_time_point const& abs_time)
         {
             this_thread::suspend(abs_time, "this_thread::sleep_until");
         }

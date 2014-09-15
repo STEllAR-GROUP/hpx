@@ -57,7 +57,7 @@ namespace hpx { namespace threads
         if (&ec != &throws)
             ec = make_success_code();
 
-        return app->get_thread_manager().set_state(abs_time.value(), id,
+        return app->get_thread_manager().set_state(abs_time, id,
             state, stateex, priority, ec);
     }
 
@@ -548,7 +548,7 @@ namespace hpx { namespace this_thread
             detail::reset_backtrace bt(id, ec);
 #endif
             threads::set_thread_state(id,
-                abs_time.value(), threads::pending, threads::wait_signaled,
+                abs_time, threads::pending, threads::wait_signaled,
                 threads::thread_priority_boost, ec);
             if (ec) return threads::wait_unknown;
 
