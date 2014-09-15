@@ -266,6 +266,8 @@ if __name__ == '__main__':
                 print(msg)
                 while procs:
                     term(procs.pop(0))
+        except:
+            pass
         finally: procs_lock.release()
 
     which = 0
@@ -277,6 +279,8 @@ if __name__ == '__main__':
             proc_watchdog.start()
             proc_watchdogs.append(proc_watchdog)
             which = which + 1
+    except:
+        pass
     finally: procs_lock.release()
 
     for proc_watchdog in proc_watchdogs:
