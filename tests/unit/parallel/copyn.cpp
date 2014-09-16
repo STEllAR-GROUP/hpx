@@ -338,8 +338,15 @@ void copy_n_bad_alloc_test()
     test_copy_n_bad_alloc<std::input_iterator_tag>();
 }
 
-int hpx_main()
+int hpx_main(boost::program_options::variables_map& vm)
 {
+	unsigned int seed = (unsigned int)std::time(0);
+	if (vm.count("seed"))
+		seed = vm["seed"].as<unsigned int>();
+
+	std::cout << "using seed: " << seed << std::endl;
+	std::srand(seed);
+
     n_copy_test();
     copy_n_exception_test();
     copy_n_bad_alloc_test();

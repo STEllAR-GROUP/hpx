@@ -316,8 +316,15 @@ void none_of_bad_alloc_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main()
+int hpx_main(boost::program_options::variables_map& vm)
 {
+	unsigned int seed = (unsigned int)std::time(0);
+	if (vm.count("seed"))
+		seed = vm["seed"].as<unsigned int>();
+
+	std::cout << "using seed: " << seed << std::endl;
+	std::srand(seed);
+
     none_of_test();
     none_of_exception_test();
     none_of_bad_alloc_test();

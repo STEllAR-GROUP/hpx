@@ -291,8 +291,15 @@ void swap_ranges_bad_alloc_test()
     test_swap_ranges_bad_alloc<std::random_access_iterator_tag>();
     test_swap_ranges_bad_alloc<std::forward_iterator_tag>();
 }
-int hpx_main()
+int hpx_main(boost::program_options::variables_map& vm)
 {
+	unsigned int seed = (unsigned int)std::time(0);
+	if (vm.count("seed"))
+		seed = vm["seed"].as<unsigned int>();
+
+	std::cout << "using seed: " << seed << std::endl;
+	std::srand(seed);
+
     swap_ranges_test();
     swap_ranges_exception_test();
     swap_ranges_bad_alloc_test();
