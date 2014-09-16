@@ -309,8 +309,15 @@ void replace_copy_if_bad_alloc_test()
     test_replace_copy_if_bad_alloc<std::input_iterator_tag>();
 }
 
-int hpx_main()
+int hpx_main(boost::program_options::variables_map& vm)
 {
+	unsigned int seed = (unsigned int)std::time(0);
+	if (vm.count("seed"))
+		seed = vm["seed"].as<unsigned int>();
+
+	std::cout << "using seed: " << seed << std::endl;
+	std::srand(seed);
+
     replace_copy_if_test();
     replace_copy_if_exception_test();
     replace_copy_if_bad_alloc_test();
