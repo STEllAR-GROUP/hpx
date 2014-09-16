@@ -131,28 +131,48 @@ void test_adjacent_find_exception_async(ExPolicy const& p, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand()+1);
 
-    bool caught_exception = false;
-    try {
-        hpx::future<decorated_iterator> f =
-            hpx::parallel::adjacent_find(p,
-                decorated_iterator(
-                    boost::begin(c),
-                    [](){ throw std::runtime_error("test"); }),
-                decorated_iterator(boost::end(c)),
-                std::greater<std::size_t>());
-        f.get();
+    {
+        bool caught_exception = false;
+        bool returned_from_algorithm = false;
 
-        HPX_TEST(false);
+        try {
+            hpx::future<decorated_iterator> f =
+                hpx::parallel::adjacent_find(p,
+                    decorated_iterator(
+                        boost::begin(c),
+                        [](){ throw std::runtime_error("test"); }),
+                    decorated_iterator(boost::end(c)),
+                    std::greater<std::size_t>());
+            bool returned_from_algorithm = true;
+            f.get();
+
+            HPX_TEST(false);
+        }
+        catch (hpx::exception_list const& e) {
+            caught_exception = true;
+            test::test_num_exceptions<
+                hpx::parallel::task_execution_policy, IteratorTag
+            >::call(hpx::parallel::task, e);
+        }
+        catch (...) {
+            HPX_TEST(false);
+        }
+
+        HPX_TEST(returned_from_algorithm);
+        HPX_TEST(caught_exception);
     }
     catch(hpx::exception_list const& e) {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
-    catch(...) {
+    catch (...) {
         HPX_TEST(false);
     }
 
     HPX_TEST(caught_exception);
+    HPX_TEST(returned_from_algorithm);
+
+    }
 }
 
 template <typename IteratorTag>
@@ -222,8 +242,8 @@ void test_adjacent_find_bad_alloc_async(ExPolicy const& p, IteratorTag)
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand()+1);
+    /*std::vector<std::size_t> c(10007);
+    std::iota(boost::begin(c), boost::end(c), std::rand()+1);*/
 
     bool caught_bad_alloc = false;
     try {
@@ -235,18 +255,45 @@ void test_adjacent_find_bad_alloc_async(ExPolicy const& p, IteratorTag)
                 decorated_iterator(boost::end(c)),
                 std::greater<std::size_t>());
 
-        f.get();
+            returned_from_algorithm = true;
+            f.get();
 
-        HPX_TEST(false);
-    }
-    catch(std::bad_alloc const&) {
-        caught_bad_alloc = true;
-    }
-    catch(...) {
-        HPX_TEST(false);
-    }
+            HPX_TEST(false);
+        }
+        catch (std::bad_alloc const&) {
+            caught_bad_alloc = true;
+        }
+        catch (...) {
+            HPX_TEST(false);
+        }
 
-    HPX_TEST(caught_bad_alloc);
+        HPX_TEST(caught_bad_alloc);
+        HPX_TEST(returned_from_algorithm);
+    }
+    {
+        bool returned_from_algorithm = false;
+        bool caught_bad_alloc = false;
+        try {
+            hpx::future<decorated_iterator> f =
+                hpx::parallel::adjacent_find(hpx::parallel::task,
+                decorated_iterator(
+                boost::begin(c),
+                [](){ throw std::bad_alloc(); }),
+                decorated_iterator(boost::end(c)));
+            returned_from_algorithm = true;
+            f.get();
+
+            HPX_TEST(false);
+        }
+        catch (std::bad_alloc const&) {
+            caught_bad_alloc = true;
+        }
+        catch (...) {
+            HPX_TEST(false);
+        }
+        HPX_TEST(caught_bad_alloc);
+        HPX_TEST(returned_from_algorithm);
+    }
 }
 
 template <typename IteratorTag>
@@ -276,8 +323,15 @@ void adjacent_find_bad_alloc_test()
     test_adjacent_find_bad_alloc<std::forward_iterator_tag>();
 }
 
-int hpx_main()
+int hpx_main(boost::program_options::variables_map& vm)
 {
+    unsigned int seed = (unsigned int)std::time(0);
+    if (vm.count("seed"))
+        seed = vm["seed"].as<unsigned int>();
+
+    std::cout << "using seed: " << seed << std::endl;
+    std::srand(seed);
+
     adjacent_find_test();
     adjacent_find_exception_test();
     adjacent_find_bad_alloc_test();
