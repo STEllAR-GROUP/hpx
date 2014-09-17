@@ -819,7 +819,6 @@ namespace hpx { namespace components { namespace server
         bool flag = false;
         if (!shutdown_all_invoked_.compare_exchange_strong(flag, true))
         {
-            BOOST_ASSERT(false);
             return;
         }
 
