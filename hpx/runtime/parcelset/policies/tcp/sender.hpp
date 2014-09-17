@@ -69,10 +69,22 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
         void verify(naming::locality const & parcel_locality_id) const
         {
-            HPX_ASSERT(parcel_locality_id.get_address() ==
-                socket_.remote_endpoint().address().to_string());
-            HPX_ASSERT(parcel_locality_id.get_port() ==
-                socket_.remote_endpoint().port());
+#if defined(HPX_DEBUG)
+            boost::system::error_code ec;
+            boost::asio::ip::tcp::socket::endpoint_type endpoint
+                = socket_.remote_endpoint(ec);
+
+            // We just ignore failures here. Those are the reason for
+            // remote endpoint not connected errors which occur
+            // when the runtime is in state_shutdown
+            if(!ec)
+            {
+                HPX_ASSERT(parcel_locality_id.get_address() ==
+                    endpoint.address().to_string());
+                HPX_ASSERT(parcel_locality_id.get_port() ==
+                    endpoint.port());
+            }
+#endif
         }
 
         template <typename Handler, typename ParcelPostprocess>

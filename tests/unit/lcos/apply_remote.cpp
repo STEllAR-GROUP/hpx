@@ -10,16 +10,15 @@
 #include <hpx/util/lightweight_test.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
+bool root_locality = false;
 boost::int32_t final_result;
 hpx::util::spinlock result_mutex;
-hpx::lcos::local::condition_variable result_cv;
 
 void receive_result(boost::int32_t i)
 {
     hpx::util::spinlock::scoped_lock l(result_mutex);
     if (i > final_result)
         final_result = i;
-    result_cv.notify_one();
 }
 HPX_PLAIN_ACTION(receive_result);
 
@@ -65,6 +64,7 @@ int hpx_main()
 {
     hpx::id_type here = hpx::find_here();
     hpx::id_type there = here;
+    root_locality = true;
     if (hpx::get_num_localities_sync() > 1)
     {
         std::vector<hpx::id_type> localities = hpx::find_remote_localities();
@@ -121,12 +121,8 @@ int hpx_main()
         hpx::apply<call_action>(inc, here, 1);
     }
 
-    hpx::util::spinlock::scoped_lock l(result_mutex);
-    result_cv.wait_for(result_mutex, boost::chrono::seconds(1),
-        hpx::util::bind(std::equal_to<boost::int32_t>(), boost::ref(final_result), 13));
 
-    HPX_TEST_EQ(final_result, 13);
-
+    // Let finalize wait for every "apply" to be finished
     return hpx::finalize();
 }
 
@@ -137,6 +133,11 @@ int main(int argc, char* argv[])
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
         "HPX main exited with non-zero status");
+
+    // After hpx::init returns, all actions should have been executed
+    // The final result is only accumulated on the root locality
+    if(root_locality)
+        HPX_TEST_EQ(final_result, 13);
 
     return hpx::util::report_errors();
 }

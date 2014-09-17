@@ -39,6 +39,11 @@
 #include <boost/foreach.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
+namespace hpx
+{
+    bool is_stopped_or_shutting_down();
+}
+
 namespace hpx { namespace detail
 {
     void dijkstra_make_black();     // forward declaration only
@@ -699,6 +704,18 @@ namespace hpx { namespace parcelset
         boost::system::error_code const& ec, parcel const& p)
     {
         if (ec) {
+            // If we are in a stopped state, ignore some errors
+            if (hpx::is_stopped_or_shutting_down())
+            {
+                if (ec == boost::asio::error::connection_aborted ||
+                    ec == boost::asio::error::broken_pipe ||
+                    ec == boost::asio::error::not_connected ||
+                    ec == boost::asio::error::eof)
+                {
+                    return;
+                }
+            }
+
             boost::exception_ptr exception =
                 hpx::detail::get_exception(hpx::exception(ec),
                     "parcelhandler::default_write_handler", __FILE__,

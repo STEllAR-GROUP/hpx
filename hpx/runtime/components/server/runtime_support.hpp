@@ -33,6 +33,7 @@
 #include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 
 #include <hpx/plugins/plugin_factory_base.hpp>
@@ -421,7 +422,8 @@ namespace hpx { namespace components { namespace server
         bool dijkstra_color_;   // false: white, true: black
         boost::atomic<bool> shutdown_all_invoked_;
 
-        lcos::local::spinlock dijkstra_mtx_;
+        typedef boost::mutex dijkstra_mtx_type;
+        dijkstra_mtx_type dijkstra_mtx_;
         lcos::local::condition_variable dijkstra_cond_;
 
         component_map_mutex_type cm_mtx_;
