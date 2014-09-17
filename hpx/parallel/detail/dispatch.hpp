@@ -13,6 +13,11 @@
 #include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
+#include <hpx/util/bind.hpp>
+#include <hpx/util/decay.hpp>
+#include <hpx/util/invoke.hpp>
+#include <hpx/util/invoke_fused.hpp>
+#include <hpx/util/tuple.hpp>
 
 #include <boost/preprocessor/repeat.hpp>
 #include <boost/preprocessor/iterate.hpp>
@@ -31,21 +36,24 @@
         return call(*policy.get<sequential_execution_policy>(), __VA_ARGS__,  \
             boost::mpl::true_());                                             \
                                                                               \
+    case detail::execution_policy_enum::sequential_task:                      \
+        return call(seq, __VA_ARGS__, boost::mpl::true_());                   \
+                                                                              \
     case detail::execution_policy_enum::parallel:                             \
         return call(*policy.get<parallel_execution_policy>(), __VA_ARGS__,    \
             boost::mpl::false_());                                            \
                                                                               \
-    case detail::execution_policy_enum::vector:                               \
-        return call(*policy.get<parallel_vector_execution_policy>(),          \
-            __VA_ARGS__, boost::mpl::false_());                               \
-                                                                              \
-    case detail::execution_policy_enum::task:                                 \
+    case detail::execution_policy_enum::parallel_task:                        \
         {                                                                     \
-            task_execution_policy const& t =                                  \
-                *policy.get<task_execution_policy>();                         \
+            parallel_task_execution_policy const& t =                         \
+                *policy.get<parallel_task_execution_policy>();                \
             return call(par(t.get_executor(), t.get_chunk_size()),            \
                 __VA_ARGS__, boost::mpl::false_());                           \
         }                                                                     \
+                                                                              \
+    case detail::execution_policy_enum::parallel_vector:                      \
+        return call(*policy.get<parallel_vector_execution_policy>(),          \
+            __VA_ARGS__, boost::mpl::false_());                               \
                                                                               \
     default:                                                                  \
         HPX_THROW_EXCEPTION(hpx::bad_parameter,                               \
@@ -56,6 +64,41 @@
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 {
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Derived, typename Tuple>
+    struct async_fused_wrapper
+    {
+        typedef typename Derived::result_type result_type;
+
+        async_fused_wrapper(Tuple && t)
+          : t_(std::forward<Tuple>(t))
+        {}
+
+        typename Derived::result_type operator()() const
+        {
+            return hpx::util::void_guard<result_type>(),
+                hpx::util::invoke_fused(Derived(), std::move(t_));
+        }
+
+        Tuple t_;
+    };
+
+    template <typename Derived, typename Tuple>
+    async_fused_wrapper<
+        Derived
+      , typename hpx::util::decay<Tuple>::type
+    >
+    get_async_fused_wrapper(Tuple && t)
+    {
+        typedef async_fused_wrapper<
+            Derived
+          , typename hpx::util::decay<Tuple>::type
+        > invoker_type;
+
+        return invoker_type(std::forward<Tuple>(t));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Derived, typename Result = void>
     struct algorithm
     {
@@ -92,30 +135,74 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         boost::mpl::true_)
     {
         try {
-            return detail::algorithm_result<ExPolicy, result_type>::get(
-                Derived::sequential(policy, HPX_ENUM_FORWARD_ARGS(N, Arg, arg)));
+            return parallel::v1::detail::algorithm_result<
+                    ExPolicy, result_type
+                >::get(Derived::sequential(
+                    policy, HPX_ENUM_FORWARD_ARGS(N, Arg, arg)));
         }
         catch (...) {
-            detail::handle_exception<ExPolicy>::call();
+            parallel::v1::detail::handle_exception<ExPolicy>::call();
         }
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     typename parallel::v1::detail::algorithm_result<
-        task_execution_policy, result_type
+        sequential_task_execution_policy, result_type
     >::type
-    call(task_execution_policy const& policy, HPX_ENUM_FWD_ARGS(N, Arg, arg),
-        boost::mpl::true_)
+    operator()(sequential_task_execution_policy const& policy,
+        HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         try {
-            return detail::algorithm_result<
-                    task_execution_policy, result_type
+            return parallel::v1::detail::algorithm_result<
+                    sequential_task_execution_policy, result_type
+                >::get(Derived::sequential(
+                    policy, HPX_ENUM_FORWARD_ARGS(N, Arg, arg)));
+        }
+        catch (...) {
+            return parallel::v1::detail::handle_exception<
+                sequential_task_execution_policy>::call();
+        }
+    }
+
+    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    typename parallel::v1::detail::algorithm_result<
+        sequential_task_execution_policy, result_type
+    >::type
+    call(sequential_task_execution_policy const& policy,
+        HPX_ENUM_FWD_ARGS(N, Arg, arg), boost::mpl::true_)
+    {
+        try {
+            return parallel::v1::detail::algorithm_result<
+                    sequential_task_execution_policy, result_type
+                >::get(
+                    hpx::async(get_async_fused_wrapper<Derived>(
+                        hpx::util::forward_as_tuple(policy,
+                            HPX_ENUM_FORWARD_ARGS(N, Arg, arg))
+                    )));
+        }
+        catch (...) {
+            return parallel::v1::detail::handle_exception<
+                    sequential_task_execution_policy, result_type
+                >::call();
+        }
+    }
+
+    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    typename parallel::v1::detail::algorithm_result<
+        parallel_task_execution_policy, result_type
+    >::type
+    call(parallel_task_execution_policy const& policy,
+        HPX_ENUM_FWD_ARGS(N, Arg, arg), boost::mpl::true_)
+    {
+        try {
+            return parallel::v1::detail::algorithm_result<
+                    parallel_task_execution_policy, result_type
                 >::get(Derived::sequential(policy,
                     HPX_ENUM_FORWARD_ARGS(N, Arg, arg)));
         }
         catch (...) {
-            return detail::handle_exception<
-                    task_execution_policy, result_type
+            return parallel::v1::detail::handle_exception<
+                    parallel_task_execution_policy, result_type
                 >::call();
         }
     }

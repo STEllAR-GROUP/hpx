@@ -94,12 +94,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The comparisons in the parallel \a fill algorithm invoked with
     /// an execution policy object of type \a parallel_execution_policy or
-    /// \a task_execution_policy are permitted to execute in an unordered
+    /// \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a fill algorithm returns a \a hpx::future<void> if the
-    ///           execution policy is of type \a task_execution_policy and
+    ///           execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a difference_type otherwise (where \a difference_type
     ///           is defined by \a void.
     ///
@@ -193,12 +195,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The comparisons in the parallel \a fill_n algorithm invoked with
     /// an execution policy object of type \a parallel_execution_policy or
-    /// \a task_execution_policy are permitted to execute in an unordered
+    /// \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a fill_n algorithm returns a \a hpx::future<void> if the
-    ///           execution policy is of type \a task_execution_policy and
+    ///           execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a difference_type otherwise (where \a difference_type
     ///           is defined by \a void.
     ///

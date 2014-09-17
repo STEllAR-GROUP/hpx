@@ -164,7 +164,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The comparison operations in the parallel \a mismatch algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
@@ -174,7 +174,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           elements are mismatch.
     ///
     /// \returns  The \a mismatch algorithm returns a \a hpx::future<bool> if the
-    ///           execution policy is of type \a task_execution_policy and
+    ///           execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a bool otherwise.
     ///           The \a mismatch algorithm returns true if the elements in the
     ///           two ranges are mismatch, otherwise it returns false.
@@ -270,7 +272,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The comparison operations in the parallel \a mismatch algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
@@ -280,7 +282,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           elements are mismatch.
     ///
     /// \returns  The \a mismatch algorithm returns a \a hpx::future<bool> if the
-    ///           execution policy is of type \a task_execution_policy and
+    ///           execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a bool otherwise.
     ///           The \a mismatch algorithm returns true if the elements in the
     ///           two ranges are mismatch, otherwise it returns false.
@@ -424,13 +428,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The comparison operations in the parallel \a mismatch algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a mismatch algorithm returns a
     ///           \a hpx::future<std::pair<InIter1, InIter2> > if the
-    ///           execution policy is of type \a task_execution_policy and
+    ///           execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a std::pair<InIter1, InIter2> otherwise.
     ///           The \a mismatch algorithm returns the first mismatching pair
     ///           of elements from two ranges: one defined by [first1, last1)
@@ -521,13 +527,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The comparison operations in the parallel \a mismatch algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a mismatch algorithm returns a
     ///           \a hpx::future<std::pair<InIter1, InIter2> > if the
-    ///           execution policy is of type \a task_execution_policy and
+    ///           execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a std::pair<InIter1, InIter2> otherwise.
     ///           The \a mismatch algorithm returns the first mismatching pair
     ///           of elements from two ranges: one defined by [first1, last1)

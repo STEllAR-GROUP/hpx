@@ -37,7 +37,7 @@ void test_generate(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_generate(hpx::parallel::task_execution_policy, IteratorTag)
+void test_generate(hpx::parallel::parallel_task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -47,7 +47,7 @@ void test_generate(hpx::parallel::task_execution_policy, IteratorTag)
     auto gen = [](){ return std::size_t(10); };
 
     hpx::future<void> f =
-        hpx::parallel::generate(hpx::parallel::task,
+        hpx::parallel::generate(hpx::parallel::par_task,
             iterator(boost::begin(c)), iterator(boost::end(c)),
             gen);
     f.wait();
@@ -68,12 +68,12 @@ void test_generate()
     test_generate(seq, IteratorTag());
     test_generate(par, IteratorTag());
     test_generate(par_vec, IteratorTag());
-    test_generate(task, IteratorTag());
+    test_generate(par(task), IteratorTag());
 
     test_generate(execution_policy(seq), IteratorTag());
     test_generate(execution_policy(par), IteratorTag());
     test_generate(execution_policy(par_vec), IteratorTag());
-    test_generate(execution_policy(task), IteratorTag());
+    test_generate(execution_policy(par(task)), IteratorTag());
 }
 
 void generate_test()
@@ -117,7 +117,7 @@ void test_generate_exception(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_generate_exception(hpx::parallel::task_execution_policy, IteratorTag)
+void test_generate_exception(hpx::parallel::parallel_task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -130,7 +130,7 @@ void test_generate_exception(hpx::parallel::task_execution_policy, IteratorTag)
     bool caught_exception = false;
     try {
         hpx::future<void> f =
-            hpx::parallel::generate(hpx::parallel::task,
+            hpx::parallel::generate(hpx::parallel::par_task,
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::runtime_error("test"); }),
@@ -143,8 +143,8 @@ void test_generate_exception(hpx::parallel::task_execution_policy, IteratorTag)
     catch(hpx::exception_list const& e) {
         caught_exception = true;
         test::test_num_exceptions<
-            hpx::parallel::task_execution_policy, IteratorTag
-        >::call(hpx::parallel::task, e);
+            hpx::parallel::parallel_task_execution_policy, IteratorTag
+        >::call(hpx::parallel::par(task), e);
     }
     catch(...) {
         HPX_TEST(false);
@@ -162,11 +162,11 @@ void test_generate_exception()
     //  with a vector execution policy
     test_generate_exception(seq, IteratorTag());
     test_generate_exception(par, IteratorTag());
-    test_generate_exception(task, IteratorTag());
+    test_generate_exception(par(task), IteratorTag());
 
     test_generate_exception(execution_policy(seq), IteratorTag());
     test_generate_exception(execution_policy(par), IteratorTag());
-    test_generate_exception(execution_policy(task), IteratorTag());
+    test_generate_exception(execution_policy(par(task)), IteratorTag());
 }
 
 void generate_exception_test()
@@ -210,7 +210,7 @@ void test_generate_bad_alloc(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_generate_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
+void test_generate_bad_alloc(hpx::parallel::parallel_task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -223,7 +223,7 @@ void test_generate_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
     bool caught_bad_alloc = false;
     try {
         hpx::future<void> f =
-            hpx::parallel::generate(hpx::parallel::task,
+            hpx::parallel::generate(hpx::parallel::par_task,
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::bad_alloc(); }),
@@ -253,11 +253,11 @@ void test_generate_bad_alloc()
     //  with a vector execution policy
     test_generate_bad_alloc(seq, IteratorTag());
     test_generate_bad_alloc(par, IteratorTag());
-    test_generate_bad_alloc(task, IteratorTag());
+    test_generate_bad_alloc(par(task), IteratorTag());
 
     test_generate_bad_alloc(execution_policy(seq), IteratorTag());
     test_generate_bad_alloc(execution_policy(par), IteratorTag());
-    test_generate_bad_alloc(execution_policy(task), IteratorTag());
+    test_generate_bad_alloc(execution_policy(par(task)), IteratorTag());
 }
 
 void generate_bad_alloc_test()

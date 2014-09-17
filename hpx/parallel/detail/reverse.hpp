@@ -101,12 +101,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The assignments in the parallel \a reverse algorithm invoked with
     /// an execution policy object of type \a parallel_execution_policy or
-    /// \a task_execution_policy are permitted to execute in an unordered
+    /// \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a reverse algorithm returns a \a hpx::future<void>
-    ///           if the execution policy is of type \a task_execution_policy and
+    ///           if the execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a void otherwise.
     ///
     template <typename ExPolicy, typename BidirIter>
@@ -204,12 +206,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The assignments in the parallel \a reverse_copy algorithm invoked with
     /// an execution policy object of type \a parallel_execution_policy or
-    /// \a task_execution_policy are permitted to execute in an unordered
+    /// \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a reverse_copy algorithm returns a \a hpx::future<OutputIter>
-    ///           if the execution policy is of type \a task_execution_policy and
+    ///           if the execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a OutputIter otherwise.
     ///           The \a reverse_copy algorithm returns the output iterator to the
     ///           element past the last element copied.

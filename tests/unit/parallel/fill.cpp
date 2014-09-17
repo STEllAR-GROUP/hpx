@@ -36,7 +36,7 @@ void test_fill(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_fill(hpx::parallel::task_execution_policy, IteratorTag)
+void test_fill(hpx::parallel::parallel_task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -45,7 +45,7 @@ void test_fill(hpx::parallel::task_execution_policy, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     hpx::future<void> f =
-        hpx::parallel::fill(hpx::parallel::task,
+        hpx::parallel::fill(hpx::parallel::par_task,
             iterator(boost::begin(c)), iterator(boost::end(c)),
             10);
     f.wait();
@@ -66,12 +66,12 @@ void test_fill()
     test_fill(seq, IteratorTag());
     test_fill(par, IteratorTag());
     test_fill(par_vec, IteratorTag());
-    test_fill(task, IteratorTag());
+    test_fill(par(task), IteratorTag());
 
     test_fill(execution_policy(seq), IteratorTag());
     test_fill(execution_policy(par), IteratorTag());
     test_fill(execution_policy(par_vec), IteratorTag());
-    test_fill(execution_policy(task), IteratorTag());
+    test_fill(execution_policy(par(task)), IteratorTag());
 }
 
 void fill_test()
@@ -114,7 +114,7 @@ void test_fill_exception(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_fill_exception(hpx::parallel::task_execution_policy, IteratorTag)
+void test_fill_exception(hpx::parallel::parallel_task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -126,7 +126,7 @@ void test_fill_exception(hpx::parallel::task_execution_policy, IteratorTag)
     bool caught_exception = false;
     try {
         hpx::future<void> f =
-            hpx::parallel::fill(hpx::parallel::task,
+            hpx::parallel::fill(hpx::parallel::par_task,
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::runtime_error("test"); }),
@@ -139,8 +139,8 @@ void test_fill_exception(hpx::parallel::task_execution_policy, IteratorTag)
     catch(hpx::exception_list const& e) {
         caught_exception = true;
         test::test_num_exceptions<
-            hpx::parallel::task_execution_policy, IteratorTag
-        >::call(hpx::parallel::task, e);
+            hpx::parallel::parallel_task_execution_policy, IteratorTag
+        >::call(hpx::parallel::par(task), e);
     }
     catch(...) {
         HPX_TEST(false);
@@ -158,11 +158,11 @@ void test_fill_exception()
     //  with a vector execution policy
     test_fill_exception(seq, IteratorTag());
     test_fill_exception(par, IteratorTag());
-    test_fill_exception(task, IteratorTag());
+    test_fill_exception(par(task), IteratorTag());
 
     test_fill_exception(execution_policy(seq), IteratorTag());
     test_fill_exception(execution_policy(par), IteratorTag());
-    test_fill_exception(execution_policy(task), IteratorTag());
+    test_fill_exception(execution_policy(par(task)), IteratorTag());
 }
 
 void fill_exception_test()
@@ -205,7 +205,7 @@ void test_fill_bad_alloc(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_fill_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
+void test_fill_bad_alloc(hpx::parallel::parallel_task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -217,7 +217,7 @@ void test_fill_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
     bool caught_bad_alloc = false;
     try {
         hpx::future<void> f =
-            hpx::parallel::fill(hpx::parallel::task,
+            hpx::parallel::fill(hpx::parallel::par_task,
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::bad_alloc(); }),
@@ -247,11 +247,11 @@ void test_fill_bad_alloc()
     //  with a vector execution policy
     test_fill_bad_alloc(seq, IteratorTag());
     test_fill_bad_alloc(par, IteratorTag());
-    test_fill_bad_alloc(task, IteratorTag());
+    test_fill_bad_alloc(par(task), IteratorTag());
 
     test_fill_bad_alloc(execution_policy(seq), IteratorTag());
     test_fill_bad_alloc(execution_policy(par), IteratorTag());
-    test_fill_bad_alloc(execution_policy(task), IteratorTag());
+    test_fill_bad_alloc(execution_policy(par(task)), IteratorTag());
 }
 
 void fill_bad_alloc_test()
