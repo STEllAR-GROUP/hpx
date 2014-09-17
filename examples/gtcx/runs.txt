@@ -1,6 +1,0 @@
--t1
-real    26m6.197s
-user    26m3.254s
-sys     0m2.020s
-
--t2
