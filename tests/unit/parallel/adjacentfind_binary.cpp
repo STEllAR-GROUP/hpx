@@ -135,12 +135,14 @@ void test_adjacent_find_exception(hpx::parallel::task_execution_policy, Iterator
         try {
             hpx::future<decorated_iterator> f =
                 hpx::parallel::adjacent_find(hpx::parallel::task,
-                decorated_iterator(
-                boost::begin(c),
-                [](){ throw std::runtime_error("test"); }),
+                    decorated_iterator(
+                        boost::begin(c),
+                        [](){ throw std::runtime_error("test"); }),
                 decorated_iterator(boost::end(c)),
                 std::greater<std::size_t>());
-            bool returned_from_algorithm = true;
+
+            returned_from_algorithm = true;
+            
             f.get();
 
             HPX_TEST(false);
@@ -158,6 +160,7 @@ void test_adjacent_find_exception(hpx::parallel::task_execution_policy, Iterator
         HPX_TEST(returned_from_algorithm);
         HPX_TEST(caught_exception);
     }
+
     {
         bool caught_exception = false;
         bool returned_from_algorithm = false;

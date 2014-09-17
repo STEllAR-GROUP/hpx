@@ -50,7 +50,7 @@ void test_fill_n(hpx::parallel::task_execution_policy, IteratorTag)
             10);
     f.wait();
 
-    std::size_t count =0;
+    std::size_t count = 0;
     std::for_each(boost::begin(c), boost::end(c),
         [&count](std::size_t v) {
             HPX_TEST_EQ(v, std::size_t(10));
@@ -88,7 +88,7 @@ void test_fill_n_exception(ExPolicy const& policy, IteratorTag)
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::decorated_iterator<base_iterator, IteratorTag>
+    typedef test::decorated_iterator < base_iterator, IteratorTag >
         decorated_iterator;
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand());
@@ -103,11 +103,11 @@ void test_fill_n_exception(ExPolicy const& policy, IteratorTag)
             10);
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e) {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
-    catch(...) {
+    catch (...) {
         HPX_TEST(false);
     }
 
@@ -118,7 +118,7 @@ template <typename IteratorTag>
 void test_fill_n_exception(hpx::parallel::task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::decorated_iterator<base_iterator, IteratorTag>
+    typedef test::decorated_iterator < base_iterator, IteratorTag >
         decorated_iterator;
 
     std::vector<std::size_t> c(10007);
@@ -137,13 +137,13 @@ void test_fill_n_exception(hpx::parallel::task_execution_policy, IteratorTag)
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e) {
         caught_exception = true;
         test::test_num_exceptions<
             hpx::parallel::task_execution_policy, IteratorTag
         >::call(hpx::parallel::task, e);
     }
-    catch(...) {
+    catch (...) {
         HPX_TEST(false);
     }
 
@@ -179,7 +179,7 @@ void test_fill_n_bad_alloc(ExPolicy const& policy, IteratorTag)
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::decorated_iterator<base_iterator, IteratorTag>
+    typedef test::decorated_iterator < base_iterator, IteratorTag >
         decorated_iterator;
 
     std::vector<std::size_t> c(100007);
@@ -195,10 +195,10 @@ void test_fill_n_bad_alloc(ExPolicy const& policy, IteratorTag)
             10);
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&) {
         caught_bad_alloc = true;
     }
-    catch(...) {
+    catch (...) {
         HPX_TEST(false);
     }
 
@@ -209,7 +209,7 @@ template <typename IteratorTag>
 void test_fill_n_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::decorated_iterator<base_iterator, IteratorTag>
+    typedef test::decorated_iterator < base_iterator, IteratorTag >
         decorated_iterator;
 
     std::vector<std::size_t> c(10007);
@@ -222,17 +222,17 @@ void test_fill_n_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::bad_alloc(); }),
-                c.size(),
-                10);
+            c.size(),
+            10);
 
         f.get();
 
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&) {
         caught_bad_alloc = true;
     }
-    catch(...) {
+    catch (...) {
         HPX_TEST(false);
     }
 
@@ -263,12 +263,12 @@ void fill_n_bad_alloc_test()
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
-	unsigned int seed = (unsigned int)std::time(0);
-	if (vm.count("seed"))
-		seed = vm["seed"].as<unsigned int>();
+    unsigned int seed = (unsigned int)std::time(0);
+    if (vm.count("seed"))
+        seed = vm["seed"].as<unsigned int>();
 
-	std::cout << "using seed: " << seed << std::endl;
-	std::srand(seed);
+    std::cout << "using seed: " << seed << std::endl;
+    std::srand(seed);
 
     fill_n_test();
     fill_n_exception_test();

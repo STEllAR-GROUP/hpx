@@ -231,12 +231,12 @@ void task_region_exceptions_test4()
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-	unsigned int seed = (unsigned int)std::time(0);
-	if (vm.count("seed"))
-		seed = vm["seed"].as<unsigned int>();
+    unsigned int seed = (unsigned int)std::time(0);
+    if (vm.count("seed"))
+        seed = vm["seed"].as<unsigned int>();
 
-	std::cout << "using seed: " << seed << std::endl;
-	std::srand(seed);
+    std::cout << "using seed: " << seed << std::endl;
+    std::srand(seed);
 
     task_region_test1();
     task_region_test2();
