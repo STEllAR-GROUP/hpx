@@ -23,7 +23,7 @@
 #include <boost/ref.hpp>
 #include <boost/foreach.hpp>
 
-#if defined(HPX_HAVE_HWLOC)
+#if defined(HPX_HAVE_HWLOC) && !defined(__APPLE__)
 #  include <hwloc.h>
 #endif
 
@@ -38,7 +38,7 @@ std::size_t thread_affinity_worker(std::size_t desired)
     std::size_t current = hpx::get_worker_thread_num();
     if (current == desired)
     {
-#if defined(HPX_HAVE_HWLOC)
+#if defined(HPX_HAVE_HWLOC) && !defined(__APPLE__)
         bool numa_sensitive = hpx::is_scheduler_numa_sensitive();
 
         // extract the desired affinity mask
