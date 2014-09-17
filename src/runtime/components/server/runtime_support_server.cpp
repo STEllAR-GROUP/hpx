@@ -575,14 +575,14 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     // initiate system shutdown for all localities
     void invoke_shutdown_functions(
-        std::vector<naming::id_type> const& prefixes, bool pre_shutdown)
+        std::vector<naming::id_type> const& localities, bool pre_shutdown)
     {
 #if !defined(HPX_GCC44_WORKAROUND)
         call_shutdown_functions_action act;
-        lcos::broadcast(act, prefixes, pre_shutdown).get();
+        lcos::broadcast(act, localities, pre_shutdown).get();
 #else
         std::vector<lcos::future<void> > lazy_actions;
-        BOOST_FOREACH(naming::id_type const& id, prefixes)
+        BOOST_FOREACH(naming::id_type const& id, localities)
         {
             using components::stubs::runtime_support;
             lazy_actions.push_back(
@@ -627,7 +627,7 @@ namespace hpx { namespace components { namespace server
 
         while (tm.get_thread_count() > 1)
         {
-            // FIXME: this sleep_for is causing the long shutdown times.
+            // FIXME: this sleep_for is causing very long shutdown times.
             // By commenting it, #1263 gets solved.
             //this_thread::sleep_for(boost::posix_time::millisec(100));
             this_thread::yield();
@@ -652,13 +652,15 @@ namespace hpx { namespace components { namespace server
     }
 
     // kick off termination detection
-    void runtime_support::dijkstra_termination_detection(
+    std::size_t runtime_support::dijkstra_termination_detection(
         std::vector<naming::id_type> const& locality_ids)
     {
         boost::uint32_t num_localities =
             static_cast<boost::uint32_t>(locality_ids.size());
         if (num_localities == 1)
-            return;
+            return 0;
+
+        std::size_t count = 0;      // keep track of number of trials
 
         {
             // Note: we protect the entire loop here since the stopping condition
@@ -674,8 +676,10 @@ namespace hpx { namespace components { namespace server
                 bool termination_aborted = false;
                 {
                     util::scoped_unlock<dijkstra_mtx_type::scoped_lock> ul(l);
-                    termination_aborted = lcos::reduce(act, locality_ids, std_logical_or_type()).get()
+                    termination_aborted = lcos::reduce(act,
+                        locality_ids, std_logical_or_type()).get()
                 }
+
                 if (termination_aborted)
                 {
                     dijkstra_color_ = true;     // unsuccessful termination
@@ -683,8 +687,13 @@ namespace hpx { namespace components { namespace server
 
                 // Rule 3: After the completion of an unsuccessful probe, machine
                 // nr.0 initiates a next probe.
+
+                ++count;
+
             } while (dijkstra_color_);
         }
+
+        return count;
     }
 #else
     void runtime_support::send_dijkstra_termination_token(
@@ -702,7 +711,7 @@ namespace hpx { namespace components { namespace server
 
         while (tm.get_thread_count() > 1)
         {
-            // FIXME: this sleep_for is causing the long shutdown times.
+            // FIXME: this sleep_for is causing very long shutdown times.
             // By commenting it, #1263 gets solved.
             //this_thread::sleep_for(boost::posix_time::millisec(100));
             this_thread::yield();
@@ -762,13 +771,13 @@ namespace hpx { namespace components { namespace server
     }
 
     // kick off termination detection
-    void runtime_support::dijkstra_termination_detection(
+    std::size_t runtime_support::dijkstra_termination_detection(
         std::vector<naming::id_type> const& locality_ids)
     {
         boost::uint32_t num_localities =
             static_cast<boost::uint32_t>(locality_ids.size());
         if (num_localities == 1)
-            return;
+            return 0;
 
         boost::uint32_t initiating_locality_id = get_locality_id();
 
@@ -776,6 +785,8 @@ namespace hpx { namespace components { namespace server
         boost::uint32_t target_id = initiating_locality_id;
         if (0 == target_id)
             target_id = static_cast<boost::uint32_t>(num_localities);
+
+        std::size_t count = 0;      // keep track of number of trials
 
         {
             // Note: we protect the entire loop here since the stopping condition
@@ -799,8 +810,12 @@ namespace hpx { namespace components { namespace server
                 // Rule 3: After the completion of an unsuccessful probe, machine
                 // nr.0 initiates a next probe.
 
+                ++count;
+
             } while (dijkstra_color_);
         }
+
+        return count;
     }
 #endif
 
@@ -823,7 +838,7 @@ namespace hpx { namespace components { namespace server
         }
 
         LRT_(info) << "runtime_support::shutdown_all: "
-            "initialiting application shutdown";
+            "initializing application shutdown";
 
         applier::applier& appl = hpx::applier::get_applier();
         naming::resolver_client& agas_client = appl.get_agas_client();
@@ -833,10 +848,11 @@ namespace hpx { namespace components { namespace server
         stop_evaluating_counters();
 
         std::vector<naming::id_type> locality_ids = find_all_localities();
-        dijkstra_termination_detection(locality_ids);
+        std::size_t count = dijkstra_termination_detection(locality_ids);
 
         LRT_(info) << "runtime_support::shutdown_all: "
-            "passed termination detection";
+                      "passed first termination detection (count: "
+                   << count << ").";
 
         // execute registered shutdown functions on all localities
         invoke_shutdown_functions(locality_ids, true);
@@ -845,11 +861,19 @@ namespace hpx { namespace components { namespace server
         LRT_(info) << "runtime_support::shutdown_all: "
             "invoked shutdown functions";
 
+        // Do a second round of termination detection to synchronize with all
+        // work which was triggered by the invocation of the shutdown
+        // functions.
+        count = dijkstra_termination_detection(locality_ids);
+
+        LRT_(info) << "runtime_support::shutdown_all: "
+                      "passed second termination detection (count: "
+                   << count << ").";
+
         // Shut down all localities except the the local one, we can't use
         // broadcast here as we have to handle the back parcel in a special
         // way.
         std::reverse(locality_ids.begin(), locality_ids.end());
-
         boost::uint32_t locality_id = get_locality_id();
         std::vector<lcos::future<void> > lazy_actions;
 

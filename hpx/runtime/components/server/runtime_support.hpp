@@ -403,7 +403,7 @@ namespace hpx { namespace components { namespace server
 #endif
 
         // the name says it all
-        void dijkstra_termination_detection(
+        std::size_t dijkstra_termination_detection(
             std::vector<naming::id_type> const& locality_ids);
 
 #if !defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)

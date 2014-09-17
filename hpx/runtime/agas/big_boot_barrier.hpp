@@ -98,9 +98,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     // no-op on non-bootstrap localities
     void trigger();
 
-    void add_thunk(
-        HPX_STD_FUNCTION<void()>* f
-        )
+    void add_thunk(HPX_STD_FUNCTION<void()>* f)
     {
         thunks.push(f);
     }
