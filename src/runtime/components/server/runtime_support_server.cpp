@@ -600,7 +600,7 @@ namespace hpx { namespace components { namespace server
     void runtime_support::dijkstra_make_black()
     {
         // Rule 1: A machine sending a message makes itself black.
-        lcos::local::spinlock::scoped_lock l(dijkstra_mtx_);
+        dijkstra_mtx_type::scoped_lock l(dijkstra_mtx_);
         dijkstra_color_ = true;
     }
 
@@ -627,7 +627,9 @@ namespace hpx { namespace components { namespace server
 
         while (tm.get_thread_count() > 1)
         {
-            this_thread::sleep_for(boost::posix_time::millisec(100));
+            // FIXME: this sleep_for is causing the long shutdown times.
+            // By commenting it, #1263 gets solved.
+            //this_thread::sleep_for(boost::posix_time::millisec(100));
             this_thread::yield();
         }
 
@@ -637,7 +639,7 @@ namespace hpx { namespace components { namespace server
         // Rule 2: When machine nr.i + 1 propagates the probe, it hands over a
         // black token to machine nr.i if it is black itself, whereas while
         // being white it leaves the color of the token unchanged.
-        lcos::local::spinlock::scoped_lock l(dijkstra_mtx_);
+        dijkstra_mtx_type::scoped_lock l(dijkstra_mtx_);
         bool dijkstra_token = dijkstra_color_;
 
         // Rule 5: Upon transmission of the token to machine nr.i, machine
@@ -658,25 +660,31 @@ namespace hpx { namespace components { namespace server
         if (num_localities == 1)
             return;
 
-        do {
-            // Rule 4: Machine nr.0 initiates a probe by making itself white
-            // and sending a white token to machine nr.N - 1.
-            {
-                lcos::local::spinlock::scoped_lock l(dijkstra_mtx_);
+        {
+            // Note: we protect the entire loop here since the stopping condition
+            // depends on the shared variable "dijkstra_color_"
+            // Proper unlocking for possible remote actions needs to be taken care of
+            dijkstra_mtx_type::scoped_lock l(dijkstra_mtx_);
+            do {
+                // Rule 4: Machine nr.0 initiates a probe by making itself white
+                // and sending a white token to machine nr.N - 1.
                 dijkstra_color_ = false;        // start off with white
-            }
 
-            dijkstra_termination_action act;
-            if (lcos::reduce(act, locality_ids, std_logical_or_type()).get())
-            {
-                lcos::local::spinlock::scoped_lock l(dijkstra_mtx_);
-                dijkstra_color_ = true;     // unsuccessful termination
-            }
+                dijkstra_termination_action act;
+                bool termination_aborted = false;
+                {
+                    util::scoped_unlock<dijkstra_mtx_type::scoped_lock> ul(l);
+                    termination_aborted = lcos::reduce(act, locality_ids, std_logical_or_type()).get()
+                }
+                if (termination_aborted)
+                {
+                    dijkstra_color_ = true;     // unsuccessful termination
+                }
 
-            // Rule 3: After the completion of an unsuccessful probe, machine
-            // nr.0 initiates a next probe.
-
-        } while (dijkstra_color_);
+                // Rule 3: After the completion of an unsuccessful probe, machine
+                // nr.0 initiates a next probe.
+            } while (dijkstra_color_);
+        }
     }
 #else
     void runtime_support::send_dijkstra_termination_token(
@@ -694,7 +702,9 @@ namespace hpx { namespace components { namespace server
 
         while (tm.get_thread_count() > 1)
         {
-            this_thread::sleep_for(boost::posix_time::millisec(100));
+            // FIXME: this sleep_for is causing the long shutdown times.
+            // By commenting it, #1263 gets solved.
+            //this_thread::sleep_for(boost::posix_time::millisec(100));
             this_thread::yield();
         }
 
@@ -705,7 +715,7 @@ namespace hpx { namespace components { namespace server
         // black token to machine nr.i if it is black itself, whereas while
         // being white it leaves the color of the token unchanged.
         {
-            lcos::local::spinlock::scoped_lock l(dijkstra_mtx_);
+            dijkstra_mtx_type::scoped_lock l(dijkstra_mtx_);
             if (dijkstra_color_)
                 dijkstra_token = dijkstra_color_;
 
@@ -730,12 +740,13 @@ namespace hpx { namespace components { namespace server
         agas_client.start_shutdown();
 
         boost::uint32_t locality_id = get_locality_id();
+
         if (initiating_locality_id == locality_id)
         {
             // we received the token after a full circle
             if (dijkstra_token)
             {
-                lcos::local::spinlock::scoped_lock l(dijkstra_mtx_);
+                dijkstra_mtx_type::scoped_lock l(dijkstra_mtx_);
                 dijkstra_color_ = true;     // unsuccessful termination
             }
 
@@ -766,25 +777,30 @@ namespace hpx { namespace components { namespace server
         if (0 == target_id)
             target_id = static_cast<boost::uint32_t>(num_localities);
 
-        do {
-            // Rule 4: Machine nr.0 initiates a probe by making itself white
-            // and sending a white token to machine nr.N - 1.
-            {
-                lcos::local::spinlock::scoped_lock l(dijkstra_mtx_);
+        {
+            // Note: we protect the entire loop here since the stopping condition
+            // depends on the shared variable "dijkstra_color_"
+            // Proper unlocking for possible remote actions needs to be taken care of
+            dijkstra_mtx_type::scoped_lock l(dijkstra_mtx_);
+            do {
+                // Rule 4: Machine nr.0 initiates a probe by making itself white
+                // and sending a white token to machine nr.N - 1.
                 dijkstra_color_ = false;        // start off with white
-            }
 
-            send_dijkstra_termination_token(target_id - 1,
-                initiating_locality_id, num_localities, false);
+                {
+                    util::scoped_unlock<dijkstra_mtx_type::scoped_lock> ul(l);
+                    send_dijkstra_termination_token(target_id - 1,
+                        initiating_locality_id, num_localities, false);
+                }
 
-            // wait for token to come back to us
-            lcos::local::spinlock::scoped_lock l(dijkstra_mtx_);
-            dijkstra_cond_.wait(l);
+                // wait for token to come back to us
+                dijkstra_cond_.wait(l);
 
-            // Rule 3: After the completion of an unsuccessful probe, machine
-            // nr.0 initiates a next probe.
+                // Rule 3: After the completion of an unsuccessful probe, machine
+                // nr.0 initiates a next probe.
 
-        } while (dijkstra_color_);
+            } while (dijkstra_color_);
+        }
     }
 #endif
 
@@ -802,7 +818,10 @@ namespace hpx { namespace components { namespace server
         // make sure shutdown_all is invoked only once
         bool flag = false;
         if (!shutdown_all_invoked_.compare_exchange_strong(flag, true))
+        {
+            BOOST_ASSERT(false);
             return;
+        }
 
         LRT_(info) << "runtime_support::shutdown_all: "
             "initialiting application shutdown";
