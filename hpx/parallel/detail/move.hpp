@@ -104,12 +104,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The move assignments in the parallel \a move algorithm invoked
     /// with an execution policy object of type
-    /// \a parallel_execution_policy or \a task_execution_policy are
+    /// \a parallel_execution_policy or \a parallel_task_execution_policy are
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a move algorithm returns a \a hpx::future<OutIter> if
-    ///           the execution policy is of type \a task_execution_policy and
+    ///           the execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a OutIter otherwise.
     ///           The \a move algorithm returns the output iterator to the
     ///           element in the destination range, one past the last element

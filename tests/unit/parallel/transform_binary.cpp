@@ -50,7 +50,7 @@ void test_transform_binary(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_transform_binary(hpx::parallel::task_execution_policy, IteratorTag)
+void test_transform_binary(hpx::parallel::parallel_task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -67,7 +67,7 @@ void test_transform_binary(hpx::parallel::task_execution_policy, IteratorTag)
         };
 
     hpx::future<base_iterator> f =
-        hpx::parallel::transform(hpx::parallel::task,
+        hpx::parallel::transform(hpx::parallel::par_task,
             iterator(boost::begin(c1)), iterator(boost::end(c1)),
             boost::begin(c2), boost::begin(d1), add);
     f.wait();
@@ -95,12 +95,12 @@ void test_transform_binary()
     test_transform_binary(seq, IteratorTag());
     test_transform_binary(par, IteratorTag());
     test_transform_binary(par_vec, IteratorTag());
-    test_transform_binary(task, IteratorTag());
+    test_transform_binary(par(task), IteratorTag());
 
     test_transform_binary(execution_policy(seq), IteratorTag());
     test_transform_binary(execution_policy(par), IteratorTag());
     test_transform_binary(execution_policy(par_vec), IteratorTag());
-    test_transform_binary(execution_policy(task), IteratorTag());
+    test_transform_binary(execution_policy(par(task)), IteratorTag());
 }
 
 void transform_binary_test()
@@ -148,7 +148,7 @@ void test_transform_binary_exception(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_transform_binary_exception(hpx::parallel::task_execution_policy, IteratorTag)
+void test_transform_binary_exception(hpx::parallel::parallel_task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -162,7 +162,7 @@ void test_transform_binary_exception(hpx::parallel::task_execution_policy, Itera
     bool caught_exception = false;
     try {
         hpx::future<base_iterator> f =
-            hpx::parallel::transform(hpx::parallel::task,
+            hpx::parallel::transform(hpx::parallel::par_task,
                 iterator(boost::begin(c1)), iterator(boost::end(c1)),
                 boost::begin(c2), boost::begin(d1),
                 [](std::size_t v1, std::size_t v2) {
@@ -175,8 +175,8 @@ void test_transform_binary_exception(hpx::parallel::task_execution_policy, Itera
     catch(hpx::exception_list const& e) {
         caught_exception = true;
         test::test_num_exceptions<
-            hpx::parallel::task_execution_policy, IteratorTag
-        >::call(hpx::parallel::task, e);
+            hpx::parallel::parallel_task_execution_policy, IteratorTag
+        >::call(hpx::parallel::par(task), e);
     }
     catch(...) {
         HPX_TEST(false);
@@ -194,11 +194,11 @@ void test_transform_binary_exception()
     //  with a vector execution policy
     test_transform_binary_exception(seq, IteratorTag());
     test_transform_binary_exception(par, IteratorTag());
-    test_transform_binary_exception(task, IteratorTag());
+    test_transform_binary_exception(par(task), IteratorTag());
 
     test_transform_binary_exception(execution_policy(seq), IteratorTag());
     test_transform_binary_exception(execution_policy(par), IteratorTag());
-    test_transform_binary_exception(execution_policy(task), IteratorTag());
+    test_transform_binary_exception(execution_policy(par(task)), IteratorTag());
 }
 
 void transform_binary_exception_test()
@@ -245,7 +245,7 @@ void test_transform_binary_bad_alloc(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_transform_binary_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
+void test_transform_binary_bad_alloc(hpx::parallel::parallel_task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -259,7 +259,7 @@ void test_transform_binary_bad_alloc(hpx::parallel::task_execution_policy, Itera
     bool caught_bad_alloc = false;
     try {
         hpx::future<base_iterator> f =
-            hpx::parallel::transform(hpx::parallel::task,
+            hpx::parallel::transform(hpx::parallel::par_task,
                 iterator(boost::begin(c1)), iterator(boost::end(c1)),
                 boost::begin(c2), boost::begin(d1),
                 [](std::size_t v1, std::size_t v2) {
@@ -288,11 +288,11 @@ void test_transform_binary_bad_alloc()
     //  with a vector execution policy
     test_transform_binary_bad_alloc(seq, IteratorTag());
     test_transform_binary_bad_alloc(par, IteratorTag());
-    test_transform_binary_bad_alloc(task, IteratorTag());
+    test_transform_binary_bad_alloc(par(task), IteratorTag());
 
     test_transform_binary_bad_alloc(execution_policy(seq), IteratorTag());
     test_transform_binary_bad_alloc(execution_policy(par), IteratorTag());
-    test_transform_binary_bad_alloc(execution_policy(task), IteratorTag());
+    test_transform_binary_bad_alloc(execution_policy(par(task)), IteratorTag());
 }
 
 void transform_binary_bad_alloc_test()

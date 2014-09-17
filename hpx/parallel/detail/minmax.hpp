@@ -154,12 +154,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The comparisons in the parallel \a min_element algorithm invoked with
     /// an execution policy object of type \a parallel_execution_policy or
-    /// \a task_execution_policy are permitted to execute in an unordered
+    /// \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a min_element algorithm returns a \a hpx::future<FwdIter>
-    ///           if the execution policy is of type \a task_execution_policy
+    ///           if the execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy
     ///           and returns \a FwdIter otherwise.
     ///           The \a min_element algorithm returns the iterator to the
     ///           smallest element in the range [first, last). If several
@@ -216,12 +218,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The comparisons in the parallel \a min_element algorithm invoked with
     /// an execution policy object of type \a parallel_execution_policy or
-    /// \a task_execution_policy are permitted to execute in an unordered
+    /// \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a min_element algorithm returns a \a hpx::future<FwdIter>
-    ///           if the execution policy is of type \a task_execution_policy
+    ///           if the execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy
     ///           and returns \a FwdIter otherwise.
     ///           The \a min_element algorithm returns the iterator to the
     ///           smallest element in the range [first, last). If several
@@ -379,12 +383,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The comparisons in the parallel \a max_element algorithm invoked with
     /// an execution policy object of type \a parallel_execution_policy or
-    /// \a task_execution_policy are permitted to execute in an unordered
+    /// \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a max_element algorithm returns a \a hpx::future<FwdIter>
-    ///           if the execution policy is of type \a task_execution_policy
+    ///           if the execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy
     ///           and returns \a FwdIter otherwise.
     ///           The \a max_element algorithm returns the iterator to the
     ///           smallest element in the range [first, last). If several
@@ -441,12 +447,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The comparisons in the parallel \a max_element algorithm invoked with
     /// an execution policy object of type \a parallel_execution_policy or
-    /// \a task_execution_policy are permitted to execute in an unordered
+    /// \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a max_element algorithm returns a \a hpx::future<FwdIter>
-    ///           if the execution policy is of type \a task_execution_policy
+    ///           if the execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy
     ///           and returns \a FwdIter otherwise.
     ///           The \a max_element algorithm returns the iterator to the
     ///           smallest element in the range [first, last). If several
@@ -620,12 +628,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The comparisons in the parallel \a minmax_element algorithm invoked with
     /// an execution policy object of type \a parallel_execution_policy or
-    /// \a task_execution_policy are permitted to execute in an unordered
+    /// \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a minmax_element algorithm returns a \a hpx::future<FwdIter>
-    ///           if the execution policy is of type \a task_execution_policy
+    ///           if the execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy
     ///           and returns \a FwdIter otherwise.
     ///           The \a minmax_element algorithm returns a pair consisting of
     ///           an iterator to the smallest element as the first element and
@@ -687,12 +697,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The comparisons in the parallel \a minmax_element algorithm invoked with
     /// an execution policy object of type \a parallel_execution_policy or
-    /// \a task_execution_policy are permitted to execute in an unordered
+    /// \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a minmax_element algorithm returns a \a hpx::future<FwdIter>
-    ///           if the execution policy is of type \a task_execution_policy
+    ///           if the execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy
     ///           and returns \a FwdIter otherwise.
     ///           The \a minmax_element algorithm returns a pair consisting of
     ///           an iterator to the smallest element as the first element and

@@ -69,8 +69,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {
             typedef boost::mpl::false_ non_seq;
 
-            task_execution_policy p =
-                task(policy.get_executor(), policy.get_chunk_size());
+            parallel_task_execution_policy p =
+                par_task(policy.get_executor(), policy.get_chunk_size());
             detail::reverse r;
             return lcos::local::dataflow(
                 hpx::util::unwrapped([=]() mutable -> hpx::future<FwdIter>
@@ -144,7 +144,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The assignments in the parallel \a rotate algorithm invoked with
     /// an execution policy object of type \a parallel_execution_policy or
-    /// \a task_execution_policy are permitted to execute in an unordered
+    /// \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
@@ -152,7 +152,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///       of \a MoveAssignable and \a MoveConstructible.
     ///
     /// \returns  The \a rotate algorithm returns a \a hpx::future<FwdIter>
-    ///           if the execution policy is of type \a task_execution_policy and
+    ///           if the execution policy is of type \a parallel_task_execution_policy and
     ///           returns \a FwdIter otherwise.
     ///           The \a rotate algorithm returns the iterator equal to
     ///           first + (last - new_first).
@@ -193,7 +193,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {
             typedef boost::mpl::false_ non_seq;
 
-            task_execution_policy p =
+            parallel_task_execution_policy p =
                 task(policy.get_executor(), policy.get_chunk_size());
 
             hpx::future<OutIter> f = detail::copy<OutIter>().call(p, new_first,
@@ -269,12 +269,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The assignments in the parallel \a rotate_copy algorithm invoked with
     /// an execution policy object of type \a parallel_execution_policy or
-    /// \a task_execution_policy are permitted to execute in an unordered
+    /// \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a rotate_copy algorithm returns a \a hpx::future<OutIter>
-    ///           if the execution policy is of type \a task_execution_policy and
+    ///           if the execution policy is of type \a parallel_task_execution_policy and
     ///           returns \a OutIter otherwise.
     ///           The \a rotate_copy algorithm returns the output iterator to the
     ///           element past the last element copied.

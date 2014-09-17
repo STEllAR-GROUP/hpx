@@ -116,13 +116,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// \note The comparisons in the parallel \a count algorithm invoked with
     ///       an execution policy object of type \a parallel_execution_policy or
-    ///       \a task_execution_policy are permitted to execute in an unordered
+    ///       \a parallel_task_execution_policy are permitted to execute in an unordered
     ///       fashion in unspecified threads, and indeterminately sequenced
     ///       within each thread.
     ///
     /// \returns  The \a count algorithm returns a
     ///           \a hpx::future<difference_type> if the execution policy is of
-    ///           type \a task_execution_policy and
+    ///           type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a difference_type otherwise (where \a difference_type
     ///           is defined by \a std::iterator_traits<InIter>::difference_type.
     ///           The \a count algorithm returns the number of elements
@@ -257,13 +259,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///       execute in sequential order in the calling thread.
     /// \note The assignments in the parallel \a count_if algorithm invoked with
     ///       an execution policy object of type \a parallel_execution_policy or
-    ///       \a task_execution_policy are permitted to execute in an unordered
+    ///       \a parallel_task_execution_policy are permitted to execute in an unordered
     ///       fashion in unspecified threads, and indeterminately sequenced
     ///       within each thread.
     ///
     /// \returns  The \a count_if algorithm returns
     ///           \a hpx::future<difference_type> if the execution policy is of
-    ///           type \a task_execution_policy and
+    ///           type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a difference_type otherwise (where \a difference_type
     ///           is defined by \a std::iterator_traits<InIter>::difference_type.
     ///           The \a count algorithm returns the number of elements

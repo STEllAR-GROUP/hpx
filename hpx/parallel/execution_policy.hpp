@@ -26,6 +26,102 @@
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
     ///////////////////////////////////////////////////////////////////////////
+    /// Extension: The class sequential_task_execution_policy is an execution
+    /// policy type used as a unique type to disambiguate parallel algorithm
+    /// overloading and indicate that a parallel algorithm's execution may be
+    /// parallelized.
+    ///
+    /// The algorithm returns a future representing the result of the
+    /// corresponding algorithm when invoked with the
+    /// sequential_execution_policy.
+    struct sequential_task_execution_policy
+    {
+        sequential_task_execution_policy() {}
+    };
+
+    /// Default sequential task execution policy object.
+    static sequential_task_execution_policy const seq_task;
+
+    /// Extension: The class parallel_task_execution_policy is an execution
+    /// policy type used as a unique type to disambiguate parallel algorithm
+    /// overloading and indicate that a parallel algorithm's execution may be
+    /// parallelized.
+    ///
+    /// The algorithm returns a future representing the result of the
+    /// corresponding algorithm when invoked with the parallel_execution_policy.
+    struct parallel_task_execution_policy
+    {
+    public:
+        /// \cond NOINTERNAL
+        parallel_task_execution_policy() {}
+        /// \endcond
+
+        /// Create a new parallel_task_execution_policy referencing an executor and
+        /// a chunk size.
+        ///
+        /// \param exec         [in] The executor to use for the execution of
+        ///                     the parallel algorithm the returned execution
+        ///                     policy is used with
+        /// \param chunk_size   [in] The chunk size controlling the number of
+        ///                     iterations scheduled to be executed on the same
+        ///                     HPX thread
+        ///
+        /// \returns The new parallel_task_execution_policy
+        ///
+        parallel_task_execution_policy operator()(threads::executor const& exec,
+            std::size_t chunk_size = 0) const
+        {
+            return parallel_task_execution_policy(exec, chunk_size);
+        }
+
+        /// Create a new parallel_task_execution_policy referencing a chunk size.
+        ///
+        /// \param chunk_size   [in] The chunk size controlling the number of
+        ///                     iterations scheduled to be executed on the same
+        ///                     HPX thread
+        ///
+        /// \returns The new parallel_task_execution_policy
+        ///
+        parallel_task_execution_policy operator()(std::size_t chunk_size) const
+        {
+            return parallel_task_execution_policy(chunk_size);
+        }
+
+        /// \cond NOINTERNAL
+        threads::executor get_executor() const { return exec_; }
+        std::size_t get_chunk_size() const { return chunk_size_; }
+        /// \endcond
+
+    private:
+        /// \cond NOINTERNAL
+        parallel_task_execution_policy(threads::executor const& exec,
+                std::size_t chunk_size)
+          : exec_(exec), chunk_size_(chunk_size)
+        {}
+
+        parallel_task_execution_policy(std::size_t chunk_size)
+          : exec_(), chunk_size_(chunk_size)
+        {}
+
+        threads::executor exec_;
+        std::size_t chunk_size_;
+        /// \endcond
+    };
+
+    /// Default parallel task execution policy object.
+    static parallel_task_execution_policy const par_task;
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \cond NOINTERNAL
+    struct task_execution_policy_tag {};
+    /// \endcond
+
+    /// The execution policy tag \a task can be used to create a execution
+    /// policy which forces the given algorithm to be executed in an
+    /// asynchronous way.
+    static task_execution_policy_tag const task;
+
+    ///////////////////////////////////////////////////////////////////////////
     /// The class parallel_execution_policy is an execution policy type used
     /// as a unique type to disambiguate parallel algorithm overloading and
     /// indicate that a parallel algorithm's execution may be parallelized.
@@ -67,6 +163,38 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return parallel_execution_policy(chunk_size);
         }
 
+        /// Create a new parallel_task_execution_policy referencing an executor
+        /// and a chunk size.
+        ///
+        /// \param exec         [in] The executor to use for the execution of
+        ///                     the parallel algorithm the returned execution
+        ///                     policy is used with
+        /// \param chunk_size   [in] The chunk size controlling the number of
+        ///                     iterations scheduled to be executed on the same
+        ///                     HPX thread
+        ///
+        /// \returns The new parallel_execution_policy
+        ///
+        parallel_task_execution_policy operator()(task_execution_policy_tag,
+            threads::executor const& exec, std::size_t chunk_size = 0) const
+        {
+            return par_task(exec, chunk_size);
+        }
+
+        /// Create a new parallel_execution_policy referencing a chunk size.
+        ///
+        /// \param chunk_size   [in] The chunk size controlling the number of
+        ///                     iterations scheduled to be executed on the same
+        ///                     HPX thread
+        ///
+        /// \returns The new parallel_execution_policy
+        ///
+        parallel_task_execution_policy operator()(task_execution_policy_tag,
+            std::size_t chunk_size = 0) const
+        {
+            return par_task(chunk_size);
+        }
+
         /// \cond NOINTERNAL
         threads::executor get_executor() const { return exec_; }
         std::size_t get_chunk_size() const { return chunk_size_; }
@@ -97,7 +225,29 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// require that a parallel algorithm's execution may not be parallelized.
     struct sequential_execution_policy
     {
+        /// \cond NOINTERNAL
         sequential_execution_policy() {}
+
+        static threads::executor get_executor() { return threads::executor(); }
+        static std::size_t get_chunk_size() { return 0; }
+        // \endcond
+
+        /// Create a new sequential_task_execution_policy referencing an executor
+        /// and a chunk size.
+        ///
+        /// \param exec         [in] The executor to use for the execution of
+        ///                     the parallel algorithm the returned execution
+        ///                     policy is used with
+        /// \param chunk_size   [in] The chunk size controlling the number of
+        ///                     iterations scheduled to be executed on the same
+        ///                     HPX thread
+        ///
+        /// \returns The new parallel_execution_policy
+        ///
+        sequential_task_execution_policy operator()(task_execution_policy_tag) const
+        {
+            return seq_task;
+        }
     };
 
     /// Default sequential execution policy object.
@@ -119,74 +269,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
     /// Default vector execution policy object.
     static parallel_vector_execution_policy const par_vec;
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// Extension: The class task_execution_policy is an execution policy type
-    /// used as a unique type to disambiguate parallel algorithm overloading
-    /// and indicate that a parallel algorithm's execution may be parallelized.
-    /// The algorithm returns a future representing the result of the
-    /// corresponding algorithm when invoked with the parallel_execution_policy.
-    struct task_execution_policy
-    {
-    public:
-        /// \cond NOINTERNAL
-        task_execution_policy() {}
-        /// \endcond
-
-        /// Create a new task_execution_policy referencing an executor and
-        /// a chunk size.
-        ///
-        /// \param exec         [in] The executor to use for the execution of
-        ///                     the parallel algorithm the returned execution
-        ///                     policy is used with
-        /// \param chunk_size   [in] The chunk size controlling the number of
-        ///                     iterations scheduled to be executed on the same
-        ///                     HPX thread
-        ///
-        /// \returns The new task_execution_policy
-        ///
-        task_execution_policy operator()(threads::executor const& exec,
-            std::size_t chunk_size = 0) const
-        {
-            return task_execution_policy(exec, chunk_size);
-        }
-
-        /// Create a new task_execution_policy referencing a chunk size.
-        ///
-        /// \param chunk_size   [in] The chunk size controlling the number of
-        ///                     iterations scheduled to be executed on the same
-        ///                     HPX thread
-        ///
-        /// \returns The new task_execution_policy
-        ///
-        task_execution_policy operator()(std::size_t chunk_size) const
-        {
-            return task_execution_policy(chunk_size);
-        }
-
-        /// \cond NOINTERNAL
-        threads::executor get_executor() const { return exec_; }
-        std::size_t get_chunk_size() const { return chunk_size_; }
-        /// \endcond
-
-    private:
-        /// \cond NOINTERNAL
-        task_execution_policy(threads::executor const& exec,
-                std::size_t chunk_size)
-          : exec_(exec), chunk_size_(chunk_size)
-        {}
-
-        task_execution_policy(std::size_t chunk_size)
-          : exec_(), chunk_size_(chunk_size)
-        {}
-
-        threads::executor exec_;
-        std::size_t chunk_size_;
-        /// \endcond
-    };
-
-    /// Default vector execution policy object.
-    static task_execution_policy const task;
 
     ///////////////////////////////////////////////////////////////////////////
     class execution_policy;
@@ -216,7 +298,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         // extension
         template <>
-        struct is_execution_policy<task_execution_policy>
+        struct is_execution_policy<sequential_task_execution_policy>
+          : boost::mpl::true_
+        {};
+
+        template <>
+        struct is_execution_policy<parallel_task_execution_policy>
           : boost::mpl::true_
         {};
 
@@ -263,7 +350,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {};
 
         template <>
-        struct is_parallel_execution_policy<task_execution_policy>
+        struct is_parallel_execution_policy<parallel_task_execution_policy>
           : boost::mpl::true_
         {};
         // \endcond
@@ -294,6 +381,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <typename T>
         struct is_sequential_execution_policy
           : boost::mpl::false_
+        {};
+
+        template <>
+        struct is_sequential_execution_policy<sequential_task_execution_policy>
+          : boost::mpl::true_
         {};
 
         template <>
@@ -455,23 +547,30 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             enum {
                 unknown = -1,
                 sequential = 0,
-                parallel = 1,
-                vector = 2,
-                task = 3
+                sequential_task = 1,
+                parallel = 2,
+                parallel_task = 3,
+                parallel_vector = 4
             };
         }
 
         inline int which(execution_policy const& policy)
         {
             std::type_info const& t = policy.type();
+
             if (t == typeid(parallel_execution_policy))
                 return execution_policy_enum::parallel;
+            if (t == typeid(parallel_task_execution_policy))
+                return execution_policy_enum::parallel_task;
+
             if (t == typeid(sequential_execution_policy))
                 return execution_policy_enum::sequential;
-            if (t == typeid(task_execution_policy))
-                return execution_policy_enum::task;
+            if (t == typeid(sequential_task_execution_policy))
+                return execution_policy_enum::sequential_task;
+
             if (t == typeid(parallel_vector_execution_policy))
-                return execution_policy_enum::vector;
+                return execution_policy_enum::parallel_vector;
+
             return execution_policy_enum::unknown;
         }
         /// \endcond

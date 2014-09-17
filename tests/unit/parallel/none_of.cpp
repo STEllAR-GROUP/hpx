@@ -43,7 +43,7 @@ void test_none_of(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_none_of(hpx::parallel::task_execution_policy, IteratorTag)
+void test_none_of(hpx::parallel::parallel_task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -54,7 +54,7 @@ void test_none_of(hpx::parallel::task_execution_policy, IteratorTag)
         std::vector<std::size_t> c = test::fill_all_any_none(10007, i);
 
         hpx::future<bool> f =
-            hpx::parallel::none_of(hpx::parallel::task,
+            hpx::parallel::none_of(hpx::parallel::par_task,
                 iterator(boost::begin(c)), iterator(boost::end(c)),
                 [](std::size_t v) {
                     return v != 0;
@@ -80,12 +80,12 @@ void test_none_of()
     test_none_of(seq, IteratorTag());
     test_none_of(par, IteratorTag());
     test_none_of(par_vec, IteratorTag());
-    test_none_of(task, IteratorTag());
+    test_none_of(par(task), IteratorTag());
 
     test_none_of(execution_policy(seq), IteratorTag());
     test_none_of(execution_policy(par), IteratorTag());
     test_none_of(execution_policy(par_vec), IteratorTag());
-    test_none_of(execution_policy(task), IteratorTag());
+    test_none_of(execution_policy(par(task)), IteratorTag());
 }
 
 // template <typename IteratorTag>
@@ -160,7 +160,7 @@ void test_none_of_exception(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_none_of_exception(hpx::parallel::task_execution_policy, IteratorTag)
+void test_none_of_exception(hpx::parallel::parallel_task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -173,7 +173,7 @@ void test_none_of_exception(hpx::parallel::task_execution_policy, IteratorTag)
         bool caught_exception = false;
         try {
             hpx::future<void> f =
-                hpx::parallel::none_of(hpx::parallel::task,
+                hpx::parallel::none_of(hpx::parallel::par_task,
                     iterator(boost::begin(c)), iterator(boost::end(c)),
                     [](std::size_t v) {
                         return throw std::runtime_error("test"), v != 0;
@@ -185,8 +185,8 @@ void test_none_of_exception(hpx::parallel::task_execution_policy, IteratorTag)
         catch(hpx::exception_list const& e) {
             caught_exception = true;
             test::test_num_exceptions<
-                hpx::parallel::task_execution_policy, IteratorTag
-            >::call(hpx::parallel::task, e);
+                hpx::parallel::parallel_task_execution_policy, IteratorTag
+            >::call(hpx::parallel::par(task), e);
         }
         catch(...) {
             HPX_TEST(false);
@@ -205,11 +205,11 @@ void test_none_of_exception()
     //  with a vector execution policy
     test_none_of_exception(seq, IteratorTag());
     test_none_of_exception(par, IteratorTag());
-    test_none_of_exception(task, IteratorTag());
+    test_none_of_exception(par(task), IteratorTag());
 
     test_none_of_exception(execution_policy(seq), IteratorTag());
     test_none_of_exception(execution_policy(par), IteratorTag());
-    test_none_of_exception(execution_policy(task), IteratorTag());
+    test_none_of_exception(execution_policy(par(task)), IteratorTag());
 }
 
 void none_of_exception_test()
@@ -255,7 +255,7 @@ void test_none_of_bad_alloc(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_none_of_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
+void test_none_of_bad_alloc(hpx::parallel::parallel_task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -268,7 +268,7 @@ void test_none_of_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
         bool caught_exception = false;
         try {
             hpx::future<void> f =
-                hpx::parallel::none_of(hpx::parallel::task,
+                hpx::parallel::none_of(hpx::parallel::par_task,
                     iterator(boost::begin(c)), iterator(boost::end(c)),
                     [](std::size_t v) {
                         return throw std::bad_alloc(), v != 0;
@@ -297,11 +297,11 @@ void test_none_of_bad_alloc()
     //  with a vector execution policy
     test_none_of_bad_alloc(seq, IteratorTag());
     test_none_of_bad_alloc(par, IteratorTag());
-    test_none_of_bad_alloc(task, IteratorTag());
+    test_none_of_bad_alloc(par(task), IteratorTag());
 
     test_none_of_bad_alloc(execution_policy(seq), IteratorTag());
     test_none_of_bad_alloc(execution_policy(par), IteratorTag());
-    test_none_of_bad_alloc(execution_policy(task), IteratorTag());
+    test_none_of_bad_alloc(execution_policy(par(task)), IteratorTag());
 }
 
 void none_of_bad_alloc_test()

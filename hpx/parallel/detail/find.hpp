@@ -112,12 +112,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The comparison operations in the parallel \a find algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a find algorithm returns a \a hpx::future<InIter> if the
-    ///           execution policy is of type \a task_execution_policy and
+    ///           execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a InIter otherwise.
     ///           The \a find algorithm returns the first element in the range
     ///           [first,last) that is equal to \a val.
@@ -250,12 +252,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The comparison operations in the parallel \a find_if algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a find_if algorithm returns a \a hpx::future<InIter> if the
-    ///           execution policy is of type \a task_execution_policy and
+    ///           execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a InIter otherwise.
     ///           The \a find_if algorithm returns the first element in the range
     ///           [first,last) that satisfies the predicate \a f.
@@ -393,12 +397,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The comparison operations in the parallel \a find_if_not algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a find_if_not algorithm returns a \a hpx::future<InIter> if the
-    ///           execution policy is of type \a task_execution_policy and
+    ///           execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a InIter otherwise.
     ///           The \a find_if_not algorithm returns the first element in the range
     ///           [first, last) that does \b not satisfy the predicate \a f.
@@ -560,12 +566,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The comparison operations in the parallel \a find_end algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a find_end algorithm returns a \a hpx::future<FwdIter> if the
-    ///           execution policy is of type \a task_execution_policy and
+    ///           execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a FwdIter otherwise.
     ///           The \a find_end algorithm returns an iterator to the beginning of
     ///           the last subsequence [first2, last2) in range [first, last).
@@ -661,12 +669,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The comparison operations in the parallel \a find_end algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a find_end algorithm returns a \a hpx::future<FwdIter> if the
-    ///           execution policy is of type \a task_execution_policy and
+    ///           execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a FwdIter otherwise.
     ///           The \a find_end algorithm returns an iterator to the beginning of
     ///           the last subsequence [first2, last2) in range [first, last).
@@ -832,12 +842,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The comparison operations in the parallel \a find_first_of algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a find_first_of algorithm returns a \a hpx::future<InIter> if the
-    ///           execution policy is of type \a task_execution_policy and
+    ///           execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a InIter otherwise.
     ///           The \a find_first_of algorithm returns an iterator to the beginning of
     ///           the last subsequence [s_first, s_last) in range [first, last).
@@ -935,12 +947,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The comparison operations in the parallel \a find_first_of algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a find_first_of algorithm returns a \a hpx::future<InIter> if the
-    ///           execution policy is of type \a task_execution_policy and
+    ///           execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a InIter otherwise.
     ///           The \a find_first_of algorithm returns an iterator to the beginning of
     ///           the last subsequence [s_first, s_last) in range [first, last).
@@ -1083,12 +1097,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The comparison operations in the parallel \a adjacent_find algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a adjacent_find algorithm returns a \a hpx::future<FwdIter> if the
-    ///           execution policy is of type \a task_execution_policy and
+    ///           execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a FwdIter otherwise.
     ///           The \a adjacent_find algorithm returns an iterator to first of the
     ///           identical elements. If no such elements are found,\a last is returned
@@ -1162,12 +1178,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The comparison operations in the parallel \a adjacent_find invoked
     /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a adjacent_find algorithm returns a \a hpx::future<InIter> if the
-    ///           execution policy is of type \a task_execution_policy and
+    ///           execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a InIter otherwise.
     ///           The \a adjacent_find algorithm returns an iterator to the first of the
     ///           identical elements. If no such elements are found, \a last is returned.
