@@ -16,6 +16,7 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
@@ -699,6 +700,19 @@ namespace hpx { namespace parcelset
         boost::system::error_code const& ec, parcel const& p)
     {
         if (ec) {
+            // If we are in a stopped state, ignore some errors
+            runtime::state state = get_runtime().get_state();
+            if(state == runtime::state_stopped || state == runtime::state_shutdown)
+            {
+                if (ec == boost::asio::error::connection_aborted ||
+                    ec == boost::asio::error::broken_pipe ||
+                    ec == boost::asio::error::not_connected ||
+                    ec == boost::asio::error::eof)
+                {
+                    return;
+                }
+            }
+
             boost::exception_ptr exception =
                 hpx::detail::get_exception(hpx::exception(ec),
                     "parcelhandler::default_write_handler", __FILE__,

@@ -1109,6 +1109,14 @@ namespace hpx
         return false;
     }
 
+    bool is_stopped()
+    {
+        runtime* rt = get_runtime_ptr();
+        if (NULL != rt)
+            return rt->get_state() == runtime::state_stopped;
+        return false;
+    }
+
     bool is_starting()
     {
         runtime* rt = get_runtime_ptr();

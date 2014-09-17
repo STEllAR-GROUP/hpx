@@ -22,6 +22,7 @@
 namespace hpx
 {
     bool is_starting();
+    bool is_stopped();
 }
 
 namespace hpx { namespace parcelset
@@ -534,6 +535,8 @@ namespace hpx { namespace parcelset
 
         bool trigger_pending_work()
         {
+            if(hpx::is_stopped()) return true;
+
             std::vector<naming::locality> destinations;
             destinations.reserve(parcel_destinations_.size());
 
@@ -565,7 +568,7 @@ namespace hpx { namespace parcelset
             naming::locality const& locality_id, bool background = false)
         {
             // repeat until no more parcels are to be sent
-            while (true)
+            while (!hpx::is_stopped())
             {
                 std::vector<parcel> parcels;
                 std::vector<write_handler_type> handlers;
@@ -686,6 +689,9 @@ namespace hpx { namespace parcelset
             std::vector<parcel>&& parcels,
             std::vector<write_handler_type>&& handlers)
         {
+            // If we are stopped already, discard the remaining pending parcels
+            if(hpx::is_stopped()) return;
+
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
             sender_connection->set_state(parcelport_connection::state_send_pending);
 #endif
