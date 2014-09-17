@@ -379,12 +379,12 @@ void move_bad_alloc_test()
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
-	unsigned int seed = (unsigned int)std::time(0);
-	if (vm.count("seed"))
-		seed = vm["seed"].as<unsigned int>();
+    unsigned int seed = (unsigned int)std::time(0);
+    if (vm.count("seed"))
+        seed = vm["seed"].as<unsigned int>();
 
-	std::cout << "using seed: " << seed << std::endl;
-	std::srand(seed);
+    std::cout << "using seed: " << seed << std::endl;
+    std::srand(seed);
 
     move_test();
     move_exception_test();
