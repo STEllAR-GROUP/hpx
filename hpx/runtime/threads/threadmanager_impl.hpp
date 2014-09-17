@@ -10,22 +10,22 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/exception.hpp>
+#include <hpx/state.hpp>
+#include <hpx/performance_counters/counters.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/util/block_profiler.hpp>
+#include <hpx/util/io_service_pool.hpp>
+#include <hpx/util/spinlock.hpp>
+
+#include <hpx/config/warnings_prefix.hpp>
+
 #include <boost/atomic.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
-
-#include <hpx/exception.hpp>
-#include <hpx/state.hpp>
-#include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/performance_counters/counters.hpp>
-#include <hpx/util/io_service_pool.hpp>
-#include <hpx/util/block_profiler.hpp>
-#include <hpx/util/spinlock.hpp>
-
-#include <hpx/config/warnings_prefix.hpp>
 
 #include <vector>
 #include <memory>
@@ -44,13 +44,6 @@ namespace hpx { namespace threads
         // we use a simple mutex to protect the data members of the
         // threadmanager for now
         typedef boost::mutex mutex_type;
-
-        // we use the boost::posix_time::ptime type for time representation
-        typedef typename threadmanager_base::time_type time_type;
-
-        // we use the boost::posix_time::time_duration type as the duration
-        // representation
-        typedef typename threadmanager_base::duration_type duration_type;
 
     public:
         typedef SchedulingPolicy scheduling_policy_type;
@@ -361,7 +354,8 @@ namespace hpx { namespace threads
         ///                   executed if the parameter \a new_state is pending.
         ///
         /// \returns
-        thread_id_type set_state (time_type const& expire_at,
+        thread_id_type set_state(
+            util::steady_time_point const& abs_time,
             thread_id_type const& id, thread_state_enum newstate = pending,
             thread_state_ex_enum newstate_ex = wait_timeout,
             thread_priority priority = thread_priority_default,
@@ -384,11 +378,16 @@ namespace hpx { namespace threads
         ///                   executed if the parameter \a new_state is pending.
         ///
         /// \returns
-        thread_id_type set_state (duration_type const& expire_from_now,
+        thread_id_type set_state(
+            util::steady_duration const& rel_time,
             thread_id_type const& id, thread_state_enum newstate = pending,
             thread_state_ex_enum newstate_ex = wait_timeout,
             thread_priority priority = thread_priority_default,
-            error_code& ec = throws);
+            error_code& ec = throws)
+        {
+            return set_state(rel_time.from_now(), id, newstate, newstate_ex,
+                priority, ec);
+        }
 
         /// The get_description function is part of the thread related API and
         /// allows to query the description of one of the threads known to the

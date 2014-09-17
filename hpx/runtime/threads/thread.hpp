@@ -211,23 +211,15 @@ namespace hpx
 
         HPX_API_EXPORT void interrupt();
 
-        HPX_API_EXPORT void sleep_until(boost::posix_time::ptime const& at);
-        HPX_API_EXPORT void sleep_for(boost::posix_time::time_duration const& p);
+        HPX_API_EXPORT void sleep_until(util::steady_time_point const& abs_time);
+
+        inline void sleep_for(util::steady_duration const& rel_time)
+        {
+            sleep_until(rel_time.from_now());
+        }
 
         HPX_API_EXPORT std::size_t get_thread_data();
         HPX_API_EXPORT std::size_t set_thread_data(std::size_t);
-
-        template <typename Clock, typename Duration>
-        void sleep_until(boost::chrono::time_point<Clock, Duration> const& at)
-        {
-            sleep_until(util::to_ptime(at));
-        }
-
-        template <typename Rep, typename Period>
-        void sleep_for(boost::chrono::duration<Rep, Period> const& p)
-        {
-            sleep_for(util::to_time_duration(p));
-        }
 
         class HPX_EXPORT disable_interruption
         {

@@ -123,17 +123,34 @@ namespace hpx { namespace threads
             // Schedule given function for execution in this executor no sooner
             // than time abs_time. This call never blocks, and may violate
             // bounds on the executor's queue size.
-            virtual void add_at(boost::posix_time::ptime const& abs_time,
+            virtual void add_at(
+                boost::chrono::steady_clock::time_point const& abs_time,
                 closure_type && f, char const* desc,
                 threads::thread_stacksize stacksize, error_code& ec) = 0;
+
+            void add_at(util::steady_time_point const& abs_time,
+                closure_type && f, char const* desc,
+                threads::thread_stacksize stacksize, error_code& ec)
+            {
+                return add_at(abs_time.value(), std::move(f), desc,
+                    stacksize, ec);
+            }
 
             // Schedule given function for execution in this executor no sooner
             // than time rel_time from now. This call never blocks, and may
             // violate bounds on the executor's queue size.
             virtual void add_after(
-                boost::posix_time::time_duration const& rel_time,
+                boost::chrono::steady_clock::duration const& rel_time,
                 closure_type && f, char const* desc,
                 threads::thread_stacksize stacksize, error_code& ec) = 0;
+
+            void add_after(util::steady_duration const& rel_time,
+                closure_type && f, char const* desc,
+                threads::thread_stacksize stacksize, error_code& ec)
+            {
+                return add_after(rel_time.value(), std::move(f), desc,
+                    stacksize, ec);
+            }
         };
     }
 
@@ -199,9 +216,9 @@ namespace hpx { namespace threads
     //      class scheduled_executor : public executor
     //      {
     //      public:
-    //          virtual void add_at(chrono::system_clock::time_point abs_time,
+    //          virtual void add_at(chrono::steady_clock::time_point abs_time,
     //              function<void()> closure) = 0;
-    //          virtual void add_after(chrono::system_clock::duration rel_time,
+    //          virtual void add_after(chrono::steady_clock::duration rel_time,
     //              function<void()> closure) = 0;
     //      };
     //
@@ -228,7 +245,8 @@ namespace hpx { namespace threads
         /// variables.
         /// Error conditions: If invoking closure throws an exception, the
         /// executor shall call terminate.
-        void add_at(boost::posix_time::ptime const& abs_time,
+        void add_at(
+            boost::chrono::steady_clock::time_point const& abs_time,
             closure_type f, char const* desc = "",
             threads::thread_stacksize stacksize = threads::thread_stacksize_default,
             error_code& ec = throws)
@@ -237,15 +255,12 @@ namespace hpx { namespace threads
                 executor_data_)->add_at(abs_time, std::move(f), desc, stacksize, ec);
         }
 
-        template <typename Clock, typename Duration>
-        void add_at(boost::chrono::time_point<Clock, Duration> const& abs_time,
-            closure_type f, char const* desc = "",
-            threads::thread_stacksize stacksize = threads::thread_stacksize_default,
-            error_code& ec = throws)
+        void add_at(util::steady_time_point const& abs_time,
+            closure_type && f, char const* desc,
+            threads::thread_stacksize stacksize, error_code& ec)
         {
-            boost::static_pointer_cast<detail::scheduled_executor_base>(
-                executor_data_)->add_at(util::to_ptime(abs_time),
-                    std::move(f), desc, stacksize);
+            return add_at(abs_time.value(), std::move(f), desc,
+                stacksize, ec);
         }
 
         /// Effects: The specified function object shall be scheduled for
@@ -257,7 +272,7 @@ namespace hpx { namespace threads
         /// Error conditions: If invoking closure throws an exception, the
         /// executor shall call terminate.
         void add_after(
-            boost::posix_time::time_duration const& rel_time,
+            boost::chrono::steady_clock::duration const& rel_time,
             closure_type f, char const* desc = "",
             threads::thread_stacksize stacksize = threads::thread_stacksize_default,
             error_code& ec = throws)
@@ -266,15 +281,12 @@ namespace hpx { namespace threads
                 executor_data_)->add_after(rel_time, std::move(f), desc, stacksize, ec);
         }
 
-        template <typename Rep, typename Period>
-        void add_after(boost::chrono::duration<Rep, Period> const& rel_time,
-            closure_type f, char const* desc = "",
-            threads::thread_stacksize stacksize = threads::thread_stacksize_default,
-            error_code& ec = throws)
+        void add_after(util::steady_duration const& rel_time,
+            closure_type && f, char const* desc,
+            threads::thread_stacksize stacksize, error_code& ec)
         {
-            boost::static_pointer_cast<detail::scheduled_executor_base>(
-                executor_data_)->add_after(util::to_time_duration(rel_time),
-                    std::move(f), desc, stacksize, ec);
+            return add_after(rel_time.value(), std::move(f), desc,
+                stacksize, ec);
         }
 
         /// Return a reference to the default executor for this process.

@@ -12,13 +12,11 @@
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/scoped_unlock.hpp>
 
-#include <boost/chrono/time_point.hpp>
-#include <boost/chrono/duration.hpp>
-#include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/intrusive/slist.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/thread/locks.hpp>
@@ -106,7 +104,7 @@ namespace hpx { namespace lcos { namespace local
             return try_lock("mutex::try_lock", ec);
         }
 
-        bool try_lock_until(boost::posix_time::ptime const& abs_time,
+        bool try_lock_until(util::steady_time_point const& abs_time,
             char const* description, error_code& ec = throws)
         {
             HPX_ASSERT(threads::get_self_ptr() != 0);
@@ -134,80 +132,22 @@ namespace hpx { namespace lcos { namespace local
             return true;
         }
 
-        template <typename Clock, typename Duration>
-        bool try_lock_until(
-            boost::chrono::time_point<Clock, Duration> const& abs_time,
-            char const* description, error_code& ec = throws)
-        {
-            return try_lock_until(util::to_ptime(abs_time), description, ec);
-        }
-
-        bool try_lock_until(
-            boost::posix_time::ptime const& abs_time,
+        bool try_lock_until(util::steady_time_point const& abs_time,
             error_code& ec = throws)
         {
             return try_lock_until(abs_time, "mutex::try_lock_until", ec);
         }
 
-        template <typename Clock, typename Duration>
-        bool try_lock_until(
-            boost::chrono::time_point<Clock, Duration> const& abs_time,
-            error_code& ec = throws)
-        {
-            return try_lock_until(util::to_ptime(abs_time), ec);
-        }
-
-        bool try_lock_for(
-            boost::posix_time::time_duration const& rel_time,
+        bool try_lock_for(util::steady_duration const& rel_time,
             char const* description, error_code& ec = throws)
         {
-            HPX_ASSERT(threads::get_self_ptr() != 0);
-
-            HPX_ITT_SYNC_PREPARE(this);
-            mutex_type::scoped_lock l(mtx_);
-
-            threads::thread_id_repr_type self_id = threads::get_self_id().get();
-            if (owner_id_ != threads::invalid_thread_id_repr)
-            {
-                threads::thread_state_ex_enum const reason =
-                    cond_.wait_for(l, rel_time, ec);
-                if (ec) { HPX_ITT_SYNC_CANCEL(this); return false; }
-
-                if (reason == threads::wait_signaled) //-V110
-                {
-                    HPX_ITT_SYNC_CANCEL(this);
-                    return false;
-                }
-            }
-
-            util::register_lock(this);
-            HPX_ITT_SYNC_ACQUIRED(this);
-            owner_id_ = self_id;
-            return true;
+            return try_lock_until(rel_time.from_now(), description, ec);
         }
 
-        template <typename Rep, typename Period>
-        bool try_lock_for(
-            boost::chrono::duration<Rep, Period> const& rel_time,
-            char const* description, error_code& ec = throws)
-        {
-            return try_lock_for(util::to_time_duration(rel_time),
-                description, ec);
-        }
-
-        bool try_lock_for(
-            boost::posix_time::time_duration const& rel_time,
+        bool try_lock_for(util::steady_duration const& rel_time,
             error_code& ec = throws)
         {
             return try_lock_for(rel_time, "mutex::try_lock_for", ec);
-        }
-
-        template <typename Rep, typename Period>
-        bool try_lock_for(
-            boost::chrono::duration<Rep, Period> const& rel_time,
-            error_code& ec = throws)
-        {
-            return try_lock_for(util::to_time_duration(rel_time), ec);
         }
 
         void unlock(error_code& ec = throws)

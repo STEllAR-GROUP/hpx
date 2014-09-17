@@ -17,7 +17,7 @@
 #include <boost/mpl/bool.hpp>
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
-#include <boost/asio/deadline_timer.hpp>
+#include <boost/asio/basic_deadline_timer.hpp>
 
 namespace hpx { namespace threads { namespace detail
 {
@@ -37,9 +37,14 @@ namespace hpx { namespace threads { namespace detail
         if (global_state.load() == running)
         {
             // create timer firing in correspondence with given time
-            boost::asio::deadline_timer t (
+            typedef boost::asio::basic_deadline_timer<
+                boost::chrono::steady_clock
+              , util::chrono_traits<boost::chrono::steady_clock>
+            > deadline_timer;
+
+            deadline_timer t(
                 get_thread_pool("timer-thread")->get_io_service(),
-                boost::posix_time::milliseconds(1000));
+                boost::chrono::milliseconds(1000));
 
             void (*handler)(SchedulingPolicy&, boost::atomic<hpx::state>&, boost::mpl::true_) =
                 &periodic_maintenance_handler<SchedulingPolicy>;
@@ -61,12 +66,15 @@ namespace hpx { namespace threads { namespace detail
     {
         scheduler.periodic_maintenance(global_state == running);
 
-        boost::posix_time::milliseconds expire(1000);
-
         // create timer firing in correspondence with given time
-        boost::asio::deadline_timer t (
+        typedef boost::asio::basic_deadline_timer<
+            boost::chrono::steady_clock
+          , util::chrono_traits<boost::chrono::steady_clock>
+        > deadline_timer;
+
+        deadline_timer t (
             get_thread_pool("io-thread")->get_io_service(),
-            boost::posix_time::milliseconds(1000));
+            boost::chrono::milliseconds(1000));
 
         void (*handler)(SchedulingPolicy&, boost::atomic<hpx::state>&, boost::mpl::true_) =
             &periodic_maintenance_handler<SchedulingPolicy>;
