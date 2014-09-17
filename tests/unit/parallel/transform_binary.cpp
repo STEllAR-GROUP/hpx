@@ -317,12 +317,12 @@ void transform_binary_bad_alloc_test()
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-	unsigned int seed = (unsigned int)std::time(0);
-	if (vm.count("seed"))
-		seed = vm["seed"].as<unsigned int>();
+    unsigned int seed = (unsigned int)std::time(0);
+    if (vm.count("seed"))
+        seed = vm["seed"].as<unsigned int>();
 
-	std::cout << "using seed: " << seed << std::endl;
-	std::srand(seed);
+    std::cout << "using seed: " << seed << std::endl;
+    std::srand(seed);
 
     transform_binary_test();
     transform_binary_exception_test();
