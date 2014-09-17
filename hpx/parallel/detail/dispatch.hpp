@@ -76,11 +76,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 
         typename Derived::result_type operator()() const
         {
-            return hpx::util::void_guard<result_type>(),
-                hpx::util::invoke_fused(Derived(), std::move(t_));
+            return hpx::util::invoke_fused_r<result_type>(
+                Derived(), std::move(t_));
         }
 
-        Tuple t_;
+        typename hpx::util::tuple_decay<Tuple>::type t_;
     };
 
     template <typename Derived, typename Tuple>
