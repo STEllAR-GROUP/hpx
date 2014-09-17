@@ -16,7 +16,6 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
@@ -40,6 +39,11 @@
 #include <boost/foreach.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
+namespace hpx
+{
+    bool is_stopped_or_shutting_down();
+}
+
 namespace hpx { namespace detail
 {
     void dijkstra_make_black();     // forward declaration only
@@ -701,8 +705,7 @@ namespace hpx { namespace parcelset
     {
         if (ec) {
             // If we are in a stopped state, ignore some errors
-            runtime::state state = get_runtime().get_state();
-            if(state == runtime::state_stopped || state == runtime::state_shutdown)
+            if (hpx::is_stopped_or_shutting_down())
             {
                 if (ec == boost::asio::error::connection_aborted ||
                     ec == boost::asio::error::broken_pipe ||

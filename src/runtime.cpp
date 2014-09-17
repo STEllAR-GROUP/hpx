@@ -1114,7 +1114,18 @@ namespace hpx
         runtime* rt = get_runtime_ptr();
         if (NULL != rt)
             return rt->get_state() == runtime::state_stopped;
-        return false;
+        return true;        // assume stopped
+    }
+
+    bool is_stopped_or_shutting_down()
+    {
+        runtime* rt = get_runtime_ptr();
+        if (NULL != rt)
+        {
+            runtime::state state = rt->get_state();
+            return state == runtime::state_stopped || state == runtime::state_shutdown;
+        }
+        return true;        // assume stopped
     }
 
     bool is_starting()
