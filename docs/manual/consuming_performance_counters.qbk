@@ -233,8 +233,8 @@ functionality related to a performance counter, like `start`, `stop`, or
 `reset`) member functions of the created client component instance should be
 called:
 
-    // print the current number of threads created on locality `0`
-    hpx::performance_counters::performance_counter counter(
+    // print the current number of threads created on locality 0
+    hpx::performance_counters::performance_counter count(
         "/threads{locality#0/total}/count/cumulative");
     hpx::cout << count.get_value<int>() << hpx::endl;
 
