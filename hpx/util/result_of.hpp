@@ -54,7 +54,7 @@ namespace hpx { namespace util
           , typename boost::enable_if<
                 boost::is_reference_wrapper<typename util::decay<Q>::type> >::type
         > : get_member_pointer_object<T
-              , typename boost::unwrap_reference<typename util::decay<Q>::type>::type&>
+              , typename util::detail::decay_unwrap<Q>::type&>
         {};
 
         template <typename T, typename C>

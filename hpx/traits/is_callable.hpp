@@ -321,9 +321,7 @@ namespace hpx { namespace traits
                 >::value
             >::type
         > : is_callable_impl<
-                typename boost::unwrap_reference<
-                    typename util::decay<F>::type
-                >::type&(A...)
+                typename util::detail::decay_unwrap<F>::type&(A...)
             >
         {};
     }
