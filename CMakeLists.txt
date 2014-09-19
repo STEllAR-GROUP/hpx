@@ -152,7 +152,7 @@ endif()
 
 ################################################################################
 
-hpx_option(HPX_BUILD_EXAMPLES BOOL "Build the HPX examples (default OFF)" OFF CATEGORY "Build Targets")
+hpx_option(HPX_BUILD_EXAMPLES BOOL "Build the HPX examples (default OFF)" ON CATEGORY "Build Targets")
 hpx_option(HPX_BUILD_TESTS BOOL "Build the HPX tests (default ON)" ON CATEGORY "Build Targets")
 hpx_option(HPX_BUILD_TESTS_BENCHMARKS BOOL "Build HPX benchmark tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_BUILD_TESTS_REGRESSIONS BOOL "Build HPX regression tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
@@ -162,6 +162,7 @@ hpx_option(HPX_BUILD_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED CA
 hpx_option(HPX_BUILD_RUNTIME BOOL "Build HPX runtime (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 
 hpx_option(HPX_FULL_RPATH BOOL "Build and link HPX libraries and executables with full RPATHs (default: ON)" ON ADVANCED)
+hpx_option(HPX_BUILD_WITH_INSTALL_PREFIX BOOL "Always set the HPX_PREFIX default to the install directory (default: OFF)" OFF ADVANCED)
 
 ################################################################################
 # Native TLS configuration
@@ -1221,8 +1222,21 @@ foreach(def ${HPX_CONFIG_DEFINITIONS_VAR})
   set(hpx_config_defines "${hpx_config_defines}#define ${def} ${${def}_define}\n")#"
 endforeach()
 
+# Generate a defines.hpp to be used in the build directory ...
+if(HPX_BUILD_WITH_INSTALL_PREFIX)
+  set(HPX_DEFINES_PREFIX ${HPX_BUILD_PREFIX})
+else()
+  set(HPX_DEFINES_PREFIX ${HPX_BUILD_PREFIX})
+endif()
 configure_file("${hpx_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
                "${CMAKE_BINARY_DIR}/hpx/config/defines.hpp"
+               @ONLY)
+
+# Generate a defines.hpp to be used in the install directory ...
+set(HPX_DEFINES_PREFIX ${HPX_PREFIX})
+
+configure_file("${hpx_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
+               "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx/config/defines.hpp"
                @ONLY)
 
 # Configure hpxrun.py
@@ -1245,7 +1259,7 @@ install( # install all hpx header files
 # Install all HPX header that have been configured using various
 # cmake options
 install(
-  DIRECTORY "${CMAKE_BINARY_DIR}/hpx/"
+  DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx/"
   DESTINATION include/hpx
   COMPONENT core
   FILES_MATCHING PATTERN "*.hpp"
