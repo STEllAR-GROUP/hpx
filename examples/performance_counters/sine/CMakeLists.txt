@@ -11,7 +11,8 @@ add_hpx_component(sine
   FOLDER "Examples/PerformanceCounters/Sine"
   HEADER_GLOB "${root}/*.h*"
   SOURCE_GLOB "${root}/sine.c*"
-  AUTOGLOB)
+  AUTOGLOB
+  PLUGIN)
 
 ###############################################################################
 # add example executable
