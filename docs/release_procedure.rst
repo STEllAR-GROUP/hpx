@@ -42,11 +42,11 @@ the lines as they are completed to avoid confusion.
     changed, and correct any typos. Pay special attention to:
 
     *   ``$HPX_SOURCE/README.rst`` 
-    *   Update grant information
+         *   Update grant information
     *   ``docs/whats_new.qbk``
     *   ``docs/people.qbk``
-    *   Update collaborators
-    *   Update grant information
+         *   Update collaborators
+         *   Update grant information
 
 #.  If there have been any commits to the release branch since the last release
     create a tag from the old release branch before deleting the old release
@@ -62,13 +62,17 @@ the lines as they are completed to avoid confusion.
     *   ``docs/hpx.qbk``
     *   ``CMakeLists.txt``
 
-#.  Create new logos for documentation. Update the logo size accordingly in
-    ``docs/cmakelist.txt`` lines 124/125, remove '_draft' suffix in logo file
-    name in ``docs/cmakelist.txt`` line 111.
+#.  Create new logos for documentation. Update the logo used on line 143 
+    (add '_draft') and change the size accordingly in ``docs/cmakelist.txt`` 
+    lines 234/235.
 
 #.  Checkout the release branch, and remove the ``-trunk`` tag from
     ``hpx/version.hpp`` (replace it with ``-rc1`` for the release candidate
     and later with an empty string for the actual release).
+    
+#.  Change logo for release documentation by removing '_draft' suffix 
+    in ``docs/cmakelist.txt`` on line 143. Update logo size accordingly on
+    lines 234/235.
 
 #.  Remove the examples and benchmarks that will not go into the release from
     the release branch.
