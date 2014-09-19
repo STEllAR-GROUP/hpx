@@ -3,43 +3,79 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PERFORMANCE_COUNTERS_PERFORMANCE_COUNTER_JAN_18_20013_0939AM)
-#define HPX_PERFORMANCE_COUNTERS_PERFORMANCE_COUNTER_JAN_18_20013_0939AM
+#if !defined(HPX_PERFORMANCE_COUNTERS_PERFORMANCE_COUNTER_JAN_18_2013_0939AM)
+#define HPX_PERFORMANCE_COUNTERS_PERFORMANCE_COUNTER_JAN_18_2013_0939AM
 
 #include <hpx/hpx_fwd.hpp>
+
+#include <hpx/lcos/future.hpp>
+#include <hpx/runtime/components/client_base.hpp>
+
 #include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/stubs/performance_counter.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters
 {
-    //[performance_counter_interface
-    // Abstract base interface for all Performance Counters.
-    struct performance_counter
+    ///////////////////////////////////////////////////////////////////////////
+    struct HPX_EXPORT performance_counter
+      : components::client_base<performance_counter, stubs::performance_counter>
     {
-        //<-
-        /// Destructor, needs to be virtual to allow for clean destruction of
-        /// derived objects
-        virtual ~performance_counter() {}
-        //->
-        // Retrieve the descriptive information about the Performance Counter.
-        virtual counter_info get_counter_info() const = 0;
+        typedef components::client_base<
+            performance_counter, stubs::performance_counter
+        > base_type;
 
-        // Retrieve the current Performance Counter value.
-        virtual counter_value get_counter_value(bool reset = false) = 0;
+        performance_counter() {}
 
-        // Reset the Performance Counter (value).
-        virtual void reset_counter_value() = 0;
+        performance_counter(std::string const& name);
 
-        // Set the (initial) value of the Performance Counter.
-        virtual void set_counter_value(counter_value const& /*value*/) = 0;
+        performance_counter(future<id_type> && id)
+          : base_type(std::move(id))
+        {}
 
-        // Start the Performance Counter.
-        virtual bool start() = 0;
+        performance_counter(hpx::future<performance_counter> && c)
+          : base_type(std::move(c))
+        {}
 
-        // Stop the Performance Counter.
-        virtual bool stop() = 0;
+        ///////////////////////////////////////////////////////////////////////
+        future<counter_info> get_info() const;
+        counter_info get_info_sync(error_code& ec = throws);
+
+        future<counter_value> get_counter_value(bool reset = false);
+        counter_value get_counter_value_sync(bool reset = false,
+            error_code& ec = throws);
+
+        ///////////////////////////////////////////////////////////////////////
+        future<bool> start();
+        bool start_sync(error_code& ec = throws);
+
+        future<bool> stop();
+        bool stop_sync(error_code& ec = throws);
+
+        future<void> reset();
+        void reset_sync(error_code& ec = throws);
+
+    private:
+        template <typename T>
+        static T extract_value(future<counter_value> && value, error_code& ec)
+        {
+            return value.get().get_value<T>(ec);
+        }
+
+    public:
+        template <typename T>
+        future<T> get_value(bool reset = false, error_code& ec = throws)
+        {
+            return get_counter_value(reset).then(
+                util::bind(&performance_counter::extract_value<T>,
+                    util::placeholders::_1, boost::ref(ec)));
+        }
+        template <typename T>
+        T get_value_sync(bool reset = false, error_code& ec = throws)
+        {
+            return get_counter_value_sync(reset).get_value<T>(ec);
+        }
     };
-    //]
 }}
 
 #endif

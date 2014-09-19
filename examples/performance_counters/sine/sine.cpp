@@ -188,7 +188,7 @@ namespace performance_counters { namespace sine
     ///////////////////////////////////////////////////////////////////////////
     // This function will be registered as a startup function for HPX below.
     //
-    // That means it will be executed in a px-thread before hpx_main, but after
+    // That means it will be executed in a HPX-thread before hpx_main, but after
     // the runtime has been initialized and started.
     void startup()
     {
@@ -257,7 +257,7 @@ namespace performance_counters { namespace sine
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-// Register a startup function which will be called as a px-thread during
+// Register a startup function which will be called as a HPX-thread during
 // runtime startup. We use this function to register our performance counter
 // type and performance counter instances.
 //

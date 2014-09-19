@@ -49,27 +49,27 @@
 ///////////////////////////////////////////////////////////////////////////////
 int monitor(boost::uint64_t pause, boost::uint64_t values)
 {
-    // Resolve the GID of the performances counter using it's symbolic name.
+    // Create the performances counters using their symbolic name.
     boost::uint32_t const prefix = hpx::get_locality_id();
-    boost::format sine_explicit("/sine{locality#%d/instance#%d}/immediate/explicit");
-    boost::format sine_implicit("/sine{locality#%d/total}/immediate/implicit");
-    boost::format sine_average("/statistics{/sine{locality#%d/instance#%d}/immediate/explicit}/average@100");
+    boost::format sine_explicit_fmt(
+        "/sine{locality#%d/instance#%d}/immediate/explicit");
+    boost::format sine_implicit_fmt(
+        "/sine{locality#%d/total}/immediate/implicit");
+    boost::format sine_average_fmt(
+        "/statistics{/sine{locality#%d/instance#%d}/immediate/explicit}/average@100");
 
-    using hpx::naming::id_type;
-    using hpx::performance_counters::get_counter;
+    using hpx::performance_counters::performance_counter;
 
-    id_type id1 = get_counter(boost::str(sine_explicit % prefix % 0));
-    id_type id2 = get_counter(boost::str(sine_implicit % prefix));
-    id_type id3 = get_counter(boost::str(sine_average % prefix % 1));
-
-    using hpx::performance_counters::stubs::performance_counter;
+    performance_counter sine_explicit(boost::str(sine_explicit_fmt % prefix % 0));
+    performance_counter sine_implicit(boost::str(sine_implicit_fmt % prefix));
+    performance_counter sine_average(boost::str(sine_average_fmt % prefix % 1));
 
     // We need to explicitly start all counters before we can use them. For
     // certain counters this could be a no-op, in which case start will return
     // 'false'.
-    performance_counter::start(id1);
-    performance_counter::start(id2);
-    performance_counter::start(id3);
+    sine_explicit.start();
+    sine_implicit.start();
+    sine_average.start();
 
     // retrieve the counter values
     boost::uint64_t start_time = 0;
@@ -80,9 +80,10 @@ int monitor(boost::uint64_t pause, boost::uint64_t values)
         using hpx::performance_counters::counter_value;
         using hpx::performance_counters::status_is_valid;
 
-        counter_value value1 = performance_counter::get_value(id1);
-        counter_value value2 = performance_counter::get_value(id2);
-        counter_value value3 = performance_counter::get_value(id3);
+        counter_value value1 = sine_explicit.get_counter_value_sync();
+        counter_value value2 = sine_implicit.get_counter_value_sync();
+        counter_value value3 = sine_average.get_counter_value_sync();
+
         if (status_is_valid(value1.status_))
         {
             if (!start_time)
@@ -95,17 +96,17 @@ int monitor(boost::uint64_t pause, boost::uint64_t values)
                 value3.get_value<double>());
         }
 
-        // stop/restart the counter referenced by id1 after 5 seconds of
+        // stop/restart the sine_explicit counter after every 5 seconds of
         // evaluation
         bool should_run =
             (int((value2.time_ - start_time) * 1e-9) / 5) % 2 != 0;
         if (should_run == started) {
             if (started) {
-                performance_counter::stop(id1);
+                sine_explicit.stop();
                 started = false;
             }
             else {
-                performance_counter::start(id1);
+                sine_explicit.start();
                 started = true;
             }
         }

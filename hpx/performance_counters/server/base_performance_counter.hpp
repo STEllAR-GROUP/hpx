@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -11,7 +11,7 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/performance_counters/performance_counter.hpp>
+#include <hpx/performance_counters/performance_counter_base.hpp>
 
 #include <boost/detail/atomic_count.hpp>
 
@@ -19,7 +19,7 @@
 namespace hpx { namespace performance_counters { namespace server
 {
     class base_performance_counter
-      : public hpx::performance_counters::performance_counter
+      : public hpx::performance_counters::performance_counter_base
     {
     protected:
         /// the following functions are not implemented by default, they will
@@ -62,6 +62,7 @@ namespace hpx { namespace performance_counters { namespace server
         // component
         typedef components::managed_component<base_performance_counter> wrapping_type;
         typedef base_performance_counter base_type_holder;
+        typedef base_performance_counter wrapped_type;
 
         /// \brief finalize() will be called just before the instance gets
         ///        destructed
