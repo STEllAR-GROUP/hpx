@@ -99,7 +99,7 @@ namespace hpx { namespace util
             "component_path = $[hpx.location]"
                 HPX_INI_PATH_DELIMITER "$[system.executable_prefix]",
             "component_path_suffixes = /lib/hpx" HPX_INI_PATH_DELIMITER
-                                      "/../lib/hpx",
+                                      "/bin/hpx",
             "master_ini_path = $[hpx.location]" HPX_INI_PATH_DELIMITER
                               "$[system.executable_prefix]/",
             "master_ini_path_suffixes = /share/" HPX_BASE_DIR_NAME
@@ -206,22 +206,22 @@ namespace hpx { namespace util
 
             "[hpx.components.barrier]",
             "name = hpx",
-            "path = $[hpx.location]/lib/hpx/" HPX_DLL_STRING,
+            "path = $[hpx.location]/bin/" HPX_DLL_STRING,
             "enabled = 1",
 
             "[hpx.components.raw_counter]",
             "name = hpx",
-            "path = $[hpx.location]/lib/hpx/" HPX_DLL_STRING,
+            "path = $[hpx.location]/bin/" HPX_DLL_STRING,
             "enabled = 1",
 
             "[hpx.components.average_count_counter]",
             "name = hpx",
-            "path = $[hpx.location]/lib/hpx/" HPX_DLL_STRING,
+            "path = $[hpx.location]/bin/" HPX_DLL_STRING,
             "enabled = 1",
 
             "[hpx.components.elapsed_time_counter]",
             "name = hpx",
-            "path = $[hpx.location]/lib/hpx/" HPX_DLL_STRING,
+            "path = $[hpx.location]/bin/" HPX_DLL_STRING,
             "enabled = 1"
         ;
 
@@ -298,9 +298,10 @@ namespace hpx { namespace util
         tokenizer_type::iterator end_suffixes = tok_suffixes.end();
         for (tokenizer_type::iterator it = tok_path.begin(); it != end_path; ++it)
         {
-            std::string path = *it;
+            std::string p = *it;
             for(tokenizer_type::iterator jt = tok_suffixes.begin(); jt != end_suffixes; ++jt)
             {
+                std::string path(p);
                 path += *jt;
 
                 if (!path.empty()) {
