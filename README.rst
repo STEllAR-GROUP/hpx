@@ -46,8 +46,8 @@ What's so special about HPX?
   active, and thriving developer community.
 
 
-The documentation for the latest release of HPX (currently V0.9.8) can be
-`found here <http://stellar.cct.lsu.edu/files/hpx_0.9.8/html/index.html>`_.
+The documentation for the latest release of HPX (currently V0.9.9) can be
+`found here <http://stellar.cct.lsu.edu/files/hpx_0.9.9/html/index.html>`_.
 
 Additionally, we regularily upload the current status of the documentation
 (which is being worked on as we speak)
