@@ -34,9 +34,10 @@
 [def __0_9_7__                  [link hpx.whats_new.hpx_previous.hpx_0_9_7 V0.9.7]]
 [def __0_9_8__                  [link hpx.whats_new.hpx_previous.hpx_0_9_8 V0.9.8]]
 [def __0_9_9__                  [link hpx.whats_new.hpx_0_9_9 V0.9.9]]
+[def __0_9_10__                 [link hpx.whats_new.hpx_0_9_10 V0.9.10]]
 [def __1_0_0__                  [link hpx.whats_new.hpx_1_0_0 V1.0.0]]
 
-[def __version__                __0_9_9__]
+[def __version__                __0_9_10__]
 
 [def __hpx__                    /HPX/]
 [def __stellar__                [@http://stellar-group.org STE||AR]]
