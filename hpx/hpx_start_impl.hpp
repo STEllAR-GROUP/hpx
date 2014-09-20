@@ -20,6 +20,27 @@ namespace hpx
     /// schedule the function given by \p f as a HPX thread. It will return
     /// immediatly after that. Use `hpx::wait` and `hpx::stop` to synchronize
     /// with the runtime system's execution.
+    inline bool start(
+        HPX_STD_FUNCTION<int(boost::program_options::variables_map& vm)> const& f,
+        boost::program_options::options_description const& desc_cmdline,
+        int argc, char** argv, std::vector<std::string> const& cfg,
+        HPX_STD_FUNCTION<void()> const& startup,
+        HPX_STD_FUNCTION<void()> const& shutdown,
+        hpx::runtime_mode mode)
+    {
+        util::set_hpx_prefix(HPX_PREFIX);
+        return 0 == detail::run_or_start(f, desc_cmdline, argc, argv, cfg,
+            startup, shutdown, mode, false);
+    }
+
+    /// \brief Main non-blocking entry point for launching the HPX runtime system.
+    ///
+    /// This is the main, non-blocking entry point for any HPX application.
+    /// This function (or one of its overloads below) should be called from the
+    /// users `main()` function. It will set up the HPX runtime environment and
+    /// schedule the function given by \p f as a HPX thread. It will return
+    /// immediatly after that. Use `hpx::wait` and `hpx::stop` to synchronize
+    /// with the runtime system's execution.
     inline bool
     start(int (*f)(boost::program_options::variables_map& vm),
         boost::program_options::options_description const& desc_cmdline,
@@ -144,8 +165,8 @@ namespace hpx
             std::string("Usage: ") + HPX_APPLICATION_STRING +  " [options]");
 
         char *dummy_argv[2] = { const_cast<char*>(HPX_APPLICATION_STRING), 0 };
-        HPX_STD_FUNCTION<void()> const empty;
 
+        HPX_STD_FUNCTION<void()> const empty;
         return start(static_cast<hpx_main_type>(::hpx_main), desc_commandline,
             1, dummy_argv, cfg, empty, empty, mode);
     }

@@ -220,7 +220,10 @@ namespace hpx
              << HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE << "\n";
 #endif
 
-        strm << "  HPX_PREFIX=" << util::hpx_prefix() << "\n";
+        strm << "  HPX_PREFIX (configured)=" << util::hpx_prefix() << "\n";
+#if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__APPLE__) && !defined(__MIC)
+        strm << "  HPX_PREFIX=" << util::find_prefix() << "\n";
+#endif
 
         return util::osstream_get_string(strm);
     }

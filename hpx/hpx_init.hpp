@@ -27,13 +27,6 @@
 int hpx_main();
 HPX_MAIN_EXPORT int hpx_main(int argc, char** argv);
 int hpx_main(boost::program_options::variables_map& vm);
-
-// We support redefining the plain C-main provided by the user to be executed
-// as the first HPX-thread (equivalent to hpx_main()). This is implemented by
-// a macro redefining main, so we disable it by default.
-#if defined(HPX_MAIN_IS_MAIN)
-#  define main hpx_startup::user_main
-#endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -52,6 +45,19 @@ namespace hpx_startup
 /// \namespace hpx
 namespace hpx
 {
+    /// \cond NOINTERNAL
+    namespace detail
+    {
+        HPX_EXPORT int run_or_start(
+            HPX_STD_FUNCTION<int(boost::program_options::variables_map& vm)> const& f,
+            boost::program_options::options_description const& desc_cmdline,
+            int argc, char** argv, std::vector<std::string> const& ini_config,
+            startup_function_type const& startup,
+            shutdown_function_type const& shutdown, hpx::runtime_mode mode,
+            bool blocking);
+    }
+    /// \endcond
+
 #ifndef DOXYGEN
     typedef int (*hpx_main_type)(boost::program_options::variables_map&);
     typedef int (*hpx_user_main_type)(int argc, char** argv);
@@ -109,7 +115,7 @@ namespace hpx
     ///                     command line arguments passed in `argc`/`argv`.
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
-    HPX_EXPORT int init(
+    inline int init(
         HPX_STD_FUNCTION<int(boost::program_options::variables_map& vm)> const& f,
         boost::program_options::options_description const& desc_cmdline,
         int argc, char** argv, std::vector<std::string> const& cfg,

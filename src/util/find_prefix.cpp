@@ -34,16 +34,21 @@
 
 namespace hpx { namespace util
 {
-    const char* hpx_prefix(const char * prefix)
+    static const char* prefix_ = 0;
+
+    void set_hpx_prefix(const char * prefix)
     {
-        static const char* prefix_ = prefix;
-        HPX_ASSERT(prefix_);
+        if (prefix_ == 0)
+            prefix_ = prefix;
+    }
+
+    char const* hpx_prefix()
+    {
+        HPX_ASSERT(0 != prefix_);
         return prefix_;
     }
 
-    std::string find_prefix(
-        std::string library
-        )
+    std::string find_prefix(std::string const& library)
     {
 #if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__APPLE__) && !defined(__MIC)
         try {

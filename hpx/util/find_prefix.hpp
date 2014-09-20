@@ -14,10 +14,12 @@
 
 namespace hpx { namespace util
 {
-    HPX_EXPORT const char* hpx_prefix(const char * prefix = 0);
+    // set and query the prefix as configured at compile time
+    HPX_EXPORT void set_hpx_prefix(const char * prefix);
+    HPX_EXPORT char const* hpx_prefix();
 
     // return the installation path of the specified module
-    HPX_EXPORT std::string find_prefix(std::string library = "hpx");
+    HPX_EXPORT std::string find_prefix(std::string const& library = "hpx");
 
     // return a list of paths delimited by HPX_INI_PATH_DELIMITER
     HPX_EXPORT std::string find_prefixes(std::string const& suffix,

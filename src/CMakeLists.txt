@@ -90,7 +90,7 @@ add_hpx_library_headers(hpx_serialization
 # libhpx headers
 add_hpx_library_headers(hpx
   GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/*.hpp"
-  EXCLUDE ".*hpx_main.hpp")
+  EXCLUDE ".*hpx_main.*[.]hpp")
 add_hpx_library_headers(hpx
   GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/preprocessed/*.hpp"
   APPEND)
@@ -130,10 +130,8 @@ if(HPX_STATIC_LINKING)
 endif()
 
 # libhpx_init headers
-#add_hpx_library_headers(hpx_init
-#  GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/hpx_init.hpp")
 add_hpx_library_headers(hpx_init
-  GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/hpx_main.hpp")
+  GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/hpx_main*.hpp")
 
 ################################################################################
 # make source groups
