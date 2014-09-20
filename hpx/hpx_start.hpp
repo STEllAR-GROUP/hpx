@@ -98,7 +98,7 @@ namespace hpx
     ///                     command line arguments passed in `argc`/`argv`.
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
-    HPX_EXPORT bool start(
+    inline bool start(
         HPX_STD_FUNCTION<int(boost::program_options::variables_map& vm)> const& f,
         boost::program_options::options_description const& desc_cmdline,
         int argc, char** argv, std::vector<std::string> const& cfg,
@@ -444,7 +444,7 @@ namespace hpx
     ///                     runtime system will not support any of the default
     ///                     command line options as described in the section
     ///                     'HPX Command Line Options'.
-    inline bool start(int argc = 0, char** argv = 0, 
+    inline bool start(int argc = 0, char** argv = 0,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
@@ -484,7 +484,7 @@ namespace hpx
     ///                     runtime system will not support any of the default
     ///                     command line options as described in the section
     ///                     'HPX Command Line Options'.
-    inline bool start(std::vector<std::string> const& cfg, 
+    inline bool start(std::vector<std::string> const& cfg,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
     /// \fn bool start(int (*f)(boost::program_options::variables_map& vm), std::string const& app_name, int argc, char** argv)
