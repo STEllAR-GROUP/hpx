@@ -45,6 +45,19 @@ namespace hpx_startup
 /// \namespace hpx
 namespace hpx
 {
+    /// \cond NOINTERNAL
+    namespace detail
+    {
+        HPX_EXPORT int run_or_start(
+            HPX_STD_FUNCTION<int(boost::program_options::variables_map& vm)> const& f,
+            boost::program_options::options_description const& desc_cmdline,
+            int argc, char** argv, std::vector<std::string> const& ini_config,
+            startup_function_type const& startup,
+            shutdown_function_type const& shutdown, hpx::runtime_mode mode,
+            bool blocking);
+    }
+    /// \endcond
+
 #ifndef DOXYGEN
     typedef int (*hpx_main_type)(boost::program_options::variables_map&);
     typedef int (*hpx_user_main_type)(int argc, char** argv);
