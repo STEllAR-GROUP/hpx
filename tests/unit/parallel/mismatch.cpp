@@ -54,8 +54,8 @@ void test_mismatch1(ExPolicy const& policy, IteratorTag)
     }
 }
 
-template <typename IteratorTag>
-void test_mismatch1(hpx::parallel::parallel_task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_mismatch1_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -75,7 +75,7 @@ void test_mismatch1(hpx::parallel::parallel_task_execution_policy, IteratorTag)
 
     {
         hpx::future<return_type> f =
-            hpx::parallel::mismatch(hpx::parallel::par_task,
+            hpx::parallel::mismatch(p,
                 begin1, end1, boost::begin(c2));
         f.wait();
 
@@ -90,7 +90,7 @@ void test_mismatch1(hpx::parallel::parallel_task_execution_policy, IteratorTag)
         ++c1[changed_idx];
 
         hpx::future<return_type> f =
-            hpx::parallel::mismatch(hpx::parallel::par_task,
+            hpx::parallel::mismatch(p,
                 begin1, end1, boost::begin(c2));
         f.wait();
 
@@ -109,11 +109,15 @@ void test_mismatch1()
     test_mismatch1(seq, IteratorTag());
     test_mismatch1(par, IteratorTag());
     test_mismatch1(par_vec, IteratorTag());
-    test_mismatch1(par(task), IteratorTag());
+
+    test_mismatch1_async(seq(task), IteratorTag());
+    test_mismatch1_async(par(task), IteratorTag());
 
     test_mismatch1(execution_policy(seq), IteratorTag());
     test_mismatch1(execution_policy(par), IteratorTag());
     test_mismatch1(execution_policy(par_vec), IteratorTag());
+
+    test_mismatch1(execution_policy(seq(task)), IteratorTag());
     test_mismatch1(execution_policy(par(task)), IteratorTag());
 }
 
@@ -168,8 +172,8 @@ void test_mismatch2(ExPolicy const& policy, IteratorTag)
     }
 }
 
-template <typename IteratorTag>
-void test_mismatch2(hpx::parallel::parallel_task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_mismatch2_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -189,7 +193,7 @@ void test_mismatch2(hpx::parallel::parallel_task_execution_policy, IteratorTag)
 
     {
         hpx::future<return_type> f =
-            hpx::parallel::mismatch(hpx::parallel::par_task,
+            hpx::parallel::mismatch(p,
                 begin1, end1, boost::begin(c2), std::equal_to<std::size_t>());
         f.wait();
 
@@ -204,7 +208,7 @@ void test_mismatch2(hpx::parallel::parallel_task_execution_policy, IteratorTag)
         ++c1[changed_idx];
 
         hpx::future<return_type> f =
-            hpx::parallel::mismatch(hpx::parallel::par_task,
+            hpx::parallel::mismatch(p,
                 begin1, end1, boost::begin(c2), std::equal_to<std::size_t>());
         f.wait();
 
@@ -223,11 +227,15 @@ void test_mismatch2()
     test_mismatch2(seq, IteratorTag());
     test_mismatch2(par, IteratorTag());
     test_mismatch2(par_vec, IteratorTag());
-    test_mismatch2(par(task), IteratorTag());
+
+    test_mismatch2_async(seq(task), IteratorTag());
+    test_mismatch2_async(par(task), IteratorTag());
 
     test_mismatch2(execution_policy(seq), IteratorTag());
     test_mismatch2(execution_policy(par), IteratorTag());
     test_mismatch2(execution_policy(par_vec), IteratorTag());
+
+    test_mismatch2(execution_policy(seq(task)), IteratorTag());
     test_mismatch2(execution_policy(par(task)), IteratorTag());
 }
 
@@ -279,8 +287,8 @@ void test_mismatch_exception(ExPolicy const& policy, IteratorTag)
     HPX_TEST(caught_exception);
 }
 
-template <typename IteratorTag>
-void test_mismatch_exception(hpx::parallel::parallel_task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_mismatch_exception_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -298,7 +306,7 @@ void test_mismatch_exception(hpx::parallel::parallel_task_execution_policy, Iter
     bool caught_exception = false;
     try {
         hpx::future<return_type> f =
-            hpx::parallel::mismatch(hpx::parallel::par_task,
+            hpx::parallel::mismatch(p,
                 iterator(boost::begin(c1)), iterator(boost::end(c1)),
                 boost::begin(c2),
                 [](std::size_t v1, std::size_t v2) {
@@ -311,9 +319,7 @@ void test_mismatch_exception(hpx::parallel::parallel_task_execution_policy, Iter
     }
     catch(hpx::exception_list const& e) {
         caught_exception = true;
-        test::test_num_exceptions<
-            hpx::parallel::parallel_task_execution_policy, IteratorTag
-        >::call(hpx::parallel::par(task), e);
+        test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
     catch(...) {
         HPX_TEST(false);
@@ -332,10 +338,14 @@ void test_mismatch_exception()
     // with a vector execution policy
     test_mismatch_exception(seq, IteratorTag());
     test_mismatch_exception(par, IteratorTag());
-    test_mismatch_exception(par(task), IteratorTag());
+
+    test_mismatch_exception_async(seq(task), IteratorTag());
+    test_mismatch_exception_async(par(task), IteratorTag());
 
     test_mismatch_exception(execution_policy(seq), IteratorTag());
     test_mismatch_exception(execution_policy(par), IteratorTag());
+
+    test_mismatch_exception(execution_policy(seq(task)), IteratorTag());
     test_mismatch_exception(execution_policy(par(task)), IteratorTag());
 }
 
@@ -386,8 +396,8 @@ void test_mismatch_bad_alloc(ExPolicy const& policy, IteratorTag)
     HPX_TEST(caught_bad_alloc);
 }
 
-template <typename IteratorTag>
-void test_mismatch_bad_alloc(hpx::parallel::parallel_task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_mismatch_bad_alloc_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -405,7 +415,7 @@ void test_mismatch_bad_alloc(hpx::parallel::parallel_task_execution_policy, Iter
     bool caught_bad_alloc = false;
     try {
         hpx::future<return_type> f =
-            hpx::parallel::mismatch(hpx::parallel::par_task,
+            hpx::parallel::mismatch(p,
                 iterator(boost::begin(c1)), iterator(boost::end(c1)),
                 boost::begin(c2),
                 [](std::size_t v1, std::size_t v2) {
@@ -436,10 +446,14 @@ void test_mismatch_bad_alloc()
     // with a vector execution policy
     test_mismatch_bad_alloc(seq, IteratorTag());
     test_mismatch_bad_alloc(par, IteratorTag());
-    test_mismatch_bad_alloc(par(task), IteratorTag());
+
+    test_mismatch_bad_alloc_async(seq(task), IteratorTag());
+    test_mismatch_bad_alloc_async(par(task), IteratorTag());
 
     test_mismatch_bad_alloc(execution_policy(seq), IteratorTag());
     test_mismatch_bad_alloc(execution_policy(par), IteratorTag());
+
+    test_mismatch_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_mismatch_bad_alloc(execution_policy(par(task)), IteratorTag());
 }
 
