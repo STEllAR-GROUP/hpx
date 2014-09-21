@@ -132,6 +132,7 @@ void test_generate_exception_async(ExPolicy const& p, IteratorTag)
     auto gen = [](){return std::size_t(10);};
 
     bool caught_exception = false;
+    bool returned_from_algorithm = false;
     try {
         hpx::future<void> f =
             hpx::parallel::generate(p,
@@ -140,6 +141,7 @@ void test_generate_exception_async(ExPolicy const& p, IteratorTag)
                     [](){ throw std::runtime_error("test"); }),
                 decorated_iterator(boost::end(c)),
                 gen);
+        returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
@@ -153,6 +155,7 @@ void test_generate_exception_async(ExPolicy const& p, IteratorTag)
     }
 
     HPX_TEST(caught_exception);
+    HPX_TEST(returned_from_algorithm);
 }
 
 template <typename IteratorTag>
@@ -227,7 +230,8 @@ void test_generate_bad_alloc_async(ExPolicy const& p, IteratorTag)
 
     auto gen = [](){return std::size_t(10);};
 
-    bool caught_bad_alloc = false;
+    bool caught_bad_alloc = false; 
+    bool returned_from_algorithm = false;
     try {
         hpx::future<void> f =
             hpx::parallel::generate(p,
@@ -236,7 +240,7 @@ void test_generate_bad_alloc_async(ExPolicy const& p, IteratorTag)
                     [](){ throw std::bad_alloc(); }),
                 decorated_iterator(boost::end(c)),
                 gen);
-
+        returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
@@ -249,6 +253,7 @@ void test_generate_bad_alloc_async(ExPolicy const& p, IteratorTag)
     }
 
     HPX_TEST(caught_bad_alloc);
+    HPX_TEST(returned_from_algorithm);
 }
 
 template <typename IteratorTag>

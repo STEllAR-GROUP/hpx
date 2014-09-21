@@ -175,6 +175,7 @@ void test_all_of_exception_async(ExPolicy const& p, IteratorTag)
         std::vector<std::size_t> c = test::fill_all_any_none(10007, i);
 
         bool caught_exception = false;
+        bool returned_from_algorithm = false;
         try {
             hpx::future<void> f =
                 hpx::parallel::all_of(p,
@@ -182,6 +183,7 @@ void test_all_of_exception_async(ExPolicy const& p, IteratorTag)
                     [](std::size_t v) {
                         return throw std::runtime_error("test"), v != 0;
                     });
+            returned_from_algorithm = true;
             f.get();
 
             HPX_TEST(false);
@@ -195,6 +197,7 @@ void test_all_of_exception_async(ExPolicy const& p, IteratorTag)
         }
 
         HPX_TEST(caught_exception);
+        HPX_TEST(returned_from_algorithm);
     }
 }
 
@@ -273,6 +276,7 @@ void test_all_of_bad_alloc_async(ExPolicy const& p, IteratorTag)
         std::vector<std::size_t> c = test::fill_all_any_none(10007, i);
 
         bool caught_exception = false;
+        bool returned_from_algorithm = false;
         try {
             hpx::future<void> f =
                 hpx::parallel::all_of(p,
@@ -280,6 +284,7 @@ void test_all_of_bad_alloc_async(ExPolicy const& p, IteratorTag)
                     [](std::size_t v) {
                         return throw std::bad_alloc(), v != 0;
                     });
+            returned_from_algorithm = true;
             f.get();
 
             HPX_TEST(false);
@@ -292,6 +297,7 @@ void test_all_of_bad_alloc_async(ExPolicy const& p, IteratorTag)
         }
 
         HPX_TEST(caught_exception);
+        HPX_TEST(returned_from_algorithm);
     }
 }
 
