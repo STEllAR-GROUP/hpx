@@ -37,8 +37,8 @@ void test_find_end1(ExPolicy const& policy, IteratorTag)
     HPX_TEST(index == iterator(test_index));
 }
 
-template <typename IteratorTag>
-void test_find_end1(hpx::parallel::parallel_task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_find_end1_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -53,7 +53,7 @@ void test_find_end1(hpx::parallel::parallel_task_execution_policy, IteratorTag)
     std::size_t h[] = { 1, 2 };
 
     hpx::future<iterator> f =
-        hpx::parallel::find_end(hpx::parallel::par_task,
+        hpx::parallel::find_end(p,
             iterator(boost::begin(c)), iterator(boost::end(c)),
             boost::begin(h), boost::end(h));
     f.wait();
@@ -71,12 +71,15 @@ void test_find_end1()
     test_find_end1(seq, IteratorTag());
     test_find_end1(par, IteratorTag());
     test_find_end1(par_vec, IteratorTag());
-    test_find_end1(par(task), IteratorTag());
 
+    test_find_end1_async(seq(task), IteratorTag());
+    test_find_end1_async(par(task), IteratorTag());
 
     test_find_end1(execution_policy(seq), IteratorTag());
     test_find_end1(execution_policy(par), IteratorTag());
     test_find_end1(execution_policy(par_vec), IteratorTag());
+
+    test_find_end1(execution_policy(seq(task)), IteratorTag());
     test_find_end1(execution_policy(par(task)), IteratorTag());
 }
 
@@ -114,15 +117,16 @@ void test_find_end2(ExPolicy const& policy, IteratorTag)
     HPX_TEST(index == iterator(test_index));
 }
 
-template <typename IteratorTag>
-void test_find_end2(hpx::parallel::parallel_task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_find_end2_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
     // fill vector with random values above 2
+    std::vector<std::size_t> c(10007);
     std::fill(boost::begin(c), boost::end(c), (std::rand() % 100) + 3);
+
     // create subsequence at start and end
     c[0] = 1;
     c[1] = 2;
@@ -132,7 +136,7 @@ void test_find_end2(hpx::parallel::parallel_task_execution_policy, IteratorTag)
     std::size_t h[] = { 1, 2 };
 
     hpx::future<iterator> f =
-        hpx::parallel::find_end(hpx::parallel::par_task,
+        hpx::parallel::find_end(p,
             iterator(boost::begin(c)), iterator(boost::end(c)),
             boost::begin(h), boost::end(h));
     f.wait();
@@ -150,12 +154,15 @@ void test_find_end2()
     test_find_end2(seq, IteratorTag());
     test_find_end2(par, IteratorTag());
     test_find_end2(par_vec, IteratorTag());
-    test_find_end2(par(task), IteratorTag());
 
+    test_find_end2_async(seq(task), IteratorTag());
+    test_find_end2_async(par(task), IteratorTag());
 
     test_find_end2(execution_policy(seq), IteratorTag());
     test_find_end2(execution_policy(par), IteratorTag());
     test_find_end2(execution_policy(par_vec), IteratorTag());
+
+    test_find_end2(execution_policy(seq(task)), IteratorTag());
     test_find_end2(execution_policy(par(task)), IteratorTag());
 }
 
@@ -173,12 +180,14 @@ void test_find_end3(ExPolicy const& policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
     // fill vector with random values above 2
+    std::vector<std::size_t> c(10007);
     std::fill(boost::begin(c), boost::end(c), (std::rand() % 100) + 3);
+
     // create subsequence large enough to always be split into multiple partitions
     std::iota(boost::begin(c), boost::begin(c) + c.size()/16+1, 1);
     std::size_t sub_size = c.size()/16 + 1;
+
     std::vector<std::size_t> h(sub_size);
     std::iota(boost::begin(h), boost::end(h), 1);
 
@@ -191,25 +200,27 @@ void test_find_end3(ExPolicy const& policy, IteratorTag)
     HPX_TEST(index == iterator(test_index));
 }
 
-template <typename IteratorTag>
-void test_find_end3(hpx::parallel::parallel_task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_find_end3_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
     // fill vector with random values above 6
+    std::vector<std::size_t> c(10007);
     std::fill(boost::begin(c), boost::end(c), (std::rand() % 100) + 7);
+
     // create subsequence large enough to always be split into multiple partitions
     std::iota(boost::begin(c), boost::begin(c) + c.size()/16+1, 1);
     std::size_t sub_size = c.size()/16 + 1;
+
     std::vector<std::size_t> h(sub_size);
     std::iota(boost::begin(h), boost::end(h), 1);
 
     // create only two partitions, splitting the desired sub sequence into
     // separate partitions.
     hpx::future<iterator> f =
-        hpx::parallel::find_end(hpx::parallel::par_task,
+        hpx::parallel::find_end(p,
             iterator(boost::begin(c)), iterator(boost::end(c)),
             boost::begin(h), boost::end(h));
     f.wait();
@@ -227,12 +238,15 @@ void test_find_end3()
     test_find_end3(seq, IteratorTag());
     test_find_end3(par, IteratorTag());
     test_find_end3(par_vec, IteratorTag());
-    test_find_end3(par(task), IteratorTag());
 
+    test_find_end3_async(seq(task), IteratorTag());
+    test_find_end3_async(par(task), IteratorTag());
 
     test_find_end3(execution_policy(seq), IteratorTag());
     test_find_end3(execution_policy(par), IteratorTag());
     test_find_end3(execution_policy(par_vec), IteratorTag());
+
+    test_find_end3(execution_policy(seq(task)), IteratorTag());
     test_find_end3(execution_policy(par(task)), IteratorTag());
 }
 
@@ -271,15 +285,16 @@ void test_find_end4(ExPolicy const& policy, IteratorTag)
     HPX_TEST(index == iterator(test_index));
 }
 
-template <typename IteratorTag>
-void test_find_end4(hpx::parallel::parallel_task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_find_end4_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
     // fill vector with random values above 2
+    std::vector<std::size_t> c(10007);
     std::fill(boost::begin(c), boost::end(c), (std::rand() % 100) + 3);
+
     // create subsequence in middle of vector
     c[c.size()/2] = 1;
     c[c.size()/2 + 1] = 2;
@@ -287,7 +302,7 @@ void test_find_end4(hpx::parallel::parallel_task_execution_policy, IteratorTag)
     std::size_t h[] = { 1, 2 };
 
     hpx::future<iterator> f =
-        hpx::parallel::find_end(hpx::parallel::par_task,
+        hpx::parallel::find_end(p,
             iterator(boost::begin(c)), iterator(boost::end(c)),
             boost::begin(h), boost::end(h),
             [](std::size_t v1, std::size_t v2) {
@@ -308,11 +323,15 @@ void test_find_end4()
     test_find_end4(seq, IteratorTag());
     test_find_end4(par, IteratorTag());
     test_find_end4(par_vec, IteratorTag());
-    test_find_end4(par(task), IteratorTag());
+
+    test_find_end4_async(seq(task), IteratorTag());
+    test_find_end4_async(par(task), IteratorTag());
 
     test_find_end4(execution_policy(seq), IteratorTag());
     test_find_end4(execution_policy(par), IteratorTag());
     test_find_end4(execution_policy(par_vec), IteratorTag());
+
+    test_find_end4(execution_policy(seq(task)), IteratorTag());
     test_find_end4(execution_policy(par(task)), IteratorTag());
 }
 
@@ -363,8 +382,8 @@ void test_find_end_exception(ExPolicy const& policy, IteratorTag)
     HPX_TEST(caught_exception);
 }
 
-template <typename IteratorTag>
-void test_find_end_exception(hpx::parallel::parallel_task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_find_end_exception_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -380,7 +399,7 @@ void test_find_end_exception(hpx::parallel::parallel_task_execution_policy, Iter
     bool caught_exception = false;
     try {
         hpx::future<decorated_iterator> f =
-            hpx::parallel::find_end(hpx::parallel::par_task,
+            hpx::parallel::find_end(p,
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::runtime_error("test"); }),
@@ -394,9 +413,7 @@ void test_find_end_exception(hpx::parallel::parallel_task_execution_policy, Iter
     }
     catch(hpx::exception_list const& e) {
         caught_exception = true;
-        test::test_num_exceptions<
-            hpx::parallel::parallel_task_execution_policy, IteratorTag
-        >::call(hpx::parallel::par(task), e);
+        test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
     catch(...) {
         HPX_TEST(false);
@@ -409,13 +426,19 @@ template <typename IteratorTag>
 void test_find_end_exception()
 {
     using namespace hpx::parallel;
-    //If the execution policy object is of type vector_execution_policy,
-    //  std::terminate shall be called. therefore we do not test exceptions
-    //  with a vector execution policy
-    test_find_end_exception(par, IteratorTag());
-    test_find_end_exception(par(task), IteratorTag());
 
-    test_find_end_exception(execution_policy(par), IteratorTag());
+    // If the execution policy object is of type vector_execution_policy,
+    // std::terminate shall be called. therefore we do not test exceptions
+    // with a vector execution policy
+    test_find_end_exception(seq, IteratorTag());
+    test_find_end_exception(par, IteratorTag());
+
+    test_find_end_exception_async(seq(task), IteratorTag());
+    test_find_end_exception_async(par(task), IteratorTag());
+
+    test_find_end_exception(execution_policy(seq), IteratorTag());
+
+    test_find_end_exception(execution_policy(seq(task)), IteratorTag());
     test_find_end_exception(execution_policy(par(task)), IteratorTag());
 }
 
@@ -463,8 +486,8 @@ void test_find_end_bad_alloc(ExPolicy const& policy, IteratorTag)
     HPX_TEST(caught_bad_alloc);
 }
 
-template <typename IteratorTag>
-void test_find_end_bad_alloc(hpx::parallel::parallel_task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_find_end_bad_alloc_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -479,7 +502,7 @@ void test_find_end_bad_alloc(hpx::parallel::parallel_task_execution_policy, Iter
     bool caught_bad_alloc = false;
     try {
         hpx::future<decorated_iterator> f =
-            hpx::parallel::find_end(hpx::parallel::par_task,
+            hpx::parallel::find_end(p,
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::bad_alloc(); }),
@@ -510,12 +533,16 @@ void test_find_end_bad_alloc()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_find_end_bad_alloc(par, IteratorTag());
     test_find_end_bad_alloc(seq, IteratorTag());
+    test_find_end_bad_alloc(par, IteratorTag());
+
+    test_find_end_bad_alloc(seq(task), IteratorTag());
     test_find_end_bad_alloc(par(task), IteratorTag());
 
-    test_find_end_bad_alloc(execution_policy(par), IteratorTag());
     test_find_end_bad_alloc(execution_policy(seq), IteratorTag());
+    test_find_end_bad_alloc(execution_policy(par), IteratorTag());
+
+    test_find_end_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_find_end_bad_alloc(execution_policy(par(task)), IteratorTag());
 }
 
