@@ -130,13 +130,18 @@ void test_adjacent_find_exception_async(ExPolicy const& p, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand() + 1);
 
     bool caught_exception = false;
+    bool returned_from_algorithm = false;
+
     try {
         hpx::future<decorated_iterator> f =
             hpx::parallel::adjacent_find(p,
             decorated_iterator(
-            boost::begin(c),
-            [](){ throw std::runtime_error("test"); }),
+                boost::begin(c),
+                [](){ throw std::runtime_error("test"); }),
             decorated_iterator(boost::end(c)));
+
+        returned_from_algorithm = true;
+
         f.get();
 
         HPX_TEST(false);
@@ -150,6 +155,7 @@ void test_adjacent_find_exception_async(ExPolicy const& p, IteratorTag)
     }
 
     HPX_TEST(caught_exception);
+    HPX_TEST(returned_from_algorithm);
 }
 
 template <typename IteratorTag>
@@ -222,6 +228,8 @@ void test_adjacent_find_bad_alloc_async(ExPolicy const& p, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand() + 1);
 
     bool caught_bad_alloc = false;
+    bool returned_from_algorithm = false;
+
     try {
         hpx::future<decorated_iterator> f =
             hpx::parallel::adjacent_find(p,
@@ -229,6 +237,8 @@ void test_adjacent_find_bad_alloc_async(ExPolicy const& p, IteratorTag)
             boost::begin(c),
             [](){ throw std::bad_alloc(); }),
             decorated_iterator(boost::end(c)));
+
+        returned_from_algorithm = true;
 
         f.get();
 
@@ -242,6 +252,7 @@ void test_adjacent_find_bad_alloc_async(ExPolicy const& p, IteratorTag)
     }
 
     HPX_TEST(caught_bad_alloc);
+    HPX_TEST(returned_from_algorithm);
 }
 
 template <typename IteratorTag>
