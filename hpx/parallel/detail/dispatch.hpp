@@ -68,13 +68,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     template <typename Derived, typename Tuple>
     struct async_fused_wrapper
     {
-        typedef typename Derived::result_type result_type;
+        typedef typename parallel::v1::detail::algorithm_result<
+            sequential_task_execution_policy, typename Derived::result_type
+        >::type result_type;
 
         async_fused_wrapper(Tuple && t)
-          : t_(std::forward<Tuple>(t))
+          : t_(std::move(t))
         {}
 
-        typename Derived::result_type operator()() const
+        BOOST_FORCEINLINE result_type operator()() const
         {
             return hpx::util::invoke_fused_r<result_type>(
                 Derived(), std::move(t_));
@@ -84,7 +86,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     };
 
     template <typename Derived, typename Tuple>
-    async_fused_wrapper<
+    BOOST_FORCEINLINE async_fused_wrapper<
         Derived
       , typename hpx::util::decay<Tuple>::type
     >
@@ -160,7 +162,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         }
         catch (...) {
             return parallel::v1::detail::handle_exception<
-                sequential_task_execution_policy>::call();
+                    sequential_task_execution_policy, result_type
+                >::call();
         }
     }
 
@@ -172,13 +175,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         HPX_ENUM_FWD_ARGS(N, Arg, arg), boost::mpl::true_)
     {
         try {
+            hpx::future<result_type> result =
+                hpx::async(get_async_fused_wrapper<Derived>(
+                    hpx::util::forward_as_tuple(policy,
+                        HPX_ENUM_FORWARD_ARGS(N, Arg, arg))
+                ));
+
             return parallel::v1::detail::algorithm_result<
                     sequential_task_execution_policy, result_type
-                >::get(
-                    hpx::async(get_async_fused_wrapper<Derived>(
-                        hpx::util::forward_as_tuple(policy,
-                            HPX_ENUM_FORWARD_ARGS(N, Arg, arg))
-                    )));
+                >::get(std::move(result));
         }
         catch (...) {
             return parallel::v1::detail::handle_exception<

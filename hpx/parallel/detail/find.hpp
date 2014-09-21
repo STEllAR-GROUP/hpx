@@ -997,8 +997,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         return detail::find_first_of<InIter>().call(
             std::forward<ExPolicy>(policy),
-            first, last, s_first, s_last, std::forward<Pred>(op),
-            is_seq());
+            first, last, s_first, s_last, std::forward<Pred>(op), is_seq());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1007,10 +1006,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     {
         /// \cond NOINTERNAL
         template <typename FwdIter>
-        struct adjacent_find: public detail::algorithm<adjacent_find<FwdIter>, FwdIter>
+        struct adjacent_find
+          : public detail::algorithm<adjacent_find<FwdIter>, FwdIter>
         {
             adjacent_find()
-                : adjacent_find::algorithm("adjacent_find")
+              : adjacent_find::algorithm("adjacent_find")
             {}
 
             template <typename ExPolicy, typename Pred>
@@ -1043,7 +1043,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return util::partitioner<ExPolicy, FwdIter, void>::call_with_index(
                     policy, hpx::util::make_zip_iterator(first,next), count-1,
-                    [op, tok](std::size_t base_idx, zip_iterator it, std::size_t part_size) mutable
+                    [op, tok](std::size_t base_idx, zip_iterator it,
+                        std::size_t part_size) mutable
                     {
                         util::loop_idx_n(
                             base_idx, it, part_size, tok,
@@ -1213,8 +1214,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         return detail::adjacent_find<FwdIter>().call(
             std::forward<ExPolicy>(policy),
-            first, last, op,
-            is_seq());
+            first, last, op, is_seq());
     }
 }}}
 

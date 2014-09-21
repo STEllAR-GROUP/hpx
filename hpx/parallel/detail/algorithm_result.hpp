@@ -92,6 +92,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         {
             return hpx::make_ready_future();
         }
+
+        static type get(hpx::future<void> && t)
+        {
+            return std::move(t);
+        }
     };
 
     template <>
@@ -104,6 +109,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         static type get(hpx::util::unused_type)
         {
             return hpx::make_ready_future();
+        }
+
+        static type get(hpx::future<void> && t)
+        {
+            return std::move(t);
         }
     };
 
