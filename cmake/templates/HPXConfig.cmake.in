@@ -40,6 +40,10 @@ if(NOT HPX_CMAKE_LOGLEVEL)
   set(HPX_CMAKE_LOGLEVEL "WARN")
 endif()
 
+if(NOT LIB)
+  set(LIB "lib")
+endif()
+
 enable_language(C)
 
 hpx_check_compiler_compatibility()
