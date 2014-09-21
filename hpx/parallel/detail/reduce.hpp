@@ -41,24 +41,26 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
               : reduce::algorithm("reduce")
             {}
 
-            template <typename ExPolicy, typename InIter, typename Reduce>
+            template <typename ExPolicy, typename InIter, typename T_,
+                typename Reduce>
             static T
             sequential(ExPolicy const&, InIter first, InIter last,
-                T && init, Reduce && r)
+                T_ && init, Reduce && r)
             {
-                return std::accumulate(first, last, std::forward<T>(init),
+                return std::accumulate(first, last, std::forward<T_>(init),
                     std::forward<Reduce>(r));
             }
 
-            template <typename ExPolicy, typename FwdIter, typename Reduce>
+            template <typename ExPolicy, typename FwdIter, typename T_,
+                typename Reduce>
             static typename detail::algorithm_result<ExPolicy, T>::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
-                T && init, Reduce && r)
+                T_ && init, Reduce && r)
             {
                 if (first == last)
                 {
                     return detail::algorithm_result<ExPolicy, T>::get(
-                        std::forward<T>(init));
+                        std::forward<T_>(init));
                 }
 
                 return util::partitioner<ExPolicy, T>::call(
