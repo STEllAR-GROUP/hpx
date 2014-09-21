@@ -281,6 +281,7 @@ void test_equal_binary_exception(hpx::parallel::task_execution_policy, IteratorT
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 
     bool caught_exception = false;
+    bool returned_from_algorithm = false;
     try {
         hpx::future<bool> f =
             hpx::parallel::equal(hpx::parallel::task,
@@ -290,7 +291,7 @@ void test_equal_binary_exception(hpx::parallel::task_execution_policy, IteratorT
                     throw std::runtime_error("test");
                     return true;
                 });
-
+        returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
@@ -306,6 +307,7 @@ void test_equal_binary_exception(hpx::parallel::task_execution_policy, IteratorT
     }
 
     HPX_TEST(caught_exception);
+    HPX_TEST(returned_from_algorithm);
 }
 
 template <typename IteratorTag>
@@ -384,6 +386,7 @@ void test_equal_binary_bad_alloc(hpx::parallel::task_execution_policy, IteratorT
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 
     bool caught_bad_alloc = false;
+    bool returned_from_algorithm = false;
     try {
         hpx::future<bool> f =
             hpx::parallel::equal(hpx::parallel::task,
@@ -393,7 +396,7 @@ void test_equal_binary_bad_alloc(hpx::parallel::task_execution_policy, IteratorT
                     throw std::bad_alloc();
                     return true;
                 });
-
+        returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
@@ -406,6 +409,7 @@ void test_equal_binary_bad_alloc(hpx::parallel::task_execution_policy, IteratorT
     }
 
     HPX_TEST(caught_bad_alloc);
+    HPX_TEST(returned_from_algorithm);
 }
 
 template <typename IteratorTag>

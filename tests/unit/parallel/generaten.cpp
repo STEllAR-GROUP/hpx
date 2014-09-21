@@ -129,6 +129,7 @@ void test_generate_n_exception(hpx::parallel::task_execution_policy, IteratorTag
     auto gen = [](){ return std::size_t(10); };
 
     bool caught_exception = false;
+    bool returned_from_algorithm = false;
     try {
         hpx::future<decorated_iterator> f =
             hpx::parallel::generate_n(hpx::parallel::task,
@@ -137,6 +138,7 @@ void test_generate_n_exception(hpx::parallel::task_execution_policy, IteratorTag
                     [](){ throw std::runtime_error("test"); }),
                 c.size(),
                 gen);
+        returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
@@ -152,6 +154,7 @@ void test_generate_n_exception(hpx::parallel::task_execution_policy, IteratorTag
     }
 
     HPX_TEST(caught_exception);
+    HPX_TEST(returned_from_algorithm);
 }
 
 template <typename IteratorTag>
@@ -222,6 +225,7 @@ void test_generate_n_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag
     auto gen = [](){ return std::size_t(10); };
 
     bool caught_bad_alloc = false;
+    bool returned_from_algorithm = false;
     try {
         hpx::future<decorated_iterator> f =
             hpx::parallel::generate_n(hpx::parallel::task,
@@ -230,7 +234,7 @@ void test_generate_n_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag
                     [](){ throw std::bad_alloc(); }),
                 c.size(),
                 gen);
-
+        returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
@@ -243,6 +247,7 @@ void test_generate_n_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag
     }
 
     HPX_TEST(caught_bad_alloc);
+    HPX_TEST(returned_from_algorithm);
 }
 
 template <typename IteratorTag>

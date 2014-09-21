@@ -378,6 +378,7 @@ void test_find_end_exception(hpx::parallel::task_execution_policy, IteratorTag)
     std::size_t h[] = { 1, 2 };
 
     bool caught_exception = false;
+    bool returned_from_algorithm = false;
     try {
         hpx::future<decorated_iterator> f =
             hpx::parallel::find_end(hpx::parallel::task,
@@ -388,6 +389,7 @@ void test_find_end_exception(hpx::parallel::task_execution_policy, IteratorTag)
                     boost::end(c),
                     [](){ throw std::runtime_error("test"); }),
             boost::begin(h), boost::end(h));
+        returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
@@ -403,6 +405,7 @@ void test_find_end_exception(hpx::parallel::task_execution_policy, IteratorTag)
     }
 
     HPX_TEST(caught_exception);
+    HPX_TEST(returned_from_algorithm);
 }
 
 template <typename IteratorTag>
@@ -477,6 +480,7 @@ void test_find_end_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
     std::size_t h[] = { 1, 2 };
 
     bool caught_bad_alloc = false;
+    bool returned_from_algorithm = false;
     try {
         hpx::future<decorated_iterator> f =
             hpx::parallel::find_end(hpx::parallel::task,
@@ -487,7 +491,7 @@ void test_find_end_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
                     boost::end(c),
                     [](){ throw std::bad_alloc(); }),
                 boost::begin(h), boost::end(h));
-
+        returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
@@ -500,6 +504,7 @@ void test_find_end_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
     }
 
     HPX_TEST(caught_bad_alloc);
+    HPX_TEST(returned_from_algorithm);
 }
 
 template <typename IteratorTag>

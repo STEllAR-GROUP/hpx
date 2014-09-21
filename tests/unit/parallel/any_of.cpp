@@ -172,6 +172,7 @@ void test_any_of_exception(hpx::parallel::task_execution_policy, IteratorTag)
         std::vector<std::size_t> c = test::fill_all_any_none(10007, i);
 
         bool caught_exception = false;
+        bool returned_from_algorithm = false;
         try {
             hpx::future<void> f =
                 hpx::parallel::any_of(hpx::parallel::task,
@@ -180,6 +181,7 @@ void test_any_of_exception(hpx::parallel::task_execution_policy, IteratorTag)
                         throw std::runtime_error("test");
                         return v != 0;
                     });
+            returned_from_algorithm = true;
             f.get();
 
             HPX_TEST(false);
@@ -195,6 +197,7 @@ void test_any_of_exception(hpx::parallel::task_execution_policy, IteratorTag)
         }
 
         HPX_TEST(caught_exception);
+        HPX_TEST(returned_from_algorithm);
     }
 }
 
@@ -269,6 +272,7 @@ void test_any_of_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
         std::vector<std::size_t> c = test::fill_all_any_none(10007, i);
 
         bool caught_exception = false;
+        bool returned_from_algorithm = false;
         try {
             hpx::future<void> f =
                 hpx::parallel::any_of(hpx::parallel::task,
@@ -277,6 +281,7 @@ void test_any_of_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
                         throw std::bad_alloc();
                         return v != 0;
                     });
+            returned_from_algorithm = true;
             f.get();
 
             HPX_TEST(false);
@@ -289,6 +294,7 @@ void test_any_of_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
         }
 
         HPX_TEST(caught_exception);
+        HPX_TEST(returned_from_algorithm);
     }
 }
 

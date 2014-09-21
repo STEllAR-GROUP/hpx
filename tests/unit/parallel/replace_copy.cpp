@@ -146,6 +146,7 @@ void test_replace_copy_exception(hpx::parallel::task_execution_policy, IteratorT
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     bool caught_exception = false;
+    bool returned_from_algorithm = false;
     try {
         hpx::future<void> f =
             hpx::parallel::replace_copy(hpx::parallel::task,
@@ -154,6 +155,7 @@ void test_replace_copy_exception(hpx::parallel::task_execution_policy, IteratorT
                     [](){ throw std::runtime_error("test"); }),
                 decorated_iterator(boost::end(c)),
                 boost::begin(d), std::size_t(42), std::size_t(43));
+        returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
@@ -169,6 +171,7 @@ void test_replace_copy_exception(hpx::parallel::task_execution_policy, IteratorT
     }
 
     HPX_TEST(caught_exception);
+    HPX_TEST(returned_from_algorithm);
 }
 
 template <typename IteratorTag>
@@ -241,6 +244,7 @@ void test_replace_copy_bad_alloc(hpx::parallel::task_execution_policy, IteratorT
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     bool caught_bad_alloc = false;
+    bool returned_from_algorithm = false;
     try {
         hpx::future<void> f =
             hpx::parallel::replace_copy(hpx::parallel::task,
@@ -249,6 +253,7 @@ void test_replace_copy_bad_alloc(hpx::parallel::task_execution_policy, IteratorT
                     [](){ throw std::bad_alloc(); }),
                 decorated_iterator(boost::end(c)),
                 boost::begin(d), std::size_t(42), std::size_t(43));
+        returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
@@ -261,6 +266,7 @@ void test_replace_copy_bad_alloc(hpx::parallel::task_execution_policy, IteratorT
     }
 
     HPX_TEST(caught_bad_alloc);
+    HPX_TEST(returned_from_algorithm);
 }
 
 template <typename IteratorTag>

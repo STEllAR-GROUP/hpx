@@ -297,6 +297,7 @@ void test_mismatch_exception(hpx::parallel::task_execution_policy, IteratorTag)
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 
     bool caught_exception = false;
+    bool returned_from_algorithm = false;
     try {
         hpx::future<return_type> f =
             hpx::parallel::mismatch(hpx::parallel::task,
@@ -306,7 +307,7 @@ void test_mismatch_exception(hpx::parallel::task_execution_policy, IteratorTag)
                     throw std::runtime_error("test");
                     return true;
                 });
-
+        returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
@@ -322,6 +323,7 @@ void test_mismatch_exception(hpx::parallel::task_execution_policy, IteratorTag)
     }
 
     HPX_TEST(caught_exception);
+    HPX_TEST(returned_from_algorithm);
 }
 
 template <typename IteratorTag>
@@ -406,6 +408,7 @@ void test_mismatch_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 
     bool caught_bad_alloc = false;
+    bool returned_from_algorithm = false;
     try {
         hpx::future<return_type> f =
             hpx::parallel::mismatch(hpx::parallel::task,
@@ -415,7 +418,7 @@ void test_mismatch_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
                     throw std::bad_alloc();
                     return true;
                 });
-
+        returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
@@ -428,6 +431,7 @@ void test_mismatch_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
     }
 
     HPX_TEST(caught_bad_alloc);
+    HPX_TEST(returned_from_algorithm);
 }
 
 template <typename IteratorTag>

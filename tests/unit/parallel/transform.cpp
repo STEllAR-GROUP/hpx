@@ -138,6 +138,7 @@ void test_transform_exception(hpx::parallel::task_execution_policy, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     bool caught_exception = false;
+    bool returned_from_algorithm = false;
     try {
         hpx::future<base_iterator> f =
             hpx::parallel::transform(hpx::parallel::task,
@@ -147,6 +148,7 @@ void test_transform_exception(hpx::parallel::task_execution_policy, IteratorTag)
                     throw std::runtime_error("test");
                     return v;
                 });
+        returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
@@ -162,6 +164,7 @@ void test_transform_exception(hpx::parallel::task_execution_policy, IteratorTag)
     }
 
     HPX_TEST(caught_exception);
+    HPX_TEST(returned_from_algorithm);
 }
 
 template <typename IteratorTag>
@@ -232,6 +235,7 @@ void test_transform_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     bool caught_bad_alloc = false;
+    bool returned_from_algorithm = false;
     try {
         hpx::future<base_iterator> f =
             hpx::parallel::transform(hpx::parallel::task,
@@ -241,6 +245,7 @@ void test_transform_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
                     throw std::bad_alloc();
                     return v;
                 });
+        returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
@@ -253,6 +258,7 @@ void test_transform_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
     }
 
     HPX_TEST(caught_bad_alloc);
+    HPX_TEST(returned_from_algorithm);
 }
 
 template <typename IteratorTag>
