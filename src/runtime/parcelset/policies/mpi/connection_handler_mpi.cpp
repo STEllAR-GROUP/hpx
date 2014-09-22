@@ -62,9 +62,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 "this parcelport was instantiated to represent an unexpected "
                 "locality type: " + get_connection_type_name(here_.get_type()));
         }
-        std::string use_io_pool =
-            ini.get_entry("hpx.parcel.mpi.use_io_pool", "1");
-        if(hpx::util::safe_lexical_cast<int>(use_io_pool, 1) == 0)
+        if(hpx::util::get_entry_as<int>(ini, "hpx.parcel.mpi.use_io_pool", "1") == 0)
         {
             use_io_pool_ = false;
         }
