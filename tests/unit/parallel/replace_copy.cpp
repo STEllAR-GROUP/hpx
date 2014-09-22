@@ -44,8 +44,8 @@ void test_replace_copy(ExPolicy const& policy, IteratorTag)
     HPX_TEST_EQ(count, d1.size());
 }
 
-template <typename IteratorTag>
-void test_replace_copy(hpx::parallel::parallel_task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_replace_copy_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -59,7 +59,7 @@ void test_replace_copy(hpx::parallel::parallel_task_execution_policy, IteratorTa
     std::size_t idx = std::rand() % c.size();
 
     hpx::future<void> f =
-        hpx::parallel::replace_copy(hpx::parallel::par_task,
+        hpx::parallel::replace_copy(p,
             iterator(boost::begin(c)), iterator(boost::end(c)),
             boost::begin(d1), c[idx], c[idx]+1);
     f.wait();
@@ -84,11 +84,15 @@ void test_replace_copy()
     test_replace_copy(seq, IteratorTag());
     test_replace_copy(par, IteratorTag());
     test_replace_copy(par_vec, IteratorTag());
-    test_replace_copy(par(task), IteratorTag());
+
+    test_replace_copy_async(seq(task), IteratorTag());
+    test_replace_copy_async(par(task), IteratorTag());
 
     test_replace_copy(execution_policy(seq), IteratorTag());
     test_replace_copy(execution_policy(par), IteratorTag());
     test_replace_copy(execution_policy(par_vec), IteratorTag());
+
+    test_replace_copy(execution_policy(seq(task)), IteratorTag());
     test_replace_copy(execution_policy(par(task)), IteratorTag());
 }
 
@@ -134,8 +138,8 @@ void test_replace_copy_exception(ExPolicy const& policy, IteratorTag)
     HPX_TEST(caught_exception);
 }
 
-template <typename IteratorTag>
-void test_replace_copy_exception(hpx::parallel::parallel_task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_replace_copy_exception_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -148,7 +152,7 @@ void test_replace_copy_exception(hpx::parallel::parallel_task_execution_policy, 
     bool caught_exception = false;
     try {
         hpx::future<void> f =
-            hpx::parallel::replace_copy(hpx::parallel::par_task,
+            hpx::parallel::replace_copy(p,
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::runtime_error("test"); }),
@@ -160,9 +164,7 @@ void test_replace_copy_exception(hpx::parallel::parallel_task_execution_policy, 
     }
     catch (hpx::exception_list const& e) {
         caught_exception = true;
-        test::test_num_exceptions<
-            hpx::parallel::parallel_task_execution_policy, IteratorTag
-        >::call(hpx::parallel::par(task), e);
+        test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
     catch (...) {
         HPX_TEST(false);
@@ -181,10 +183,14 @@ void test_replace_copy_exception()
     // with a vector execution policy
     test_replace_copy_exception(seq, IteratorTag());
     test_replace_copy_exception(par, IteratorTag());
-    test_replace_copy_exception(par(task), IteratorTag());
+
+    test_replace_copy_exception_async(seq(task), IteratorTag());
+    test_replace_copy_exception_async(par(task), IteratorTag());
 
     test_replace_copy_exception(execution_policy(seq), IteratorTag());
     test_replace_copy_exception(execution_policy(par), IteratorTag());
+
+    test_replace_copy_exception(execution_policy(seq(task)), IteratorTag());
     test_replace_copy_exception(execution_policy(par(task)), IteratorTag());
 }
 
@@ -229,8 +235,8 @@ void test_replace_copy_bad_alloc(ExPolicy const& policy, IteratorTag)
     HPX_TEST(caught_bad_alloc);
 }
 
-template <typename IteratorTag>
-void test_replace_copy_bad_alloc(hpx::parallel::parallel_task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_replace_copy_bad_alloc_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -243,7 +249,7 @@ void test_replace_copy_bad_alloc(hpx::parallel::parallel_task_execution_policy, 
     bool caught_bad_alloc = false;
     try {
         hpx::future<void> f =
-            hpx::parallel::replace_copy(hpx::parallel::par_task,
+            hpx::parallel::replace_copy(p,
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::bad_alloc(); }),
@@ -273,10 +279,14 @@ void test_replace_copy_bad_alloc()
     // with a vector execution policy
     test_replace_copy_bad_alloc(seq, IteratorTag());
     test_replace_copy_bad_alloc(par, IteratorTag());
-    test_replace_copy_bad_alloc(par(task), IteratorTag());
+
+    test_replace_copy_bad_alloc_async(seq(task), IteratorTag());
+    test_replace_copy_bad_alloc_async(par(task), IteratorTag());
 
     test_replace_copy_bad_alloc(execution_policy(seq), IteratorTag());
     test_replace_copy_bad_alloc(execution_policy(par), IteratorTag());
+
+    test_replace_copy_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_replace_copy_bad_alloc(execution_policy(par(task)), IteratorTag());
 }
 

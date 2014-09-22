@@ -47,8 +47,8 @@ void test_swap_ranges(ExPolicy const& policy, IteratorTag)
     HPX_TEST_EQ(count, d.size());
 }
 
-template <typename IteratorTag>
-void test_swap_ranges(hpx::parallel::parallel_task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_swap_ranges_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -59,8 +59,9 @@ void test_swap_ranges(hpx::parallel::parallel_task_execution_policy, IteratorTag
     std::fill(boost::begin(d), boost::end(d), std::rand());
 
     hpx::future<base_iterator> f =
-        hpx::parallel::swap_ranges(hpx::parallel::par_task,
-            iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d));
+        hpx::parallel::swap_ranges(p,
+            iterator(boost::begin(c)), iterator(boost::end(c)),
+            boost::begin(d));
 
     f.wait();
 
@@ -89,11 +90,15 @@ void test_swap_ranges()
     test_swap_ranges(seq, IteratorTag());
     test_swap_ranges(par, IteratorTag());
     test_swap_ranges(par_vec, IteratorTag());
-    test_swap_ranges(par(task), IteratorTag());
+
+    test_swap_ranges_async(seq(task), IteratorTag());
+    test_swap_ranges_async(par(task), IteratorTag());
 
     test_swap_ranges(execution_policy(seq), IteratorTag());
     test_swap_ranges(execution_policy(par), IteratorTag());
     test_swap_ranges(execution_policy(par_vec), IteratorTag());
+
+    test_swap_ranges(execution_policy(seq(task)), IteratorTag());
     test_swap_ranges(execution_policy(par(task)), IteratorTag());
 }
 
@@ -139,8 +144,8 @@ void test_swap_ranges_exception(ExPolicy const& policy, IteratorTag)
     HPX_TEST(caught_exception);
 }
 
-template <typename IteratorTag>
-void test_swap_ranges_exception(hpx::parallel::parallel_task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_swap_ranges_exception_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -154,7 +159,7 @@ void test_swap_ranges_exception(hpx::parallel::parallel_task_execution_policy, I
     bool caught_exception = false;
     try {
         hpx::future<base_iterator> f =
-            hpx::parallel::swap_ranges(hpx::parallel::par_task,
+            hpx::parallel::swap_ranges(p,
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::runtime_error("test"); }),
@@ -166,9 +171,7 @@ void test_swap_ranges_exception(hpx::parallel::parallel_task_execution_policy, I
     }
     catch (hpx::exception_list const& e) {
         caught_exception = true;
-        test::test_num_exceptions<
-            hpx::parallel::parallel_task_execution_policy, IteratorTag
-        >::call(hpx::parallel::par(task), e);
+        test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
     catch (...) {
         HPX_TEST(false);
@@ -181,15 +184,20 @@ template <typename IteratorTag>
 void test_swap_ranges_exception()
 {
     using namespace hpx::parallel;
-    //If the execution policy object is of type vector_execution_policy,
-    //  std::terminate shall be called. therefore we do not test exceptions
-    //  with a vector execution policy
+
+    // If the execution policy object is of type vector_execution_policy,
+    // std::terminate shall be called. therefore we do not test exceptions
+    // with a vector execution policy
     test_swap_ranges_exception(seq, IteratorTag());
     test_swap_ranges_exception(par, IteratorTag());
-    test_swap_ranges_exception(par(task), IteratorTag());
+
+    test_swap_ranges_exception_async(seq(task), IteratorTag());
+    test_swap_ranges_exception_async(par(task), IteratorTag());
 
     test_swap_ranges_exception(execution_policy(seq), IteratorTag());
     test_swap_ranges_exception(execution_policy(par), IteratorTag());
+
+    test_swap_ranges_exception(execution_policy(seq(task)), IteratorTag());
     test_swap_ranges_exception(execution_policy(par(task)), IteratorTag());
 }
 
@@ -234,8 +242,8 @@ void test_swap_ranges_bad_alloc(ExPolicy const& policy, IteratorTag)
     HPX_TEST(caught_bad_alloc);
 }
 
-template <typename IteratorTag>
-void test_swap_ranges_bad_alloc(hpx::parallel::parallel_task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_swap_ranges_bad_alloc_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -249,7 +257,7 @@ void test_swap_ranges_bad_alloc(hpx::parallel::parallel_task_execution_policy, I
     bool caught_bad_alloc = false;
     try {
         hpx::future<base_iterator> f =
-            hpx::parallel::swap_ranges(hpx::parallel::par_task,
+            hpx::parallel::swap_ranges(p,
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::bad_alloc(); }),
@@ -274,15 +282,20 @@ template <typename IteratorTag>
 void test_swap_ranges_bad_alloc()
 {
     using namespace hpx::parallel;
-    //If the execution policy object is of type vector_execution_policy,
-    //  std::terminate shall be called. therefore we do not test exceptions
-    //  with a vector execution policy
+
+    // If the execution policy object is of type vector_execution_policy,
+    // std::terminate shall be called. therefore we do not test exceptions
+    // with a vector execution policy
     test_swap_ranges_bad_alloc(seq, IteratorTag());
     test_swap_ranges_bad_alloc(par, IteratorTag());
-    test_swap_ranges_bad_alloc(par(task), IteratorTag());
+
+    test_swap_ranges_bad_alloc_async(seq(task), IteratorTag());
+    test_swap_ranges_bad_alloc_async(par(task), IteratorTag());
 
     test_swap_ranges_bad_alloc(execution_policy(seq), IteratorTag());
     test_swap_ranges_bad_alloc(execution_policy(par), IteratorTag());
+
+    test_swap_ranges_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_swap_ranges_bad_alloc(execution_policy(par(task)), IteratorTag());
 }
 
