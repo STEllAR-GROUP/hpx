@@ -40,8 +40,8 @@ void test_transform(ExPolicy const& policy, IteratorTag)
     HPX_TEST_EQ(count, d.size());
 }
 
-template <typename IteratorTag>
-void test_transform(hpx::parallel::parallel_task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_transform_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -51,7 +51,7 @@ void test_transform(hpx::parallel::parallel_task_execution_policy, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     hpx::future<base_iterator> f =
-        hpx::parallel::transform(hpx::parallel::par_task,
+        hpx::parallel::transform(p,
             iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
             [](std::size_t& v) {
                 return v + 1;
@@ -77,11 +77,15 @@ void test_transform()
     test_transform(seq, IteratorTag());
     test_transform(par, IteratorTag());
     test_transform(par_vec, IteratorTag());
-    test_transform(par(task), IteratorTag());
+
+    test_transform_async(seq(task), IteratorTag());
+    test_transform_async(par(task), IteratorTag());
 
     test_transform(execution_policy(seq), IteratorTag());
     test_transform(execution_policy(par), IteratorTag());
     test_transform(execution_policy(par_vec), IteratorTag());
+
+    test_transform(execution_policy(seq(task)), IteratorTag());
     test_transform(execution_policy(par(task)), IteratorTag());
 }
 
@@ -126,8 +130,8 @@ void test_transform_exception(ExPolicy const& policy, IteratorTag)
     HPX_TEST(caught_exception);
 }
 
-template <typename IteratorTag>
-void test_transform_exception(hpx::parallel::parallel_task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_transform_exception_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -139,7 +143,7 @@ void test_transform_exception(hpx::parallel::parallel_task_execution_policy, Ite
     bool caught_exception = false;
     try {
         hpx::future<base_iterator> f =
-            hpx::parallel::transform(hpx::parallel::par_task,
+            hpx::parallel::transform(p,
                 iterator(boost::begin(c)), iterator(boost::end(c)),
                 boost::begin(d),
                 [](std::size_t v) {
@@ -151,9 +155,7 @@ void test_transform_exception(hpx::parallel::parallel_task_execution_policy, Ite
     }
     catch(hpx::exception_list const& e) {
         caught_exception = true;
-        test::test_num_exceptions<
-            hpx::parallel::parallel_task_execution_policy, IteratorTag
-        >::call(hpx::parallel::par(task), e);
+        test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
     catch(...) {
         HPX_TEST(false);
@@ -166,15 +168,20 @@ template <typename IteratorTag>
 void test_transform_exception()
 {
     using namespace hpx::parallel;
-    //If the execution policy object is of type vector_execution_policy,
-    //  std::terminate shall be called. therefore we do not test exceptions
-    //  with a vector execution policy
+
+    // If the execution policy object is of type vector_execution_policy,
+    // std::terminate shall be called. therefore we do not test exceptions
+    // with a vector execution policy
     test_transform_exception(seq, IteratorTag());
     test_transform_exception(par, IteratorTag());
-    test_transform_exception(par(task), IteratorTag());
+
+    test_transform_exception_async(seq(task), IteratorTag());
+    test_transform_exception_async(par(task), IteratorTag());
 
     test_transform_exception(execution_policy(seq), IteratorTag());
     test_transform_exception(execution_policy(par), IteratorTag());
+
+    test_transform_exception(execution_policy(seq(task)), IteratorTag());
     test_transform_exception(execution_policy(par(task)), IteratorTag());
 }
 
@@ -218,8 +225,8 @@ void test_transform_bad_alloc(ExPolicy const& policy, IteratorTag)
     HPX_TEST(caught_bad_alloc);
 }
 
-template <typename IteratorTag>
-void test_transform_bad_alloc(hpx::parallel::parallel_task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_transform_bad_alloc_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -231,7 +238,7 @@ void test_transform_bad_alloc(hpx::parallel::parallel_task_execution_policy, Ite
     bool caught_bad_alloc = false;
     try {
         hpx::future<base_iterator> f =
-            hpx::parallel::transform(hpx::parallel::par_task,
+            hpx::parallel::transform(p,
                 iterator(boost::begin(c)), iterator(boost::end(c)),
                 boost::begin(d),
                 [](std::size_t v) {
@@ -255,15 +262,20 @@ template <typename IteratorTag>
 void test_transform_bad_alloc()
 {
     using namespace hpx::parallel;
-    //If the execution policy object is of type vector_execution_policy,
-    //  std::terminate shall be called. therefore we do not test exceptions
-    //  with a vector execution policy
+
+    // If the execution policy object is of type vector_execution_policy,
+    // std::terminate shall be called. therefore we do not test exceptions
+    // with a vector execution policy
     test_transform_bad_alloc(seq, IteratorTag());
     test_transform_bad_alloc(par, IteratorTag());
-    test_transform_bad_alloc(par(task), IteratorTag());
+
+    test_transform_bad_alloc_async(seq(task), IteratorTag());
+    test_transform_bad_alloc_async(par(task), IteratorTag());
 
     test_transform_bad_alloc(execution_policy(seq), IteratorTag());
     test_transform_bad_alloc(execution_policy(par), IteratorTag());
+
+    test_transform_bad_alloc(execution_policy(seq(task)), IteratorTag());
     test_transform_bad_alloc(execution_policy(par(task)), IteratorTag());
 }
 
