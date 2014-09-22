@@ -49,10 +49,8 @@ namespace hpx { namespace parcelset
             std::string key("hpx.parcel.");
             key += connection_handler_name();
 
-            std::string thread_pool_size =
-                ini.get_entry(key + ".io_pool_size", "2");
-            return hpx::util::safe_lexical_cast<std::size_t>(
-                thread_pool_size, 2);
+            return hpx::util::get_entry_as<std::size_t>(
+                ini, key + ".io_pool_size", "2");
         }
 
         static const char *pool_name()
@@ -70,11 +68,8 @@ namespace hpx { namespace parcelset
             std::string key("hpx.parcel.");
             key += connection_handler_name();
 
-            std::string max_connections =
-                ini.get_entry(key + ".max_connections",
-                    HPX_PARCEL_MAX_CONNECTIONS);
-            return hpx::util::safe_lexical_cast<std::size_t>(
-                max_connections, HPX_PARCEL_MAX_CONNECTIONS);
+            return hpx::util::get_entry_as<std::size_t>(
+                ini, key + ".max_connections", HPX_PARCEL_MAX_CONNECTIONS);
         }
 
         static std::size_t max_connections_per_loc(util::runtime_configuration const& ini)
@@ -82,11 +77,8 @@ namespace hpx { namespace parcelset
             std::string key("hpx.parcel.");
             key += connection_handler_name();
 
-            std::string max_connections_per_locality =
-                ini.get_entry(key + ".max_connections_per_locality",
-                    HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY);
-            return hpx::util::safe_lexical_cast<std::size_t>(
-                max_connections_per_locality, HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY);
+            return hpx::util::get_entry_as<std::size_t>(
+                ini, key + ".max_connections_per_locality", HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY);
         }
 
     public:
