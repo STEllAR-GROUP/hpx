@@ -21,9 +21,9 @@ void test_adjacent_find(ExPolicy const& policy, IteratorTag)
 
     // fill vector with random values about 1
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), (std::rand() % 100) + 2);
+    std::iota(boost::begin(c), boost::end(c), (std::rand()%100) + 2);
 
-    std::size_t random_pos = std::rand() % 10006;
+    std::size_t random_pos = std::rand()%10006;
 
     c[random_pos] = 1;
     c[random_pos + 1] = 1;
@@ -53,7 +53,7 @@ void test_adjacent_find_async(ExPolicy const& p, IteratorTag)
 
     hpx::future<iterator> f =
         hpx::parallel::adjacent_find(p,
-        iterator(boost::begin(c)), iterator(boost::end(c)));
+            iterator(boost::begin(c)), iterator(boost::end(c)));
     f.wait();
 
     // create iterator at position of value to be found
@@ -94,7 +94,7 @@ void test_adjacent_find_exception(ExPolicy const& policy, IteratorTag)
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::decorated_iterator < base_iterator, IteratorTag >
+    typedef test::decorated_iterator <base_iterator, IteratorTag>
         decorated_iterator;
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand() + 1);
@@ -103,8 +103,8 @@ void test_adjacent_find_exception(ExPolicy const& policy, IteratorTag)
     try {
         hpx::parallel::adjacent_find(policy,
             decorated_iterator(
-            boost::begin(c),
-            [](){ throw std::runtime_error("test"); }),
+                boost::begin(c),
+                [](){ throw std::runtime_error("test"); }),
             decorated_iterator(boost::end(c)));
         HPX_TEST(false);
     }
@@ -123,7 +123,7 @@ template <typename ExPolicy, typename IteratorTag>
 void test_adjacent_find_exception_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::decorated_iterator < base_iterator, IteratorTag >
+    typedef test::decorated_iterator <base_iterator, IteratorTag>
         decorated_iterator;
 
     std::vector<std::size_t> c(10007);
@@ -135,10 +135,10 @@ void test_adjacent_find_exception_async(ExPolicy const& p, IteratorTag)
     try {
         hpx::future<decorated_iterator> f =
             hpx::parallel::adjacent_find(p,
-            decorated_iterator(
-                boost::begin(c),
-                [](){ throw std::runtime_error("test"); }),
-            decorated_iterator(boost::end(c)));
+                decorated_iterator(
+                    boost::begin(c),
+                    [](){ throw std::runtime_error("test"); }),
+                decorated_iterator(boost::end(c)));
 
         returned_from_algorithm = true;
 
@@ -146,7 +146,7 @@ void test_adjacent_find_exception_async(ExPolicy const& p, IteratorTag)
 
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e) {
+    catch(hpx::exception_list const& e) {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
@@ -192,7 +192,7 @@ void test_adjacent_find_bad_alloc(ExPolicy const& policy, IteratorTag)
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::decorated_iterator < base_iterator, IteratorTag >
+    typedef test::decorated_iterator <base_iterator, IteratorTag>
         decorated_iterator;
 
     std::vector<std::size_t> c(100007);
@@ -221,7 +221,7 @@ template <typename ExPolicy, typename IteratorTag>
 void test_adjacent_find_bad_alloc_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::decorated_iterator < base_iterator, IteratorTag >
+    typedef test::decorated_iterator <base_iterator, IteratorTag>
         decorated_iterator;
 
     std::vector<std::size_t> c(10007);
@@ -234,8 +234,8 @@ void test_adjacent_find_bad_alloc_async(ExPolicy const& p, IteratorTag)
         hpx::future<decorated_iterator> f =
             hpx::parallel::adjacent_find(p,
             decorated_iterator(
-            boost::begin(c),
-            [](){ throw std::bad_alloc(); }),
+                boost::begin(c),
+                [](){ throw std::bad_alloc(); }),
             decorated_iterator(boost::end(c)));
 
         returned_from_algorithm = true;
@@ -300,10 +300,22 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 int main(int argc, char* argv[])
 {
+    // add command line option which controls the random number generator seed
+    using namespace boost::program_options;
+    options_description desc_commandline(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
+
+    desc_commandline.add_options()
+        ("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run")
+        ;
+
+    // By default this test should run on all available cores
     std::vector<std::string> cfg;
     cfg.push_back("hpx.os_threads=" +
         boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency()));
 
+    // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,
         "HPX main exited with non-zero status");
 
