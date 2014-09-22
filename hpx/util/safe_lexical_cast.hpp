@@ -12,7 +12,7 @@
 namespace hpx { namespace util
 {
     template <class DestType, class SrcType>
-    DestType safe_lexical_cast(const SrcType& value, const DestType& dflt = DestType{})
+    DestType safe_lexical_cast(const SrcType& value, const DestType& dflt = DestType())
     {
         try
         {
