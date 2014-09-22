@@ -11,6 +11,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/io_service_pool.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
@@ -304,7 +305,7 @@ namespace hpx { namespace parcelset
         std::string enable_ipc =
             get_config_entry("hpx.parcel.ipc.enable", "0");
 
-        if (boost::lexical_cast<int>(enable_ipc))
+        if (hpx::util::safe_lexical_cast<int>(enable_ipc))
         {
             attach_parcelport(parcelport::create(
                 connection_ipc, hpx::get_config(),
@@ -315,7 +316,7 @@ namespace hpx { namespace parcelset
         std::string enable_ibverbs =
             get_config_entry("hpx.parcel.ibverbs.enable", "0");
 
-        if (boost::lexical_cast<int>(enable_ibverbs))
+        if (hpx::util::safe_lexical_cast<int>(enable_ibverbs))
         {
             attach_parcelport(parcelport::create(
                 connection_ibverbs, hpx::get_config(),
@@ -335,7 +336,7 @@ namespace hpx { namespace parcelset
         {
             std::string enable_tcp =
                 get_config_entry("hpx.parcel.tcp.enable", "1");
-            if (boost::lexical_cast<int>(enable_tcp)) {
+            if (hpx::util::safe_lexical_cast<int>(enable_tcp)) {
                 attach_parcelport(parcelport::create(
                     connection_tcp, hpx::get_config(),
                     pool->get_on_start_thread(), pool->get_on_stop_thread()));
@@ -355,7 +356,7 @@ namespace hpx { namespace parcelset
         {
             std::string cfgkey("hpx.parcel." + ppname + ".enable");
             std::string enabled = get_config_entry(cfgkey, "0");
-            strm << ", " << (boost::lexical_cast<int>(enabled) ? "" : "not ")
+            strm << ", " << (hpx::util::safe_lexical_cast<int>(enabled) ? "" : "not ")
                  << "enabled";
 
             std::string bootstrap = get_config_entry("hpx.parcel.bootstrap", "tcp");
@@ -518,7 +519,7 @@ namespace hpx { namespace parcelset
             // otherwise fall back to tcp
             if (use_alternative_parcelports_ &&
                 dest.get_address() == here().get_address() &&
-                boost::lexical_cast<int>(enable_ipc))
+                hpx::util::safe_lexical_cast<int>(enable_ipc))
             {
                 if (pports_[connection_ipc])
                     return connection_ipc;
@@ -532,7 +533,7 @@ namespace hpx { namespace parcelset
             std::string enable_ibverbs =
                 get_config_entry("hpx.parcel.ibverbs.enable", "0");
             if (use_alternative_parcelports_ &&
-                boost::lexical_cast<int>(enable_ibverbs))
+                hpx::util::safe_lexical_cast<int>(enable_ibverbs))
             {
                 if (pports_[connection_ibverbs])
                     return connection_ibverbs;

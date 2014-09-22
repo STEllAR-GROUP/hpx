@@ -16,6 +16,7 @@
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/util/mpi_environment.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/asio.hpp>
 #include <boost/lexical_cast.hpp>
@@ -214,7 +215,7 @@ namespace hpx { namespace util
                 if ("all" == threads_str)
                     threads = thread::hardware_concurrency(); //-V101
                 else
-                    threads = boost::lexical_cast<std::size_t>(threads_str);
+                    threads = hpx::util::safe_lexical_cast<std::size_t>(threads_str);
 
                 if (threads == 0)
                 {
@@ -278,7 +279,7 @@ namespace hpx { namespace util
                 if ("all" == cores_str)
                     num_cores = get_number_of_default_cores(env);
                 else
-                    num_cores = boost::lexical_cast<std::size_t>(cores_str);
+                    num_cores = hpx::util::safe_lexical_cast<std::size_t>(cores_str);
             }
 
             return num_cores;

@@ -8,6 +8,7 @@
 #include <hpx/util/ini.hpp>
 #include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <string>
 #include <stdexcept>
@@ -39,19 +40,6 @@ namespace hpx { namespace util
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename T>
-        inline T safe_lexical_cast(std::string const& s, T dflt)
-        {
-            try {
-                return boost::lexical_cast<T>(s);
-            }
-            catch (boost::bad_lexical_cast const&) {
-                /**/;
-            }
-            return dflt;
-        }
-
-        ///////////////////////////////////////////////////////////////////////
         // All command line options which are normally formatted as --hpx:foo
         // should be usable as --hpx:N:foo, where N is the node number this
         // option should be exclusively used for.
@@ -72,7 +60,7 @@ namespace hpx { namespace util
             if (p == std::string::npos)
                 return false;
 
-            if (safe_lexical_cast(s.substr(hpx_prefix_len, p-hpx_prefix_len),
+            if (hpx::util::safe_lexical_cast(s.substr(hpx_prefix_len, p-hpx_prefix_len),
                     std::size_t(-1)) == node)
             {
                 // this option is for the current locality only
@@ -674,7 +662,7 @@ namespace hpx { namespace util
         if (cfg.has_entry("hpx.cmd_line"))
             cmdline = cfg.get_entry("hpx.cmd_line");
         if (cfg.has_entry("hpx.locality"))
-            node = boost::lexical_cast<std::size_t>(cfg.get_entry("hpx.locality"));
+            node = hpx::util::safe_lexical_cast<std::size_t>(cfg.get_entry("hpx.locality"));
 
         return parse_commandline(cfg, app_options, cmdline, vm, node,
             allow_unregistered);

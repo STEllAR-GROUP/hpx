@@ -16,6 +16,7 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
 
 #include <boost/format.hpp>
@@ -333,7 +334,7 @@ namespace hpx { namespace performance_counters
             }
             else if (!elements.instance_.parent_.index_.empty()) {
                 path.parentinstanceindex_ =
-                    boost::lexical_cast<boost::uint64_t>(elements.instance_.parent_.index_);
+                    hpx::util::safe_lexical_cast<boost::uint64_t>(elements.instance_.parent_.index_);
             }
 
             if (elements.instance_.child_.index_ == "#*") {
@@ -341,7 +342,7 @@ namespace hpx { namespace performance_counters
             }
             else if (!elements.instance_.child_.index_.empty()) {
                 path.instanceindex_ =
-                    boost::lexical_cast<boost::uint64_t>(elements.instance_.child_.index_);
+                    hpx::util::safe_lexical_cast<boost::uint64_t>(elements.instance_.child_.index_);
             }
         }
 
