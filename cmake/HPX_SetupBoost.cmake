@@ -28,11 +28,11 @@ endif()
 
 set(Boost_TMP_LIBRARIES ${Boost_LIBRARIES})
 if(UNIX AND NOT CYGWIN)
-  find_library(BOOST_THREAD_LIBRARY NAMES pthread DOC "The threading library used by boost.thread")
-  if(NOT BOOST_THREAD_LIBRARY AND (HPX_PLATFORM_UC STREQUAL "XEONPHI"))
-    set(BOOST_THREAD_LIBRARY "-pthread")
+  find_library(BOOST_UNDERLYING_THREAD_LIBRARY NAMES pthread DOC "The threading library used by boost.thread")
+  if(NOT BOOST_UNDERLYING_THREAD_LIBRARY AND (HPX_PLATFORM_UC STREQUAL "XEONPHI"))
+    set(BOOST_UNDERLYING_THREAD_LIBRARY "-pthread")
   endif()
-  set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${BOOST_THREAD_LIBRARY})
+  set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${BOOST_UNDERLYING_THREAD_LIBRARY})
 endif()
 
 # Set configuration option to use Boost.Context or not. This depends on the Boost
