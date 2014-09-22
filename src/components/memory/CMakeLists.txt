@@ -10,7 +10,8 @@ if(HPX_BUILD_DEFAULT_TARGETS)
   add_hpx_component(memory
     FOLDER "Core/Components"
     HEADER_ROOT ${root}
-    AUTOGLOB)
+    AUTOGLOB
+    PLUGIN)
 endif()
 
 add_hpx_pseudo_dependencies(components.memory
