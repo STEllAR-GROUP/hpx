@@ -444,8 +444,8 @@ namespace hpx { namespace util
     // configuration section:
     //
     //    [hpx.agas]
-    //    address=<ip address>   # this defaults to HPX_INITIAL_IP_PORT
-    //    port=<ip port>         # this defaults to HPX_INITIAL_IP_ADDRESS
+    //    address=<ip address>   # this defaults to HPX_INITIAL_IP_ADDRESS
+    //    port=<ip port>         # this defaults to HPX_INITIAL_IP_PORT
     //
     // TODO: implement for AGAS v2
     naming::locality runtime_configuration::get_agas_locality() const
@@ -468,7 +468,7 @@ namespace hpx { namespace util
 #if defined(HPX_PARCELPORT_IBVERBS) // FIXME
                       , ""
 #endif
-                      , hpx::util::safe_lexical_cast<boost::uint16_t>(cfg_port)
+                      , hpx::util::safe_lexical_cast<boost::uint16_t>(cfg_port, HPX_INITIAL_IP_PORT)
 #if defined(HPX_PARCELPORT_MPI)
                       , mpi_environment::enabled() ? 0 : -1
 #endif
@@ -497,8 +497,8 @@ namespace hpx { namespace util
     // global hpx configuration section:
     //
     //    [hpx.parcel]
-    //    address=<ip address>   # this defaults to HPX_INITIAL_IP_PORT
-    //    port=<ip port>         # this defaults to HPX_INITIAL_IP_ADDRESS
+    //    address=<ip address>   # this defaults to HPX_INITIAL_IP_ADDRESS
+    //    port=<ip port>         # this defaults to HPX_INITIAL_IP_PORT
     //
     naming::locality runtime_configuration::get_parcelport_address() const
     {
@@ -514,7 +514,7 @@ namespace hpx { namespace util
 #if defined(HPX_PARCELPORT_IBVERBS)
                   , get_ibverbs_address()
 #endif
-                  , hpx::util::safe_lexical_cast<boost::uint16_t>(cfg_port)
+                  , hpx::util::safe_lexical_cast<boost::uint16_t>(cfg_port, HPX_INITIAL_IP_PORT)
                 );
             }
         }
@@ -599,7 +599,8 @@ namespace hpx { namespace util
                     sec->get_entry("data_buffer_cache_size",
                         HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE));
 
-                return hpx::util::safe_lexical_cast<std::size_t>(cfg_ipc_data_buffer_cache_size);
+                return hpx::util::safe_lexical_cast<std::size_t>(
+                    cfg_ipc_data_buffer_cache_size, HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE);
             }
         }
         return HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE;
@@ -637,7 +638,7 @@ namespace hpx { namespace util
                 util::section const* sec = get_section("hpx");
                 if (NULL != sec) {
                     num_localities = hpx::util::safe_lexical_cast<boost::uint32_t>(
-                        sec->get_entry("localities", 1));
+                        sec->get_entry("localities", 1), 1);
                 }
             }
         }
@@ -667,7 +668,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
                 return hpx::util::safe_lexical_cast<boost::uint32_t>(
-                    sec->get_entry("first_used_core", 0));
+                    sec->get_entry("first_used_core", 0), 0);
             }
         }
         return 0;
@@ -693,7 +694,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
                 cache_size = hpx::util::safe_lexical_cast<std::size_t>(
-                    sec->get_entry("local_cache_size", cache_size));
+                    sec->get_entry("local_cache_size", cache_size), cache_size);
             }
         }
 
@@ -710,7 +711,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
                 cache_size = hpx::util::safe_lexical_cast<std::size_t>(
-                    sec->get_entry("local_cache_size_per_thread", cache_size));
+                    sec->get_entry("local_cache_size_per_thread", cache_size), cache_size);
             }
         }
 
@@ -725,7 +726,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
                 return hpx::util::safe_lexical_cast<int>(
-                    sec->get_entry("use_caching", "1")) != 0;
+                    sec->get_entry("use_caching", "1"), 1) != 0;
             }
         }
         return false;
@@ -737,7 +738,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
                 return hpx::util::safe_lexical_cast<int>(
-                    sec->get_entry("use_range_caching", "1")) != 0;
+                    sec->get_entry("use_range_caching", "1"), 1) != 0;
             }
         }
         return false;
@@ -751,7 +752,8 @@ namespace hpx { namespace util
             if (NULL != sec) {
                 return hpx::util::safe_lexical_cast<std::size_t>(
                     sec->get_entry("max_pending_refcnt_requests",
-                        HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS));
+                        HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS),
+                        HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS);
             }
         }
         return HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS;
@@ -766,7 +768,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
                 return hpx::util::safe_lexical_cast<int>(
-                    sec->get_entry("dedicated_server", 0)) != 0;
+                    sec->get_entry("dedicated_server", 0), 0) != 0;
             }
         }
         return false;
@@ -779,7 +781,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
                 return hpx::util::safe_lexical_cast<int>(
-                    sec->get_entry("use_itt_notify", "0")) != 0;
+                    sec->get_entry("use_itt_notify", "0"), 0) != 0;
             }
         }
 #endif
@@ -794,7 +796,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
                 return hpx::util::safe_lexical_cast<int>(
-                    sec->get_entry("lock_detection", "0")) != 0;
+                    sec->get_entry("lock_detection", "0"), 0) != 0;
             }
         }
 #endif
@@ -809,7 +811,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
                 return hpx::util::safe_lexical_cast<int>(
-                    sec->get_entry("global_lock_detection", "0")) != 0;
+                    sec->get_entry("global_lock_detection", "0"), 0) != 0;
             }
         }
 #endif
@@ -825,10 +827,10 @@ namespace hpx { namespace util
             if (NULL != sec) {
 #ifdef HPX_DEBUG
                 return hpx::util::safe_lexical_cast<int>(
-                    sec->get_entry("minimal_deadlock_detection", "1")) != 0;
+                    sec->get_entry("minimal_deadlock_detection", "1"), 1) != 0;
 #else
                 return hpx::util::safe_lexical_cast<int>(
-                    sec->get_entry("minimal_deadlock_detection", "0")) != 0;
+                    sec->get_entry("minimal_deadlock_detection", "0"), 0) != 0;
 #endif
             }
         }
@@ -850,7 +852,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
                 return hpx::util::safe_lexical_cast<std::size_t>(
-                    sec->get_entry("os_threads", 1));
+                    sec->get_entry("os_threads", 1), 1);
             }
         }
         return 1;
@@ -874,7 +876,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx.threadpools");
             if (NULL != sec) {
                 return hpx::util::safe_lexical_cast<std::size_t>(
-                    sec->get_entry(std::string(poolname) + "_size", "2"));
+                    sec->get_entry(std::string(poolname) + "_size", "2"), 2);
             }
         }
         return 2;     // the default size for all pools is 2
@@ -927,7 +929,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx.stacks");
             if (NULL != sec) {
                 return hpx::util::safe_lexical_cast<int>(
-                    sec->get_entry("use_guard_pages", "1")) != 0;
+                    sec->get_entry("use_guard_pages", "1"), 1) != 0;
             }
         }
         return true;    // default is true
@@ -966,7 +968,8 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx.parcel");
             if (NULL != sec) {
                 return hpx::util::safe_lexical_cast<boost::uint64_t>(
-                    sec->get_entry("max_message_size", HPX_PARCEL_MAX_MESSAGE_SIZE));
+                    sec->get_entry("max_message_size", HPX_PARCEL_MAX_MESSAGE_SIZE),
+                    HPX_PARCEL_MAX_MESSAGE_SIZE);
             }
         }
         return HPX_PARCEL_MAX_MESSAGE_SIZE;    // default is 1GByte
