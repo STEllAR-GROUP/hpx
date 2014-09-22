@@ -365,7 +365,7 @@ void addressing_service::launch_bootstrap(
                   % naming::get_locality_id_from_gid(here)));
 
     boost::uint32_t num_threads = hpx::util::safe_lexical_cast<boost::uint32_t>(
-        ini_.get_entry("hpx.os_threads", boost::uint32_t(1)));
+        ini_.get_entry("hpx.os_threads", boost::uint32_t(1)), 1);
     request locality_req(locality_ns_allocate, ep, 4, num_threads); //-V112
     bootstrap->locality_ns_server_.remote_service(locality_req);
 

@@ -64,7 +64,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         }
         std::string use_io_pool =
             ini.get_entry("hpx.parcel.mpi.use_io_pool", "1");
-        if(hpx::util::safe_lexical_cast<int>(use_io_pool) == 0)
+        if(hpx::util::safe_lexical_cast<int>(use_io_pool, 1) == 0)
         {
             use_io_pool_ = false;
         }
