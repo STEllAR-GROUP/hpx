@@ -7,6 +7,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/batch_environment.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -87,8 +88,8 @@ namespace hpx { namespace util { namespace detail
                         }
                         else
                         {
-                            std::size_t begin = boost::lexical_cast<std::size_t>(range[0]);
-                            std::size_t end = boost::lexical_cast<std::size_t>(range[1]);
+                            std::size_t begin = hpx::util::safe_lexical_cast<std::size_t>(range[0]);
+                            std::size_t end = hpx::util::safe_lexical_cast<std::size_t>(range[1]);
                             if(begin > end) std::swap(begin, end);
 
                             std::vector<std::string> vs;

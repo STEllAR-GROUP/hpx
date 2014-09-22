@@ -13,6 +13,7 @@
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/register_locks_globally.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 
 // TODO: move parcel ports into plugins
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
@@ -468,7 +469,7 @@ namespace hpx { namespace util
 #if defined(HPX_PARCELPORT_IBVERBS) // FIXME
                       , ""
 #endif
-                      , boost::lexical_cast<boost::uint16_t>(cfg_port)
+                      , hpx::util::safe_lexical_cast<boost::uint16_t>(cfg_port)
 #if defined(HPX_PARCELPORT_MPI)
                       , mpi_environment::enabled() ? 0 : -1
 #endif
@@ -514,7 +515,7 @@ namespace hpx { namespace util
 #if defined(HPX_PARCELPORT_IBVERBS)
                   , get_ibverbs_address()
 #endif
-                  , boost::lexical_cast<boost::uint16_t>(cfg_port)
+                  , hpx::util::safe_lexical_cast<boost::uint16_t>(cfg_port)
                 );
             }
         }
@@ -599,7 +600,7 @@ namespace hpx { namespace util
                     sec->get_entry("data_buffer_cache_size",
                         HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE));
 
-                return boost::lexical_cast<std::size_t>(cfg_ipc_data_buffer_cache_size);
+                return hpx::util::safe_lexical_cast<std::size_t>(cfg_ipc_data_buffer_cache_size);
             }
         }
         return HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE;
@@ -636,7 +637,7 @@ namespace hpx { namespace util
             if (has_section("hpx")) {
                 util::section const* sec = get_section("hpx");
                 if (NULL != sec) {
-                    num_localities = boost::lexical_cast<boost::uint32_t>(
+                    num_localities = hpx::util::safe_lexical_cast<boost::uint32_t>(
                         sec->get_entry("localities", 1));
                 }
             }
@@ -666,7 +667,7 @@ namespace hpx { namespace util
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
-                return boost::lexical_cast<boost::uint32_t>(
+                return hpx::util::safe_lexical_cast<boost::uint32_t>(
                     sec->get_entry("first_used_core", 0));
             }
         }
@@ -692,7 +693,7 @@ namespace hpx { namespace util
         if (has_section("hpx.agas")) {
             util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
-                cache_size = boost::lexical_cast<std::size_t>(
+                cache_size = hpx::util::safe_lexical_cast<std::size_t>(
                     sec->get_entry("local_cache_size", cache_size));
             }
         }
@@ -709,7 +710,7 @@ namespace hpx { namespace util
         if (has_section("hpx.agas")) {
             util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
-                cache_size = boost::lexical_cast<std::size_t>(
+                cache_size = hpx::util::safe_lexical_cast<std::size_t>(
                     sec->get_entry("local_cache_size_per_thread", cache_size));
             }
         }
@@ -724,7 +725,7 @@ namespace hpx { namespace util
         if (has_section("hpx.agas")) {
             util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
-                return boost::lexical_cast<int>(
+                return hpx::util::safe_lexical_cast<int>(
                     sec->get_entry("use_caching", "1")) != 0;
             }
         }
@@ -736,7 +737,7 @@ namespace hpx { namespace util
         if (has_section("hpx.agas")) {
             util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
-                return boost::lexical_cast<int>(
+                return hpx::util::safe_lexical_cast<int>(
                     sec->get_entry("use_range_caching", "1")) != 0;
             }
         }
@@ -749,7 +750,7 @@ namespace hpx { namespace util
         if (has_section("hpx.agas")) {
             util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
-                return boost::lexical_cast<std::size_t>(
+                return hpx::util::safe_lexical_cast<std::size_t>(
                     sec->get_entry("max_pending_refcnt_requests",
                         HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS));
             }
@@ -765,7 +766,7 @@ namespace hpx { namespace util
         if (has_section("hpx.agas")) {
             util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
-                return boost::lexical_cast<int>(
+                return hpx::util::safe_lexical_cast<int>(
                     sec->get_entry("dedicated_server", 0)) != 0;
             }
         }
@@ -778,7 +779,7 @@ namespace hpx { namespace util
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
-                return boost::lexical_cast<int>(
+                return hpx::util::safe_lexical_cast<int>(
                     sec->get_entry("use_itt_notify", "0")) != 0;
             }
         }
@@ -793,7 +794,7 @@ namespace hpx { namespace util
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
-                return boost::lexical_cast<int>(
+                return hpx::util::safe_lexical_cast<int>(
                     sec->get_entry("lock_detection", "0")) != 0;
             }
         }
@@ -808,7 +809,7 @@ namespace hpx { namespace util
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
-                return boost::lexical_cast<int>(
+                return hpx::util::safe_lexical_cast<int>(
                     sec->get_entry("global_lock_detection", "0")) != 0;
             }
         }
@@ -824,10 +825,10 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
 #ifdef HPX_DEBUG
-                return boost::lexical_cast<int>(
+                return hpx::util::safe_lexical_cast<int>(
                     sec->get_entry("minimal_deadlock_detection", "1")) != 0;
 #else
-                return boost::lexical_cast<int>(
+                return hpx::util::safe_lexical_cast<int>(
                     sec->get_entry("minimal_deadlock_detection", "0")) != 0;
 #endif
             }
@@ -849,7 +850,7 @@ namespace hpx { namespace util
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
-                return boost::lexical_cast<std::size_t>(
+                return hpx::util::safe_lexical_cast<std::size_t>(
                     sec->get_entry("os_threads", 1));
             }
         }
@@ -873,7 +874,7 @@ namespace hpx { namespace util
         if (has_section("hpx.threadpools")) {
             util::section const* sec = get_section("hpx.threadpools");
             if (NULL != sec) {
-                return boost::lexical_cast<std::size_t>(
+                return hpx::util::safe_lexical_cast<std::size_t>(
                     sec->get_entry(std::string(poolname) + "_size", "2"));
             }
         }
@@ -926,7 +927,7 @@ namespace hpx { namespace util
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx.stacks");
             if (NULL != sec) {
-                return boost::lexical_cast<int>(
+                return hpx::util::safe_lexical_cast<int>(
                     sec->get_entry("use_guard_pages", "1")) != 0;
             }
         }
@@ -965,7 +966,7 @@ namespace hpx { namespace util
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx.parcel");
             if (NULL != sec) {
-                return boost::lexical_cast<boost::uint64_t>(
+                return hpx::util::safe_lexical_cast<boost::uint64_t>(
                     sec->get_entry("max_message_size", HPX_PARCEL_MAX_MESSAGE_SIZE));
             }
         }

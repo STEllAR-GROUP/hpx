@@ -17,6 +17,7 @@
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -51,7 +52,7 @@ namespace hpx { namespace parcelset
 
             std::string thread_pool_size =
                 ini.get_entry(key + ".io_pool_size", "2");
-            return boost::lexical_cast<std::size_t>(thread_pool_size);
+            return hpx::util::safe_lexical_cast<std::size_t>(thread_pool_size);
         }
 
         static const char *pool_name()
@@ -72,7 +73,7 @@ namespace hpx { namespace parcelset
             std::string max_connections =
                 ini.get_entry(key + ".max_connections",
                     HPX_PARCEL_MAX_CONNECTIONS);
-            return boost::lexical_cast<std::size_t>(max_connections);
+            return hpx::util::safe_lexical_cast<std::size_t>(max_connections);
         }
 
         static std::size_t max_connections_per_loc(util::runtime_configuration const& ini)
@@ -83,7 +84,7 @@ namespace hpx { namespace parcelset
             std::string max_connections_per_locality =
                 ini.get_entry(key + ".max_connections_per_locality",
                     HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY);
-            return boost::lexical_cast<std::size_t>(max_connections_per_locality);
+            return hpx::util::safe_lexical_cast<std::size_t>(max_connections_per_locality);
         }
 
     public:
