@@ -536,8 +536,8 @@ void test_find_end_bad_alloc()
     test_find_end_bad_alloc(seq, IteratorTag());
     test_find_end_bad_alloc(par, IteratorTag());
 
-    test_find_end_bad_alloc(seq(task), IteratorTag());
-    test_find_end_bad_alloc(par(task), IteratorTag());
+    test_find_end_bad_alloc_async(seq(task), IteratorTag());
+    test_find_end_bad_alloc_async(par(task), IteratorTag());
 
     test_find_end_bad_alloc(execution_policy(seq), IteratorTag());
     test_find_end_bad_alloc(execution_policy(par), IteratorTag());
