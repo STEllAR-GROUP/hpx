@@ -212,7 +212,8 @@ void test_copy_n_exception_async(ExPolicy const& p, IteratorTag)
                 ),
                 c.size(),
                 boost::begin(d));
-        bool returned_from_algorithm = false;
+
+        returned_from_algorithm = false;
         f.get();
 
         HPX_TEST(false);
