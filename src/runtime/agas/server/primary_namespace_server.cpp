@@ -891,7 +891,8 @@ void primary_namespace::resolve_free_list(
             if (ec)
                 return;
 
-            if (at_c<0>(r) == naming::invalid_gid)
+            naming::gid_type& raw = at_c<0>(r);
+            if (raw == naming::invalid_gid)
             {
                 LAGAS_(info) << (boost::format(
                     "primary_namespace::resolve_free_list, failed to resolve gid, "
@@ -901,9 +902,10 @@ void primary_namespace::resolve_free_list(
             }
 
             // Make sure the GVA is valid.
+            gva& g = at_c<1>(r);
+
             // REVIEW: Should we do more to make sure the GVA is valid?
-            if (HPX_UNLIKELY(components::component_invalid
-                                == at_c<1>(r).type))
+            if (HPX_UNLIKELY(components::component_invalid == g.type))
             {
                 l.unlock();
 
@@ -912,11 +914,10 @@ void primary_namespace::resolve_free_list(
                     , boost::str(boost::format(
                         "encountered a GVA with an invalid type while "
                         "performing a decrement, gid:%1%, gva:%2%")
-                        % query % at_c<1>(r)));
+                        % query % g));
                 return;
             }
-
-            else if (HPX_UNLIKELY(0 == at_c<1>(r).count))
+            else if (HPX_UNLIKELY(0 == g.count))
             {
                 l.unlock();
 
@@ -925,14 +926,14 @@ void primary_namespace::resolve_free_list(
                     , boost::str(boost::format(
                         "encountered a GVA with a count of zero while "
                         "performing a decrement, gid:%1%, gva:%2%")
-                        % query % at_c<1>(r)));
+                        % query % g));
                 return;
             }
 
             // Determine how much of the mapping's key space this GVA covers.
             // Note that at_c<1>(r).count must be greater than 0 if we've
             // reached this point in the code.
-            naming::gid_type sub_upper(at_c<0>(r) + (at_c<1>(r).count - 1));
+            naming::gid_type sub_upper(raw + (g.count - 1));
 
             // If this GVA ends after the key space, we just set the upper
             // limit to the end of the key space.
@@ -961,11 +962,11 @@ void primary_namespace::resolve_free_list(
             naming::gid_type const length = boost::icl::length(sub);
 
             // Fully resolve the range.
-            gva const g = at_c<1>(r).resolve(query, at_c<0>(r));
+            gva const resolved = g.resolve(query, raw);
 
             // Add the information needed to destroy these components to the
             // free list.
-            free_entry_list.push_back(free_entry(g, query, length, at_c<2>(r)));
+            free_entry_list.push_back(free_entry(resolved, query, length, at_c<2>(r)));
         }
 
         // If this is just a partial match, we need to split it up with a
@@ -1073,7 +1074,7 @@ void primary_namespace::decrement_sweep(
         }
 
         ///////////////////////////////////////////////////////////////////////
-        // Resolve the dead objects.
+        // Resolve the objects which have to be deleted.
         resolve_free_list(l, free_list, free_entry_list, lower, upper, ec);
 
     } // Unlock the mutex.
