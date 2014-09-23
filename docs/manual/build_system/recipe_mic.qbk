@@ -58,7 +58,7 @@ with the sole difference that you have to enable the Xeon Phi in the CMake Build
 This is achieved by invoking CMake in the following way:
 ```
         cmake                                             \
-            -CMAKE_TOOLCHAIN_FILE=/path/to/hpx/cmake/toolchains/XeonPhi.cmake \
+            -DCMAKE_TOOLCHAIN_FILE=/path/to/hpx/cmake/toolchains/XeonPhi.cmake \
             -DBOOST_ROOT=$BOOST_ROOT                      \
             -DHWLOC_ROOT=$HWLOC_ROOT                      \
             /path/to/hpx
