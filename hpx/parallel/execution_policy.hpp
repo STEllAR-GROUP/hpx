@@ -113,7 +113,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
     ///////////////////////////////////////////////////////////////////////////
     /// \cond NOINTERNAL
-    struct task_execution_policy_tag {};
+    struct task_execution_policy_tag
+    {
+        task_execution_policy_tag() {}
+    };
     /// \endcond
 
     /// The execution policy tag \a task can be used to create a execution
