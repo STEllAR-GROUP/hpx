@@ -46,7 +46,25 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     };
 
     template <typename T>
-    struct algorithm_result_impl<task_execution_policy, T>
+    struct algorithm_result_impl<sequential_task_execution_policy, T>
+    {
+        // The return type of the initiating function.
+        typedef hpx::future<T> type;
+
+        // Obtain initiating function's return type.
+        static type get(T && t)
+        {
+            return hpx::make_ready_future(std::move(t));
+        }
+
+        static type get(hpx::future<T> && t)
+        {
+            return std::move(t);
+        }
+    };
+
+    template <typename T>
+    struct algorithm_result_impl<parallel_task_execution_policy, T>
     {
         // The return type of the initiating function.
         typedef hpx::future<T> type;
@@ -64,7 +82,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     };
 
     template <>
-    struct algorithm_result_impl<task_execution_policy, void>
+    struct algorithm_result_impl<sequential_task_execution_policy, void>
     {
         // The return type of the initiating function.
         typedef hpx::future<void> type;
@@ -73,6 +91,29 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         static type get(hpx::util::unused_type)
         {
             return hpx::make_ready_future();
+        }
+
+        static type get(hpx::future<void> && t)
+        {
+            return std::move(t);
+        }
+    };
+
+    template <>
+    struct algorithm_result_impl<parallel_task_execution_policy, void>
+    {
+        // The return type of the initiating function.
+        typedef hpx::future<void> type;
+
+        // Obtain initiating function's return type.
+        static type get(hpx::util::unused_type)
+        {
+            return hpx::make_ready_future();
+        }
+
+        static type get(hpx::future<void> && t)
+        {
+            return std::move(t);
         }
     };
 

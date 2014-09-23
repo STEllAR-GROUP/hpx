@@ -52,8 +52,8 @@ void test_equal1(ExPolicy const& policy, IteratorTag)
     }
 }
 
-template <typename IteratorTag>
-void test_equal1(hpx::parallel::task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_equal1_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -67,7 +67,7 @@ void test_equal1(hpx::parallel::task_execution_policy, IteratorTag)
 
     {
         hpx::future<bool> result =
-            hpx::parallel::equal(hpx::parallel::task,
+            hpx::parallel::equal(p,
                 iterator(boost::begin(c1)), iterator(boost::end(c1)),
                 boost::begin(c2));
         result.wait();
@@ -83,7 +83,7 @@ void test_equal1(hpx::parallel::task_execution_policy, IteratorTag)
         ++c1[std::rand() % c1.size()];
 
         hpx::future<bool> result =
-            hpx::parallel::equal(hpx::parallel::task,
+            hpx::parallel::equal(p,
                 iterator(boost::begin(c1)), iterator(boost::end(c1)),
                 boost::begin(c2));
         result.wait();
@@ -104,12 +104,16 @@ void test_equal1()
     test_equal1(seq, IteratorTag());
     test_equal1(par, IteratorTag());
     test_equal1(par_vec, IteratorTag());
-    test_equal1(task, IteratorTag());
+
+    test_equal1_async(seq(task), IteratorTag());
+    test_equal1_async(par(task), IteratorTag());
 
     test_equal1(execution_policy(seq), IteratorTag());
     test_equal1(execution_policy(par), IteratorTag());
     test_equal1(execution_policy(par_vec), IteratorTag());
-    test_equal1(execution_policy(task), IteratorTag());
+
+    test_equal1(execution_policy(seq(task)), IteratorTag());
+    test_equal1(execution_policy(par(task)), IteratorTag());
 }
 
 void equal_test1()
@@ -161,8 +165,8 @@ void test_equal2(ExPolicy const& policy, IteratorTag)
     }
 }
 
-template <typename IteratorTag>
-void test_equal2(hpx::parallel::task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_equal2_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -176,7 +180,7 @@ void test_equal2(hpx::parallel::task_execution_policy, IteratorTag)
 
     {
         hpx::future<bool> result =
-            hpx::parallel::equal(hpx::parallel::task,
+            hpx::parallel::equal(p,
                 iterator(boost::begin(c1)), iterator(boost::end(c1)),
                 boost::begin(c2), std::equal_to<std::size_t>());
         result.wait();
@@ -192,7 +196,7 @@ void test_equal2(hpx::parallel::task_execution_policy, IteratorTag)
         ++c1[std::rand() % c1.size()];
 
         hpx::future<bool> result =
-            hpx::parallel::equal(hpx::parallel::task,
+            hpx::parallel::equal(p,
                 iterator(boost::begin(c1)), iterator(boost::end(c1)),
                 boost::begin(c2), std::equal_to<std::size_t>());
         result.wait();
@@ -213,12 +217,16 @@ void test_equal2()
     test_equal2(seq, IteratorTag());
     test_equal2(par, IteratorTag());
     test_equal2(par_vec, IteratorTag());
-    test_equal2(task, IteratorTag());
+
+    test_equal2_async(seq(task), IteratorTag());
+    test_equal2_async(par(task), IteratorTag());
 
     test_equal2(execution_policy(seq), IteratorTag());
     test_equal2(execution_policy(par), IteratorTag());
     test_equal2(execution_policy(par_vec), IteratorTag());
-    test_equal2(execution_policy(task), IteratorTag());
+
+    test_equal2(execution_policy(seq(task)), IteratorTag());
+    test_equal2(execution_policy(par(task)), IteratorTag());
 }
 
 void equal_test2()
@@ -266,8 +274,8 @@ void test_equal_exception(ExPolicy const& policy, IteratorTag)
     HPX_TEST(caught_exception);
 }
 
-template <typename IteratorTag>
-void test_equal_exception(hpx::parallel::task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_equal_exception_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -282,7 +290,7 @@ void test_equal_exception(hpx::parallel::task_execution_policy, IteratorTag)
     bool caught_exception = false;
     try {
         hpx::future<bool> f =
-            hpx::parallel::equal(hpx::parallel::task,
+            hpx::parallel::equal(p,
                 iterator(boost::begin(c1)), iterator(boost::end(c1)),
                 boost::begin(c2),
                 [](std::size_t v1, std::size_t v2) {
@@ -295,9 +303,7 @@ void test_equal_exception(hpx::parallel::task_execution_policy, IteratorTag)
     }
     catch(hpx::exception_list const& e) {
         caught_exception = true;
-        test::test_num_exceptions<
-            hpx::parallel::task_execution_policy, IteratorTag
-        >::call(hpx::parallel::task, e);
+        test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
     catch(...) {
         HPX_TEST(false);
@@ -316,11 +322,15 @@ void test_equal_exception()
     // with a vector execution policy
     test_equal_exception(seq, IteratorTag());
     test_equal_exception(par, IteratorTag());
-    test_equal_exception(task, IteratorTag());
+
+    test_equal_exception_async(seq(task), IteratorTag());
+    test_equal_exception_async(par(task), IteratorTag());
 
     test_equal_exception(execution_policy(seq), IteratorTag());
     test_equal_exception(execution_policy(par), IteratorTag());
-    test_equal_exception(execution_policy(task), IteratorTag());
+
+    test_equal_exception(execution_policy(seq(task)), IteratorTag());
+    test_equal_exception(execution_policy(par(task)), IteratorTag());
 }
 
 void equal_exception_test()
@@ -367,8 +377,8 @@ void test_equal_bad_alloc(ExPolicy const& policy, IteratorTag)
     HPX_TEST(caught_bad_alloc);
 }
 
-template <typename IteratorTag>
-void test_equal_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_equal_bad_alloc_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -383,7 +393,7 @@ void test_equal_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
     bool caught_bad_alloc = false;
     try {
         hpx::future<bool> f =
-            hpx::parallel::equal(hpx::parallel::task,
+            hpx::parallel::equal(p,
                 iterator(boost::begin(c1)), iterator(boost::end(c1)),
                 boost::begin(c2),
                 [](std::size_t v1, std::size_t v2) {
@@ -414,11 +424,15 @@ void test_equal_bad_alloc()
     // with a vector execution policy
     test_equal_bad_alloc(seq, IteratorTag());
     test_equal_bad_alloc(par, IteratorTag());
-    test_equal_bad_alloc(task, IteratorTag());
+
+    test_equal_bad_alloc_async(seq(task), IteratorTag());
+    test_equal_bad_alloc_async(par(task), IteratorTag());
 
     test_equal_bad_alloc(execution_policy(seq), IteratorTag());
     test_equal_bad_alloc(execution_policy(par), IteratorTag());
-    test_equal_bad_alloc(execution_policy(task), IteratorTag());
+
+    test_equal_bad_alloc(execution_policy(seq(task)), IteratorTag());
+    test_equal_bad_alloc(execution_policy(par(task)), IteratorTag());
 }
 
 void equal_bad_alloc_test()

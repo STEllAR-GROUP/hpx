@@ -128,13 +128,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with an execution policy object of type
-    /// \a parallel_execution_policy or \a task_execution_policy are
+    /// \a parallel_execution_policy or \a parallel_task_execution_policy are
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a none_of algorithm returns a \a hpx::future<bool> if
-    ///           the execution policy is of type \a task_execution_policy and
-    ///           returns \a bool otherwise.
+    ///           the execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and returns \a bool
+    ///           otherwise.
     ///           The \a none_of algorithm returns true if the unary predicate
     ///           \a f returns true for no elements in the range, false
     ///           otherwise. It returns true if the range is empty.
@@ -262,12 +264,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with an execution policy object of type
-    /// \a parallel_execution_policy or \a task_execution_policy are
+    /// \a parallel_execution_policy or \a parallel_task_execution_policy are
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a any_of algorithm returns a \a hpx::future<bool> if
-    ///           the execution policy is of type \a task_execution_policy and
+    ///           the execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a bool otherwise.
     ///           The \a any_of algorithm returns true if the unary predicate
     ///           \a f returns true for at least one element in the range,
@@ -396,12 +400,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with an execution policy object of type
-    /// \a parallel_execution_policy or \a task_execution_policy are
+    /// \a parallel_execution_policy or \a parallel_task_execution_policy are
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a all_of algorithm returns a \a hpx::future<bool> if
-    ///           the execution policy is of type \a task_execution_policy and
+    ///           the execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a bool otherwise.
     ///           The \a all_of algorithm returns true if the unary predicate
     ///           \a f returns true for all elements in the range, false

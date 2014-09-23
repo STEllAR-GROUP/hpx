@@ -41,24 +41,26 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
               : reduce::algorithm("reduce")
             {}
 
-            template <typename ExPolicy, typename InIter, typename Reduce>
+            template <typename ExPolicy, typename InIter, typename T_,
+                typename Reduce>
             static T
             sequential(ExPolicy const&, InIter first, InIter last,
-                T && init, Reduce && r)
+                T_ && init, Reduce && r)
             {
-                return std::accumulate(first, last, std::forward<T>(init),
+                return std::accumulate(first, last, std::forward<T_>(init),
                     std::forward<Reduce>(r));
             }
 
-            template <typename ExPolicy, typename FwdIter, typename Reduce>
+            template <typename ExPolicy, typename FwdIter, typename T_,
+                typename Reduce>
             static typename detail::algorithm_result<ExPolicy, T>::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
-                T && init, Reduce && r)
+                T_ && init, Reduce && r)
             {
                 if (first == last)
                 {
                     return detail::algorithm_result<ExPolicy, T>::get(
-                        std::forward<T>(init));
+                        std::forward<T_>(init));
                 }
 
                 return util::partitioner<ExPolicy, T>::call(
@@ -125,12 +127,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The reduce operations in the parallel \a copy_if algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a reduce algorithm returns a \a hpx::future<T> if the
-    ///           execution policy is of type \a task_execution_policy and
+    ///           execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a T otherwise.
     ///           The \a reduce algorithm returns the result of the
     ///           generalized sum over the elements given by the input range
@@ -200,12 +204,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The reduce operations in the parallel \a copy_if algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a reduce algorithm returns a \a hpx::future<T> if the
-    ///           execution policy is of type \a task_execution_policy and
+    ///           execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a T otherwise.
     ///           The \a reduce algorithm returns the result of the
     ///           generalized sum (applying operator+()) over the elements given
@@ -272,12 +278,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The reduce operations in the parallel \a copy_if algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a reduce algorithm returns a \a hpx::future<T> if the
-    ///           execution policy is of type \a task_execution_policy and
+    ///           execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns T otherwise (where T is the the value_type of
     ///           \a InIter).
     ///           The \a reduce algorithm returns the result of the

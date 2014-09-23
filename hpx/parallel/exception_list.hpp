@@ -37,7 +37,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         };
 
         template <typename Result>
-        struct handle_exception<task_execution_policy, Result>
+        struct handle_exception<sequential_task_execution_policy, Result>
         {
             static future<Result> call()
             {
@@ -60,6 +60,30 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
         };
 
+
+        template <typename Result>
+        struct handle_exception<parallel_task_execution_policy, Result>
+        {
+            static future<Result> call()
+            {
+                try {
+                    try {
+                        throw; //-V667
+                    }
+                    catch(std::bad_alloc const& e) {
+                        boost::throw_exception(e);
+                    }
+                    catch (...) {
+                        boost::throw_exception(
+                            hpx::exception_list(boost::current_exception())
+                        );
+                    }
+                }
+                catch (...) {
+                    return make_error_future<Result>(boost::current_exception());
+                }
+            }
+        };
         template <typename Result>
         struct handle_exception<parallel_vector_execution_policy, Result>
         {

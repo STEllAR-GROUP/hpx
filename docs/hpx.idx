@@ -57,6 +57,9 @@ is_parallel_execution_policy          "" "hpx\.parallel\.v1\.is_parallel_executi
 is_sequential_execution_policy        "" "hpx\.parallel\.v1\.is_sequential_execution_policy.*"
 
 
+# hpx/parallel/detail/adjacent_find.hpp
+parallel::adjacent_find               "adjacent_find" "hpx\.parallel\.v1\.adjacent_find.*"
+
 # hpx/parallel/detail/all_any_none.hpp
 parallel::all_of                      "all_of" "hpx\.parallel\.v1\.all_of.*"
 parallel::any_of                      "any_of" "hpx\.parallel\.v1\.any_of.*"
@@ -83,7 +86,6 @@ parallel::find_if                     "find_if" "hpx\.parallel\.v1\.find_if$"
 parallel::find_if_not                 "find_if_not" "hpx\.parallel\.v1\.find_if_not.*"
 parallel::find_end                    "find_end" "hpx\.parallel\.v1\.find_end.*"
 parallel::find_first_of               "find_first_of" "hpx\.parallel\.v1\.find_first_of.*"
-parallel::adjacent_find               "adjacent_find" "hpx\.parallel\.v1\.adjacent_find.*"
 
 # hpx/parallel/detail/for_each.hpp
 parallel::for_each                    "for_each" "hpx\.parallel\.v1\.for_each$"

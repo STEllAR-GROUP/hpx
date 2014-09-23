@@ -162,7 +162,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The comparison operations in the parallel \a equal algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
@@ -172,7 +172,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           elements are equal.
     ///
     /// \returns  The \a equal algorithm returns a \a hpx::future<bool> if the
-    ///           execution policy is of type \a task_execution_policy and
+    ///           execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a bool otherwise.
     ///           The \a equal algorithm returns true if the elements in the
     ///           two ranges are equal, otherwise it returns false.
@@ -263,7 +265,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The comparison operations in the parallel \a equal algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
@@ -273,7 +275,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           elements are equal.
     ///
     /// \returns  The \a equal algorithm returns a \a hpx::future<bool> if the
-    ///           execution policy is of type \a task_execution_policy and
+    ///           execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a bool otherwise.
     ///           The \a equal algorithm returns true if the elements in the
     ///           two ranges are equal, otherwise it returns false.
@@ -409,7 +413,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The comparison operations in the parallel \a equal algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
@@ -419,7 +423,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           elements are equal.
     ///
     /// \returns  The \a equal algorithm returns a \a hpx::future<bool> if the
-    ///           execution policy is of type \a task_execution_policy and
+    ///           execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a bool otherwise.
     ///           The \a equal algorithm returns true if the elements in the
     ///           two ranges are equal, otherwise it returns false.
@@ -506,7 +512,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The comparison operations in the parallel \a equal algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
@@ -516,7 +522,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           elements are equal.
     ///
     /// \returns  The \a equal algorithm returns a \a hpx::future<bool> if the
-    ///           execution policy is of type \a task_execution_policy and
+    ///           execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a bool otherwise.
     ///           The \a equal algorithm returns true if the elements in the
     ///           two ranges are equal, otherwise it returns false.

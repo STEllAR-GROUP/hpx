@@ -43,27 +43,27 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
               : transform_reduce::algorithm("transform_reduce")
             {}
 
-            template <typename ExPolicy, typename InIter, typename Reduce,
-                typename Convert>
+            template <typename ExPolicy, typename InIter, typename T_,
+                typename Reduce, typename Convert>
             static T
             sequential(ExPolicy const&, InIter first, InIter last,
-                T && init, Reduce && r, Convert && conv)
+                T_ && init, Reduce && r, Convert && conv)
             {
                 typedef typename std::iterator_traits<InIter>::value_type
                     value_type;
 
-                return std::accumulate(first, last, std::forward<T>(init),
+                return std::accumulate(first, last, std::forward<T_>(init),
                     [&r, &conv](T const& res, value_type const& next)
                     {
                         return r(res, conv(next));
                     });
             }
 
-            template <typename ExPolicy, typename FwdIter, typename Reduce,
-                typename Convert>
+            template <typename ExPolicy, typename FwdIter, typename T_,
+                typename Reduce, typename Convert>
             static typename detail::algorithm_result<ExPolicy, T>::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
-                T && init, Reduce && r, Convert && conv)
+                T_ && init, Reduce && r, Convert && conv)
             {
                 if (first == last)
                 {
@@ -159,12 +159,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The reduce operations in the parallel \a transform_reduce algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a transform_reduce algorithm returns a \a hpx::future<T> if the
-    ///           execution policy is of type \a task_execution_policy and
+    ///           execution policy is of type \a parallel_task_execution_policy and
     ///           returns \a T otherwise.
     ///           The \a transform_reduce algorithm returns the result of the
     ///           generalized sum over the values returned from \a conv_op when

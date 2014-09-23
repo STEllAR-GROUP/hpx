@@ -21,9 +21,10 @@ Extensions for Parallelism) and __cpp11_n4088__ (Task Regions).
 [section:parallel_algorithms Using Parallel Algorithms]
 
 [def __sequential_execution_policy__ [classref hpx::parallel::v1::sequential_execution_policy `sequential_execution_policy`]]
+[def __sequential_task_execution_policy__ [classref hpx::parallel::v1::sequential_task_execution_policy `sequential_task_execution_policy`]]
 [def __parallel_execution_policy__ [classref hpx::parallel::v1::parallel_execution_policy `parallel_execution_policy`]]
 [def __parallel_vector_execution_policy__ [classref hpx::parallel::v1::parallel_vector_execution_policy `parallel_vector_execution_policy`]]
-[def __task_execution_policy__ [classref hpx::parallel::v1::task_execution_policy `task_execution_policy`]]
+[def __parallel_task_execution_policy__ [classref hpx::parallel::v1::parallel_task_execution_policy `parallel_task_execution_policy`]]
 [def __execution_policy__ [classref hpx::parallel::v1::execution_policy `execution_policy`]]
 
 [def __exception_list__ [classref hpx::exception_list `exception_list`]]
@@ -53,7 +54,7 @@ sequential order in the calling thread.
 
 The applications of function objects in parallel algorithms invoked with an
 execution policy object of type __parallel_execution_policy__ or
-__task_execution_policy__ are permitted to execute in an unordered fashion in
+__parallel_task_execution_policy__ are permitted to execute in an unordered fashion in
 unspecified threads, and indeterminately sequenced within each thread.
 
 [important It is the caller's responsibility to ensure correctness, for example
@@ -66,10 +67,11 @@ equivalent to the use of the execution policy __parallel_execution_policy__.
 Algorithms invoked with an execution policy object of type __execution_policy__
 execute internally as if invoked with the contained execution policy object.
 An exception is when an __execution_policy__ contains an execution policy of
-type __task_execution_policy__ (which normally turns the algorithm into its
-asynchronous version). In this case the execution is semantically equivalent to
-the case of passing a __parallel_execution_policy__ contained in the
-__execution_policy__ object.
+type __sequential_task_execution_policy__ or __parallel_task_execution_policy__
+(which normally turn the algorithm into its asynchronous version). In this case
+the execution is semantically equivalent to the case of passing a
+__sequential_execution_policy__ or __parallel_execution_policy__ contained in the
+__execution_policy__ object respectively.
 
 
 [heading Parallel Exceptions]
@@ -87,7 +89,8 @@ the algorithm:
   [funcref hpx::terminate] shall be called.
 
 * If the execution policy object is of type __sequential_execution_policy__,
-  __parallel_execution_policy__, or __task_execution_policy__ the execution of
+  __sequential_task_execution_policy__, __parallel_execution_policy__, or
+  __parallel_task_execution_policy__ the execution of
   the algorithm terminates with an __exception_list__ exception. All
   uncaught exceptions thrown during the application of user-provided
   function objects shall be contained in the __exception_list__.

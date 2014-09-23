@@ -32,8 +32,8 @@ void test_find(ExPolicy const& policy, IteratorTag)
     HPX_TEST(index == iterator(test_index));
 }
 
-template <typename IteratorTag>
-void test_find(hpx::parallel::task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_find_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -44,7 +44,7 @@ void test_find(hpx::parallel::task_execution_policy, IteratorTag)
     c.at(c.size()/2) = 1;
 
     hpx::future<iterator> f =
-        hpx::parallel::find(hpx::parallel::task,
+        hpx::parallel::find(p,
             iterator(boost::begin(c)), iterator(boost::end(c)),
             std::size_t(1));
     f.wait();
@@ -62,12 +62,16 @@ void test_find()
     test_find(seq, IteratorTag());
     test_find(par, IteratorTag());
     test_find(par_vec, IteratorTag());
-    test_find(task, IteratorTag());
+
+    test_find_async(seq(task), IteratorTag());
+    test_find_async(par(task), IteratorTag());
 
     test_find(execution_policy(seq), IteratorTag());
     test_find(execution_policy(par), IteratorTag());
     test_find(execution_policy(par_vec), IteratorTag());
-    test_find(execution_policy(task), IteratorTag());
+
+    test_find(execution_policy(seq(task)), IteratorTag());
+    test_find(execution_policy(par(task)), IteratorTag());
 }
 
 void find_test()
@@ -76,7 +80,6 @@ void find_test()
     test_find<std::forward_iterator_tag>();
     test_find<std::input_iterator_tag>();
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
@@ -112,8 +115,8 @@ void test_find_exception(ExPolicy const& policy, IteratorTag)
     HPX_TEST(caught_exception);
 }
 
-template <typename IteratorTag>
-void test_find_exception(hpx::parallel::task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_find_exception_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -121,12 +124,12 @@ void test_find_exception(hpx::parallel::task_execution_policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand()+1);
-    c[c.size()/2]=0;
+    c[c.size()/2] = 0;
 
     bool caught_exception = false;
     try {
         hpx::future<decorated_iterator> f =
-            hpx::parallel::find(hpx::parallel::task,
+            hpx::parallel::find(p,
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::runtime_error("test"); }),
@@ -138,9 +141,7 @@ void test_find_exception(hpx::parallel::task_execution_policy, IteratorTag)
     }
     catch(hpx::exception_list const& e) {
         caught_exception = true;
-        test::test_num_exceptions<
-            hpx::parallel::task_execution_policy, IteratorTag
-        >::call(hpx::parallel::task, e);
+        test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
     catch(...) {
         HPX_TEST(false);
@@ -153,16 +154,21 @@ template <typename IteratorTag>
 void test_find_exception()
 {
     using namespace hpx::parallel;
-    //If the execution policy object is of type vector_execution_policy,
-    //  std::terminate shall be called. therefore we do not test exceptions
-    //  with a vector execution policy
+
+    // If the execution policy object is of type vector_execution_policy,
+    // std::terminate shall be called. therefore we do not test exceptions
+    // with a vector execution policy
     test_find_exception(seq, IteratorTag());
     test_find_exception(par, IteratorTag());
-    test_find_exception(task, IteratorTag());
+
+    test_find_exception_async(seq(task), IteratorTag());
+    test_find_exception_async(par(task), IteratorTag());
 
     test_find_exception(execution_policy(seq), IteratorTag());
     test_find_exception(execution_policy(par), IteratorTag());
-    test_find_exception(execution_policy(task), IteratorTag());
+
+    test_find_exception(execution_policy(seq(task)), IteratorTag());
+    test_find_exception(execution_policy(par(task)), IteratorTag());
 }
 
 void find_exception_test()
@@ -206,8 +212,8 @@ void test_find_bad_alloc(ExPolicy const& policy, IteratorTag)
     HPX_TEST(caught_bad_alloc);
 }
 
-template <typename IteratorTag>
-void test_find_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_find_bad_alloc_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -220,7 +226,7 @@ void test_find_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
     bool caught_bad_alloc = false;
     try {
         hpx::future<decorated_iterator> f =
-            hpx::parallel::find(hpx::parallel::task,
+            hpx::parallel::find(p,
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::bad_alloc(); }),
@@ -245,16 +251,21 @@ template <typename IteratorTag>
 void test_find_bad_alloc()
 {
     using namespace hpx::parallel;
-    //If the execution policy object is of type vector_execution_policy,
-    //  std::terminate shall be called. therefore we do not test exceptions
-    //  with a vector execution policy
+
+    // If the execution policy object is of type vector_execution_policy,
+    // std::terminate shall be called. therefore we do not test exceptions
+    // with a vector execution policy
     test_find_bad_alloc(seq, IteratorTag());
     test_find_bad_alloc(par, IteratorTag());
-    test_find_bad_alloc(task, IteratorTag());
+
+    test_find_bad_alloc_async(seq(task), IteratorTag());
+    test_find_bad_alloc_async(par(task), IteratorTag());
 
     test_find_bad_alloc(execution_policy(seq), IteratorTag());
     test_find_bad_alloc(execution_policy(par), IteratorTag());
-    test_find_bad_alloc(execution_policy(task), IteratorTag());
+
+    test_find_bad_alloc(execution_policy(seq(task)), IteratorTag());
+    test_find_bad_alloc(execution_policy(par(task)), IteratorTag());
 }
 
 void find_bad_alloc_test()

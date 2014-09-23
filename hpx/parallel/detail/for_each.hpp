@@ -135,13 +135,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with an execution policy object of type
-    /// \a parallel_execution_policy or \a task_execution_policy are
+    /// \a parallel_execution_policy or \a parallel_task_execution_policy are
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a for_each_n algorithm returns a
     ///           \a hpx::future<InIter> if the execution policy is of
-    ///           type \a task_execution_policy and returns \a InIter
+    ///           type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and returns \a InIter
     ///           otherwise.
     ///           It returns \a first + \a count for non-negative values of
     ///           \a count and \a first for negative values.
@@ -267,12 +269,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with an execution policy object of type
-    /// \a parallel_execution_policy or \a task_execution_policy are
+    /// \a parallel_execution_policy or \a parallel_task_execution_policy are
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a for_each algorithm returns a \a hpx::future<void> if the
-    ///           execution policy is of type \a task_execution_policy and
+    ///           execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a void otherwise.
     ///
     template <typename ExPolicy, typename InIter, typename F>

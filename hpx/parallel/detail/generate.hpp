@@ -100,12 +100,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The assignments in the parallel \a generate algorithm invoked with
     /// an execution policy object of type \a parallel_execution_policy or
-    /// \a task_execution_policy are permitted to execute in an unordered
+    /// \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a generate algorithm has a return value of type \a void
-    ///
+    /// \returns  The \a replace_if algorithm returns a \a hpx::future<void>
+    ///           if the execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy
+    ///           and returns \a void otherwise.
     template <typename ExPolicy, typename FwdIter, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
@@ -206,12 +209,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The assignments in the parallel \a generate_n algorithm invoked with
     /// an execution policy object of type \a parallel_execution_policy or
-    /// \a task_execution_policy are permitted to execute in an unordered
+    /// \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a generate_n algorithm has a return type of type \a void.
-    ///
+    /// \returns  The \a replace_if algorithm returns a \a hpx::future<void>
+    ///           if the execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy
+    ///           and returns \a void otherwise.
     template <typename ExPolicy, typename OutIter, typename Size, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,

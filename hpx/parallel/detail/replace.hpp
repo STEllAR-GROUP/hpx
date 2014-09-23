@@ -100,12 +100,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The assignments in the parallel \a replace algorithm invoked with
     /// an execution policy object of type \a parallel_execution_policy or
-    /// \a task_execution_policy are permitted to execute in an unordered
+    /// \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a replace algorithm returns a \a hpx::future<void> if
-    ///           the execution policy is of type \a task_execution_policy and
+    ///           the execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy and
     ///           returns \a void otherwise.
     ///
     template <typename ExPolicy, typename FwdIter, typename T>
@@ -222,12 +224,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The assignments in the parallel \a replace_if algorithm invoked with
     /// an execution policy object of type \a parallel_execution_policy or
-    /// \a task_execution_policy are permitted to execute in an unordered
+    /// \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a replace_if algorithm returns a \a hpx::future<void>
-    ///           if the execution policy is of type \a task_execution_policy
+    ///           if the execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy
     ///           and returns \a void otherwise.
     ///
     template <typename ExPolicy, typename FwdIter, typename F, typename T>
@@ -338,12 +342,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The assignments in the parallel \a replace_copy algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy or
-    /// \a task_execution_policy are permitted to execute in an unordered
+    /// \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a replace_copy algorithm returns a \a hpx::future<OutIter>
-    ///           if the execution policy is of type \a task_execution_policy
+    ///           if the execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy
     ///           and returns \a OutIter otherwise.
     ///           The \a replace_copy algorithm returns the output iterator
     ///           to the element in the destination range, one past the last
@@ -491,12 +497,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The assignments in the parallel \a replace_copy_if algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy or
-    /// \a task_execution_policy are permitted to execute in an unordered
+    /// \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a replace_copy_if algorithm returns a \a hpx::future<OutIter>
-    ///           if the execution policy is of type \a task_execution_policy
+    ///           if the execution policy is of type
+    ///           \a sequential_task_execution_policy or
+    ///           \a parallel_task_execution_policy
     ///           and returns \a OutIter otherwise.
     ///           The \a replace_copy_if algorithm returns the output iterator
     ///           to the element in the destination range, one past the last
