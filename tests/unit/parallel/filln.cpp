@@ -299,7 +299,7 @@ int main(int argc, char* argv[])
         boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency()));
 
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,
+    HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,
         "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
