@@ -202,8 +202,8 @@ void test_adjacent_find_bad_alloc(ExPolicy const& policy, IteratorTag)
     try {
         hpx::parallel::adjacent_find(policy,
             decorated_iterator(
-            boost::begin(c),
-            [](){ throw std::bad_alloc(); }),
+                boost::begin(c),
+                [](){ throw std::bad_alloc(); }),
             decorated_iterator(boost::end(c)));
         HPX_TEST(false);
     }
@@ -281,7 +281,6 @@ void adjacent_find_bad_alloc_test()
     test_adjacent_find_bad_alloc<std::random_access_iterator_tag>();
     test_adjacent_find_bad_alloc<std::forward_iterator_tag>();
 }
-
 
 int hpx_main(boost::program_options::variables_map& vm)
 {

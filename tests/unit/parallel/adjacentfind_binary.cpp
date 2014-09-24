@@ -136,24 +136,21 @@ void test_adjacent_find_exception_async(ExPolicy const& p, IteratorTag)
 
     try {
         hpx::future<decorated_iterator> f =
-            hpx::parallel::adjacent_find(hpx::parallel::task,
+            hpx::parallel::adjacent_find(p,
                 decorated_iterator(
-                    boost::begin(c),
-                    [](){ throw std::runtime_error("test"); }),
+                    boost::begin(c), [](){ throw std::runtime_error("test"); }),
                 decorated_iterator(boost::end(c)),
                 std::greater<std::size_t>());
 
         returned_from_algorithm = true;
-        
+
         f.get();
 
         HPX_TEST(false);
     }
     catch (hpx::exception_list const& e) {
         caught_exception = true;
-        test::test_num_exceptions<
-            hpx::parallel::task_execution_policy, IteratorTag
-        >::call(hpx::parallel::task, e);
+        test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
     catch (...) {
         HPX_TEST(false);
@@ -207,10 +204,9 @@ void test_adjacent_find_bad_alloc(ExPolicy const& policy, IteratorTag)
     try {
         hpx::parallel::adjacent_find(policy,
             decorated_iterator(
-                boost::begin(c),
-                [](){ throw std::bad_alloc(); }),
+                boost::begin(c), [](){ throw std::bad_alloc(); }),
             decorated_iterator(boost::end(c)),
-                std::greater<std::size_t>());
+            std::greater<std::size_t>());
         HPX_TEST(false);
     }
     catch(std::bad_alloc const&) {
@@ -233,19 +229,19 @@ void test_adjacent_find_bad_alloc_async(ExPolicy const& p, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand()+1);
 
-        bool returned_from_algorithm = false;
-        bool caught_bad_alloc = false;
+    bool returned_from_algorithm = false;
+    bool caught_bad_alloc = false;
 
     try {
         hpx::future<decorated_iterator> f =
-            hpx::parallel::adjacent_find(hpx::parallel::task,
+            hpx::parallel::adjacent_find(p,
                 decorated_iterator(
-                    boost::begin(c),
-                    [](){ throw std::bad_alloc(); }),
+                    boost::begin(c), [](){ throw std::bad_alloc(); }),
                 decorated_iterator(boost::end(c)),
                 std::greater<std::size_t>());
 
         returned_from_algorithm = true;
+
         f.get();
 
         HPX_TEST(false);
