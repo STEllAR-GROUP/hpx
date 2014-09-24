@@ -27,7 +27,7 @@ void test_copy_if(ExPolicy const& policy, IteratorTag)
 
     hpx::parallel::copy_if(policy,
         iterator(boost::begin(c)), iterator(boost::end(c)),
-        boost::begin(d), [](int i){return !(i<0);});
+        boost::begin(d), [](int i){ return !(i < 0); });
 
     std::size_t count = 0;
     HPX_TEST(std::equal(boost::begin(c), middle, boost::begin(d),
@@ -37,10 +37,10 @@ void test_copy_if(ExPolicy const& policy, IteratorTag)
             return v1 == v2;
         }));
 
-    HPX_TEST(std::equal(middle,boost::end(c),
-        boost::begin(d) + (1 + d.size()/2),
+    HPX_TEST(std::equal(middle, boost::end(c),
+        boost::begin(d) + d.size()/2,
         [&count](int v1, int v2) -> bool {
-            HPX_TEST_NEQ(v1,v2);
+            HPX_TEST_NEQ(v1, v2);
             ++count;
             return v1!=v2;
     }));
@@ -63,7 +63,7 @@ void test_copy_if_async(ExPolicy const& p, IteratorTag)
     hpx::future<base_iterator> f =
         hpx::parallel::copy_if(p,
             iterator(boost::begin(c)), iterator(boost::end(c)),
-            boost::begin(d), [](int i){return !(i<0);});
+            boost::begin(d), [](int i){ return !(i < 0); });
     f.wait();
 
     std::size_t count = 0;
@@ -74,10 +74,10 @@ void test_copy_if_async(ExPolicy const& p, IteratorTag)
             return v1 == v2;
         }));
 
-    HPX_TEST(std::equal(middle,boost::end(c),
-        boost::begin(d) + (1 + d.size()/2),
+    HPX_TEST(std::equal(middle, boost::end(c),
+        boost::begin(d) + d.size()/2,
         [&count](int v1, int v2) -> bool {
-            HPX_TEST_NEQ(v1,v2);
+            HPX_TEST_NEQ(v1, v2);
             ++count;
             return v1!=v2;
     }));
@@ -101,7 +101,7 @@ void test_copy_if_outiter(ExPolicy const& policy, IteratorTag)
 
     hpx::parallel::copy_if(policy,
         iterator(boost::begin(c)), iterator(boost::end(c)),
-        std::back_inserter(d), [](int i){return !(i<0);});
+        std::back_inserter(d), [](int i){ return !(i < 0); });
 
     HPX_TEST(std::equal(boost::begin(c), middle, boost::begin(d),
         [](int v1, int v2) -> bool {
@@ -109,7 +109,7 @@ void test_copy_if_outiter(ExPolicy const& policy, IteratorTag)
             return v1 == v2;
         }));
 
-    //assure D is half the size of C
+    // assure D is half the size of C
     HPX_TEST_EQ(c.size()/2, d.size());
 }
 
@@ -128,7 +128,7 @@ void test_copy_if_outiter_async(ExPolicy const& p, IteratorTag)
     auto f =
         hpx::parallel::copy_if(p,
             iterator(boost::begin(c)), iterator(boost::end(c)),
-            std::back_inserter(d), [](int i){return !(i<0);});
+            std::back_inserter(d), [](int i){ return !(i < 0); });
     f.wait();
 
     HPX_TEST(std::equal(boost::begin(c), middle, boost::begin(d),
@@ -234,6 +234,7 @@ void test_copy_if_exception_async(ExPolicy const& p, IteratorTag)
                 [](std::size_t v) {
                     return throw std::runtime_error("test"), v != 0;
                 });
+
         returned_from_algorithm = true;
         f.get();
 
@@ -332,6 +333,7 @@ void test_copy_if_bad_alloc_async(ExPolicy const& p, IteratorTag)
             [](std::size_t v) {
                 return throw std::bad_alloc(), v;
             });
+
         returned_from_algorithm = true;
         f.get();
 
