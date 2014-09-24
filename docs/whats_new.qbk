@@ -52,7 +52,9 @@ the first time to __hpx__.
    * Building HPX statically (without dynamic libraries) is now supported
      (`-DHPX_STATIC_LINKING=On`).
    * Please note that many variables used to configure the build process have
-     been renamed to unify the naming conventions.
+     been renamed to unify the naming conventions (see the section
+     [link hpx.manual.build_system.building_hpx.cmake_variables CMake Variables used to configure __hpx__]
+     for more information).
    * This also fixes a long list of issues, for more information see [issue 1204].
 * We started to implement various proposals to the C++ Standardization committee
   related to parallelism and concurrency, most notably __cpp11_n4104__ (Working
@@ -68,10 +70,21 @@ the first time to __hpx__.
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1273] - Sequential task execution policy
+* [issue 1272] - Avoid CMake name clash for Boost.Thread library
+* [issue 1271] - Updates on HPX Test Units
+* [issue 1269] - Added default value for "LIB" cmake variable
+* [issue 1268] - Memory Counters not working
+* [issue 1266] - FindHPX.cmake is not installed
+* [issue 1263] - apply_remote test takes too long
+* [issue 1262] - Chrono cleanup
+* [issue 1261] - Need make install for papi counters and this builds all the
+                 examples
 * [issue 1259] - Avoid double-linking Boost on Windows
 * [issue 1257] - Adding additional parameter to create_thread
 * [issue 1256] - added buildbot changes to release notes
 * [issue 1253] - hpx::thread defects
+* [issue 1252] - HPX_PREFIX is too fragile
 * [issue 1250] - switch_to_fiber_emulation does not work properly
 * [issue 1249] - Documentation is generated under Release folder
 * [issue 1248] - Fix usage of hpx_generic_coroutine_context and get tests
@@ -86,6 +99,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1238] - Fixed #1237: hpx::util::portable_binary_iarchive failed
 * [issue 1237] - hpx::util::portable_binary_iarchive faileds
 * [issue 1235] - Fixing clang warnings and errors
+* [issue 1234] - TCP runs fail: Transport endpoint is not connected
 * [issue 1233] - Making sure the correct number of threads is registered with
                  AGAS
 * [issue 1232] - Fixing race in wait_xxx
