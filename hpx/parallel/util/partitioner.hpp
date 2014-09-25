@@ -286,7 +286,7 @@ namespace hpx { namespace parallel { namespace util
                     {
                         if (exec)
                         {
-                            workitems.push_back(hpx::async(exec, f1, *data_it++
+                            workitems.push_back(hpx::async(exec, f1, *data_it++,
                                 first, chunk_size));
                         }
                         else
