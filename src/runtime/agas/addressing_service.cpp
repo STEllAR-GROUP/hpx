@@ -1831,11 +1831,8 @@ lcos::future<boost::int64_t> addressing_service::incref_async(
         else
         {
             // case no. 1
-            HPX_ASSERT(pending_decrefs == 0);
-            HPX_ASSERT(!has_pending_incref);
-
-            // we pass the credits to the pre-resolved callback below
-            pending_decrefs = credit;
+            pending_incref = mapping(raw, credit);
+            has_pending_incref = true;
         }
     }
 
