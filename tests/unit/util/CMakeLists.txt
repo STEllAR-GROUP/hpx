@@ -9,7 +9,6 @@ set(tests
     boost_any
     bind_action
     function
-    merging_map
     parse_slurm_nodelist
     serialize_buffer
     tuple
