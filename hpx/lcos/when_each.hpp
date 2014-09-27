@@ -202,6 +202,16 @@ namespace hpx { namespace lcos
         return lcos::when_each(lazy_values, std::forward<F>(f));
     }
 
+    namespace detail
+    {
+        template <typename Iterator>
+        Iterator return_iterator(hpx::future<void>&& fut, Iterator end)
+        {
+            fut.get();      // rethrow exceptions, if any
+            return end;
+        }
+    }
+
     template <typename Iterator, typename F>
     lcos::future<Iterator>
     when_each(Iterator begin, Iterator end, F && f)
