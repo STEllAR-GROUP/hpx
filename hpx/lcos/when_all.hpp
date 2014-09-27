@@ -398,7 +398,9 @@ namespace hpx { namespace lcos
         for (std::size_t i = 0; i != count; ++i)
             values.push_back(func(*begin++));
 
-        return lcos::when_all(std::move(values));
+        return lcos::when_all(std::move(values)).then(
+            util::bind(&detail::return_iterator<Iterator>,
+                util::placeholders::_1, begin));
     }
 }}
 
