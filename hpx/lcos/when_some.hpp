@@ -4,6 +4,158 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file lcos/when_some.hpp
+
+#if defined(DOXYGEN)
+namespace hpx
+{
+    /// The function \a when_some is an operator allowing to join on the result
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns a new future object representing the same list of futures
+    /// after n of them finished executing.
+    ///
+    /// \param n        [in] The number of futures out of the arguments which
+    ///                 have to become ready in order for the returned future
+    ///                 to get ready.
+    /// \param first    [in] The iterator pointing to the first element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a when_all should wait.
+    /// \param last     [in] The iterator pointing to the last element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a when_all should wait.
+    /// \param ec       [in,out] this represents the error status on exit, if
+    ///                 this is pre-initialized to \a hpx#throws the function
+    ///                 will throw on error instead.
+    ///
+    /// \note The future returned by the function \a when_some becomes ready
+    ///       when at least \a n argument futures have become ready.
+    ///
+    /// \return   Returns a future holding the same list of futures as has
+    ///           been passed to when_some.
+    ///           - future<vector<future<R>>>: If the input cardinality is
+    ///             unknown at compile time and the futures are all of the
+    ///             same type.
+    ///
+    /// \note Calling this version of \a when_some where first == last, returns
+    ///       a future with an empty vector that is immediately ready.
+    ///       Each future and shared_future is waited upon and then copied into
+    ///       the collection of the output (returned) future, maintaining the
+    ///       order of the futures in the input collection.
+    ///       The future returned by \a when_some will not throw an exception,
+    ///       but the futures held in the output collection may.
+    template <typename InputIter>
+    future<vector<future<typename std::iterator_traits<InputIter>::value_type>>>
+    when_some(std::size_t n, Iterator first, Iterator last, error_code& ec = throws);
+
+    /// The function \a when_some is an operator allowing to join on the result
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns a new future object representing the same list of futures
+    /// after n of them finished executing.
+    ///
+    /// \param n        [in] The number of futures out of the arguments which
+    ///                 have to become ready in order for the returned future
+    ///                 to get ready.
+    /// \param futures  [in] A vector holding an arbitrary amount of \a future
+    ///                 or \a shared_future objects for which \a when_some
+    ///                 should wait.
+    /// \param ec       [in,out] this represents the error status on exit, if
+    ///                 this is pre-initialized to \a hpx#throws the function
+    ///                 will throw on error instead.
+    ///
+    /// \note The future returned by the function \a when_some becomes ready
+    ///       when at least \a n argument futures have become ready.
+    ///
+    /// \return   Returns a future holding the same list of futures as has
+    ///           been passed to when_some.
+    ///           - future<vector<future<R>>>: If the input cardinality is
+    ///             unknown at compile time and the futures are all of the
+    ///             same type.
+    ///
+    /// \note Each future and shared_future is waited upon and then copied into
+    ///       the collection of the output (returned) future, maintaining the
+    ///       order of the futures in the input collection.
+    ///       The future returned by \a when_some will not throw an exception,
+    ///       but the futures held in the output collection may.
+    template <typename R>
+    future<std::vector<future<R>>>
+    when_some(std::size_t n, std::vector<future<R>>&& futures,
+        error_code& ec = throws);
+
+    /// The function \a when_some is an operator allowing to join on the result
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns a new future object representing the same list of futures
+    /// after n of them finished executing.
+    ///
+    /// \param n        [in] The number of futures out of the arguments which
+    ///                 have to become ready in order for the returned future
+    ///                 to get ready.
+    /// \param futures  [in] An arbitrary number of \a future or \a shared_future
+    ///                 objects, possibly holding different types for which
+    ///                 \a when_some should wait.
+    /// \param ec       [in,out] this represents the error status on exit, if
+    ///                 this is pre-initialized to \a hpx#throws the function
+    ///                 will throw on error instead.
+    ///
+    /// \note The future returned by the function \a when_some becomes ready
+    ///       when at least \a n argument futures have become ready.
+    ///
+    /// \return   Returns a future holding the same list of futures as has
+    ///           been passed to when_some.
+    ///           - future<tuple<future<R0>, future<R1>, future<R2>...>>: If
+    ///             inputs are fixed in number and are of heterogeneous types.
+    ///             The inputs can be any arbitrary number of future objects.
+    ///
+    /// \note Each future and shared_future is waited upon and then copied into
+    ///       the collection of the output (returned) future, maintaining the
+    ///       order of the futures in the input collection.
+    ///       The future returned by \a when_some will not throw an exception,
+    ///       but the futures held in the output collection may.
+    template <typename ...T>
+    future<tuple<future<T>...>>
+    when_some(std::size_t n, T &&... futures, error_code& ec = throws);
+
+    /// The function \a when_some_n is an operator allowing to join on the result
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns a new future object representing the same list of futures
+    /// after n of them finished executing.
+    ///
+    /// \param n        [in] The number of futures out of the arguments which
+    ///                 have to become ready in order for the returned future
+    ///                 to get ready.
+    /// \param first    [in] The iterator pointing to the first element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a when_all should wait.
+    /// \param count    [in] The number of elements in the sequence starting at
+    ///                 \a first.
+    /// \param ec       [in,out] this represents the error status on exit, if
+    ///                 this is pre-initialized to \a hpx#throws the function
+    ///                 will throw on error instead.
+    ///
+    /// \note The future returned by the function \a when_some_n becomes ready
+    ///       when at least \a n argument futures have become ready.
+    ///
+    /// \return   Returns a future holding the same list of futures as has
+    ///           been passed to when_some_n.
+    ///           - future<vector<future<R>>>: If the input cardinality is
+    ///             unknown at compile time and the futures are all of the
+    ///             same type.
+    ///
+    /// \note Calling this version of \a when_some_n where count == 0, returns
+    ///       a future with the same elements as the arguments that is
+    ///       immediately ready. Possibly none of the futures in that vector
+    ///       are ready.
+    ///       Each future and shared_future is waited upon and then copied into
+    ///       the collection of the output (returned) future, maintaining the
+    ///       order of the futures in the input collection.
+    ///       The future returned by \a when_some_n will not throw an exception,
+    ///       but the futures held in the output collection may.
+    template <typename InputIter>
+    future<vector<future<typename std::iterator_traits<InputIter>::value_type>>>
+    when_some_n(std::size_t n, Iterator first, std::size_t count,
+        error_code& ec = throws);
+}
+#else
+
 #if !BOOST_PP_IS_ITERATING
 
 #if !defined(HPX_LCOS_WHEN_SOME_APR_19_2012_0203PM)
@@ -190,25 +342,7 @@ namespace hpx { namespace lcos
         };
     }
 
-    /// The function \a when_some is a operator allowing to join on the result
-    /// of all given futures. It AND-composes all future objects given and
-    /// returns a new future object representing the same list of futures
-    /// after n of them finished executing.
-    ///
-    /// \note There are three variations of when_some. The first takes a pair
-    ///       of InputIterators. The second takes an std::vector of future<R>.
-    ///       The third takes any arbitrary number of future<R>, where R need
-    ///       not be the same type.
-    ///
-    /// \return   Returns a future holding the same list of futures as has
-    ///           been passed to when_some.
-    ///           - future<vector<future<R>>>: If the input cardinality is
-    ///             unknown at compile time and the futures are all of the
-    ///             same type.
-    ///           - future<tuple<future<R0>, future<R1>, future<R2>...>>: If
-    ///             inputs are fixed in number and are of heterogeneous types.
-    ///             The inputs can be any arbitrary number of future objects.
-
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
     lcos::future<std::vector<Future> >
     when_some(std::size_t n,
@@ -274,21 +408,14 @@ namespace hpx { namespace lcos
         result_type lazy_values_;
         std::transform(begin, end, std::back_inserter(lazy_values_),
             detail::when_acquire_future<future_type>());
+
         return lcos::when_some(n, lazy_values_, ec);
     }
 
-    namespace detail
-    {
-        template <typename Iterator>
-        Iterator return_iterator(hpx::future<void> fut, Iterator end)
-        {
-            fut.get();      // rethrow exceptions, if any
-            return end;
-        }
-    }
-
     template <typename Iterator>
-    lcos::future<Iterator>
+    lcos::future<std::vector<
+        typename lcos::detail::future_iterator_traits<Iterator>::type
+    > >
     when_some_n(std::size_t n, Iterator begin, std::size_t count,
         error_code& ec = throws)
     {
@@ -299,13 +426,12 @@ namespace hpx { namespace lcos
 
         result_type lazy_values_;
         lazy_values_.reserve(count);
+
         detail::when_acquire_future<future_type> func;
         for (std::size_t i = 0; i != count; ++i)
             lazy_values_.push_back(func(*begin++));
 
-        return lcos::when_some(n, lazy_values_, ec).then(
-            util::bind(&detail::return_iterator<Iterator>,
-                util::placeholders::_1, begin));
+        return lcos::when_some(n, lazy_values_, ec);
     }
 
     inline lcos::future<HPX_STD_TUPLE<> >
@@ -411,3 +537,4 @@ namespace hpx { namespace lcos
 
 #endif
 
+#endif
