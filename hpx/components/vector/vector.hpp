@@ -222,9 +222,9 @@ namespace hpx{
                               if(chunk_index<(num_of_chunk_bc%localities.size()))  
                               {
                                   extra_chunk_size =
-                                     (num_of_chunk_bc / 
-                                       (num_of_chunk_bc % 
-                                           localities.size()))*block_size;
+                                     ((num_of_chunk_bc / 
+                                           localities.size())*block_size)+ 
+                                           block_size;
                               }
                               else if ((chunk_index+1) ==
                                      num_of_chunk_bc%localities.size())
@@ -253,9 +253,8 @@ namespace hpx{
                                if(chunk_index<(num_of_chunk_bc%num_chunk))  
                                {     
                                    extra_chunk_size = 
-                                     (num_of_chunk_bc / 
-                                       (num_of_chunk_bc % 
-                                           num_chunk))*block_size;
+                                     ((num_of_chunk_bc/num_chunk)*block_size) + 
+                                     block_size;
                                }
                                else if (chunk_index == num_of_chunk_bc%num_chunk)
                                {      
