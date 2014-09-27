@@ -96,8 +96,8 @@ namespace hpx{
 
         // This typedef helps to call object of same class.
         typedef hpx::vector                                self_type;
-        size_type                                          num_chunk;
-        size_type                                          size_of_vec;
+        size_type                                          num_chunk; // number of chunk
+        size_type                                          size_of_vec; // big_chunk
         size_type                                          block_size; // for block_cyclic 
         // This holds all the localities available  
         std::vector<hpx::naming::id_type> localities;
@@ -190,7 +190,7 @@ namespace hpx{
                         extra_chunk_size = chunk_size+1;
                         --offset;
                     }
-                    if(state == hpx::dis_state::dis_block)
+                    if(state == hpx::dis_state::dis_block) // for block
                     {
                         base_sf_of_gid_pair_.push_back(
                             std::make_pair(
@@ -201,7 +201,7 @@ namespace hpx{
                                                      );
                         index_so_far = extra_chunk_size + index_so_far;
                     } 
-                    else if(state == hpx::dis_state::dis_cyclic)
+                    else if(state == hpx::dis_state::dis_cyclic) // for cyclic
                     {
                       base_sf_of_gid_pair_.push_back(
                             std::make_pair(
@@ -212,6 +212,7 @@ namespace hpx{
                                                      );
                        ++chunk_index;
                     }
+                    // for block_cyclic
                     else if(state == hpx::dis_state::dis_block_cyclic)
                     {
                         if(num_chunk == 1)
