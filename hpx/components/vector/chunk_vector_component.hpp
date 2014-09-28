@@ -382,12 +382,10 @@ namespace hpx
                                 size_type last,
                                 hpx::util::function<void(VALUE_TYPE &)> fn)
             {
-                std::cout<<"for_each  begin"<<hpx::find_here()<<std::endl;
                 hpx::parallel::for_each( hpx::parallel::par, 
                                chunk_vector_.begin() + first,
                                chunk_vector_.begin() + last,
                                fn);
-               std::cout<<"end of for loop in "<<hpx::find_here()<<std::endl;
             }
 
             /** @brief Apply the function \a fn to each element in the range
