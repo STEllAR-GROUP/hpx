@@ -22,6 +22,8 @@
 #include <hpx/util/function.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/util.hpp>
+#include <hpx/parallel/detail/for_each.hpp>
+#include <iostream>
 
 #include <vector>
 
@@ -380,9 +382,12 @@ namespace hpx
                                 size_type last,
                                 hpx::util::function<void(VALUE_TYPE &)> fn)
             {
-                std::for_each( chunk_vector_.begin() + first,
+                std::cout<<"for_each  begin"<<hpx::find_here()<<std::endl;
+                hpx::parallel::for_each( hpx::parallel::par, 
+                               chunk_vector_.begin() + first,
                                chunk_vector_.begin() + last,
                                fn);
+               std::cout<<"end of for loop in "<<hpx::find_here()<<std::endl;
             }
 
             /** @brief Apply the function \a fn to each element in the range
@@ -404,7 +409,8 @@ namespace hpx
                                 hpx::util::function<void(VALUE_TYPE const&)> fn
                                       ) const
             {
-                std::for_each( chunk_vector_.begin() + first,
+                hpx::parallel::for_each( hpx::parallel::par,
+                               chunk_vector_.begin() + first,
                                chunk_vector_.begin() + last,
                                fn);
             }
