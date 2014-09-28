@@ -101,9 +101,9 @@ namespace hpx
     ///       become ready. All input futures are still valid after \a wait_any_n
     ///       returns.
     ///
-    /// \return   Returns a future holding the iterator referring to the first
-    ///           element in the input sequence after the last processed
-    ///           element.
+    /// \return         The function \a wait_all_n will return an iterator
+    ///                 referring to the first element in the input sequence
+    ///                 after the last processed element.
     ///
     /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
     ///           function doesn't throw but returns the result code using the
@@ -112,8 +112,8 @@ namespace hpx
     ///
     /// \note     None of the futures in the input sequence are invalidated.
     template <typename InputIter>
-    future<InputIter>
-    wait_any_n(InputIter first, std::size_t count, error_code& ec = throws);
+    InputIter wait_any_n(InputIter first, std::size_t count,
+        error_code& ec = throws);
 }
 #else
 

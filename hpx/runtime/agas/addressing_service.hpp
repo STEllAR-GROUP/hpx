@@ -31,14 +31,15 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/util/merging_map.hpp>
 
+#include <map>
 
 // TODO: split into a base class and two implementations (one for bootstrap,
 // one for hosted).
 // TODO: Use \copydoc.
 
-namespace hpx { namespace util {
+namespace hpx { namespace util
+{
     class runtime_configuration;
 }}
 
@@ -79,8 +80,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     > gva_cache_type;
     // }}}
 
-    typedef util::merging_map<naming::gid_type, boost::int64_t>
-        refcnt_requests_type;
+    typedef std::map<naming::gid_type, boost::int64_t> refcnt_requests_type;
 
     struct bootstrap_data_type;
     struct hosted_data_type;

@@ -4,6 +4,145 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file lcos/wait_some.hpp
+
+#if defined(DOXYGEN)
+namespace hpx
+{
+    /// The function \a wait_some is an operator allowing to join on the result
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns a new future object representing the same list of futures
+    /// after n of them finished executing.
+    ///
+    /// \param n        [in] The number of futures out of the arguments which
+    ///                 have to become ready in order for the returned future
+    ///                 to get ready.
+    /// \param first    [in] The iterator pointing to the first element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a when_all should wait.
+    /// \param last     [in] The iterator pointing to the last element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a when_all should wait.
+    /// \param ec       [in,out] this represents the error status on exit, if
+    ///                 this is pre-initialized to \a hpx#throws the function
+    ///                 will throw on error instead.
+    ///
+    /// \note The future returned by the function \a wait_some becomes ready
+    ///       when at least \a n argument futures have become ready.
+    ///
+    /// \return   Returns a future holding the same list of futures as has
+    ///           been passed to wait_some.
+    ///           - future<vector<future<R>>>: If the input cardinality is
+    ///             unknown at compile time and the futures are all of the
+    ///             same type.
+    ///
+    /// \note Calling this version of \a wait_some where first == last, returns
+    ///       a future with an empty vector that is immediately ready.
+    ///       Each future and shared_future is waited upon and then copied into
+    ///       the collection of the output (returned) future, maintaining the
+    ///       order of the futures in the input collection.
+    ///       The future returned by \a wait_some will not throw an exception,
+    ///       but the futures held in the output collection may.
+    template <typename InputIter>
+    future<vector<future<typename std::iterator_traits<InputIter>::value_type>>>
+    wait_some(std::size_t n, Iterator first, Iterator last, error_code& ec = throws);
+
+    /// The function \a wait_some is an operator allowing to join on the result
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns a new future object representing the same list of futures
+    /// after n of them finished executing.
+    ///
+    /// \param n        [in] The number of futures out of the arguments which
+    ///                 have to become ready in order for the returned future
+    ///                 to get ready.
+    /// \param futures  [in] A vector holding an arbitrary amount of \a future
+    ///                 or \a shared_future objects for which \a wait_some
+    ///                 should wait.
+    /// \param ec       [in,out] this represents the error status on exit, if
+    ///                 this is pre-initialized to \a hpx#throws the function
+    ///                 will throw on error instead.
+    ///
+    /// \note The function \a wait_all returns after \a n futures have become
+    ///       ready. All input futures are still valid after \a wait_all
+    ///       returns.
+    ///
+    /// \note Each future and shared_future is waited upon and then copied into
+    ///       the collection of the output (returned) future, maintaining the
+    ///       order of the futures in the input collection.
+    ///       The future returned by \a wait_some will not throw an exception,
+    ///       but the futures held in the output collection may.
+    template <typename R>
+    void wait_some(std::size_t n, std::vector<future<R>>&& futures,
+        error_code& ec = throws);
+
+    /// The function \a wait_some is an operator allowing to join on the result
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns a new future object representing the same list of futures
+    /// after n of them finished executing.
+    ///
+    /// \param n        [in] The number of futures out of the arguments which
+    ///                 have to become ready in order for the returned future
+    ///                 to get ready.
+    /// \param futures  [in] An arbitrary number of \a future or \a shared_future
+    ///                 objects, possibly holding different types for which
+    ///                 \a wait_some should wait.
+    /// \param ec       [in,out] this represents the error status on exit, if
+    ///                 this is pre-initialized to \a hpx#throws the function
+    ///                 will throw on error instead.
+    ///
+    /// \note The function \a wait_all returns after \a n futures have become
+    ///       ready. All input futures are still valid after \a wait_all
+    ///       returns.
+    ///
+    /// \note Calling this version of \a wait_some where first == last, returns
+    ///       a future with an empty vector that is immediately ready.
+    ///       Each future and shared_future is waited upon and then copied into
+    ///       the collection of the output (returned) future, maintaining the
+    ///       order of the futures in the input collection.
+    ///       The future returned by \a wait_some will not throw an exception,
+    ///       but the futures held in the output collection may.
+    template <typename ...T>
+    void wait_some(std::size_t n, T &&... futures, error_code& ec = throws);
+
+    /// The function \a wait_some_n is an operator allowing to join on the result
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns a new future object representing the same list of futures
+    /// after n of them finished executing.
+    ///
+    /// \param n        [in] The number of futures out of the arguments which
+    ///                 have to become ready in order for the returned future
+    ///                 to get ready.
+    /// \param first    [in] The iterator pointing to the first element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a when_all should wait.
+    /// \param count    [in] The number of elements in the sequence starting at
+    ///                 \a first.
+    /// \param ec       [in,out] this represents the error status on exit, if
+    ///                 this is pre-initialized to \a hpx#throws the function
+    ///                 will throw on error instead.
+    ///
+    /// \note The function \a wait_all returns after \a n futures have become
+    ///       ready. All input futures are still valid after \a wait_all
+    ///       returns.
+    ///
+    /// \return This function returns an Iterator referring to the first
+    ///         element after the last processed input element.
+    ///
+    /// \note Calling this version of \a wait_some_n where count == 0, returns
+    ///       a future with the same elements as the arguments that is
+    ///       immediately ready. Possibly none of the futures in that vector
+    ///       are ready.
+    ///       Each future and shared_future is waited upon and then copied into
+    ///       the collection of the output (returned) future, maintaining the
+    ///       order of the futures in the input collection.
+    ///       The future returned by \a wait_some_n will not throw an exception,
+    ///       but the futures held in the output collection may.
+    template <typename InputIter>
+    InputIter wait_some_n(std::size_t n, Iterator first,
+        std::size_t count, error_code& ec = throws);
+}
+#else
+
 #if !BOOST_PP_IS_ITERATING
 
 #if !defined(HPX_LCOS_WAIT_SOME_APR_19_2012_0203PM)
@@ -147,7 +286,7 @@ namespace hpx { namespace lcos
                 {
                     // wait for any of the futures to return to become ready
                     this_thread::suspend(threads::suspended,
-                        "hpx::detail::when_some::operator()");
+                        "hpx::detail::wait_some::operator()");
                 }
 
                 // at least N futures should be ready
@@ -176,25 +315,7 @@ namespace hpx { namespace lcos
         };
     }
 
-    /// The function \a wait_some is a operator allowing to join on the result
-    /// of all given futures. It AND-composes all future objects given and
-    /// returns the same list of futures after they finished executing.
-    ///
-    /// \a wait_some returns after n futures have been triggered.
-    ///
-    /// \note There are three variations of wait_some. The first takes a pair
-    ///       of InputIterators. The second takes an std::vector of future<R>.
-    ///       The third takes any arbitrary number of future<R>, where R need
-    ///       not be the same type.
-    ///
-    /// \return   The same list of futures as has been passed to wait_some.
-    ///           - future<vector<future<R>>>: If the input cardinality is
-    ///             unknown at compile time and the futures are all of the
-    ///             same type.
-    ///           - future<tuple<future<R0>, future<R1>, future<R2>...>>: If
-    ///             inputs are fixed in number and are of heterogeneous types.
-    ///             The inputs can be any arbitrary number of future objects.
-
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
     void wait_some(std::size_t n,
         std::vector<Future> const& lazy_values,
@@ -429,3 +550,4 @@ namespace hpx { namespace lcos
 
 #endif
 
+#endif

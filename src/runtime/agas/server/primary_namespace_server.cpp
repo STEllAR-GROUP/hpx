@@ -610,9 +610,10 @@ response primary_namespace::increment_credit(
     naming::detail::strip_internal_bits_from_gid(lower);
 
     // Increment.
+    naming::gid_type upper = lower;
     if (credits > 0)
     {
-        increment(lower, lower, credits, ec);
+        increment(lower, ++upper, credits, ec);
         if (ec) return response();
     }
     else
@@ -638,6 +639,9 @@ response primary_namespace::decrement_credit(
 
     naming::detail::strip_internal_bits_from_gid(lower);
     naming::detail::strip_internal_bits_from_gid(upper);
+
+    if (lower == upper)
+        ++upper;
 
     // Decrement.
     if (credits < 0)
@@ -729,7 +733,8 @@ response primary_namespace::allocate(
 
 #if defined(HPX_AGAS_DUMP_REFCNT_ENTRIES)
     void primary_namespace::dump_refcnt_matches(
-        refcnt_match match
+        refcnt_table_type::iterator lower_it
+      , refcnt_table_type::iterator upper_it
       , naming::gid_type const& lower
       , naming::gid_type const& upper
       , mutex_type::scoped_lock& l
@@ -738,7 +743,7 @@ response primary_namespace::allocate(
     { // dump_refcnt_matches implementation
         HPX_ASSERT(l.owns_lock());
 
-        if (match.first == refcnts_.end() && match.second == refcnts_.end())
+        if (lower_it == refcnts_.end() && upper_it == refcnts_.end())
             // We got nothing, bail - our caller is probably about to throw.
             return;
 
@@ -748,24 +753,14 @@ response primary_namespace::allocate(
               "upper(%3%):")
               % func_name % lower % upper);
 
-        for (/**/; match.first != match.second; ++match.first)
+        for (/**/; lower_it != upper_it; ++lower_it)
         {
-            naming::gid_type const lower = boost::icl::lower(match.first->key_);
-            naming::gid_type const upper = boost::icl::upper(match.first->key_);
-
-            naming::gid_type const length_gid = (upper - lower);
-            HPX_ASSERT(length_gid.get_msb() == 0);
-            boost::uint64_t const length = length_gid.get_lsb() + 1;
-
             // The [server] tag is in there to make it easier to filter
             // through the logs.
             ss << (boost::format(
-                   "\n  [server] lower(%1%), upper(%2%), length(%3%), "
-                   "credits(%4%)")
-                   % lower
-                   % upper
-                   % length
-                   % match.first->data_);
+                   "\n  [server] lower(%1%), credits(%2%)")
+                   % lower_it->first
+                   % lower_it->second);
         }
 
         LAGAS_(debug) << ss.str();
@@ -773,21 +768,6 @@ response primary_namespace::allocate(
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::int64_t default_global_credit(
-    util::merging_map<naming::gid_type, boost::int64_t>::key_type const&)
-{
-    return boost::int64_t(HPX_GLOBALCREDIT_INITIAL);
-}
-
-boost::int64_t init_credit(
-    util::merging_map<naming::gid_type, boost::int64_t>::key_type const&
-  , boost::int64_t& added_credits
-    )
-{
-    added_credits += HPX_GLOBALCREDIT_INITIAL;
-    return boost::int64_t(HPX_GLOBALCREDIT_INITIAL);
-}
-
 void primary_namespace::increment(
     naming::gid_type const& lower
   , naming::gid_type const& upper
@@ -803,9 +783,19 @@ void primary_namespace::increment(
         typedef refcnt_table_type::iterator iterator;
 
         // Find the mappings that we're about to touch.
-        std::pair<iterator, iterator> match = refcnts_.find(lower, upper);
+        refcnt_table_type::iterator lower_it = refcnts_.find(lower);
+        refcnt_table_type::iterator upper_it;
+        if (lower != upper)
+        {
+            upper_it = refcnts_.find(upper);
+        }
+        else
+        {
+            upper_it = lower_it;
+            ++upper_it;
+        }
 
-        dump_refcnt_matches(match, lower, upper, l,
+        dump_refcnt_matches(lower_it, upper_it, lower, upper, l,
             "primary_namespace::increment");
     }
 #endif
@@ -819,15 +809,39 @@ void primary_namespace::increment(
     // key is not mapped. We don't insert GIDs into the refcnt table when we
     // allocate/bind them, so if a GID is not in the refcnt table, we know that
     // it's global reference count is the initial global reference count.
-    using util::placeholders::_1;
-    refcnts_.apply(
-            lower, upper
-          , util::incrementer<boost::int64_t>(credits)
-          , util::bind(&init_credit, _1, std::ref(credits)));
 
-    LAGAS_(info) << (boost::format(
-        "primary_namespace::increment, lower(%1%), upper(%2%), credits(%3%)")
-        % lower % upper % credits);
+    for (naming::gid_type raw = lower; raw != upper; ++raw)
+    {
+        refcnt_table_type::iterator it = refcnts_.find(raw);
+        if (it == refcnts_.end())
+        {
+            boost::int64_t count = boost::int64_t(HPX_GLOBALCREDIT_INITIAL) + credits;
+            std::pair<refcnt_table_type::iterator, bool> p =
+                refcnts_.insert(refcnt_table_type::value_type(raw, count));
+            if (!p.second)
+            {
+                l.unlock();
+
+                HPX_THROWS_IF(ec, invalid_data
+                    , "primary_namespace::decrement_sweep"
+                    , boost::str(boost::format(
+                        "couldn't create entry in reference count table, "
+                        "raw(%1%), ref-count(%3%)")
+                        % raw % count));
+                return;
+            }
+
+            it = p.first;
+        }
+        else
+        {
+            it->second += credits;
+        }
+
+        LAGAS_(info) << (boost::format(
+            "primary_namespace::increment, raw(%1%), refcnt(%2%)")
+            % lower % it->second);
+    }
 
     if (&ec != &throws)
         ec = make_success_code();
@@ -849,132 +863,73 @@ void primary_namespace::resolve_free_list(
 
     BOOST_FOREACH(iterator const& it, free_list)
     {
-        // Both the client- and server-side merging algorithms are unaware
-        // of component type, so a merged mapping in the reference count
-        // tables might contain multiple component types, or the same
-        // component type on different localities (currently, the latter is
-        // improbable due to the nature of address allocation and the fact
-        // that moving objects is still unsupported).
-
         typedef refcnt_table_type::key_type key_type;
 
         // The mapping's key space.
-        key_type super = it->key_;
+        key_type gid = it->first;
 
-        // Make sure we stay within the bounds of the decrement request.
-        if (boost::icl::lower(super) < lower &&
-            boost::icl::upper(super) > upper)
+        // Resolve the query GID.
+        boost::fusion::vector3<naming::gid_type, gva, boost::uint32_t>
+            r = resolve_gid_locked(gid, ec);
+        if (ec) return;
+
+        naming::gid_type& raw = at_c<0>(r);
+        if (raw == naming::invalid_gid)
         {
-            super = key_type(lower, upper);
+            l.unlock();
+
+            HPX_THROWS_IF(ec, internal_server_error
+                , "primary_namespace::resolve_free_list"
+                , boost::str(boost::format(
+                    "primary_namespace::resolve_free_list, failed to resolve "
+                    "gid, gid(%1%)")
+                    % gid));
+            return;       // couldn't resolve this one
         }
 
-        else if (boost::icl::lower(super) < lower)
+        // Make sure the GVA is valid.
+        gva& g = at_c<1>(r);
+
+        // REVIEW: Should we do more to make sure the GVA is valid?
+        if (HPX_UNLIKELY(components::component_invalid == g.type))
         {
-            super = key_type(lower, boost::icl::upper(super));
+            l.unlock();
+
+            HPX_THROWS_IF(ec, internal_server_error
+                , "primary_namespace::resolve_free_list"
+                , boost::str(boost::format(
+                    "encountered a GVA with an invalid type while "
+                    "performing a decrement, gid(%1%), gva:(%2%)")
+                    % gid % g));
+            return;
+        }
+        else if (HPX_UNLIKELY(0 == g.count))
+        {
+            l.unlock();
+
+            HPX_THROWS_IF(ec, internal_server_error
+                , "primary_namespace::resolve_free_list"
+                , boost::str(boost::format(
+                    "encountered a GVA with a count of zero while "
+                    "performing a decrement, gid(%1%), gva(%2%)")
+                    % gid % g));
+            return;
         }
 
-        else if (boost::icl::upper(super) > upper)
-        {
-            super = key_type(boost::icl::lower(super), upper);
-        }
+        LAGAS_(info) << (boost::format(
+            "primary_namespace::resolve_free_list, resolved match, "
+            "gid(%1%), gva(%2%)")
+            % gid % g);
 
-        // Keep resolving GIDs to GVAs until we've covered all of this
-        // mapping's key space.
-        while (!boost::icl::is_empty(super))
-        {
-            naming::gid_type query = boost::icl::lower(super);
+        // Fully resolve the range.
+        gva const resolved = g.resolve(gid, raw);
 
-            // Resolve the query GID.
-            boost::fusion::vector3<naming::gid_type, gva, boost::uint32_t>
-                r = resolve_gid_locked(query, ec);
+        // Add the information needed to destroy these components to the
+        // free list.
+        free_entry_list.push_back(free_entry(resolved, gid, at_c<2>(r)));
 
-            if (ec)
-                return;
-
-            if (at_c<0>(r) == naming::invalid_gid)
-            {
-                LAGAS_(info) << (boost::format(
-                    "primary_namespace::resolve_free_list, failed to resolve gid, "
-                    "lower(%1%), upper(%2%), super-object(%3%)")
-                    % lower % upper % super);
-                continue;       // couldn't resolve this one
-            }
-
-            // Make sure the GVA is valid.
-            // REVIEW: Should we do more to make sure the GVA is valid?
-            if (HPX_UNLIKELY(components::component_invalid
-                                == at_c<1>(r).type))
-            {
-                l.unlock();
-
-                HPX_THROWS_IF(ec, internal_server_error
-                    , "primary_namespace::resolve_free_list"
-                    , boost::str(boost::format(
-                        "encountered a GVA with an invalid type while "
-                        "performing a decrement, gid:%1%, gva:%2%")
-                        % query % at_c<1>(r)));
-                return;
-            }
-
-            else if (HPX_UNLIKELY(0 == at_c<1>(r).count))
-            {
-                l.unlock();
-
-                HPX_THROWS_IF(ec, internal_server_error
-                    , "primary_namespace::resolve_free_list"
-                    , boost::str(boost::format(
-                        "encountered a GVA with a count of zero while "
-                        "performing a decrement, gid:%1%, gva:%2%")
-                        % query % at_c<1>(r)));
-                return;
-            }
-
-            // Determine how much of the mapping's key space this GVA covers.
-            // Note that at_c<1>(r).count must be greater than 0 if we've
-            // reached this point in the code.
-            naming::gid_type sub_upper(at_c<0>(r) + (at_c<1>(r).count - 1));
-
-            // If this GVA ends after the key space, we just set the upper
-            // limit to the end of the key space.
-            if (sub_upper > boost::icl::upper(super))
-                sub_upper = boost::icl::upper(super);
-
-            HPX_ASSERT(query <= sub_upper);
-
-            // We don't use the base GID returned by resolve_gid_locked, but
-            // instead we use the GID that we queried the GVA table with.
-            // This ensures that GVAs which cover a range that begins before
-            // our key space are handled properly.
-            key_type const sub(query, sub_upper);
-
-            LAGAS_(info) << (boost::format(
-                "primary_namespace::resolve_free_list, resolved match, "
-                "lower(%1%), upper(%2%), super-object(%3%), "
-                "sub-object(%4%)")
-                % lower % upper % super % sub);
-
-            // Subtract the GIDs that are bound to this GVA from the
-            // key space.
-            super = boost::icl::left_subtract(super, sub);
-
-            // Compute the length of sub.
-            naming::gid_type const length = boost::icl::length(sub);
-
-            // Fully resolve the range.
-            gva const g = at_c<1>(r).resolve(query, at_c<0>(r));
-
-            // Add the information needed to destroy these components to the
-            // free list.
-            free_entry_list.push_back(free_entry(g, query, length, at_c<2>(r)));
-        }
-
-        // If this is just a partial match, we need to split it up with a
-        // remapping so that we can erase it.
-        if (super != it->key_)
-            // We use ~0 to prevent merges.
-            refcnts_.erase(refcnts_.bind(super, boost::int64_t(~0)));
-        else
-            refcnts_.erase(it);
+        // remove this entry from the refcnt table
+        refcnts_.erase(it);
     }
 }
 
@@ -1003,9 +958,19 @@ void primary_namespace::decrement_sweep(
             typedef refcnt_table_type::iterator iterator;
 
             // Find the mappings that we just added or modified.
-            std::pair<iterator, iterator> match = refcnts_.find(lower, upper);
+            refcnt_table_type::iterator lower_it = refcnts_.find(lower);
+            refcnt_table_type::iterator upper_it;
+            if (lower != upper)
+            {
+                upper_it = refcnts_.find(upper);
+            }
+            else
+            {
+                upper_it = lower_it;
+                ++upper_it;
+            }
 
-            dump_refcnt_matches(match, lower, upper, l,
+            dump_refcnt_matches(lower_it, upper_it, lower, upper, l,
                 "primary_namespace::decrement_sweep");
         }
 #endif
@@ -1018,62 +983,56 @@ void primary_namespace::decrement_sweep(
         // when we allocate/bind them, so if a GID is not in the refcnt table,
         // we know that it's global reference count is the initial global
         // reference count.
-        using util::placeholders::_1;
-        refcnts_.apply(
-            lower, upper
-          , util::decrementer<boost::int64_t>(credits)
-          , default_global_credit);
 
-        ///////////////////////////////////////////////////////////////////////
-        // Search for dead objects.
-
-        typedef refcnt_table_type::iterator iterator;
-
-        // Find the mappings that we just added or modified.
-        std::pair<iterator, iterator> match = refcnts_.find(lower, upper);
-
-        // This search should always succeed.
-        if (match.first == refcnts_.end() && match.second == refcnts_.end())
+        std::list<refcnt_table_type::iterator> free_list;
+        for (naming::gid_type raw = lower; raw != upper; ++raw)
         {
-            l.unlock();
+            refcnt_table_type::iterator it = refcnts_.find(raw);
+            if (it == refcnts_.end())
+            {
+                boost::int64_t count = boost::int64_t(HPX_GLOBALCREDIT_INITIAL) - credits;
+                std::pair<refcnt_table_type::iterator, bool> p =
+                    refcnts_.insert(refcnt_table_type::value_type(raw, count));
+                if (!p.second)
+                {
+                    l.unlock();
 
-            HPX_THROWS_IF(ec, lock_error
-              , "primary_namespace::decrement_sweep"
-              , boost::str(boost::format(
-                    "reference count table insertion failed due to a locking "
-                    "error or memory corruption, lower(%1%), upper(%2%)")
-                    % lower % upper));
-            return;
-        }
+                    HPX_THROWS_IF(ec, invalid_data
+                      , "primary_namespace::decrement_sweep"
+                      , boost::str(boost::format(
+                            "couldn't create entry in reference count table, "
+                            "raw(%1%), ref-count(%3%)")
+                            % raw % count));
+                    return;
+                }
 
-        // Ranges containing dead objects.
-        std::list<iterator> free_list;
+                it = p.first;
+            }
+            else
+            {
+                it->second -= credits;
+            }
 
-        for (/**/; match.first != match.second; ++match.first)
-        {
             // Sanity check.
-            if (match.first->data_ < 0)
+            if (it->second < 0)
             {
                 l.unlock();
 
                 HPX_THROWS_IF(ec, invalid_data
                   , "primary_namespace::decrement_sweep"
                   , boost::str(boost::format(
-                        "negative entry in reference count table, lower(%1%), "
-                        "upper(%2%), count(%3%)")
-                        % boost::icl::lower(match.first->key_)
-                        % boost::icl::upper(match.first->key_)
-                        % match.first->data_));
+                        "negative entry in reference count table, raw(%1%), "
+                        "refcount(%2%)")
+                        % raw % it->second));
                 return;
             }
 
-            // Any object with a reference count of 0 is dead.
-            if (match.first->data_ == 0)
-                free_list.push_back(match.first);
+            // this objects needs to be deleted
+            if (it->second == 0)
+                free_list.push_back(it);
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        // Resolve the dead objects.
+        // Resolve the objects which have to be deleted.
         resolve_free_list(l, free_list, free_entry_list, lower, upper, ec);
 
     } // Unlock the mutex.
@@ -1102,46 +1061,44 @@ void primary_namespace::free_components_sync(
     {
         // Bail if we're in late shutdown and non-local.
         if (HPX_UNLIKELY(!threads::threadmanager_is(running)) &&
-            at_c<3>(e) != locality_id_)
+            e.locality_id_ != locality_id_)
         {
             LAGAS_(info) << (boost::format(
                 "primary_namespace::free_components_sync, cancelling free "
                 "operation because the threadmanager is down, lower(%1%), "
-                "upper(%2%), base(%3%), gva(%4%), count(%5%), locality_id(%6%)")
+                "upper(%2%), base(%3%), gva(%4%), locality_id(%5%)")
                 % lower
                 % upper
-                % at_c<1>(e) % at_c<0>(e) % at_c<2>(e) % at_c<3>(e));
+                % e.gid_ % e.gva_ % e.locality_id_);
             continue;
         }
 
         naming::id_type const target_locality(
-            naming::get_gid_from_locality_id(at_c<3>(e))
+            naming::get_gid_from_locality_id(e.locality_id_)
           , naming::id_type::unmanaged);
 
         LAGAS_(info) << (boost::format(
-            "primary_namespace::free_components_sync, freeing component%1%, "
-            "lower(%2%), upper(%3%), base(%4%), gva(%5%), count(%6%), locality_id(%7%)")
-            % ((at_c<2>(e) == naming::gid_type(0, 1)) ? "" : "s")
+            "primary_namespace::free_components_sync, freeing component, "
+            "lower(%1%), upper(%2%), base(%3%), gva(%4%), locality_id(%5%)")
             % lower
             % upper
-            % at_c<1>(e) % at_c<0>(e) % at_c<2>(e) % at_c<3>(e));
+            % e.gid_ % e.gva_ % e.locality_id_);
 
         // Free the object directly, if local (this avoids creating another
         // local promise via async which would create a snowball effect of
         // free_component calls.
-        if (at_c<3>(e) == hpx::get_locality_id())
+        if (e.locality_id_ == hpx::get_locality_id())
         {
-            get_runtime_support_ptr()->free_component(at_c<0>(e),
-                at_c<1>(e), at_c<2>(e).get_lsb());
+            get_runtime_support_ptr()->free_component(e.gva_, e.gid_, 1);
         }
         else
         {
-            futures.push_back(hpx::async(act, target_locality, at_c<0>(e),
-                at_c<1>(e), at_c<2>(e).get_lsb()));
+            futures.push_back(hpx::async(act, target_locality, e.gva_, e.gid_, 1));
         }
     }
 
-    hpx::wait_all(futures);
+    if (!futures.empty())
+        hpx::wait_all(futures);
 
     if (&ec != &throws)
         ec = make_success_code();

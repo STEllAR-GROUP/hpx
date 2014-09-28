@@ -1786,45 +1786,38 @@ lcos::future<boost::int64_t> addressing_service::incref_async(
     //   3        10        10        0           0        10
     //   4        10        11        0           1        10
 
-    mapping pending_incref;
+    std::pair<naming::gid_type, boost::int64_t> pending_incref;
     bool has_pending_incref = false;
     boost::int64_t pending_decrefs = 0;
 
     {
         mutex_type::scoped_lock l(refcnt_requests_mtx_);
 
-        typedef refcnt_requests_type::key_type key_type;
-        typedef refcnt_requests_type::data_type data_type;
         typedef refcnt_requests_type::iterator iterator;
 
         naming::gid_type raw = naming::detail::get_stripped_gid(gid);
 
         iterator matches = refcnt_requests_->find(raw);
         if (matches != refcnt_requests_->end())
-            pending_decrefs = matches->data_;
-
-        refcnt_requests_->apply(raw, util::incrementer<boost::int64_t>(credit));
-
-        // Collect all entries which require to increment the refcnt, those
-        // need to be handled immediately.
-        matches = refcnt_requests_->find(raw);
-        if (matches != refcnt_requests_->end())
         {
-            data_type& match_data = matches->data_;
+            pending_decrefs = matches->second;
+            matches->second += credit;
+
+            // Increment requests need to be handled immediately.
 
             // If the given incref was fully compensated by a pending decref
             // (i.e. match_data is less than 0) then there is no need
             // to do anything more.
-            if (match_data > 0)
+            if (matches->second > 0)
             {
                 // credit > decrefs (case no 4): store the remaining incref to
                 // be handled below.
-                pending_incref = mapping(matches->key_, match_data);
+                pending_incref = mapping(matches->first, matches->second);
                 has_pending_incref = true;
 
                 refcnt_requests_->erase(matches);
             }
-            else if (match_data == 0)
+            else if (matches->second == 0)
             {
                 // credit == decref (case no. 3): if the incref offsets any
                 // pending decref, just remove the pending decref request.
@@ -1838,11 +1831,8 @@ lcos::future<boost::int64_t> addressing_service::incref_async(
         else
         {
             // case no. 1
-            HPX_ASSERT(pending_decrefs == 0);
-            HPX_ASSERT(!has_pending_incref);
-
-            // we pass the credits to the pre-resolved callback below
-            pending_decrefs = credit;
+            pending_incref = mapping(raw, credit);
+            has_pending_incref = true;
         }
     }
 
@@ -1852,8 +1842,8 @@ lcos::future<boost::int64_t> addressing_service::incref_async(
         return hpx::make_ready_future(pending_decrefs);
     }
 
-    naming::gid_type const e_lower = boost::icl::lower(pending_incref.key());
-    request req(primary_ns_increment_credit, e_lower, pending_incref.data());
+    naming::gid_type const e_lower = pending_incref.first;
+    request req(primary_ns_increment_credit, e_lower, pending_incref.second);
 
     naming::id_type target(
         stubs::primary_namespace::get_service_instance(e_lower)
@@ -1904,7 +1894,31 @@ void addressing_service::decref(
         mutex_type::scoped_lock l(refcnt_requests_mtx_);
 
         // Match the decref request with entries in the incref table
-        refcnt_requests_->apply(raw, util::decrementer<boost::int64_t>(credit));
+        typedef refcnt_requests_type::iterator iterator;
+        typedef refcnt_requests_type::value_type mapping;
+
+        iterator matches = refcnt_requests_->find(raw);
+        if (matches != refcnt_requests_->end())
+        {
+            matches->second -= credit;
+        }
+        else
+        {
+            std::pair<iterator, bool> p =
+                refcnt_requests_->insert(mapping(raw, -credit));
+
+            if (HPX_UNLIKELY(!p.second))
+            {
+                l.unlock();
+
+                HPX_THROWS_IF(ec, bad_parameter
+                  , "addressing_service::decref"
+                  , boost::str(boost::format("couldn't insert decref request "
+                        "for %1% (%2%)") % raw % credit));
+                return;
+            }
+        }
+
         send_refcnt_requests(l, ec);
     }
     catch (hpx::exception const& e) {
@@ -2779,22 +2793,12 @@ void addressing_service::send_refcnt_requests(
 
         BOOST_FOREACH(const_reference e, requests)
         {
-            naming::gid_type const lower = boost::icl::lower(e.key());
-            naming::gid_type const upper = boost::icl::upper(e.key());
-
-            naming::gid_type const length_gid = (upper - lower);
-            HPX_ASSERT(length_gid.get_msb() == 0);
-            boost::uint64_t const length = length_gid.get_lsb() + 1;
-
             // The [client] tag is in there to make it easier to filter
             // through the logs.
             ss << ( boost::format(
-                  "\n  [client] lower(%1%), upper(%2%), length(%3%), "
-                  "credits(%4%)")
-                  % lower
-                  % upper
-                  % length
-                  % e.data());
+                  "\n  [client] gid(%1%), credits(%2%)")
+                  % e.first
+                  % e.second);
         }
 
         LAGAS_(debug) << ss.str();
@@ -2837,14 +2841,13 @@ void addressing_service::send_refcnt_requests_non_blocking(
 
         BOOST_FOREACH(refcnt_requests_type::const_reference e, *p)
         {
-            HPX_ASSERT(e.data() < 0);
+            HPX_ASSERT(e.second < 0);
 
-            naming::gid_type lower(boost::icl::lower(e.key()));
-            request const req(primary_ns_decrement_credit
-              , lower, boost::icl::upper(e.key()), e.data());
+            naming::gid_type raw(e.first);
+            request const req(primary_ns_decrement_credit, raw, raw, e.second);
 
             naming::id_type target(
-                stubs::primary_namespace::get_service_instance(lower)
+                stubs::primary_namespace::get_service_instance(raw)
               , naming::id_type::unmanaged);
 
             requests[target].push_back(req);
@@ -2903,16 +2906,13 @@ addressing_service::send_refcnt_requests_async(
     std::vector<hpx::future<std::vector<response> > > lazy_results;
     BOOST_FOREACH(refcnt_requests_type::const_reference e, *p)
     {
-        HPX_ASSERT(e.data() < 0);
+        HPX_ASSERT(e.second < 0);
 
-        naming::gid_type lower(boost::icl::lower(e.key()));
-        request const req(primary_ns_decrement_credit
-                        , lower
-                        , boost::icl::upper(e.key())
-                        , e.data());
+        naming::gid_type raw(e.first);
+        request const req(primary_ns_decrement_credit, raw, raw, e.second);
 
         naming::id_type target(
-            stubs::primary_namespace::get_service_instance(lower)
+            stubs::primary_namespace::get_service_instance(raw)
           , naming::id_type::unmanaged);
 
         requests[target].push_back(req);
