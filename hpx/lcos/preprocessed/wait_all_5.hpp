@@ -12,71 +12,119 @@ namespace hpx { namespace lcos
 {
     
     template <typename T0>
-    void wait_all(T0 && f0, error_code& ec = throws)
+    void wait_all(T0 && f0)
     {
-        return lcos::wait_some(1, std::forward<T0>( f0 ), ec);
+        typedef hpx::util::tuple<
+                typename lcos::detail::shared_state_ptr_for<T0>::type
+            > result_type;
+        typedef detail::wait_all_frame<result_type> frame_type;
+        result_type values(lcos::detail::get_shared_state(f0));
+        boost::intrusive_ptr<frame_type> p(new frame_type(values));
+        p->wait_all();
     }
 }}
 namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1>
-    void wait_all(T0 && f0 , T1 && f1, error_code& ec = throws)
+    void wait_all(T0 && f0 , T1 && f1)
     {
-        return lcos::wait_some(2, std::forward<T0>( f0 ) , std::forward<T1>( f1 ), ec);
+        typedef hpx::util::tuple<
+                typename lcos::detail::shared_state_ptr_for<T0>::type , typename lcos::detail::shared_state_ptr_for<T1>::type
+            > result_type;
+        typedef detail::wait_all_frame<result_type> frame_type;
+        result_type values(lcos::detail::get_shared_state(f0) , lcos::detail::get_shared_state(f1));
+        boost::intrusive_ptr<frame_type> p(new frame_type(values));
+        p->wait_all();
     }
 }}
 namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1 , typename T2>
-    void wait_all(T0 && f0 , T1 && f1 , T2 && f2, error_code& ec = throws)
+    void wait_all(T0 && f0 , T1 && f1 , T2 && f2)
     {
-        return lcos::wait_some(3, std::forward<T0>( f0 ) , std::forward<T1>( f1 ) , std::forward<T2>( f2 ), ec);
+        typedef hpx::util::tuple<
+                typename lcos::detail::shared_state_ptr_for<T0>::type , typename lcos::detail::shared_state_ptr_for<T1>::type , typename lcos::detail::shared_state_ptr_for<T2>::type
+            > result_type;
+        typedef detail::wait_all_frame<result_type> frame_type;
+        result_type values(lcos::detail::get_shared_state(f0) , lcos::detail::get_shared_state(f1) , lcos::detail::get_shared_state(f2));
+        boost::intrusive_ptr<frame_type> p(new frame_type(values));
+        p->wait_all();
     }
 }}
 namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1 , typename T2 , typename T3>
-    void wait_all(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3, error_code& ec = throws)
+    void wait_all(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3)
     {
-        return lcos::wait_some(4, std::forward<T0>( f0 ) , std::forward<T1>( f1 ) , std::forward<T2>( f2 ) , std::forward<T3>( f3 ), ec);
+        typedef hpx::util::tuple<
+                typename lcos::detail::shared_state_ptr_for<T0>::type , typename lcos::detail::shared_state_ptr_for<T1>::type , typename lcos::detail::shared_state_ptr_for<T2>::type , typename lcos::detail::shared_state_ptr_for<T3>::type
+            > result_type;
+        typedef detail::wait_all_frame<result_type> frame_type;
+        result_type values(lcos::detail::get_shared_state(f0) , lcos::detail::get_shared_state(f1) , lcos::detail::get_shared_state(f2) , lcos::detail::get_shared_state(f3));
+        boost::intrusive_ptr<frame_type> p(new frame_type(values));
+        p->wait_all();
     }
 }}
 namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4>
-    void wait_all(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4, error_code& ec = throws)
+    void wait_all(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4)
     {
-        return lcos::wait_some(5, std::forward<T0>( f0 ) , std::forward<T1>( f1 ) , std::forward<T2>( f2 ) , std::forward<T3>( f3 ) , std::forward<T4>( f4 ), ec);
+        typedef hpx::util::tuple<
+                typename lcos::detail::shared_state_ptr_for<T0>::type , typename lcos::detail::shared_state_ptr_for<T1>::type , typename lcos::detail::shared_state_ptr_for<T2>::type , typename lcos::detail::shared_state_ptr_for<T3>::type , typename lcos::detail::shared_state_ptr_for<T4>::type
+            > result_type;
+        typedef detail::wait_all_frame<result_type> frame_type;
+        result_type values(lcos::detail::get_shared_state(f0) , lcos::detail::get_shared_state(f1) , lcos::detail::get_shared_state(f2) , lcos::detail::get_shared_state(f3) , lcos::detail::get_shared_state(f4));
+        boost::intrusive_ptr<frame_type> p(new frame_type(values));
+        p->wait_all();
     }
 }}
 namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5>
-    void wait_all(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5, error_code& ec = throws)
+    void wait_all(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5)
     {
-        return lcos::wait_some(6, std::forward<T0>( f0 ) , std::forward<T1>( f1 ) , std::forward<T2>( f2 ) , std::forward<T3>( f3 ) , std::forward<T4>( f4 ) , std::forward<T5>( f5 ), ec);
+        typedef hpx::util::tuple<
+                typename lcos::detail::shared_state_ptr_for<T0>::type , typename lcos::detail::shared_state_ptr_for<T1>::type , typename lcos::detail::shared_state_ptr_for<T2>::type , typename lcos::detail::shared_state_ptr_for<T3>::type , typename lcos::detail::shared_state_ptr_for<T4>::type , typename lcos::detail::shared_state_ptr_for<T5>::type
+            > result_type;
+        typedef detail::wait_all_frame<result_type> frame_type;
+        result_type values(lcos::detail::get_shared_state(f0) , lcos::detail::get_shared_state(f1) , lcos::detail::get_shared_state(f2) , lcos::detail::get_shared_state(f3) , lcos::detail::get_shared_state(f4) , lcos::detail::get_shared_state(f5));
+        boost::intrusive_ptr<frame_type> p(new frame_type(values));
+        p->wait_all();
     }
 }}
 namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6>
-    void wait_all(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6, error_code& ec = throws)
+    void wait_all(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6)
     {
-        return lcos::wait_some(7, std::forward<T0>( f0 ) , std::forward<T1>( f1 ) , std::forward<T2>( f2 ) , std::forward<T3>( f3 ) , std::forward<T4>( f4 ) , std::forward<T5>( f5 ) , std::forward<T6>( f6 ), ec);
+        typedef hpx::util::tuple<
+                typename lcos::detail::shared_state_ptr_for<T0>::type , typename lcos::detail::shared_state_ptr_for<T1>::type , typename lcos::detail::shared_state_ptr_for<T2>::type , typename lcos::detail::shared_state_ptr_for<T3>::type , typename lcos::detail::shared_state_ptr_for<T4>::type , typename lcos::detail::shared_state_ptr_for<T5>::type , typename lcos::detail::shared_state_ptr_for<T6>::type
+            > result_type;
+        typedef detail::wait_all_frame<result_type> frame_type;
+        result_type values(lcos::detail::get_shared_state(f0) , lcos::detail::get_shared_state(f1) , lcos::detail::get_shared_state(f2) , lcos::detail::get_shared_state(f3) , lcos::detail::get_shared_state(f4) , lcos::detail::get_shared_state(f5) , lcos::detail::get_shared_state(f6));
+        boost::intrusive_ptr<frame_type> p(new frame_type(values));
+        p->wait_all();
     }
 }}
 namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7>
-    void wait_all(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7, error_code& ec = throws)
+    void wait_all(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7)
     {
-        return lcos::wait_some(8, std::forward<T0>( f0 ) , std::forward<T1>( f1 ) , std::forward<T2>( f2 ) , std::forward<T3>( f3 ) , std::forward<T4>( f4 ) , std::forward<T5>( f5 ) , std::forward<T6>( f6 ) , std::forward<T7>( f7 ), ec);
+        typedef hpx::util::tuple<
+                typename lcos::detail::shared_state_ptr_for<T0>::type , typename lcos::detail::shared_state_ptr_for<T1>::type , typename lcos::detail::shared_state_ptr_for<T2>::type , typename lcos::detail::shared_state_ptr_for<T3>::type , typename lcos::detail::shared_state_ptr_for<T4>::type , typename lcos::detail::shared_state_ptr_for<T5>::type , typename lcos::detail::shared_state_ptr_for<T6>::type , typename lcos::detail::shared_state_ptr_for<T7>::type
+            > result_type;
+        typedef detail::wait_all_frame<result_type> frame_type;
+        result_type values(lcos::detail::get_shared_state(f0) , lcos::detail::get_shared_state(f1) , lcos::detail::get_shared_state(f2) , lcos::detail::get_shared_state(f3) , lcos::detail::get_shared_state(f4) , lcos::detail::get_shared_state(f5) , lcos::detail::get_shared_state(f6) , lcos::detail::get_shared_state(f7));
+        boost::intrusive_ptr<frame_type> p(new frame_type(values));
+        p->wait_all();
     }
 }}
