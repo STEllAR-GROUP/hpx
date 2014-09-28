@@ -149,7 +149,7 @@ namespace hpx { namespace parallel { namespace util
             static Iter call(Iter it, std::size_t count, F && f)
             {
                 for (/**/; count != 0; --count, ++it)
-                    f(it);
+                    f(*it);
                 return it;
             }
 

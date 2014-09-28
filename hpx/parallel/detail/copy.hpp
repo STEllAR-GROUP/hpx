@@ -358,7 +358,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 hpx::util::unwrapped(
                   [=](std::vector<Pair> &&)
                   {
-                    std::advance(dest, sum);
+                    std::advance(dest, std::get<0>(sum));
                     return dest;
                   }
                 ),
