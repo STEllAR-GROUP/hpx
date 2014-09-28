@@ -20,7 +20,6 @@
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/util/insert_checked.hpp>
-#include <hpx/util/merging_map.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/lcos/local/mutex.hpp>
@@ -117,12 +116,7 @@ struct HPX_EXPORT primary_namespace
 
     typedef std::pair<gva, boost::uint32_t> gva_table_data_type;
     typedef std::map<naming::gid_type, gva_table_data_type> gva_table_type;
-
-    typedef util::merging_map<naming::gid_type, boost::int64_t>
-        refcnt_table_type;
-
-    typedef std::pair<refcnt_table_type::iterator, refcnt_table_type::iterator>
-        refcnt_match;
+    typedef std::map<naming::gid_type, boost::int64_t> refcnt_table_type;
     // }}}
 
   private:
@@ -224,7 +218,8 @@ struct HPX_EXPORT primary_namespace
     /// Dump the credit counts of all matching ranges. Expects that \p l
     /// is locked.
     void dump_refcnt_matches(
-        refcnt_match match
+        refcnt_table_type::iterator lower_it
+      , refcnt_table_type::iterator upper_it
       , naming::gid_type const& lower
       , naming::gid_type const& upper
       , mutex_type::scoped_lock& l
@@ -341,26 +336,18 @@ struct HPX_EXPORT primary_namespace
       , error_code& ec
         );
 
-    /// TODO/REVIEW: Do we ensure that a GID doesn't get reinserted into the
-    /// table after it's been decremented to 0 and destroyed? How do we do this
-    /// efficiently?
-    ///
-    /// The new decrement algorithm (decrement_sweep handles 0-2,
-    /// kill_non_blocking or kill_sync handles 3):
-    ///
-    ///    0.) Apply the decrement across the entire keyspace.
-    ///    1.) Search for dead objects (e.g. objects with a reference count of
-    ///        0) by iterating over the keyspace.
-    ///    2.) Resolve the dead objects (retrieve the GVA, adjust for partial
-    ///        matches) and remove them from the reference counting table.
-    ///    3.) Kill the dead objects (fire-and-forget semantics).
+    ///////////////////////////////////////////////////////////////////////////
+    struct free_entry
+    {
+        free_entry(agas::gva gva, naming::gid_type gid,
+                boost::uint32_t locality_id)
+          : gva_(gva), gid_(gid), locality_id_(locality_id)
+        {}
 
-    typedef boost::fusion::vector4<
-        gva                 // gva
-      , naming::gid_type    // gid
-      , naming::gid_type    // count
-      , boost::uint32_t     // locality_id
-    > free_entry;
+        agas::gva gva_;
+        naming::gid_type gid_;
+        boost::uint32_t locality_id_;
+    };
 
     void resolve_free_list(
         mutex_type::scoped_lock& l
