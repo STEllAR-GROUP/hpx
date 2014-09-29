@@ -49,9 +49,7 @@ namespace hpx { namespace util
         template <typename T, typename U>
         struct decay_unwrap<T, boost::reference_wrapper<U> >
         {
-            typedef typename boost::unwrap_reference<
-                boost::reference_wrapper<U>
-            >::type type;
+            typedef U& type;
         };
     }
 }}
