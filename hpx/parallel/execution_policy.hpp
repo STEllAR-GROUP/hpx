@@ -169,6 +169,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// Create a new parallel_task_execution_policy referencing an executor
         /// and a chunk size.
         ///
+        /// \param tag          [in] Specify that the corresponding asynchronous
+        ///                     execution policy should be used
         /// \param exec         [in] The executor to use for the execution of
         ///                     the parallel algorithm the returned execution
         ///                     policy is used with
@@ -178,7 +180,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \returns The new parallel_execution_policy
         ///
-        parallel_task_execution_policy operator()(task_execution_policy_tag,
+        parallel_task_execution_policy operator()(task_execution_policy_tag tag,
             threads::executor const& exec, std::size_t chunk_size = 0) const
         {
             return par_task(exec, chunk_size);
@@ -186,13 +188,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         /// Create a new parallel_execution_policy referencing a chunk size.
         ///
+        /// \param tag          [in] Specify that the corresponding asynchronous
+        ///                     execution policy should be used
         /// \param chunk_size   [in] The chunk size controlling the number of
         ///                     iterations scheduled to be executed on the same
         ///                     HPX thread
         ///
         /// \returns The new parallel_execution_policy
         ///
-        parallel_task_execution_policy operator()(task_execution_policy_tag,
+        parallel_task_execution_policy operator()(task_execution_policy_tag tag,
             std::size_t chunk_size = 0) const
         {
             return par_task(chunk_size);
@@ -238,16 +242,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// Create a new sequential_task_execution_policy referencing an executor
         /// and a chunk size.
         ///
-        /// \param exec         [in] The executor to use for the execution of
-        ///                     the parallel algorithm the returned execution
-        ///                     policy is used with
-        /// \param chunk_size   [in] The chunk size controlling the number of
-        ///                     iterations scheduled to be executed on the same
-        ///                     HPX thread
+        /// \param tag          [in] Specify that the corresponding asynchronous
+        ///                     execution policy should be used
         ///
         /// \returns The new parallel_execution_policy
         ///
-        sequential_task_execution_policy operator()(task_execution_policy_tag) const
+        sequential_task_execution_policy operator()(
+            task_execution_policy_tag tag) const
         {
             return seq_task;
         }

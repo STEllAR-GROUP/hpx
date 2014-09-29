@@ -24,10 +24,6 @@ namespace hpx
     ///                 this is pre-initialized to \a hpx#throws the function
     ///                 will throw on error instead.
     ///
-    /// \note The function \a when_any returns after at least one future has
-    ///       become ready. All input futures are still valid after \a when_any
-    ///       returns.
-    ///
     /// \return   Returns a future holding the same list of futures as has
     ///           been passed to when_any.
     ///           - future<vector<future<R>>>: If the input cardinality is
@@ -55,10 +51,6 @@ namespace hpx
     ///                 this is pre-initialized to \a hpx#throws the function
     ///                 will throw on error instead.
     ///
-    /// \note The function \a when_any returns after at least one future has
-    ///       become ready. All input futures are still valid after \a when_any
-    ///       returns.
-    ///
     /// \return   Returns a future holding the same list of futures as has
     ///           been passed to when_any.
     ///           - future<vector<future<R>>>: If the input cardinality is
@@ -84,10 +76,6 @@ namespace hpx
     /// \param ec       [in,out] this represents the error status on exit, if
     ///                 this is pre-initialized to \a hpx#throws the function
     ///                 will throw on error instead.
-    ///
-    /// \note The function \a when_any returns after at least one future has
-    ///       become ready. All input futures are still valid after \a when_any
-    ///       returns.
     ///
     /// \return   Returns a future holding the same list of futures as has
     ///           been passed to when_any.
@@ -119,13 +107,12 @@ namespace hpx
     ///                 this is pre-initialized to \a hpx#throws the function
     ///                 will throw on error instead.
     ///
-    /// \note The function \a when_any_n returns after at least one future has
-    ///       become ready. All input futures are still valid after \a when_any_n
-    ///       returns.
-    ///
-    /// \return   Returns a future holding the iterator referring to the first
-    ///           element in the input sequence after the last processed
-    ///           element.
+    /// \return   Returns a future holding the same list of futures as has
+    ///           been passed to when_any_n.
+    ///           - future<vector<future<R>>>: If the input cardinality is
+    ///             unknown at compile time and the futures are all of the
+    ///             same type. The order of the futures in the output vector
+    ///             will be the same as given by the input iterator.
     ///
     /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
     ///           function doesn't throw but returns the result code using the
@@ -134,7 +121,7 @@ namespace hpx
     ///
     /// \note     None of the futures in the input sequence are invalidated.
     template <typename InputIter>
-    future<InputIter>
+    future<vector<future<typename std::iterator_traits<InputIter>::value_type>>>
     when_any_n(InputIter first, std::size_t count, error_code& ec = throws);
 
     /// The function \a when_any_back is a non-deterministic choice
@@ -154,12 +141,8 @@ namespace hpx
     ///                 this is pre-initialized to \a hpx#throws the function
     ///                 will throw on error instead.
     ///
-    /// \note The function \a when_any_nback returns after at least one future has
-    ///       become ready. All input futures are still valid after \a when_any_back
-    ///       returns.
-    ///
     /// \return   Returns a future holding the same list of futures as has
-    ///           been passed to when_any.
+    ///           been passed to when_any_back.
     ///           - future<vector<future<R>>>: If the input cardinality is
     ///             unknown at compile time and the futures are all of the
     ///             same type. The order of the futures in the output vector
@@ -187,12 +170,8 @@ namespace hpx
     ///                 this is pre-initialized to \a hpx#throws the function
     ///                 will throw on error instead.
     ///
-    /// \note The function \a when_any_nback returns after at least one future has
-    ///       become ready. All input futures are still valid after \a when_any_back
-    ///       returns.
-    ///
     /// \return   Returns a future holding the same list of futures as has
-    ///           been passed to when_any.
+    ///           been passed to when_any_back.
     ///           - future<vector<future<R>>>: If the input cardinality is
     ///             unknown at compile time and the futures are all of the
     ///             same type.
@@ -218,10 +197,6 @@ namespace hpx
     /// \param ec       [in,out] this represents the error status on exit, if
     ///                 this is pre-initialized to \a hpx#throws the function
     ///                 will throw on error instead.
-    ///
-    /// \note The function \a when_any_nback returns after at least one future has
-    ///       become ready. All input futures are still valid after \a when_any_back
-    ///       returns.
     ///
     /// \return   Returns a future holding the same list of futures as has
     ///           been passed to when_any.
@@ -259,9 +234,12 @@ namespace hpx
     ///       become ready. All input futures are still valid after \a when_any_back_n
     ///       returns.
     ///
-    /// \return   Returns a future holding the iterator referring to the first
-    ///           element in the input sequence after the last processed
-    ///           element.
+    /// \return   Returns a future holding the same list of futures as has
+    ///           been passed to when_any_back_n.
+    ///           - future<vector<future<R>>>: If the input cardinality is
+    ///             unknown at compile time and the futures are all of the
+    ///             same type. The order of the futures in the output vector
+    ///             will be the same as given by the input iterator.
     ///
     /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
     ///           function doesn't throw but returns the result code using the
@@ -270,7 +248,7 @@ namespace hpx
     ///
     /// \note     None of the futures in the input sequence are invalidated.
     template <typename InputIter>
-    future<InputIter>
+    future<vector<future<typename std::iterator_traits<InputIter>::value_type>>>
     when_any_back_n(InputIter first, std::size_t count, error_code& ec = throws);
 }
 #else
@@ -392,8 +370,7 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
     lcos::future<std::vector<Future> >
-    when_any(std::vector<Future>& lazy_values,
-        error_code& ec = throws)
+    when_any(std::vector<Future>& lazy_values, error_code& ec = throws)
     {
         typedef std::vector<Future> result_type;
 
@@ -405,8 +382,7 @@ namespace hpx { namespace lcos
 
     template <typename Future>
     lcos::future<std::vector<Future> > //-V659
-    when_any(std::vector<Future> && lazy_values,
-        error_code& ec = throws)
+    when_any(std::vector<Future> && lazy_values, error_code& ec = throws)
     {
         return lcos::when_any(lazy_values, ec);
     }
@@ -430,8 +406,10 @@ namespace hpx { namespace lcos
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator>
-    lcos::future<Iterator> when_any_n(Iterator begin, std::size_t count,
-        error_code& ec = throws)
+    lcos::future<std::vector<
+        typename lcos::detail::future_iterator_traits<Iterator>::type
+    > >
+    when_any_n(Iterator begin, std::size_t count, error_code& ec = throws)
     {
         return when_some_n(1, begin, count, ec);
     }
@@ -439,8 +417,7 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
     lcos::future<std::vector<Future> >
-    when_any_back(std::vector<Future>& lazy_values,
-        error_code& ec = throws)
+    when_any_back(std::vector<Future>& lazy_values, error_code& ec = throws)
     {
         typedef std::vector<Future> result_type;
 
@@ -465,8 +442,7 @@ namespace hpx { namespace lcos
 
     template <typename Future>
     lcos::future<std::vector<Future> > //-V659
-    when_any_back(std::vector<Future> && lazy_values,
-        error_code& ec = throws)
+    when_any_back(std::vector<Future> && lazy_values, error_code& ec = throws)
     {
         return lcos::when_any_back(lazy_values, ec);
     }
@@ -475,8 +451,7 @@ namespace hpx { namespace lcos
     lcos::future<std::vector<
         typename lcos::detail::future_iterator_traits<Iterator>::type
     > >
-    when_any_back(Iterator begin, Iterator end,
-        error_code& ec = throws)
+    when_any_back(Iterator begin, Iterator end, error_code& ec = throws)
     {
         typedef
             typename lcos::detail::future_iterator_traits<Iterator>::type
@@ -491,9 +466,10 @@ namespace hpx { namespace lcos
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator>
-    lcos::future<Iterator>
-    when_any_back_n(Iterator begin, std::size_t count,
-        error_code& ec = throws)
+    lcos::future<std::vector<
+        typename lcos::detail::future_iterator_traits<Iterator>::type
+    > >
+    when_any_back_n(Iterator begin, std::size_t count, error_code& ec = throws)
     {
         typedef
             typename lcos::detail::future_iterator_traits<Iterator>::type
