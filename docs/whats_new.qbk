@@ -57,6 +57,8 @@ the first time to __hpx__.
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1277] - feature request: get access to argc argv and variables_map
+* [issue 1276] - Remove merging map
 * [issue 1273] - Sequential task execution policy
 * [issue 1272] - Avoid CMake name clash for Boost.Thread library
 * [issue 1271] - Updates on HPX Test Units
@@ -81,6 +83,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1244] - HPX_WITH_RDTSC configure test fails, but should succeed
 * [issue 1243] - CTest dashboard info for CSCS CDash drop location
 * [issue 1242] - Mac fixes
+* [issue 1241] - Failure in Distributed with Boost 1.56
 * [issue 1240] - fix a race condition in examples.diskperf
 * [issue 1239] - fix wait_each in examples.diskperf
 * [issue 1238] - Fixed #1237: hpx::util::portable_binary_iarchive failed
@@ -128,6 +131,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1193] - Adding `parallel::equal`
 * [issue 1192] - HPX(out_of_memory) on including <hpx/hpx.hpp>
 * [issue 1191] - Fixing #1189
+* [issue 1190] - Chrono cleanup
 * [issue 1189] - Deadlock .. somewhere? (probably serialization)
 * [issue 1188] - Removed `future::get_status()`
 * [issue 1186] - Fixed FindOpenCL to find current AMD APP SDK
