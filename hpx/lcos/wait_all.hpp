@@ -174,7 +174,7 @@ namespace hpx { namespace lcos
             BOOST_FORCEINLINE
             void await(TupleIter&&, boost::mpl::true_)
             {
-                this->set_result(util::unused);     // simply make ourselves ready
+                this->set_result(util::unused);     // simply make ourself ready
             }
 
             // Current element is a range (vector) of futures
@@ -201,9 +201,8 @@ namespace hpx { namespace lcos
                             lcos::detail::future_data<future_result_type>
                         > next_future_data = lcos::detail::get_shared_state(*next);
 
-                        boost::intrusive_ptr<wait_all_frame> this_(this);
                         next_future_data->set_on_completed(util::bind(
-                            f, this_, std::move(iter),
+                            f, this, std::move(iter),
                             std::move(next), std::move(end)));
                         return;
                     }
@@ -256,9 +255,8 @@ namespace hpx { namespace lcos
                     void (wait_all_frame::*f)(TupleIter, true_, false_) =
                         &wait_all_frame::await_next;
 
-                    boost::intrusive_ptr<wait_all_frame> this_(this);
                     next_future_data->set_on_completed(hpx::util::bind(
-                        f, this_, std::move(iter), true_(), false_()));
+                        f, this, std::move(iter), true_(), false_()));
                 }
                 else
                 {
@@ -278,9 +276,7 @@ namespace hpx { namespace lcos
                     typename boost::fusion::result_of::deref<TupleIter>::type
                 >::type future_type;
 
-                typedef typename detail::is_future_or_shared_state<typename util::detail::decay_unwrap<
-                    typename boost::fusion::result_of::deref<TupleIter>::type
-                >::type>::type
+                typedef typename detail::is_future_or_shared_state<future_type>::type
                     is_future;
                 typedef typename traits::is_future_range<future_type>::type is_range;
 
@@ -315,20 +311,20 @@ namespace hpx { namespace lcos
         typedef detail::wait_all_frame<result_type> frame_type;
 
         result_type data(values);
-        boost::intrusive_ptr<frame_type> p(new frame_type(data));
-        p->wait_all();
+        frame_type frame(data);
+        frame.wait_all();
     }
 
     template <typename Future>
-    void wait_all(std::vector<Future>& values)
+    BOOST_FORCEINLINE void wait_all(std::vector<Future>& values)
     {
-        return lcos::wait_all(const_cast<std::vector<Future> const&>(values));
+        lcos::wait_all(const_cast<std::vector<Future> const&>(values));
     }
 
     template <typename Future>
-    void wait_all(std::vector<Future>&& values)
+    BOOST_FORCEINLINE void wait_all(std::vector<Future>&& values)
     {
-        return lcos::wait_all(const_cast<std::vector<Future> const&>(values));
+        lcos::wait_all(const_cast<std::vector<Future> const&>(values));
     }
 
     template <typename Iterator>
@@ -347,7 +343,7 @@ namespace hpx { namespace lcos
         std::transform(begin, end, std::back_inserter(values),
             detail::wait_get_shared_state<future_type>());
 
-        return lcos::wait_all(values);
+        lcos::wait_all(values);
     }
 
     template <typename Iterator>
@@ -431,8 +427,8 @@ namespace hpx { namespace lcos
 
         result_type values(BOOST_PP_ENUM(N, HPX_WAIT_ALL_GET_SHARED_STATE, _));
 
-        boost::intrusive_ptr<frame_type> p(new frame_type(values));
-        p->wait_all();
+        frame_type frame(values);
+        frame.wait_all();
     }
 }}
 
