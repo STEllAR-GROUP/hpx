@@ -290,7 +290,11 @@ namespace hpx { namespace threads
                     HPX_THROWS_IF(ec, kernel_error
                       , "hpx::threads::hwloc_topology::set_thread_affinity_mask"
                       , boost::str(boost::format(
+#if !defined(HPX_HAVE_MORE_THAN_64_THREADS) || (defined(HPX_MAX_CPU_COUNT) && HPX_MAX_CPU_COUNT <= 64)
                             "failed to set thread affinity mask (0x%x) for cpuset %s")
+#else
+                            "failed to set thread affinity mask (0b%x) for cpuset %s")
+#endif
                             % mask % buff));
 
                     if (ec)
