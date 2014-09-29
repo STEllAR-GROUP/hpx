@@ -19,8 +19,8 @@ namespace hpx { namespace lcos
             > result_type;
         typedef detail::wait_all_frame<result_type> frame_type;
         result_type values(lcos::detail::get_shared_state(f0));
-        boost::intrusive_ptr<frame_type> p(new frame_type(values));
-        p->wait_all();
+        frame_type frame(values);
+        frame.wait_all();
     }
 }}
 namespace hpx { namespace lcos
@@ -34,8 +34,8 @@ namespace hpx { namespace lcos
             > result_type;
         typedef detail::wait_all_frame<result_type> frame_type;
         result_type values(lcos::detail::get_shared_state(f0) , lcos::detail::get_shared_state(f1));
-        boost::intrusive_ptr<frame_type> p(new frame_type(values));
-        p->wait_all();
+        frame_type frame(values);
+        frame.wait_all();
     }
 }}
 namespace hpx { namespace lcos
@@ -49,8 +49,8 @@ namespace hpx { namespace lcos
             > result_type;
         typedef detail::wait_all_frame<result_type> frame_type;
         result_type values(lcos::detail::get_shared_state(f0) , lcos::detail::get_shared_state(f1) , lcos::detail::get_shared_state(f2));
-        boost::intrusive_ptr<frame_type> p(new frame_type(values));
-        p->wait_all();
+        frame_type frame(values);
+        frame.wait_all();
     }
 }}
 namespace hpx { namespace lcos
@@ -64,8 +64,8 @@ namespace hpx { namespace lcos
             > result_type;
         typedef detail::wait_all_frame<result_type> frame_type;
         result_type values(lcos::detail::get_shared_state(f0) , lcos::detail::get_shared_state(f1) , lcos::detail::get_shared_state(f2) , lcos::detail::get_shared_state(f3));
-        boost::intrusive_ptr<frame_type> p(new frame_type(values));
-        p->wait_all();
+        frame_type frame(values);
+        frame.wait_all();
     }
 }}
 namespace hpx { namespace lcos
@@ -79,8 +79,8 @@ namespace hpx { namespace lcos
             > result_type;
         typedef detail::wait_all_frame<result_type> frame_type;
         result_type values(lcos::detail::get_shared_state(f0) , lcos::detail::get_shared_state(f1) , lcos::detail::get_shared_state(f2) , lcos::detail::get_shared_state(f3) , lcos::detail::get_shared_state(f4));
-        boost::intrusive_ptr<frame_type> p(new frame_type(values));
-        p->wait_all();
+        frame_type frame(values);
+        frame.wait_all();
     }
 }}
 namespace hpx { namespace lcos
@@ -94,8 +94,8 @@ namespace hpx { namespace lcos
             > result_type;
         typedef detail::wait_all_frame<result_type> frame_type;
         result_type values(lcos::detail::get_shared_state(f0) , lcos::detail::get_shared_state(f1) , lcos::detail::get_shared_state(f2) , lcos::detail::get_shared_state(f3) , lcos::detail::get_shared_state(f4) , lcos::detail::get_shared_state(f5));
-        boost::intrusive_ptr<frame_type> p(new frame_type(values));
-        p->wait_all();
+        frame_type frame(values);
+        frame.wait_all();
     }
 }}
 namespace hpx { namespace lcos
@@ -109,8 +109,8 @@ namespace hpx { namespace lcos
             > result_type;
         typedef detail::wait_all_frame<result_type> frame_type;
         result_type values(lcos::detail::get_shared_state(f0) , lcos::detail::get_shared_state(f1) , lcos::detail::get_shared_state(f2) , lcos::detail::get_shared_state(f3) , lcos::detail::get_shared_state(f4) , lcos::detail::get_shared_state(f5) , lcos::detail::get_shared_state(f6));
-        boost::intrusive_ptr<frame_type> p(new frame_type(values));
-        p->wait_all();
+        frame_type frame(values);
+        frame.wait_all();
     }
 }}
 namespace hpx { namespace lcos
@@ -124,8 +124,8 @@ namespace hpx { namespace lcos
             > result_type;
         typedef detail::wait_all_frame<result_type> frame_type;
         result_type values(lcos::detail::get_shared_state(f0) , lcos::detail::get_shared_state(f1) , lcos::detail::get_shared_state(f2) , lcos::detail::get_shared_state(f3) , lcos::detail::get_shared_state(f4) , lcos::detail::get_shared_state(f5) , lcos::detail::get_shared_state(f6) , lcos::detail::get_shared_state(f7));
-        boost::intrusive_ptr<frame_type> p(new frame_type(values));
-        p->wait_all();
+        frame_type frame(values);
+        frame.wait_all();
     }
 }}
 namespace hpx { namespace lcos
@@ -139,8 +139,8 @@ namespace hpx { namespace lcos
             > result_type;
         typedef detail::wait_all_frame<result_type> frame_type;
         result_type values(lcos::detail::get_shared_state(f0) , lcos::detail::get_shared_state(f1) , lcos::detail::get_shared_state(f2) , lcos::detail::get_shared_state(f3) , lcos::detail::get_shared_state(f4) , lcos::detail::get_shared_state(f5) , lcos::detail::get_shared_state(f6) , lcos::detail::get_shared_state(f7) , lcos::detail::get_shared_state(f8));
-        boost::intrusive_ptr<frame_type> p(new frame_type(values));
-        p->wait_all();
+        frame_type frame(values);
+        frame.wait_all();
     }
 }}
 namespace hpx { namespace lcos
@@ -154,8 +154,8 @@ namespace hpx { namespace lcos
             > result_type;
         typedef detail::wait_all_frame<result_type> frame_type;
         result_type values(lcos::detail::get_shared_state(f0) , lcos::detail::get_shared_state(f1) , lcos::detail::get_shared_state(f2) , lcos::detail::get_shared_state(f3) , lcos::detail::get_shared_state(f4) , lcos::detail::get_shared_state(f5) , lcos::detail::get_shared_state(f6) , lcos::detail::get_shared_state(f7) , lcos::detail::get_shared_state(f8) , lcos::detail::get_shared_state(f9));
-        boost::intrusive_ptr<frame_type> p(new frame_type(values));
-        p->wait_all();
+        frame_type frame(values);
+        frame.wait_all();
     }
 }}
 namespace hpx { namespace lcos
@@ -169,8 +169,8 @@ namespace hpx { namespace lcos
             > result_type;
         typedef detail::wait_all_frame<result_type> frame_type;
         result_type values(lcos::detail::get_shared_state(f0) , lcos::detail::get_shared_state(f1) , lcos::detail::get_shared_state(f2) , lcos::detail::get_shared_state(f3) , lcos::detail::get_shared_state(f4) , lcos::detail::get_shared_state(f5) , lcos::detail::get_shared_state(f6) , lcos::detail::get_shared_state(f7) , lcos::detail::get_shared_state(f8) , lcos::detail::get_shared_state(f9) , lcos::detail::get_shared_state(f10));
-        boost::intrusive_ptr<frame_type> p(new frame_type(values));
-        p->wait_all();
+        frame_type frame(values);
+        frame.wait_all();
     }
 }}
 namespace hpx { namespace lcos
@@ -184,8 +184,8 @@ namespace hpx { namespace lcos
             > result_type;
         typedef detail::wait_all_frame<result_type> frame_type;
         result_type values(lcos::detail::get_shared_state(f0) , lcos::detail::get_shared_state(f1) , lcos::detail::get_shared_state(f2) , lcos::detail::get_shared_state(f3) , lcos::detail::get_shared_state(f4) , lcos::detail::get_shared_state(f5) , lcos::detail::get_shared_state(f6) , lcos::detail::get_shared_state(f7) , lcos::detail::get_shared_state(f8) , lcos::detail::get_shared_state(f9) , lcos::detail::get_shared_state(f10) , lcos::detail::get_shared_state(f11));
-        boost::intrusive_ptr<frame_type> p(new frame_type(values));
-        p->wait_all();
+        frame_type frame(values);
+        frame.wait_all();
     }
 }}
 namespace hpx { namespace lcos
@@ -199,7 +199,7 @@ namespace hpx { namespace lcos
             > result_type;
         typedef detail::wait_all_frame<result_type> frame_type;
         result_type values(lcos::detail::get_shared_state(f0) , lcos::detail::get_shared_state(f1) , lcos::detail::get_shared_state(f2) , lcos::detail::get_shared_state(f3) , lcos::detail::get_shared_state(f4) , lcos::detail::get_shared_state(f5) , lcos::detail::get_shared_state(f6) , lcos::detail::get_shared_state(f7) , lcos::detail::get_shared_state(f8) , lcos::detail::get_shared_state(f9) , lcos::detail::get_shared_state(f10) , lcos::detail::get_shared_state(f11) , lcos::detail::get_shared_state(f12));
-        boost::intrusive_ptr<frame_type> p(new frame_type(values));
-        p->wait_all();
+        frame_type frame(values);
+        frame.wait_all();
     }
 }}
