@@ -652,6 +652,9 @@ namespace hpx { namespace threads
         // Set the affinity for the current thread.
         threads::mask_cref_type mask = get_pu_mask(topology_, num_thread);
 
+        if (LHPX_ENABLED(debug))
+            topology_.write_to_log();
+
         error_code ec(lightweight);
         topology_.set_thread_affinity_mask(mask, ec);
         if (ec)

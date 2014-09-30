@@ -155,6 +155,8 @@ namespace hpx { namespace threads
 
         struct hwloc_topology_tag {};
 
+        void write_to_log() const;
+
     private:
         static mask_type empty_mask;
 

@@ -19,9 +19,56 @@
 #include <boost/format.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/io/ios_state.hpp>
+#include <boost/foreach.hpp>
 
 namespace hpx { namespace threads
 {
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        void write_to_log(char const* valuename, std::size_t value)
+        {
+            LTM_(debug) << "hwloc_topology: " << valuename << ": " << value;
+        }
+
+        void write_to_log_mask(char const* valuename, mask_cref_type value)
+        {
+            LTM_(debug) << "hwloc_topology: " << valuename
+                        << ": " HPX_CPU_MASK_PREFIX
+                        << std::hex << value;
+        }
+
+        void write_to_log(char const* valuename,
+            std::vector<std::size_t> const& values)
+        {
+            LTM_(debug) << "hwloc_topology: " << valuename << "s, size: "
+                        << values.size();
+
+            std::size_t i = 0;
+            BOOST_FOREACH(std::size_t value, values)
+            {
+                LTM_(debug) << "hwloc_topology: " << valuename
+                            << "(" << i++ << "): " << value;
+            }
+        }
+
+        void write_to_log_mask(char const* valuename,
+            std::vector<mask_type> const& values)
+        {
+            LTM_(debug) << "hwloc_topology: " << valuename << "s, size: "
+                        << values.size();
+
+            std::size_t i = 0;
+            BOOST_FOREACH(mask_cref_type value, values)
+            {
+                LTM_(debug) << "hwloc_topology: " << valuename
+                            << "(" << i++ << "): " HPX_CPU_MASK_PREFIX
+                            << std::hex << value;
+            }
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     mask_type hwloc_topology::empty_mask = mask_type();
 
     hwloc_topology::hwloc_topology()
@@ -53,6 +100,7 @@ namespace hpx { namespace threads
 
         std::size_t num_of_sockets = get_number_of_sockets();
         if (num_of_sockets == 0) num_of_sockets = 1;
+
         for (std::size_t i = 0; i < num_of_pus_; ++i)
         {
             std::size_t socket = init_socket_number(i);
@@ -62,6 +110,7 @@ namespace hpx { namespace threads
 
         std::size_t num_of_nodes = get_number_of_numa_nodes();
         if (num_of_nodes == 0) num_of_nodes = 1;
+
         for (std::size_t i = 0; i < num_of_pus_; ++i)
         {
             std::size_t numa_node = init_numa_node_number(i);
@@ -71,6 +120,7 @@ namespace hpx { namespace threads
 
         std::size_t num_of_cores = get_number_of_cores();
         if (num_of_cores == 0) num_of_cores = 1;
+
         for (std::size_t i = 0; i < num_of_pus_; ++i)
         {
             std::size_t core_number = init_core_number(i);
@@ -104,6 +154,35 @@ namespace hpx { namespace threads
             thread_affinity_masks_.push_back(init_thread_affinity_mask(i));
         }
     } // }}}
+
+    void hwloc_topology::write_to_log() const
+    {
+        std::size_t num_of_sockets = get_number_of_sockets();
+        if (num_of_sockets == 0) num_of_sockets = 1;
+        detail::write_to_log("num_sockets", num_of_sockets);
+
+
+        std::size_t num_of_nodes = get_number_of_numa_nodes();
+        if (num_of_nodes == 0) num_of_nodes = 1;
+        detail::write_to_log("num_of_nodes", num_of_nodes);
+
+        std::size_t num_of_cores = get_number_of_cores();
+        if (num_of_cores == 0) num_of_cores = 1;
+        detail::write_to_log("num_of_cores", num_of_cores);
+
+        detail::write_to_log("num_of_pus", num_of_pus_);
+
+        detail::write_to_log("socket_number", socket_numbers_);
+        detail::write_to_log("numa_node_number", numa_node_numbers_);
+        detail::write_to_log("core_number", core_numbers_);
+
+        detail::write_to_log_mask("machine_affinity_mask", machine_affinity_mask_);
+
+        detail::write_to_log_mask("socket_affinity_mask", socket_affinity_masks_);
+        detail::write_to_log_mask("numa_node_affinity_mask", numa_node_affinity_masks_);
+        detail::write_to_log_mask("core_affinity_mask", core_affinity_masks_);
+        detail::write_to_log_mask("thread_affinity_mask", thread_affinity_masks_);
+    }
 
     hwloc_topology::~hwloc_topology()
     {
@@ -281,21 +360,17 @@ namespace hpx { namespace threads
                 // Strict binding not supported or failed, try weak binding.
                 if (hwloc_set_cpubind(topo, cpuset, HWLOC_CPUBIND_THREAD))
                 {
-                    char* buff = 0;
-                    hwloc_bitmap_asprintf(&buff, cpuset);
-                    hwloc_bitmap_free(cpuset);
+                    boost::scoped_ptr<char> buffer(new char [1024]);
 
-                    boost::scoped_ptr<char> buffer(buff);
+                    hwloc_bitmap_snprintf(buffer.get(), 1024, cpuset);
+                    hwloc_bitmap_free(cpuset);
 
                     HPX_THROWS_IF(ec, kernel_error
                       , "hpx::threads::hwloc_topology::set_thread_affinity_mask"
                       , boost::str(boost::format(
-#if !defined(HPX_HAVE_MORE_THAN_64_THREADS) || (defined(HPX_MAX_CPU_COUNT) && HPX_MAX_CPU_COUNT <= 64)
-                            "failed to set thread affinity mask (0x%x) for cpuset %s")
-#else
-                            "failed to set thread affinity mask (0b%x) for cpuset %s")
-#endif
-                            % mask % buff));
+                            "failed to set thread affinity mask ("
+                            HPX_CPU_MASK_PREFIX "%x) for cpuset %s")
+                            % mask % buffer.get()));
 
                     if (ec)
                         return;
