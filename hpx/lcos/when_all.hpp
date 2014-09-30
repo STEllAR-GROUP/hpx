@@ -180,14 +180,29 @@ namespace hpx { namespace lcos
         template <typename T>
         struct when_all_result<util::tuple<T>,
             typename util::always_void<
-                typename traits::is_future_range<T>::type
+                typename traits::is_future_range<
+                    typename util::decay<T>::type
+                >::type
             >::type>
         {
-            typedef T type;
+            typedef typename boost::remove_reference<T>::type type;
+
+            template <typename T_>
+            static type call(util::tuple<T_>&& t, boost::mpl::false_)
+            {
+                return std::move(util::get<0>(t));
+            }
+
+            template <typename T_>
+            static type call(util::tuple<T_>&& t, boost::mpl::true_)
+            {
+                return util::get<0>(t);
+            }
 
             static type call(util::tuple<T>&& t)
             {
-                return std::move(util::get<0>(t));
+                typedef typename boost::is_reference<T>::type is_reference;
+                return call(std::move(t), is_reference());
             }
         };
 
@@ -345,7 +360,7 @@ namespace hpx { namespace lcos
         typedef std::vector<Future> result_type;
 
         typedef detail::when_all_frame<
-                hpx::util::tuple<std::vector<Future> >
+                hpx::util::tuple<result_type>
             > frame_type;
 
         boost::intrusive_ptr<frame_type> p(new frame_type(
@@ -371,6 +386,25 @@ namespace hpx { namespace lcos
             detail::when_acquire_future<future_type>());
 
         return lcos::when_all(std::move(values_));
+    }
+
+    template <typename T>
+    lcos::future<std::vector<shared_future<T> > >
+    when_all(std::vector<shared_future<T> >& values)
+    {
+        typedef shared_future<T> future_type;
+        typedef std::vector<future_type> result_type;
+
+        typedef detail::when_all_frame<
+                hpx::util::tuple<result_type&>
+            > frame_type;
+
+        boost::intrusive_ptr<frame_type> p(new frame_type(
+            hpx::util::forward_as_tuple(values)));
+        p->await();
+
+        using traits::future_access;
+        return future_access<lcos::future<result_type> >::create(std::move(p));
     }
 
     template <typename Iterator>
