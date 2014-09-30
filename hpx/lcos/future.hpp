@@ -141,6 +141,14 @@ namespace hpx { namespace lcos { namespace detail
         return traits::future_access<Future>::get_shared_state(f);
     }
 
+    template <typename R>
+    BOOST_FORCEINLINE
+    boost::intrusive_ptr<future_data<R> > const&
+    get_shared_state(boost::intrusive_ptr<future_data<R> > const& st)
+    {
+        return st;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     enum future_state
     {

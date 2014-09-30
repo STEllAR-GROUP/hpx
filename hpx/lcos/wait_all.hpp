@@ -19,20 +19,11 @@ namespace hpx
     /// \param last     The iterator pointing to the last element of a
     ///                 sequence of \a future or \a shared_future objects for
     ///                 which \a wait_all should wait.
-    /// \param ec       [in,out] this represents the error status on exit, if
-    ///                 this is pre-initialized to \a hpx#throws the function
-    ///                 will throw on error instead.
     ///
     /// \note The function \a wait_all returns after all futures have become
     ///       ready. All input futures are still valid after \a wait_all
     ///       returns.
     ///
-    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
-    ///           function doesn't throw but returns the result code using the
-    ///           parameter \a ec. Otherwise it throws an instance of
-    ///           hpx::exception.
-    ///
-    /// \note     None of the futures in the input sequence are invalidated.
     template <typename InputIter>
     void wait_all(InputIter first, InputIter last, error_code& ec = throws);
 
@@ -43,20 +34,11 @@ namespace hpx
     /// \param futures  A vector holding an arbitrary amount of \a future or
     ///                 \a shared_future objects for which \a wait_all should
     ///                 wait.
-    /// \param ec       [in,out] this represents the error status on exit, if
-    ///                 this is pre-initialized to \a hpx#throws the function
-    ///                 will throw on error instead.
     ///
     /// \note The function \a wait_all returns after all futures have become
     ///       ready. All input futures are still valid after \a wait_all
     ///       returns.
     ///
-    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
-    ///           function doesn't throw but returns the result code using the
-    ///           parameter \a ec. Otherwise it throws an instance of
-    ///           hpx::exception.
-    ///
-    /// \note     None of the futures in the input sequence are invalidated.
     template <typename R>
     void wait_all(std::vector<future<R>>&& futures, error_code& ec = throws);
 
@@ -67,20 +49,11 @@ namespace hpx
     /// \param futures  An arbitrary number of \a future or \a shared_future
     ///                 objects, possibly holding different types for which
     ///                 \a wait_all should wait.
-    /// \param ec       [in,out] this represents the error status on exit, if
-    ///                 this is pre-initialized to \a hpx#throws the function
-    ///                 will throw on error instead.
     ///
     /// \note The function \a wait_all returns after all futures have become
     ///       ready. All input futures are still valid after \a wait_all
     ///       returns.
     ///
-    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
-    ///           function doesn't throw but returns the result code using the
-    ///           parameter \a ec. Otherwise it throws an instance of
-    ///           hpx::exception.
-    ///
-    /// \note     None of the futures in the input sequence are invalidated.
     template <typename ...T>
     void wait_all(T &&... futures, error_code& ec = throws);
 
@@ -93,9 +66,6 @@ namespace hpx
     ///                 which \a wait_all_n should wait.
     /// \param count    The number of elements in the sequence starting at
     ///                 \a first.
-    /// \param ec       [in,out] this represents the error status on exit, if
-    ///                 this is pre-initialized to \a hpx#throws the function
-    ///                 will throw on error instead.
     ///
     /// \return         The function \a wait_all_n will return an iterator
     ///                 referring to the first element in the input sequence
@@ -105,12 +75,6 @@ namespace hpx
     ///       ready. All input futures are still valid after \a wait_all_n
     ///       returns.
     ///
-    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
-    ///           function doesn't throw but returns the result code using the
-    ///           parameter \a ec. Otherwise it throws an instance of
-    ///           hpx::exception.
-    ///
-    /// \note     None of the futures in the input sequence are invalidated.
     template <typename InputIter>
     InputIter wait_all_n(InputIter begin, std::size_t count,
         error_code& ec = throws);
@@ -129,7 +93,14 @@ namespace hpx
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/detail/pp_strip_parens.hpp>
+
+#include <boost/mpl/bool.hpp>
+#include <boost/fusion/include/begin.hpp>
+#include <boost/fusion/include/end.hpp>
+#include <boost/fusion/include/deref.hpp>
+#include <boost/fusion/include/next.hpp>
+#include <boost/type_traits/is_same.hpp>
+#include <boost/ref.hpp>
 
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/enum.hpp>
@@ -142,65 +113,262 @@ namespace hpx
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
 {
-    template <typename Future>
-    void wait_all(std::vector<Future> const& lazy_values,
-        error_code& ec = throws)
+    namespace detail
     {
-        return lcos::wait_some(
-            lazy_values.size(), lazy_values, ec);
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Future, typename Enable = void>
+        struct is_future_or_shared_state
+          : boost::mpl::false_
+        {};
+
+        template <typename Future>
+        struct is_future_or_shared_state<Future,
+                typename boost::enable_if<traits::is_future<Future> >::type>
+          : boost::mpl::true_
+        {};
+
+        template <typename R>
+        struct is_future_or_shared_state<
+                boost::intrusive_ptr<future_data<R> > >
+          : boost::mpl::true_
+        {};
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Future, typename Enable = void>
+        struct future_or_shared_state_result;
+
+        template <typename Future>
+        struct future_or_shared_state_result<Future,
+                typename boost::enable_if<traits::is_future<Future> >::type>
+          : traits::future_traits<Future>
+        {};
+
+        template <typename R>
+        struct future_or_shared_state_result<
+            boost::intrusive_ptr<future_data<R> > >
+        {
+            typedef R type;
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Tuple>
+        struct wait_all_frame
+          : hpx::lcos::detail::future_data<void>
+        {
+        private:
+            // workaround gcc regression wrongly instantiating constructors
+            wait_all_frame();
+            wait_all_frame(wait_all_frame const&);
+
+            typedef typename boost::fusion::result_of::end<Tuple const>::type
+                end_type;
+
+        public:
+            wait_all_frame(Tuple const& t)
+              : t_(t)
+            {}
+
+        protected:
+            // End of the tuple is reached
+            template <typename TupleIter>
+            BOOST_FORCEINLINE
+            void await(TupleIter&&, boost::mpl::true_)
+            {
+                this->set_result(util::unused);     // simply make ourself ready
+            }
+
+            // Current element is a range (vector) of futures
+            template <typename TupleIter, typename Iter>
+            void await_range(TupleIter iter, Iter next, Iter end)
+            {
+                for (/**/; next != end; ++next)
+                {
+                    if (!next->is_ready())
+                    {
+                        // Attach a continuation to this future which will
+                        // re-evaluate it and continue to the next element
+                        // in the sequence (if any).
+                        void (wait_all_frame::*f)(TupleIter, Iter, Iter) =
+                            &wait_all_frame::await_range;
+
+                        typedef typename std::iterator_traits<Iter>::value_type
+                            future_type;
+                        typedef typename detail::future_or_shared_state_result<
+                                future_type
+                            >::type future_result_type;
+
+                        boost::intrusive_ptr<
+                            lcos::detail::future_data<future_result_type>
+                        > next_future_data = lcos::detail::get_shared_state(*next);
+
+                        next_future_data->set_on_completed(util::bind(
+                            f, this, std::move(iter),
+                            std::move(next), std::move(end)));
+                        return;
+                    }
+                }
+
+                // All elements of the sequence are ready now, proceed to the
+                // next argument.
+                typedef typename boost::fusion::result_of::next<TupleIter>::type
+                    next_type;
+                typedef boost::is_same<next_type, end_type> pred;
+
+                await(boost::fusion::next(iter), pred());
+            }
+
+            template <typename TupleIter>
+            BOOST_FORCEINLINE
+            void await_next(TupleIter iter, boost::mpl::false_, boost::mpl::true_)
+            {
+                await_range(iter,
+                    boost::begin(boost::unwrap_ref(boost::fusion::deref(iter))),
+                    boost::end(boost::unwrap_ref(boost::fusion::deref(iter))));
+            }
+
+            // Current element is a simple future
+            template <typename TupleIter>
+            BOOST_FORCEINLINE
+            void await_next(TupleIter iter, boost::mpl::true_, boost::mpl::false_)
+            {
+                typedef typename util::detail::decay_unwrap<
+                    typename boost::fusion::result_of::deref<TupleIter>::type
+                >::type future_type;
+
+                typedef typename detail::future_or_shared_state_result<
+                        future_type
+                    >::type future_result_type;
+
+                using boost::mpl::false_;
+                using boost::mpl::true_;
+
+                boost::intrusive_ptr<
+                    lcos::detail::future_data<future_result_type>
+                > next_future_data = lcos::detail::get_shared_state(
+                    boost::fusion::deref(iter));
+
+                if (!next_future_data->is_ready())
+                {
+                    // Attach a continuation to this future which will
+                    // re-evaluate it and continue to the next argument
+                    // (if any).
+                    void (wait_all_frame::*f)(TupleIter, true_, false_) =
+                        &wait_all_frame::await_next;
+
+                    next_future_data->set_on_completed(hpx::util::bind(
+                        f, this, std::move(iter), true_(), false_()));
+                }
+                else
+                {
+                    typedef typename boost::fusion::result_of::next<TupleIter>::type
+                        next_type;
+                    typedef boost::is_same<next_type, end_type> pred;
+
+                    await(boost::fusion::next(iter), pred());
+                }
+            }
+
+            template <typename TupleIter>
+            BOOST_FORCEINLINE
+            void await(TupleIter&& iter, boost::mpl::false_)
+            {
+                typedef typename util::detail::decay_unwrap<
+                    typename boost::fusion::result_of::deref<TupleIter>::type
+                >::type future_type;
+
+                typedef typename detail::is_future_or_shared_state<future_type>::type
+                    is_future;
+                typedef typename traits::is_future_range<future_type>::type is_range;
+
+                await_next(std::forward<TupleIter>(iter), is_future(), is_range());
+            }
+
+        public:
+            void wait_all()
+            {
+                typedef typename boost::fusion::result_of::begin<Tuple const>::type
+                    begin_type;
+                typedef boost::is_same<begin_type, end_type> pred;
+
+                await(boost::fusion::begin(t_), pred());
+
+                // If there are still futures which are not ready, suspend and
+                // wait.
+                if (!this->is_ready())
+                    this->wait();
+            }
+
+        private:
+            Tuple const& t_;
+        };
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Future>
+    void wait_all(std::vector<Future> const& values)
+    {
+        typedef hpx::util::tuple<std::vector<Future> const&> result_type;
+        typedef detail::wait_all_frame<result_type> frame_type;
+
+        result_type data(values);
+        frame_type frame(data);
+        frame.wait_all();
     }
 
     template <typename Future>
-    void wait_all(std::vector<Future>& lazy_values,
-        error_code& ec = throws)
+    BOOST_FORCEINLINE void wait_all(std::vector<Future>& values)
     {
-        return lcos::wait_all(
-            const_cast<std::vector<Future> const&>(lazy_values), ec);
+        lcos::wait_all(const_cast<std::vector<Future> const&>(values));
     }
 
     template <typename Future>
-    void wait_all(std::vector<Future> && lazy_values,
-        error_code& ec = throws)
+    BOOST_FORCEINLINE void wait_all(std::vector<Future>&& values)
     {
-        return lcos::wait_all(
-            const_cast<std::vector<Future> const&>(lazy_values), ec);
+        lcos::wait_all(const_cast<std::vector<Future> const&>(values));
     }
 
     template <typename Iterator>
     typename util::always_void<
         typename lcos::detail::future_iterator_traits<Iterator>::type
-    >::type wait_all(Iterator begin, Iterator end,
-        error_code& ec = throws)
+    >::type
+    wait_all(Iterator begin, Iterator end)
     {
-        typedef
-            typename lcos::detail::future_iterator_traits<Iterator>::type
+        typedef typename lcos::detail::future_iterator_traits<Iterator>::type
             future_type;
-        typedef
-            typename lcos::detail::shared_state_ptr_for<future_type>::type
+        typedef typename lcos::detail::shared_state_ptr_for<future_type>::type
             shared_state_ptr;
         typedef std::vector<shared_state_ptr> result_type;
 
-        result_type lazy_values_;
-        std::transform(begin, end, std::back_inserter(lazy_values_),
+        result_type values;
+        std::transform(begin, end, std::back_inserter(values),
             detail::wait_get_shared_state<future_type>());
 
-        boost::shared_ptr<detail::wait_some<result_type> > f =
-            boost::make_shared<detail::wait_some<result_type> >(
-                std::move(lazy_values_), lazy_values_.size());
-
-        return (*f.get())();
+        lcos::wait_all(values);
     }
 
     template <typename Iterator>
-    Iterator wait_all_n(Iterator begin, std::size_t count,
-        error_code& ec = throws)
+    Iterator wait_all_n(Iterator begin, std::size_t count)
     {
-        return wait_some_n(count, begin, count, ec);
+        typedef typename lcos::detail::future_iterator_traits<Iterator>::type
+            future_type;
+        typedef typename lcos::detail::shared_state_ptr_for<future_type>::type
+            shared_state_ptr;
+        typedef std::vector<shared_state_ptr> result_type;
+
+        result_type values;
+        values.reserve(count);
+
+        detail::wait_get_shared_state<future_type> func;
+        for (std::size_t i = 0; i != count; ++i)
+            values.push_back(func(*begin++));
+
+        lcos::wait_all(std::move(values));
+
+        return begin;
     }
 
-    inline void wait_all(error_code& ec = throws)
+    inline void wait_all()
     {
-        return lcos::wait_some(0, ec);
     }
 }}
 
@@ -212,10 +380,20 @@ namespace hpx { namespace lcos
 #  pragma wave option(preserve: 1, line: 0, output: "preprocessed/wait_all_" HPX_LIMIT_STR ".hpp")
 #endif
 
+#define HPX_WAIT_ALL_SHARED_STATE_FOR_FUTURE(Z, N, D)                         \
+    typename lcos::detail::shared_state_ptr_for<BOOST_PP_CAT(T, N)>::type     \
+    /**/
+#define HPX_WAIT_ALL_GET_SHARED_STATE(Z, N, D)                                \
+    lcos::detail::get_shared_state(BOOST_PP_CAT(f, N))                        \
+    /**/
+
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (1, HPX_WAIT_ARGUMENT_LIMIT, <hpx/lcos/wait_all.hpp>))                \
 /**/
 #include BOOST_PP_ITERATE()
+
+#undef HPX_WAIT_ALL_GET_SHARED_STATE
+#undef HPX_WAIT_ALL_SHARED_STATE_FOR_FUTURE
 
 #if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
 #  pragma wave option(output: null)
@@ -240,9 +418,17 @@ namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
     template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-    void wait_all(HPX_ENUM_FWD_ARGS(N, T, f), error_code& ec = throws)
+    void wait_all(HPX_ENUM_FWD_ARGS(N, T, f))
     {
-        return lcos::wait_some(N, HPX_ENUM_FORWARD_ARGS(N, T, f), ec);
+        typedef hpx::util::tuple<
+                BOOST_PP_ENUM(N, HPX_WAIT_ALL_SHARED_STATE_FOR_FUTURE, _)
+            > result_type;
+        typedef detail::wait_all_frame<result_type> frame_type;
+
+        result_type values(BOOST_PP_ENUM(N, HPX_WAIT_ALL_GET_SHARED_STATE, _));
+
+        frame_type frame(values);
+        frame.wait_all();
     }
 }}
 

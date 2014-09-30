@@ -12,79 +12,135 @@ namespace hpx { namespace lcos
 {
     
     template <typename T0>
-    lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type> >
-    when_all(T0 && f0, error_code& ec = throws)
+    lcos::future<hpx::util::tuple<typename util::decay<T0>::type> >
+    when_all(T0 && f0)
     {
-        return lcos::when_some(1, std::forward<T0>( f0 ), ec);
+        typedef hpx::util::tuple<typename util::decay<T0>::type>
+            result_type;
+        typedef detail::when_all_frame<result_type> frame_type;
+        result_type values(detail::when_acquire_future<T0>()(f0));
+        boost::intrusive_ptr<frame_type> p(new frame_type(std::move(values)));
+        p->await();
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
 }}
 namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1>
-    lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type> >
-    when_all(T0 && f0 , T1 && f1, error_code& ec = throws)
+    lcos::future<hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type> >
+    when_all(T0 && f0 , T1 && f1)
     {
-        return lcos::when_some(2, std::forward<T0>( f0 ) , std::forward<T1>( f1 ), ec);
+        typedef hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type>
+            result_type;
+        typedef detail::when_all_frame<result_type> frame_type;
+        result_type values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1));
+        boost::intrusive_ptr<frame_type> p(new frame_type(std::move(values)));
+        p->await();
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
 }}
 namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1 , typename T2>
-    lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type> >
-    when_all(T0 && f0 , T1 && f1 , T2 && f2, error_code& ec = throws)
+    lcos::future<hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type> >
+    when_all(T0 && f0 , T1 && f1 , T2 && f2)
     {
-        return lcos::when_some(3, std::forward<T0>( f0 ) , std::forward<T1>( f1 ) , std::forward<T2>( f2 ), ec);
+        typedef hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type>
+            result_type;
+        typedef detail::when_all_frame<result_type> frame_type;
+        result_type values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2));
+        boost::intrusive_ptr<frame_type> p(new frame_type(std::move(values)));
+        p->await();
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
 }}
 namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1 , typename T2 , typename T3>
-    lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type> >
-    when_all(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3, error_code& ec = throws)
+    lcos::future<hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type> >
+    when_all(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3)
     {
-        return lcos::when_some(4, std::forward<T0>( f0 ) , std::forward<T1>( f1 ) , std::forward<T2>( f2 ) , std::forward<T3>( f3 ), ec);
+        typedef hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type>
+            result_type;
+        typedef detail::when_all_frame<result_type> frame_type;
+        result_type values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3));
+        boost::intrusive_ptr<frame_type> p(new frame_type(std::move(values)));
+        p->await();
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
 }}
 namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4>
-    lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type> >
-    when_all(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4, error_code& ec = throws)
+    lcos::future<hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type> >
+    when_all(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4)
     {
-        return lcos::when_some(5, std::forward<T0>( f0 ) , std::forward<T1>( f1 ) , std::forward<T2>( f2 ) , std::forward<T3>( f3 ) , std::forward<T4>( f4 ), ec);
+        typedef hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type>
+            result_type;
+        typedef detail::when_all_frame<result_type> frame_type;
+        result_type values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4));
+        boost::intrusive_ptr<frame_type> p(new frame_type(std::move(values)));
+        p->await();
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
 }}
 namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5>
-    lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type> >
-    when_all(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5, error_code& ec = throws)
+    lcos::future<hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type> >
+    when_all(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5)
     {
-        return lcos::when_some(6, std::forward<T0>( f0 ) , std::forward<T1>( f1 ) , std::forward<T2>( f2 ) , std::forward<T3>( f3 ) , std::forward<T4>( f4 ) , std::forward<T5>( f5 ), ec);
+        typedef hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type>
+            result_type;
+        typedef detail::when_all_frame<result_type> frame_type;
+        result_type values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5));
+        boost::intrusive_ptr<frame_type> p(new frame_type(std::move(values)));
+        p->await();
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
 }}
 namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6>
-    lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type> >
-    when_all(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6, error_code& ec = throws)
+    lcos::future<hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type> >
+    when_all(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6)
     {
-        return lcos::when_some(7, std::forward<T0>( f0 ) , std::forward<T1>( f1 ) , std::forward<T2>( f2 ) , std::forward<T3>( f3 ) , std::forward<T4>( f4 ) , std::forward<T5>( f5 ) , std::forward<T6>( f6 ), ec);
+        typedef hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type>
+            result_type;
+        typedef detail::when_all_frame<result_type> frame_type;
+        result_type values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6));
+        boost::intrusive_ptr<frame_type> p(new frame_type(std::move(values)));
+        p->await();
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
 }}
 namespace hpx { namespace lcos
 {
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7>
-    lcos::future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type> >
-    when_all(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7, error_code& ec = throws)
+    lcos::future<hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type> >
+    when_all(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7)
     {
-        return lcos::when_some(8, std::forward<T0>( f0 ) , std::forward<T1>( f1 ) , std::forward<T2>( f2 ) , std::forward<T3>( f3 ) , std::forward<T4>( f4 ) , std::forward<T5>( f5 ) , std::forward<T6>( f6 ) , std::forward<T7>( f7 ), ec);
+        typedef hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type>
+            result_type;
+        typedef detail::when_all_frame<result_type> frame_type;
+        result_type values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7));
+        boost::intrusive_ptr<frame_type> p(new frame_type(std::move(values)));
+        p->await();
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
     }
 }}
