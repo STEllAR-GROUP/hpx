@@ -337,7 +337,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
     public:
-        void attach(Future& future, BOOST_SCOPED_ENUM(launch) policy)
+        void attach(Future const& future, BOOST_SCOPED_ENUM(launch) policy)
         {
             typedef
                 typename shared_state_ptr_for<Future>::type
@@ -358,7 +358,7 @@ namespace hpx { namespace lcos { namespace detail
             state->set_on_completed(util::bind(cb, std::move(this_), state));
         }
 
-        void attach(Future& future, threads::executor& sched)
+        void attach(Future const& future, threads::executor& sched)
         {
             typedef
                 typename shared_state_ptr_for<Future>::type
@@ -387,7 +387,7 @@ namespace hpx { namespace lcos { namespace detail
     inline typename shared_state_ptr<
         typename continuation_result<ContResult>::type
     >::type
-    make_continuation(Future& future, BOOST_SCOPED_ENUM(launch) policy,
+    make_continuation(Future const& future, BOOST_SCOPED_ENUM(launch) policy,
         F && f)
     {
         typedef detail::continuation<Future, F, ContResult> shared_state;
@@ -404,7 +404,7 @@ namespace hpx { namespace lcos { namespace detail
     inline typename shared_state_ptr<
         typename continuation_result<ContResult>::type
     >::type
-    make_continuation(Future& future, threads::executor& sched,
+    make_continuation(Future const& future, threads::executor& sched,
         F && f)
     {
         typedef detail::continuation<Future, F, ContResult> shared_state;

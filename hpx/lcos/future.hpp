@@ -426,14 +426,14 @@ namespace hpx { namespace lcos { namespace detail
     inline typename shared_state_ptr<
         typename continuation_result<ContResult>::type
     >::type
-    make_continuation(Future& future, BOOST_SCOPED_ENUM(launch) policy,
+    make_continuation(Future const& future, BOOST_SCOPED_ENUM(launch) policy,
         F && f);
 
     template <typename ContResult, typename Future, typename F>
     inline typename shared_state_ptr<
         typename continuation_result<ContResult>::type
     >::type
-    make_continuation(Future& future, threads::executor& sched,
+    make_continuation(Future const& future, threads::executor& sched,
         F && f);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -592,14 +592,14 @@ namespace hpx { namespace lcos { namespace detail
             >
           , future_then_result<Derived, F>
         >::type
-        then(F && f, error_code& ec = throws)
+        then(F && f, error_code& ec = throws) const
         {
             return then(launch::all, std::forward<F>(f), ec);
         }
 
         template <typename F>
         typename future_then_result<Derived, F>::type
-        then(BOOST_SCOPED_ENUM(launch) policy, F && f, error_code& ec = throws)
+        then(BOOST_SCOPED_ENUM(launch) policy, F && f, error_code& ec = throws) const
         {
             typedef
                 typename future_then_result<Derived, F>::result_type
@@ -622,13 +622,13 @@ namespace hpx { namespace lcos { namespace detail
 
             shared_state_ptr p =
                 detail::make_continuation<continuation_result_type>(
-                    *static_cast<Derived*>(this), policy, std::forward<F>(f));
+                    *static_cast<Derived const*>(this), policy, std::forward<F>(f));
             return traits::future_access<future<result_type> >::create(std::move(p));
         }
 
         template <typename F>
         typename future_then_result<Derived, F>::type
-        then(threads::executor& sched, F && f, error_code& ec = throws)
+        then(threads::executor& sched, F && f, error_code& ec = throws) const
         {
             typedef
                 typename future_then_result<Derived, F>::result_type
@@ -651,7 +651,7 @@ namespace hpx { namespace lcos { namespace detail
 
             shared_state_ptr p =
                 detail::make_continuation<continuation_result_type>(
-                    *static_cast<Derived*>(this), sched, std::forward<F>(f));
+                    *static_cast<Derived const*>(this), sched, std::forward<F>(f));
             return traits::future_access<future<result_type> >::create(std::move(p));
         }
 
