@@ -241,6 +241,7 @@ hpx_option(HPX_MAX_CPU_COUNT STRING
   "HPX applications will not use more that this number of OS-Threads (default: ${HPX_MAX_CPU_COUNT_DEFAULT})"
   ${HPX_MAX_CPU_COUNT_DEFAULT}
   CATEGORY "Thread Manager" ADVANCED)
+hpx_add_config_define(HPX_MAX_CPU_COUNT ${HPX_MAX_CPU_COUNT})
 
 hpx_option(HPX_THREAD_STACK_MMAP BOOL
   "Use mmap for stack allocation on appropriate platforms"
