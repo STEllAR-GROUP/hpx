@@ -17,46 +17,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace iostreams { namespace detail
 {
-    ///////////////////////////////////////////////////////////////////////////
-    std::ostream& get_outstream(cout_tag)
-    {
-        return std::cout;
-    }
-
-    std::ostream& get_outstream(cerr_tag)
-    {
-        return std::cerr;
-    }
-
     std::stringstream& get_consolestream()
     {
         static std::stringstream console_stream;
         return console_stream;
-    }
-
-    std::ostream& get_outstream(consolestream_tag)
-    {
-        return get_consolestream();
-    }
-
-    char const* const cout_name = "/locality#console/output_stream#cout";
-    char const* const cerr_name = "/locality#console/output_stream#cerr";
-    char const* const consolestream_name =
-        "/locality#console/output_stream#consolestream";
-
-    char const* const get_outstream_name(cout_tag)
-    {
-        return cout_name;
-    }
-
-    char const* const get_outstream_name(cerr_tag)
-    {
-        return cerr_name;
-    }
-
-    char const* const get_outstream_name(consolestream_tag)
-    {
-        return consolestream_name;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -67,13 +31,12 @@ namespace hpx { namespace iostreams { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Tag>
-    hpx::future<naming::id_type> create_ostream(Tag tag)
+    hpx::future<naming::id_type>
+    create_ostream(char const* cout_name, std::ostream& strm)
     {
         LRT_(info) << "detail::create_ostream: creating '"
                    << cout_name << "' stream object";
 
-        char const* cout_name = get_outstream_name(tag);
         naming::resolver_client& agas_client = get_runtime().get_agas_client();
         if (agas_client.is_console())
         {
@@ -82,7 +45,7 @@ namespace hpx { namespace iostreams { namespace detail
 
             naming::id_type cout_id(
                 components::server::create_with_args<ostream_type>(
-                    boost::ref(detail::get_outstream(tag))),
+                    boost::ref(strm)),
                 naming::id_type::managed);
 
             return agas::register_name(cout_name, cout_id).then(

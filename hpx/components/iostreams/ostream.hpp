@@ -12,6 +12,7 @@
 
 #include <iterator>
 #include <ios>
+#include <iostream>
 
 #include <boost/swap.hpp>
 #include <boost/noncopyable.hpp>
@@ -77,8 +78,54 @@ namespace hpx { namespace iostreams
         };
 
         ///////////////////////////////////////////////////////////////////////
+        inline std::ostream& get_outstream(cout_tag)
+        {
+            return std::cout;
+        }
+
+        inline std::ostream& get_outstream(cerr_tag)
+        {
+            return std::cerr;
+        }
+
+        std::stringstream& get_consolestream();
+
+        inline std::ostream& get_outstream(consolestream_tag)
+        {
+            return get_consolestream();
+        }
+
+        static char const* const cout_name =
+            "/locality#console/output_stream#cout";
+        static char const* const cerr_name =
+            "/locality#console/output_stream#cerr";
+        static char const* const consolestream_name =
+            "/locality#console/output_stream#consolestream";
+
+        inline char const* const get_outstream_name(cout_tag)
+        {
+            return cout_name;
+        }
+
+        inline char const* const get_outstream_name(cerr_tag)
+        {
+            return cerr_name;
+        }
+
+        inline char const* const get_outstream_name(consolestream_tag)
+        {
+            return consolestream_name;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        hpx::future<naming::id_type>
+        create_ostream(char const* name, std::ostream& strm);
+
         template <typename Tag>
-        hpx::future<naming::id_type> create_ostream(Tag tag);
+        hpx::future<naming::id_type> create_ostream(Tag tag)
+        {
+            return create_ostream(get_outstream_name(tag), detail::get_outstream(tag));
+        }
 
         void register_ostreams();
         void unregister_ostreams();
