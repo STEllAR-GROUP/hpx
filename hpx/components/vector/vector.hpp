@@ -800,13 +800,28 @@ namespace hpx{
                                                             ).get();
                  }
              }
-             else if(state == hpx::dis_state::dis_block_cyclic) 
+             else if(state == hpx::dis_state::dis_block_cyclic)
              {
-                 return chunk_vector_stubs::get_value_noexpt_async(
-                                                         (it->second).get(),
-                                                         (pos%block_size) 
-                                                            ).get();
-             } 
+                 if(num_chunk >1)
+                 {
+                     return chunk_vector_stubs::get_value_async(
+                                                     (it->second).get(),
+                                                     ((((pos/block_size)/
+                                                     num_chunk)*block_size)+
+                                                     (pos%block_size))
+                                                               ).get();
+                 }
+                 else if(num_chunk == 1)
+                 {
+                     return chunk_vector_stubs::get_value_async(
+                                                      (it->second).get(),
+                                                      ((((pos/block_size)/
+                                                 localities.size())*block_size)+
+                                                      (pos%block_size))
+                                                               ).get();
+                 }
+             }
+
         }
         
 
