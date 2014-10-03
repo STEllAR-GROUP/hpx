@@ -173,8 +173,8 @@ namespace hpx { namespace threads { namespace detail
     struct idle_collect_rate
     {
         idle_collect_rate(boost::uint64_t& tfunc_time, boost::uint64_t& exec_time)
-          : start_timestamp_(util::hardware::timestamp())
-          , tfunc_time_(tfunc_time)
+          : start_timestamp_(0)
+          , tfunc_time_(boost::uint64_t(-1))
           , exec_time_(exec_time)
         {}
 
@@ -184,7 +184,15 @@ namespace hpx { namespace threads { namespace detail
         }
         void take_snapshot()
         {
-            tfunc_time_ = util::hardware::timestamp() - start_timestamp_;
+            if (tfunc_time_ == boost::uint64_t(-1))
+            {
+                start_timestamp_ = util::hardware::timestamp();
+                tfunc_time_ = 0;
+            }
+            else
+            {
+                tfunc_time_ = util::hardware::timestamp() - start_timestamp_;
+            }
         }
 
         boost::uint64_t start_timestamp_;

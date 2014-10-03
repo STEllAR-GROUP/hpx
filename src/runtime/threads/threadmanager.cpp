@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach, Katelyn Kufahl
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
@@ -1673,9 +1673,9 @@ namespace hpx { namespace threads
             std::accumulate(tfunc_times.begin(), tfunc_times.end(), 0.);
 
         if (reset) {
-            boost::uint64_t t = util::hardware::timestamp();
-            std::fill(exec_times.begin(), exec_times.end(), t);
-            std::fill(tfunc_times.begin(), tfunc_times.end(), t);
+            std::fill(exec_times.begin(), exec_times.end(), 0);
+            std::fill(tfunc_times.begin(), tfunc_times.end(),
+                boost::uint64_t(-1));
         }
 
         if (std::abs(tfunc_total) < 1e-16)   // avoid division by zero
@@ -1693,9 +1693,8 @@ namespace hpx { namespace threads
         double const tfunc_time = static_cast<double>(tfunc_times[num_thread]);
 
         if (reset) {
-            boost::uint64_t t = util::hardware::timestamp();
-            exec_times[num_thread] = t;
-            tfunc_times[num_thread] = t;
+            exec_times[num_thread] = 0;
+            tfunc_times[num_thread] = boost::uint64_t(-1);
         }
 
         if (std::abs(tfunc_time) < 1e-16)   // avoid division by zero
@@ -1719,9 +1718,9 @@ namespace hpx { namespace threads
             std::accumulate(tfunc_times.begin(), tfunc_times.end(), 0.);
 
         if (reset) {
-            boost::uint64_t t = util::hardware::timestamp();
-            std::fill(exec_times.begin(), exec_times.end(), t);
-            std::fill(tfunc_times.begin(), tfunc_times.end(), t);
+            std::fill(exec_times.begin(), exec_times.end(), 0);
+            std::fill(tfunc_times.begin(), tfunc_times.end(),
+                boost::uint64_t(-1));
         }
 
         // avoid division by zero
@@ -1744,9 +1743,9 @@ namespace hpx { namespace threads
             std::accumulate(tfunc_times.begin(), tfunc_times.end(), 0.);
 
         if (reset) {
-            boost::uint64_t t = util::hardware::timestamp();
-            std::fill(exec_times.begin(), exec_times.end(), t);
-            std::fill(tfunc_times.begin(), tfunc_times.end(), t);
+            std::fill(exec_times.begin(), exec_times.end(), 0);
+            std::fill(tfunc_times.begin(), tfunc_times.end(),
+                boost::uint64_t(-1));
         }
 
         // avoid division by zero
