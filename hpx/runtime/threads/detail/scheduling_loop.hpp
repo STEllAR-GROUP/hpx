@@ -173,8 +173,8 @@ namespace hpx { namespace threads { namespace detail
     struct idle_collect_rate
     {
         idle_collect_rate(boost::uint64_t& tfunc_time, boost::uint64_t& exec_time)
-          : start_timestamp_(0)
-          , tfunc_time_(boost::uint64_t(-1))
+          : start_timestamp_(util::hardware::timestamp())
+          , tfunc_time_(tfunc_time)
           , exec_time_(exec_time)
         {}
 
