@@ -188,6 +188,7 @@ namespace hpx { namespace threads { namespace detail
             {
                 start_timestamp_ = util::hardware::timestamp();
                 tfunc_time_ = 0;
+                exec_time_ = 0;
             }
             else
             {

@@ -1673,13 +1673,14 @@ namespace hpx { namespace threads
             std::accumulate(tfunc_times.begin(), tfunc_times.end(), 0.);
 
         if (reset) {
-            std::fill(exec_times.begin(), exec_times.end(), 0);
             std::fill(tfunc_times.begin(), tfunc_times.end(),
                 boost::uint64_t(-1));
         }
 
         if (std::abs(tfunc_total) < 1e-16)   // avoid division by zero
             return 10000LL;
+
+        HPX_ASSERT(tfunc_total > exec_total);
 
         double const percent = 1. - (exec_total / tfunc_total);
         return boost::int64_t(10000. * percent);    // 0.01 percent
@@ -1693,12 +1694,13 @@ namespace hpx { namespace threads
         double const tfunc_time = static_cast<double>(tfunc_times[num_thread]);
 
         if (reset) {
-            exec_times[num_thread] = 0;
             tfunc_times[num_thread] = boost::uint64_t(-1);
         }
 
         if (std::abs(tfunc_time) < 1e-16)   // avoid division by zero
             return 10000LL;
+
+        HPX_ASSERT(tfunc_total > exec_total);
 
         double const percent = 1. - (exec_time / tfunc_time);
         return boost::int64_t(10000. * percent);   // 0.01 percent
@@ -1718,14 +1720,15 @@ namespace hpx { namespace threads
             std::accumulate(tfunc_times.begin(), tfunc_times.end(), 0.);
 
         if (reset) {
-            std::fill(exec_times.begin(), exec_times.end(), 0);
             std::fill(tfunc_times.begin(), tfunc_times.end(),
                 boost::uint64_t(-1));
         }
 
         // avoid division by zero
-        if (std::abs(tfunc_total - exec_total) == 0.0)
+        if (std::abs(tfunc_total - exec_total) < 1e-16)
             return 10000LL;
+
+        HPX_ASSERT(tfunc_total > exec_total);
 
         double const percent = (creation_total / (tfunc_total - exec_total));
         return boost::int64_t(10000. * percent);    // 0.01 percent
@@ -1743,14 +1746,15 @@ namespace hpx { namespace threads
             std::accumulate(tfunc_times.begin(), tfunc_times.end(), 0.);
 
         if (reset) {
-            std::fill(exec_times.begin(), exec_times.end(), 0);
             std::fill(tfunc_times.begin(), tfunc_times.end(),
                 boost::uint64_t(-1));
         }
 
         // avoid division by zero
-        if (std::abs(tfunc_total - exec_total) == 0.0)
+        if (std::abs(tfunc_total - exec_total) < 1e-16)
             return 10000LL;
+
+        HPX_ASSERT(tfunc_total > exec_total);
 
         double const percent = (cleanup_total / (tfunc_total - exec_total));
         return boost::int64_t(10000. * percent);    // 0.01 percent
