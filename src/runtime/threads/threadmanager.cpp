@@ -1700,7 +1700,7 @@ namespace hpx { namespace threads
         if (std::abs(tfunc_time) < 1e-16)   // avoid division by zero
             return 10000LL;
 
-        HPX_ASSERT(tfunc_total > exec_total);
+        HPX_ASSERT(tfunc_time > exec_time);
 
         double const percent = 1. - (exec_time / tfunc_time);
         return boost::int64_t(10000. * percent);   // 0.01 percent
