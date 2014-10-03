@@ -97,7 +97,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename zip_iterator::reference reference;
 
                 util::cancellation_token<> tok;
-                return util::partitioner<ExPolicy, bool>::call(policy,
+                return util::partitioner<ExPolicy, zip_iterator, bool>::call(policy,
                     hpx::util::make_zip_iterator(first1, first2), count1,
                     [f, tok](zip_iterator it, std::size_t part_count) mutable -> bool
                     {
@@ -350,7 +350,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename zip_iterator::reference reference;
 
                 util::cancellation_token<> tok;
-                return util::partitioner<ExPolicy, bool>::call(policy,
+                return util::partitioner<ExPolicy, zip_iterator, bool>::call(policy,
                     hpx::util::make_zip_iterator(first1, first2), count,
                     [f, tok](zip_iterator it, std::size_t part_count) mutable -> bool
                     {

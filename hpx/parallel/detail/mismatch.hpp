@@ -93,33 +93,34 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 util::cancellation_token<std::size_t> tok(count1);
 
-                return util::partitioner<ExPolicy, T, void>::call_with_index(
-                    policy, hpx::util::make_zip_iterator(first1, first2), count1,
-                    [f, tok](std::size_t base_idx, zip_iterator it,
-                        std::size_t part_count) mutable
-                    {
-                        util::loop_idx_n(
-                            base_idx, it, part_count, tok,
-                            [&f, &tok](reference t, std::size_t i)
-                            {
-                                using hpx::util::get;
-                                if (!f(get<0>(t), get<1>(t)))
-                                    tok.cancel(i);
-                            });
-                    },
-                    [=](std::vector<hpx::future<void> > &&) mutable -> std::pair<FwdIter1, FwdIter2>
-                    {
-                        std::size_t mismatched = tok.get_data();
-                        if (mismatched != count1) {
-                            std::advance(first1, mismatched);
-                            std::advance(first2, mismatched);
-                        }
-                        else {
-                            first1 = last1;
-                            first2 = last2;
-                        }
-                        return std::make_pair(first1, first2);
-                    });
+                return util::partitioner<ExPolicy, zip_iterator, T, void>::
+                    call_with_index(
+                        policy, hpx::util::make_zip_iterator(first1, first2), count1,
+                        [f, tok](std::size_t base_idx, zip_iterator it,
+                            std::size_t part_count) mutable
+                        {
+                            util::loop_idx_n(
+                                base_idx, it, part_count, tok,
+                                [&f, &tok](reference t, std::size_t i)
+                                {
+                                    using hpx::util::get;
+                                    if (!f(get<0>(t), get<1>(t)))
+                                        tok.cancel(i);
+                                });
+                        },
+                        [=](std::vector<hpx::future<void> > &&) mutable -> std::pair<FwdIter1, FwdIter2>
+                        {
+                            std::size_t mismatched = tok.get_data();
+                            if (mismatched != count1) {
+                                std::advance(first1, mismatched);
+                                std::advance(first2, mismatched);
+                            }
+                            else {
+                                first1 = last1;
+                                first2 = last2;
+                            }
+                            return std::make_pair(first1, first2);
+                        });
             }
         };
         /// \endcond
@@ -364,31 +365,32 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 util::cancellation_token<std::size_t> tok(count);
 
-                return util::partitioner<ExPolicy, T, void>::call_with_index(
-                    policy, hpx::util::make_zip_iterator(first1, first2), count,
-                    [f, tok](std::size_t base_idx, zip_iterator it,
-                        std::size_t part_count) mutable
-                    {
-                        util::loop_idx_n(
-                            base_idx, it, part_count, tok,
-                            [&f, &tok](reference t, std::size_t i)
-                            {
-                                using hpx::util::get;
-                                if (!f(get<0>(t), get<1>(t)))
-                                    tok.cancel(i);
-                            });
-                    },
-                    [=](std::vector<hpx::future<void> > &&) mutable -> std::pair<FwdIter1, FwdIter2>
-                    {
-                        std::size_t mismatched = tok.get_data();
-                        if (mismatched != count)
-                            std::advance(first1, mismatched);
-                        else
-                            first1 = last1;
+                return util::partitioner<ExPolicy, zip_iterator, T, void>::
+                    call_with_index(
+                        policy, hpx::util::make_zip_iterator(first1, first2), count,
+                        [f, tok](std::size_t base_idx, zip_iterator it,
+                            std::size_t part_count) mutable
+                        {
+                            util::loop_idx_n(
+                                base_idx, it, part_count, tok,
+                                [&f, &tok](reference t, std::size_t i)
+                                {
+                                    using hpx::util::get;
+                                    if (!f(get<0>(t), get<1>(t)))
+                                        tok.cancel(i);
+                                });
+                        },
+                        [=](std::vector<hpx::future<void> > &&) mutable -> std::pair<FwdIter1, FwdIter2>
+                        {
+                            std::size_t mismatched = tok.get_data();
+                            if (mismatched != count)
+                                std::advance(first1, mismatched);
+                            else
+                                first1 = last1;
 
-                        std::advance(first2, mismatched);
-                        return std::make_pair(first1, first2);
-                    });
+                            std::advance(first2, mismatched);
+                            return std::make_pair(first1, first2);
+                        });
             }
         };
         /// \endcond

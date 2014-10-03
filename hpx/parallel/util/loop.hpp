@@ -192,6 +192,78 @@ namespace hpx { namespace parallel { namespace util
         // Helper class to repeatedly call a function a given number of times
         // starting from a given iterator position.
         template <typename IterCat>
+        struct loop_with_cleanup_n
+        {
+            ///////////////////////////////////////////////////////////////////
+            // handle sequences of non-futures
+            template <typename Iter, typename F, typename Cleanup>
+            static Iter call(Iter it, std::size_t count, F && f,
+                Cleanup && cleanup)
+            {
+                Iter iter = it;
+                try {
+                    for (/**/; count != 0; (void) --count, ++it)
+                        f(it);
+                    return it;
+                }
+                catch (...) {
+                    for (/**/; iter != it; ++iter)
+                        cleanup(iter);
+                    throw;
+                }
+            }
+
+            template <typename Iter, typename CancelToken, typename F,
+                typename Cleanup>
+            static Iter call(Iter it, std::size_t count, CancelToken& tok,
+                F && f, Cleanup && cleanup)
+            {
+                Iter iter = it;
+                try {
+                    for (/**/; count != 0; (void) --count, ++it)
+                    {
+                        f(it);
+                        if (tok.was_cancelled())
+                            break;
+                    }
+                    return it;
+                }
+                catch (...) {
+                    for (/**/; iter != it; ++iter)
+                        cleanup(iter);
+                    tok.cancel();
+                    throw;
+                }
+            }
+        };
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // no special handling of futures
+    template <typename Iter, typename F>
+    BOOST_FORCEINLINE Iter
+    loop_with_cleanup_n(Iter it, std::size_t count, F && f)
+    {
+        typedef typename std::iterator_traits<Iter>::iterator_category cat;
+        return detail::loop_with_cleanup_n<cat>::call(it, count,
+            std::forward<F>(f));
+    }
+
+    template <typename Iter, typename CancelToken, typename F>
+    BOOST_FORCEINLINE Iter
+    loop_with_cleanup_n(Iter it, std::size_t count, CancelToken& tok, F && f)
+    {
+        typedef typename std::iterator_traits<Iter>::iterator_category cat;
+        return detail::loop_with_cleanup_n<cat>::call(it, count, tok,
+            std::forward<F>(f));
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        // Helper class to repeatedly call a function a given number of times
+        // starting from a given iterator position.
+        template <typename IterCat>
         struct loop_idx_n
         {
             ///////////////////////////////////////////////////////////////////
