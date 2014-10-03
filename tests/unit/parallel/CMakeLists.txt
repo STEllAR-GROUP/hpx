@@ -48,6 +48,7 @@ set(tests
     transform
     transform_binary
     transform_reduce
+    uninitialized_copy
    )
 
 set(task_region_FLAGS DEPENDENCIES iostreams_component)
