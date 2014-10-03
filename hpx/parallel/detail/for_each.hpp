@@ -17,7 +17,7 @@
 #include <hpx/parallel/detail/algorithm_result.hpp>
 #include <hpx/parallel/detail/dispatch.hpp>
 #include <hpx/parallel/detail/is_negative.hpp>
-#include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
 #include <algorithm>
@@ -59,7 +59,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 if (count != 0)
                 {
-                    return util::foreach_n_partitioner<ExPolicy>::call(
+                    return util::foreach_n_partitioner<ExPolicy, Iter>::call(
                         policy, first, count,
                         [f](Iter part_begin, std::size_t part_size)
                         {
