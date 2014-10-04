@@ -63,12 +63,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 FwdIter next = first;
                 ++next;
-                difference_type count = std::distance(first,last);
+                difference_type count = std::distance(first, last);
                 util::cancellation_token<difference_type> tok(count);
 
                 return util::partitioner<ExPolicy, FwdIter, FwdIter, void>::
                     call_with_index(
-                        policy, hpx::util::make_zip_iterator(first,next), count-1,
+                        policy, hpx::util::make_zip_iterator(first, next), count-1,
                         [op, tok](std::size_t base_idx, zip_iterator it,
                             std::size_t part_size) mutable
                         {
@@ -76,7 +76,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                 base_idx, it, part_size, tok,
                                 [&op, &tok](reference t, std::size_t i)
                                 {
-                                    if(op(hpx::util::get<0>(t), hpx::util::get<1>(t)))
+                                    using hpx::util::get;
+                                    if(op(get<0>(t), get<1>(t)))
                                         tok.cancel(i);
                                 });
                         },
@@ -118,23 +119,25 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param last         Refers to the end of the sequence of elements of
     ///                     the range the algorithm will be applied to.
     ///
-    /// The comparison operations in the parallel \a adjacent_find algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
-    /// execute in sequential order in the calling thread.
+    /// The comparison operations in the parallel \a adjacent_find algorithm
+    /// invoked with an execution policy object of type
+    /// \a sequential_execution_policy execute in sequential order in the
+    /// calling thread.
     ///
-    /// The comparison operations in the parallel \a adjacent_find algorithm invoked
-    /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
+    /// The comparison operations in the parallel \a adjacent_find algorithm
+    /// invoked with an execution policy object of type
+    /// \a parallel_execution_policy or \a parallel_task_execution_policy are
+    /// permitted to execute in an unordered fashion in unspecified threads,
+    /// and indeterminately sequenced within each thread.
     ///
-    /// \returns  The \a adjacent_find algorithm returns a \a hpx::future<FwdIter> if the
-    ///           execution policy is of type
+    /// \returns  The \a adjacent_find algorithm returns a
+    ///           \a hpx::future<FwdIter> if the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
     ///           returns \a FwdIter otherwise.
-    ///           The \a adjacent_find algorithm returns an iterator to first of the
-    ///           identical elements. If no such elements are found,\a last is returned
+    ///           The \a adjacent_find algorithm returns an iterator to first
+    ///           of the identical elements. If no such elements are found,
+    ///           \a last is returned
     ///
     template <typename ExPolicy, typename FwdIter>
     inline typename boost::enable_if<
@@ -150,7 +153,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (boost::is_base_of<
                 std::forward_iterator_tag, iterator_category
             >::value),
-            "Requires at least forward iterator");
+            "Requires at least a forward iterator");
 
         typedef is_sequential_execution_policy<ExPolicy> is_seq;
 
@@ -187,8 +190,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param last         Refers to the end of the sequence of elements of
     ///                     the range the algorithm will be applied to.
     /// \param op           The binary predicate which returns \a true
-    ///                     if the elements should be treated as equal. The signature
-    ///                     should be equivalent to the following:
+    ///                     if the elements should be treated as equal. The
+    ///                     signature should be equivalent to the following:
     ///                     \code
     ///                     bool pred(const Type1 &a, const Type2 &b);
     ///                     \endcode \n
@@ -205,20 +208,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The comparison operations in the parallel \a adjacent_find invoked
     /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
+    /// or \a parallel_task_execution_policy are permitted to execute in an
+    /// unordered fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a adjacent_find algorithm returns a \a hpx::future<InIter> if the
-    ///           execution policy is of type
+    /// \returns  The \a adjacent_find algorithm returns a \a hpx::future<InIter>
+    ///           if the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
     ///           returns \a InIter otherwise.
-    ///           The \a adjacent_find algorithm returns an iterator to the first of the
-    ///           identical elements. If no such elements are found, \a last is returned.
+    ///           The \a adjacent_find algorithm returns an iterator to the
+    ///           first of the identical elements. If no such elements are
+    ///           found, \a last is returned.
     ///
-    ///           This overload of \a adjacent_find is available if the user decides to
-    ///           provide their algorithm their own binary predicate \a op.
+    ///           This overload of \a adjacent_find is available if the user
+    ///           decides to provide their algorithm their own binary
+    ///           predicate \a op.
     ///
     template <typename ExPolicy, typename FwdIter, typename Pred>
     inline typename boost::enable_if<
@@ -234,7 +239,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (boost::is_base_of<
                 std::forward_iterator_tag, iterator_category
             >::value),
-            "Requires at least forward iterator");
+            "Requires at least a forward iterator");
 
         typedef is_sequential_execution_policy<ExPolicy> is_seq;
 
