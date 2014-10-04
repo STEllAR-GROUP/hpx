@@ -487,7 +487,7 @@ namespace hpx { namespace util
             }
         }
 
-        queuing_ = "priority_local";
+        queuing_ = "local-priority";
         if (vm.count("hpx:queuing"))
             queuing_ = vm["hpx:queuing"].as<std::string>();
 

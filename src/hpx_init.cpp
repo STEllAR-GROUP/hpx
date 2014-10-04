@@ -446,8 +446,8 @@ namespace hpx
             if (vm.count("hpx:high-priority-threads")) {
                 throw std::logic_error("Invalid command line option "
                     "--hpx:high-priority-threads, valid for "
-                    "--hpx:queuing=priority_local and --hpx:queuing=priority_abp "
-                    "only");
+                    "--hpx:queuing=local-priority and "
+                    "--hpx:queuing=abp-priority only");
             }
         }
 
@@ -457,8 +457,8 @@ namespace hpx
             if (vm.count("hpx:numa-sensitive")) {
                 throw std::logic_error("Invalid command line option "
                     "--hpx:numa-sensitive, valid for "
-                    "--hpx:queuing=local, --hpx:queuing=priority_local, or "
-                    "--hpx:queuing=priority_abp only");
+                    "--hpx:queuing=local, --hpx:queuing=local-priority, or "
+                    "--hpx:queuing=abp-priority only");
             }
         }
 
@@ -467,7 +467,8 @@ namespace hpx
         {
             if (vm.count("hpx:hierarchy-arity")) {
                 throw std::logic_error("Invalid command line option "
-                    "--hpx:hierarchy-arity, valid for --hpx:queuing=hierarchy only.");
+                    "--hpx:hierarchy-arity, valid for "
+                    "--hpx:queuing=hierarchy only.");
             }
         }
 
@@ -487,30 +488,34 @@ namespace hpx
             if (vm.count("hpx:pu-offset")) {
                 throw std::logic_error("Invalid command line option "
                     "--hpx:pu-offset, valid for --hpx:queuing=priority or "
-                    "--hpx:queuing=priority_local only.");
+                    "--hpx:queuing=local-priority only.");
             }
             if (vm.count("hpx:pu-step")) {
                 throw std::logic_error("Invalid command line option "
-                    "--hpx:pu-step, valid for --hpx:queuing=priority or "
-                    "--hpx:queuing=priority_local only.");
+                    "--hpx:pu-step, valid for --hpx:queuing=abp-priority, "
+                    "--hpx:queuing=periodic-priority, or "
+                    "--hpx:queuing=local-priority only.");
             }
 #endif
 #if defined(HPX_HAVE_HWLOC)
             // affinity control is available for HWLOC only
             if (vm.count("hpx:affinity")) {
                 throw std::logic_error("Invalid command line option "
-                    "--hpx:affinity, valid for --hpx:queuing=priority or "
-                    "--hpx:queuing=priority_local only.");
+                    "--hpx:affinity, valid for --hpx:queuing=abp-priority, "
+                    "--hpx:queuing=periodic-priority, or "
+                    "--hpx:queuing=local-priority only.");
             }
             if (vm.count("hpx:bind")) {
                 throw std::logic_error("Invalid command line option "
-                    "--hpx:bind, valid for --hpx:queuing=priority or "
-                    "--hpx:queuing=priority_local only.");
+                    "--hpx:bind, valid for --hpx:queuing=abp-priority, "
+                    "--hpx:queuing=periodic-priority, or "
+                    "--hpx:queuing=local-priority only.");
             }
             if (vm.count("hpx:print-bind")) {
                 throw std::logic_error("Invalid command line option "
-                    "--hpx:print-bind, valid for --hpx:queuing=priority or "
-                    "--hpx:queuing=priority_local only.");
+                    "--hpx:print-bind, valid for --hpx:queuing=abp-priority, "
+                    "--hpx:queuing=periodic-priority, or "
+                    "--hpx:queuing=local-priority only.");
             }
 #endif
         }
@@ -1031,57 +1036,68 @@ namespace hpx
                 // Initialize and start the HPX runtime.
                 if (0 == std::string("local").find(cfg.queuing_)) {
 #if defined(HPX_LOCAL_SCHEDULER)
+                    cfg.queuing_ = "local";
                     result = detail::run_local(startup, shutdown, cfg, blocking);
 #else
-                    throw std::logic_error("Command line option --hpx:queuing=local "
+                    throw std::logic_error("Command line option "
+                        "--hpx:queuing=local "
                         "is not configured in this build. Please rebuild with "
-                        "'cmake -DHPX_LOCAL_SCHEDULER=ON'.");
+                        "'cmake -DHPX_THREAD_SCHEDULERS=local'.");
 #endif
                 }
                 else if (0 == std::string("static").find(cfg.queuing_)) {
 #if defined(HPX_STATIC_PRIORITY_SCHEDULER)
+                    cfg.queuing_ = "static";
                     result = detail::run_static(startup, shutdown, cfg, blocking);
 #else
-                    throw std::logic_error("Command line option --hpx:queuing=static "
+                    throw std::logic_error("Command line option "
+                        "--hpx:queuing=static "
                         "is not configured in this build. Please rebuild with "
-                        "'cmake -DHPX_STATIC_PRIORITY_SCHEDULER=ON'.");
+                        "'cmake -DHPX_THREAD_SCHEDULERS=static-priority'.");
 #endif
                 }
-                else if (0 == std::string("priority_local").find(cfg.queuing_)) {
+                else if (0 == std::string("local-priority").find(cfg.queuing_)) {
                     // local scheduler with priority queue (one queue for each OS threads
-                    // plus separate deques for low/high priority HPX-threads)
+                    // plus separate dequeues for low/high priority HPX-threads)
+                    cfg.queuing_ = "local-priority";
                     result = detail::run_priority_local(startup, shutdown, cfg, blocking);
                 }
-                else if (0 == std::string("priority_abp").find(cfg.queuing_)) {
+                else if (0 == std::string("abp-priority").find(cfg.queuing_)) {
 #if defined(HPX_ABP_SCHEDULER)
                     // local scheduler with priority deque (one deque for each OS threads
-                    // plus separate deques for high priority HPX-threads), uses
+                    // plus separate dequeues for high priority HPX-threads), uses
                     // abp-style stealing
+                    cfg.queuing_ = "abp-priority";
                     result = detail::run_priority_abp(startup, shutdown, cfg, blocking);
 #else
-                    throw std::logic_error("Command line option --hpx:queuing=priority_abp "
+                    throw std::logic_error("Command line option "
+                        "--hpx:queuing=abp-priority "
                         "is not configured in this build. Please rebuild with "
-                        "'cmake -DHPX_ABP_SCHEDULER=ON'.");
+                        "'cmake -DHPX_THREAD_SCHEDULERS=abp-priority'.");
 #endif
                 }
                 else if (0 == std::string("hierarchy").find(cfg.queuing_)) {
 #if defined(HPX_HIERARCHY_SCHEDULER)
                     // hierarchy scheduler: tree of queues, with work
                     // stealing from the parent queue in that tree.
+                    cfg.queuing_ = "hierarchy";
                     result = detail::run_hierarchy(startup, shutdown, cfg, blocking);
 #else
-                    throw std::logic_error("Command line option --hpx:queuing=hierarchy "
+                    throw std::logic_error("Command line option "
+                        "--hpx:queuing=hierarchy "
                         "is not configured in this build. Please rebuild with "
-                        "'cmake -DHPX_HIERARCHY_SCHEDULER=ON'.");
+                        "'cmake -DHPX_THREAD_SCHEDULERS=hierarchy'.");
 #endif
                 }
-                else if (0 == std::string("periodic").find(cfg.queuing_)) {
+                else if (0 == std::string("periodic-priority").find(cfg.queuing_)) {
 #if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
+                    cfg.queuing_ = "periodic-priority";
                     result = detail::run_periodic(startup, shutdown, cfg, blocking);
 #else
-                    throw std::logic_error("Command line option --hpx:queuing=periodic "
+                    throw std::logic_error("Command line option "
+                        "--hpx:queuing=periodic-priority "
                         "is not configured in this build. Please rebuild with "
-                        "'cmake -DHPX_PERIODIC_PRIORITY_SCHEDULER=ON'.");
+                        "'cmake -DHPX_THREAD_SCHEDULERS=periodic-priority'.");
 #endif
                 }
                 else {

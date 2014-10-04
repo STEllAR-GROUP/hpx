@@ -419,17 +419,20 @@ namespace hpx { namespace util
                 ("hpx:pu-offset", value<std::size_t>(),
                   "the first processing unit this instance of HPX should be "
                   "run on (default: 0), valid for "
-                  "--hpx:queuing=local, static and priority_local only")
+                  "--hpx:queuing=local, --hpx:queuing=abp-priority, "
+                  "--hpx:queuing=static and --hpx:queuing=local-priority only")
                 ("hpx:pu-step", value<std::size_t>(),
                   "the step between used processing unit numbers for this "
                   "instance of HPX (default: 1), valid for "
-                  "--hpx:queuing=local, static and priority_local only")
+                  "--hpx:queuing=local, --hpx:queuing=abp-priority, "
+                  "--hpx:queuing=static and --hpx:queuing=local-priority only")
 #endif
 #if defined(HPX_HAVE_HWLOC)
                 ("hpx:affinity", value<std::string>(),
                   "the affinity domain the OS threads will be confined to, "
                   "possible values: pu, core, numa, machine (default: pu), valid for "
-                  "--hpx:queuing=local, static and priority_local only")
+                  "--hpx:queuing=local, --hpx:queuing=abp-priority, "
+                  "--hpx:queuing=static and --hpx:queuing=local-priority only")
                 ("hpx:bind", value<std::vector<std::string> >()->composing(),
                   "the detailed affinity description for the OS threads, see "
                   "the documentation for a detailed description of possible "
@@ -449,8 +452,9 @@ namespace hpx { namespace util
                  "the number of total cores in the system)")
                 ("hpx:queuing", value<std::string>(),
                   "the queue scheduling policy to use, options are "
-                  "'local', 'priority_local', 'priority_abp', "
-                  "'hierarchy', 'static' and 'periodic' (default: 'priority_local'; "
+                  "'local', 'local-priority', 'abp-priority', "
+                  "'hierarchy', 'static', and 'periodic-priority' "
+                  "(default: 'local-priority'; "
                   "all option values can be abbreviated)")
                 ("hpx:hierarchy-arity", value<std::size_t>(),
                   "the arity of the of the thread queue tree, valid for "
@@ -458,9 +462,9 @@ namespace hpx { namespace util
                 ("hpx:high-priority-threads", value<std::size_t>(),
                   "the number of operating system threads maintaining a high "
                   "priority queue (default: number of OS threads), valid for "
-                  "--hpx:queuing=priority_local and --hpx:queuing=priority_abp only)")
+                  "--hpx:queuing=local-priority and --hpx:queuing=abp-priority only)")
                 ("hpx:numa-sensitive",
-                  "makes the priority_local scheduler NUMA sensitive")
+                  "makes the local-priority scheduler NUMA sensitive")
             ;
 
             options_description config_options("HPX configuration options");
