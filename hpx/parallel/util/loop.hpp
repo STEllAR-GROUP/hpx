@@ -108,9 +108,9 @@ namespace hpx { namespace parallel { namespace util
             {
                 for (/**/; it != end; ++it)
                 {
-                    func(*it);
                     if (tok.was_cancelled())
                         break;
+                    func(*it);
                 }
                 return it;
             }
@@ -159,9 +159,9 @@ namespace hpx { namespace parallel { namespace util
             {
                 for (/**/; count != 0; (void) --count, ++it)
                 {
-                    f(it);
                     if (tok.was_cancelled())
                         break;
+                    f(it);
                 }
                 return it;
             }
@@ -222,9 +222,9 @@ namespace hpx { namespace parallel { namespace util
                 try {
                     for (/**/; count != 0; (void) --count, ++it)
                     {
-                        f(it);
                         if (tok.was_cancelled())
                             break;
+                        f(it);
                     }
                     return it;
                 }
@@ -285,9 +285,9 @@ namespace hpx { namespace parallel { namespace util
             {
                 for (/**/; count != 0; (void) --count, ++it, ++base_idx)
                 {
-                    f(*it, base_idx);
                     if (tok.was_cancelled(base_idx))
                         break;
+                    f(*it, base_idx);
                 }
                 return it;
             }
