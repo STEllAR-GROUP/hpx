@@ -85,6 +85,7 @@ namespace hpx { namespace parallel { namespace util
         }
     };
 
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
@@ -118,7 +119,6 @@ namespace hpx { namespace parallel { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // no special handling for futures
     template <typename Iter, typename F>
     BOOST_FORCEINLINE Iter
     loop(Iter begin, Iter end, F && f)
@@ -169,7 +169,6 @@ namespace hpx { namespace parallel { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // no special handling of futures
     template <typename Iter, typename F>
     BOOST_FORCEINLINE Iter
     loop_n(Iter it, std::size_t count, F && f)
@@ -184,6 +183,79 @@ namespace hpx { namespace parallel { namespace util
     {
         typedef typename std::iterator_traits<Iter>::iterator_category cat;
         return detail::loop_n<cat>::call(it, count, tok, std::forward<F>(f));
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        // Helper class to repeatedly call a function a given number of times
+        // starting from a given iterator position. If an exception is thrown,
+        // the given cleanup function will be called.
+        template <typename IterCat>
+        struct loop_with_cleanup
+        {
+            ///////////////////////////////////////////////////////////////////
+            // handle sequences of non-futures
+            template <typename Iter, typename F, typename Cleanup>
+            static Iter call(Iter it, Iter last, F && f, Cleanup && cleanup)
+            {
+                Iter iter = it;
+                try {
+                    for (/**/; it != last; ++it)
+                        f(it);
+                    return it;
+                }
+                catch (...) {
+                    for (/**/; iter != it; ++iter)
+                        cleanup(iter);
+                    throw;
+                }
+            }
+
+            template <typename Iter, typename CancelToken, typename F,
+                typename Cleanup>
+            static Iter call(Iter it, Iter last, CancelToken& tok,
+                F && f, Cleanup && cleanup)
+            {
+                Iter iter = it;
+                try {
+                    for (/**/; it != last; ++it)
+                    {
+                        if (tok.was_cancelled())
+                            break;
+                        f(it);
+                    }
+                    return it;
+                }
+                catch (...) {
+                    tok.cancel();
+                    for (/**/; iter != it; ++iter)
+                        cleanup(iter);
+                    throw;
+                }
+            }
+        };
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // no special handling of futures
+    template <typename Iter, typename F, typename Cleanup>
+    BOOST_FORCEINLINE Iter
+    loop_with_cleanup(Iter it, Iter last, F && f, Cleanup && cleanup)
+    {
+        typedef typename std::iterator_traits<Iter>::iterator_category cat;
+        return detail::loop_with_cleanup<cat>::call(it, last,
+            std::forward<F>(f), std::forward<Cleanup>(cleanup));
+    }
+
+    template <typename Iter, typename CancelToken, typename F, typename Cleanup>
+    BOOST_FORCEINLINE Iter
+    loop_with_cleanup(Iter it, Iter last, CancelToken& tok, F && f,
+        Cleanup && cleanup)
+    {
+        typedef typename std::iterator_traits<Iter>::iterator_category cat;
+        return detail::loop_with_cleanup<cat>::call(it, last, tok,
+            std::forward<F>(f), std::forward<Cleanup>(cleanup));
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -229,9 +301,9 @@ namespace hpx { namespace parallel { namespace util
                     return it;
                 }
                 catch (...) {
+                    tok.cancel();
                     for (/**/; iter != it; ++iter)
                         cleanup(iter);
-                    tok.cancel();
                     throw;
                 }
             }
@@ -239,23 +311,23 @@ namespace hpx { namespace parallel { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // no special handling of futures
-    template <typename Iter, typename F>
+    template <typename Iter, typename F, typename Cleanup>
     BOOST_FORCEINLINE Iter
-    loop_with_cleanup_n(Iter it, std::size_t count, F && f)
+    loop_with_cleanup_n(Iter it, std::size_t count, F && f, Cleanup && cleanup)
     {
         typedef typename std::iterator_traits<Iter>::iterator_category cat;
         return detail::loop_with_cleanup_n<cat>::call(it, count,
-            std::forward<F>(f));
+            std::forward<F>(f), std::forward<Cleanup>(cleanup));
     }
 
-    template <typename Iter, typename CancelToken, typename F>
+    template <typename Iter, typename CancelToken, typename F, typename Cleanup>
     BOOST_FORCEINLINE Iter
-    loop_with_cleanup_n(Iter it, std::size_t count, CancelToken& tok, F && f)
+    loop_with_cleanup_n(Iter it, std::size_t count, CancelToken& tok, F && f,
+        Cleanup && cleanup)
     {
         typedef typename std::iterator_traits<Iter>::iterator_category cat;
         return detail::loop_with_cleanup_n<cat>::call(it, count, tok,
-            std::forward<F>(f));
+            std::forward<F>(f), std::forward<Cleanup>(cleanup));
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -295,7 +367,6 @@ namespace hpx { namespace parallel { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // no special handling of futures
     template <typename Iter, typename F>
     BOOST_FORCEINLINE Iter
     loop_idx_n(std::size_t base_idx, Iter it, std::size_t count, F && f)
