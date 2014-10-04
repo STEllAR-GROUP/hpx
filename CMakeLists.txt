@@ -348,7 +348,7 @@ hpx_option(HPX_HAVE_SWAP_CONTEXT_EMULATION BOOL "Emulate SwapContext API for cor
 # Scheduler configuration
 ################################################################################
 hpx_option(HPX_THREAD_SCHEDULERS STRING
-  "Which thread schedulers are build. Options are: all, abp, local, static-priority, hierarchy, and periodic-priority. For multiple enabled schedulers, separate with a semicolon (default: all)"
+  "Which thread schedulers are build. Options are: all, abp-priority, local, static-priority, hierarchy, and periodic-priority. For multiple enabled schedulers, separate with a semicolon (default: all)"
   "all"
   CATEGORY "Thread Manager" ADVANCED)
 
@@ -358,15 +358,15 @@ foreach(_scheduler ${HPX_THREAD_SCHEDULERS_UC})
     set(_all On)
     set(HPX_ALL_SCHEDULERS ON CACHE INTERNAL "")
   endif()
-  if(_scheduler STREQUAL "ABP" OR _all)
+  if(_scheduler STREQUAL "ABP-PRIORITY" OR _all)
     hpx_add_config_define(HPX_ABP_SCHEDULER)
-    set(HPX_LOCAL_SCHEDULER ON CACHE INTERNAL "")
+    set(HPX_ABP_SCHEDULER ON CACHE INTERNAL "")
   endif()
   if(_scheduler STREQUAL "LOCAL" OR _all)
     hpx_add_config_define(HPX_LOCAL_SCHEDULER)
     set(HPX_LOCAL_SCHEDULER ON CACHE INTERNAL "")
   endif()
-  if(_scheduler STREQUAL "STATIC_PRIORITY" OR _all)
+  if(_scheduler STREQUAL "STATIC-PRIORITY" OR _all)
     hpx_add_config_define(HPX_STATIC_PRIORITY_SCHEDULER)
     set(HPX_STATIC_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
   endif()
@@ -374,7 +374,7 @@ foreach(_scheduler ${HPX_THREAD_SCHEDULERS_UC})
     hpx_add_config_define(HPX_HIERARCHY_SCHEDULER)
     set(HPX_HIERARCHY_SCHEDULER ON CACHE INTERNAL "")
   endif()
-  if(_scheduler STREQUAL "PERIODIC_PRIORITY" OR _all)
+  if(_scheduler STREQUAL "PERIODIC-PRIORITY" OR _all)
     hpx_add_config_define(HPX_PERIODIC_PRIORITY_SCHEDULER)
     set(HPX_PERIODIC_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
   endif()

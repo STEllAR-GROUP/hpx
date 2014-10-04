@@ -139,7 +139,7 @@ The options are split into these categories:
         [[[#build_system.cmake_variables.HPX_THREAD_MAINTAIN_STEALING_COUNTS] `HPX_THREAD_MAINTAIN_STEALING_COUNTS:BOOL`][Enable keeping track of counts of thread stealing incidents in the schedulers (default: ON)]]
         [[[#build_system.cmake_variables.HPX_THREAD_MAINTAIN_TARGET_ADDRESS] `HPX_THREAD_MAINTAIN_TARGET_ADDRESS:BOOL`][Enable storing target address in thread for NUMA awareness (default: OFF)]]
         [[[#build_system.cmake_variables.HPX_THREAD_MANAGER_IDLE_BACKOFF] `HPX_THREAD_MANAGER_IDLE_BACKOFF:BOOL`][HPX scheduler threads are backing off on idle queues (default: ON)]]
-        [[[#build_system.cmake_variables.HPX_THREAD_SCHEDULERS] `HPX_THREAD_SCHEDULERS:STRING`][Which thread schedulers are build. Options are: all, abp, local, static-priority, hierarchy, and periodic-priority. For multiple enabled schedulers, separate with a semicolon (default: all)]]
+        [[[#build_system.cmake_variables.HPX_THREAD_SCHEDULERS] `HPX_THREAD_SCHEDULERS:STRING`][Which thread schedulers are build. Options are: all, abp-priority, local, static-priority, hierarchy, and periodic-priority. For multiple enabled schedulers, separate with a semicolon (default: all)]]
         [[[#build_system.cmake_variables.HPX_THREAD_STACK_MMAP] `HPX_THREAD_STACK_MMAP:BOOL`][Use mmap for stack allocation on appropriate platforms]]
         [[[#build_system.cmake_variables.HPX_WITH_STACKTRACES] `HPX_WITH_STACKTRACES:BOOL`][Attach backtraces to HPX exceptions (default: ON)]]
 ] [/ Thread Manager Options]
