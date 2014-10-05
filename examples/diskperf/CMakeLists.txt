@@ -5,19 +5,25 @@
 
 find_package(OrangeFS)
 
-if(ORANGEFS_FOUND)
-
-  # add OrangeFS header files directory
-  include_directories(${ORANGEFS_INCLUDE_DIR})
-
-  if(HPX_WITH_CXX11_LAMBDAS)
+if(HPX_WITH_CXX11_LAMBDAS)
     set(example_programs
-        diskperf_ofs_pxfs_action)
-    set(diskperf_ofs_pxfs_action_FLAGS DEPENDENCIES iostreams_component
-        ${ORANGEFS_LIBRARY} pthread dl rt crypto)
-  endif()
+            diskperf_local_file)
+    set(diskperf_local_file_FLAGS DEPENDENCIES
+            iostreams_component local_file_component)
 
-  foreach(example_program ${example_programs})
+    if(ORANGEFS_FOUND)
+        # add OrangeFS header files directory
+        include_directories(${ORANGEFS_INCLUDE_DIR})
+        set(example_programs
+                ${example_programs}
+                diskperf_orangefs_pxfs_file)
+        set(diskperf_orangefs_pxfs_file_FLAGS DEPENDENCIES
+                iostreams_component orangefs_file_component
+                ${ORANGEFS_LIBRARY} pthread dl rt crypto)
+    endif()
+endif()
+
+foreach(example_program ${example_programs})
 
     set(sources ${example_program}.cpp)
 
@@ -25,20 +31,19 @@ if(ORANGEFS_FOUND)
 
     # add example executable
     add_hpx_executable(${example_program}
-                        SOURCES ${sources}
-                        ${${example_program}_FLAGS}
-                        FOLDER "Examples/Diskperf/${example_program}")
+            SOURCES ${sources}
+            ${${example_program}_FLAGS}
+            FOLDER "Examples/Diskperf/${example_program}")
 
     # add a custom target for this example
     add_hpx_pseudo_target(examples.diskperf.${example_program})
 
     # make pseudo-targets depend on master pseudo-target
     add_hpx_pseudo_dependencies(examples.diskperf
-                                examples.diskperf.${example_program})
+            examples.diskperf.${example_program})
 
     # add dependencies to pseudo-target
     add_hpx_pseudo_dependencies(examples.diskperf.${example_program}
-                                ${example_program}_exe)
-  endforeach()
-endif()
+            ${example_program}_exe)
+endforeach()
 

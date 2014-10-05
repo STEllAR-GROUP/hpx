@@ -375,6 +375,11 @@ namespace hpx { namespace io
             return fd_ >= 0;
         }
 
+        bool is_open_sync()
+        {
+            return is_open();
+        }
+
         int close_sync()
         {
             return close().get();
