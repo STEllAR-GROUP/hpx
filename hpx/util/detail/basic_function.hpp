@@ -60,9 +60,11 @@ namespace hpx { namespace util { namespace detail
     {
         HPX_MOVABLE_BUT_NOT_COPYABLE(function_base);
 
+        static VTablePtr const empty_table;
+
     public:
         function_base() BOOST_NOEXCEPT
-          : vptr(get_empty_table_ptr())
+          : vptr(&empty_table)
           , object(0)
         {
             vtable::default_construct<empty_function<Sig> >(&object);
@@ -72,7 +74,7 @@ namespace hpx { namespace util { namespace detail
           : vptr(other.vptr)
           , object(other.object) // move-construct
         {
-            other.vptr = get_empty_table_ptr();
+            other.vptr = &empty_table;
             vtable::default_construct<empty_function<Sig> >(&other.object);
         }
 
@@ -120,7 +122,7 @@ namespace hpx { namespace util { namespace detail
             {
                 vptr->delete_(&object);
 
-                vptr = get_empty_table_ptr();
+                vptr = &empty_table;
                 vtable::default_construct<empty_function<Sig> >(&object);
             }
         }
@@ -166,11 +168,6 @@ namespace hpx { namespace util { namespace detail
         }
 
     private:
-        static VTablePtr const* get_empty_table_ptr() BOOST_NOEXCEPT
-        {
-            return detail::get_table<VTablePtr, detail::empty_function<Sig> >();
-        }
-
         template <typename T>
         static VTablePtr const* get_table_ptr() BOOST_NOEXCEPT
         {
@@ -181,6 +178,10 @@ namespace hpx { namespace util { namespace detail
         VTablePtr const *vptr;
         mutable void *object;
     };
+
+    template <typename VTablePtr, typename Sig>
+    VTablePtr const function_base<VTablePtr, Sig>::empty_table =
+        boost::mpl::identity<detail::empty_function<Sig> >();
 
     template <typename Sig, typename VTablePtr>
     static bool is_empty_function(function_base<VTablePtr, Sig> const& f) BOOST_NOEXCEPT
