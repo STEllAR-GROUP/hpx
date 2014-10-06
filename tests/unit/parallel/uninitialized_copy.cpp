@@ -1,5 +1,4 @@
 //  Copyright (c) 2014 Hartmut Kaiser
-//  Copyright (c) 2014 Grant Mercer
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -89,51 +88,21 @@ void uninitialized_copy_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-struct count_instances
-{
-    count_instances()
-      : value_(std::size_t(-1))
-    {
-        ++instance_count;
-    }
-    count_instances(int value)
-      : value_(value)
-    {
-        ++instance_count;
-    }
-    count_instances(count_instances const& rhs)
-      : value_(rhs.value_)
-    {
-        ++instance_count;
-    }
-
-    ~count_instances()
-    {
-        --instance_count;
-    }
-
-    std::size_t value_;
-    static boost::atomic<std::size_t> instance_count;
-};
-
-boost::atomic<std::size_t> count_instances::instance_count(0);
-
-///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
 void test_uninitialized_copy_exception(ExPolicy const& policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
-    typedef std::vector<count_instances>::iterator base_iterator;
+    typedef std::vector<test::count_instances>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    std::vector<count_instances> c(10007);
-    std::vector<count_instances> d(c.size());
+    std::vector<test::count_instances> c(10007);
+    std::vector<test::count_instances> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     boost::atomic<std::size_t> throw_after(std::rand() % c.size());
-    count_instances::instance_count.store(0);
+    test::count_instances::instance_count.store(0);
 
     bool caught_exception = false;
     try {
@@ -158,22 +127,22 @@ void test_uninitialized_copy_exception(ExPolicy const& policy, IteratorTag)
     }
 
     HPX_TEST(caught_exception);
-    HPX_TEST(count_instances::instance_count.load() == 0);
+    HPX_TEST(test::count_instances::instance_count.load() == 0);
 }
 
 template <typename ExPolicy, typename IteratorTag>
 void test_uninitialized_copy_exception_async(ExPolicy const& p, IteratorTag)
 {
-    typedef std::vector<count_instances>::iterator base_iterator;
+    typedef std::vector<test::count_instances>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    std::vector<count_instances> c(10007);
-    std::vector<count_instances> d(c.size());
+    std::vector<test::count_instances> c(10007);
+    std::vector<test::count_instances> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     boost::atomic<std::size_t> throw_after(std::rand() % c.size());
-    count_instances::instance_count.store(0);
+    test::count_instances::instance_count.store(0);
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
@@ -205,7 +174,7 @@ void test_uninitialized_copy_exception_async(ExPolicy const& p, IteratorTag)
 
     HPX_TEST(caught_exception);
     HPX_TEST(returned_from_algorithm);
-    HPX_TEST(count_instances::instance_count.load() == 0);
+    HPX_TEST(test::count_instances::instance_count.load() == 0);
 }
 
 template <typename IteratorTag>
@@ -242,16 +211,16 @@ void test_uninitialized_copy_bad_alloc(ExPolicy const& policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
-    typedef std::vector<count_instances>::iterator base_iterator;
+    typedef std::vector<test::count_instances>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    std::vector<count_instances> c(10007);
-    std::vector<count_instances> d(c.size());
+    std::vector<test::count_instances> c(10007);
+    std::vector<test::count_instances> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     boost::atomic<std::size_t> throw_after(std::rand() % c.size());
-    count_instances::instance_count.store(0);
+    test::count_instances::instance_count.store(0);
 
     bool caught_bad_alloc = false;
     try {
@@ -276,22 +245,22 @@ void test_uninitialized_copy_bad_alloc(ExPolicy const& policy, IteratorTag)
     }
 
     HPX_TEST(caught_bad_alloc);
-    HPX_TEST(count_instances::instance_count.load() == 0);
+    HPX_TEST(test::count_instances::instance_count.load() == 0);
 }
 
 template <typename ExPolicy, typename IteratorTag>
 void test_uninitialized_copy_bad_alloc_async(ExPolicy const& p, IteratorTag)
 {
-    typedef std::vector<count_instances>::iterator base_iterator;
+    typedef std::vector<test::count_instances>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    std::vector<count_instances> c(10007);
-    std::vector<count_instances> d(c.size());
+    std::vector<test::count_instances> c(10007);
+    std::vector<test::count_instances> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     boost::atomic<std::size_t> throw_after(std::rand() % c.size());
-    count_instances::instance_count.store(0);
+    test::count_instances::instance_count.store(0);
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
@@ -322,7 +291,7 @@ void test_uninitialized_copy_bad_alloc_async(ExPolicy const& p, IteratorTag)
 
     HPX_TEST(caught_bad_alloc);
     HPX_TEST(returned_from_algorithm);
-    HPX_TEST(count_instances::instance_count.load() == 0);
+    HPX_TEST(test::count_instances::instance_count.load() == 0);
 }
 
 template <typename IteratorTag>

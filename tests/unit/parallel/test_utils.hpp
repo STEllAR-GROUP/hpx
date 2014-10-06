@@ -70,6 +70,36 @@ namespace test
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    struct count_instances
+    {
+        count_instances()
+          : value_(std::size_t(-1))
+        {
+            ++instance_count;
+        }
+        count_instances(int value)
+          : value_(value)
+        {
+            ++instance_count;
+        }
+        count_instances(count_instances const& rhs)
+          : value_(rhs.value_)
+        {
+            ++instance_count;
+        }
+
+        ~count_instances()
+        {
+            --instance_count;
+        }
+
+        std::size_t value_;
+        static boost::atomic<std::size_t> instance_count;
+    };
+
+    boost::atomic<std::size_t> count_instances::instance_count(0);
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename IteratorTag>
     struct test_num_exceptions
     {
