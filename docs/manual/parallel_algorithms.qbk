@@ -49,8 +49,9 @@ the execution of these algorithms may be parallelized and the manner in which
 they apply user-provided function objects.
 
 The applications of function objects in parallel algorithms invoked with an
-execution policy object of type __sequential_execution_policy__ execute in
-sequential order in the calling thread.
+execution policy object of type __sequential_execution_policy__ or
+__sequential_task_execution_policy__ execute in sequential order. For
+__sequential_execution_policy__ the execution happens in the calling thread.
 
 The applications of function objects in parallel algorithms invoked with an
 execution policy object of type __parallel_execution_policy__ or
@@ -66,8 +67,8 @@ equivalent to the use of the execution policy __parallel_execution_policy__.
 
 Algorithms invoked with an execution policy object of type __execution_policy__
 execute internally as if invoked with the contained execution policy object.
-An exception is when an __execution_policy__ contains an execution policy of
-type __sequential_task_execution_policy__ or __parallel_task_execution_policy__
+No exception is thrown when an __execution_policy__ contains an execution policy
+of type __sequential_task_execution_policy__ or __parallel_task_execution_policy__
 (which normally turn the algorithm into its asynchronous version). In this case
 the execution is semantically equivalent to the case of passing a
 __sequential_execution_policy__ or __parallel_execution_policy__ contained in the
