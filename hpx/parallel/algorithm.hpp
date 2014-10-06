@@ -31,6 +31,5 @@
 #include <hpx/parallel/detail/swap_ranges.hpp>
 #include <hpx/parallel/detail/transform.hpp>
 #include <hpx/parallel/detail/transform_reduce.hpp>
-#include <hpx/parallel/detail/uninitialized_copy.hpp>
 
 #endif
