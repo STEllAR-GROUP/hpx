@@ -35,25 +35,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     {
         /// \cond NOINTERNAL
         template <typename FwdIter, typename T>
-        FwdIter sequential_uninitialized_fill(FwdIter first, FwdIter last,
-            T && value)
-        {
-            typedef typename std::iterator_traits<FwdIter>::value_type
-                value_type;
-
-            return
-                util::loop_with_cleanup(first, last,
-                    [&value](FwdIter it) {
-                        ::new (&*it) value_type(value);
-                    },
-                    [](FwdIter it) {
-                        (*it).~value_type();
-                    });
-        }
-
-        template <typename FwdIter, typename T>
         FwdIter sequential_uninitialized_fill_n(FwdIter first, std::size_t count,
-            T && value, util::cancellation_token<util::detail::no_data>& tok)
+            T const& value, util::cancellation_token<util::detail::no_data>& tok)
         {
             typedef typename std::iterator_traits<FwdIter>::value_type
                 value_type;
@@ -73,7 +56,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <typename ExPolicy, typename Iter, typename T>
         typename detail::algorithm_result<ExPolicy>::type
         parallel_sequential_uninitialized_fill_n(ExPolicy const& policy,
-            Iter first, std::size_t count, T && value)
+            Iter first, std::size_t count, T const& value)
         {
             if (count == 0)
                 return detail::algorithm_result<ExPolicy>::get();
@@ -119,21 +102,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename Iter, typename T>
             static hpx::util::unused_type
-            sequential(ExPolicy const&, Iter first, Iter last, T && value)
+            sequential(ExPolicy const&, Iter first, Iter last, T const& value)
             {
-                sequential_uninitialized_fill(first, last, std::forward<T>(value));
+                std::uninitialized_fill(first, last, value);
                 return hpx::util::unused;
             }
 
             template <typename ExPolicy, typename Iter, typename T>
             static typename detail::algorithm_result<ExPolicy>::type
-            parallel(ExPolicy const& policy, Iter first, Iter last, T && value)
+            parallel(ExPolicy const& policy, Iter first, Iter last,
+                T const& value)
             {
                 if (first == last)
                     return detail::algorithm_result<ExPolicy>::get();
 
                 return parallel_sequential_uninitialized_fill_n(policy, first,
-                    std::distance(first, last), std::forward<T>(value));
+                    std::distance(first, last), value);
             }
         };
         /// \endcond
@@ -184,7 +168,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         is_execution_policy<ExPolicy>,
         typename detail::algorithm_result<ExPolicy>::type
     >::type
-    uninitialized_fill(ExPolicy && policy, InIter first, InIter last, T value)
+    uninitialized_fill(ExPolicy && policy, InIter first, InIter last,
+        T const& value)
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
             input_iterator_category;
@@ -201,7 +186,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         return detail::uninitialized_fill().call(
             std::forward<ExPolicy>(policy),
-            first, last, std::move(value), is_seq());
+            first, last, value, is_seq());
     }
 
     /////////////////////////////////////////////////////////////////////////////
@@ -211,7 +196,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \cond NOINTERNAL
         template <typename FwdIter, typename T>
         FwdIter sequential_uninitialized_fill_n(FwdIter first,
-            std::size_t count, T && value)
+            std::size_t count, T const& value)
         {
             typedef typename std::iterator_traits<FwdIter>::value_type
                 value_type;
@@ -237,20 +222,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename FwdIter, typename T>
             static hpx::util::unused_type
             sequential(ExPolicy const&, FwdIter first, std::size_t count,
-                T && value)
+                T const& value)
             {
-                sequential_uninitialized_fill_n(first, count,
-                    std::forward<T>(value));
+                std::uninitialized_fill_n(first, count, value);
                 return hpx::util::unused;
             }
 
             template <typename ExPolicy, typename FwdIter, typename T>
             static typename detail::algorithm_result<ExPolicy>::type
             parallel(ExPolicy const& policy, FwdIter first, std::size_t count,
-                T && value)
+                T const& value)
             {
                 return parallel_sequential_uninitialized_fill_n(policy, first,
-                    count, std::forward<T>(value));
+                    count, value);
             }
         };
         /// \endcond
@@ -304,7 +288,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         is_execution_policy<ExPolicy>,
         typename detail::algorithm_result<ExPolicy>::type
     >::type
-    uninitialized_fill_n(ExPolicy && policy, FwdIter first, Size count, T value)
+    uninitialized_fill_n(ExPolicy && policy, FwdIter first, Size count,
+        T const& value)
     {
         typedef typename std::iterator_traits<FwdIter>::iterator_category
             forward_iterator_category;
@@ -322,7 +307,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         return detail::uninitialized_fill_n().call(
             std::forward<ExPolicy>(policy),
-            first, std::size_t(count), std::move(value), is_seq());
+            first, std::size_t(count), value, is_seq());
     }
 }}}
 
