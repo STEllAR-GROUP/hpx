@@ -60,7 +60,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 value_type;
 
             return
-                util::loop_with_cleanup_n(
+                util::loop_with_cleanup_n_with_token(
                     first, count, dest, tok,
                     [](Iter it, FwdIter dest) {
                         ::new (&*dest) value_type(*it);

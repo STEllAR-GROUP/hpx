@@ -124,44 +124,37 @@ namespace hpx { namespace parallel { namespace util
         struct loop_with_cleanup
         {
             ///////////////////////////////////////////////////////////////////
-            // handle sequences of non-futures
+            template <typename FwdIter, typename F, typename Cleanup>
+            static FwdIter call(FwdIter it, FwdIter last, F && f,
+                Cleanup && cleanup)
+            {
+                FwdIter base = it;
+                try {
+                    for (/**/; it != last; ++it)
+                        f(it);
+                    return it;
+                }
+                catch (...) {
+                    for (/**/; base != it; ++base)
+                        cleanup(base);
+                    throw;
+                }
+            }
+
             template <typename Iter, typename FwdIter, typename F,
                 typename Cleanup>
             static FwdIter call(Iter it, Iter last, FwdIter dest, F && f,
                 Cleanup && cleanup)
             {
-                FwdIter iter = dest;
+                FwdIter base = dest;
                 try {
                     for (/**/; it != last; (void) ++it, ++dest)
                         f(it, dest);
                     return dest;
                 }
                 catch (...) {
-                    for (/**/; iter != dest; ++iter)
-                        cleanup(iter);
-                    throw;
-                }
-            }
-
-            template <typename Iter, typename FwdIter, typename CancelToken,
-                typename F, typename Cleanup>
-            static FwdIter call(Iter it, Iter last, FwdIter dest,
-                CancelToken& tok, F && f, Cleanup && cleanup)
-            {
-                FwdIter iter = dest;
-                try {
-                    for (/**/; it != last; (void) ++it, ++dest)
-                    {
-                        if (tok.was_cancelled())
-                            break;
-                        f(it, dest);
-                    }
-                    return dest;
-                }
-                catch (...) {
-                    tok.cancel();
-                    for (/**/; iter != dest; ++iter)
-                        cleanup(iter);
+                    for (/**/; base != dest; ++base)
+                        cleanup(base);
                     throw;
                 }
             }
@@ -169,7 +162,15 @@ namespace hpx { namespace parallel { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // no special handling of futures
+    template <typename Iter, typename F, typename Cleanup>
+    BOOST_FORCEINLINE Iter
+    loop_with_cleanup(Iter it, Iter last, F && f, Cleanup && cleanup)
+    {
+        typedef typename std::iterator_traits<Iter>::iterator_category cat;
+        return detail::loop_with_cleanup<cat>::call(it, last,
+            std::forward<F>(f), std::forward<Cleanup>(cleanup));
+    }
+
     template <typename Iter, typename FwdIter, typename F, typename Cleanup>
     BOOST_FORCEINLINE FwdIter
     loop_with_cleanup(Iter it, Iter last, FwdIter dest, F && f,
@@ -180,17 +181,6 @@ namespace hpx { namespace parallel { namespace util
             std::forward<F>(f), std::forward<Cleanup>(cleanup));
     }
 
-    template <typename Iter, typename FwdIter, typename CancelToken,
-        typename F, typename Cleanup>
-    BOOST_FORCEINLINE Iter
-    loop_with_cleanup(Iter it, Iter last, FwdIter dest, CancelToken& tok,
-        F && f, Cleanup && cleanup)
-    {
-        typedef typename std::iterator_traits<Iter>::iterator_category cat;
-        return detail::loop_with_cleanup<cat>::call(it, last, dest, tok,
-            std::forward<F>(f), std::forward<Cleanup>(cleanup));
-    };
-
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
@@ -200,31 +190,71 @@ namespace hpx { namespace parallel { namespace util
         struct loop_with_cleanup_n
         {
             ///////////////////////////////////////////////////////////////////
-            // handle sequences of non-futures
+            template <typename FwdIter, typename F, typename Cleanup>
+            static FwdIter call(FwdIter it, std::size_t count, F && f,
+                Cleanup && cleanup)
+            {
+                FwdIter base = it;
+                try {
+                    for (/**/; count != 0; (void) --count, ++it)
+                        f(it);
+                    return it;
+                }
+                catch (...) {
+                    for (/**/; base != it; ++base)
+                        cleanup(base);
+                    throw;
+                }
+            }
+
             template <typename Iter, typename FwdIter, typename F,
                 typename Cleanup>
             static FwdIter call(Iter it, std::size_t count, FwdIter dest,
                 F && f, Cleanup && cleanup)
             {
-                FwdIter iter = dest;
+                FwdIter base = dest;
                 try {
                     for (/**/; count != 0; (void) --count, ++it, ++dest)
                         f(it, dest);
                     return dest;
                 }
                 catch (...) {
-                    for (/**/; iter != dest; ++iter)
-                        cleanup(iter);
+                    for (/**/; base != dest; ++base)
+                        cleanup(base);
+                    throw;
+                }
+            }
+
+            ///////////////////////////////////////////////////////////////////
+            template <typename FwdIter, typename CancelToken, typename F,
+                typename Cleanup>
+            static FwdIter call_with_token(FwdIter it, std::size_t count,
+                CancelToken& tok, F && f, Cleanup && cleanup)
+            {
+                FwdIter base = it;
+                try {
+                    for (/**/; count != 0; (void) --count, ++it)
+                    {
+                        if (tok.was_cancelled())
+                            break;
+                        f(it);
+                    }
+                    return it;
+                }
+                catch (...) {
+                    tok.cancel();
+                    for (/**/; base != it; ++base)
+                        cleanup(base);
                     throw;
                 }
             }
 
             template <typename Iter, typename FwdIter, typename CancelToken,
                 typename F, typename Cleanup>
-            static FwdIter call(Iter it, std::size_t count, FwdIter dest,
-                CancelToken& tok, F && f, Cleanup && cleanup)
+            static FwdIter call_with_token(Iter it, std::size_t count,
+                FwdIter dest, CancelToken& tok, F && f, Cleanup && cleanup)
             {
-                FwdIter iter = dest;
+                FwdIter base = dest;
                 try {
                     for (/**/; count != 0; (void) --count, ++it, ++dest)
                     {
@@ -236,8 +266,8 @@ namespace hpx { namespace parallel { namespace util
                 }
                 catch (...) {
                     tok.cancel();
-                    for (/**/; iter != dest; ++iter)
-                        cleanup(iter);
+                    for (/**/; base != dest; ++base)
+                        cleanup(base);
                     throw;
                 }
             }
@@ -245,6 +275,15 @@ namespace hpx { namespace parallel { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Iter, typename F, typename Cleanup>
+    BOOST_FORCEINLINE Iter
+    loop_with_cleanup_n(Iter it, std::size_t count, F && f, Cleanup && cleanup)
+    {
+        typedef typename std::iterator_traits<Iter>::iterator_category cat;
+        return detail::loop_with_cleanup_n<cat>::call(it, count,
+            std::forward<F>(f), std::forward<Cleanup>(cleanup));
+    }
+
     template <typename Iter, typename FwdIter, typename F, typename Cleanup>
     BOOST_FORCEINLINE FwdIter
     loop_with_cleanup_n(Iter it, std::size_t count, FwdIter dest, F && f,
@@ -255,15 +294,25 @@ namespace hpx { namespace parallel { namespace util
             std::forward<F>(f), std::forward<Cleanup>(cleanup));
     }
 
-    template <typename Iter, typename FwdIter, typename CancelToken,
-        typename F, typename Cleanup>
-    BOOST_FORCEINLINE FwdIter
-    loop_with_cleanup_n(Iter it, std::size_t count, FwdIter dest,
+    template <typename Iter, typename CancelToken, typename F, typename Cleanup>
+    BOOST_FORCEINLINE Iter
+    loop_with_cleanup_n_with_token(Iter it, std::size_t count,
         CancelToken& tok, F && f, Cleanup && cleanup)
     {
         typedef typename std::iterator_traits<Iter>::iterator_category cat;
-        return detail::loop_with_cleanup_n<cat>::call(it, count, dest, tok,
-            std::forward<F>(f), std::forward<Cleanup>(cleanup));
+        return detail::loop_with_cleanup_n<cat>::call_with_token(it, count,
+            tok, std::forward<F>(f), std::forward<Cleanup>(cleanup));
+    };
+
+    template <typename Iter, typename FwdIter, typename CancelToken,
+        typename F, typename Cleanup>
+    BOOST_FORCEINLINE FwdIter
+    loop_with_cleanup_n_with_token(Iter it, std::size_t count, FwdIter dest,
+        CancelToken& tok, F && f, Cleanup && cleanup)
+    {
+        typedef typename std::iterator_traits<Iter>::iterator_category cat;
+        return detail::loop_with_cleanup_n<cat>::call_with_token(it, count,
+            dest, tok, std::forward<F>(f), std::forward<Cleanup>(cleanup));
     };
 
     ///////////////////////////////////////////////////////////////////////////

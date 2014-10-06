@@ -50,6 +50,8 @@ set(tests
     transform_reduce
     uninitialized_copy
     uninitialized_copyn
+    uninitialized_fill
+    uninitialized_filln
    )
 
 set(task_region_FLAGS DEPENDENCIES iostreams_component)
