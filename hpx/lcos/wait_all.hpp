@@ -25,7 +25,7 @@ namespace hpx
     ///       returns.
     ///
     template <typename InputIter>
-    void wait_all(InputIter first, InputIter last, error_code& ec = throws);
+    void wait_all(InputIter first, InputIter last);
 
     /// The function \a wait_all is a operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
@@ -40,7 +40,7 @@ namespace hpx
     ///       returns.
     ///
     template <typename R>
-    void wait_all(std::vector<future<R>>&& futures, error_code& ec = throws);
+    void wait_all(std::vector<future<R>>&& futures);
 
     /// The function \a wait_all is a operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
@@ -55,7 +55,7 @@ namespace hpx
     ///       returns.
     ///
     template <typename ...T>
-    void wait_all(T &&... futures, error_code& ec = throws);
+    void wait_all(T &&... futures);
 
     /// The function \a wait_all_n is a operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
@@ -76,8 +76,7 @@ namespace hpx
     ///       returns.
     ///
     template <typename InputIter>
-    InputIter wait_all_n(InputIter begin, std::size_t count,
-        error_code& ec = throws);
+    InputIter wait_all_n(InputIter begin, std::size_t count);
 }
 #else
 

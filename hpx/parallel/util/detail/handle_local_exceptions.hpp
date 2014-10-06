@@ -51,15 +51,25 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         }
 
         template <typename T, typename Cleanup>
-        static void call(std::vector<hpx::future<T> > const& workitems,
+        static void call(std::vector<hpx::future<T> >& workitems,
             std::list<boost::exception_ptr>& errors, Cleanup && cleanup)
         {
             bool has_exception = false;
-            for (hpx::future<T> const& f: workitems)
+            boost::exception_ptr bad_alloc_exception;
+            for (hpx::future<T>& f: workitems)
             {
                 if (f.has_exception())
                 {
-                    call(f.get_exception_ptr(), errors);
+                    boost::exception_ptr e = f.get_exception_ptr();
+                    try {
+                        boost::rethrow_exception(e);
+                    }
+                    catch (std::bad_alloc const&) {
+                        bad_alloc_exception = e;
+                    }
+                    catch (...) {
+                        errors.push_back(e);
+                    }
                     has_exception = true;
                 }
             }
@@ -76,6 +86,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                 }
             }
 
+            if (bad_alloc_exception)
+                boost::rethrow_exception(bad_alloc_exception);
+
             if (!errors.empty())
                 boost::throw_exception(exception_list(std::move(errors)));
         }
@@ -87,7 +100,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         HPX_ATTRIBUTE_NORETURN static void call(
             boost::exception_ptr const&, std::list<boost::exception_ptr>&)
         {
-            std::terminate();
+            hpx::terminate();
         }
 
         template <typename T>
