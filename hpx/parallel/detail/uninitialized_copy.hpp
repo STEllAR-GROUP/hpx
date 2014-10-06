@@ -36,23 +36,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \cond NOINTERNAL
         template <typename Iter, typename FwdIter>
         FwdIter
-        sequential_uninitialized_copy(Iter first, Iter last, FwdIter dest)
-        {
-            typedef typename std::iterator_traits<FwdIter>::value_type
-                value_type;
-
-            return
-                util::loop_with_cleanup(first, last, dest,
-                    [](Iter it, FwdIter dest) {
-                        ::new (&*dest) value_type(*it);
-                    },
-                    [](FwdIter dest) {
-                        (*dest).~value_type();
-                    });
-        }
-
-        template <typename Iter, typename FwdIter>
-        FwdIter
         sequential_uninitialized_copy_n(Iter first, std::size_t count,
             FwdIter dest, util::cancellation_token<util::detail::no_data>& tok)
         {
@@ -133,7 +116,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static FwdIter
             sequential(ExPolicy const&, Iter first, Iter last, FwdIter dest)
             {
-                return sequential_uninitialized_copy(first, last, dest);
+                return std::uninitialized_copy(first, last, dest);
             }
 
             template <typename ExPolicy, typename Iter>
@@ -263,7 +246,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             sequential(ExPolicy const&, Iter first, std::size_t count,
                 FwdIter dest)
             {
-                return sequential_uninitialized_copy_n(first, count, dest);
+                return std::uninitialized_copy_n(first, count, dest);
             }
 
             template <typename ExPolicy, typename Iter>
