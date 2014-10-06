@@ -12,6 +12,7 @@
 #include <memory>
 
 #include <hpx/parallel/detail/uninitialized_copy.hpp>
+#include <hpx/parallel/detail/uninitialized_fill.hpp>
 
 #endif
 
