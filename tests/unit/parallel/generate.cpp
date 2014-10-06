@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/algorithm.hpp>
+#include <hpx/include/parallel_generate.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include "test_utils.hpp"
@@ -230,7 +230,7 @@ void test_generate_bad_alloc_async(ExPolicy const& p, IteratorTag)
 
     auto gen = [](){return std::size_t(10);};
 
-    bool caught_bad_alloc = false; 
+    bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
     try {
         hpx::future<void> f =
