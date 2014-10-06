@@ -26,6 +26,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 #include <boost/foreach.hpp>
+#include <boost/smart_ptr/scoped_ptr.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
