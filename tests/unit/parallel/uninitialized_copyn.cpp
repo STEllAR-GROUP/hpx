@@ -1,4 +1,3 @@
-//  Copyright (c) 2014 Hartmut Kaiser
 //  Copyright (c) 2014 Grant Mercer
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,7 +12,7 @@
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_uninitialized_copy(ExPolicy const& policy, IteratorTag)
+void test_uninitialized_copy_n(ExPolicy const& policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -23,8 +22,9 @@ void test_uninitialized_copy(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
-    hpx::parallel::uninitialized_copy(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d));
+
+    hpx::parallel::uninitialized_copy_n(policy,
+        iterator(boost::begin(c)), c.size(), boost::begin(d));
 
     std::size_t count = 0;
     HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
@@ -37,7 +37,7 @@ void test_uninitialized_copy(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_uninitialized_copy_async(ExPolicy const& p, IteratorTag)
+void test_uninitialized_copy_n_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -47,9 +47,8 @@ void test_uninitialized_copy_async(ExPolicy const& p, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     hpx::future<base_iterator> f =
-        hpx::parallel::uninitialized_copy(p,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
-            boost::begin(d));
+        hpx::parallel::uninitialized_copy_n(p,
+            iterator(boost::begin(c)), c.size(), boost::begin(d));
     f.wait();
 
     std::size_t count = 0;
@@ -63,29 +62,30 @@ void test_uninitialized_copy_async(ExPolicy const& p, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_uninitialized_copy()
+void test_uninitialized_copy_n()
 {
     using namespace hpx::parallel;
-    test_uninitialized_copy(seq, IteratorTag());
-    test_uninitialized_copy(par, IteratorTag());
-    test_uninitialized_copy(par_vec, IteratorTag());
 
-    test_uninitialized_copy_async(seq(task), IteratorTag());
-    test_uninitialized_copy_async(par(task), IteratorTag());
+    test_uninitialized_copy_n(seq, IteratorTag());
+    test_uninitialized_copy_n(par, IteratorTag());
+    test_uninitialized_copy_n(par_vec, IteratorTag());
 
-    test_uninitialized_copy(execution_policy(seq), IteratorTag());
-    test_uninitialized_copy(execution_policy(par), IteratorTag());
-    test_uninitialized_copy(execution_policy(par_vec), IteratorTag());
+    test_uninitialized_copy_n_async(seq(task), IteratorTag());
+    test_uninitialized_copy_n_async(par(task), IteratorTag());
 
-    test_uninitialized_copy(execution_policy(seq(task)), IteratorTag());
-    test_uninitialized_copy(execution_policy(par(task)), IteratorTag());
+    test_uninitialized_copy_n(execution_policy(seq), IteratorTag());
+    test_uninitialized_copy_n(execution_policy(par), IteratorTag());
+    test_uninitialized_copy_n(execution_policy(par_vec), IteratorTag());
+
+    test_uninitialized_copy_n(execution_policy(seq(task)), IteratorTag());
+    test_uninitialized_copy_n(execution_policy(par(task)), IteratorTag());
 }
 
-void uninitialized_copy_test()
+void n_copy_test()
 {
-    test_uninitialized_copy<std::random_access_iterator_tag>();
-    test_uninitialized_copy<std::forward_iterator_tag>();
-    test_uninitialized_copy<std::input_iterator_tag>();
+    test_uninitialized_copy_n<std::random_access_iterator_tag>();
+    test_uninitialized_copy_n<std::forward_iterator_tag>();
+    test_uninitialized_copy_n<std::input_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -119,8 +119,8 @@ struct count_instances
 boost::atomic<std::size_t> count_instances::instance_count(0);
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename IteratorTag>
-void test_uninitialized_copy_exception(ExPolicy const& policy, IteratorTag)
+template<typename ExPolicy, typename IteratorTag>
+void test_uninitialized_copy_n_exception(ExPolicy const& policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -137,7 +137,7 @@ void test_uninitialized_copy_exception(ExPolicy const& policy, IteratorTag)
 
     bool caught_exception = false;
     try {
-        hpx::parallel::uninitialized_copy(policy,
+        hpx::parallel::uninitialized_copy_n(policy,
             decorated_iterator(
                 boost::begin(c),
                 [&throw_after]()
@@ -145,15 +145,15 @@ void test_uninitialized_copy_exception(ExPolicy const& policy, IteratorTag)
                     if (--throw_after == 0)
                         throw std::runtime_error("test");
                 }),
-            decorated_iterator(boost::end(c)),
+            c.size(),
             boost::begin(d));
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e) {
+    catch(hpx::exception_list const& e) {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
-    catch (...) {
+    catch(...) {
         HPX_TEST(false);
     }
 
@@ -162,7 +162,7 @@ void test_uninitialized_copy_exception(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_uninitialized_copy_exception_async(ExPolicy const& p, IteratorTag)
+void test_uninitialized_copy_n_exception_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<count_instances>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -179,7 +179,7 @@ void test_uninitialized_copy_exception_async(ExPolicy const& p, IteratorTag)
     bool returned_from_algorithm = false;
     try {
         hpx::future<base_iterator> f =
-            hpx::parallel::uninitialized_copy(p,
+            hpx::parallel::uninitialized_copy_n(p,
                 decorated_iterator(
                     boost::begin(c),
                     [&throw_after]()
@@ -187,7 +187,8 @@ void test_uninitialized_copy_exception_async(ExPolicy const& p, IteratorTag)
                         if (--throw_after == 0)
                             throw std::runtime_error("test");
                     }),
-                decorated_iterator(boost::end(c)),
+                ),
+                c.size(),
                 boost::begin(d));
 
         returned_from_algorithm = true;
@@ -195,11 +196,11 @@ void test_uninitialized_copy_exception_async(ExPolicy const& p, IteratorTag)
 
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e) {
+    catch(hpx::exception_list const& e) {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
-    catch (...) {
+    catch(...) {
         HPX_TEST(false);
     }
 
@@ -208,37 +209,37 @@ void test_uninitialized_copy_exception_async(ExPolicy const& p, IteratorTag)
     HPX_TEST(count_instances::instance_count.load() == 0);
 }
 
-template <typename IteratorTag>
-void test_uninitialized_copy_exception()
+template<typename IteratorTag>
+void test_uninitialized_copy_n_exception()
 {
     using namespace hpx::parallel;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_uninitialized_copy_exception(seq, IteratorTag());
-    test_uninitialized_copy_exception(par, IteratorTag());
+    test_uninitialized_copy_n_exception(seq, IteratorTag());
+    test_uninitialized_copy_n_exception(par, IteratorTag());
 
-    test_uninitialized_copy_exception_async(seq(task), IteratorTag());
-    test_uninitialized_copy_exception_async(par(task), IteratorTag());
+    test_uninitialized_copy_n_exception_async(seq(task), IteratorTag());
+    test_uninitialized_copy_n_exception_async(par(task), IteratorTag());
 
-    test_uninitialized_copy_exception(execution_policy(seq), IteratorTag());
-    test_uninitialized_copy_exception(execution_policy(par), IteratorTag());
+    test_uninitialized_copy_n_exception(execution_policy(seq), IteratorTag());
+    test_uninitialized_copy_n_exception(execution_policy(par), IteratorTag());
 
-    test_uninitialized_copy_exception(execution_policy(seq(task)), IteratorTag());
-    test_uninitialized_copy_exception(execution_policy(par(task)), IteratorTag());
+    test_uninitialized_copy_n_exception(execution_policy(seq(task)), IteratorTag());
+    test_uninitialized_copy_n_exception(execution_policy(par(task)), IteratorTag());
 }
 
-void uninitialized_copy_exception_test()
+void uninitialized_copy_n_exception_test()
 {
-    test_uninitialized_copy_exception<std::random_access_iterator_tag>();
-    test_uninitialized_copy_exception<std::forward_iterator_tag>();
-    test_uninitialized_copy_exception<std::input_iterator_tag>();
+    test_uninitialized_copy_n_exception<std::random_access_iterator_tag>();
+    test_uninitialized_copy_n_exception<std::forward_iterator_tag>();
+    test_uninitialized_copy_n_exception<std::input_iterator_tag>();
 }
 
-//////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename IteratorTag>
-void test_uninitialized_copy_bad_alloc(ExPolicy const& policy, IteratorTag)
+////////////////////////////////////////////////////////////////////////////////
+template< typename ExPolicy, typename IteratorTag>
+void test_uninitialized_copy_n_bad_alloc(ExPolicy const& policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -255,7 +256,7 @@ void test_uninitialized_copy_bad_alloc(ExPolicy const& policy, IteratorTag)
 
     bool caught_bad_alloc = false;
     try {
-        hpx::parallel::uninitialized_copy(policy,
+        hpx::parallel::uninitialized_copy_n(policy,
             decorated_iterator(
                 boost::begin(c),
                 [&throw_after]()
@@ -263,15 +264,16 @@ void test_uninitialized_copy_bad_alloc(ExPolicy const& policy, IteratorTag)
                     if (--throw_after == 0)
                         throw std::bad_alloc();
                 }),
-            decorated_iterator(boost::end(c)),
+            ),
+            c.size(),
             boost::begin(d));
 
         HPX_TEST(false);
     }
-    catch (std::bad_alloc const&) {
+    catch(std::bad_alloc const&) {
         caught_bad_alloc = true;
     }
-    catch (...) {
+    catch(...) {
         HPX_TEST(false);
     }
 
@@ -280,7 +282,7 @@ void test_uninitialized_copy_bad_alloc(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_uninitialized_copy_bad_alloc_async(ExPolicy const& p, IteratorTag)
+void test_uninitialized_copy_n_bad_alloc_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<count_instances>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -297,7 +299,7 @@ void test_uninitialized_copy_bad_alloc_async(ExPolicy const& p, IteratorTag)
     bool returned_from_algorithm = false;
     try {
         hpx::future<base_iterator> f =
-            hpx::parallel::uninitialized_copy(p,
+            hpx::parallel::uninitialized_copy_n(p,
                 decorated_iterator(
                     boost::begin(c),
                     [&throw_after]()
@@ -305,7 +307,7 @@ void test_uninitialized_copy_bad_alloc_async(ExPolicy const& p, IteratorTag)
                         if (--throw_after == 0)
                             throw std::bad_alloc();
                     }),
-                decorated_iterator(boost::end(c)),
+                c.size(),
                 boost::begin(d));
 
         returned_from_algorithm = true;
@@ -325,32 +327,32 @@ void test_uninitialized_copy_bad_alloc_async(ExPolicy const& p, IteratorTag)
     HPX_TEST(count_instances::instance_count.load() == 0);
 }
 
-template <typename IteratorTag>
-void test_uninitialized_copy_bad_alloc()
+template<typename IteratorTag>
+void test_uninitialized_copy_n_bad_alloc()
 {
     using namespace hpx::parallel;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_uninitialized_copy_bad_alloc(seq, IteratorTag());
-    test_uninitialized_copy_bad_alloc(par, IteratorTag());
+    test_uninitialized_copy_n_bad_alloc(seq, IteratorTag());
+    test_uninitialized_copy_n_bad_alloc(par, IteratorTag());
 
-    test_uninitialized_copy_bad_alloc_async(seq(task), IteratorTag());
-    test_uninitialized_copy_bad_alloc_async(par(task), IteratorTag());
+    test_uninitialized_copy_n_bad_alloc_async(seq(task), IteratorTag());
+    test_uninitialized_copy_n_bad_alloc_async(par(task), IteratorTag());
 
-    test_uninitialized_copy_bad_alloc(execution_policy(seq), IteratorTag());
-    test_uninitialized_copy_bad_alloc(execution_policy(par), IteratorTag());
+    test_uninitialized_copy_n_bad_alloc(execution_policy(seq), IteratorTag());
+    test_uninitialized_copy_n_bad_alloc(execution_policy(par), IteratorTag());
 
-    test_uninitialized_copy_bad_alloc(execution_policy(seq(task)), IteratorTag());
-    test_uninitialized_copy_bad_alloc(execution_policy(par(task)), IteratorTag());
+    test_uninitialized_copy_n_bad_alloc(execution_policy(seq(task)), IteratorTag());
+    test_uninitialized_copy_n_bad_alloc(execution_policy(par(task)), IteratorTag());
 }
 
-void uninitialized_copy_bad_alloc_test()
+void uninitialized_copy_n_bad_alloc_test()
 {
-    test_uninitialized_copy_bad_alloc<std::random_access_iterator_tag>();
-    test_uninitialized_copy_bad_alloc<std::forward_iterator_tag>();
-    test_uninitialized_copy_bad_alloc<std::input_iterator_tag>();
+    test_uninitialized_copy_n_bad_alloc<std::random_access_iterator_tag>();
+    test_uninitialized_copy_n_bad_alloc<std::forward_iterator_tag>();
+    test_uninitialized_copy_n_bad_alloc<std::input_iterator_tag>();
 }
 
 int hpx_main(boost::program_options::variables_map& vm)
@@ -362,9 +364,9 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    uninitialized_copy_test();
-    uninitialized_copy_exception_test();
-    uninitialized_copy_bad_alloc_test();
+    n_copy_test();
+    uninitialized_copy_n_exception_test();
+    uninitialized_copy_n_bad_alloc_test();
     return hpx::finalize();
 }
 
@@ -390,5 +392,4 @@ int main(int argc, char* argv[])
         "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
-
 }
