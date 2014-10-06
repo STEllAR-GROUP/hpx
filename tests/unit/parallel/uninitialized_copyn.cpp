@@ -81,7 +81,7 @@ void test_uninitialized_copy_n()
     test_uninitialized_copy_n(execution_policy(par(task)), IteratorTag());
 }
 
-void n_copy_test()
+void uninitialized_copy_n_test()
 {
     test_uninitialized_copy_n<std::random_access_iterator_tag>();
     test_uninitialized_copy_n<std::forward_iterator_tag>();
@@ -187,7 +187,6 @@ void test_uninitialized_copy_n_exception_async(ExPolicy const& p, IteratorTag)
                         if (--throw_after == 0)
                             throw std::runtime_error("test");
                     }),
-                ),
                 c.size(),
                 boost::begin(d));
 
@@ -264,7 +263,6 @@ void test_uninitialized_copy_n_bad_alloc(ExPolicy const& policy, IteratorTag)
                     if (--throw_after == 0)
                         throw std::bad_alloc();
                 }),
-            ),
             c.size(),
             boost::begin(d));
 
@@ -364,7 +362,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    n_copy_test();
+    uninitialized_copy_n_test();
     uninitialized_copy_n_exception_test();
     uninitialized_copy_n_bad_alloc_test();
     return hpx::finalize();
