@@ -16,6 +16,7 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/unused.hpp>
+#include <hpx/util/unique_function.hpp>
 #include <hpx/util/detail/value_or_error.hpp>
 
 #include <boost/intrusive_ptr.hpp>
@@ -100,12 +101,20 @@ namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F1, typename F2>
-    struct compose_cb_impl
+    class compose_cb_impl
     {
+        HPX_MOVABLE_BUT_NOT_COPYABLE(compose_cb_impl);
+
+    public:
         template <typename A1, typename A2>
         compose_cb_impl(A1 && f1, A2 && f2)
           : f1_(std::forward<A1>(f1))
           , f2_(std::forward<A2>(f2))
+        {}
+
+        compose_cb_impl(compose_cb_impl&& other)
+          : f1_(std::move(other.f1_))
+          , f2_(std::move(other.f2_))
         {}
 
         typedef void result_type;
@@ -116,22 +125,24 @@ namespace detail
             f2_();
         }
 
-        typename boost::remove_reference<F1>::type f1_;
-        typename boost::remove_reference<F2>::type f2_;
+        F1 f1_;
+        F2 f2_;
     };
 
     template <typename F1, typename F2>
-    static BOOST_FORCEINLINE HPX_STD_FUNCTION<void()>
+    static BOOST_FORCEINLINE util::unique_function_nonser<void()>
     compose_cb(F1 && f1, F2 && f2)
     {
-        if (f1.empty())
+        if (!f1)
             return std::forward<F2>(f2);
-        else if (f2.empty())
+        else if (!f2)
             return std::forward<F1>(f1);
 
         // otherwise create a combined callback
-        return compose_cb_impl<F1, F2>(
-            std::forward<F1>(f1), std::forward<F2>(f2));
+        typedef compose_cb_impl<
+            typename util::decay<F1>::type, typename util::decay<F2>::type
+        > result_type;
+        return result_type(std::forward<F1>(f1), std::forward<F2>(f2));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -140,7 +151,7 @@ namespace detail
     {
         typedef typename future_data_result<Result>::type result_type;
         typedef util::detail::value_or_error<result_type> data_type;
-        typedef HPX_STD_FUNCTION<void()> completed_callback_type;
+        typedef util::unique_function_nonser<void()> completed_callback_type;
         typedef lcos::local::spinlock mutex_type;
 
     public:
@@ -239,7 +250,7 @@ namespace detail
             }
 
             // invoke the callback (continuation) function
-            if (!on_completed.empty())
+            if (on_completed)
                 on_completed();
         }
 
@@ -301,41 +312,25 @@ namespace detail
         /// Set the callback which needs to be invoked when the future becomes
         /// ready. If the future is ready the function will be invoked
         /// immediately.
-        completed_callback_type
-        set_on_completed(completed_callback_type data_sink)
+        void set_on_completed(completed_callback_type data_sink)
         {
+            if (!data_sink) return;
+
             typename mutex_type::scoped_lock l(this->mtx_);
 
-            completed_callback_type retval = std::move(this->on_completed_);
-
-            if (!data_sink.empty() && is_ready_locked()) {
+            if (is_ready_locked()) {
                 // invoke the callback (continuation) function right away
                 l.unlock();
 
-                if (!retval.empty())
-                    retval();
+                HPX_ASSERT(!on_completed_);
+
                 data_sink();
             }
-            else if (!retval.empty()) {
-                // store a combined callback wrapping the old and the new one
-                this->on_completed_ = std::move(
-                    compose_cb(std::move(data_sink), retval));
-
-                l.unlock();
-            }
             else {
-                // store the new callback
-                this->on_completed_ = std::move(data_sink);
-
-                l.unlock();
+                // store a combined callback wrapping the old and the new one
+                this->on_completed_ = compose_cb(
+                    std::move(data_sink), std::move(on_completed_));
             }
-
-            return std::move(retval);
-        }
-
-        completed_callback_type reset_on_completed_locked()
-        {
-            return std::move(this->on_completed_);
         }
 
         virtual void wait(error_code& ec = throws)
