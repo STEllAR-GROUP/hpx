@@ -11,6 +11,8 @@
 #include <hpx/util/interval_timer.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
+#include <boost/smart_ptr/scoped_ptr.hpp>
+
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
