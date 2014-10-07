@@ -82,7 +82,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     },
                     // cleanup function, called for each partition which
                     // didn't fail, but only if at least one failed
-                    [](partition_result_type& r)
+                    [](partition_result_type && r)
                     {
                         while (r.first != r.second)
                         {
