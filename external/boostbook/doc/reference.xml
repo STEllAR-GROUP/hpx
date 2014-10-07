@@ -36,7 +36,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>name</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry>The name of the element being declared to referenced</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
@@ -140,7 +140,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>name</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry>The name of the element being declared to referenced</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
@@ -176,7 +176,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>name</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry>The name of the element being declared to referenced</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
@@ -218,7 +218,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
 </tbody>
@@ -258,7 +258,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>specifiers</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>The specifiers for this function, e.g., inline, static, etc.</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
@@ -294,7 +294,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>pack</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to '1' if the parameter is a parameter pack.</entry></row>
 <row><entry>name</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry>The name of the element being declared to referenced</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
@@ -340,7 +340,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
 </tbody>
@@ -378,7 +378,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
 </tbody>
@@ -441,7 +441,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
 </tbody>
@@ -481,7 +481,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
 </tbody>
@@ -516,7 +516,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>name</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry>The name of the element being declared to referenced</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
@@ -555,7 +555,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>access</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>The access specifier ("public", "private", or "protected") of the inheritance.</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>pack</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to '1' if this is a pack exapansion.</entry></row>
@@ -599,7 +599,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
 </tbody>
@@ -717,7 +717,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>specifiers</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>The specifiers for this function, e.g., inline, static, etc.</entry></row>
 <row><entry>name</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry>The name of the element being declared to referenced</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
@@ -754,7 +754,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>alt</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry/></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 </tbody>
@@ -789,7 +789,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
 </tbody>
@@ -863,7 +863,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>cv</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>cv-qualifiers for this method, e.g., const volatile</entry></row>
 <row><entry>specifiers</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>The specifiers for this function, e.g., inline, static, etc.</entry></row>
 <row><entry>name</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry>The name of the element being declared to referenced</entry></row>
@@ -939,7 +939,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>specifiers</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>The specifiers for this function, e.g., inline, static, etc.</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
@@ -991,7 +991,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>name</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry>The name of the element being declared to referenced</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
@@ -1050,7 +1050,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>alt</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry/></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 </tbody>
@@ -1085,7 +1085,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>name</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry>The name of the element being declared to referenced</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
@@ -1129,7 +1129,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>alt</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry/></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
@@ -1165,7 +1165,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>name</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry>The name of the element being declared to referenced</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
@@ -1201,7 +1201,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
 </tbody>
@@ -1236,7 +1236,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>specifiers</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>The specifiers for this function, e.g., inline, static, etc.</entry></row>
 <row><entry>name</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry>The name of the element being declared to referenced</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
@@ -1273,7 +1273,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
 </tbody>
@@ -1308,7 +1308,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>name</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry>The name of the element being declared to referenced</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
@@ -1344,7 +1344,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
 </tbody>
@@ -1379,7 +1379,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>pack</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to '1' if this is a pack exapansion.</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
@@ -1415,7 +1415,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>alt</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry/></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 </tbody>
@@ -1450,7 +1450,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>name</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry>The name of the element being declared to referenced</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
@@ -1528,7 +1528,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
 </tbody>
@@ -1563,7 +1563,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
 </tbody>
@@ -1598,7 +1598,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>name</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry>The name of the element being declared to referenced</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
@@ -1668,7 +1668,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
 </tbody>
@@ -1712,7 +1712,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>cv</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>cv-qualifiers for this method, e.g., const volatile</entry></row>
 <row><entry>specifiers</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>The specifiers for this function, e.g., inline, static, etc.</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
@@ -1783,7 +1783,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
 </tbody>
@@ -1852,7 +1852,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
 </tbody>
@@ -1887,7 +1887,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
 </tbody>
@@ -1965,7 +1965,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>cv</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>cv-qualifiers for this method, e.g., const volatile</entry></row>
 <row><entry>specifiers</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>The specifiers for this function, e.g., inline, static, etc.</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
@@ -2007,7 +2007,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>name</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry>The name of the element being declared to referenced</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
@@ -2046,7 +2046,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>name</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry>The name of the access specification, e.g. "public", "private", or "protected".</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 </tbody>
@@ -2126,7 +2126,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>name</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry>The name of the element being declared to referenced</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
@@ -2165,7 +2165,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>name</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry>The name of the element being declared to referenced</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
@@ -2201,7 +2201,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
 </tbody>
@@ -2236,7 +2236,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>name</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry>The name of the element being declared to referenced</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
@@ -2277,7 +2277,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>name</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry>The name of the element being declared to referenced</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
@@ -2346,7 +2346,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
 </tbody>
@@ -2381,7 +2381,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
 </tbody>
@@ -2416,7 +2416,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>pack</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to '1' if the parameter is a parameter pack.</entry></row>
 <row><entry>name</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry>The name of the element being declared to referenced</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
@@ -2453,7 +2453,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>dirname</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry/></row>
 <row><entry>url</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry/></row>
 <row><entry>name</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry>The name of the element being declared to referenced</entry></row>
@@ -2497,7 +2497,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
 </tbody>
@@ -2532,7 +2532,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>name</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry>The name of the element being declared to referenced</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
@@ -2568,7 +2568,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>alt</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry/></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 </tbody>
@@ -2603,7 +2603,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>name</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry>The name of the element being declared to referenced</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
@@ -2639,7 +2639,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>name</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry>The name of the element being declared to referenced</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
@@ -2692,7 +2692,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>name</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry>The name of the element being declared to referenced</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
@@ -2728,7 +2728,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
 </tbody>
@@ -2763,7 +2763,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
 </tbody>
@@ -2798,7 +2798,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
 </tbody>
@@ -2833,7 +2833,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
 </tbody>
@@ -2868,7 +2868,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
 </tbody>
@@ -2903,7 +2903,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>name</entry><entry>#REQUIRED</entry><entry>CDATA</entry><entry>The name of the element being declared to referenced</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
@@ -2939,7 +2939,7 @@
           </thead>
           <tbody>
 
-<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date: 2009-10-10 08:01:30 -0500 (Sat, 10 Oct 2009) $ to keep "last revised" information in sync with CVS changes</entry></row>
+<row><entry>last-revision</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Set to $Date$ to keep "last revised" information in sync with CVS changes</entry></row>
 <row><entry>id</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>A global identifier for this element</entry></row>
 <row><entry>xml:base</entry><entry>#IMPLIED</entry><entry>CDATA</entry><entry>Implementation detail used by XIncludes</entry></row>
 </tbody>

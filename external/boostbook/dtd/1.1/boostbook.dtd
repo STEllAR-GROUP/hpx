@@ -16,8 +16,8 @@
    PUBLIC "-//Boost//DTD BoostBook XML V1.1//EN"
    SYSTEM "http://www.boost.org/tools/boostbook/dtd/1.1/boostbook.dtd"
 
-   $Revision: 55470 $
-   $Date: 2009-08-08 13:50:00 -0500 (Sat, 08 Aug 2009) $
+   $Revision$
+   $Date$
 -->
 
 <!--========== Define XInclude features. ==========-->
