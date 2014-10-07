@@ -232,11 +232,14 @@ set       toc,title
               <xsl:value-of
                 select="normalize-space($revision-node/attribute::rev:last-revision)"/>
             </xsl:variable>
-            <xsl:if test="string-length($revision-text) &gt; 0">
+            <xsl:if test="string-length($revision-text) &gt; 0 and not($revision-text = '$Date$')">
               <p>
                 <small>
                   <xsl:text>Last revised: </xsl:text>
                   <xsl:choose>
+                    <xsl:when test="not(contains($revision-text, '$Date: ')) and not(contains($revision-text, '$Date:: '))">
+                      <xsl:value-of select="$revision-text"/>
+                    </xsl:when>
                     <xsl:when test="contains($revision-text, '/')">
                       <xsl:call-template name="format.cvs.revision">
                         <xsl:with-param name="text" select="$revision-text"/>

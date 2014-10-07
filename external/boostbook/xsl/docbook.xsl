@@ -398,6 +398,10 @@ Error: XSL template 'link-or-anchor' called with invalid link-type '<xsl:value-o
     </computeroutput>
   </xsl:template>
 
+  <xsl:template match="code[@language='c++']">
+    <xsl:apply-templates select="." mode="annotation"/>
+  </xsl:template>
+
   <xsl:template match="bold">
     <emphasis role="bold">
       <xsl:apply-templates mode="annotation"/>
@@ -452,6 +456,10 @@ Error: XSL template 'link-or-anchor' called with invalid link-type '<xsl:value-o
     <programlisting>
       <xsl:apply-templates mode="highlight-jam"/>
     </programlisting>
+  </xsl:template>
+
+  <xsl:template match="programlisting[@language='c++']">
+    <xsl:apply-templates select="." mode="annotation"/>
   </xsl:template>
 
   <!-- These DocBook elements have special meaning. Use the annotation mode -->

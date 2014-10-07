@@ -221,7 +221,132 @@
   </fo:list-item>
 </xsl:template>
 
+
 <!-- 
+
+  The following rules apply text coloring to Quickbook items like
+  
+    [role blue Some blue text]
+   
+  These correspond to an arbitrary list of colors added to the CSS file
+  
+    $(BOOST-ROOT)\doc\src\boostbook.css
+   
+  and are required for building pdf documentation.
+ 
+  A more elegant way of doing this is probably possible.
+  Other colors can be added simply by copying these examples.
+-->
+  
+<xsl:template match="phrase[@role='red']">
+  <fo:inline color="red">
+    <xsl:apply-templates/>
+  </fo:inline>
+</xsl:template>
+
+<xsl:template match="phrase[@role='blue']">
+  <fo:inline color="blue">
+    <xsl:apply-templates/>
+  </fo:inline>
+</xsl:template>
+
+<xsl:template match="phrase[@role='green']">
+  <fo:inline color="green">
+    <xsl:apply-templates/>
+  </fo:inline>
+</xsl:template>
+<xsl:template match="phrase[@role='lime']">
+  <fo:inline color="lime">
+    <xsl:apply-templates/>
+  </fo:inline>
+</xsl:template>
+<xsl:template match="phrase[@role='navy']">
+  <fo:inline color="navy">
+    <xsl:apply-templates/>
+  </fo:inline>
+</xsl:template>
+<xsl:template match="phrase[@role='yellow']">
+  <fo:inline color="yellow">
+    <xsl:apply-templates/>
+  </fo:inline>
+</xsl:template>
+<xsl:template match="phrase[@role='magenta']">
+  <fo:inline color="magenta">
+    <xsl:apply-templates/>
+  </fo:inline>
+</xsl:template>
+
+<xsl:template match="phrase[@role='indigo']">
+  <fo:inline color="indigo">
+    <xsl:apply-templates/>
+  </fo:inline>
+</xsl:template>
+  
+<xsl:template match="phrase[@role='cyan']">
+  <fo:inline color="cyan">
+    <xsl:apply-templates/>
+  </fo:inline>
+</xsl:template>
+  
+<xsl:template match="phrase[@role='purple']">
+  <fo:inline color="purple">
+    <xsl:apply-templates/>
+  </fo:inline>
+</xsl:template>
+  
+<xsl:template match="phrase[@role='gold']">
+  <fo:inline color="gold">
+    <xsl:apply-templates/>
+  </fo:inline>
+</xsl:template>
+  
+<xsl:template match="phrase[@role='silver']">
+  <fo:inline color="silver">
+    <xsl:apply-templates/>
+  </fo:inline>
+</xsl:template>
+  
+<xsl:template match="phrase[@role='gray']">
+  <fo:inline color="gray">
+    <xsl:apply-templates/>
+  </fo:inline>
+</xsl:template>
+
+<!-- alignment -->
+
+<xsl:template match="phrase[@role='aligncenter']">
+  <fo:inline>
+    <fo:block text-align="center">
+      <xsl:apply-templates/>
+    </fo:block>
+  </fo:inline>
+</xsl:template>
+
+<xsl:template match="phrase[@role='alignleft']">
+  <fo:inline>
+    <fo:block text-align="left">
+      <xsl:apply-templates/>
+    </fo:block>
+  </fo:inline>
+</xsl:template>
+
+<xsl:template match="phrase[@role='alignright']">
+  <fo:inline>
+    <fo:block text-align="right">
+     <xsl:apply-templates/>
+    </fo:block>
+  </fo:inline>
+</xsl:template>
+
+<xsl:template match="phrase[@role='alignjustify']">
+  <fo:inline>
+    <fo:block text-align="justify">
+     <xsl:apply-templates/>
+    </fo:block>
+  </fo:inline>
+</xsl:template>
+
+  <!-- 
 
  The following rules apply syntax highlighting to phrases
  that have been appropriately marked up, the highlighting

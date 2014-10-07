@@ -129,8 +129,8 @@ if test -r "$HOME/user-config.jam"; then
   JAM_CONFIG_IN_TEMP="yes"
   echo -n "Updating Boost.Jam configuration in $JAM_CONFIG_OUT... "
 
-elif test -r "$BOOST_ROOT/tools/build/v2/user-config.jam"; then
-  JAM_CONFIG_IN="$BOOST_ROOT/tools/build/v2/user-config.jam";
+elif test -r "$BOOST_ROOT/tools/build/user-config.jam"; then
+  JAM_CONFIG_IN="$BOOST_ROOT/tools/build/user-config.jam";
   JAM_CONFIG_IN_TEMP="no"
   echo -n "Writing Boost.Jam configuration to $JAM_CONFIG_OUT... "
 else
@@ -176,6 +176,6 @@ awk -f setup_boostbook.awk $JAM_CONFIG_IN > $JAM_CONFIG_OUT
 rm -f setup_boostbook.awk
 echo "done."
 
-echo "Done! Execute \"bjam --v2\" in a documentation directory to generate"
+echo "Done! Execute \"b2\" in a documentation directory to generate"
 echo "documentation with BoostBook. If you have not already, you will need"
 echo "to compile Boost.Jam."

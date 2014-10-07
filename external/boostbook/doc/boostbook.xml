@@ -9,7 +9,7 @@
 <!DOCTYPE part PUBLIC "-//Boost//DTD BoostBook XML V1.0//EN"
   "http://www.boost.org/tools/boostbook/dtd/boostbook.dtd">
 <part xmlns:xi="http://www.w3.org/2001/XInclude" id="boostbook"
-     last-revision="$Date: 2010-07-18 11:46:20 -0500 (Sun, 18 Jul 2010) $">
+     last-revision="$Date$">
   <partinfo>
     <author>
       <firstname>Douglas</firstname>
@@ -140,9 +140,9 @@ std::cout &lt;&lt; f(5, 3) &gt;&gt; std::endl;
       happen in the BBv2 user configuration file,
       <filename>user-config.jam</filename>. If you do not have a copy
       of this file in your home directory, you should copy the one
-      that resides in <code>tools/build/v2</code> to your home
+      that resides in <code>tools/build/</code> to your home
       directory. Alternatively, you can edit
-      <filename>tools/build/v2/user-config.jam</filename> directly or
+      <filename>tools/build/user-config.jam</filename> directly or
       a site-wide <filename>site-config.jam</filename> file.</para>
 
       <section id="boostbook.setup.xsltproc">
