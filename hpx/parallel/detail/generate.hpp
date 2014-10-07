@@ -11,7 +11,9 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/detail/algorithm_result.hpp>
-#include <hpx/parallel/detail/is_negative.hpp>
+#include <hpx/parallel/detail/dispatch.hpp>
+#include <hpx/parallel/detail/for_each.hpp>
+#include <hpx/util/void_guard.hpp>
 
 #include <algorithm>
 #include <iterator>
