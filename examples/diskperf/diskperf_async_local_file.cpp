@@ -313,29 +313,6 @@ void run_local_file_test(test_info_type const& test_info)
 
     hpx::cout<<hpx::endl;
 
-    if(test_info.is_remove)
-    {
-        hpx::cout<<"removing test files ...\n";
-
-        char filename[1024];
-        uint64_t fileno = (test_info.rfiles > 0) ?
-            test_info.rfiles : test_info.wfiles;
-
-        for(uint32_t loc = 0; loc < localities.size(); ++loc)
-        {
-            for(ssize_t proc = 0; proc < test_info.procs; ++proc)
-            {
-                for(uint64_t i = 0; i < fileno; ++i)
-                {
-                    sprintf(filename, "%s/loc_%d_file%ld.%ld",
-                            test_info.path.c_str(), loc, proc, i);
-                    remove(filename);
-                }
-            }
-        }
-
-        hpx::cout<<hpx::endl;
-    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -387,6 +364,30 @@ int hpx_main(variables_map& vm)
             path, is_remove, procs);
 
     run_local_file_test(test_info);
+
+    if(test_info.is_remove)
+    {
+        hpx::cout<<"removing test files ...\n";
+
+        char filename[1024];
+        uint64_t fileno = (test_info.rfiles > 0) ?
+            test_info.rfiles : test_info.wfiles;
+
+        for(uint32_t loc = 0; loc < hpx::find_all_localities().size(); ++loc)
+        {
+            for(ssize_t proc = 0; proc < test_info.procs; ++proc)
+            {
+                for(uint64_t i = 0; i < fileno; ++i)
+                {
+                    sprintf(filename, "%s/loc_%d_file%ld.%ld",
+                            test_info.path.c_str(), loc, proc, i);
+                    remove(filename);
+                }
+            }
+        }
+
+        hpx::cout<<hpx::endl;
+    }
 
     return hpx::finalize();
 }
