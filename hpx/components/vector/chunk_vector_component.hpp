@@ -24,8 +24,9 @@
 #include <hpx/include/util.hpp>
 #include <hpx/parallel/detail/for_each.hpp>
 #include <iostream>
-
+#include <tuple>
 #include <vector>
+#include <string>
 
 #include <boost/assign/std.hpp>
 
@@ -63,15 +64,26 @@ namespace hpx
             typedef std::vector<VALUE_TYPE>::const_iterator const_iterator_type;
             typedef std::vector<VALUE_TYPE>::iterator       iterator_type;
 
+        private:
+            /** @brief It it the std::vector of VALUE_TYPE. */
+            std::vector<std::tuple<int,VALUE_TYPE> > chunk_vector_;
+            enum dis_state{
+               dis_block         = 0, /**< This represent the block */
+               dis_cyclic        = 1,      /**< This represent the cyclic */
+               dis_block_cyclic  = 2
+            };
+
+
         public:
             typedef std::size_t         size_type;
-
+ 
             //
             //Constructors
             //
             /** @brief Default Constructor which create chunk_vector with size 0.
              */
-            explicit chunk_vector(): chunk_vector_(0, VALUE_TYPE()) {}
+            explicit chunk_vector(): chunk_vector_(0, 
+                                       std::make_tuple(0, VALUE_TYPE())) {}
 
 //            explicit chunk_vector(size_type chunk_size)
 //                : chunk_vector_(chunk_size, VALUE_TYPE()) {}
@@ -82,9 +94,49 @@ namespace hpx
              *  @param chunk_size The size of vector
              *  @param val Default value for the elements in chunk_vector
              */
-            explicit chunk_vector(size_type chunk_size, VALUE_TYPE val)
-                : chunk_vector_(chunk_size, val) {}
-
+            template<typename T>
+            explicit chunk_vector(size_type chunk_size, VALUE_TYPE val,
+                                  size_type index, T policy) 
+            {   // : chunk_vector_(chunk_size, val) {}
+                 int count             = 0;
+                 int block_size        = policy.get_block_size();
+                 int num_chunk         = policy.get_num_chunk();
+                 int locality_size     = policy.get_locality_size();
+                 std::string my_policy = policy.get_policy();
+                 for(std::size_t i = 0; i < chunk_size; i++)
+                 {
+                     
+                     chunk_vector_.push_back(std::make_tuple(index,val));
+                     if(my_policy == "block")
+                     {
+                         ++index;
+                     }
+                     else if(my_policy == "cyclic")
+                     {
+                         if(num_chunk > 1)
+                             index = index + num_chunk;
+                         else if(num_chunk == 1)
+                             index = index + locality_size; 
+                     }
+                     else if(my_policy == "block_cyclic")
+                     {
+                         if(count < block_size)
+                         {
+                            ++index;
+                            ++count;    
+                         } 
+                         else
+                         {
+                             if(num_chunk > 1)
+                               index = index + (block_size*num_chunk); 
+                             else if(num_chunk == 1)
+                               index = index + (block_size*locality_size);
+                              
+                             count = 0;
+                         }
+                     } 
+                 }
+            }
             //
             //Destructor (Non Virtual)
             //
@@ -126,7 +178,7 @@ namespace hpx
              */
             void resize(size_type n, VALUE_TYPE const& val)
             {
-                chunk_vector_.resize(n, val);
+                //chunk_vector_.resize(n, val);
             }
 
             /** @brief Compute the size of currently allocated storage capacity
@@ -196,7 +248,7 @@ namespace hpx
              */
             VALUE_TYPE get_value_noexpt(size_type pos) const
             {
-                return chunk_vector_[pos];
+                return std::get<1>(chunk_vector_[pos]);
             }
 
             /** @brief Return the element at position \a pos in the chunk_vector
@@ -216,7 +268,7 @@ namespace hpx
             {
                 try
                 {
-                    return chunk_vector_.at(pos);
+                    return std::get<1>(chunk_vector_.at(pos));
                 }
                 catch(const std::out_of_range& /*e*/)
                 {
@@ -236,7 +288,7 @@ namespace hpx
              */
             VALUE_TYPE front() const
             {
-                return chunk_vector_.front();
+                return std::get<1>(chunk_vector_.front());
             }
 
 
@@ -248,7 +300,7 @@ namespace hpx
              */
             VALUE_TYPE back() const
             {
-                return chunk_vector_.back();
+                return std::get<1>(chunk_vector_.back());
             }
 
             //
@@ -263,7 +315,9 @@ namespace hpx
              */
             void assign(size_type n, VALUE_TYPE const& val)
             {
-                chunk_vector_.assign(n, val);
+                chunk_vector_.assign(n, std::make_tuple(0,val));
+                //    std::generate(chunk_vector_.begin(), chunk_vector_.end(),
+                //                have to write formula);
             }
 
             /** @brief Add new element at the end of chunk_vector. The added
@@ -273,7 +327,7 @@ namespace hpx
              */
             void push_back(VALUE_TYPE const& val)
             {
-                chunk_vector_.push_back(val);
+               // chunk_vector_.push_back(val);
             }
 
             /** @brief Add new element at the end of chunk_vector. The added
@@ -283,7 +337,7 @@ namespace hpx
              */
             void push_back_rval(VALUE_TYPE&& val)
             {
-                chunk_vector_.push_back(std::move(val));
+                //chunk_vector_.push_back(std::move(val));
             }
 
             /** @brief Remove the last element from chunk_vector effectively
@@ -291,7 +345,7 @@ namespace hpx
              */
             void pop_back()
             {
-                chunk_vector_.pop_back();
+                //chunk_vector_.pop_back();
             }
 
             //  This API is required as we do not returning the reference to the
@@ -313,7 +367,8 @@ namespace hpx
             {
                 try
                 {
-                    chunk_vector_.at(pos) = val;
+                    
+                    std::get<1>(chunk_vector_.at(pos)) = val;
                 }
                 catch(const std::out_of_range& /*e*/)
                 {
@@ -340,7 +395,7 @@ namespace hpx
             {
                 try
                 {
-                    chunk_vector_.at(pos) = std::move(val);
+                    std::get<1>(chunk_vector_.at(pos))  = std::move(val);
                 }
                 catch(const std::out_of_range& /*e*/)
                 {
@@ -380,7 +435,7 @@ namespace hpx
              */
             void chunk_for_each(size_type first,
                                 size_type last,
-                                hpx::util::function<void(VALUE_TYPE &)> fn)
+                                hpx::util::function<void(std::tuple<int, double> &)> fn)
             {
                 hpx::parallel::for_each( hpx::parallel::par, 
                                chunk_vector_.begin() + first,
@@ -404,7 +459,7 @@ namespace hpx
             void chunk_for_each_const(
                                 size_type first,
                                 size_type last,
-                                hpx::util::function<void(VALUE_TYPE const&)> fn
+                                hpx::util::function<void(std::tuple<int, double> const&)> fn
                                       ) const
             {
                 hpx::parallel::for_each( hpx::parallel::par,
@@ -502,11 +557,8 @@ namespace hpx
              */
             HPX_DEFINE_COMPONENT_CONST_ACTION(chunk_vector, chunk_for_each_const);
 
-
-        private:
-            /** @brief It it the std::vector of VALUE_TYPE. */
-            std::vector<VALUE_TYPE> chunk_vector_;
-        };//end of class chunk_vector
+            
+      };//end of class chunk_vector
 
     }//end of server namespace
 
@@ -983,7 +1035,7 @@ namespace hpx
                                         size_type first,
                                         size_type last,
                                         hpx::util::function<
-                                            void(VALUE_TYPE &)
+                                            void(std::tuple<int, double> &)
                                                         > fn
                                                     )
             {
@@ -1019,7 +1071,7 @@ namespace hpx
                                             size_type first,
                                             size_type last,
                                             hpx::util::function<
-                                                void(VALUE_TYPE const &)
+                                                void(std::tuple<int, double> const &)
                                                                 > fn)
             {
                 return hpx::async<base_type::chunk_for_each_const_action>(gid,

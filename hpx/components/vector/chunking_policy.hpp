@@ -5,6 +5,9 @@
 
 #include <vector>
 #include <iostream>
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/export.hpp>
 
 namespace hpx
 {
@@ -76,6 +79,13 @@ namespace hpx
            return localities.size();
        }
 
+       template<class Archive>
+       void serialize(Archive & ar, const unsigned int version)
+       {
+            ar & big_chunk & num_chunk & localities;
+       }
+
+
     private:
       
        block_chunking_policy(std::size_t num_chunk_, 
@@ -94,6 +104,7 @@ namespace hpx
        std::size_t big_chunk;
        std::size_t num_chunk;
        std::vector<hpx::naming::id_type> localities; 
+
     };
 
     static block_chunking_policy const block;

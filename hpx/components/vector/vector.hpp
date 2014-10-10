@@ -196,7 +196,7 @@ namespace hpx{
                             std::make_pair(
                                 index_so_far,
                                 hpx::components::new_<chunk_vector_server>(
-                                node, extra_chunk_size, val               )
+                                node, extra_chunk_size, val,index_so_far, policy )
                                            )
                                                      );
                         index_so_far = extra_chunk_size + index_so_far;
@@ -207,7 +207,7 @@ namespace hpx{
                             std::make_pair(
                                 chunk_index,
                                 hpx::components::new_<chunk_vector_server>(
-                                node, extra_chunk_size, val                     )
+                                node, extra_chunk_size, val, chunk_index, policy)
                                            )
                                                      );
                        ++chunk_index;
@@ -278,7 +278,8 @@ namespace hpx{
                             std::make_pair(
                                 chunk_index*block_size,
                                 hpx::components::new_<chunk_vector_server>(
-                                node, extra_chunk_size, val                     )
+                                node, extra_chunk_size, val,
+                                (chunk_index*block_size), policy       )
                                           )
                                                      );
                        ++chunk_index;
@@ -800,13 +801,28 @@ namespace hpx{
                                                             ).get();
                  }
              }
-             else if(state == hpx::dis_state::dis_block_cyclic) 
+             else if(state == hpx::dis_state::dis_block_cyclic)
              {
-                 return chunk_vector_stubs::get_value_noexpt_async(
-                                                         (it->second).get(),
-                                                         (pos%block_size) 
-                                                            ).get();
-             } 
+                 if(num_chunk >1)
+                 {
+                     return chunk_vector_stubs::get_value_async(
+                                                     (it->second).get(),
+                                                     ((((pos/block_size)/
+                                                     num_chunk)*block_size)+
+                                                     (pos%block_size))
+                                                               ).get();
+                 }
+                 else if(num_chunk == 1)
+                 {
+                     return chunk_vector_stubs::get_value_async(
+                                                      (it->second).get(),
+                                                      ((((pos/block_size)/
+                                                 localities.size())*block_size)+
+                                                      (pos%block_size))
+                                                               ).get();
+                 }
+             }
+
         }
         
 
