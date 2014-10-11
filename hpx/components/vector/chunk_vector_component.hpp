@@ -98,11 +98,14 @@ namespace hpx
             explicit chunk_vector(size_type chunk_size, VALUE_TYPE val,
                                   size_type index, T policy) 
             {   // : chunk_vector_(chunk_size, val) {}
-                 int count             = 0;
-                 int block_size        = policy.get_block_size();
-                 int num_chunk         = policy.get_num_chunk();
-                 int locality_size     = policy.get_locality_size();
-                 std::string my_policy = policy.get_policy();
+                 int count              = 0;
+                 int block_size         = policy.get_block_size();
+                 int num_chunk          = policy.get_num_chunk();
+                 int locality_size      = policy.get_locality_size();
+                 std::string my_policy  = policy.get_policy();
+                 std::size_t init_index = index;
+                 int count_block        = 0;  
+
                  for(std::size_t i = 0; i < chunk_size; i++)
                  {
                      
@@ -120,19 +123,25 @@ namespace hpx
                      }
                      else if(my_policy == "block_cyclic")
                      {
-                         if(count < block_size)
+                         if(count < (block_size-1))
                          {
                             ++index;
                             ++count;    
                          } 
                          else
-                         {
+                         {  
+                             ++count_block;
                              if(num_chunk > 1)
-                               index = index + (block_size*num_chunk); 
+                             {
+                               index = init_index +
+                                (block_size*num_chunk*count_block); 
+                             } 
                              else if(num_chunk == 1)
-                               index = index + (block_size*locality_size);
-                              
-                             count = 0;
+                             {
+                               index = init_index +
+                                (block_size*locality_size*count_block);
+                             }
+                              count = 0;
                          }
                      } 
                  }
@@ -437,7 +446,7 @@ namespace hpx
                                 size_type last,
                                 hpx::util::function<void(std::tuple<int, double> &)> fn)
             {
-                hpx::parallel::for_each( hpx::parallel::par, 
+                hpx::parallel::for_each( hpx::parallel::seq, 
                                chunk_vector_.begin() + first,
                                chunk_vector_.begin() + last,
                                fn);
@@ -462,7 +471,7 @@ namespace hpx
                                 hpx::util::function<void(std::tuple<int, double> const&)> fn
                                       ) const
             {
-                hpx::parallel::for_each( hpx::parallel::par,
+                hpx::parallel::for_each( hpx::parallel::seq,
                                chunk_vector_.begin() + first,
                                chunk_vector_.begin() + last,
                                fn);

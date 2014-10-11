@@ -176,7 +176,13 @@ namespace hpx
 
            return localities.size();
        }
-    private:
+       template<class Archive>
+       void serialize(Archive & ar, const unsigned int version)
+       {
+            ar & big_chunk & num_chunk & localities;
+       }
+
+   private:
       
        cyclic_chunking_policy(std::size_t num_chunk_, 
                              std::vector<hpx::naming::id_type> loc)
@@ -269,6 +275,13 @@ namespace hpx
 
            return localities.size();
        }
+      
+       template<class Archive>
+       void serialize(Archive & ar, const unsigned int version)
+       {
+            ar & big_chunk & num_chunk & block_size & localities;
+       }
+
     private:
       
        block_cyclic_chunking_policy(std::size_t block_size_,

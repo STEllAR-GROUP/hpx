@@ -196,7 +196,7 @@ namespace hpx{
                             std::make_pair(
                                 index_so_far,
                                 hpx::components::new_<chunk_vector_server>(
-                                node, extra_chunk_size, val,index_so_far, policy )
+                                node, extra_chunk_size, val, index_so_far, policy )
                                            )
                                                      );
                         index_so_far = extra_chunk_size + index_so_far;
