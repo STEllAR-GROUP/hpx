@@ -5,7 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-// disk performance benchmark using orangefs_file and pxfs_file classes
+// disk performance benchmark using hpx and async APIs of orangefs_file and
+// pxfs_file classes
 
 #include <hpx/components/io/orangefs_file.hpp>
 #include <hpx/components/io/pxfs_file.hpp>
@@ -596,7 +597,7 @@ int hpx_main(variables_map& vm)
     }
 
     hpx::cout << "HPX disk performance benchmark with orangefs_file/pxfs_file "
-        "class." << hpx::endl;
+        "async APIs." << hpx::endl;
 
     // init test_info
     test_info_type test_info(rfiles, wfiles, bufsiz, count,

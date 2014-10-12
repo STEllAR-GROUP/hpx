@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-// disk performance benchmark using local_file class
+// disk performance benchmark using local_file class async APIs
 
 #include <hpx/components/io/local_file.hpp>
 #include <hpx/hpx_init.hpp>
@@ -240,7 +240,8 @@ void run_local_file_test(test_info_type const& test_info)
     // overall performance
     double tt = t.elapsed();
 
-    hpx::cout << "local_file performance results:" << hpx::endl;
+    hpx::cout << "local_file with HPX and async APIs performance results:"
+        << hpx::endl;
 
     if(test_info.rfiles > 0)
     {
