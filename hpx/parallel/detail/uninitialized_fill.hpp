@@ -194,24 +194,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename FwdIter, typename T>
-        FwdIter sequential_uninitialized_fill_n(FwdIter first,
-            std::size_t count, T const& value)
-        {
-            typedef typename std::iterator_traits<FwdIter>::value_type
-                value_type;
-
-            return
-                util::loop_with_cleanup_n(
-                    first, count,
-                    [&value](FwdIter it) {
-                        ::new (&*it) value_type(value);
-                    },
-                    [](FwdIter it) {
-                        (*it).~value_type();
-                    });
-        }
-
         struct uninitialized_fill_n
           : public detail::algorithm<uninitialized_fill_n>
         {
