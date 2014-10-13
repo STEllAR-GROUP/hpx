@@ -128,7 +128,7 @@ void test_uninitialized_copy_n_exception(ExPolicy const& policy, IteratorTag)
     }
 
     HPX_TEST(caught_exception);
-    HPX_TEST_EQ(test::count_instances::instance_count.load(), 0);
+    HPX_TEST_EQ(test::count_instances::instance_count.load(), std::size_t(0));
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -175,7 +175,7 @@ void test_uninitialized_copy_n_exception_async(ExPolicy const& p, IteratorTag)
 
     HPX_TEST(caught_exception);
     HPX_TEST(returned_from_algorithm);
-    HPX_TEST_EQ(test::count_instances::instance_count.load(), 0);
+    HPX_TEST_EQ(test::count_instances::instance_count.load(), std::size_t(0));
 }
 
 template<typename IteratorTag>
@@ -246,7 +246,7 @@ void test_uninitialized_copy_n_bad_alloc(ExPolicy const& policy, IteratorTag)
     }
 
     HPX_TEST(caught_bad_alloc);
-    HPX_TEST_EQ(test::count_instances::instance_count.load(), 0);
+    HPX_TEST_EQ(test::count_instances::instance_count.load(), std::size_t(0));
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -292,7 +292,7 @@ void test_uninitialized_copy_n_bad_alloc_async(ExPolicy const& p, IteratorTag)
 
     HPX_TEST(caught_bad_alloc);
     HPX_TEST(returned_from_algorithm);
-    HPX_TEST_EQ(test::count_instances::instance_count.load(), 0);
+    HPX_TEST_EQ(test::count_instances::instance_count.load(), std::size_t(0));
 }
 
 template<typename IteratorTag>
