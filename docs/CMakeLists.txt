@@ -14,6 +14,14 @@ set(documentation_files
     ${manual_files} ${tutorial_files} ${base_files} ${index_files})
 
 set(documentation_dependencies
+    "${hpx_SOURCE_DIR}/examples/1d_stencil/1d_stencil_1.cpp"
+    "${hpx_SOURCE_DIR}/examples/1d_stencil/1d_stencil_2.cpp"
+    "${hpx_SOURCE_DIR}/examples/1d_stencil/1d_stencil_3.cpp"
+    "${hpx_SOURCE_DIR}/examples/1d_stencil/1d_stencil_4.cpp"
+    "${hpx_SOURCE_DIR}/examples/1d_stencil/1d_stencil_5.cpp"
+    "${hpx_SOURCE_DIR}/examples/1d_stencil/1d_stencil_6.cpp"
+    "${hpx_SOURCE_DIR}/examples/1d_stencil/1d_stencil_7.cpp"
+    "${hpx_SOURCE_DIR}/examples/1d_stencil/1d_stencil_8.cpp"
     "${hpx_SOURCE_DIR}/examples/quickstart/hello_world.cpp"
     "${hpx_SOURCE_DIR}/examples/quickstart/simplest_hello_world.cpp"
     "${hpx_SOURCE_DIR}/examples/quickstart/error_handling.cpp"
