@@ -360,7 +360,7 @@ accumulator instance.
 [teletype]
 
 The source code for this example can be found here:
-[hpx_link examples/accumulator/accumulators..accumulators].
+[hpx_link examples/accumulator/managed_accumulator_client.cpp..managed_accumulator_client.cpp].
 
 To compile this program, go to your __hpx__ build directory (see __getting_started__
 for information on configuring and building __hpx__) and enter:
@@ -370,7 +370,6 @@ for information on configuring and building __hpx__) and enter:
 ``
 
 To run the program type:
-
 
 ``
     ./bin/managed_accumulator_client
@@ -440,13 +439,13 @@ base class. There are currently two component base classes:
   component instances.
 
 The managed_accumulator component inherits from [classref hpx::components::locking_hock]`<>`.
-This allows the runtime system to ensure that all action invocations are 
-serialized. That means that the system ensures that no two actions are invoked 
-at the same time on a given component instance. This makes the component thread 
+This allows the runtime system to ensure that all action invocations are
+serialized. That means that the system ensures that no two actions are invoked
+at the same time on a given component instance. This makes the component thread
 safe and no additional locking has to be implemented by the user. Moreover,
 managed_accumulator component is a managed component, because it also inherits
-from [classref hpx::components::managed_component_base]`<>` (the template 
-argument passed to locking_hook is used as its base class). The following 
+from [classref hpx::components::managed_component_base]`<>` (the template
+argument passed to locking_hook is used as its base class). The following
 snippet shows the corresponding code:
 
 [import ../../examples/accumulator/accumulators/server/managed_accumulator.hpp]
