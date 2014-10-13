@@ -111,7 +111,7 @@ void test_uninitialized_copy_exception(ExPolicy const& policy, IteratorTag)
                 boost::begin(c),
                 [&throw_after]()
                 {
-                    if (--throw_after == 0)
+                    if (throw_after-- == 0)
                         throw std::runtime_error("test");
                 }),
             decorated_iterator(boost::end(c)),
@@ -153,7 +153,7 @@ void test_uninitialized_copy_exception_async(ExPolicy const& p, IteratorTag)
                     boost::begin(c),
                     [&throw_after]()
                     {
-                        if (--throw_after == 0)
+                        if (throw_after-- == 0)
                             throw std::runtime_error("test");
                     }),
                 decorated_iterator(boost::end(c)),
@@ -229,7 +229,7 @@ void test_uninitialized_copy_bad_alloc(ExPolicy const& policy, IteratorTag)
                 boost::begin(c),
                 [&throw_after]()
                 {
-                    if (--throw_after == 0)
+                    if (throw_after-- == 0)
                         throw std::bad_alloc();
                 }),
             decorated_iterator(boost::end(c)),
@@ -271,7 +271,7 @@ void test_uninitialized_copy_bad_alloc_async(ExPolicy const& p, IteratorTag)
                     boost::begin(c),
                     [&throw_after]()
                     {
-                        if (--throw_after == 0)
+                        if (throw_after-- == 0)
                             throw std::bad_alloc();
                     }),
                 decorated_iterator(boost::end(c)),
