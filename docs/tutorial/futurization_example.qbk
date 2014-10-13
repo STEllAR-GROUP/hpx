@@ -124,11 +124,13 @@ done in example 2. It should be noted
 how strikingly similar example 4 is to example 2.
 
 Example 4 finally shows good results.  This code
-scales better than the OpenMP version by fifty percent.
-While these results are impressive, our work on this
-algorithm is not over. This example only runs on one locality.
-To get the full benefit of HPX we need to be able to distribute
-the work to other machines in a cluster. We begin this process in
+scales equivalently to the OpenMP version.
+While these results are promising, there are more opportunities
+to improve the application's scalability. Currently this code only
+runs on one locality, but to get the full benefit of HPX we need 
+to be able to distribute
+the work to other machines in a cluster. We begin to add this 
+functionality in
 example 5.
 
 In order to run on a distributed system, a large amount of boilerplate code
