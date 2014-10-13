@@ -9,6 +9,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 
 #include <hpx/util/mpi_environment.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <algorithm>
 
@@ -62,9 +63,10 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         pu_nums_.clear();
 
 #if defined(HPX_HAVE_HWLOC)
+	const std::size_t used_cores = data.used_cores_;
         std::size_t max_cores =
-            boost::lexical_cast<std::size_t>(
-                get_runtime().get_config().get_entry("hpx.cores", data.used_cores_));
+            hpx::util::safe_lexical_cast<std::size_t>(
+                get_runtime().get_config().get_entry("hpx.cores", used_cores), used_cores);
 
         if (!data.affinity_desc_.empty())
         {

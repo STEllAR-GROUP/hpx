@@ -16,6 +16,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/mpi_environment.hpp>
 #include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/assign/std/vector.hpp>
 #include <boost/shared_ptr.hpp>
@@ -61,9 +62,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 "this parcelport was instantiated to represent an unexpected "
                 "locality type: " + get_connection_type_name(here_.get_type()));
         }
-        std::string use_io_pool =
-            ini.get_entry("hpx.parcel.mpi.use_io_pool", "1");
-        if(boost::lexical_cast<int>(use_io_pool) == 0)
+        if(hpx::util::get_entry_as<int>(ini, "hpx.parcel.mpi.use_io_pool", "1") == 0)
         {
             use_io_pool_ = false;
         }

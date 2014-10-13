@@ -36,6 +36,7 @@
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/exception.hpp>
 
 #include <boost/shared_ptr.hpp>
@@ -110,10 +111,7 @@ namespace hpx { namespace parcelset
         case connection_tcp:
             {
 #if defined(HPX_PARCELPORT_TCP)
-                std::string enable_tcp =
-                    cfg.get_entry("hpx.parcel.tcp.enable", "1");
-
-                if (boost::lexical_cast<int>(enable_tcp))
+                if (hpx::util::get_entry_as<int>(cfg, "hpx.parcel.tcp.enable", "1"))
                 {
                     return boost::make_shared<policies::tcp::connection_handler>(
                         cfg, on_start_thread, on_stop_thread);
@@ -129,10 +127,7 @@ namespace hpx { namespace parcelset
 #if defined(HPX_PARCELPORT_IPC)
                 // Create ipc based parcelport only if allowed by the
                 // configuration info.
-                std::string enable_ipc =
-                    cfg.get_entry("hpx.parcel.ipc.enable", "0");
-
-                if (boost::lexical_cast<int>(enable_ipc))
+                if (hpx::util::get_entry_as<int>(cfg, "hpx.parcel.ipc.enable", "0"))
                 {
                     return boost::make_shared<policies::ipc::connection_handler>(
                         cfg, on_start_thread, on_stop_thread);
@@ -148,10 +143,7 @@ namespace hpx { namespace parcelset
             {
                 // Create ibverbs based parcelport only if allowed by the
                 // configuration info.
-                std::string enable_ibverbs =
-                    cfg.get_entry("hpx.parcel.ibverbs.enable", "0");
-
-                if (boost::lexical_cast<int>(enable_ibverbs))
+                if (hpx::util::get_entry_as<int>(cfg, "hpx.parcel.ibverbs.enable", "0"))
                 {
                     return boost::make_shared<policies::ibverbs::connection_handler>(
                         cfg, on_start_thread, on_stop_thread);
@@ -172,10 +164,7 @@ namespace hpx { namespace parcelset
             {
                 // Create MPI based parcelport only if allowed by the
                 // configuration info.
-                std::string enable_mpi =
-                    cfg.get_entry("hpx.parcel.mpi.enable", "0");
-
-                if (boost::lexical_cast<int>(enable_mpi))
+                if (hpx::util::get_entry_as<int>(cfg, "hpx.parcel.mpi.enable", "0"))
                 {
                     return boost::make_shared<policies::mpi::connection_handler>(
                         cfg, on_start_thread, on_stop_thread);
@@ -211,30 +200,21 @@ namespace hpx { namespace parcelset
         std::string key("hpx.parcel.");
         key += type;
 
-        std::string array_optimization =
-            ini.get_entry(key + ".array_optimization", "1");
-
-        if (boost::lexical_cast<int>(array_optimization) == 0) {
+        if (hpx::util::get_entry_as<int>(ini, key + ".array_optimization", "1") == 0) {
             allow_array_optimizations_ = false;
             allow_zero_copy_optimizations_ = false;
         }
         else {
-            std::string zero_copy_optimization =
-                ini.get_entry(key + ".zero_copy_optimization", "1");
-            if (boost::lexical_cast<int>(zero_copy_optimization) == 0)
+            if (hpx::util::get_entry_as<int>(ini, key + ".zero_copy_optimization", "1") == 0)
                 allow_zero_copy_optimizations_ = false;
         }
 
-        std::string enable_security =
-            ini.get_entry(key + ".enable_security", "0");
-        if(boost::lexical_cast<int>(enable_security) != 0)
+        if(hpx::util::get_entry_as<int>(ini, key + ".enable_security", "0") != 0)
         {
             enable_security_ = true;
         }
 
-        std::string async_serialization =
-            ini.get_entry(key + ".async_serialization", "0");
-        if(boost::lexical_cast<int>(async_serialization) != 0)
+        if(hpx::util::get_entry_as<int>(ini, key + ".async_serialization", "0") != 0)
         {
             async_serialization_ = true;
         }

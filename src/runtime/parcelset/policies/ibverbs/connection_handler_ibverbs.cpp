@@ -16,6 +16,7 @@
 #include <hpx/runtime/parcelset/policies/ibverbs/receiver.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/assign/std/vector.hpp>
 #include <boost/shared_ptr.hpp>
@@ -49,16 +50,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
     std::size_t connection_handler::memory_chunk_size(util::runtime_configuration const& ini)
     {
-        std::string memory_chunk_size =
-            ini.get_entry("hpx.parcel.ibverbs.memory_chunk_size", HPX_PARCELPORT_IBVERBS_MEMORY_CHUNK_SIZE);
-        return boost::lexical_cast<std::size_t>(memory_chunk_size);
+        return hpx::util::get_entry_as<std::size_t>(
+            ini, "hpx.parcel.ibverbs.memory_chunk_size", HPX_PARCELPORT_IBVERBS_MEMORY_CHUNK_SIZE);
     }
 
     std::size_t connection_handler::max_memory_chunks(util::runtime_configuration const& ini)
     {
-        std::string max_memory_chunks =
-            ini.get_entry("hpx.parcel.ibverbs.max_memory_chunks", HPX_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS);
-        return boost::lexical_cast<std::size_t>(max_memory_chunks);
+        return hpx::util::get_entry_as<std::size_t>(
+            ini, "hpx.parcel.ibverbs.max_memory_chunks", HPX_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS);
     }
 
     connection_handler::connection_handler(util::runtime_configuration const& ini,
@@ -74,9 +73,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         // we never do zero copy optimization for this parcelport
         allow_zero_copy_optimizations_ = false;
 
-        std::string use_io_pool =
-            ini.get_entry("hpx.parcel.ibverbs.use_io_pool", "1");
-        if(boost::lexical_cast<int>(use_io_pool) == 0)
+        if(hpx::util::get_entry_as<int>(ini, "hpx.parcel.ibverbs.use_io_pool", "1") == 0)
         {
             use_io_pool_ = false;
         }

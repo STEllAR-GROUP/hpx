@@ -21,6 +21,7 @@
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/lcos/wait_all.hpp>
@@ -363,8 +364,8 @@ void addressing_service::launch_bootstrap(
         boost::str(boost::format("hpx.locality!=%1%")
                   % naming::get_locality_id_from_gid(here)));
 
-    boost::uint32_t num_threads = boost::lexical_cast<boost::uint32_t>(
-        ini_.get_entry("hpx.os_threads", boost::uint32_t(1)));
+    boost::uint32_t num_threads = hpx::util::get_entry_as<boost::uint32_t>(
+        ini_, "hpx.os_threads", 1u);
     request locality_req(locality_ns_allocate, ep, 4, num_threads); //-V112
     bootstrap->locality_ns_server_.remote_service(locality_req);
 
