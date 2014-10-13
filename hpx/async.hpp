@@ -49,7 +49,15 @@ namespace hpx { namespace detail
     >::type
     call_sync(F && f, boost::mpl::false_)
     {
-        return lcos::make_ready_future(boost::ref(f()));
+        typedef boost::reference_wrapper<typename boost::remove_reference<
+            typename util::deferred_call_result_of<F()>::type
+        >::type> result_type;
+        try
+        {
+            return lcos::make_ready_future(boost::ref(f()));
+        } catch (...) {
+            return lcos::make_error_future<result_type>(boost::current_exception());
+        }
     }
     
     template <typename F>
@@ -60,15 +68,26 @@ namespace hpx { namespace detail
     >::type
     call_sync(F && f, boost::mpl::false_)
     {
-        return lcos::make_ready_future(f());
+        typedef typename util::deferred_call_result_of<F()>::type result_type;
+        try
+        {
+            return lcos::make_ready_future(f());
+        } catch (...) {
+            return lcos::make_error_future<result_type>(boost::current_exception());
+        }
     }
 
     template <typename F>
     BOOST_FORCEINLINE typename detail::create_future<F()>::type
     call_sync(F && f, boost::mpl::true_)
     {
-        f();
-        return lcos::make_ready_future();
+        try
+        {
+            f();
+            return lcos::make_ready_future();
+        } catch (...) {
+            return lcos::make_error_future<void>(boost::current_exception());
+        }
     }
 }}
 
