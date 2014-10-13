@@ -107,7 +107,7 @@ void test_uninitialized_fill_n_exception(ExPolicy const& policy, IteratorTag)
                 boost::begin(c),
                 [&throw_after]()
                 {
-                    if (--throw_after == 0)
+                    if (throw_after-- == 0)
                         throw std::runtime_error("test");
                 }),
             c.size(),
@@ -149,7 +149,7 @@ void test_uninitialized_fill_n_exception_async(ExPolicy const& p, IteratorTag)
                     boost::begin(c),
                     [&throw_after]()
                     {
-                        if (--throw_after == 0)
+                        if (throw_after-- == 0)
                             throw std::runtime_error("test");
                     }),
                 c.size(),
@@ -223,7 +223,7 @@ void test_uninitialized_fill_n_bad_alloc(ExPolicy const& policy, IteratorTag)
                 boost::begin(c),
                 [&throw_after]()
                 {
-                    if (--throw_after == 0)
+                    if (throw_after-- == 0)
                         throw std::bad_alloc();
                 }),
             c.size(),
@@ -264,7 +264,7 @@ void test_uninitialized_fill_n_bad_alloc_async(ExPolicy const& p, IteratorTag)
                     boost::begin(c),
                     [&throw_after]()
                     {
-                        if (--throw_after == 0)
+                        if (throw_after-- == 0)
                             throw std::bad_alloc();
                     }),
                 c.size(),
