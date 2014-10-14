@@ -14,6 +14,7 @@ set(subdirs
     papi_counters
     remote_object
     security
+    vector
    )
 
 add_hpx_pseudo_target(components)
