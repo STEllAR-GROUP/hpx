@@ -446,7 +446,7 @@ namespace hpx
                                 size_type last,
                                 hpx::util::function<void(std::tuple<int, double> &)> fn)
             {
-                hpx::parallel::for_each( hpx::parallel::seq, 
+                hpx::parallel::for_each( hpx::parallel::par, 
                                chunk_vector_.begin() + first,
                                chunk_vector_.begin() + last,
                                fn);
@@ -471,7 +471,7 @@ namespace hpx
                                 hpx::util::function<void(std::tuple<int, double> const&)> fn
                                       ) const
             {
-                hpx::parallel::for_each( hpx::parallel::seq,
+                hpx::parallel::for_each( hpx::parallel::par,
                                chunk_vector_.begin() + first,
                                chunk_vector_.begin() + last,
                                fn);
