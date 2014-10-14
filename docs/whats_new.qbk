@@ -57,8 +57,12 @@ the first time to __hpx__.
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1282] - Update documentation of build options for schedulers
+* [issue 1281] - reset idle rate counter
+* [issue 1278] - Implement improved when_all/wait_all
 * [issue 1277] - feature request: get access to argc argv and variables_map
 * [issue 1276] - Remove merging map
+* [issue 1274] - Weird (wrong) string code in papi.cpp
 * [issue 1273] - Sequential task execution policy
 * [issue 1272] - Avoid CMake name clash for Boost.Thread library
 * [issue 1271] - Updates on HPX Test Units
@@ -69,6 +73,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1262] - Chrono cleanup
 * [issue 1261] - Need make install for papi counters and this builds all the
                  examples
+* [issue 1260] - Documentation of Stencil example claims
 * [issue 1259] - Avoid double-linking Boost on Windows
 * [issue 1257] - Adding additional parameter to create_thread
 * [issue 1256] - added buildbot changes to release notes
@@ -263,6 +268,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 865]  - future<T> and friends shall work for movable only Ts
 * [issue 847]  - Dynamic libraries are not installed on OS X
 * [issue 816]  - First Program tutorial pull request
+* [issue 799]  - Wrap lexical_cast to avoid exceptions
 * [issue 720]  - broken configuration when using ccmake on Ubuntu
 * [issue 622]  - `--hpx:hpx` and `--hpx:debug-hpx-log` is nonsensical
 * [issue 525]  - Extend barrier LCO test to run in distributed
