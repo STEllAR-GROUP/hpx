@@ -202,8 +202,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         try {
             return parallel::v1::detail::algorithm_result<
                     parallel_task_execution_policy, result_type
-                >::get(Derived::sequential(policy,
-                    HPX_ENUM_FORWARD_ARGS(N, Arg, arg)));
+                >::get(Derived::sequential(
+                    policy, HPX_ENUM_FORWARD_ARGS(N, Arg, arg)));
         }
         catch (...) {
             return parallel::v1::detail::handle_exception<
@@ -220,6 +220,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         return Derived::parallel(policy, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     result_type call(parallel::v1::execution_policy const& policy,
         HPX_ENUM_FWD_ARGS(N, Arg, arg), boost::mpl::false_)
@@ -231,8 +232,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     result_type call(parallel::v1::execution_policy const& policy,
          HPX_ENUM_FWD_ARGS(N, Arg, arg), boost::mpl::true_)
     {
-        return call(parallel::v1::sequential_execution_policy(),
-            HPX_ENUM_FORWARD_ARGS(N, Arg, arg), boost::mpl::true_());
+        return call(seq, HPX_ENUM_FORWARD_ARGS(N, Arg, arg), boost::mpl::true_());
     }
 
 #undef N

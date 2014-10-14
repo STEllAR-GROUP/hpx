@@ -62,7 +62,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (first == last)
                     return detail::algorithm_result<ExPolicy, difference_type>::get(0);
 
-                return util::partitioner<ExPolicy, difference_type>::call(
+                return util::partitioner<ExPolicy, Iter, difference_type>::call(
                     policy, first, std::distance(first, last),
                     [value](Iter part_begin, std::size_t part_size) -> difference_type
                     {
@@ -189,7 +189,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (first == last)
                     return detail::algorithm_result<ExPolicy, difference_type>::get(0);
 
-                return util::partitioner<ExPolicy, difference_type>::call(
+                return util::partitioner<ExPolicy, Iter, difference_type>::call(
                     policy, first, std::distance(first, last),
                     [op](Iter part_begin, std::size_t part_size) -> difference_type
                     {

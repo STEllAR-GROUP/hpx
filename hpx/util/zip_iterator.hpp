@@ -91,6 +91,7 @@ namespace hpx { namespace util
         struct zip_iterator_category_impl
         {};
 
+        // random_access_iterator_tag
         template <>
         struct zip_iterator_category_impl<
             std::random_access_iterator_tag,
@@ -133,6 +134,23 @@ namespace hpx { namespace util
 
         template <>
         struct zip_iterator_category_impl<
+            std::random_access_iterator_tag,
+            std::input_iterator_tag>
+        {
+            typedef std::input_iterator_tag type;
+        };
+
+        template <>
+        struct zip_iterator_category_impl<
+            std::input_iterator_tag,
+            std::random_access_iterator_tag>
+        {
+            typedef std::input_iterator_tag type;
+        };
+
+        // bidirectional_iterator_tag
+        template <>
+        struct zip_iterator_category_impl<
             std::bidirectional_iterator_tag,
             std::bidirectional_iterator_tag>
         {
@@ -157,12 +175,55 @@ namespace hpx { namespace util
 
         template <>
         struct zip_iterator_category_impl<
+            std::bidirectional_iterator_tag,
+            std::input_iterator_tag>
+        {
+            typedef std::input_iterator_tag type;
+        };
+
+        template <>
+        struct zip_iterator_category_impl<
+            std::input_iterator_tag,
+            std::bidirectional_iterator_tag>
+        {
+            typedef std::input_iterator_tag type;
+        };
+
+        // forward_iterator_tag
+        template <>
+        struct zip_iterator_category_impl<
             std::forward_iterator_tag,
             std::forward_iterator_tag>
         {
             typedef std::forward_iterator_tag type;
         };
 
+        template <>
+        struct zip_iterator_category_impl<
+            std::input_iterator_tag,
+            std::forward_iterator_tag>
+        {
+            typedef std::input_iterator_tag type;
+        };
+
+        template <>
+        struct zip_iterator_category_impl<
+            std::forward_iterator_tag,
+            std::input_iterator_tag>
+        {
+            typedef std::input_iterator_tag type;
+        };
+
+        // input_iterator_tag
+        template <>
+        struct zip_iterator_category_impl<
+            std::input_iterator_tag,
+            std::input_iterator_tag>
+        {
+            typedef std::input_iterator_tag type;
+        };
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename IteratorTuple, typename Enable = void>
         struct zip_iterator_category;
 

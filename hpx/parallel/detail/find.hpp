@@ -54,29 +54,30 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::size_t count = std::distance(first, last);
                 util::cancellation_token<std::size_t> tok(count);
 
-                return util::partitioner<ExPolicy, InIter, void>::call_with_index(
-                    policy, first, count,
-                    [val, tok](std::size_t base_idx, InIter it,
-                        std::size_t part_size) mutable
-                    {
-                        util::loop_idx_n(
-                            base_idx, it, part_size, tok,
-                            [&val, &tok](type& v, std::size_t i)
-                            {
-                                if (v == val)
-                                    tok.cancel(i);
-                            });
-                    },
-                    [=](std::vector<hpx::future<void> > &&) mutable -> InIter
-                    {
-                        std::size_t find_res = tok.get_data();
-                        if(find_res != count)
-                            std::advance(first, find_res);
-                        else
-                            first = last;
+                return util::partitioner<ExPolicy, InIter, InIter, void>::
+                    call_with_index(
+                        policy, first, count,
+                        [val, tok](std::size_t base_idx, InIter it,
+                            std::size_t part_size) mutable
+                        {
+                            util::loop_idx_n(
+                                base_idx, it, part_size, tok,
+                                [&val, &tok](type& v, std::size_t i)
+                                {
+                                    if (v == val)
+                                        tok.cancel(i);
+                                });
+                        },
+                        [=](std::vector<hpx::future<void> > &&) mutable -> InIter
+                        {
+                            std::size_t find_res = tok.get_data();
+                            if(find_res != count)
+                                std::advance(first, find_res);
+                            else
+                                first = last;
 
-                        return std::move(first);
-                    });
+                            return std::move(first);
+                        });
             }
         };
         /// \endcond
@@ -180,29 +181,30 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::size_t count = std::distance(first, last);
                 util::cancellation_token<std::size_t> tok(count);
 
-                return util::partitioner<ExPolicy, FwdIter, void>::call_with_index(
-                    policy, first, count,
-                    [f, tok](std::size_t base_idx, FwdIter it,
-                        std::size_t part_size) mutable
-                {
-                    util::loop_idx_n(
-                        base_idx, it, part_size, tok,
-                        [&f, &tok](type& v, std::size_t i)
-                    {
-                        if ( f(v) )
-                            tok.cancel(i);
-                    });
-                },
-                [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
-                {
-                    std::size_t find_res = tok.get_data();
-                    if(find_res != count)
-                        std::advance(first, find_res);
-                    else
-                        first = last;
+                return util::partitioner<ExPolicy, FwdIter, FwdIter, void>::
+                    call_with_index(
+                        policy, first, count,
+                        [f, tok](std::size_t base_idx, FwdIter it,
+                            std::size_t part_size) mutable
+                        {
+                            util::loop_idx_n(
+                                base_idx, it, part_size, tok,
+                                [&f, &tok](type& v, std::size_t i)
+                            {
+                                if ( f(v) )
+                                    tok.cancel(i);
+                            });
+                        },
+                        [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
+                        {
+                            std::size_t find_res = tok.get_data();
+                            if(find_res != count)
+                                std::advance(first, find_res);
+                            else
+                                first = last;
 
-                    return std::move(first);
-                });
+                            return std::move(first);
+                        });
             }
         };
         /// \endcond
@@ -325,29 +327,30 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::size_t count = std::distance(first, last);
                 util::cancellation_token<std::size_t> tok(count);
 
-                return util::partitioner<ExPolicy, FwdIter, void>::call_with_index(
-                    policy, first, count,
-                    [f, tok](std::size_t base_idx, FwdIter it, std::size_t part_size) mutable
-                {
-                    util::loop_idx_n(
-                        base_idx, it, part_size, tok,
-                        [&f, &tok](type& v, std::size_t i)
-                    {
-                        if (!f(v))
-                            tok.cancel(i);
-                    });
+                return util::partitioner<ExPolicy, FwdIter, FwdIter, void>::
+                    call_with_index(
+                        policy, first, count,
+                        [f, tok](std::size_t base_idx, FwdIter it, std::size_t part_size) mutable
+                        {
+                            util::loop_idx_n(
+                                base_idx, it, part_size, tok,
+                                [&f, &tok](type& v, std::size_t i)
+                            {
+                                if (!f(v))
+                                    tok.cancel(i);
+                            });
 
-                },
-                [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
-                {
-                    std::size_t find_res = tok.get_data();
-                    if(find_res != count)
-                        std::advance(first, find_res);
-                    else
-                        first = last;
+                        },
+                        [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
+                        {
+                            std::size_t find_res = tok.get_data();
+                            if(find_res != count)
+                                std::advance(first, find_res);
+                            else
+                                first = last;
 
-                    return std::move(first);
-                });
+                            return std::move(first);
+                        });
             }
         };
         /// \endcond
@@ -484,46 +487,47 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     difference_type, std::greater<difference_type>
                 > tok(-1);
 
-                return util::partitioner<ExPolicy, FwdIter, void>::call_with_index(
-                    policy, first1, count-(diff-1),
-                    [=](std::size_t base_idx, FwdIter it, std::size_t part_size) mutable
-                    {
-                        FwdIter curr = it;
+                return util::partitioner<ExPolicy, FwdIter, FwdIter, void>::
+                    call_with_index(
+                        policy, first1, count-(diff-1),
+                        [=](std::size_t base_idx, FwdIter it, std::size_t part_size) mutable
+                        {
+                            FwdIter curr = it;
 
-                        util::loop_idx_n(
-                            base_idx, it, part_size, tok,
-                            [=, &tok, &curr](reference t, std::size_t i)
-                            {
-                                ++curr;
-                                if (op(t, *first2))
+                            util::loop_idx_n(
+                                base_idx, it, part_size, tok,
+                                [=, &tok, &curr](reference t, std::size_t i)
                                 {
-                                    difference_type local_count = 1;
-                                    FwdIter2 needle = first2;
-                                    FwdIter mid = curr;
-
-                                    for (difference_type len = 0;
-                                         local_count != diff && len != count;
-                                         (void) ++local_count, ++len, ++mid)
+                                    ++curr;
+                                    if (op(t, *first2))
                                     {
-                                        if (*mid != *++needle)
-                                            break;
+                                        difference_type local_count = 1;
+                                        FwdIter2 needle = first2;
+                                        FwdIter mid = curr;
+
+                                        for (difference_type len = 0;
+                                             local_count != diff && len != count;
+                                             (void) ++local_count, ++len, ++mid)
+                                        {
+                                            if (*mid != *++needle)
+                                                break;
+                                        }
+
+                                        if (local_count == diff)
+                                            tok.cancel(i);
                                     }
+                                });
+                        },
+                        [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
+                        {
+                            difference_type find_end_res = tok.get_data();
+                            if (find_end_res != count)
+                                std::advance(first1, find_end_res);
+                            else
+                                first1 = last1;
 
-                                    if (local_count == diff)
-                                        tok.cancel(i);
-                                }
-                            });
-                },
-                [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
-                {
-                    difference_type find_end_res = tok.get_data();
-                    if (find_end_res != count)
-                        std::advance(first1, find_end_res);
-                    else
-                        first1 = last1;
-
-                    return std::move(first1);
-                });
+                            return std::move(first1);
+                        });
             }
         };
         /// \endcond
@@ -774,32 +778,32 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 util::cancellation_token<difference_type> tok(count);
 
-                return util::partitioner<ExPolicy, InIter, void>::call_with_index(
-                    policy, first, count,
-                    [s_first, s_last, tok, op](std::size_t base_idx, InIter it,
-                        std::size_t part_size) mutable
-                {
-                    util::loop_idx_n(
-                        base_idx, it, part_size, tok,
-                        [&tok, &s_first, &s_last, &op](reference v, std::size_t i)
+                return util::partitioner<ExPolicy, InIter, InIter, void>::
+                    call_with_index(
+                        policy, first, count,
+                        [s_first, s_last, tok, op](std::size_t base_idx, InIter it,
+                            std::size_t part_size) mutable
                         {
-                            for(FwdIter iter = s_first; iter != s_last; ++iter) {
-                                if(op(v,*iter))
-                                    tok.cancel(i);
-                            }
+                            util::loop_idx_n(
+                                base_idx, it, part_size, tok,
+                                [&tok, &s_first, &s_last, &op](reference v, std::size_t i)
+                                {
+                                    for(FwdIter iter = s_first; iter != s_last; ++iter) {
+                                        if(op(v,*iter))
+                                            tok.cancel(i);
+                                    }
+                                });
+                        },
+                        [=](std::vector<hpx::future<void> > &&) mutable -> InIter
+                        {
+                            difference_type find_first_of_res = tok.get_data();
+                            if(find_first_of_res != count)
+                                std::advance(first, find_first_of_res);
+                            else
+                                first = last;
+
+                            return std::move(first);
                         });
-                },
-                [=](std::vector<hpx::future<void> > &&) mutable -> InIter
-                {
-                    difference_type find_first_of_res = tok.get_data();
-                    if(find_first_of_res != count)
-                        std::advance(first, find_first_of_res);
-                    else
-                        first = last;
-
-                    return std::move(first);
-                });
-
             }
         };
         /// \endcond
