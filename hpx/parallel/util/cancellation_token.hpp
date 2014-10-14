@@ -10,7 +10,7 @@
 
 #include <algorithm>
 
-#include <boost/atomic/atomic.hpp>
+#include <boost/atomic.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 
