@@ -351,7 +351,7 @@ Intel(R) Xeon/Phi
 After installing Boost and HWLOC, the build procedure is almost the same as 
 for how to build HPX on Unix Variants with the sole difference that you have 
 to enable the Xeon Phi in the CMake Build system. This is achieved by invoking
-CMake in the following way: 
+CMake in the following way:: 
 
     cmake \
          -DCMAKE_TOOLCHAIN_FILE=/path/to/hpx/cmake/toolchains/XeonPhi.cmake \
@@ -376,29 +376,29 @@ We would also like to thank the following
 organizations for granting us allocations of their compute resources: 
 LSU HPC, LONI, XSEDE, NERSC, and the Gauss Center for Supercomputing.
 
-HPX is currently funded by:
+HPX is currently funded by
 
- * The National Science Foundation through awards 1117470 (APX), 
-   1240655 (STAR), 1447831 (PXFS), and 1339782 (STORM). 
+* The National Science Foundation through awards 1117470 (APX), 
+  1240655 (STAR), 1447831 (PXFS), and 1339782 (STORM). 
 
-   Any opinions, findings, and conclusions or 
-   recommendations expressed in this material are those of the author(s) 
-   and do not necessarily reflect the views of the National Science Foundation.
+  Any opinions, findings, and conclusions or 
+  recommendations expressed in this material are those of the author(s) 
+  and do not necessarily reflect the views of the National Science Foundation.
 
- * The Department of Energy (DoE) through the award DE-SC0008714 (XPRESS). 
+* The Department of Energy (DoE) through the award DE-SC0008714 (XPRESS). 
 
-   Neither the United States Government nor any agency thereof, nor any of 
-   their employees, makes any warranty, express or implied, or assumes any 
-   legal liability or responsibility for the accuracy, completeness, or 
-   usefulness of any information, apparatus, product, or process disclosed, 
-   or represents that its use would not infringe privately owned rights. 
-   Reference herein to any specific commercial product, process, or service 
-   by trade name, trademark, manufacturer, or otherwise does not necessarily 
-   constitute or imply its endorsement, recommendation, or favoring by the 
-   United States Government or any agency thereof. The views and opinions of 
-   authors expressed herein do not necessarily state or reflect those of the 
-   United States Government or any agency thereof.
+  Neither the United States Government nor any agency thereof, nor any of 
+  their employees, makes any warranty, express or implied, or assumes any 
+  legal liability or responsibility for the accuracy, completeness, or 
+  usefulness of any information, apparatus, product, or process disclosed, 
+  or represents that its use would not infringe privately owned rights. 
+  Reference herein to any specific commercial product, process, or service 
+  by trade name, trademark, manufacturer, or otherwise does not necessarily 
+  constitute or imply its endorsement, recommendation, or favoring by the 
+  United States Government or any agency thereof. The views and opinions of 
+  authors expressed herein do not necessarily state or reflect those of the 
+  United States Government or any agency thereof.
 
- * The Bavarian Research Foundation (Bayerische Forschungsstfitung) through 
-   the grant AZ-987-11. 
+* The Bavarian Research Foundation (Bayerische Forschungsstfitung) through 
+  the grant AZ-987-11. 
 
