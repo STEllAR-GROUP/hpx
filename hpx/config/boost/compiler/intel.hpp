@@ -215,6 +215,10 @@ template<> struct assert_intrinsic_wchar_t<unsigned short> {};
 #if defined(BOOST_INTEL_STDCXX0X) && (BOOST_INTEL_CXX_VERSION >= 1200)
 //#  undef  BOOST_NO_CXX11_RVALUE_REFERENCES // Enabling this breaks Filesystem and Exception libraries
 //#  undef  BOOST_NO_CXX11_SCOPED_ENUMS  // doesn't really work!!
+#ifdef __MIC__
+#  define  BOOST_NO_CXX11_ALLOCATOR
+#  define  BOOST_NO_CXX11_SMART_PTR
+#endif
 #  undef  BOOST_NO_CXX11_DELETED_FUNCTIONS
 //#  undef  BOOST_NO_CXX11_DEFAULTED_FUNCTIONS
 #  undef  BOOST_NO_CXX11_LAMBDAS
