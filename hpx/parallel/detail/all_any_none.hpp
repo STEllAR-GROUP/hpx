@@ -56,7 +56,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     return detail::algorithm_result<ExPolicy, bool>::get(true);
 
                 util::cancellation_token<> tok;
-                return util::partitioner<ExPolicy, bool>::call(
+                return util::partitioner<ExPolicy, FwdIter, bool>::call(
                     policy, first, std::distance(first, last),
                     [op, tok](FwdIter part_begin, std::size_t part_count) mutable -> bool
                     {
@@ -192,7 +192,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     return detail::algorithm_result<ExPolicy, bool>::get(false);
 
                 util::cancellation_token<> tok;
-                return util::partitioner<ExPolicy, bool>::call(
+                return util::partitioner<ExPolicy, FwdIter, bool>::call(
                     policy, first, std::distance(first, last),
                     [op, tok](FwdIter part_begin, std::size_t part_count) mutable -> bool
                     {
@@ -328,7 +328,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     return detail::algorithm_result<ExPolicy, bool>::get(true);
 
                 util::cancellation_token<> tok;
-                return util::partitioner<ExPolicy, bool>::call(
+                return util::partitioner<ExPolicy, FwdIter, bool>::call(
                     policy, first, std::distance(first, last),
                     [op, tok](FwdIter part_begin, std::size_t part_count) mutable -> bool
                     {

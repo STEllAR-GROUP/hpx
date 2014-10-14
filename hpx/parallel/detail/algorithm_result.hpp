@@ -42,6 +42,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         typedef void type;
 
         // Obtain initiating function's return type.
+        static void get() {}
+
         static void get(hpx::util::unused_type) {}
     };
 
@@ -88,6 +90,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         typedef hpx::future<void> type;
 
         // Obtain initiating function's return type.
+        static type get()
+        {
+            return hpx::make_ready_future();
+        }
+
         static type get(hpx::util::unused_type)
         {
             return hpx::make_ready_future();
@@ -106,6 +113,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         typedef hpx::future<void> type;
 
         // Obtain initiating function's return type.
+        static type get()
+        {
+            return hpx::make_ready_future();
+        }
+
         static type get(hpx::util::unused_type)
         {
             return hpx::make_ready_future();

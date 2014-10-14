@@ -138,6 +138,14 @@ parallel::transform                   "transform" "hpx\.parallel\.v1\.transform.
 # hpx/parallel/detail/transform_reduce.hpp
 parallel::transform_reduce            "transform_reduce" "hpx\.parallel\.v1\.transform_reduce.*"
 
+# hpx/parallel/detail/uninitialized_copy.hpp
+parallel::uninitialized_copy            "uninitialized_copy" "hpx\.parallel\.v1\.uninitialized_copy$"
+parallel::uninitialized_copy_n          "uninitialized_copy_n" "hpx\.parallel\.v1\.uninitialized_copy_n.*"
+
+# hpx/parallel/detail/uninitialized_fill.hpp
+parallel::uninitialized_fill            "uninitialized_fill" "hpx\.parallel\.v1\.uninitialized_fill$"
+parallel::uninitialized_fill_n          "uninitialized_fill_n" "hpx\.parallel\.v1\.uninitialized_fill_n.*"
+
 
 # hpx/runtime/components/new.hpp
 new_                                  "" "hpx\.components\.new_.*"

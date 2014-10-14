@@ -5,8 +5,8 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/numeric.hpp>
-#include <hpx/include/algorithm.hpp>
+#include <hpx/include/parallel_numeric.hpp>
+#include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/include/iostreams.hpp>
 
 #include <boost/iterator/counting_iterator.hpp>
