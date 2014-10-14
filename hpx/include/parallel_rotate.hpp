@@ -6,7 +6,7 @@
 #if !defined(HPX_PARALLEL_ROTATE_AUG_05_2014_0136PM)
 #define HPX_PARALLEL_ROTATE_AUG_05_2014_0136PM
 
-#include <hpx/parallel/detail/rotate.hpp>
+#include <hpx/parallel/algorithms/rotate.hpp>
 
 #endif
 

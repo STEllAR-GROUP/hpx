@@ -6,6 +6,7 @@
 #if !defined(HPX_PARALLEL_TASK_REGION_JUL_09_2014_0417PM)
 #define HPX_PARALLEL_TASK_REGION_JUL_09_2014_0417PM
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/parallel/task_region.hpp>
 
 #endif

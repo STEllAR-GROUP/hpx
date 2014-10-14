@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/detail/rotate.hpp
+/// \file parallel/algorithms/rotate.hpp
 
 #if !defined(HPX_PARALLEL_DETAIL_ROTATE_AUG_05_2014_0138PM)
 #define HPX_PARALLEL_DETAIL_ROTATE_AUG_05_2014_0138PM
@@ -14,10 +14,10 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/detail/algorithm_result.hpp>
-#include <hpx/parallel/detail/dispatch.hpp>
-#include <hpx/parallel/detail/reverse.hpp>
-#include <hpx/parallel/detail/copy.hpp>
+#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
+#include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/reverse.hpp>
+#include <hpx/parallel/algorithms/copy.hpp>
 
 #include <algorithm>
 #include <iterator>
