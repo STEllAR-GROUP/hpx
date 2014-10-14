@@ -7,7 +7,7 @@
 #if !defined(HPX_PARALLEL_FIND_JUL_21_2014_0248PM)
 #define HPX_PARALLEL_FIND_JUL_21_2014_0248PM
 
-#include <hpx/parallel/detail/find.hpp>
+#include <hpx/parallel/algorithms/find.hpp>
 
 #endif
 

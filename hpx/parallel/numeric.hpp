@@ -11,8 +11,8 @@
 /// See N4071: 1.3/3
 #include <numeric>
 
-#include <hpx/parallel/detail/reduce.hpp>
-#include <hpx/parallel/detail/transform_reduce.hpp>
+#include <hpx/parallel/algorithms/reduce.hpp>
+#include <hpx/parallel/algorithms/transform_reduce.hpp>
 
 #endif
 

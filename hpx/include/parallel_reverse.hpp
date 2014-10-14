@@ -7,6 +7,6 @@
 #if !defined(HPX_PARALLEL_REVERSE_COPY_JUL_29_2014_0348PM)
 #define HPX_PARALLEL_REVERSE_COPY_JUL_29_2014_0348PM
 
-#include <hpx/parallel/detail/reverse.hpp>
+#include <hpx/parallel/algorithms/reverse.hpp>
 
 #endif

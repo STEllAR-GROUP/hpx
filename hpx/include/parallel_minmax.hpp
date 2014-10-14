@@ -7,7 +7,7 @@
 #if !defined(HPX_PARALLEL_MINMAX_AUG_20_2014_0454PM)
 #define HPX_PARALLEL_MINMAX_AUG_20_2014_0454PM
 
-#include <hpx/parallel/detail/minmax.hpp>
+#include <hpx/parallel/algorithms/minmax.hpp>
 
 #endif
 

@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/detail/all_any_none.hpp
+/// \file parallel/algorithms/all_any_none.hpp
 
 #if !defined(HPX_PARALLEL_DETAIL_ALL_ANY_NONE_JUL_05_2014_0940PM)
 #define HPX_PARALLEL_DETAIL_ALL_ANY_NONE_JUL_05_2014_0940PM
@@ -14,9 +14,9 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/detail/algorithm_result.hpp>
-#include <hpx/parallel/detail/dispatch.hpp>
-#include <hpx/parallel/detail/is_negative.hpp>
+#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
+#include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 

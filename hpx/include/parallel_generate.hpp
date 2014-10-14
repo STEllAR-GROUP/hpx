@@ -7,7 +7,7 @@
 #if !defined(HPX_PARALLEL_GENERATE_OCT_06_2014_1007AM)
 #define HPX_PARALLEL_GENERATE_OCT_06_2014_1007AM
 
-#include <hpx/parallel/detail/generate.hpp>
+#include <hpx/parallel/algorithms/generate.hpp>
 
 #endif
 
