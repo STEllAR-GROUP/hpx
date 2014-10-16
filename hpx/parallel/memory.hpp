@@ -11,8 +11,8 @@
 /// See N4071: 1.3/3
 #include <memory>
 
-#include <hpx/parallel/detail/uninitialized_copy.hpp>
-#include <hpx/parallel/detail/uninitialized_fill.hpp>
+#include <hpx/parallel/algorithms/uninitialized_copy.hpp>
+#include <hpx/parallel/algorithms/uninitialized_fill.hpp>
 
 #endif
 

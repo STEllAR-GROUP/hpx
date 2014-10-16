@@ -6,7 +6,7 @@
 #if !defined(HPX_PARALLEL_UNINITIALIZED_COPY_OCT_03_2014_0515PM)
 #define HPX_PARALLEL_UNINITIALIZED_COPY_OCT_03_2014_0515PM
 
-#include <hpx/parallel/detail/uninitialized_copy.hpp>
+#include <hpx/parallel/algorithms/uninitialized_copy.hpp>
 
 #endif
 

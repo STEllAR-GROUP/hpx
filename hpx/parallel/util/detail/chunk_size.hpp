@@ -7,16 +7,9 @@
 #define HPX_PARALLEL_UTIL_DETAIL_AUTO_CHUNK_SIZE_OCT_03_2014_0159PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/async.hpp>
-#include <hpx/exception_list.hpp>
-#include <hpx/lcos/wait_all.hpp>
-#include <hpx/lcos/local/dataflow.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
-#include <hpx/parallel/traits/extract_partitioner.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/lcos/future.hpp>
+
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace util { namespace detail

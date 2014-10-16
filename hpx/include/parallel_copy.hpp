@@ -7,7 +7,7 @@
 #if !defined(HPX_PARALLEL_COPY_JUN_28_2014_0827AM)
 #define HPX_PARALLEL_COPY_JUN_28_2014_0827AM
 
-#include <hpx/parallel/detail/copy.hpp>
+#include <hpx/parallel/algorithms/copy.hpp>
 
 #endif
 

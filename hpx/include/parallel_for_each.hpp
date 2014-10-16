@@ -7,7 +7,7 @@
 #if !defined(HPX_PARALLEL_FOREACH_JUN_28_2014_0827AM)
 #define HPX_PARALLEL_FOREACH_JUN_28_2014_0827AM
 
-#include <hpx/parallel/detail/for_each.hpp>
+#include <hpx/parallel/algorithms/for_each.hpp>
 
 #endif
 
