@@ -26,6 +26,7 @@
 #include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
+#include <boost/type_traits/is_same.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -212,6 +213,29 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         std::forward<F>(f), boost::mpl::false_());
             }
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        // non-segmented implementation
+        template <typename ExPolicy, typename InIter, typename F>
+        inline typename boost::enable_if<
+            is_execution_policy<ExPolicy>,
+            typename detail::algorithm_result<ExPolicy, void>::type
+        >::type
+        for_each(ExPolicy && policy, InIter first, InIter last, F && f,
+            boost::mpl::false_)
+        {
+            typedef typename std::iterator_traits<InIter>::iterator_category
+                iterator_category;
+
+            typedef typename boost::mpl::or_<
+                is_sequential_execution_policy<ExPolicy>,
+                boost::is_same<std::input_iterator_tag, iterator_category>
+            >::type is_seq;
+
+            return for_each().call(
+                std::forward<ExPolicy>(policy),
+                first, last, std::forward<F>(f), is_seq());
+        }
         /// \endcond
     }
 
@@ -293,14 +317,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
             "Requires at least input iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>
-        >::type is_seq;
+        typedef traits::segmented_iterator_traits<InIter> iterator_traits;
+        typedef typename iterator_traits::is_segmented_iterator is_seg;
 
-        return detail::for_each().call(
-            std::forward<ExPolicy>(policy),
-            first, last, std::forward<F>(f), is_seq());
+        return for_each(std::forward<ExPolicy>(policy), first, last, is_seg());
     }
 }}}
 

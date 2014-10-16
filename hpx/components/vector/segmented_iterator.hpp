@@ -13,7 +13,6 @@
  *
  */
 
-// PROGRAMMER DOCUMENTATION:
  //     The idea of these iterator is taken from
  //     http://afstern.org/matt/segmented.pdf with some modification
  //
@@ -46,13 +45,11 @@ namespace hpx
         typedef chunk_vector chunk_vector_client;
 
     public:
-        // PROGRAMMER DOCUMENTATION:
         //  This represent the return type of the local(), begin() and end() API
         //   which are important for segmented_vector iterator.
         typedef std::pair<chunk_vector_client, size_type> local_return_type;
 
     protected:
-        // PROGRAMMER DOCUMENTATION:
         //  For the following two typedefs refer to hpx::vector class
         typedef std::pair<chunk_vector_client, size_type> chunk_description_type;
         typedef std::vector<chunk_description_type> chunks_vector_type;
@@ -81,9 +78,6 @@ namespace hpx
             local_index_(other.local_index_)
         {}
 
-        // COPY ASSIGNMENT
-        //  PROGRAMMER DOCUMENTATION:
-        //  Return self_type& allow a=b=c;
         /** @brief Copy one const_segmented_vector_iterator into other.
          *
          *  @param other The const_segmented_vector_iterator objects which
@@ -103,7 +97,6 @@ namespace hpx
             return *this;
         }
 
-        // COMPARISON API
         /** @brief Compare the two iterators for equality.
          *
          *  @param other The iterator objects which is to be compared
@@ -127,7 +120,6 @@ namespace hpx
             return !(*this == other);
         }
 
-        // REREFERENCE
         /** @brief Dereferences the iterator and returns the value of the
          *          element.
          *
@@ -143,15 +135,6 @@ namespace hpx
             return curr_chunk_->first.get_value(local_index_);
         }
 
-        // INCREMENT
-        //  PROGRAMMER DOCUMENTATION:
-        //    ALGO:
-        //      1. Just increment the local_index until you go beyond
-        //         the actual size of that chunk. If you go beyond then go to the
-        //         next gid in the available vector
-        //      2. The step 1 is repeated until you hit last valid gid in the list
-        //         for the last valid gid you just increment local_index
-        //
         /** @brief Increment the const_segmented_vector_iterator position by one
          *          unit.
          *
@@ -193,15 +176,6 @@ namespace hpx
             return temp;
         }
 
-        // DECREMENT
-        // PROGRAMMER DOCUMENTATION:
-        //  ALGO:
-        //    1. If local_index equal to zero then we have to check is it first
-        //       VALID gid in the list. If so the decrement make iterator to
-        //       invalid state. Other wise we have to move the immediate previous
-        //       gid.
-        //    2. Else just decrement the local_index.
-        //
         /** @brief Decrement the const_segmented_vector_iterator position by one
          *          unit.
          *
@@ -242,7 +216,6 @@ namespace hpx
             return temp;
         }
 
-        // ARITHMATIC OPERATOR
         /** @brief Return the const_segmented_vector_iterator pointing to the
          *  position which is \a n units ahead of the current position.
          */
@@ -401,7 +374,6 @@ namespace hpx
 //            else{HPX_ASSERT(0);}
 //        } // end of a - b
 
-        // RELATIONAL OPERATOR
         /** @brief Compare the two iterator for less than relation.
          *
          *  @param other This the iterator objects which is to be compared
@@ -516,7 +488,6 @@ namespace hpx
         }
 
     protected:
-        //  PROGRAMMER DOCUMENTATION:
         //  This is the iterator pointing the the vector which stores the
         //   (base_index, gid) pair. (For base_index and gid refer to
         //   hpx::vector class in hpx/components/vector/vector.hpp). This
