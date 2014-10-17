@@ -7,7 +7,7 @@
 #if !defined(HPX_PARALLEL_MISMATCH_JUL_13_2014_0820PM)
 #define HPX_PARALLEL_MISMATCH_JUL_13_2014_0820PM
 
-#include <hpx/parallel/detail/mismatch.hpp>
+#include <hpx/parallel/algorithms/mismatch.hpp>
 
 #endif
 

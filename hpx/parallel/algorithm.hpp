@@ -12,24 +12,24 @@
 /// See N4071: 1.3/3
 #include <algorithm>
 
-#include <hpx/parallel/detail/adjacent_find.hpp>
-#include <hpx/parallel/detail/all_any_none.hpp>
-#include <hpx/parallel/detail/copy.hpp>
-#include <hpx/parallel/detail/count.hpp>
-#include <hpx/parallel/detail/equal.hpp>
-#include <hpx/parallel/detail/fill.hpp>
-#include <hpx/parallel/detail/find.hpp>
-#include <hpx/parallel/detail/for_each.hpp>
-#include <hpx/parallel/detail/generate.hpp>
-#include <hpx/parallel/detail/minmax.hpp>
-#include <hpx/parallel/detail/mismatch.hpp>
-#include <hpx/parallel/detail/move.hpp>
-#include <hpx/parallel/detail/replace.hpp>
-#include <hpx/parallel/detail/reduce.hpp>
-#include <hpx/parallel/detail/reverse.hpp>
-#include <hpx/parallel/detail/rotate.hpp>
-#include <hpx/parallel/detail/swap_ranges.hpp>
-#include <hpx/parallel/detail/transform.hpp>
-#include <hpx/parallel/detail/transform_reduce.hpp>
+#include <hpx/parallel/algorithms/adjacent_find.hpp>
+#include <hpx/parallel/algorithms/all_any_none.hpp>
+#include <hpx/parallel/algorithms/copy.hpp>
+#include <hpx/parallel/algorithms/count.hpp>
+#include <hpx/parallel/algorithms/equal.hpp>
+#include <hpx/parallel/algorithms/fill.hpp>
+#include <hpx/parallel/algorithms/find.hpp>
+#include <hpx/parallel/algorithms/for_each.hpp>
+#include <hpx/parallel/algorithms/generate.hpp>
+#include <hpx/parallel/algorithms/minmax.hpp>
+#include <hpx/parallel/algorithms/mismatch.hpp>
+#include <hpx/parallel/algorithms/move.hpp>
+#include <hpx/parallel/algorithms/replace.hpp>
+#include <hpx/parallel/algorithms/reduce.hpp>
+#include <hpx/parallel/algorithms/reverse.hpp>
+#include <hpx/parallel/algorithms/rotate.hpp>
+#include <hpx/parallel/algorithms/swap_ranges.hpp>
+#include <hpx/parallel/algorithms/transform.hpp>
+#include <hpx/parallel/algorithms/transform_reduce.hpp>
 
 #endif

@@ -7,7 +7,7 @@
 #if !defined(HPX_PARALLEL_EQUAL_JUL_13_2014_1225PM)
 #define HPX_PARALLEL_EQUAL_JUL_13_2014_1225PM
 
-#include <hpx/parallel/detail/equal.hpp>
+#include <hpx/parallel/algorithms/equal.hpp>
 
 #endif
 

@@ -7,7 +7,7 @@
 #if !defined(HPX_PARALLEL_SWAP_RANGES_JUN_28_2014_0827AM)
 #define HPX_PARALLEL_SWAP_RANGES_JUN_28_2014_0827AM
 
-#include <hpx/parallel/detail/swap_ranges.hpp>
+#include <hpx/parallel/algorithms/swap_ranges.hpp>
 
 #endif
 

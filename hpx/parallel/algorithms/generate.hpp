@@ -3,16 +3,16 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/detail/generate.hpp
+/// \file parallel/algorithms/generate.hpp
 
 #if !defined(HPX_PARALLEL_DETAIL_GENERATE_JULY_15_2014_0224PM)
 #define HPX_PARALLEL_DETAIL_GENERATE_JULY_15_2014_0224PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/detail/algorithm_result.hpp>
-#include <hpx/parallel/detail/dispatch.hpp>
-#include <hpx/parallel/detail/for_each.hpp>
+#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
+#include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/util/void_guard.hpp>
 
 #include <algorithm>

@@ -12,7 +12,7 @@
 #include <hpx/util/move.hpp>
 #include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/detail/algorithm_result.hpp>
+#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke.hpp>
@@ -107,7 +107,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         typedef Result result_type;
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (2, 5, "hpx/parallel/detail/dispatch.hpp"))                           \
+    (3, (2, 5, "hpx/parallel/algorithms/detail/dispatch.hpp"))                \
     /**/
 
 #include BOOST_PP_ITERATE()
