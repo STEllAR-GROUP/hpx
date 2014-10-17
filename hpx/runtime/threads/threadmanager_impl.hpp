@@ -571,6 +571,10 @@ namespace hpx { namespace threads
         std::vector<boost::int64_t> executed_thread_phases_;
         boost::atomic<long> thread_count_;
 
+#if defined(HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS) && defined(HPX_THREAD_MAINTAIN_IDLE_RATES)
+        double timestamp_scale_;            ///< scale timestamps to nanoseconds
+#endif
+
         boost::atomic<hpx::state> state_;   ///< thread manager state
         util::io_service_pool& timer_pool_; ///< used for timed set_state
 
