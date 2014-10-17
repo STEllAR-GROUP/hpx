@@ -509,9 +509,9 @@ namespace hpx { namespace threads { namespace policies
                     while(work_flag_tree[level][idx])
                     {
 #if defined(BOOST_WINDOWS)
-                    Sleep(1);
+                        Sleep(1);
 #elif defined(BOOST_HAS_PTHREADS)
-                    sched_yield();
+                        sched_yield();
 #else
 #endif
                     }
@@ -521,8 +521,8 @@ namespace hpx { namespace threads { namespace policies
             boost::int64_t count = tq->get_pending_queue_length()/d + 1;
             dest->move_work_items_from(tq, count);
 
-            tq->increment_num_stolen_from_pending();
-            dest->increment_num_stolen_to_pending();
+            tq->increment_num_stolen_from_pending(count);
+            dest->increment_num_stolen_to_pending(count);
         }
 
         /// Return the next thread to be executed, return false if none is
