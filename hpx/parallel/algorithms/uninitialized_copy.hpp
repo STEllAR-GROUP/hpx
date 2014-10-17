@@ -75,7 +75,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     ExPolicy, Iter, FwdIter, partition_result_type
                 >::call(
                     policy, hpx::util::make_zip_iterator(first, dest), count,
-                    [tok](zip_iterator t, std::size_t part_size) mutable
+                    [tok](zip_iterator t, std::size_t part_size)
+                        mutable -> partition_result_type
                     {
                         using hpx::util::get;
                         FwdIter const& dest = get<1>(t.get_iterator_tuple());
@@ -86,14 +87,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     },
                     // finalize, called once if no error occurred
                     [dest, count](
-                        std::vector<hpx::future<partition_result_type> > &&) mutable
+                        std::vector<hpx::future<partition_result_type> > &&)
+                            mutable -> FwdIter
                     {
                         std::advance(dest, count);
                         return dest;
                     },
                     // cleanup function, called for each partition which
                     // didn't fail, but only if at least one failed
-                    [](partition_result_type && r)
+                    [](partition_result_type && r) -> void
                     {
                         while (r.first != r.second)
                         {

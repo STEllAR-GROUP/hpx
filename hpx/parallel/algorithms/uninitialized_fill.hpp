@@ -70,7 +70,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     ExPolicy, Iter, void, partition_result_type
                 >::call(
                     policy, first, count,
-                    [value, tok](Iter it, std::size_t part_size) mutable
+                    [value, tok](Iter it, std::size_t part_size)
+                        mutable -> partition_result_type
                     {
                         return std::make_pair(it,
                             sequential_uninitialized_fill_n(
@@ -78,11 +79,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     },
                     // finalize, called once if no error occurred
                     [](std::vector<hpx::future<partition_result_type> > &&)
+                        -> void
                     {
                     },
                     // cleanup function, called for each partition which
                     // didn't fail, but only if at least one failed
-                    [](partition_result_type && r)
+                    [](partition_result_type && r) -> void
                     {
                         while (r.first != r.second)
                         {
