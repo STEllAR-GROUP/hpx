@@ -138,6 +138,9 @@ namespace hpx { namespace threads
       : startup_(NULL),
         num_threads_(num_threads),
         thread_count_(0),
+#if defined(HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS) && defined(HPX_THREAD_MAINTAIN_IDLE_RATES)
+        timestamp_scale_(1.),
+#endif
         state_(starting),
         timer_pool_(timer_pool),
         thread_logger_("threadmanager_impl::register_thread"),
@@ -1536,6 +1539,28 @@ namespace hpx { namespace threads
                 "threadmanager_impl::run", "number of threads is zero");
         }
 
+#if defined(HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS) && defined(HPX_THREAD_MAINTAIN_IDLE_RATES)
+        // scale timestamps to nanoseconds
+        boost::uint64_t base_timestamp = util::hardware::timestamp();
+        boost::uint64_t base_time = util::high_resolution_clock::now();
+        boost::uint64_t curr_timestamp = util::hardware::timestamp();
+        boost::uint64_t curr_time = util::high_resolution_clock::now();
+
+        while ((curr_time - base_time) <= 100000)
+        {
+            curr_timestamp = util::hardware::timestamp();
+            curr_time = util::high_resolution_clock::now();
+        }
+
+        if (curr_timestamp - base_timestamp != 0)
+        {
+            timestamp_scale_ = double(curr_time - base_time) /
+                double(curr_timestamp - base_timestamp);
+        }
+
+        LTM_(info) << "run: timestamp_scale: " << timestamp_scale_; //-V128
+#endif
+
         mutex_type::scoped_lock lk(mtx_);
         if (!threads_.empty() || (state_.load() == running))
             return true;    // do nothing if already running
@@ -1705,7 +1730,7 @@ namespace hpx { namespace threads
                 executed_thread_phases_[num] = 0;
                 tfunc_times[num] = boost::uint64_t(-1);
             }
-            return boost::uint64_t(exec_total / num_phases);
+            return boost::uint64_t((exec_total * timestamp_scale_)/ num_phases);
         }
 
         double exec_total = std::accumulate(exec_times.begin(),
@@ -1719,7 +1744,7 @@ namespace hpx { namespace threads
             std::fill(tfunc_times.begin(), tfunc_times.end(),
                 boost::uint64_t(-1));
         }
-        return boost::uint64_t(exec_total / num_phases);
+        return boost::uint64_t((exec_total * timestamp_scale_)/ num_phases);
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -1734,7 +1759,7 @@ namespace hpx { namespace threads
                 executed_threads_[num] = 0;
                 tfunc_times[num] = boost::uint64_t(-1);
             }
-            return boost::uint64_t(exec_total / num_threads);
+            return boost::uint64_t((exec_total * timestamp_scale_)/ num_threads);
         }
 
         double exec_total = std::accumulate(exec_times.begin(),
@@ -1747,7 +1772,7 @@ namespace hpx { namespace threads
             std::fill(tfunc_times.begin(), tfunc_times.end(),
                 boost::uint64_t(-1));
         }
-        return boost::uint64_t(exec_total / num_threads);
+        return boost::uint64_t((exec_total * timestamp_scale_) / num_threads);
     }
 #endif
 #endif
