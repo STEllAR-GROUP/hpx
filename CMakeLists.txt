@@ -85,7 +85,7 @@ include(HPX_FortranCompiler)
 # Setup platform for which HPX should be compiled for.
 #
 include(HPX_SetPlatform)
-if(HPX_PLATFORM_UC STREQUAL "ANDROID")
+if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
   unset(HPX_LIBRARY_VERSION)
   unset(HPX_SOVERSION)
 endif()
@@ -683,16 +683,16 @@ if(MSVC)
 endif()
 
 # Setup platform specific compiler options and check for compatible compilers
-if(HPX_PLATFORM_UC STREQUAL "NATIVE")
+if("${HPX_PLATFORM_UC}" STREQUAL "NATIVE")
   hpx_info("Compiling with the native toolset")
-elseif(HPX_PLATFORM_UC STREQUAL "ANDROID")
+elseif("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
   hpx_info("Compiling for Android devices")
-elseif(HPX_PLATFORM_UC STREQUAL "XEONPHI")
+elseif("${HPX_PLATFORM_UC}" STREQUAL "XEONPHI")
   hpx_info("Compiling for Intel Xeon Phi devices")
   if(NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
     hpx_error("HPX on the MIC can only be compiled with the Intel compiler.")
   endif()
-elseif(HPX_PLATFORM_UC STREQUAL "BLUEGENEQ")
+elseif("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
   if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     hpx_error("HPX on the BG/Q can only be compiled with bgclang")
   endif()
@@ -973,8 +973,12 @@ else()
   # a serializing instruction.
   hpx_cpuid("rdtsc" HPX_WITH_RDTSC
     DEFINITIONS HPX_HAVE_RDTSC)
-  hpx_cpuid("rdtscp" HPX_WITH_RDTSCP
-    DEFINITIONS HPX_HAVE_RDTSCP)
+
+  # XeonPhi's do not support RDTSCP
+  if(NOT ("${HPX_PLATFORM_UC}" STREQUAL "XEONPHI"))
+    hpx_cpuid("rdtscp" HPX_WITH_RDTSCP
+      DEFINITIONS HPX_HAVE_RDTSCP)
+  endif()
 
   if(NOT HPX_WITH_RDTSC AND NOT HPX_WITH_RDTSCP)
     hpx_warn("Neither rdtsc nor rdtscp is available; some performance counters may report incorrect results")
@@ -1040,7 +1044,7 @@ if(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
   if(NOT Boost_CONTEXT_FOUND)
     hpx_error("The usage of Boost.Context was selected but Boost.Context was not found (Version 1.51 or higher is required).")
   endif()
-  if(HPX_PLATFORM_UC STREQUAL "BLUEGENEQ")
+  if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
     if(Boost_VERSION LESS 105600)
       hpx_error("On BlueGene/Q, Boost.Context can only be used with a Boost >=1.56")
     endif()
@@ -1075,7 +1079,7 @@ endif()
 # HPX_PREFIX
 # The prefix is the default search path for HPX plugins
 ################################################################################
-if(${HPX_PLATFORM_UC} STREQUAL "ANDROID")
+if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
   set(HPX_PREFIX "lib")
   set(HPX_BUILD_PREFIX "lib")
 else()
@@ -1372,7 +1376,7 @@ if(Boost_VERSION LESS 104900)
     PATTERN ".git" EXCLUDE)
 endif()
 
-if(HPX_PLATFORM_UC STREQUAL "XEONPHI")
+if("${HPX_PLATFORM_UC}" STREQUAL "XEONPHI")
   # FIXME: push changes upstream
   install(
     DIRECTORY external/asio/boost
