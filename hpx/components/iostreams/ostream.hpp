@@ -93,6 +93,8 @@ namespace hpx { namespace iostreams
     private:
         typedef components::client_base<ostream, stubs::output_stream> base_type;
         typedef detail::ostream_creator<char>::stream_type stream_base_type;
+        typedef stream_base_type::traits_type stream_traits_type;
+        typedef BOOST_IOSTREAMS_BASIC_OSTREAM(char, stream_traits_type) std_stream_type;
         typedef detail::ostream_creator<char>::iterator_type iterator_type;
         typedef lcos::local::recursive_mutex mutex_type;
 
@@ -250,7 +252,12 @@ namespace hpx { namespace iostreams
             return streaming_operator_lazy(subject);
         }
 
-        using stream_base_type::operator<<;
+        ///////////////////////////////////////////////////////////////////////
+        ostream& operator<<(std_stream_type& (*manip_fun)(std_stream_type&))
+        {
+            mutex_type::scoped_lock l(mtx_);
+            return streaming_operator_lazy(manip_fun);
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
