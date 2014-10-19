@@ -336,7 +336,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
           using hpx::util::make_zip_iterator;
           return
-            util::partitioner<ExPolicy, FwdIter2>::
+            util::partitioner<ExPolicy, FwdIter2, Pair const >::
               call_with_data(policy,
                 make_zip_iterator(first, flags.get()), count,
                 [dest](Pair const& data, zip_iterator part_begin,
@@ -346,11 +346,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                   std::advance(out_iter, std::get<0>(data));
 
                   util::loop_n(part_begin, part_size,
-                    [&dest, &out_iter](reference d)
+                    [&dest, &out_iter](zip_iterator d)
                     {
                       using hpx::util::get;
-                      if(get<1>(d))
-                        *out_iter++ = get<0>(d);
+                      if(get<1>(*d))
+                        *out_iter++ = get<0>(*d);
                     });
 
                   return data;
@@ -402,17 +402,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                   {
                         std::size_t curr = 0;
                         util::loop_n(part_begin, part_size,
-                        [&curr, &f](reference d)
+                        [&curr, &f](zip_iterator d)
                         {
                           using hpx::util::get;
-                          if(f(get<0>(d)))
+                          if(f(get<0>(*d)))
                           {
-                            get<1>(d) = 1;
+                            get<1>(*d) = 1;
                             ++curr;
                           }
                           else
                           {
-                            get<1>(d) = 0;
+                            get<1>(*d) = 0;
                           }
                         });
                         return std::make_pair(curr, base_idx);
