@@ -57,12 +57,11 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         std::vector<id_type> const& get_localities() const
         {
-            return localities_.empty() ?
-                std::vector<id_type>(1, find_here()) : localities_;
+            return localities_;
         }
-        std::size_t get_locality_size()
+        std::size_t get_num_localities()
         {
-            return localities_.empty() ? 1 : localities_.size();
+            return localities_.size();
         }
 
         std::size_t get_block_size() const
@@ -141,12 +140,11 @@ namespace hpx
 
         std::vector<id_type> const& get_localities() const
         {
-            return localities_.empty() ?
-                std::vector<id_type>(1, find_here()) : localities_;
+            return localities_;
         }
-        std::size_t get_locality_size()
+        std::size_t get_num_localities()
         {
-            return localities_.empty() ? 1 : localities_.size();
+            return localities_.size();
         }
 
         std::size_t get_block_size()
@@ -237,15 +235,14 @@ namespace hpx
 
         std::vector<id_type> const& get_localities() const
         {
-            return localities_.empty() ?
-                std::vector<id_type>(1, find_here()) : localities_;
+            return localities_;
         }
-        std::size_t get_locality_size()
+        std::size_t get_num_localities()
         {
-            return localities_.empty() ? 1 : localities_.size();
+            return localities_.size();
         }
 
-        std::size_t get_num_chunk() const
+        std::size_t get_num_chunks() const
         {
             return num_chunks_ == std::size_t(-1) ?
                 get_num_localities_sync() : num_chunks_;
@@ -294,7 +291,7 @@ namespace hpx
         block_cyclic_distribution_policy(std::vector<id_type> const& localities)
           : localities_(localities),
             num_chunks_(localities.size()),
-            block_size_(1),
+            block_size_(1)
         {}
 
         block_cyclic_distribution_policy(std::size_t num_chunks)

@@ -104,11 +104,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///////////////////////////////////////////////////////////////////////
         // segmented implementation
         template <typename ExPolicy, typename SegIter, typename F>
-        inline typename boost::enable_if<
-            is_execution_policy<ExPolicy>,
-            typename detail::algorithm_result<ExPolicy, void>::type
-        >::type
-        for_each(ExPolicy && policy, SegIter first, SegIter last, F && f,
+        inline typename detail::algorithm_result<ExPolicy>::type
+        for_each_(ExPolicy && policy, SegIter first, SegIter last, F && f,
             boost::mpl::true_)
         {
             typedef typename std::iterator_traits<SegIter>::iterator_category
