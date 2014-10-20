@@ -48,14 +48,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static void
             sequential(ExPolicy const&, SegIter first, SegIter last, F && f)
             {
+                typedef segmented_iterator_traits<SegIter> traits;
+                typedef typename traits::segment_iterator segment_iterator;
+                typedef typename traits::local_iterator local_iterator;
+
                 using hpx::util:placeholders::_1;
                 using traits::local;
                 using traits::begin;
                 using traits::end;
-
-                typedef segmented_iterator_traits<SegIter> traits;
-                typedef typename traits::segment_iterator segment_iterator;
-                typedef typename traits::local_iterator local_iterator;
 
                 segment_iterator sfirst = traits::segment(first);
                 segment_iterator slast = traits::segment(last);
@@ -66,15 +66,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 id_type id = sfirst.get_id();
 
+                using util::remote::sequential_loop;
                 if (sfirst == slast)
-                    util::remote::loop(id, local(first), local(last), f_);
+                    sequential_loop(id, local(first), local(last), f_);
                 else
                 {
-                    util::remote::loop(id, local(first), end(sfirst), f_);
+                    sequential_loop(id, local(first), end(sfirst), f_);
                     for (++sfirst; sfirst != slast; ++sfirst)
-                        util::remote::loop(id, begin(sfirst), end(sfirst), f_);
-                    util::remote::loop(id, begin(sfirst), local(last), f_);
+                        sequential_loop(id, begin(sfirst), end(sfirst), f_);
+                    sequential_loop(id, begin(sfirst), local(last), f_);
                 }
+
                 return hpx::util::unused;
             }
 

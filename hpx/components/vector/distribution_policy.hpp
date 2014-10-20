@@ -34,12 +34,12 @@ namespace hpx
     {
     public:
         block_distribution_policy()
-          : num_chunks_(std::size_t(-1))
+          : num_partitions_(1)
         {}
 
-        block_distribution_policy operator()(std::size_t num_chunks) const
+        block_distribution_policy operator()(std::size_t num_partitions) const
         {
-            return block_distribution_policy(num_chunks);
+            return block_distribution_policy(num_partitions);
         }
 
         block_distribution_policy operator()(
@@ -48,10 +48,10 @@ namespace hpx
             return block_distribution_policy(localities);
         }
 
-        block_distribution_policy operator()(std::size_t num_chunks,
+        block_distribution_policy operator()(std::size_t num_partitions,
             std::vector<id_type> const& localities) const
         {
-            return block_distribution_policy(num_chunks, localities);
+            return block_distribution_policy(num_partitions, localities);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -59,23 +59,18 @@ namespace hpx
         {
             return localities_;
         }
-        std::size_t get_num_localities()
-        {
-            return localities_.size();
-        }
 
-        std::size_t get_block_size() const
+        std::size_t get_partition_size() const
         {
             return std::size_t(-1);
         }
 
-        std::size_t get_num_chunks() const
+        std::size_t get_num_partitions() const
         {
-            return num_chunks_ == std::size_t(-1) ?
-                get_num_localities_sync() : num_chunks_;
+            return num_partitions_;
         }
 
-        BOOST_SCOPED_ENUM(distribution_policy) get_policy() const
+        BOOST_SCOPED_ENUM(distribution_policy) get_policy_type() const
         {
             return distribution_policy::block;
         }
@@ -86,27 +81,27 @@ namespace hpx
         template <typename Archive>
         void serialize(Archive & ar, const unsigned int version)
         {
-            ar & localities_ & num_chunks_;
+            ar & localities_ & num_partitions_;
         }
 
-        block_distribution_policy(std::size_t num_chunks,
+        block_distribution_policy(std::size_t num_partitions,
              std::vector<id_type> const& localities)
           : localities_(localities),
-            num_chunks_(num_chunks)
+            num_partitions_(num_partitions)
         {}
 
         block_distribution_policy(std::vector<id_type> const& localities)
           : localities_(localities),
-            num_chunks_(localities.size())
+            num_partitions_(localities.size())
         {}
 
-        block_distribution_policy(std::size_t num_chunks)
-          : num_chunks_(num_chunks)
+        block_distribution_policy(std::size_t num_partitions)
+          : num_partitions_(num_partitions)
         {}
 
     private:
         std::vector<id_type> localities_;   // localities to create chunks on
-        std::size_t num_chunks_;            // number of chunks to create
+        std::size_t num_partitions_;            // number of chunks to create
     };
 
     static block_distribution_policy const block;
@@ -118,12 +113,12 @@ namespace hpx
     {
     public:
         cyclic_distribution_policy()
-          : num_chunks_(std::size_t(-1))
+          : num_partitions_(1)
         {}
 
-        cyclic_distribution_policy operator()(std::size_t num_chunks) const
+        cyclic_distribution_policy operator()(std::size_t num_partitions) const
         {
-            return cyclic_distribution_policy(num_chunks);
+            return cyclic_distribution_policy(num_partitions);
         }
 
         cyclic_distribution_policy operator()(
@@ -132,33 +127,28 @@ namespace hpx
             return cyclic_distribution_policy(localities);
         }
 
-        cyclic_distribution_policy operator()(std::size_t num_chunks,
+        cyclic_distribution_policy operator()(std::size_t num_partitions,
             std::vector<id_type> const& localities) const
         {
-            return cyclic_distribution_policy(num_chunks, localities);
+            return cyclic_distribution_policy(num_partitions, localities);
         }
 
         std::vector<id_type> const& get_localities() const
         {
             return localities_;
         }
-        std::size_t get_num_localities()
-        {
-            return localities_.size();
-        }
 
-        std::size_t get_block_size()
+        std::size_t get_partition_size()
         {
             return 1;
         }
 
-        std::size_t get_num_chunks() const
+        std::size_t get_num_partitions() const
         {
-            return num_chunks_ == std::size_t(-1) ?
-                get_num_localities_sync() : num_chunks_;
+            return num_partitions_;
         }
 
-        BOOST_SCOPED_ENUM(distribution_policy) get_policy() const
+        BOOST_SCOPED_ENUM(distribution_policy) get_policy_type() const
         {
             return distribution_policy::cyclic;
         }
@@ -169,27 +159,27 @@ namespace hpx
         template<class Archive>
         void serialize(Archive & ar, const unsigned int version)
         {
-            ar & localities_ & num_chunks_;
+            ar & localities_ & num_partitions_;
         }
 
-        cyclic_distribution_policy(std::size_t num_chunks,
+        cyclic_distribution_policy(std::size_t num_partitions,
                 std::vector<id_type> const& localities)
           : localities_(localities),
-            num_chunks_(num_chunks)
+            num_partitions_(num_partitions)
         {}
 
         cyclic_distribution_policy(std::vector<id_type> const& localities)
           : localities_(localities),
-            num_chunks_(localities.size())
+            num_partitions_(localities.size())
         {}
 
-        cyclic_distribution_policy(std::size_t num_chunks)
-          : num_chunks_(num_chunks)
+        cyclic_distribution_policy(std::size_t num_partitions)
+          : num_partitions_(num_partitions)
         {}
 
     private:
         std::vector<id_type> localities_;
-        std::size_t num_chunks_;
+        std::size_t num_partitions_;
     };
 
     static cyclic_distribution_policy const cyclic;
@@ -201,24 +191,24 @@ namespace hpx
     {
     public:
         block_cyclic_distribution_policy()
-          : num_chunks_(std::size_t(-1))
+          : num_partitions_(1)
         {}
 
-        block_cyclic_distribution_policy operator()(std::size_t num_chunks) const
+        block_cyclic_distribution_policy operator()(std::size_t num_partitions) const
         {
-            return block_cyclic_distribution_policy(num_chunks);
+            return block_cyclic_distribution_policy(num_partitions);
         }
 
-        block_cyclic_distribution_policy operator()(std::size_t num_chunks,
+        block_cyclic_distribution_policy operator()(std::size_t num_partitions,
             std::vector<id_type> const& localities) const
         {
-            return block_cyclic_distribution_policy(num_chunks, localities);
+            return block_cyclic_distribution_policy(num_partitions, localities);
         }
 
-        block_cyclic_distribution_policy operator()(std::size_t num_chunks,
+        block_cyclic_distribution_policy operator()(std::size_t num_partitions,
             std::vector<id_type> const& localities, std::size_t block_size) const
         {
-            return block_cyclic_distribution_policy(num_chunks, localities, block_size);
+            return block_cyclic_distribution_policy(num_partitions, localities, block_size);
         }
 
         block_cyclic_distribution_policy operator()(
@@ -237,23 +227,18 @@ namespace hpx
         {
             return localities_;
         }
-        std::size_t get_num_localities()
+
+        std::size_t get_num_partitions() const
         {
-            return localities_.size();
+            return num_partitions_;
         }
 
-        std::size_t get_num_chunks() const
-        {
-            return num_chunks_ == std::size_t(-1) ?
-                get_num_localities_sync() : num_chunks_;
-        }
-
-        BOOST_SCOPED_ENUM(distribution_policy) get_policy() const
+        BOOST_SCOPED_ENUM(distribution_policy) get_policy_type() const
         {
             return distribution_policy::block_cyclic;
         }
 
-        std::size_t get_block_size()
+        std::size_t get_partition_size()
         {
             return block_size_;
         }
@@ -264,44 +249,44 @@ namespace hpx
         template <typename Archive>
         void serialize(Archive & ar, const unsigned int version)
         {
-            ar & localities_ & num_chunks_ & block_size_;
+            ar & localities_ & num_partitions_ & block_size_;
         }
 
-        block_cyclic_distribution_policy(std::size_t num_chunks,
+        block_cyclic_distribution_policy(std::size_t num_partitions,
                 std::vector<id_type> const& localities, std::size_t block_size)
           : localities_(localities),
-            num_chunks_(num_chunks),
+            num_partitions_(num_partitions),
             block_size_(block_size)
         {}
 
-        block_cyclic_distribution_policy(std::size_t num_chunks,
+        block_cyclic_distribution_policy(std::size_t num_partitions,
                 std::vector<id_type> const& localities)
           : localities_(localities),
-            num_chunks_(num_chunks),
+            num_partitions_(num_partitions),
             block_size_(1)
         {}
 
         block_cyclic_distribution_policy(std::vector<id_type> const& localities,
                 std::size_t block_size)
           : localities_(localities),
-            num_chunks_(localities_.size()),
+            num_partitions_(localities_.size()),
             block_size_(block_size)
         {}
 
         block_cyclic_distribution_policy(std::vector<id_type> const& localities)
           : localities_(localities),
-            num_chunks_(localities.size()),
+            num_partitions_(localities.size()),
             block_size_(1)
         {}
 
-        block_cyclic_distribution_policy(std::size_t num_chunks)
-          : num_chunks_(num_chunks),
+        block_cyclic_distribution_policy(std::size_t num_partitions)
+          : num_partitions_(num_partitions),
             block_size_(1)
         {}
 
     private:
         std::vector<id_type> localities_;   // localities to create chunks on
-        std::size_t num_chunks_;            // number of chunks to create
+        std::size_t num_partitions_;            // number of chunks to create
         std::size_t block_size_;            // size of a cyclic block
     };
 
