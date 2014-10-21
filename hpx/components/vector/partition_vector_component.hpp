@@ -541,25 +541,6 @@ namespace hpx { namespace stubs
         //  Element Access API's in stubs class
         ///////////////////////////////////////////////////////////////////////
 
-        /** @brief Return the value at position \a pos in the partition_vector
-         *          component. It throws the \a hpx::out_of_range exception.
-         *
-         *  @param gid  The global id of the partition_vector component register
-         *               with HPX
-         *  @param pos  Position of the element in the partition_vector [Note
-         *               the first position in the partition_vector is 0]
-         *
-         * @exception hpx::out_of_range The \a pos is bound checked and if
-         *             \a pos is out of bound then it throws the
-         *             \a hpx::out_of_range exception.
-         *
-         *  @return This return value as the hpx::future
-         */
-        static future<T> get_value_async(id_type const& gid, size_type pos)
-        {
-            return hpx::async<base_type::get_value_action>(gid, pos);
-        }
-
         /** @brief Access the value of first element in partition_vector
          *          component.
          *
@@ -639,32 +620,6 @@ namespace hpx { namespace stubs
             return hpx::async<base_type::pop_back_action>(gid);
         }
 
-        /** @brief Copy the value of \a val in the element at position
-         *          \a pos in the partition_vector component. It throws the
-         *          \a hpx::out_of_range exception.
-         *
-         *  @param gid  The global id of the partition_vector component register
-         *               with HPX
-         *  @param pos  Position of the element in the partition_vector [Note
-         *               the first position in the partition_vector is 0].
-         *  @param val  Value to be copied
-         *
-         *  @exception hpx::out_of_range The \a pos is bound checked and if
-         *             \a pos is out of bound then it throws the
-         *             \a hpx::out_of_range exception.
-         *
-         *  @return This return the hpx::future of type void [The void
-         *           return type can help to check whether the action is
-         *           completed or not].
-         */
-        template <typename T_>
-        static future<void>
-        set_value_async(id_type const& gid, size_type pos, T_ && val)
-        {
-            return hpx::async<base_type::set_value_action>(
-                gid, pos, std::forward<T_>(val));
-        }
-
         /** @brief Remove all elements from the vector leaving the
          *          partition_vector with size 0.
          *  @param gid  The global id of the partition_vector component register
@@ -715,9 +670,12 @@ namespace hpx
 {
     template <typename T>
     class partition_vector
-      : public components::client_base<partition_vector<T>, stubs::partition_vector<T> >
+      : public components::client_base<
+            partition_vector<T>, stubs::partition_vector<T>
+        >
     {
     private:
+        typedef hpx::server::partition_vector server_type;
         typedef hpx::components::client_base<
                 partition_vector<T>, stubs::partition_vector<T>
             > base_type;
@@ -794,14 +752,31 @@ namespace hpx
         }
 
         //  Element Access API's in Client class
-        future<T> get_value_async(std::size_t pos) const
-        {
-            HPX_ASSERT(this->get_gid());
-            return this->base_type::get_value_async(this->get_gid(), pos);
-        }
+
+        /// Returns the value at position \a pos in the partition_vector
+        /// component.
+        ///
+        /// \param pos  Position of the element in the partition_vector
+        ///
+        /// \return This returns the value as the hpx::future
+        ///
         T get_value(std::size_t pos) const
         {
             return get_value_async(pos).get();
+        }
+
+        /// Return the element at the position \a pos in the
+        /// partition_vector container.
+        ///
+        /// \param pos Position of the element in the partition_vector
+        ///
+        /// \return Returns the value of the element at position represented
+        ///         by \a pos
+        ///
+        future<T> get_value_async(std::size_t pos) const
+        {
+            HPX_ASSERT(this->get_gid());
+            return hpx::async<server_type::get_value_action>(this->get_gid(), pos);
         }
 
         future<T> front_async() const
@@ -846,13 +821,34 @@ namespace hpx
             this->base_type::pop_back_async(this->get_gid()).get();
         }
 
+        /// Copy the value of \a val in the element at position
+        /// \a pos in the partition_vector container.
+        ///
+        /// \param pos   Position of the element in the partition_vector
+        /// \param val   The value to be copied
+        ///
         template <typename T_>
         void set_value(std::size_t pos, T_ && val)
         {
-            HPX_ASSERT(this->get_gid());
-            this->base_type::set_value_async(
-                this->get_gid(), pos, std::forward<T_>(val)).get();
+            set_value_async(pos, std::forward<T_>(val)).get();
         }
+
+        /// Copy the value of \a val in the element at position
+        /// \a pos in the partition_vector component.
+        ///
+        /// \param pos  Position of the element in the partition_vector
+        /// \param val  Value to be copied
+        ///
+        /// \return This returns the hpx::future of type void
+        ///
+        template <typename T_>
+        future<void> set_value_async(std::size_t pos, T_ && val)
+        {
+            HPX_ASSERT(this->get_gid());
+            return hpx::async<server_type::set_value_action>(
+                this->get_gid(), pos, std::forward<T_>(val));
+        }
+
 
         void clear()
         {

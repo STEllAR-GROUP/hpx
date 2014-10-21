@@ -14,16 +14,15 @@
 
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/vector.hpp>
-#include <boost/serialization/export.hpp>
 
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
     BOOST_SCOPED_ENUM_START(distribution_policy)
     {
-        block         = 0,      /**< block distribution policy*/
-        cyclic        = 1,      /**< cyclic distribution policy */
-        block_cyclic  = 2       /**< block-cyclic distribution policy */
+        block         = 0,      ///< block distribution policy
+        cyclic        = 1,      ///< cyclic distribution policy
+        block_cyclic  = 2       ///< block-cyclic distribution policy
     };
     BOOST_SCOPED_ENUM_END
 
@@ -60,7 +59,7 @@ namespace hpx
             return localities_;
         }
 
-        std::size_t get_partition_size() const
+        std::size_t get_block_size() const
         {
             return std::size_t(-1);
         }
@@ -138,9 +137,9 @@ namespace hpx
             return localities_;
         }
 
-        std::size_t get_partition_size()
+        std::size_t get_block_size() const
         {
-            return 1;
+            return std::size_t(-1);
         }
 
         std::size_t get_num_partitions() const
@@ -191,7 +190,8 @@ namespace hpx
     {
     public:
         block_cyclic_distribution_policy()
-          : num_partitions_(1)
+          : num_partitions_(1),
+            block_size_(std::size_t(-1))
         {}
 
         block_cyclic_distribution_policy operator()(std::size_t num_partitions) const
@@ -223,6 +223,12 @@ namespace hpx
             return block_cyclic_distribution_policy(localities);
         }
 
+        block_cyclic_distribution_policy operator()(std::size_t num_partitions,
+            std::size_t block_size) const
+        {
+            return block_cyclic_distribution_policy(num_partitions, block_size);
+        }
+
         std::vector<id_type> const& get_localities() const
         {
             return localities_;
@@ -238,7 +244,7 @@ namespace hpx
             return distribution_policy::block_cyclic;
         }
 
-        std::size_t get_partition_size()
+        std::size_t get_block_size() const
         {
             return block_size_;
         }
@@ -263,7 +269,7 @@ namespace hpx
                 std::vector<id_type> const& localities)
           : localities_(localities),
             num_partitions_(num_partitions),
-            block_size_(1)
+            block_size_(std::size_t(-1))
         {}
 
         block_cyclic_distribution_policy(std::vector<id_type> const& localities,
@@ -276,12 +282,18 @@ namespace hpx
         block_cyclic_distribution_policy(std::vector<id_type> const& localities)
           : localities_(localities),
             num_partitions_(localities.size()),
-            block_size_(1)
+            block_size_(std::size_t(-1))
+        {}
+
+        block_cyclic_distribution_policy(std::size_t num_partitions,
+                std::size_t block_size)
+          : num_partitions_(num_partitions),
+            block_size_(block_size)
         {}
 
         block_cyclic_distribution_policy(std::size_t num_partitions)
           : num_partitions_(num_partitions),
-            block_size_(1)
+            block_size_(std::size_t(-1))
         {}
 
     private:

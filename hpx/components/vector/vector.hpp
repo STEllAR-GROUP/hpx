@@ -18,18 +18,18 @@
 
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/util.hpp>
-#include <hpx/runtime/components/new.hpp>
+#include <hpx/include/components.hpp>
 
 #include <hpx/components/vector/segmented_iterator.hpp>
 #include <hpx/components/vector/partition_vector_component.hpp>
+#include <hpx/components/vector/vector_configuration.hpp>
 #include <hpx/components/vector/distribution_policy.hpp>
 
 #include <cstdint>
 #include <iostream>
 #include <memory>
 
-#include <boost/integer.hpp>
-#include <boost/foreach.hpp>
+#include <boost/format.hpp>
 
 namespace hpx
 {
@@ -42,6 +42,7 @@ namespace hpx
     ///
     template <typename T>
     class vector
+      : hpx::components::client_base<vector<T>, server::vector_configuration>
     {
     public:
         typedef std::allocator<T> allocator_type;
@@ -62,24 +63,24 @@ namespace hpx
         typedef hpx::partition_vector<T> partition_vector_client;
 
         // Each partition is described by it's corresponding client object, its
-        // size, and base index.
+        // size, and locality id.
         struct partition_description
         {
             partition_description(partition_vector_client part, size_type size,
-                    size_type base_index)
-              : partition_(part), size_(size), base_index_(base_index)
+                    boost::uint32_t locality_id)
+              : partition_(part), size_(size), locality_id_(locality_id)
             {}
 
             partition_vector_client partition_;
             size_type size_;
-            size_type base_index_;
+            boost::uint32_t locality_id_;
         };
 
         // The list of partitions belonging to this vector.
         typedef std::vector<partition_description> partitions_vector_type;
 
-        // overall size of the vector
-        size_type size_;
+        size_type size_;                // overall size of the vector
+        size_type block_size_;          // cycle stride
 
         // This is the vector representing the base_index and corresponding
         // global ID's of the underlying partition_vectors.
@@ -87,7 +88,6 @@ namespace hpx
 
         // parameters taken from distribution policy
         BOOST_SCOPED_ENUM(distribution_policy) policy_;     // policy to use
-        size_type block_size_;                              // cycle partition
 
     public:
         typedef vector_iterator<T> iterator;
@@ -115,6 +115,92 @@ namespace hpx
             return num_parts ? ((size_ + num_parts - 1) / num_parts) : 0;
         }
 
+        std::size_t get_global_index(std::size_t segment, std::size_t part_size,
+            size_type local_index) const
+        {
+            switch (policy_)
+            {
+            case distribution_policy::block:
+                return segment * part_size + local_index;
+
+            case distribution_policy::cyclic:
+                return segment + local_index * (part_size - 1);
+
+            case distribution_policy::block_cyclic:
+                return (segment * part_size/block_size_) + local_index * (part_size - 1);
+
+            default:
+                break;
+            }
+            return std::size_t(-1);
+        }
+
+        void verify_consistency()
+        {
+            // verify consistency of parameters
+            switch (policy_)
+            {
+            case distribution_policy::block:
+                break;      // no limitations apply
+
+            case distribution_policy::cyclic:
+                // overall size must be multiple of partition size
+                {
+                    std::size_t part_size = get_partition_size();
+                    if (part_size != std::size_t(-1) &&
+                        (size_ % part_size) != 0)
+                    {
+                        HPX_THROW_EXCEPTION(bad_parameter,
+                            "hpx::vector::create",
+                            boost::str(boost::format(
+                                "cyclic distribution policy requires that the "
+                                "overall size(%1%) of the vector must be a "
+                                "multiple of the partition size(%2%)"
+                            ) % size_ % part_size));
+                    }
+                }
+                break;
+
+            case distribution_policy::block_cyclic:
+                {
+                    if (block_size_ == std::size_t(-1))
+                        block_size_ = get_partition_size();
+
+                    std::size_t part_size = get_partition_size();
+                    if (part_size != std::size_t(-1) &&
+                        (size_ % part_size) != 0)
+                    {
+                        HPX_THROW_EXCEPTION(bad_parameter,
+                            "hpx::vector::create",
+                            boost::str(boost::format(
+                                "block_cyclic distribution policy requires "
+                                "that the overall size(%1%) of the vector must "
+                                "be a multiple of the partition size(%2%)"
+                            ) % size_ % part_size));
+                        break;
+                    }
+
+                    HPX_ASSERT(block_size_ != 0);
+                    if ((part_size % block_size_) != 0)
+                    {
+                        HPX_THROW_EXCEPTION(bad_parameter,
+                            "hpx::vector::create",
+                            boost::str(boost::format(
+                                "block_cyclic distribution policy requires "
+                                "that the overall partition size(%1%) of the "
+                                "vector must be a multiple of the block "
+                                "size(%2%)"
+                            ) % part_size % block_size_));
+                        break;
+                    }
+                }
+                break;
+
+            default:
+                break;
+            }
+        }
+
     public:
         // Return the sequence number of the segment corresponding to the
         // given global index
@@ -123,19 +209,96 @@ namespace hpx
             if (global_index == size_)
                 return std::size_t(-1);
 
-            std::size_t part_size = get_partition_size();
-            return part_size ? (global_index / part_size) : std::size_t(-1);
+            switch (policy_)
+            {
+            case distribution_policy::block:
+                {
+                    std::size_t part_size = get_partition_size();
+                    if (part_size != 0)
+                        return global_index / part_size;
+                }
+                break;
+
+            case distribution_policy::cyclic:
+                {
+                    std::size_t num_parts = partitions_.size();
+                    if (num_parts != 0)
+                        return global_index % num_parts;
+                }
+                break;
+
+            case distribution_policy::block_cyclic:
+                {
+                    HPX_ASSERT(block_size_ != 0);
+                    std::size_t num_blocks = size_ / block_size_;
+                    if (num_blocks != 0)
+                    {
+                        std::size_t num_parts = partitions_.size();
+                        if (num_parts != 0)
+                        {
+                            std::size_t block_num = global_index % num_blocks;
+                            return block_num / (num_blocks / num_parts);
+                        }
+                    }
+                }
+                break;
+
+            default:
+                break;
+            }
+            return std::size_t(-1);
         }
 
         // Return the local index inside the segment corresponding to the
         // given global index
-        std::size_t get_local_index(size_type global_index, std::size_t /*part*/) const
+        std::size_t get_local_index(size_type global_index) const
         {
             if (global_index == size_)
                 return std::size_t(-1);
 
-            std::size_t part_size = get_partition_size();
-            return part_size ? (global_index % part_size) : std::size_t(-1);
+            switch (policy_)
+            {
+            case distribution_policy::block:
+                {
+                    std::size_t part_size = get_partition_size();
+                    if (part_size != 0)
+                        return global_index % part_size;
+                }
+                break;
+
+            case distribution_policy::cyclic:
+                {
+                    std::size_t num_parts = partitions_.size();
+                    if (num_parts != 0)
+                        return global_index / num_parts;
+                }
+                break;
+
+            case distribution_policy::block_cyclic:
+                {
+                    HPX_ASSERT(block_size_ != 0);
+                    std::size_t num_blocks = size_ / block_size_;
+                    if (num_blocks != 0)
+                    {
+                        std::size_t num_parts = partitions_.size();
+                        if (num_parts != 0)
+                        {
+                            // block number inside its partitions
+                            std::size_t block_num = global_index % num_blocks;
+                            block_num %= (num_blocks / num_parts);
+
+                            // blocks below current index + index inside block
+                            std::size_t block_idx = global_index / num_blocks;
+                            return block_size_ * block_num + block_idx;
+                        }
+                    }
+                }
+                break;
+
+            default:
+                break;
+            }
+            return std::size_t(-1);
         }
 
         // Return the global index corresponding to the local index inside the
@@ -148,8 +311,9 @@ namespace hpx
                 return std::size_t(-1);
 
             std::size_t segment = std::distance(partitions_.begin(), it.base());
-            return segment * part_size + local_index;
+            return get_global_index(segment, part_size, local_index);
         }
+
         std::size_t get_global_index(const_segment_iterator const& it,
             size_type local_index) const
         {
@@ -158,7 +322,7 @@ namespace hpx
                 return std::size_t(-1);
 
             std::size_t segment = std::distance(partitions_.cbegin(), it.base());
-            return segment * part_size + local_index;
+            return get_global_index(segment, part_size, local_index);
         }
 
         // Return the local iterator referencing an element inside a segment
@@ -169,7 +333,7 @@ namespace hpx
             if (part == std::size_t(-1))
                 return local_iterator();
 
-            std::size_t local_index = get_local_index(global_index, part);
+            std::size_t local_index = get_local_index(global_index);
             HPX_ASSERT(local_index != std::size_t(-1));
 
             return local_iterator(partitions_[part].partition_, local_index);
@@ -181,7 +345,7 @@ namespace hpx
             if (part == std::size_t(-1))
                 return const_local_iterator();
 
-            std::size_t local_index = get_local_index(global_index, part);
+            std::size_t local_index = get_local_index(global_index);
             HPX_ASSERT(local_index != std::size_t(-1));
 
             return const_local_iterator(partitions_[part].partition_, local_index);
@@ -227,10 +391,11 @@ namespace hpx
                 // create as many partitions on a given locality as required
                 for (std::size_t l = 0; l != num_parts_per_loc; ++l)
                 {
+                    id_type const& locality = localities[loc];
                     std::size_t size = (std::min)(part_size, size_-allocated_size);
                     partitions_.push_back(partition_description(
-                        partition_vector_client::create(localities[loc], size),
-                        size, num_part * part_size
+                        partition_vector_client::create(locality, size),
+                        size, hpx::naming::get_locality_id_from_id(locality)
                     ));
 
                     allocated_size += size;
@@ -258,10 +423,11 @@ namespace hpx
                 // create as many partitions on a given locality as required
                 for (std::size_t l = 0; l != num_parts_per_loc; ++l)
                 {
+                    id_type const& locality = localities[loc];
                     std::size_t size = (std::min)(part_size, size_-allocated_size);
                     partitions_.push_back(partition_description(
-                        partition_vector_client::create(localities[loc], size, val),
-                        size, num_part * part_size
+                        partition_vector_client::create(locality, size, val),
+                        size, hpx::naming::get_locality_id_from_id(locality)
                     ));
 
                     allocated_size += size;
@@ -281,6 +447,8 @@ namespace hpx
                 create(std::vector<id_type>(1, find_here()), policy);
             else
                 create(localities, policy);
+
+            verify_consistency();
         }
 
         template <typename DistPolicy>
@@ -291,260 +459,9 @@ namespace hpx
                 create(val, std::vector<id_type>(1, find_here()), policy);
             else
                 create(val, localities, policy);
+
+            verify_consistency();
         }
-
-//             std::vector<id_type> const& localities = policy.get_localities();
-//             size_type num_partitions = policy.get_num_partitions();
-//
-//             size_type partition_index             = 0;
-//             size_type partition_size              = 0;
-//             size_type index_so_far            = 0;
-//             size_type offset_partition_count      = 0;
-//
-//             policy.set_big_partition(big_partition);
-//             size_type offset;
-//             size_type local_partition_count; //
-//             size_type extra_local_partition_count;
-//             size_type extra_partition_size;
-//             size_type num_of_partition_bc; // for block_cyclic
-//
-//             if (num_partitions == 1)
-//             {
-//                 if (policy_ == distribution_policy::block_cyclic)
-//                 {
-//                     block_size         = policy.get_block_size();
-//                     num_of_partition_bc    = size_/block_size;
-//                 }
-//                 else
-//                 {
-//                     partition_size    = big_partition/localities_.size();
-//                 }
-//                 offset             = big_partition%localities_.size();
-//                 local_partition_count  = 1;
-//             }
-//             else if(num_partitions_ > 1)
-//             {
-//                 if (policy_ == distribution_policy::block_cyclic)
-//                 {
-//                     block_size       = policy.get_block_size();
-//                     num_of_partition_bc = size_/block_size;
-//                 }
-//                 else
-//                 {
-//                     partition_size    = big_partition/num_partitions_;
-//                 }
-//
-//                 offset             = big_partition%num_partitions_;
-//
-//                 if(state == block_cyclic)
-//                     offset = big_partition%block_size;
-//
-//                 local_partition_count  = num_partitions_/localities_.size();
-//                 if (local_partition_count == 0) local_partition_count = 1;
-//
-//                 offset_partition_count = num_partitions_%localities_.size();
-//                 if (localities_.size() > num_partitions_) offset_partition_count = 0;
-//             }
-//
-//             extra_local_partition_count = local_partition_count;
-//             extra_partition_size        = partition_size;
-//             if(num_partitions_ < localities_.size()) localities_.resize(num_partitions_);
-//             BOOST_FOREACH(hpx::naming::id_type const& node, localities_)
-//             {
-//                 if(offset_partition_count > 0)
-//                 {
-//                     extra_local_partition_count = local_partition_count+1;
-//                     --offset_partition_count;
-//                 }
-//
-//                 for (std::size_t my_index = 0;
-//                          my_index < extra_local_partition_count;
-//                          ++my_index)
-//                 {
-//                     if(offset > 0)
-//                     {
-//                         extra_partition_size = partition_size+1;
-//                         --offset;
-//                     }
-//                     if(state == hpx::dis_state::dis_block) // for block
-//                     {
-//                         partitions_.push_back(
-//                             std::make_pair(
-//                                 index_so_far,
-//                                 hpx::components::new_<partition_vector_server>(
-//                                 node, extra_partition_size, val, index_so_far, policy )
-//                                            )
-//                                                      );
-//                         index_so_far = extra_partition_size + index_so_far;
-//                     }
-//                     else if(state == hpx::dis_state::dis_cyclic) // for cyclic
-//                     {
-//                       partitions_.push_back(
-//                             std::make_pair(
-//                                 partition_index,
-//                                 hpx::components::new_<partition_vector_server>(
-//                                 node, extra_partition_size, val, partition_index, policy)
-//                                            )
-//                                                      );
-//                        ++partition_index;
-//                     }
-//                     // for block_cyclic
-//                     else if(state == hpx::dis_state::block_cyclic)
-//                     {
-//                         if(num_partitions_ == 1)
-//                         {
-//                             if((num_of_partition_bc%localities_.size()) > 0)
-//                             {
-//                               if(partition_index<(num_of_partition_bc%localities_.size()))
-//                               {
-//                                   extra_partition_size =
-//                                      ((num_of_partition_bc /
-//                                            localities_.size())*block_size)+
-//                                            block_size;
-//                               }
-//                               else if ((partition_index+1) ==
-//                                      num_of_partition_bc%localities_.size())
-//                               {
-//                                   extra_partition_size =
-//                                       ((num_of_partition_bc/localities_.size())*block_size)+
-//                                           (size_%block_size);
-//                               }
-//                               else
-//                               {
-//                                   extra_partition_size =
-//                                    (num_of_partition_bc/localities_.size())*block_size;
-//                               }
-//
-//                             }
-//                             else
-//                             {
-//                                 extra_partition_size =
-//                                  (num_of_partition_bc/localities_.size())*block_size;
-//                             }
-//                         }
-//                         else if(num_partitions_ > 1)
-//                         {
-//                             if((num_of_partition_bc%num_partitions_) > 0)
-//                             {
-//                                if(partition_index<(num_of_partition_bc%num_partitions_))
-//                                {
-//                                    extra_partition_size =
-//                                      ((num_of_partition_bc/num_partitions_)*block_size) +
-//                                      block_size;
-//                                }
-//                                else if (partition_index == num_of_partition_bc%num_partitions_)
-//                                {
-//                                    extra_partition_size =
-//                                        ((num_of_partition_bc/num_partitions_)*block_size)+
-//                                           (size_%block_size);
-//                                }
-//                                else
-//                                {
-//                                    extra_partition_size =
-//                                        (num_of_partition_bc/num_partitions_)*block_size;
-//                                }
-//                             }
-//                             else
-//                             {
-//                                 extra_partition_size =
-//                                     (num_of_partition_bc/num_partitions_)*block_size;
-//                             }
-//                         }
-//                         partitions_.push_back(
-//                             std::make_pair(
-//                                 partition_index*block_size,
-//                                 hpx::components::new_<partition_vector_server>(
-//                                 node, extra_partition_size, val,
-//                                 (partition_index*block_size), policy)
-//                             ));
-//                        ++partition_index;
-//                     }
-//
-//                     if(extra_partition_size > partition_size)
-//                         extra_partition_size = partition_size;
-//                 }
-//                 if (extra_local_partition_count > local_partition_count)
-//                     extra_local_partition_count  = local_partition_count;
-//             }
-//
-//             // We must always have at least one partition_vector.
-//             HPX_ASSERT(!partitions_.empty());
-//         } // End of create function
-
-        //  Return the bgf_pair in which the element represented by pos must be
-        //  present. Here one assumption is made that in any case the
-        //  num_elements in the hpx::vector must be less than max possible value
-        //  of the size_type
-//         partition_vector_type::const_iterator get_base_gid_pair(size_type pos) const
-//         {
-//             size_type partition_size = 0;
-//             size_type offset     = 0;
-//             size_type distance   = 0;
-//
-//             // Return the iterator to the first element which does not
-//             // comparable less than value (i.e equal or greater)
-//             partition_vector_type::const_iterator it;
-//             if(state == hpx::dis_state::dis_block)
-//             {
-//                 if(num_partitions_ == 1)
-//                 {
-//                     partition_size = size_/localities_.size();
-//                     offset     = size_%localities_.size();
-//                 }
-//                 else if(num_partitions_ > 1)
-//                 {
-//                     partition_size = size_/num_partitions_;
-//                     offset     = size_%num_partitions_;
-//                 }
-//                 if(offset > 0)
-//                 {
-//                     if((offset*(partition_size+1)) > pos )
-//                         distance = pos/(partition_size+1);
-//                     else
-//                     {
-//                         distance = offset +
-//                             ((pos - (offset*(partition_size+1)))/partition_size);
-//                     }
-//                 }
-//                 if(offset == 0) distance =  pos/partition_size;
-//                 it = partitions_.begin() + distance;
-//             }
-//             else if(state == hpx::dis_state::dis_cyclic)
-//             {
-//                 if(num_partitions_ > 1)
-//                     it = partitions_.begin()+(pos%num_partitions_);
-//                 else if (num_partitions_ == 1)
-//                 {
-//                     it = partitions_.begin()+
-//                             (pos%partitions_.size());
-//                 }
-//             }
-//             else if(state == hpx::dis_state::block_cyclic)
-//             {
-//                 if(num_partitions_>1)
-//                 {
-//                     it = partitions_.begin()+
-//                                     ((pos/block_size)%num_partitions_);
-//                 }
-//                 else if(num_partitions_ == 1)
-//                 {
-//                     it = partitions_.begin()+
-//                                      ((pos/block_size)%localities_.size());
-//                 }
-//             }
-//
-//             //  Second condition avoid the boundary case where the get_value can
-//             //  be called on invalid gid. This occurs when pos = -1
-//             //  (maximum value)
-//             if(it->second == pos && (it->first).get() != invalid_id)
-//             {
-//                  return it;
-//             }
-//             else //It takes care of the case if "it" is at the LAST
-//             {
-//                 return (it);
-//             }
-//         }//End of get_gid
 
 //        //Note num_partitions == represent then partition vector index
 //        future<size_type>
@@ -757,23 +674,6 @@ namespace hpx
 //                                                  );
 //             }
 //         }//end of capacity_helper
-//
-//         // PROGRAMMER DOCUMENTATION:
-//         //   This is the helper function to maintain consistency in the
-//         //   base_index across all the partition_description_type. It helps for the resize() and
-//         //   assign() function. This is needed as one necessary condition is the
-//         //   base_index for partition_description_type must be unique for each partition_vector.
-//         //
-//         void adjust_base_index(partition_vector_type::iterator begin,
-//                                partition_vector_type::iterator end,
-//                                size_type new_partition_size)
-//         {
-//             size_type i = 0;
-//             for(partition_vector_type::iterator it = begin; it != end; it++, i++)
-//             {
-//                 it->second = i * new_partition_size;
-//             }
-//         }//end of adjust_base_index
 
     public:
         /// Default Constructor which create hpx::vector with
@@ -782,6 +682,7 @@ namespace hpx
         ///
         vector()
           : size_(0),
+            block_size_(std::size_t(-1)),
             policy_(distribution_policy::block)
         {}
 
@@ -791,6 +692,7 @@ namespace hpx
         ///
         explicit vector(size_type size)
           : size_(size),
+            block_size_(std::size_t(-1)),
             policy_(distribution_policy::block)
         {
             if (size != 0)
@@ -805,6 +707,7 @@ namespace hpx
         ///
         vector(size_type size, T const& val)
           : size_(size),
+            block_size_(std::size_t(-1)),
             policy_(distribution_policy::block)
         {
             if (size != 0)
@@ -819,8 +722,9 @@ namespace hpx
         ///
         template <typename DistPolicy>
         vector(size_type size, DistPolicy const& policy)
-         : size_(size),
-           policy_(policy.get_policy_type())
+          : size_(size),
+            block_size_(policy.get_block_size()),
+            policy_(policy.get_policy_type())
         {
             if (size != 0)
                 create(policy);
@@ -837,6 +741,7 @@ namespace hpx
         template <typename DistPolicy>
         vector(size_type size, T const& val, DistPolicy const& policy)
           : size_(size),
+            block_size_(policy.get_block_size()),
             policy_(policy.get_policy_type())
         {
             if (size != 0)
@@ -864,54 +769,6 @@ namespace hpx
             return get_value(pos);
         }
 
-//             partition_vector_type::const_iterator it = get_base_gid_pair(pos);
-//             if(state == hpx::dis_state::dis_block)
-//                 return partition_vector_stub::get_value_noexpt_async(
-//                                                         (it->first).get(),
-//                                                         (pos - (it->second))
-//                                                              ).get();
-//              else if(state == hpx::dis_state::dis_cyclic)
-//              {
-//                  if(num_partitions_ > 1)
-//                  {
-//                      return partition_vector_stub::get_value_noexpt_async(
-//                                                         (it->first).get(),
-//                                                         (pos/num_partitions_)
-//                                                             ).get();
-//                  }
-//                  else if (num_partitions_ ==1)
-//                  {
-//                      return partition_vector_stub::get_value_noexpt_async(
-//                                                         (it->first).get(),
-//                                                         (pos/localities_.size())
-//                                                             ).get();
-//                  }
-//              }
-//              else if(state == hpx::dis_state::block_cyclic)
-//              {
-//                  if(num_partitions_ >1)
-//                  {
-//                      return partition_vector_stub::get_value_async(
-//                                                      (it->first).get(),
-//                                                      ((((pos/block_size)/
-//                                                      num_partitions_)*block_size)+
-//                                                      (pos%block_size))
-//                                                                ).get();
-//                  }
-//                  else if(num_partitions_ == 1)
-//                  {
-//                      return partition_vector_stub::get_value_async(
-//                                                       (it->first).get(),
-//                                                       ((((pos/block_size)/
-//                                                  localities_.size())*block_size)+
-//                                                       (pos%block_size))
-//                                                                ).get();
-//                  }
-//              }
-//
-//         }
-//
-//
 //         /** @brief Copy assignment operator.
 //          *
 //          *  @param other    This the hpx::vector object which is to be copied
@@ -923,7 +780,6 @@ namespace hpx
 //             this->partitions_ = other.partitions_;
 //             return *this;
 //         }
-
 
         ///////////////////////////////////////////////////////////////////////
         // Capacity related API's in vector class
@@ -1179,11 +1035,10 @@ namespace hpx
 //             return hpx::async(launch::async,
 //                               hpx::util::bind(&vector::reserve, this, n));
 //         }
-//
-//
-//         //
-//         //  Element access API's in vector class
-//         //
+
+        //
+        //  Element access API's in vector class
+        //
 
         /// Returns the element at position \a pos in the vector container.
         ///
@@ -1195,138 +1050,23 @@ namespace hpx
         ///
         T get_value(size_type pos) const
         {
-            std::size_t part = get_partition(pos);
-            std::size_t index = get_local_index(pos, part);
-            return partitions_[part].partition_.get_value(index);
+            return get_value_async(pos).get();
         }
 
-//             try{
-//                 partition_vector_type::const_iterator it = get_base_gid_pair(pos);
-//                 if(state == hpx::dis_state::dis_block)
-//                     return partition_vector_stub::get_value_async(
-//                                                            (it->first).get(),
-//                                                            (pos - (it->second))
-//                                                           ).get();
-//                 else if(state == hpx::dis_state::dis_cyclic)
-//                 {
-//                     if(num_partitions_ > 1)
-//                     {
-//                         return partition_vector_stub::get_value_async(
-//                                                         (it->first).get(),
-//                                                         (pos/num_partitions_)
-//                                                                ).get();
-//                     }
-//                     else if(num_partitions_ == 1)
-//                     {
-//                         return partition_vector_stub::get_value_async(
-//                                                         (it->first).get(),
-//                                                         (pos/localities_.size())
-//                                                               ).get();
-//                     }
-//                 }
-//                 else if(state == hpx::dis_state::block_cyclic)
-//                 {
-//                    if(num_partitions_ >1)
-//                    {
-//                        return partition_vector_stub::get_value_async(
-//                                                      (it->first).get(),
-//                                                      ((((pos/block_size)/
-//                                                      num_partitions_)*block_size)+
-//                                                      (pos%block_size))
-//                                                                ).get();
-//                    }
-//                    else if(num_partitions_ == 1)
-//                    {
-//                        return partition_vector_stub::get_value_async(
-//                                                       (it->first).get(),
-//                                                       ((((pos/block_size)/
-//                                                  localities_.size())*block_size)+
-//                                                       (pos%block_size))
-//                                                                ).get();
-//                     }
-//                 }
-//             }
-//             catch(hpx::exception const& /*e*/){
-//                 HPX_THROW_EXCEPTION(hpx::out_of_range,
-//                                     "get_value",
-//                                     "Value of 'pos' is out of range");
-//             }
-//         }//end of get_value
-//
-//         /** @brief Asynchronous API for get_value(). It throws the
-//          *          \a hpx::out_of_range exception.
-//          *
-//          *  @param pos Position of the element in the vector [Note the first
-//          *          position in the partition is 0]
-//          *
-//          *  @return Return the hpx::future to value of the element at position
-//          *           represented by \a pos [Note that this is not the reference
-//          *           to the element]
-//          *
-//          *  @exception hpx::out_of_range The \a pos is bound checked and if
-//          *              \a pos is out of bound then it throws the
-//          *              \a hpx::out_of_range exception.
-//          */
-//         hpx::future< VALUE_TYPE > get_value_async(size_type pos) const
-//         {
-//             // Here you can call the get_val_sync API but you have already an
-//             // API to do that which reduce one function call
-//             try{
-//                 partition_vector_type::const_iterator it = get_base_gid_pair(pos);
-//                 if(state == hpx::dis_state::dis_block)
-//                 {
-//                     return partition_vector_stub::get_value_async(
-//                                                         (it->first).get(),
-//                                                         (pos - (it->second))
-//                                                           );
-//                 }
-//                 else if(state == hpx::dis_state::dis_cyclic)
-//                 {
-//                     if(num_partitions_ > 1)
-//                     {
-//                         return partition_vector_stub::get_value_async(
-//                                                         (it->first).get(),
-//                                                         (pos/num_partitions_)
-//                                                                );
-//                     }
-//                     else if(num_partitions_ == 1)
-//                     {
-//                         return partition_vector_stub::get_value_async(
-//                                                         (it->first).get(),
-//                                                         (pos/localities_.size())
-//                                                               );
-//                     }
-//                 }
-//                 else if(state == hpx::dis_state::block_cyclic)
-//                 {
-//                    if(num_partitions_ >1)
-//                    {
-//                        return partition_vector_stub::get_value_async(
-//                                                      (it->first).get(),
-//                                                      ((((pos/block_size)/
-//                                                      num_partitions_)*block_size)+
-//                                                      (pos%block_size))
-//                                                                );
-//                    }
-//                    else if(num_partitions_ == 1)
-//                    {
-//                        return partition_vector_stub::get_value_async(
-//                                                       (it->first).get(),
-//                                                       ((((pos/block_size)/
-//                                                  localities_.size())*block_size)+
-//                                                       (pos%block_size))
-//                                                                );
-//                    }
-//                 }
-//             }
-//             catch(hpx::exception const& /*e*/){
-//                 HPX_THROW_EXCEPTION(
-//                     hpx::out_of_range,
-//                     "get_value_async",
-//                     "Value of 'pos' is out of range");
-//             }
-//         }//end of get_value_async
-//
+        /// Asynchronous API for get_value().
+        ///
+        /// \param pos Position of the element in the vector
+        ///
+        /// \return Returns the hpx::future to value of the element at position
+        ///         represented by \a pos.
+        ///
+        future<T> get_value_async(size_type pos) const
+        {
+            std::size_t part = get_partition(pos);
+            std::size_t index = get_local_index(pos);
+            return partitions_[part].partition_.get_value_async(index);
+        }
+
 //         //FRONT (never throws exception)
 //         /** @brief Access the value of first element in the vector.
 //          *
@@ -1383,8 +1123,6 @@ namespace hpx
 //                             ((partitions_.end() - 2)->first).get()
 //                                                  );
 //         }//end of back_async
-//
-//
 //
 //         //
 //         // Modifier component action
@@ -1530,268 +1268,23 @@ namespace hpx
         template <typename T_>
         void set_value(size_type pos, T_ && val)
         {
-            std::size_t part = get_partition(pos);
-            std::size_t index = get_local_index(pos, part);
-            partitions_[part].partition_.set_value(index, std::forward<T_>(val));
+            set_value_async(pos, std::forward<T_>(val)).get();
         }
 
-//             try{
-//                 partition_vector_type::const_iterator it = get_base_gid_pair(pos);
-//
-//                 if(state == hpx::dis_state::dis_block)
-//                     return partition_vector_stub::set_value_async(
-//                                                         (it->first).get(),
-//                                                         (pos - (it->second)),
-//                                                          val
-//                                                               ).get();
-//                  else if(state == hpx::dis_state::dis_cyclic)
-//                  {
-//                      if(num_partitions_ > 1)
-//                          return partition_vector_stub::set_value_async(
-//                                                         (it->first).get(),
-//                                                         (pos/num_partitions_),
-//                                                         val
-//                                                                ).get();
-//                      else if(num_partitions_ == 1)
-//                           return partition_vector_stub::set_value_async(
-//                                                         (it->first).get(),
-//                                                         (pos/localities_.size()),
-//                                                         val
-//                                                               ).get();
-//
-//                  }
-//                  else if(state == hpx::dis_state::block_cyclic)
-//                  {
-//                     if(num_partitions_ >1)
-//                        return partition_vector_stub::set_value_async(
-//                                                       (it->first).get(),
-//                                                       ((((pos/block_size)/
-//                                                       num_partitions_)*block_size)+
-//                                                       (pos%block_size)),
-//                                                         val
-//                                                                ).get();
-//                     else if(num_partitions_ == 1)
-//                        return partition_vector_stub::set_value_async(
-//                                                       (it->first).get(),
-//                                                       ((((pos/block_size)/
-//                                                  localities_.size())*block_size)+
-//                                                       (pos%block_size)),
-//                                                         val
-//                                                                ).get();
-//
-//                 }
-//             }
-//             catch(hpx::exception const& /*e*/){
-//                 HPX_THROW_EXCEPTION(hpx::out_of_range,
-//                                     "set_value",
-//                                     "Value of 'pos' is out of range"
-//                                     );
-//             }
-//         }//end of set_value
-//
-//         /** @brief Asynchronous API for set_value(). It throws the
-//          *          \a hpx::out_of_range exception.
-//          *
-//          *  @param pos   Position of the element in the vector [Note the first
-//          *                position in the vector is 0]
-//          *  @param val   The value to be copied
-//          *
-//          *  @exception hpx::out_of_range The \a pos is bound checked and if
-//          *              \a pos is out of bound then it throws the
-//          *              \a hpx::out_of_range exception.
-//          */
-//         future<void> set_value_async(size_type pos, VALUE_TYPE const& val)
-//         {
-//             try{
-//                 // This reduce one function call as we are directly calling
-//                 // partition vector API
-//                 partition_vector_type::const_iterator it = get_base_gid_pair(pos);
-//                if(state == hpx::dis_state::dis_block)
-//                     return partition_vector_stub::set_value_async(
-//                                                         (it->first).get(),
-//                                                         (pos - (it->second)),
-//                                                         val   );
-//                else if(state == hpx::dis_state::dis_cyclic)
-//                {
-//                   if(num_partitions_ > 1)
-//                      return partition_vector_stub::set_value_async(
-//                                                         (it->first).get(),
-//                                                         (pos/num_partitions_),
-//                                                         val   );
-//                   else if (num_partitions_ == 1)
-//                       return partition_vector_stub::set_value_async(
-//                                                         (it->first).get(),
-//                                                         (pos/localities_.size()),
-//                                                         val   );
-//
-//                }
-//                else if(state == hpx::dis_state::block_cyclic)
-//                {
-//                    if(num_partitions_ >1)
-//                       return partition_vector_stub::set_value_async(
-//                                                       (it->first).get(),
-//                                                       ((((pos/block_size)/
-//                                                       num_partitions_)*block_size)+
-//                                                       (pos%block_size)),
-//                                                         val
-//                                                                );
-//                    else if(num_partitions_ == 1)
-//                        return partition_vector_stub::set_value_async(
-//                                                       (it->first).get(),
-//                                                       ((((pos/block_size)/
-//                                                  localities_.size())*block_size)+
-//                                                       (pos%block_size)),
-//                                                         val
-//                                                                );
-//
-//                }
-//             }
-//             catch(hpx::exception const& /*e*/){
-//                 HPX_THROW_EXCEPTION(hpx::out_of_range,
-//                                     "set_value_async",
-//                                     "Value of 'pos' is out of range");
-//             }
-//         }//end of set_value_async
-//
-//         //SET_VALUE (with rval)
-//         /** @brief Move the val in the element at position \a pos in the vector
-//          *          container. It throws the \a hpx::out_of_range exception.
-//          *
-//          *  @param pos   Position of the element in the vector [Note the
-//          *                first position in the vector is 0]
-//          *  @param val   The value to be moved
-//          *
-//          *  @exception hpx::out_of_range The \a pos is bound checked and if
-//          *              \a pos is out of bound then it throws the
-//          *              \a hpx::out_of_range exception.
-//          */
-//         void set_value(size_type pos, VALUE_TYPE const&& val)
-//         {
-//            try{
-//                 partition_vector_type::const_iterator it = get_base_gid_pair(pos);
-//                 if(state == hpx::dis_state::dis_block)
-//                 {
-//
-//                     return partition_vector_stub::set_value_rval_async(
-//                                                     (it->first).get(),
-//                                                     (pos - (it->second)),
-//                                                     std::move(val)
-//                                                                  ).get();
-//                 }
-//                 else if (state == hpx::dis_state::dis_cyclic)
-//                 {
-//                     if(num_partitions_ > 1)
-//                        return partition_vector_stub::set_value_rval_async(
-//                                                     (it->first).get(),
-//                                                     (pos/num_partitions_),
-//                                                     std::move(val)
-//                                                                 ).get();
-//                      else if(num_partitions_ == 1)
-//                         return partition_vector_stub::set_value_rval_async(
-//                                                     (it->first).get(),
-//                                                     (pos/localities_.size()),
-//                                                     std::move(val)
-//                                                                 ).get();
-//
-//
-//                 }
-//                else if(state == hpx::dis_state::block_cyclic)
-//                {
-//                    if(num_partitions_ >1)
-//                       return partition_vector_stub::set_value_async(
-//                                                       (it->first).get(),
-//                                                       ((((pos/block_size)/
-//                                                       num_partitions_)*block_size)+
-//                                                       (pos%block_size)),
-//                                                         std::move(val)
-//                                                                ).get();
-//                    else if(num_partitions_ == 1)
-//                        return partition_vector_stub::set_value_async(
-//                                                       (it->first).get(),
-//                                                       ((((pos/block_size)/
-//                                                  localities_.size())*block_size)+
-//                                                       (pos%block_size)),
-//                                                         std::move(val)
-//                                                                ).get();
-//
-//                 }
-//             }
-//             catch(hpx::exception const& /*e*/){
-//                 HPX_THROW_EXCEPTION(hpx::out_of_range,
-//                                     "set_value",
-//                                     "Value of 'pos' is out of range");
-//             }
-//         }//end of set_value
-//
-//         /** @brief Asynchronous API for
-//          *          set_value(std::size_t pos, VALUE_TYPE const&& val).
-//          *          It throws the \a hpx::out_of_range exception.
-//          *
-//          *  @param pos   Position of the element in the vector [Note the
-//          *                first position in the vector is 0]
-//          *  @param val   The value to be moved
-//          *
-//          *  @exception hpx::out_of_range The \a pos is bound checked and if
-//          *              \a pos is out of bound then it throws the
-//          *              \a hpx::out_of_range exception.
-//          */
-//         future<void> set_value_async(size_type pos, VALUE_TYPE const&& val)
-//         {
-//             try{
-//                 partition_vector_type::const_iterator it = get_base_gid_pair(pos);
-//                 if(state == hpx::dis_state::dis_block)
-//                     return partition_vector_stub::set_value_rval_async(
-//                                                     (it->first).get(),
-//                                                     (pos - (it->second)),
-//                                                         std::move(val)
-//                                                                  );
-//                 else if (state == hpx::dis_state::dis_cyclic)
-//                 {
-//                     if(num_partitions_ > 1)
-//                       return partition_vector_stub::set_value_rval_async(
-//                                                     (it->first).get(),
-//                                                     (pos/num_partitions_),
-//                                                     std::move(val)
-//                                                                 );
-//
-//                     else if(num_partitions_ == 1)
-//                         return partition_vector_stub::set_value_rval_async(
-//                                                     (it->first).get(),
-//                                                     (pos/localities_.size()),
-//                                                     std::move(val)
-//                                                                 );
-//
-//                }
-//                else if(state == hpx::dis_state::block_cyclic)
-//                {
-//                    if(num_partitions_ >1)
-//                       return partition_vector_stub::set_value_async(
-//                                                       (it->first).get(),
-//                                                       ((((pos/block_size)/
-//                                                       num_partitions_)*block_size)+
-//                                                       (pos%block_size)),
-//                                                         std::move(val)
-//                                                                );
-//                    else if(num_partitions_ == 1)
-//                        return partition_vector_stub::set_value_async(
-//                                                       (it->first).get(),
-//                                                       ((((pos/block_size)/
-//                                                  localities_.size())*block_size)+
-//                                                       (pos%block_size)),
-//                                                         std::move(val)
-//                                                                );
-//                }
-//
-//             }
-//             catch(hpx::exception const& /*e*/){
-//                 HPX_THROW_EXCEPTION(hpx::out_of_range,
-//                                     "set_value_async",
-//                                     "Value of 'pos' is out of range");
-//             }
-//         }//end of set_value_async
-//
-//
-//
+        /// Asynchronous API for set_value().
+        ///
+        /// \param pos   Position of the element in the vector
+        /// \param val   The value to be copied
+        ///
+        template <typename T_>
+        future<void> set_value_async(size_type pos, T_ && val)
+        {
+            std::size_t part = get_partition(pos);
+            std::size_t index = get_local_index(pos);
+            return partitions_[part].partition_.set_value_async(
+                index, std::forward<T_>(val));
+        }
+
 //             //CLEAR
 //             //TODO if number of partitions is kept constant every time then clear should modified (clear each partition_vector one by one).
 // //            void clear()
