@@ -8,6 +8,8 @@ set(example_programs
   transpose_serial
   transpose_serial_block
   transpose_smp
+  transpose_smp_block
+  transpose
 )
 
 foreach(example_program ${example_programs})
