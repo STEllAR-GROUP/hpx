@@ -240,13 +240,13 @@ namespace hpx { namespace lcos { namespace detail
             return this->future_data_type::set_exception(e);
         }
 
-        Result const& get_value(error_code& ec = throws)
+        Result get_value(error_code& ec = throws)
         {
             typedef typename future_data_type::data_type data_type;
             data_type& data = this->get_result();
 
             // no error has been reported, return the result
-            return data.get_value();
+            return data.move_value();
         }
 
         void add_ref()
@@ -353,7 +353,7 @@ namespace hpx { namespace lcos { namespace detail
             return this->future_data_type::set_exception(e);
         }
 
-        util::unused_type const& get_value(error_code& /*ec*/ = throws)
+        util::unused_type get_value(error_code& /*ec*/ = throws)
         {
             this->get_result();
             return util::unused;
