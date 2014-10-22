@@ -34,6 +34,7 @@ set(subdirs
      1d_stencil
      diskperf
      tuplespace
+     transpose
       )
 endif()
 
