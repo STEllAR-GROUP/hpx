@@ -17,6 +17,7 @@
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/traits/is_future.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 
 #include <utility>
 #include <boost/utility/enable_if.hpp>
@@ -289,11 +290,70 @@ namespace hpx { namespace components
             return gid_;
         }
 
+        void reset(id_type const& id)
+        {
+            gid_ = make_ready_future(id);
+        }
+
+        void reset(id_type && id)
+        {
+            gid_ = make_ready_future(std::move(id));
+        }
+
+        void reset(future_type && rhs)
+        {
+            gid_ = std::move(rhs);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // Interface mimicking future
         bool is_ready() const
         {
             return gid_.is_ready();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+    protected:
+        static void register_as_helper(shared_future<naming::id_type> f,
+            char const* name)
+        {
+            hpx::agas::register_name(name, f.get());
+        }
+
+    public:
+        // Register our id with AGAS using the given name
+        future<void> register_as(char const* symbolic_name)
+        {
+            using util::placeholders::_1;
+            return gid_.then(util::bind(
+                &client_base::register_as_helper, _1, symbolic_name));
+        }
+
+        // Retrieve the id associated with the given name and use it to
+        // initialize this client_base instance.
+        //
+        // F is expected to reset the underlying client_base, it is passed the
+        // future<id_type> returned from on_symbol_namespace_event()
+        template <typename F>
+        future<void> connect_to(char const* symbolic_name, F && f)
+        {
+            return agas::on_symbol_namespace_event(
+                symbolic_name, agas::symbol_ns_bind, true)
+                    .then(std::forward<F>(f));
+        }
+
+    protected:
+        void connect_to_helper(future<naming::id_type> f)
+        {
+            gid_ = f.share();
+        }
+
+    public:
+        future<void> connect_to(char const* symbolic_name)
+        {
+            using util::placeholders::_1;
+            return connect_to(symbolic_name,
+                util::bind(&client_base::connect_to_helper, this, _1));
         }
 
 //     protected:

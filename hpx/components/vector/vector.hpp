@@ -30,6 +30,7 @@
 #include <memory>
 
 #include <boost/format.hpp>
+#include <boost/cstdint.hpp>
 
 namespace hpx
 {
@@ -58,26 +59,19 @@ namespace hpx
             const_pointer;
 
     private:
+        typedef hpx::components::client_base<
+                vector, server::vector_configuration
+            > base_type;
+
         typedef hpx::server::partition_vector partition_vector_server;
         typedef hpx::stubs::partition_vector<T> partition_vector_stub;
         typedef hpx::partition_vector<T> partition_vector_client;
 
+        // The list of partitions belonging to this vector.
         // Each partition is described by it's corresponding client object, its
         // size, and locality id.
-        struct partition_description
-        {
-            partition_description(partition_vector_client part, size_type size,
-                    boost::uint32_t locality_id)
-              : partition_(part), size_(size), locality_id_(locality_id)
-            {}
-
-            partition_vector_client partition_;
-            size_type size_;
-            boost::uint32_t locality_id_;
-        };
-
-        // The list of partitions belonging to this vector.
-        typedef std::vector<partition_description> partitions_vector_type;
+        typedef server::vector_configuration::partition_data partition_data;
+        typedef std::vector<partition_data> partitions_vector_type;
 
         size_type size_;                // overall size of the vector
         size_type block_size_;          // cycle stride
@@ -199,6 +193,59 @@ namespace hpx
             default:
                 break;
             }
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // Connect this vector to the existing vector using the given symbolic
+        // name.
+        void get_data_helper(id_type id,
+            future<server::vector_configuration::config_data> f)
+        {
+            server::vector_configuration::config_data data = f.get();
+            size_ = data.size_;
+            block_size_ = data.block_size_;
+            partitions_ = std::move(data.partitions_);
+            policy_ = static_cast<BOOST_SCOPED_ENUM(distribution_policy)>(
+                data.policy_);
+
+            base_type::reset(std::move(id));
+        }
+
+        // this will be called by the base class once the registered id becomes
+        // available
+        future<void> connect_to_helper(future<id_type> f)
+        {
+            using util::placeholders::_1;
+            id_type id = f.get();
+            return async(server::vector_configuration::get_action(), id)
+                .then(util::bind(&vector::get_data_helper, this, id, _1));
+        }
+
+    public:
+        future<void> connect_to(char const* symbolic_name)
+        {
+            using util::placeholders::_1;
+            return base_type::connect_to(symbolic_name,
+                util::bind(&vector::connect_to_helper, this, _1));
+        }
+
+        future<void> connect_to(std::string const& symbolic_name)
+        {
+            return connect_to(symbolic_name.c_str());
+        }
+
+        // Register this vector with AGAS using the given symbolic name
+        future<void> register_as(char const* symbolic_name)
+        {
+            server::vector_configuration::config_data data(
+                size_, block_size_, partitions_, int(policy_));
+            base_type::reset(base_type::create_async(hpx::find_here(), data));
+            return base_type::register_as(symbolic_name);
+        }
+
+        future<void> register_as(std::string const& symbolic_name)
+        {
+            return register_as(symbolic_name.c_str());
         }
 
     public:
@@ -359,7 +406,8 @@ namespace hpx
             if (part == std::size_t(-1))
                 return segment_iterator(this, partitions_.end());
 
-            return segment_iterator(this, partitions_.begin() + part);
+            return segment_iterator(this, partitions_.begin() + part,
+                partitions_.end());
         }
 
         const_segment_iterator get_const_segment_iterator(
@@ -369,7 +417,8 @@ namespace hpx
             if (part == std::size_t(-1))
                 return const_segment_iterator(this, partitions_.cend());
 
-            return const_segment_iterator(this, partitions_.cbegin() + part);
+            return const_segment_iterator(this, partitions_.cbegin() + part,
+                partitions_.cend());
         }
 
     protected:
@@ -393,8 +442,8 @@ namespace hpx
                 {
                     id_type const& locality = localities[loc];
                     std::size_t size = (std::min)(part_size, size_-allocated_size);
-                    partitions_.push_back(partition_description(
-                        partition_vector_client::create(locality, size),
+                    partitions_.push_back(partition_data(
+                        partition_vector_client::create_async(locality, size),
                         size, hpx::naming::get_locality_id_from_id(locality)
                     ));
 
@@ -425,8 +474,8 @@ namespace hpx
                 {
                     id_type const& locality = localities[loc];
                     std::size_t size = (std::min)(part_size, size_-allocated_size);
-                    partitions_.push_back(partition_description(
-                        partition_vector_client::create(locality, size, val),
+                    partitions_.push_back(partition_data(
+                        partition_vector_client::create_async(locality, size, val),
                         size, hpx::naming::get_locality_id_from_id(locality)
                     ));
 
@@ -463,76 +512,6 @@ namespace hpx
             verify_consistency();
         }
 
-//        //Note num_partitions == represent then partition vector index
-//        future<size_type>
-//            size_helper(size_type num_partitions) const
-//        {
-//            if(num_partitions < 1)
-//            {
-//                HPX_ASSERT(num_partitions >= 0);
-//                return partition_vector_stub::size_async(
-//                          ((partitions_.at(num_partitions)).second).get()
-//                                                      );
-//            }
-//            else
-//                return hpx::lcos::local::dataflow(
-//                    [](future<size_type> s1,
-//                       future<size_type> s2) -> size_type
-//                        {
-//                            return s1.get() + s2.get();
-//                        },
-//                    partition_vector_stub::size_async(
-//                        ((partitions_.at(num_partitions)).second).get()
-//                                                         ),
-//                    size_helper(num_partitions - 1)
-//                                                );
-//            }//end of size_helper
-
-
-//         //FASTER VERSION OF SIZE_HELPER
-//
-//         // PROGRAMMER DOCUMENTATION:
-//         //  This helper function return the number of element in the hpx::vector.
-//         //  Here we are dividing the sequence of partition_description_types into half and
-//         //  computing the size of the individual partition_vector and then adding
-//         //  them. Note this create the binary tree of height equal to log
-//         //  (num_partition_description_types in partitions_). Hence it might be efficient
-//         //  than previous implementation
-//         //
-//         // NOTE: This implementation does not need all the partition_vector of same
-//         //       size.
-//         //
-//         future<size_type> size_helper(partition_vector_type::const_iterator it_begin,
-//                                 partition_vector_type::const_iterator it_end) const
-//         {
-//             if((it_end - it_begin) == 1 )
-//                 return partition_vector_stub::size_async((it_begin->first).get());
-//             else
-//             {
-//                 int mid = (it_end - it_begin)/2;
-//                 future<size_type> left_tree_size = size_helper(it_begin,
-//                                                          it_begin + mid);
-//                 future<size_type> right_tree_size = hpx::async(
-//                                                     launch::async,
-//                                                     hpx::util::bind(
-//                                                         &vector::size_helper,
-//                                                         this,
-//                                                         (it_begin + mid),
-//                                                         it_end
-//                                                                     )
-//                                                         );
-//
-//             return hpx::lcos::local::dataflow(
-//                         [](future<size_type> s1, future<size_type> s2) -> size_type
-//                         {
-//                             return s1.get() + s2.get();
-//                         },
-//                         std::move(left_tree_size),
-//                         std::move(right_tree_size)
-//                                             );
-//             }
-//         }//end of size_helper
-//
 // //        future<size_type>
 // //            max_size_helper(size_type num_partitions) const
 // //        {
@@ -680,23 +659,48 @@ namespace hpx
         /// \a num_partitions = 1 and \a partition_size = 0. Hence overall size
         /// of the vector is 0.
         ///
-        vector()
+        vector(char const* symbolic_name = 0)
           : size_(0),
             block_size_(std::size_t(-1)),
             policy_(distribution_policy::block)
-        {}
+        {
+            if (symbolic_name)
+                connect_to(symbolic_name).get();
+        }
+
+        vector(std::string const& symbolic_name)
+          : size_(0),
+            block_size_(std::size_t(-1)),
+            policy_(distribution_policy::block)
+        {
+            connect_to(symbolic_name).get();
+        }
 
         /// Constructor which create hpx::vector with the given overall \a size
         ///
         /// \param size   The overall size of the vector
         ///
-        explicit vector(size_type size)
+        explicit vector(size_type size, char const* symbolic_name = 0)
           : size_(size),
             block_size_(std::size_t(-1)),
             policy_(distribution_policy::block)
         {
             if (size != 0)
                 create(hpx::block);
+
+            if (symbolic_name)
+                register_as(symbolic_name).get();
+        }
+
+        vector(size_type size, std::string const& symbolic_name)
+          : size_(size),
+            block_size_(std::size_t(-1)),
+            policy_(distribution_policy::block)
+        {
+            if (size != 0)
+                create(hpx::block);
+
+            register_as(symbolic_name).get();
         }
 
         /// Constructor which create and initialize vector with the
@@ -705,13 +709,27 @@ namespace hpx
         /// \param size   The overall size of the vector
         /// \param val    Default value for the elements in vector
         ///
-        vector(size_type size, T const& val)
+        vector(size_type size, T const& val, char const* symbolic_name = 0)
           : size_(size),
             block_size_(std::size_t(-1)),
             policy_(distribution_policy::block)
         {
             if (size != 0)
                 create(val, hpx::block);
+
+            if (symbolic_name)
+                register_as(symbolic_name).get();
+        }
+
+        vector(size_type size, T const& val, std::string const& symbolic_name)
+          : size_(size),
+            block_size_(std::size_t(-1)),
+            policy_(distribution_policy::block)
+        {
+            if (size != 0)
+                create(val, hpx::block);
+
+            register_as(symbolic_name).get();
         }
 
         /// Constructor which create and initialize vector of size
@@ -721,13 +739,30 @@ namespace hpx
         /// \param policy The distribution policy to use (default: block)
         ///
         template <typename DistPolicy>
-        vector(size_type size, DistPolicy const& policy)
+        vector(size_type size, DistPolicy const& policy,
+                char const* symbolic_name = 0)
           : size_(size),
             block_size_(policy.get_block_size()),
             policy_(policy.get_policy_type())
         {
             if (size != 0)
                 create(policy);
+
+            if (symbolic_name)
+                register_as(symbolic_name).get();
+        }
+
+        template <typename DistPolicy>
+        vector(size_type size, DistPolicy const& policy,
+                std::string const& symbolic_name)
+          : size_(size),
+            block_size_(policy.get_block_size()),
+            policy_(policy.get_policy_type())
+        {
+            if (size != 0)
+                create(policy);
+
+            register_as(symbolic_name).get();
         }
 
         /// Constructor which create and initialize vector with the
@@ -739,13 +774,30 @@ namespace hpx
         /// \param policy The distribution policy to use (default: block)
         ///
         template <typename DistPolicy>
-        vector(size_type size, T const& val, DistPolicy const& policy)
+        vector(size_type size, T const& val, DistPolicy const& policy,
+                char const* symbolic_name = 0)
           : size_(size),
             block_size_(policy.get_block_size()),
             policy_(policy.get_policy_type())
         {
             if (size != 0)
                 create(val, policy);
+
+            if (symbolic_name)
+                register_as(symbolic_name).get();
+        }
+
+        template <typename DistPolicy>
+        vector(size_type size, T const& val, DistPolicy const& policy,
+                std::string const& symbolic_name)
+          : size_(size),
+            block_size_(policy.get_block_size()),
+            policy_(policy.get_policy_type())
+        {
+            if (size != 0)
+                create(val, policy);
+
+            register_as(symbolic_name).get();
         }
 
     public:
@@ -1064,7 +1116,8 @@ namespace hpx
         {
             std::size_t part = get_partition(pos);
             std::size_t index = get_local_index(pos);
-            return partitions_[part].partition_.get_value_async(index);
+            return partition_vector_client(partitions_[part].partition_)
+                .get_value_async(index);
         }
 
 //         //FRONT (never throws exception)
@@ -1281,8 +1334,8 @@ namespace hpx
         {
             std::size_t part = get_partition(pos);
             std::size_t index = get_local_index(pos);
-            return partitions_[part].partition_.set_value_async(
-                index, std::forward<T_>(val));
+            return partition_vector_client(partitions_[part].partition_)
+                .set_value_async(index, std::forward<T_>(val));
         }
 
 //             //CLEAR
@@ -1348,6 +1401,46 @@ namespace hpx
         const_iterator cend() const
         {
             return const_iterator(this, size_);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        segment_iterator
+        segment_begin(boost::uint32_t id = invalid_locality_id)
+        {
+            return segment_iterator(this, partitions_.begin(),
+                partitions_.end(), id);
+        }
+
+        const_segment_iterator
+        segment_begin(boost::uint32_t id = invalid_locality_id) const
+        {
+            return const_segment_iterator(this, partitions_.cbegin(),
+                partitions_.cend(), id);
+        }
+
+        const_segment_iterator
+        segment_cbegin(boost::uint32_t id = invalid_locality_id) const
+        {
+            return const_segment_iterator(this, partitions_.cbegin(),
+                partitions_.cend(), id);
+        }
+
+        segment_iterator
+        segment_end(boost::uint32_t id = invalid_locality_id)
+        {
+            return segment_iterator(this, partitions_.end());
+        }
+
+        const_segment_iterator
+        segment_end(boost::uint32_t id = invalid_locality_id) const
+        {
+            return const_segment_iterator(this, partitions_.cend());
+        }
+
+        const_segment_iterator
+        segment_cend(boost::uint32_t id = invalid_locality_id) const
+        {
+            return const_segment_iterator(this, partitions_.cend());
         }
     };
 }

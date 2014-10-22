@@ -14,6 +14,7 @@
  // http://afstern.org/matt/segmented.pdf.
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/include/naming.hpp>
 #include <hpx/include/util.hpp>
 
 #include <hpx/components/vector/partition_vector_component.hpp>
@@ -23,7 +24,7 @@
 
 #include <boost/integer.hpp>
 #include <boost/iterator/iterator_facade.hpp>
-#include <boost/iterator/iterator_adaptor.hpp>
+#include <boost/iterator/filter_iterator.hpp>
 
 #include <boost/serialization/serialization.hpp>
 
@@ -305,23 +306,46 @@ namespace hpx
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename BaseIterator>
+    struct is_requested_locality
+    {
+        typedef typename std::iterator_traits<BaseIterator>::reference reference;
+
+        is_requested_locality(boost::uint32_t locality_id = naming::invalid_locality_id)
+          : locality_id_(locality_id)
+        {}
+
+        bool operator()(reference val) const
+        {
+            return locality_id_ == naming::invalid_locality_id ||
+                   locality_id_ == val.locality_id_;
+        }
+
+        boost::uint32_t locality_id_;
+    };
+
     /// \brief This class implement the segmented iterator for the hpx::vector
     template <typename T, typename BaseIter>
     class segment_vector_iterator
-      : public boost::iterator_adaptor<
-            segment_vector_iterator<T, BaseIter>, BaseIter, T,
-            std::random_access_iterator_tag
+      : public boost::filter_iterator<
+            is_requested_locality<BaseIter>, BaseIter
         >
     {
     private:
-        typedef boost::iterator_adaptor<
-            segment_vector_iterator<T, BaseIter>, BaseIter, T,
-            std::random_access_iterator_tag
+        typedef boost::filter_iterator<
+            is_requested_locality<BaseIter>, BaseIter
         > base_type;
+        typedef is_requested_locality<BaseIter> predicate;
 
     public:
-        segment_vector_iterator(vector<T>* data, BaseIter const& it)
-          : base_type(it), data_(data)
+        segment_vector_iterator(vector<T>* data, BaseIter const& end)
+          : base_type(predicate(), end, end), data_(data)
+        {}
+
+        segment_vector_iterator(
+                vector<T>* data, BaseIter const& it, BaseIter const& end,
+                boost::uint32_t locality_id = naming::invalid_locality_id)
+          : base_type(predicate(locality_id), it, end), data_(data)
         {}
 
         vector<T>* get_data() { return data_; }
@@ -333,20 +357,25 @@ namespace hpx
 
     template <typename T, typename BaseIter>
     class const_segment_vector_iterator
-      : public boost::iterator_adaptor<
-            const_segment_vector_iterator<T, BaseIter>, BaseIter, T const,
-            std::random_access_iterator_tag
+      : public boost::filter_iterator<
+            is_requested_locality<BaseIter>, BaseIter
         >
     {
     private:
-        typedef boost::iterator_adaptor<
-            const_segment_vector_iterator<T, BaseIter>, BaseIter, T const,
-            std::random_access_iterator_tag
+        typedef boost::filter_iterator<
+            is_requested_locality<BaseIter>, BaseIter
         > base_type;
+        typedef is_requested_locality<BaseIter> predicate;
 
     public:
-        const_segment_vector_iterator(vector<T> const* data, BaseIter const& it)
-          : base_type(it), data_(data)
+        const_segment_vector_iterator(vector<T> const* data, BaseIter const& end)
+          : base_type(predicate(), end, end), data_(data)
+        {}
+
+        const_segment_vector_iterator(
+                vector<T> const* data, BaseIter const& it, BaseIter const& end,
+                boost::uint32_t locality_id = naming::invalid_locality_id)
+          : base_type(predicate(locality_id), it, end), data_(data)
         {}
 
         vector<T> const* get_data() const { return data_; }

@@ -66,9 +66,8 @@ namespace hpx { namespace server
         ///////////////////////////////////////////////////////////////////////
         vector_configuration() { HPX_ASSERT(false); }
 
-        vector_configuration(std::size_t size, std::size_t block_size,
-                std::vector<partition_data> const& partitions, int policy)
-          : data_(size, block_size, partitions, policy)
+        vector_configuration(config_data const& data)
+          : data_(data)
         {}
 
         /// Retrieve the configuration data.
