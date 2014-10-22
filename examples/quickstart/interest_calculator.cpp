@@ -22,7 +22,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/components/dataflow/dataflow.hpp>
+#include <hpx/lcos/local/dataflow.hpp>
 
 #include <iostream>
 
@@ -44,23 +44,6 @@ double add(double principal, double interest)
 {
     return principal + interest;
 }
-
-///////////////////////////////////////////////////////////////////////////////
-// Action Declarations
-HPX_PLAIN_DIRECT_ACTION(calc, calc_action);
-HPX_PLAIN_ACTION(add, add_action);
-//]
-
-///////////////////////////////////////////////////////////////////////////////
-//[interest_id_action
-// This is a helper function allowing to encapsulate the initial values into a
-// dataflow object
-double identity(double initial_value)
-{
-    return initial_value;
-}
-
-HPX_PLAIN_ACTION(identity, identity_action);
 //]
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -68,8 +51,10 @@ HPX_PLAIN_ACTION(identity, identity_action);
 int hpx_main(variables_map & vm)
 {
     {
-        using hpx::lcos::dataflow;
-        using hpx::lcos::dataflow_base;
+        using hpx::shared_future;
+        using hpx::make_ready_future;
+        using hpx::lcos::local::dataflow;
+        using hpx::util::unwrapped;
         hpx::naming::id_type here = hpx::find_here();
 
         double init_principal=vm["principal"].as<double>(); //Initial principal
@@ -95,18 +80,18 @@ int hpx_main(variables_map & vm)
         //
         // Please note the similarity with the code below!
 
-        dataflow_base<double> principal = dataflow<identity_action>(here, init_principal);
-        dataflow_base<double> rate = dataflow<identity_action>(here, init_rate);
+        shared_future<double> principal = make_ready_future(init_principal);
+        shared_future<double> rate = make_ready_future(init_rate);
 
         for (int i = 0; i < t; ++i)
         {
-            dataflow_base<double> interest = dataflow<calc_action>(here, principal, rate);
-            principal = dataflow<add_action>(here, principal, interest);
+            shared_future<double> interest = dataflow(unwrapped(calc), principal, rate);
+            principal = dataflow(unwrapped(add), principal, interest);
         }
 
         // wait for the dataflow execution graph to be finished calculating our
         // overall interest
-        double result = principal.get_future().get();
+        double result = principal.get();
 
         std::cout << "Final amount: " << result << std::endl;
         std::cout << "Amount made: " << result-init_principal << std::endl;
