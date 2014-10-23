@@ -315,14 +315,14 @@ namespace hpx { namespace components
         ///////////////////////////////////////////////////////////////////////
     protected:
         static void register_as_helper(shared_future<naming::id_type> f,
-            char const* name)
+            std::string const& symbolic_name)
         {
-            hpx::agas::register_name(name, f.get());
+            hpx::agas::register_name(symbolic_name, f.get());
         }
 
     public:
         // Register our id with AGAS using the given name
-        future<void> register_as(char const* symbolic_name)
+        future<void> register_as(std::string const& symbolic_name)
         {
             using util::placeholders::_1;
             return gid_.then(util::bind(
@@ -335,7 +335,7 @@ namespace hpx { namespace components
         // F is expected to reset the underlying client_base, it is passed the
         // future<id_type> returned from on_symbol_namespace_event()
         template <typename F>
-        future<void> connect_to(char const* symbolic_name, F && f)
+        future<void> connect_to(std::string const& symbolic_name, F && f)
         {
             return agas::on_symbol_namespace_event(
                 symbolic_name, agas::symbol_ns_bind, true)
@@ -349,7 +349,7 @@ namespace hpx { namespace components
         }
 
     public:
-        future<void> connect_to(char const* symbolic_name)
+        future<void> connect_to(std::string const& symbolic_name)
         {
             using util::placeholders::_1;
             return connect_to(symbolic_name,

@@ -63,8 +63,7 @@ namespace hpx
                 vector, server::vector_configuration
             > base_type;
 
-        typedef hpx::server::partition_vector partition_vector_server;
-        typedef hpx::stubs::partition_vector<T> partition_vector_stub;
+        typedef hpx::server::partition_vector<T> partition_vector_server;
         typedef hpx::partition_vector<T> partition_vector_client;
 
         // The list of partitions belonging to this vector.
@@ -82,6 +81,9 @@ namespace hpx
 
         // parameters taken from distribution policy
         BOOST_SCOPED_ENUM(distribution_policy) policy_;     // policy to use
+
+        // will be set for created (non-attached) objects
+        std::string registered_name_;
 
     public:
         typedef vector_iterator<T> iterator;
@@ -222,30 +224,22 @@ namespace hpx
         }
 
     public:
-        future<void> connect_to(char const* symbolic_name)
+        future<void> connect_to(std::string const& symbolic_name)
         {
             using util::placeholders::_1;
             return base_type::connect_to(symbolic_name,
                 util::bind(&vector::connect_to_helper, this, _1));
         }
 
-        future<void> connect_to(std::string const& symbolic_name)
-        {
-            return connect_to(symbolic_name.c_str());
-        }
-
         // Register this vector with AGAS using the given symbolic name
-        future<void> register_as(char const* symbolic_name)
+        future<void> register_as(std::string const& symbolic_name)
         {
             server::vector_configuration::config_data data(
                 size_, block_size_, partitions_, int(policy_));
             base_type::reset(base_type::create_async(hpx::find_here(), data));
-            return base_type::register_as(symbolic_name);
-        }
 
-        future<void> register_as(std::string const& symbolic_name)
-        {
-            return register_as(symbolic_name.c_str());
+            registered_name_ = symbolic_name;
+            return base_type::register_as(symbolic_name);
         }
 
     public:
@@ -443,7 +437,7 @@ namespace hpx
                     id_type const& locality = localities[loc];
                     std::size_t size = (std::min)(part_size, size_-allocated_size);
                     partitions_.push_back(partition_data(
-                        partition_vector_client::create_async(locality, size),
+                        hpx::new_<partition_vector_server>(locality, size),
                         size, hpx::naming::get_locality_id_from_id(locality)
                     ));
 
@@ -475,7 +469,7 @@ namespace hpx
                     id_type const& locality = localities[loc];
                     std::size_t size = (std::min)(part_size, size_-allocated_size);
                     partitions_.push_back(partition_data(
-                        partition_vector_client::create_async(locality, size, val),
+                        hpx::new_<partition_vector_server>(locality, size, val),
                         size, hpx::naming::get_locality_id_from_id(locality)
                     ));
 
@@ -659,15 +653,14 @@ namespace hpx
         /// \a num_partitions = 1 and \a partition_size = 0. Hence overall size
         /// of the vector is 0.
         ///
-        vector(char const* symbolic_name = 0)
+        vector()
           : size_(0),
             block_size_(std::size_t(-1)),
             policy_(distribution_policy::block)
-        {
-            if (symbolic_name)
-                connect_to(symbolic_name).get();
-        }
+        {}
 
+        /// Construct a new vector representation from the data associated with
+        /// the given symbolic name.
         vector(std::string const& symbolic_name)
           : size_(0),
             block_size_(std::size_t(-1)),
@@ -678,20 +671,18 @@ namespace hpx
 
         /// Constructor which create hpx::vector with the given overall \a size
         ///
-        /// \param size   The overall size of the vector
+        /// \param size             The overall size of the vector
+        /// \param symbolic_name    The (optional) name to register the newly
+        ///                         created vector
         ///
-        explicit vector(size_type size, char const* symbolic_name = 0)
+        vector(size_type size)
           : size_(size),
             block_size_(std::size_t(-1)),
             policy_(distribution_policy::block)
         {
             if (size != 0)
                 create(hpx::block);
-
-            if (symbolic_name)
-                register_as(symbolic_name).get();
         }
-
         vector(size_type size, std::string const& symbolic_name)
           : size_(size),
             block_size_(std::size_t(-1)),
@@ -706,21 +697,19 @@ namespace hpx
         /// Constructor which create and initialize vector with the
         /// given \a where all elements are initialized with \a val.
         ///
-        /// \param size   The overall size of the vector
-        /// \param val    Default value for the elements in vector
+        /// \param size             The overall size of the vector
+        /// \param val              Default value for the elements in vector
+        /// \param symbolic_name    The (optional) name to register the newly
+        ///                         created vector
         ///
-        vector(size_type size, T const& val, char const* symbolic_name = 0)
+        vector(size_type size, T const& val)
           : size_(size),
             block_size_(std::size_t(-1)),
             policy_(distribution_policy::block)
         {
             if (size != 0)
                 create(val, hpx::block);
-
-            if (symbolic_name)
-                register_as(symbolic_name).get();
         }
-
         vector(size_type size, T const& val, std::string const& symbolic_name)
           : size_(size),
             block_size_(std::size_t(-1)),
@@ -735,23 +724,20 @@ namespace hpx
         /// Constructor which create and initialize vector of size
         /// \a size using the given distribution policy.
         ///
-        /// \param size   The overall size of the vector
-        /// \param policy The distribution policy to use (default: block)
+        /// \param size             The overall size of the vector
+        /// \param policy           The distribution policy to use (default: block)
+        /// \param symbolic_name    The (optional) name to register the newly
+        ///                         created vector
         ///
         template <typename DistPolicy>
-        vector(size_type size, DistPolicy const& policy,
-                char const* symbolic_name = 0)
+        vector(size_type size, DistPolicy const& policy)
           : size_(size),
             block_size_(policy.get_block_size()),
             policy_(policy.get_policy_type())
         {
             if (size != 0)
                 create(policy);
-
-            if (symbolic_name)
-                register_as(symbolic_name).get();
         }
-
         template <typename DistPolicy>
         vector(size_type size, DistPolicy const& policy,
                 std::string const& symbolic_name)
@@ -769,24 +755,21 @@ namespace hpx
         /// given \a where all elements are initialized with \a val and
         /// using the given distribution policy.
         ///
-        /// \param size   The overall size of the vector
-        /// \param val    Default value for the elements in vector
-        /// \param policy The distribution policy to use (default: block)
+        /// \param size             The overall size of the vector
+        /// \param val              Default value for the elements in vector
+        /// \param policy           The distribution policy to use (default: block)
+        /// \param symbolic_name    The (optional) name to register the newly
+        ///                         created vector
         ///
         template <typename DistPolicy>
-        vector(size_type size, T const& val, DistPolicy const& policy,
-                char const* symbolic_name = 0)
+        vector(size_type size, T const& val, DistPolicy const& policy)
           : size_(size),
             block_size_(policy.get_block_size()),
             policy_(policy.get_policy_type())
         {
             if (size != 0)
                 create(val, policy);
-
-            if (symbolic_name)
-                register_as(symbolic_name).get();
         }
-
         template <typename DistPolicy>
         vector(size_type size, T const& val, DistPolicy const& policy,
                 std::string const& symbolic_name)
@@ -798,6 +781,15 @@ namespace hpx
                 create(val, policy);
 
             register_as(symbolic_name).get();
+        }
+
+        ~vector()
+        {
+            if (!registered_name_.empty())
+            {
+                error_code ec;      // ignore all exceptions
+                agas::unregister_name_sync(registered_name_, ec);
+            }
         }
 
     public:

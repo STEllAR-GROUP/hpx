@@ -1,8 +1,7 @@
 //  Copyright (c) 2014 Hartmut Kaiser
 //
-// (C) Copyright Ion Gaztanaga 2004-2012. Distributed under the Boost
-// Software License, Version 1.0. (See accompanying file
-// LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/components/vector/vector.hpp>
@@ -16,84 +15,22 @@
 
 #include <boost/foreach.hpp>
 
-// #include "check_equal_containers.hpp"
-// #include "movable_int.hpp"
-// #include "expand_bwd_test_allocator.hpp"
-// #include "expand_bwd_test_template.hpp"
-// #include "dummy_test_allocator.hpp"
-// #include "propagate_allocator_test.hpp"
-// #include "vector_test.hpp"
+///////////////////////////////////////////////////////////////////////////////
+// Define the vector types to be used.
+HPX_REGISTER_VECTOR(double);
+HPX_REGISTER_VECTOR(int);
 
-// namespace hpx { namespace components
-// {
-//     // Explicit instantiation to detect compilation errors
-//     template class boost::container::vector<test::movable_and_copyable_int,
-//        test::simple_allocator<test::movable_and_copyable_int> >;
-//
-//     template class boost::container::vector<test::movable_and_copyable_int,
-//        test::dummy_test_allocator<test::movable_and_copyable_int> >;
-//
-//     template class boost::container::vector<test::movable_and_copyable_int,
-//        std::allocator<test::movable_and_copyable_int> >;
-// }}
-//
-// int test_expand_bwd()
-// {
-//    // Now test all back insertion possibilities
-//
-//    // First raw ints
-//    typedef test::expand_bwd_test_allocator<int>
-//       int_allocator_type;
-//    typedef vector<int, int_allocator_type>
-//       int_vector;
-//
-//    if(!test::test_all_expand_bwd<int_vector>())
-//       return 1;
-//
-//    //Now user defined wrapped int
-//    typedef test::expand_bwd_test_allocator<test::int_holder>
-//       int_holder_allocator_type;
-//    typedef vector<test::int_holder, int_holder_allocator_type>
-//       int_holder_vector;
-//
-//    if(!test::test_all_expand_bwd<int_holder_vector>())
-//       return 1;
-//
-//    //Now user defined bigger wrapped int
-//    typedef test::expand_bwd_test_allocator<test::triple_int_holder>
-//       triple_int_holder_allocator_type;
-//
-//    typedef vector<test::triple_int_holder, triple_int_holder_allocator_type>
-//       triple_int_holder_vector;
-//
-//    if(!test::test_all_expand_bwd<triple_int_holder_vector>())
-//       return 1;
-//
-//    return 0;
-// }
-//
-// class recursive_vector
-// {
-//    public:
-//    int id_;
-//    vector<recursive_vector> vector_;
-// };
-//
-// void recursive_vector_test()//Test for recursive types
-// {
-//    vector<recursive_vector> recursive_vector_vector;
-// }
-//
-// enum Test
-// {
-//    zero, one, two, three, four, five, six
-// };
-
+///////////////////////////////////////////////////////////////////////////////
 template <typename T>
 void test_global_iteration(hpx::vector<T>& v, std::size_t size, T const& val)
 {
     typedef hpx::vector<T>::iterator iterator;
+    typedef hpx::traits::segmented_iterator_traits<iterator> traits;
+    HPX_TEST(traits::is_segmented_iterator::value);
+
     typedef hpx::vector<T>::const_iterator const_iterator;
+    typedef hpx::traits::segmented_iterator_traits<const_iterator> const_traits;
+    HPX_TEST(const_traits::is_segmented_iterator::value);
 
     HPX_TEST_EQ(v.size(), size);
     for(std::size_t i = 0; i != size; ++i)
@@ -247,14 +184,6 @@ void test_segmented_iteration(hpx::vector<T>& v, std::size_t size,
 template <typename T>
 void trivial_test_without_policy(std::size_t size, char const* prefix)
 {
-    typedef hpx::vector<T>::iterator iterator;
-    typedef hpx::traits::segmented_iterator_traits<iterator> traits;
-    HPX_TEST(traits::is_segmented_iterator::value);
-
-    typedef hpx::vector<T>::const_iterator const_iterator;
-    typedef hpx::traits::segmented_iterator_traits<const_iterator> const_traits;
-    HPX_TEST(const_traits::is_segmented_iterator::value);
-
     std::string prefix_(prefix);
 
     {
@@ -320,14 +249,6 @@ template <typename T, typename DistPolicy>
 void trivial_test_with_policy(std::size_t size, std::size_t parts,
     DistPolicy const& policy, char const* prefix)
 {
-    typedef hpx::vector<T>::iterator iterator;
-    typedef hpx::traits::segmented_iterator_traits<iterator> traits;
-    typedef traits::segment_iterator segment_iterator;
-
-    typedef hpx::vector<T>::const_iterator const_iterator;
-    typedef hpx::traits::segmented_iterator_traits<const_iterator> const_traits;
-    typedef const_traits::segment_iterator const_segment_iterator;
-
     std::string prefix_(prefix);
 
     {
@@ -371,82 +292,38 @@ void trivial_tests()
     std::size_t const length = 12;
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
-    trivial_test_without_policy<double>(length, "1");
+    trivial_test_without_policy<T>(length, "1");
 
-    trivial_test_with_policy<double>(length, 1, hpx::block, "1");
-    trivial_test_with_policy<double>(length, 3, hpx::block(3), "2");
-    trivial_test_with_policy<double>(length, 3, hpx::block(3, localities), "3");
-    trivial_test_with_policy<double>(length, localities.size(),
+    trivial_test_with_policy<T>(length, 1, hpx::block, "1");
+    trivial_test_with_policy<T>(length, 3, hpx::block(3), "2");
+    trivial_test_with_policy<T>(length, 3, hpx::block(3, localities), "3");
+    trivial_test_with_policy<T>(length, localities.size(),
         hpx::block(localities), "4");
 
-    trivial_test_with_policy<double>(length, 1, hpx::cyclic, "5");
-    trivial_test_with_policy<double>(length, 3, hpx::cyclic(3), "6");
-    trivial_test_with_policy<double>(length, 3, hpx::cyclic(3, localities), "7");
-    trivial_test_with_policy<double>(length, localities.size(),
+    trivial_test_with_policy<T>(length, 1, hpx::cyclic, "5");
+    trivial_test_with_policy<T>(length, 3, hpx::cyclic(3), "6");
+    trivial_test_with_policy<T>(length, 3, hpx::cyclic(3, localities), "7");
+    trivial_test_with_policy<T>(length, localities.size(),
         hpx::cyclic(localities), "8");
 
-    trivial_test_with_policy<double>(length, 1, hpx::block_cyclic, "9");
-    trivial_test_with_policy<double>(length, 3, hpx::block_cyclic(3), "10");
-    trivial_test_with_policy<double>(length, 3,
+    trivial_test_with_policy<T>(length, 1, hpx::block_cyclic, "9");
+    trivial_test_with_policy<T>(length, 3, hpx::block_cyclic(3), "10");
+    trivial_test_with_policy<T>(length, 3,
         hpx::block_cyclic(3, localities), "11");
-    trivial_test_with_policy<double>(length, localities.size(),
+    trivial_test_with_policy<T>(length, localities.size(),
         hpx::block_cyclic(localities), "12");
-    trivial_test_with_policy<double>(length, 4, hpx::block_cyclic(4, 3), "13");
-    trivial_test_with_policy<double>(length, 4,
+    trivial_test_with_policy<T>(length, 4, hpx::block_cyclic(4, 3), "13");
+    trivial_test_with_policy<T>(length, 4,
         hpx::block_cyclic(4, localities, 3), "14");
-    trivial_test_with_policy<double>(length, localities.size(),
+    trivial_test_with_policy<T>(length, localities.size(),
         hpx::block_cyclic(localities, 3), "15");
 }
 
 int main()
 {
     trivial_tests<double>();
+    trivial_tests<int>();
 
-//    recursive_vector_test();
-//    {
-//       //Now test move semantics
-//       vector<recursive_vector> original;
-//       vector<recursive_vector> move_ctor(boost::move(original));
-//       vector<recursive_vector> move_assign;
-//       move_assign = boost::move(move_ctor);
-//       move_assign.swap(original);
-//    }
-//    typedef vector<int> MyVector;
-//    typedef vector<test::movable_int> MyMoveVector;
-//    typedef vector<test::movable_and_copyable_int> MyCopyMoveVector;
-//    typedef vector<test::copyable_int> MyCopyVector;
-//    typedef vector<Test> MyEnumVector;
-//
-//    if(test::vector_test<MyVector>())
-//       return 1;
-//    if(test::vector_test<MyMoveVector>())
-//       return 1;
-//    if(test::vector_test<MyCopyMoveVector>())
-//       return 1;
-//    if(test::vector_test<MyCopyVector>())
-//       return 1;
-//    if(test_expand_bwd())
-//       return 1;
-//    if(!test::default_init_test< vector<int, test::default_init_allocator<int> > >()){
-//       std::cerr << "Default init test failed" << std::endl;
-//       return 1;
-//    }
-//
-//    MyEnumVector v;
-//    Test t;
-//    v.push_back(t);
-//    v.push_back(::boost::move(t));
-//    v.push_back(Test());
-//
-//    const test::EmplaceOptions Options = (test::EmplaceOptions)(test::EMPLACE_BACK | test::EMPLACE_BEFORE);
-//    if(!boost::container::test::test_emplace< vector<test::EmplaceInt>, Options>()){
-//       return 1;
-//    }
-//
-//    if(!boost::container::test::test_propagate_allocator<vector>()){
-//       return 1;
-//    }
-
-   return 0;
+    return 0;
 }
 
