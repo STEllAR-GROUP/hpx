@@ -37,7 +37,7 @@ namespace hpx { namespace server
     /// This contain the implementation of the partition_vector's component
     /// functionality.
     template <typename T>
-    class HPX_COMPONENT_EXPORT partition_vector
+    class partition_vector
       : public hpx::components::simple_component_base<partition_vector<T> >
     {
     public:

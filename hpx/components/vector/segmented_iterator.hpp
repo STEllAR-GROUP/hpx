@@ -44,7 +44,7 @@ namespace hpx
 
     namespace server
     {
-        template <typename T> class HPX_COMPONENT_EXPORT partition_vector;
+        template <typename T> class partition_vector;
     }
 
     ///////////////////////////////////////////////////////////////////////////

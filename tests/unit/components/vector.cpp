@@ -16,6 +16,11 @@
 #include <boost/foreach.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
+// Define the vector types to be used.
+HPX_REGISTER_VECTOR(double);
+HPX_REGISTER_VECTOR(int);
+
+///////////////////////////////////////////////////////////////////////////////
 template <typename T>
 void test_global_iteration(hpx::vector<T>& v, std::size_t size, T const& val)
 {
