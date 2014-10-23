@@ -15,3 +15,8 @@
 
 HPX_REGISTER_COMPONENT_MODULE();
 
+///////////////////////////////////////////////////////////////////////////////
+// Define the vector types to be used.
+HPX_REGISTER_VECTOR(double);
+HPX_REGISTER_VECTOR(int);
+

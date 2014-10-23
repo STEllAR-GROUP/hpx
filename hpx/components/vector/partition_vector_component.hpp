@@ -37,7 +37,7 @@ namespace hpx { namespace server
     /// This contain the implementation of the partition_vector's component
     /// functionality.
     template <typename T>
-    class partition_vector
+    class HPX_COMPONENT_EXPORT partition_vector
       : public hpx::components::simple_component_base<partition_vector<T> >
     {
     public:
@@ -270,10 +270,10 @@ namespace hpx { namespace server
 //             *          action type.
 //             */
 //         HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(partition_vector, max_size);
-//         /** @brief Macro to define \a resize function as HPX component
-//             *          action type.
-//             */
-//         HPX_DEFINE_COMPONENT_ACTION(partition_vector, resize);
+
+        /// Macro to define \a resize function as an HPX component action.
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL(partition_vector, resize);
+
 //         /** @brief Macro to define \a capacity function as HPX component
 //             *          action type.
 //             */
@@ -287,8 +287,8 @@ namespace hpx { namespace server
 //             */
 //         HPX_DEFINE_COMPONENT_ACTION(partition_vector, reserve);
 
-        /// Macro to define \a get_value function as am HPX component action.
-        HPX_DEFINE_COMPONENT_CONST_ACTION_TPL(partition_vector, get_value);
+        /// Macro to define \a get_value function as an HPX component action.
+        HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_TPL(partition_vector, get_value);
 
         /** @brief Macro to define \a front function as HPX component
             *          action type.
@@ -313,7 +313,7 @@ namespace hpx { namespace server
 //         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_vector, pop_back);
 
         /// Macro to define \a set_value function as an HPX component action.
-        HPX_DEFINE_COMPONENT_ACTION_TPL(partition_vector, set_value);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL(partition_vector, set_value);
 
 //         /** @brief Macro to define \a clear function as HPX component action
 //             *          type.
@@ -341,6 +341,9 @@ namespace hpx { namespace server
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         hpx::server::partition_vector<type>::set_value_action,                \
         BOOST_PP_CAT(__vector_set_value_action_, name));                      \
+    HPX_REGISTER_ACTION_DECLARATION(                                          \
+        hpx::server::partition_vector<type>::resize_action,                   \
+        BOOST_PP_CAT(__vector_resize_action_, name));                         \
     /**/
 
 #define HPX_REGISTER_VECTOR(...)                                              \
@@ -362,10 +365,13 @@ namespace hpx { namespace server
     HPX_REGISTER_ACTION(                                                      \
         ::hpx::server::partition_vector<type>::set_value_action,              \
         BOOST_PP_CAT(__vector_set_value_action_, name));                      \
+    HPX_REGISTER_ACTION(                                                      \
+        hpx::server::partition_vector<type>::resize_action,                   \
+        BOOST_PP_CAT(__vector_resize_action_, name));                         \
     typedef ::hpx::components::simple_component<                              \
         ::hpx::server::partition_vector<type>                                 \
     > BOOST_PP_CAT(__vector_, name);                                          \
-    template ::hpx::server::partition_vector<type>;                           \
+    template HPX_COMPONENT_EXPORT ::hpx::server::partition_vector<type>;      \
     HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(BOOST_PP_CAT(__vector_, name))     \
     /**/
 
@@ -378,10 +384,6 @@ namespace hpx { namespace server
 // HPX_REGISTER_ACTION_DECLARATION(
 //     hpx::server::partition_vector::max_size_action,
 //     partition_vector_max_size_action);
-// /** @brief Macro to register \a resize component action type.*/
-// HPX_REGISTER_ACTION_DECLARATION(
-//     hpx::server::partition_vector::resize_action,
-//     partition_vector_resize_action);
 // /** @brief Macro to register \a capacity component action type.*/
 // HPX_REGISTER_ACTION_DECLARATION(
 //     hpx::server::partition_vector::capacity_action,
@@ -474,25 +476,6 @@ namespace hpx { namespace server
 // //         static future<size_type> max_size_async(id_type const& gid)
 // //         {
 // //             return hpx::async<base_type::max_size_action>(gid);
-// //         }
-//
-//         /** @brief Resize the partition_vector component. If the \a val is not
-//          *          it use default constructor instead.
-//          *
-//          *  @param gid  The global id of the partition_vector component register
-//          *               with HPX
-//          *  @param n    New size of the partition_vector
-//          *  @param val  Value to be copied if \a n is greater than the
-//          *               current size
-//          *
-//          *  @return This returns the hpx::future of type void [The void return
-//          *           type can help to check whether the action is completed or
-//          *           not]
-//          */
-// //         static future<void> resize_async(id_type const& gid,
-// //             size_type n, T const& val = T())
-// //         {
-// //             return hpx::async<base_type::resize_action>(gid, n, val);
 // //         }
 //
 //         /** @brief Calculate the capacity of the partition_vector component.
@@ -692,11 +675,33 @@ namespace hpx
 //             return max_size_async().get();
 //         }
 
-//         void resize(std::size_t n, T const& val = 0)
-//         {
-//             HPX_ASSERT(this->get_gid());
-//             this->base_type::resize_async(this->get_gid(), n, val).get();
-//         }
+        /// \brief Resize the partition_vector component. If the \a val is not
+        ///         it use default constructor instead.
+        ///
+        /// \param n    New size of the partition_vector
+        /// \param val  Value to be copied if \a n is greater than the current
+        ///             size
+        ///
+        void resize(std::size_t n, T const& val = T())
+        {
+            return resize_async(n, val).get();
+        }
+
+        /// \brief Resize the partition_vector component. If the \a val is not
+        ///         it use default constructor instead.
+        ///
+        /// \param n    New size of the partition_vector
+        /// \param val  Value to be copied if \a n is greater than the current
+        ///             size
+        ///
+        /// \return This returns the hpx::future of type void which gets ready
+        ///         once the operation is finished.
+        ///
+        future<void> resize_async(std::size_t n, T const& val = T())
+        {
+            HPX_ASSERT(this->get_gid());
+            return hpx::async<server_type::resize_action>(this->get_gid(), n, val);
+        }
 
 //         future<std::size_t> capacity_async() const
 //         {
@@ -731,7 +736,8 @@ namespace hpx
         ///
         /// \param pos  Position of the element in the partition_vector
         ///
-        /// \return This returns the value as the hpx::future
+        /// \return Returns the value of the element at position represented
+        ///         by \a pos
         ///
         T get_value(std::size_t pos) const
         {
@@ -743,8 +749,7 @@ namespace hpx
         ///
         /// \param pos Position of the element in the partition_vector
         ///
-        /// \return Returns the value of the element at position represented
-        ///         by \a pos
+        /// \return This returns the value as the hpx::future
         ///
         future<T> get_value_async(std::size_t pos) const
         {

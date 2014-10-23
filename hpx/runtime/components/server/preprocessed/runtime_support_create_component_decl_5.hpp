@@ -14,12 +14,24 @@
     template <typename Component, typename A0 , typename A1>
     naming::gid_type create_component2(
         A0 a0 , A1 a1);
+    template <typename Component, typename A0>
+    std::vector<naming::gid_type> bulk_create_component2(
+        std::size_t count, A0 a0);
     template <typename Component, typename A0 , typename A1 , typename A2>
     naming::gid_type create_component3(
         A0 a0 , A1 a1 , A2 a2);
+    template <typename Component, typename A0 , typename A1>
+    std::vector<naming::gid_type> bulk_create_component3(
+        std::size_t count, A0 a0 , A1 a1);
     template <typename Component, typename A0 , typename A1 , typename A2 , typename A3>
     naming::gid_type create_component4(
         A0 a0 , A1 a1 , A2 a2 , A3 a3);
+    template <typename Component, typename A0 , typename A1 , typename A2>
+    std::vector<naming::gid_type> bulk_create_component4(
+        std::size_t count, A0 a0 , A1 a1 , A2 a2);
     template <typename Component, typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
     naming::gid_type create_component5(
         A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4);
+    template <typename Component, typename A0 , typename A1 , typename A2 , typename A3>
+    std::vector<naming::gid_type> bulk_create_component5(
+        std::size_t count, A0 a0 , A1 a1 , A2 a2 , A3 a3);

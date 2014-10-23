@@ -236,7 +236,8 @@ namespace hpx
         {
             server::vector_configuration::config_data data(
                 size_, block_size_, partitions_, int(policy_));
-            base_type::reset(base_type::create_async(hpx::find_here(), data));
+            base_type::reset(hpx::new_<server::vector_configuration>(
+                hpx::find_here(), data));
 
             registered_name_ = symbolic_name;
             return base_type::register_as(symbolic_name);
@@ -416,9 +417,25 @@ namespace hpx
         }
 
     protected:
-        template <typename DistPolicy>
+        future<std::vector<id_type> >
+        create_helper1(id_type const& locality, std::size_t count,
+            std::size_t size)
+        {
+            return partition_vector_client::bulk_create_async(
+                locality, count, size);
+        }
+
+        future<std::vector<id_type> >
+        create_helper2(id_type const& locality, std::size_t count,
+            std::size_t size, T const& val)
+        {
+            return partition_vector_client::bulk_create_async(
+                locality, count, size, val);
+        }
+
+        template <typename DistPolicy, typename Create>
         void create(std::vector<id_type> const& localities,
-            DistPolicy const& policy)
+            DistPolicy const& policy, Create && creator)
         {
             std::size_t num_parts = policy.get_num_partitions();
             std::size_t part_size = (size_ + num_parts - 1) / num_parts;
@@ -427,57 +444,77 @@ namespace hpx
                 (num_parts + num_localities - 1) / num_localities;
 
             // create as many partitions as required
+            std::vector<future<std::vector<id_type> > > ids;
+            ids.reserve(num_localities);
+
+            for (std::size_t loc = 0; loc != num_localities; ++loc)
+            {
+                // create as many partitions on a given locality as required
+                ids.push_back(
+                    creator(localities[loc], num_parts_per_loc, part_size)
+                );
+            }
+            hpx::wait_all(ids);
+
+            // now initialize our data structures
             std::size_t num_part = 0;
             std::size_t allocated_size = 0;
             for (std::size_t loc = 0; loc != num_localities; ++loc)
             {
-                // create as many partitions on a given locality as required
+                boost::uint32_t locality =
+                    naming::get_locality_id_from_id(localities[loc]);
+                std::vector<id_type> objs = ids[loc].get();
+
+                HPX_ASSERT(objs.size() == num_parts_per_loc);
                 for (std::size_t l = 0; l != num_parts_per_loc; ++l)
                 {
-                    id_type const& locality = localities[loc];
                     std::size_t size = (std::min)(part_size, size_-allocated_size);
-                    partitions_.push_back(partition_data(
-                        hpx::new_<partition_vector_server>(locality, size),
-                        size, hpx::naming::get_locality_id_from_id(locality)
-                    ));
+                    partitions_.push_back(partition_data(objs[l], size, locality));
 
                     allocated_size += size;
                     if (++num_part == num_parts)
+                    {
+                        HPX_ASSERT(allocated_size == size_);
+
+                        // shrink last partition, if appropriate
+                        if (size != part_size)
+                        {
+                            partition_vector_client(
+                                    partitions_.back().partition_
+                                ).resize(size);
+                        }
                         return;
+                    }
+                    else
+                    {
+                        HPX_ASSERT(size == part_size);
+                    }
                 }
             }
+        }
+
+        template <typename DistPolicy>
+        void create(std::vector<id_type> const& localities,
+            DistPolicy const& policy)
+        {
+            using util::placeholders::_1;
+            using util::placeholders::_2;
+            using util::placeholders::_3;
+
+            create(localities, policy, util::bind(
+                &vector::create_helper1, this, _1, _2, _3));
         }
 
         template <typename DistPolicy>
         void create(T const& val, std::vector<id_type> const& localities,
             DistPolicy const& policy)
         {
-            std::size_t num_parts = policy.get_num_partitions();
-            std::size_t part_size = (size_ + num_parts - 1) / num_parts;
-            std::size_t num_localities = localities.size();
-            std::size_t num_parts_per_loc =
-                (num_parts + num_localities - 1) / num_localities;
+            using util::placeholders::_1;
+            using util::placeholders::_2;
+            using util::placeholders::_3;
 
-            // create as many partitions as required
-            std::size_t num_part = 0;
-            std::size_t allocated_size = 0;
-            for (std::size_t loc = 0; loc != num_localities; ++loc)
-            {
-                // create as many partitions on a given locality as required
-                for (std::size_t l = 0; l != num_parts_per_loc; ++l)
-                {
-                    id_type const& locality = localities[loc];
-                    std::size_t size = (std::min)(part_size, size_-allocated_size);
-                    partitions_.push_back(partition_data(
-                        hpx::new_<partition_vector_server>(locality, size, val),
-                        size, hpx::naming::get_locality_id_from_id(locality)
-                    ));
-
-                    allocated_size += size;
-                    if (++num_part == num_parts)
-                        return;
-                }
-            }
+            create(localities, policy, util::bind(
+                &vector::create_helper2, this, _1, _2, _3, boost::ref(val)));
         }
 
         // This function is called when we are creating the vector. It
@@ -672,8 +709,6 @@ namespace hpx
         /// Constructor which create hpx::vector with the given overall \a size
         ///
         /// \param size             The overall size of the vector
-        /// \param symbolic_name    The (optional) name to register the newly
-        ///                         created vector
         ///
         vector(size_type size)
           : size_(size),
@@ -682,16 +717,6 @@ namespace hpx
         {
             if (size != 0)
                 create(hpx::block);
-        }
-        vector(size_type size, std::string const& symbolic_name)
-          : size_(size),
-            block_size_(std::size_t(-1)),
-            policy_(distribution_policy::block)
-        {
-            if (size != 0)
-                create(hpx::block);
-
-            register_as(symbolic_name).get();
         }
 
         /// Constructor which create and initialize vector with the

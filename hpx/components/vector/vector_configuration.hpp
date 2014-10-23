@@ -33,6 +33,12 @@ namespace hpx { namespace server
               : size_(0), locality_id_(naming::invalid_locality_id)
             {}
 
+            partition_data(id_type const& part, std::size_t size,
+                    boost::uint32_t locality_id)
+              : partition_(make_ready_future(part).share()),
+                size_(size), locality_id_(locality_id)
+            {}
+
             partition_data(hpx::shared_future<id_type> part, std::size_t size,
                     boost::uint32_t locality_id)
               : partition_(part), size_(size), locality_id_(locality_id)
@@ -74,7 +80,7 @@ namespace hpx { namespace server
         config_data get() const { return data_; }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_DEFINE_COMPONENT_CONST_ACTION(vector_configuration, get);
+        HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(vector_configuration, get);
 
     private:
         config_data data_;
