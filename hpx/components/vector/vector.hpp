@@ -1347,8 +1347,8 @@ namespace hpx
         /// Copy the value of \a val in the element at position \a pos in
         /// the vector container.
         ///
-        /// @param pos   Position of the element in the vector
-        /// @param val   The value to be copied
+        /// \param pos   Position of the element in the vector
+        /// \param val   The value to be copied
         ///
         template <typename T_>
         void set_value(size_type pos, T_ && val)
@@ -1360,6 +1360,9 @@ namespace hpx
         ///
         /// \param pos   Position of the element in the vector
         /// \param val   The value to be copied
+        ///
+        /// \return This returns the hpx::future of type void which gets ready
+        ///         once the operation is finished.
         ///
         template <typename T_>
         future<void> set_value_async(size_type pos, T_ && val)

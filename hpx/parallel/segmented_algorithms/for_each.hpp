@@ -57,30 +57,30 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 using traits::begin;
                 using traits::end;
 
-                segment_iterator sfirst = traits::segment(first);
-                segment_iterator slast = traits::segment(last);
+                segment_iterator sit = traits::segment(first);
+                segment_iterator send = traits::segment(last);
 
                 void (invoke_)(F const&, local_iterator) =
                     &for_each_segmented::invoke;
                 auto f_ = hpx::util::bind(invoke_, std::forward<F>(f), _1);
 
-                id_type id = sfirst.get_id();
+                id_type id = sit.get_id();
 
                 using util::remote::sequential_loop;
-                if (sfirst == slast)
+                if (sit == send)
                     sequential_loop(id, local(first), local(last), f_);
                 else
                 {
-                    sequential_loop(id, local(first), end(sfirst), f_);
-                    for (++sfirst; sfirst != slast; ++sfirst)
-                        sequential_loop(id, begin(sfirst), end(sfirst), f_);
-                    sequential_loop(id, begin(sfirst), local(last), f_);
+                    sequential_loop(id, local(first), end(sit), f_);
+                    for (++sit; sit != send; ++sit)
+                        sequential_loop(sit.get_id(), begin(sit), end(sit), f_);
+                    sequential_loop(sit.get_id(), begin(sit), local(last), f_);
                 }
 
                 return hpx::util::unused;
             }
 
-            template <typename ExPolicy, typename F>
+            template <typename ExPolicy, typename SegIter, typename F>
             static typename detail::algorithm_result<ExPolicy>::type
             parallel(ExPolicy const& policy, SegIter first, SegIter last,
                 F && f)
