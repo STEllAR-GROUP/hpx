@@ -39,11 +39,6 @@ namespace hpx { namespace server
                 size_(size), locality_id_(locality_id)
             {}
 
-            partition_data(hpx::shared_future<id_type> part, std::size_t size,
-                    boost::uint32_t locality_id)
-              : partition_(part), size_(size), locality_id_(locality_id)
-            {}
-
             hpx::shared_future<id_type> partition_;
             std::size_t size_;
             boost::uint32_t locality_id_;

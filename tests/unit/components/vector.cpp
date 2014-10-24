@@ -121,6 +121,44 @@ void test_segmented_iteration(hpx::vector<T>& v, std::size_t size,
     HPX_TEST_EQ(count, size);
     HPX_TEST_EQ(seg_count, parts);
 
+    // test iteration over localities
+    count = 0;
+    BOOST_FOREACH(hpx::id_type const& loc, hpx::find_all_localities())
+    {
+        boost::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
+        iterator end = v.end(locality_id);
+        for (iterator it = v.begin(locality_id); it != end; ++it, ++count)
+        {
+            std::size_t i = 42;
+            local_iterator loc_end = traits::end(traits::segment(it));
+            for (local_iterator lit = traits::begin(traits::segment(it));
+                 lit != loc_end; ++lit, ++i)
+            {
+                *lit = T(i);
+                HPX_TEST_EQ(*lit, T(i));
+            }
+        }
+    }
+    HPX_TEST_EQ(count, size);
+
+    count = 0;
+    BOOST_FOREACH(hpx::id_type const& loc, hpx::find_all_localities())
+    {
+        boost::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
+        const_iterator end = v.cend(locality_id);
+        for (const_iterator it = v.cbegin(locality_id); it != end; ++it, ++count)
+        {
+            std::size_t i = 42;
+            const_local_iterator loc_end = const_traits::end(const_traits::segment(it));
+            for (const_local_iterator lcit = const_traits::begin(const_traits::segment(it));
+                 lcit != loc_end; ++lcit, ++i)
+            {
+                HPX_TEST_EQ(*lcit, T(i));
+            }
+        }
+    }
+    HPX_TEST_EQ(count, size);
+
     // test segmented iteration over localities
     count = 0;
     seg_count = 0;

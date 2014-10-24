@@ -106,11 +106,11 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         base_iterator_type base_iterator()
         {
-            return partition_.get_ptr()->begin() + local_index_;
+            return get_ptr()->begin() + local_index_;
         }
         base_const_iterator_type base_iterator() const
         {
-            return partition_.get_ptr()->begin() + local_index_;
+            return get_ptr()->cbegin() + local_index_;
         }
 
     private:
@@ -120,6 +120,13 @@ namespace hpx
         void serialize(Archive& ar, unsigned version)
         {
             ar & partition_ & local_index_;
+        }
+
+        boost::shared_ptr<server::partition_vector<T> > get_ptr() const
+        {
+            if (!data_)
+                data_ = partition_.get_ptr();
+            return data_;
         }
 
     protected:
@@ -132,6 +139,9 @@ namespace hpx
 
         bool equal(local_vector_iterator const& other) const
         {
+            if (is_at_end() && other.is_at_end())
+                return true;
+
             return partition_ == other.partition_ &&
                 local_index_ == other.local_index_;
         }
@@ -139,7 +149,7 @@ namespace hpx
         typename base_type::reference dereference() const
         {
             HPX_ASSERT(!is_at_end());
-            return partition_.get_value(local_index_);
+            return *(get_ptr()->begin() + local_index_);
         }
 
         void increment()
@@ -189,6 +199,9 @@ namespace hpx
 
         // local position in the referenced partition
         size_type local_index_;
+
+        // caching address of component
+        mutable boost::shared_ptr<server::partition_vector<T> > data_;
     };
 
     template <typename T>
@@ -222,11 +235,11 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         base_const_iterator_type base_iterator()
         {
-            return partition_.get_ptr()->cbegin() + local_index_;
+            return get_ptr()->cbegin() + local_index_;
         }
         base_const_iterator_type base_iterator() const
         {
-            return partition_.get_ptr()->cbegin() + local_index_;
+            return get_ptr()->cbegin() + local_index_;
         }
 
     private:
@@ -236,6 +249,13 @@ namespace hpx
         void serialize(Archive& ar, unsigned version)
         {
             ar & partition_ & local_index_;
+        }
+
+        boost::shared_ptr<server::partition_vector<T> > get_ptr() const
+        {
+            if (!data_)
+                data_ = partition_.get_ptr();
+            return data_;
         }
 
     protected:
@@ -248,6 +268,9 @@ namespace hpx
 
         bool equal(const_local_vector_iterator const& other) const
         {
+            if (is_at_end() && other.is_at_end())
+                return true;
+
             return partition_ == other.partition_ &&
                 local_index_ == other.local_index_;
         }
@@ -255,7 +278,7 @@ namespace hpx
         typename base_type::reference dereference() const
         {
             HPX_ASSERT(!is_at_end());
-            return partition_.get_value(local_index_);
+            return *base_iterator();
         }
 
         void increment()
@@ -303,6 +326,9 @@ namespace hpx
 
         // local position in the referenced partition
         size_type local_index_;
+
+        // caching address of component
+        mutable boost::shared_ptr<server::partition_vector<T> > data_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -428,6 +454,8 @@ namespace hpx
 
         bool equal(vector_iterator const& other) const
         {
+            if (is_at_end() && other.is_at_end())
+                return true;
             return data_ == other.data_ && global_index_ == other.global_index_;
         }
 
@@ -520,6 +548,8 @@ namespace hpx
 
         bool equal(const_vector_iterator const& other) const
         {
+            if (is_at_end() && other.is_at_end())
+                return true;
             return data_ == other.data_ && global_index_ == other.global_index_;
         }
 

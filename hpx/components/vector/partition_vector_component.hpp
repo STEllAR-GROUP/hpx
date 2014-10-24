@@ -650,7 +650,7 @@ namespace hpx
         // Return the pinned pointer to the underlying component
         boost::shared_ptr<server::partition_vector<T> > get_ptr() const
         {
-            return hpx::get_ptr<server::partition_vector<T> >(this->get_gid());
+            return hpx::get_ptr<server::partition_vector<T> >(this->get_gid()).get();
         }
 
         ///////////////////////////////////////////////////////////////////////
