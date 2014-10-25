@@ -164,7 +164,7 @@ namespace hpx { namespace util
                     typename unwrap_impl<
                         typename util::decay<Future>::type
                     >::is_void
-                  , typename util::decay<Tuple>::type
+                  , util::decay<Tuple>
                   , unwrap_tuple_push_back<
                         typename util::decay<Tuple>::type
                       , typename unwrap_impl<
