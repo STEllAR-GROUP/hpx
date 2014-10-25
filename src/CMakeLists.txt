@@ -20,6 +20,9 @@ endforeach()
 # libhpx_serialization sources
 add_hpx_library_sources(hpx_serialization
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/util/*_binary_*archive.cpp")
+add_hpx_library_sources(hpx_serialization
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/serialization/*.cpp"
+  APPEND)
 
 # libhpx sources
 add_hpx_library_sources(hpx
@@ -80,6 +83,9 @@ endif()
 # libhpx_serialization headers
 add_hpx_library_headers(hpx_serialization
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/util/*_binary_*.hpp")
+add_hpx_library_headers(hpx_serialization
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/serialization/*.hpp"
+  APPEND)
 add_hpx_library_headers(hpx_serialization
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/util/ichunk_manager.hpp"
   APPEND)

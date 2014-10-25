@@ -11,6 +11,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/static.hpp>
+#include <hpx/traits/needs_automatic_registration.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/cstdint.hpp>
@@ -18,16 +19,6 @@
 #include <map>
 
 #include <hpx/config/warnings_prefix.hpp>
-
-namespace hpx { namespace traits
-{
-    // This trait is used to decide whether a class (or specialization) is
-    // required to automatically register to the action factory
-    template <typename T, typename Enable = void>
-    struct needs_automatic_registration
-      : boost::mpl::true_
-    {};
-}}
 
 namespace hpx { namespace actions { namespace detail
 {

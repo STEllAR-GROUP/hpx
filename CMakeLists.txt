@@ -872,7 +872,7 @@ if(HPX_COMPILER_WARNINGS)
     hpx_add_compile_flag_if_available(-Wdouble-promotion)
 
     # Warn about casting that violates qualifiers or alignment
-    hpx_add_compile_flag_if_available(-Wcast-qual)
+    #hpx_add_compile_flag_if_available(-Wcast-qual)
     if(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
       # Clang is overeager in reporting cast alignment problems in Boost
       hpx_add_compile_flag_if_available(-Wcast-align)
@@ -890,7 +890,7 @@ if(HPX_COMPILER_WARNINGS)
       hpx_add_compile_flag_if_available(-Werror=uninitialized)
     endif()
 
-    #hpx_add_compile_flag_if_available(-Werror=missing-field-initializers)
+    hpx_add_compile_flag_if_available(-Wno-missing-field-initializers)
     hpx_add_compile_flag_if_available(-Werror=format)
     hpx_add_compile_flag_if_available(-Werror=missing-braces)
     hpx_add_compile_flag_if_available(-Werror=sign-compare)
