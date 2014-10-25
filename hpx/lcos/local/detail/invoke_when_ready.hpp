@@ -130,7 +130,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 util::invoke_fused(f, std::forward<Args>(args)));
         }
         catch (...) {
-            return hpx::make_error_future<value_type>(boost::current_exception());
+            return hpx::make_exceptional_future<value_type>(boost::current_exception());
         }
     }
 
@@ -145,7 +145,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             return hpx::make_ready_future();
         }
         catch (...) {
-            return hpx::make_error_future<void>(boost::current_exception());
+            return hpx::make_exceptional_future<void>(boost::current_exception());
         }
     }
 
