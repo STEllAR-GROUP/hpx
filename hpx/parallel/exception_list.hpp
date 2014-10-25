@@ -55,7 +55,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     }
                 }
                 catch (...) {
-                    return make_error_future<Result>(boost::current_exception());
+                    return hpx::make_exceptional_future<Result>(boost::current_exception());
                 }
             }
         };
@@ -80,7 +80,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     }
                 }
                 catch (...) {
-                    return make_error_future<Result>(boost::current_exception());
+                    return hpx::make_exceptional_future<Result>(boost::current_exception());
                 }
             }
         };

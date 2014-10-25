@@ -191,7 +191,7 @@ namespace hpx { namespace parallel { namespace util
                     }
                 }
                 catch (std::bad_alloc const&) {
-                    return hpx::make_error_future<R>(
+                    return hpx::make_exceptional_future<R>(
                         boost::current_exception());
                 }
                 catch (...) {
@@ -263,7 +263,7 @@ namespace hpx { namespace parallel { namespace util
                     }
                 }
                 catch (std::bad_alloc const&) {
-                    return hpx::make_error_future<R>(
+                    return hpx::make_exceptional_future<R>(
                         boost::current_exception());
                 }
                 catch (...) {

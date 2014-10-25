@@ -1178,17 +1178,26 @@ namespace hpx { namespace lcos
 
     // extension: create a pre-initialized future object which holds the
     // given error
-    template <typename Result>
-    future<typename util::detail::decay_unwrap<Result>::type>
-    make_error_future(boost::exception_ptr const& e)
+    template <typename T>
+    future<T> make_exceptional_future(boost::exception_ptr const& e)
     {
-        typedef typename util::detail::decay_unwrap<Result>::type result_type;
-        typedef lcos::detail::future_data<result_type> shared_state;
+        typedef lcos::detail::future_data<T> shared_state;
 
         boost::intrusive_ptr<shared_state> p(new shared_state());
         p->set_exception(e);
 
-        return traits::future_access<future<result_type> >::create(std::move(p));
+        return traits::future_access<future<T> >::create(std::move(p));
+    }
+
+    template <typename T, typename E>
+    future<T> make_exceptional_future(E e)
+    {
+        try
+        {
+            throw e;
+        } catch (...) {
+            return lcos::make_exceptional_future<T>(boost::current_exception());
+        }
     }
 
     // extension: create a pre-initialized future object which gets ready at
@@ -1700,13 +1709,13 @@ namespace boost { namespace serialization
 namespace hpx
 {
     using lcos::make_ready_future;
-    using lcos::make_error_future;
+    using lcos::make_exceptional_future;
     using lcos::make_ready_future_at;
     using lcos::make_ready_future_after;
 }
 
-#define HPX_MAKE_ERROR_FUTURE(T, errorcode, f, msg)                    \
-    lcos::make_error_future<T>(HPX_GET_EXCEPTION(errorcode, f, msg))   \
+#define HPX_MAKE_EXCEPTIONAL_FUTURE(T, errorcode, f, msg)                    \
+    lcos::make_exceptional_future<T>(HPX_GET_EXCEPTION(errorcode, f, msg))   \
     /**/
 
 #endif

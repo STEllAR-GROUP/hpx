@@ -1441,7 +1441,7 @@ hpx::future<naming::address> addressing_service::resolve_async(
 
         if (ec)
         {
-            return make_error_future<naming::address>(
+            return hpx::make_exceptional_future<naming::address>(
                 hpx::detail::access_exception(ec));
         }
     }
