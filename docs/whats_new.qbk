@@ -57,8 +57,20 @@ the first time to __hpx__.
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1295] - building issue
+* [issue 1293] - Transpose example
+* [issue 1292] - Wrong abs() function used in example
+* [issue 1291] - non-syncronized shift operators have been removed
+* [issue 1289] - Fixing 1288
+* [issue 1288] - Add new performance counters
+* [issue 1287] - Hierarchy scheduler broken performance counters
+* [issue 1286] - Algorithm cleanup
+* [issue 1284] - Uninitialized copy
+* [issue 1283] - missing boost::scoped_ptr includes
 * [issue 1282] - Update documentation of build options for schedulers
 * [issue 1281] - reset idle rate counter
+* [issue 1280] - Bug when executing on Intel MIC
+* [issue 1279] - Add improved when_all/wait_all
 * [issue 1278] - Implement improved when_all/wait_all
 * [issue 1277] - feature request: get access to argc argv and variables_map
 * [issue 1276] - Remove merging map
@@ -66,6 +78,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1273] - Sequential task execution policy
 * [issue 1272] - Avoid CMake name clash for Boost.Thread library
 * [issue 1271] - Updates on HPX Test Units
+* [issue 1270] - hpx/util/safe_lexical_cast.hpp is added
 * [issue 1269] - Added default value for "LIB" cmake variable
 * [issue 1268] - Memory Counters not working
 * [issue 1266] - FindHPX.cmake is not installed
@@ -101,6 +114,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1231] - Parallel minmax
 * [issue 1230] - Distributed run of 1d_stencil_8 uses less threads than spec.
                  & sometimes gives errors
+* [issue 1229] - Unstable number of threads
 * [issue 1228] - HPX link error (cmake / MPI)
 * [issue 1226] - Warning about struct/class thread_counters
 * [issue 1225] - Adding parallel::replace etc
@@ -154,6 +168,7 @@ Here is a list of the important tickets we closed for this release.
                  2-argument version
 * [issue 1175] - Create util::zip_iterator working with util::tuple<>
 * [issue 1174] - Error Building HPX on linux, root_certificate_authority.cpp
+* [issue 1173] - hpx::cout output lost
 * [issue 1172] - HPX build error with Clang 3.4.2
 * [issue 1171] - `CMAKE_INSTALL_PREFIX` ignored
 * [issue 1170] - Close hpx_benchmarks repository on Github
