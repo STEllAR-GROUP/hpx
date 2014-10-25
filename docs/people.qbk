@@ -128,6 +128,8 @@ the project through discussions, pull requests, documentation patches, etc.
 * Agustin Berge, who contributed patches fixing some very nasty hidden template
   meta-programming issues. He rewrote large parts of the API elements ensuring
   strict conformance with C++11/14.
+* Anton Bikineev for contributing changes to make using `boost::lexical_cast`
+  safer, he also contributed a thread safety fix to the iostreams module.
 * Pyry Jahkola, who contributed the Mac OS build system and build documentation
   on how to build HPX using Clang and libc++.
 * Mario Mulansky, who created an __hpx__ backend for his Boost.Odeint library, and
@@ -136,8 +138,6 @@ the project through discussions, pull requests, documentation patches, etc.
 * Rekha Raj, who contributed changes to the description of the Windows build
   instructions.
 * Alex Nagelberg for his work on implementing a C wrapper API for HPX.
-* Anton Bikineev for contributing changes to make using `boost::lexical_cast`
-  safer.
 
 In addition to the people who worked directly with __hpx__ development we would
 like to acknowledge the NSF, DoE, DARPA, __cct__, and __inf3__ who fund and
