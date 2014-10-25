@@ -129,18 +129,18 @@ namespace hpx
             return data_;
         }
 
-    protected:
         bool is_at_end() const
         {
             return !partition_ || local_index_ == size_type(-1);
         }
 
+    protected:
         friend class boost::iterator_core_access;
 
         bool equal(local_vector_iterator const& other) const
         {
-            if (is_at_end() && other.is_at_end())
-                return true;
+            if (is_at_end())
+                return other.is_at_end();
 
             return partition_ == other.partition_ &&
                 local_index_ == other.local_index_;
@@ -177,11 +177,11 @@ namespace hpx
                 if (is_at_end())
                     return 0;
 
-                return partition_.size() - local_index_;
+                return get_ptr()->size() - local_index_;
             }
 
             if (is_at_end())
-                return other_.local_index_ - other.partition_.size();
+                return other.local_index_ - other.get_ptr()->size();
 
             HPX_ASSERT(partition_ == other.partition_);
             return other.local_index_ - local_index_;
@@ -258,18 +258,18 @@ namespace hpx
             return data_;
         }
 
-    protected:
         bool is_at_end() const
         {
             return !partition_ || local_index_ == size_type(-1);
         }
 
+    protected:
         friend class boost::iterator_core_access;
 
         bool equal(const_local_vector_iterator const& other) const
         {
-            if (is_at_end() && other.is_at_end())
-                return true;
+            if (is_at_end())
+                return other.is_at_end();
 
             return partition_ == other.partition_ &&
                 local_index_ == other.local_index_;
@@ -364,6 +364,10 @@ namespace hpx
         typedef is_requested_locality<BaseIter> predicate;
 
     public:
+        segment_vector_iterator()
+          : data_(0)
+        {}
+
         segment_vector_iterator(vector<T>* data, BaseIter const& end)
           : base_type(predicate(), end, end), data_(data)
         {}
@@ -376,6 +380,11 @@ namespace hpx
 
         vector<T>* get_data() { return data_; }
         vector<T> const* get_data() const { return data_; }
+
+        bool is_at_end() const
+        {
+            return data_ == 0 || this->base() == this->end();
+        }
 
     private:
         vector<T>* data_;
@@ -394,6 +403,10 @@ namespace hpx
         typedef is_requested_locality<BaseIter> predicate;
 
     public:
+        const_segment_vector_iterator()
+          : data_(0)
+        {}
+
         const_segment_vector_iterator(vector<T> const* data, BaseIter const& end)
           : base_type(predicate(), end, end), data_(data)
         {}
@@ -405,6 +418,11 @@ namespace hpx
         {}
 
         vector<T> const* get_data() const { return data_; }
+
+        bool is_at_end() const
+        {
+            return data_ == 0 || this->base() == this->end();
+        }
 
     private:
         vector<T> const* data_;
@@ -444,18 +462,18 @@ namespace hpx
 
         size_type get_global_index() const { return global_index_; }
 
-    protected:
         bool is_at_end() const
         {
             return data_ == 0 || global_index_ == size_type(-1);
         }
 
+    protected:
         friend class boost::iterator_core_access;
 
         bool equal(vector_iterator const& other) const
         {
-            if (is_at_end() && other.is_at_end())
-                return true;
+            if (is_at_end())
+                return other.is_at_end();
             return data_ == other.data_ && global_index_ == other.global_index_;
         }
 
@@ -538,18 +556,18 @@ namespace hpx
         vector<T> const* get_data() const { return data_; }
         size_type get_global_index() const { return global_index_; }
 
-    protected:
         bool is_at_end() const
         {
             return data_ == 0 || global_index_ == size_type(-1);
         }
 
+    protected:
         friend class boost::iterator_core_access;
 
         bool equal(const_vector_iterator const& other) const
         {
-            if (is_at_end() && other.is_at_end())
-                return true;
+            if (is_at_end())
+                return other.is_at_end();
             return data_ == other.data_ && global_index_ == other.global_index_;
         }
 
@@ -618,6 +636,9 @@ namespace hpx { namespace traits
         //  the iterator is currently pointing to (i.e. just global iterator).
         static segment_iterator segment(iterator& iter)
         {
+//             if (iter.is_at_end())           // avoid dereferencing end iterator
+//                 return segment_iterator();
+
             return iter.get_data()->get_segment_iterator(
                 iter.get_global_index());
         }
@@ -626,6 +647,9 @@ namespace hpx { namespace traits
         //  the exact position to which local iterator is pointing.
         static local_iterator local(iterator& iter)
         {
+            if (iter.is_at_end())           // avoid dereferencing end iterator
+                return local_iterator();
+
             return iter.get_data()->get_local_iterator(
                 iter.get_global_index());
         }
@@ -643,6 +667,9 @@ namespace hpx { namespace traits
         //  beginning of the partition.
         static local_iterator begin(segment_iterator const& seg_iter)
         {
+            if (seg_iter.is_at_end())       // avoid dereferencing end iterator
+                return local_iterator();
+
             return local_iterator(seg_iter.base()->partition_, 0);
         }
 
@@ -650,6 +677,9 @@ namespace hpx { namespace traits
         //  end of the partition.
         static local_iterator end(segment_iterator const& seg_iter)
         {
+            if (seg_iter.is_at_end())       // avoid dereferencing end iterator
+                return local_iterator();
+
             return local_iterator(seg_iter.base()->partition_,
                 seg_iter.base()->size_);
         }
@@ -668,6 +698,9 @@ namespace hpx { namespace traits
         //  the iterator is currently pointing to (i.e. just global iterator).
         static segment_iterator segment(iterator& iter)
         {
+//             if (iter.is_at_end())           // avoid dereferencing end iterator
+//                 return segment_iterator();
+
             return iter.get_data()->get_const_segment_iterator(
                 iter.get_global_index());
         }
@@ -676,6 +709,9 @@ namespace hpx { namespace traits
         //  the exact position to which local iterator is pointing.
         static local_iterator local(iterator const& iter)
         {
+            if (iter.is_at_end())           // avoid dereferencing end iterator
+                return local_iterator();
+
             return iter.get_data()->get_const_local_iterator(
                 iter.get_global_index());
         }
@@ -693,6 +729,9 @@ namespace hpx { namespace traits
         //  beginning of the partition.
         static local_iterator begin(segment_iterator const& seg_iter)
         {
+            if (seg_iter.is_at_end())       // avoid dereferencing end iterator
+                return local_iterator();
+
             return local_iterator(seg_iter.base()->partition_, 0);
         }
 
@@ -700,6 +739,9 @@ namespace hpx { namespace traits
         //  end of the partition.
         static local_iterator end(segment_iterator const& seg_iter)
         {
+            if (seg_iter.is_at_end())       // avoid dereferencing end iterator
+                return local_iterator();
+
             return local_iterator(seg_iter.base()->partition_,
                 seg_iter.base()->size_);
         }

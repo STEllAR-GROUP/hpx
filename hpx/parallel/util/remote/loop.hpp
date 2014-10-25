@@ -22,7 +22,7 @@ namespace hpx { namespace parallel { namespace util { namespace remote
         template <typename Iter, typename F>
         struct loop_invoker
         {
-            static Iter sequential(Iter begin, Iter end, F const& f)
+            static Iter sequential(Iter begin, Iter end, F f)
             {
                 typedef typename Iter::base_iterator_type iterator;
 
@@ -30,17 +30,17 @@ namespace hpx { namespace parallel { namespace util { namespace remote
                 for (iterator it = begin.base_iterator(); it != last;
                      (void) ++it, ++begin)
                 {
-                    f(*it);
+                    f(it);
                 }
 
                 return begin;
             }
 
-            static Iter parallel(Iter begin, Iter end, F const& f)
+            static Iter parallel(Iter begin, Iter end, F f)
             {
                 typedef typename Iter::base_iterator_type iterator;
 
-                return parallel::for_each(begin.base_iterator(),
+                return parallel::for_each(parallel::par, begin.base_iterator(),
                     end.base_iterator(), f);
             }
         };
@@ -48,7 +48,7 @@ namespace hpx { namespace parallel { namespace util { namespace remote
         template <typename Iter, typename F>
         struct sequential_loop_invoker_action
             : hpx::actions::make_action<
-                Iter (*)(Iter, Iter, F const&),
+                Iter (*)(Iter, Iter, F),
                 &loop_invoker<Iter, F>::sequential,
                 sequential_loop_invoker_action<Iter, F>
             >
@@ -57,7 +57,7 @@ namespace hpx { namespace parallel { namespace util { namespace remote
         template <typename Iter, typename F>
         struct parallel_loop_invoker_action
             : hpx::actions::make_action<
-                Iter (*)(Iter, Iter, F const&),
+                Iter (*)(Iter, Iter, F),
                 &loop_invoker<Iter, F>::parallel,
                 parallel_loop_invoker_action<Iter, F>
             >
@@ -65,21 +65,31 @@ namespace hpx { namespace parallel { namespace util { namespace remote
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename LocalIter, typename F>
+    template <typename SegIter, typename LocalIter, typename F>
     BOOST_FORCEINLINE hpx::future<LocalIter>
-    sequential_loop_async(id_type id, LocalIter begin, LocalIter end, F && f)
+    segmented_sequential_loop_async(SegIter sit, LocalIter begin, LocalIter end,
+        F && f)
     {
+        if (begin == end)
+            return hpx::make_ready_future(begin);
+
         typename detail::sequential_loop_invoker_action<
-                LocalIter, hpx::util::decay<F>::type
+                LocalIter, typename hpx::util::decay<F>::type
             > act;
-        return hpx::async_colocated(act, id, begin, end, std::forward<F>(f));
+        return hpx::async_colocated(act, sit->get_id(), begin, end,
+            std::forward<F>(f));
     }
 
-    template <typename LocalIter, typename F>
+    template <typename SegIter, typename LocalIter, typename F>
     BOOST_FORCEINLINE LocalIter
-    sequential_loop(id_type id, LocalIter begin, LocalIter end, F && f)
+    segmented_sequential_loop(SegIter sit, LocalIter begin, LocalIter end,
+        F && f)
     {
-        return sequential_loop_async(id, first, last, std::forward<F>(f)).get();
+        if (begin == end)
+            return begin;
+
+        return segmented_sequential_loop_async(sit, begin, end,
+            std::forward<F>(f)).get();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -88,7 +98,7 @@ namespace hpx { namespace parallel { namespace util { namespace remote
     parallel_loop_async(id_type id, LocalIter begin, LocalIter end, F && f)
     {
         typename detail::parallel_loop_invoker_action<
-                LocalIter, hpx::util::decay<F>::type
+                LocalIter, typename hpx::util::decay<F>::type
             > act;
         return hpx::async_colocated(act, id, begin, end, std::forward<F>(f));
     }
@@ -97,7 +107,7 @@ namespace hpx { namespace parallel { namespace util { namespace remote
     BOOST_FORCEINLINE LocalIter
     parallel_loop(id_type id, LocalIter begin, LocalIter end, F && f)
     {
-        return parallel_loop_async(id, first, last, std::forward<F>(f)).get();
+        return parallel_loop_async(id, begin, end, std::forward<F>(f)).get();
     }
 }}}}
 

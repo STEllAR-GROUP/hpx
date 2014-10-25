@@ -226,7 +226,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 iterator_category;
 
             typedef typename boost::mpl::or_<
-                is_sequential_execution_policy<ExPolicy>,
+                parallel::is_sequential_execution_policy<ExPolicy>,
                 boost::is_same<std::input_iterator_tag, iterator_category>
             >::type is_seq;
 

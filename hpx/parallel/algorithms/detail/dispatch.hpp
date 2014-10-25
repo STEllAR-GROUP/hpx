@@ -25,6 +25,7 @@
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 
 #include <boost/mpl/bool.hpp>
+#include <boost/serialization/serialization.hpp>
 
 #include <string>
 
@@ -115,6 +116,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         explicit algorithm(char const* const name) : name_(name) {}
 
         char const* const name_;
+
+        template <typename Archive>
+        void serialize(Archive& ar, unsigned int)
+        {
+        }
     };
 }}}}
 
@@ -232,7 +238,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     result_type call(parallel::v1::execution_policy const& policy,
          HPX_ENUM_FWD_ARGS(N, Arg, arg), boost::mpl::true_)
     {
-        return call(seq, HPX_ENUM_FORWARD_ARGS(N, Arg, arg), boost::mpl::true_());
+        return call(seq, HPX_ENUM_FORWARD_ARGS(N, Arg, arg),
+            boost::mpl::true_());
     }
 
 #undef N

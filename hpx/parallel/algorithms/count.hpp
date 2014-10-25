@@ -84,6 +84,33 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         }));
             }
         };
+
+        template <typename ExPolicy, typename InIter, typename T>
+        inline typename boost::enable_if<
+            is_execution_policy<ExPolicy>,
+            typename detail::algorithm_result<ExPolicy,
+                typename std::iterator_traits<InIter>::difference_type
+            >::type
+        >::type
+        count_(ExPolicy && policy, InIter first, InIter last, T const& value,
+            boost::mpl::false_)
+        {
+            typedef typename std::iterator_traits<InIter>::iterator_category
+                category;
+
+            BOOST_STATIC_ASSERT_MSG(
+                (boost::is_base_of<std::input_iterator_tag, category>::value),
+                "Required at least input iterator.");
+
+            typedef typename boost::mpl::or_<
+                parallel::is_sequential_execution_policy<ExPolicy>,
+                boost::is_same<std::input_iterator_tag, category>
+            >::type is_seq;
+
+            return detail::count<InIter>().call(
+                std::forward<ExPolicy>(policy),
+                first, last, value, is_seq());
+        }
         /// \endcond
     }
 
@@ -151,9 +178,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, category>
         >::type is_seq;
 
-        return detail::count<InIter>().call(
+        typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;
+        typedef typename iterator_traits::is_segmented_iterator is_segmented;
+
+        return detail::count_().call(
             std::forward<ExPolicy>(policy),
-            first, last, value, is_seq());
+            first, last, value, is_segmented());
     }
 
     ///////////////////////////////////////////////////////////////////////////
