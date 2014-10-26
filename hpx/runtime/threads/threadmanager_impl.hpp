@@ -488,6 +488,13 @@ namespace hpx { namespace threads
             std::size_t num = std::size_t(-1), bool reset = false);
         boost::int64_t get_executed_thread_phases(
             std::size_t num = std::size_t(-1), bool reset = false);
+
+#ifdef HPX_THREAD_MAINTAIN_IDLE_RATES
+        boost::int64_t get_thread_phase_duration(
+            std::size_t num = std::size_t(-1), bool reset = false);
+        boost::int64_t get_thread_duration(
+            std::size_t num = std::size_t(-1), bool reset = false);
+#endif
 #endif
 
     protected:
@@ -563,6 +570,10 @@ namespace hpx { namespace threads
         std::vector<boost::int64_t> executed_threads_;
         std::vector<boost::int64_t> executed_thread_phases_;
         boost::atomic<long> thread_count_;
+
+#if defined(HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS) && defined(HPX_THREAD_MAINTAIN_IDLE_RATES)
+        double timestamp_scale_;            ///< scale timestamps to nanoseconds
+#endif
 
         boost::atomic<hpx::state> state_;   ///< thread manager state
         util::io_service_pool& timer_pool_; ///< used for timed set_state

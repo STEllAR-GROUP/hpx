@@ -18,15 +18,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 int test_count = 100;
 
-struct Point {
-    double x,y;
+struct Point
+{
+    double x, y;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 void measure_transform_reduce(std::size_t size)
 {
     std::vector<Point> data_representation(size, 
-        {std::rand(), std::rand()});
+        Point{std::rand(), std::rand()});
 
     //invode transform_reduce
     double result = 
@@ -97,6 +98,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     }
     return hpx::finalize();
 }
+
 int main(int argc, char* argv[])
 {
     std::vector<std::string> cfg;
