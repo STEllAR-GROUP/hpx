@@ -604,7 +604,7 @@ namespace hpx { namespace lcos
 
         if (ids.empty())
         {
-            return make_error_future<action_result>(
+            return hpx::make_exceptional_future<action_result>(
                 HPX_GET_EXCEPTION(bad_parameter, "hpx::lcos::fold",
                     "empty list of targets for fold operation"));
         }
@@ -729,7 +729,7 @@ namespace hpx { namespace lcos
 
         if (ids.empty())
         {
-            return make_error_future<action_result>(
+            return hpx::make_exceptional_future<action_result>(
                 HPX_GET_EXCEPTION(bad_parameter,
                     "hpx::lcos::inverse_fold",
                     "empty list of targets for fold operation"));

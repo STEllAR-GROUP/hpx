@@ -136,7 +136,7 @@ namespace hpx { namespace parallel { namespace util
                     }
                 }
                 catch (std::bad_alloc const&) {
-                    return hpx::make_error_future<FwdIter>(
+                    return hpx::make_exceptional_future<FwdIter>(
                         boost::current_exception());
                 }
                 catch (...) {
