@@ -215,9 +215,10 @@ double test_results(boost::uint64_t order, boost::uint64_t block_order, std::vec
     using hpx::parallel::par;
 
     const boost::uint64_t start = 0;
+    const boost::uint64_t end = trans.size();
 
     // Fill the original matrix, set transpose to known garbage value.
-    auto range = boost::irange(start, trans.size());
+    auto range = boost::irange(start, end);
     double errsq =
         transform_reduce(par, boost::begin(range), boost::end(range), 0.0,
             [](double lhs, double rhs) { return lhs + rhs; },
