@@ -340,7 +340,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
           using hpx::util::make_zip_iterator;
           return
-            util::partitioner<ExPolicy, FwdIter2, Pair const >::
+            util::partitioner<ExPolicy, FwdIter2, void>::
               call_with_data(policy,
                 make_zip_iterator(first, flags.get()), count,
                 [dest](Pair const& data, zip_iterator part_begin,
@@ -360,7 +360,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                   return data;
                 },
                 hpx::util::unwrapped(
-                  [=](std::vector<Pair> &&)
+                  [=](std::vector<Pair> &&) -> FwdIter2
                   {
                     std::advance(dest, std::get<0>(sum));
                     return dest;
