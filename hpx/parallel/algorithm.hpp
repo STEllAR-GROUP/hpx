@@ -32,5 +32,4 @@
 #include <hpx/parallel/algorithms/swap_ranges.hpp>
 #include <hpx/parallel/algorithms/transform.hpp>
 #include <hpx/parallel/algorithms/transform_reduce.hpp>
-
 #endif
