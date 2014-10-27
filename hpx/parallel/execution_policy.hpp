@@ -69,9 +69,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new parallel_task_execution_policy
         ///
         parallel_task_execution_policy operator()(threads::executor const& exec,
-            std::size_t chunk_size = 0) const
+            std::size_t chunk_size) const
         {
             return parallel_task_execution_policy(exec, chunk_size);
+        }
+
+        /// Create a new parallel_task_execution_policy referencing an executor and
+        /// a chunk size.
+        ///
+        /// \param exec         [in] The executor to use for the execution of
+        ///                     the parallel algorithm the returned execution
+        ///                     policy is used with
+        ///
+        /// \returns The new parallel_task_execution_policy
+        ///
+        parallel_task_execution_policy operator()(
+            threads::executor const& exec) const
+        {
+            return parallel_task_execution_policy(exec, chunk_size_);
         }
 
         /// Create a new parallel_task_execution_policy referencing a chunk size.
@@ -84,7 +99,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         parallel_task_execution_policy operator()(std::size_t chunk_size) const
         {
-            return parallel_task_execution_policy(chunk_size);
+            return parallel_task_execution_policy(exec_, chunk_size);
         }
 
         /// \cond NOINTERNAL
@@ -97,10 +112,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         parallel_task_execution_policy(threads::executor const& exec,
                 std::size_t chunk_size)
           : exec_(exec), chunk_size_(chunk_size)
-        {}
-
-        parallel_task_execution_policy(std::size_t chunk_size)
-          : exec_(), chunk_size_(chunk_size)
         {}
 
         threads::executor exec_;
@@ -148,9 +159,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new parallel_execution_policy
         ///
         parallel_execution_policy operator()(threads::executor const& exec,
-            std::size_t chunk_size = 0) const
+            std::size_t chunk_size) const
         {
             return parallel_execution_policy(exec, chunk_size);
+        }
+
+        /// Create a new parallel_execution_policy referencing an executor and
+        /// a chunk size.
+        ///
+        /// \param exec         [in] The executor to use for the execution of
+        ///                     the parallel algorithm the returned execution
+        ///                     policy is used with
+        ///
+        /// \returns The new parallel_execution_policy
+        ///
+        parallel_execution_policy operator()(threads::executor const& exec) const
+        {
+            return parallel_execution_policy(exec, chunk_size_);
         }
 
         /// Create a new parallel_execution_policy referencing a chunk size.
@@ -163,7 +188,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         parallel_execution_policy operator()(std::size_t chunk_size) const
         {
-            return parallel_execution_policy(chunk_size);
+            return parallel_execution_policy(exec_, chunk_size);
         }
 
         /// Create a new parallel_task_execution_policy referencing an executor
@@ -181,9 +206,26 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new parallel_execution_policy
         ///
         parallel_task_execution_policy operator()(task_execution_policy_tag tag,
-            threads::executor const& exec, std::size_t chunk_size = 0) const
+            threads::executor const& exec, std::size_t chunk_size) const
         {
             return par_task(exec, chunk_size);
+        }
+
+        /// Create a new parallel_task_execution_policy referencing an executor
+        /// and a chunk size.
+        ///
+        /// \param tag          [in] Specify that the corresponding asynchronous
+        ///                     execution policy should be used
+        /// \param exec         [in] The executor to use for the execution of
+        ///                     the parallel algorithm the returned execution
+        ///                     policy is used with
+        ///
+        /// \returns The new parallel_execution_policy
+        ///
+        parallel_task_execution_policy operator()(task_execution_policy_tag tag,
+            threads::executor const& exec) const
+        {
+            return par_task(exec, chunk_size_);
         }
 
         /// Create a new parallel_execution_policy referencing a chunk size.
@@ -197,9 +239,21 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new parallel_execution_policy
         ///
         parallel_task_execution_policy operator()(task_execution_policy_tag tag,
-            std::size_t chunk_size = 0) const
+            std::size_t chunk_size) const
         {
-            return par_task(chunk_size);
+            return par_task(exec_, chunk_size);
+        }
+
+        /// Create a new parallel_execution_policy referencing a chunk size.
+        ///
+        /// \param tag          [in] Specify that the corresponding asynchronous
+        ///                     execution policy should be used
+        ///
+        /// \returns The new parallel_execution_policy
+        ///
+        parallel_task_execution_policy operator()(task_execution_policy_tag tag) const
+        {
+            return par_task(exec_, chunk_size_);
         }
 
         /// \cond NOINTERNAL
@@ -212,10 +266,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         parallel_execution_policy(threads::executor const& exec,
                 std::size_t chunk_size)
           : exec_(exec), chunk_size_(chunk_size)
-        {}
-
-        parallel_execution_policy(std::size_t chunk_size)
-          : exec_(), chunk_size_(chunk_size)
         {}
 
         threads::executor exec_;
