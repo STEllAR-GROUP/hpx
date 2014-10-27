@@ -33,6 +33,11 @@ void for_each_tests()
     {
         hpx::vector<T> v;
         hpx::parallel::for_each(hpx::parallel::seq, v.begin(), v.end(), pfo());
+        hpx::parallel::for_each(hpx::parallel::par, v.begin(), v.end(), pfo());
+        hpx::parallel::for_each(hpx::parallel::seq(hpx::parallel::task),
+            v.begin(), v.end(), pfo());
+        hpx::parallel::for_each(hpx::parallel::par(hpx::parallel::task),
+            v.begin(), v.end(), pfo());
     }
 
 //     {

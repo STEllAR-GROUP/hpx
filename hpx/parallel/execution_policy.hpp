@@ -20,6 +20,7 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/type_traits/is_base_of.hpp>
+#include <boost/serialization/serialization.hpp>
 
 #include <memory>
 
@@ -94,6 +95,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
     private:
         /// \cond NOINTERNAL
+        friend class boost::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive& ar, unsigned)
+        {
+            ar & chunk_size_;
+        }
+
         parallel_task_execution_policy(threads::executor const& exec,
                 std::size_t chunk_size)
           : exec_(exec), chunk_size_(chunk_size)
@@ -209,6 +218,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
     private:
         /// \cond NOINTERNAL
+        friend class boost::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive& ar, unsigned)
+        {
+            ar & chunk_size_;
+        }
+
         parallel_execution_policy(threads::executor const& exec,
                 std::size_t chunk_size)
           : exec_(exec), chunk_size_(chunk_size)
@@ -361,7 +378,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// Extension: Detect whether give execution policy enables parallelization
+    /// Extension: Detect whether given execution policy enables parallelization
     ///
     /// 1. The type is_parallel_execution_policy can be used to detect parallel
     ///    execution policies for the purpose of excluding function signatures
@@ -400,7 +417,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// Extension: Detect whether give execution policy does not enable
+    /// Extension: Detect whether given execution policy does not enable
     ///            parallelization
     ///
     /// 1. The type is_sequential_execution_policy can be used to detect
@@ -417,7 +434,49 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     // extension:
     template <typename T>
     struct is_sequential_execution_policy
-        : detail::is_sequential_execution_policy<typename hpx::util::decay<T>::type>
+      : detail::is_sequential_execution_policy<typename hpx::util::decay<T>::type>
+    {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        /// \cond NOINTERNAL
+        template <typename T>
+        struct is_async_execution_policy
+          : boost::mpl::false_
+        {};
+
+        template <>
+        struct is_async_execution_policy<sequential_task_execution_policy>
+          : boost::mpl::true_
+        {};
+
+        template <>
+        struct is_async_execution_policy<parallel_task_execution_policy>
+          : boost::mpl::true_
+        {};
+        // \endcond
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Extension: Detect whether given execution policy makes algorithms
+    ///            asynchronous
+    ///
+    /// 1. The type is_async_execution_policy can be used to detect
+    ///    asynchronous execution policies for the purpose of excluding
+    ///    function signatures from otherwise ambiguous overload resolution
+    ///    participation.
+    /// 2. If T is the type of a standard or implementation-defined execution
+    ///    policy, is_async_execution_policy<T> shall be publicly derived
+    ///    from integral_constant<bool, true>, otherwise from
+    ///    integral_constant<bool, false>.
+    /// 3. The behavior of a program that adds specializations for
+    ///    is_async_execution_policy is undefined.
+    ///
+    // extension:
+    template <typename T>
+    struct is_async_execution_policy
+      : detail::is_async_execution_policy<typename hpx::util::decay<T>::type>
     {};
 
     ///////////////////////////////////////////////////////////////////////////

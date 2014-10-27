@@ -230,6 +230,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 boost::is_same<std::input_iterator_tag, iterator_category>
             >::type is_seq;
 
+            if (first == last)
+                return;
+
             return for_each().call(
                 std::forward<ExPolicy>(policy),
                 first, last, std::forward<F>(f), is_seq());
