@@ -26,6 +26,7 @@
 #include <hpx/parallel/detail/replace.hpp>
 #include <hpx/parallel/detail/reverse.hpp>
 #include <hpx/parallel/detail/rotate.hpp>
+#include <hpx/parallel/detail/search.hpp>
 #include <hpx/parallel/detail/swap_ranges.hpp>
 #include <hpx/parallel/detail/transform.hpp>
 

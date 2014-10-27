@@ -43,6 +43,7 @@ set(tests
     reverse_copy
     rotate
     rotate_copy
+    search
     swapranges
     task_region
     transform
