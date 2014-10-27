@@ -1451,6 +1451,49 @@ namespace hpx
                 distribution_policy::block));
         }
 
+        /// Return the iterator at the beginning of the first segment located
+        /// on the given locality.
+        iterator begin(id_type const& id)
+        {
+            HPX_ASSERT(naming::is_locality(id));
+            return begin(naming::get_locality_from_id(id));
+        }
+
+        /// \brief Return the const_iterator at the beginning of the vector.
+        const_iterator begin(id_type const& id) const
+        {
+            HPX_ASSERT(naming::is_locality(id));
+            return begin(naming::get_locality_from_id(id));
+        }
+
+        /// \brief Return the const_iterator at the beginning of the vector.
+        const_iterator cbegin(id_type const& id) const
+        {
+            HPX_ASSERT(naming::is_locality(id));
+            return cbegin(naming::get_locality_from_id(id));
+        }
+
+        /// \brief Return the iterator at the end of the vector.
+        iterator end(id_type const& id)
+        {
+            HPX_ASSERT(naming::is_locality(id));
+            return end(naming::get_locality_from_id(id));
+        }
+
+        /// \brief Return the const_iterator at the end of the vector.
+        const_iterator end(id_type const& id) const
+        {
+            HPX_ASSERT(naming::is_locality(id));
+            return end(naming::get_locality_from_id(id));
+        }
+
+        /// \brief Return the const_iterator at the end of the vector.
+        const_iterator cend(id_type const& id) const
+        {
+            HPX_ASSERT(naming::is_locality(id));
+            return cend(naming::get_locality_from_id(id));
+        }
+
         ///////////////////////////////////////////////////////////////////////
         segment_iterator
         segment_begin(boost::uint32_t id = naming::invalid_locality_id)
@@ -1489,6 +1532,48 @@ namespace hpx
         segment_cend(boost::uint32_t id = naming::invalid_locality_id) const
         {
             return const_segment_iterator(this, partitions_.cend());
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        segment_iterator segment_begin(id_type const& id)
+        {
+            HPX_ASSERT(naming::is_locality(id));
+            return segment_begin(naming::get_locality_from_id(id));
+        }
+
+        const_segment_iterator
+        segment_begin(id_type const& id) const
+        {
+            HPX_ASSERT(naming::is_locality(id));
+            return segment_begin(naming::get_locality_from_id(id));
+        }
+
+        const_segment_iterator
+        segment_cbegin(id_type const& id) const
+        {
+            HPX_ASSERT(naming::is_locality(id));
+            return segment_cbegin(naming::get_locality_from_id(id));
+        }
+
+        segment_iterator
+        segment_end(id_type const& id)
+        {
+            HPX_ASSERT(naming::is_locality(id));
+            return segment_end(naming::get_locality_from_id(id));
+        }
+
+        const_segment_iterator
+        segment_end(id_type const& id) const
+        {
+            HPX_ASSERT(naming::is_locality(id));
+            return segment_end(naming::get_locality_from_id(id));
+        }
+
+        const_segment_iterator
+        segment_cend(id_type const& id) const
+        {
+            HPX_ASSERT(naming::is_locality(id));
+            return segment_cend(naming::get_locality_from_id(id));
         }
     };
 }
