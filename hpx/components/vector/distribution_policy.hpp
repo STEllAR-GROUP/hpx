@@ -38,13 +38,13 @@ namespace hpx
 
         block_distribution_policy operator()(std::size_t num_partitions) const
         {
-            return block_distribution_policy(num_partitions);
+            return block_distribution_policy(num_partitions, localities_);
         }
 
         block_distribution_policy operator()(
             std::vector<id_type> const& localities) const
         {
-            return block_distribution_policy(localities);
+            return block_distribution_policy(num_partitions_, localities);
         }
 
         block_distribution_policy operator()(std::size_t num_partitions,
@@ -89,15 +89,6 @@ namespace hpx
             num_partitions_(num_partitions)
         {}
 
-        block_distribution_policy(std::vector<id_type> const& localities)
-          : localities_(localities),
-            num_partitions_(localities.size())
-        {}
-
-        block_distribution_policy(std::size_t num_partitions)
-          : num_partitions_(num_partitions)
-        {}
-
     private:
         std::vector<id_type> localities_;   // localities to create chunks on
         std::size_t num_partitions_;            // number of chunks to create
@@ -117,13 +108,13 @@ namespace hpx
 
         cyclic_distribution_policy operator()(std::size_t num_partitions) const
         {
-            return cyclic_distribution_policy(num_partitions);
+            return cyclic_distribution_policy(num_partitions, localities_);
         }
 
         cyclic_distribution_policy operator()(
             std::vector<id_type> const& localities) const
         {
-            return cyclic_distribution_policy(localities);
+            return cyclic_distribution_policy(num_partitions_, localities);
         }
 
         cyclic_distribution_policy operator()(std::size_t num_partitions,
@@ -167,15 +158,6 @@ namespace hpx
             num_partitions_(num_partitions)
         {}
 
-        cyclic_distribution_policy(std::vector<id_type> const& localities)
-          : localities_(localities),
-            num_partitions_(localities.size())
-        {}
-
-        cyclic_distribution_policy(std::size_t num_partitions)
-          : num_partitions_(num_partitions)
-        {}
-
     private:
         std::vector<id_type> localities_;
         std::size_t num_partitions_;
@@ -196,37 +178,43 @@ namespace hpx
 
         block_cyclic_distribution_policy operator()(std::size_t num_partitions) const
         {
-            return block_cyclic_distribution_policy(num_partitions);
+            return block_cyclic_distribution_policy(
+                num_partitions, localities_, block_size_);
         }
 
         block_cyclic_distribution_policy operator()(std::size_t num_partitions,
             std::vector<id_type> const& localities) const
         {
-            return block_cyclic_distribution_policy(num_partitions, localities);
+            return block_cyclic_distribution_policy(
+                num_partitions, localities, block_size_);
         }
 
         block_cyclic_distribution_policy operator()(std::size_t num_partitions,
             std::vector<id_type> const& localities, std::size_t block_size) const
         {
-            return block_cyclic_distribution_policy(num_partitions, localities, block_size);
+            return block_cyclic_distribution_policy(
+                num_partitions, localities, block_size);
         }
 
         block_cyclic_distribution_policy operator()(
             std::vector<id_type> const& localities, std::size_t block_size) const
         {
-            return block_cyclic_distribution_policy(localities, block_size);
+            return block_cyclic_distribution_policy(
+                num_partitions_, localities, block_size);
         }
 
         block_cyclic_distribution_policy operator()(
             std::vector<id_type> const& localities) const
         {
-            return block_cyclic_distribution_policy(localities);
+            return block_cyclic_distribution_policy(
+                num_partitions_, localities, block_size_);
         }
 
         block_cyclic_distribution_policy operator()(std::size_t num_partitions,
             std::size_t block_size) const
         {
-            return block_cyclic_distribution_policy(num_partitions, block_size);
+            return block_cyclic_distribution_policy(
+                num_partitions, localities_, block_size);
         }
 
         std::vector<id_type> const& get_localities() const
@@ -263,37 +251,6 @@ namespace hpx
           : localities_(localities),
             num_partitions_(num_partitions),
             block_size_(block_size)
-        {}
-
-        block_cyclic_distribution_policy(std::size_t num_partitions,
-                std::vector<id_type> const& localities)
-          : localities_(localities),
-            num_partitions_(num_partitions),
-            block_size_(std::size_t(-1))
-        {}
-
-        block_cyclic_distribution_policy(std::vector<id_type> const& localities,
-                std::size_t block_size)
-          : localities_(localities),
-            num_partitions_(localities_.size()),
-            block_size_(block_size)
-        {}
-
-        block_cyclic_distribution_policy(std::vector<id_type> const& localities)
-          : localities_(localities),
-            num_partitions_(localities.size()),
-            block_size_(std::size_t(-1))
-        {}
-
-        block_cyclic_distribution_policy(std::size_t num_partitions,
-                std::size_t block_size)
-          : num_partitions_(num_partitions),
-            block_size_(block_size)
-        {}
-
-        block_cyclic_distribution_policy(std::size_t num_partitions)
-          : num_partitions_(num_partitions),
-            block_size_(std::size_t(-1))
         {}
 
     private:
