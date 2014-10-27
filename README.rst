@@ -67,6 +67,9 @@ In any case, if you happen to run into problems we very much encourage and appre
 any issue reports through the `issue tracker for this Github project
 <http://github.com/STEllAR-GROUP/hpx/issues>`_.
 
+Also, if you have any questions feel free to ask it over at `stackoverflow <http://stackoverflow.com>`_
+and tag the question with `hpx <http://stackoverflow.com/questions/tagged/hpx>`_. 
+
 ********************
  Build Instructions
 ********************
