@@ -97,7 +97,9 @@ namespace hpx
 
         local_vector_iterator(partition_vector<T> partition,
                 size_type local_index)
-          : partition_(partition), local_index_(local_index)
+          : partition_(partition),
+            local_index_(local_index),
+            data_(partition.get_ptr())
         {}
 
         typedef typename std::vector<T>::iterator base_iterator_type;
@@ -106,28 +108,30 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         base_iterator_type base_iterator()
         {
-            return get_ptr()->begin() + local_index_;
+            return data_->begin() + local_index_;
         }
         base_const_iterator_type base_iterator() const
         {
-            return get_ptr()->cbegin() + local_index_;
+            return data_->cbegin() + local_index_;
         }
 
     private:
         friend class boost::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, unsigned version)
+        void load(Archive& ar, unsigned version)
+        {
+            ar & partition_ & local_index_;
+            if (partition_)
+                data_ = partition_.get_ptr();
+        }
+        template <typename Archive>
+        void save(Archive& ar, unsigned version) const
         {
             ar & partition_ & local_index_;
         }
 
-        boost::shared_ptr<server::partition_vector<T> > get_ptr() const
-        {
-            if (!data_)
-                data_ = partition_.get_ptr();
-            return data_;
-        }
+        BOOST_SERIALIZATION_SPLIT_MEMBER()
 
         bool is_at_end() const
         {
@@ -149,7 +153,7 @@ namespace hpx
         typename base_type::reference dereference() const
         {
             HPX_ASSERT(!is_at_end());
-            return *(get_ptr()->begin() + local_index_);
+            return *(data_->begin() + local_index_);
         }
 
         void increment()
@@ -177,11 +181,11 @@ namespace hpx
                 if (is_at_end())
                     return 0;
 
-                return get_ptr()->size() - local_index_;
+                return data_->size() - local_index_;
             }
 
             if (is_at_end())
-                return other.local_index_ - other.get_ptr()->size();
+                return other.local_index_ - other.data_->size();
 
             HPX_ASSERT(partition_ == other.partition_);
             return other.local_index_ - local_index_;
@@ -226,7 +230,9 @@ namespace hpx
 
         const_local_vector_iterator(partition_vector<T> partition,
                 size_type local_index)
-          : partition_(partition), local_index_(local_index)
+          : partition_(partition),
+            local_index_(local_index),
+            data_(partition.get_ptr())
         {}
 
         typedef typename std::vector<T>::const_iterator base_iterator_type;
@@ -235,28 +241,30 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         base_const_iterator_type base_iterator()
         {
-            return get_ptr()->cbegin() + local_index_;
+            return data_->cbegin() + local_index_;
         }
         base_const_iterator_type base_iterator() const
         {
-            return get_ptr()->cbegin() + local_index_;
+            return data_->cbegin() + local_index_;
         }
 
     private:
         friend class boost::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, unsigned version)
+        void load(Archive& ar, unsigned version)
+        {
+            ar & partition_ & local_index_;
+            if (partition_)
+                data_ = partition_.get_ptr();
+        }
+        template <typename Archive>
+        void save(Archive& ar, unsigned version) const
         {
             ar & partition_ & local_index_;
         }
 
-        boost::shared_ptr<server::partition_vector<T> > get_ptr() const
-        {
-            if (!data_)
-                data_ = partition_.get_ptr();
-            return data_;
-        }
+        BOOST_SERIALIZATION_SPLIT_MEMBER()
 
         bool is_at_end() const
         {
@@ -306,11 +314,11 @@ namespace hpx
                 if (is_at_end())
                     return 0;
 
-                return partition_.size() - local_index_;
+                return data_->size() - local_index_;
             }
 
             if (is_at_end())
-                return other.local_index_ - other.partition_.size();
+                return other.local_index_ - other.data_->size();
 
             HPX_ASSERT(partition_ == other.partition_);
             return other.local_index_ - local_index_;
