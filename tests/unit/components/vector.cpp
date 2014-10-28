@@ -24,11 +24,11 @@ HPX_REGISTER_VECTOR(int);
 template <typename T>
 void test_global_iteration(hpx::vector<T>& v, std::size_t size, T const& val)
 {
-    typedef hpx::vector<T>::iterator iterator;
+    typedef typename hpx::vector<T>::iterator iterator;
     typedef hpx::traits::segmented_iterator_traits<iterator> traits;
     HPX_TEST(traits::is_segmented_iterator::value);
 
-    typedef hpx::vector<T>::const_iterator const_iterator;
+    typedef typename hpx::vector<T>::const_iterator const_iterator;
     typedef hpx::traits::segmented_iterator_traits<const_iterator> const_traits;
     HPX_TEST(const_traits::is_segmented_iterator::value);
 
@@ -65,15 +65,15 @@ template <typename T>
 void test_segmented_iteration(hpx::vector<T>& v, std::size_t size,
     std::size_t parts)
 {
-    typedef hpx::vector<T>::iterator iterator;
+    typedef typename hpx::vector<T>::iterator iterator;
     typedef hpx::traits::segmented_iterator_traits<iterator> traits;
-    typedef traits::segment_iterator segment_iterator;
-    typedef traits::local_iterator local_iterator;
+    typedef typename traits::segment_iterator segment_iterator;
+    typedef typename traits::local_iterator local_iterator;
 
-    typedef hpx::vector<T>::const_iterator const_iterator;
+    typedef typename hpx::vector<T>::const_iterator const_iterator;
     typedef hpx::traits::segmented_iterator_traits<const_iterator> const_traits;
-    typedef const_traits::segment_iterator const_segment_iterator;
-    typedef const_traits::local_iterator const_local_iterator;
+    typedef typename const_traits::segment_iterator const_segment_iterator;
+    typedef typename const_traits::local_iterator const_local_iterator;
 
     HPX_TEST(!hpx::traits::segmented_iterator_traits<
             segment_iterator
