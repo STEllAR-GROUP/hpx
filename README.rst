@@ -59,7 +59,7 @@ If you plan to use HPX we suggest to start with the latest released version
 
 If you would like to work with the cutting edge version from this repository
 we suggest following the current health status of the master branch by looking at
-our `contiguous integration results website <http://hermione.cct.lsu.edu/waterfall>`_.
+our `contiguous integration results website <http://hermione.cct.lsu.edu/console>`_.
 While we try to keep the master branch stable and usable, sometimes new bugs
 trick their way into the code base - you have been warned!
 
@@ -76,7 +76,7 @@ Version 1.0 (See accompanying file LICENSE_1_0.txt or an online copy available
 `here <http://www.boost.org/LICENSE_1_0.txt>`_).
 
 Before starting to build HPX, please read about the
-`prerequisites <http://stellar-group.github.io/hpx/docs/html/hpx/tutorial/getting_started/prereqs.html>`_.
+`prerequisites <http://stellar-group.github.io/hpx/docs/html/hpx/manual/build_system/prerequisites.html>`_.
 
 Linux
 -----
@@ -101,7 +101,7 @@ Linux
             /path/to/hpx/source/tree
 
    for instance::
-   
+
       cmake -DBOOST_ROOT=~/packages/boost \
             -DHWLOC_ROOT=/packages/hwloc \
             -DCMAKE_INSTALL_PREFIX=~/packages/hpx \
@@ -127,7 +127,7 @@ Linux
       gmake install
 
    to build and install the examples.
-   
+
 Please refer `here <http://stellar-group.github.io/hpx/docs/html/hpx/manual/build_system/building_hpx/build_recipes.html#hpx.manual.build_system.building_hpx.build_recipes.unix_installation>`_
 for more information about building HPX on a Linux system.
 
@@ -256,7 +256,7 @@ Windows
    "Where to build the binaries:", enter the full path to the build folder you
    created in step 2.
 
-4) Add CMake variable definitions (if any) by clicking the "Add Entry" button and selecting type 
+4) Add CMake variable definitions (if any) by clicking the "Add Entry" button and selecting type
    "String". Most probably you will need to at least add the directories where `Boost <http://www.boost.org>`_
    is located as BOOST_ROOT and where `Hwloc <http://www.open-mpi.org/projects/hwloc/>`_ is
    located as HWLOC_ROOT.
@@ -322,7 +322,7 @@ So far we only support BGClang for compiling HPX on the BlueGene/Q.
 5) Generate the HPX buildfiles using cmake::
 
     cmake -DHPX_PLATFORM=BlueGeneQ \
-          -CMAKE_TOOLCHAIN_FILE=/path/to/hpx/cmake/toolchains/BGQ.cmake \
+          -DCMAKE_TOOLCHAIN_FILE=/path/to/hpx/cmake/toolchains/BGQ.cmake \
           -DCMAKE_CXX_COMPILER=bgclang++11 \
           -DMPI_CXX_COMPILER=mpiclang++11 \
           -DHWLOC_ROOT=/path/to/hwloc/installation \
@@ -348,10 +348,10 @@ You can find more details about using HPX on a BlueGene/Q system
 Intel(R) Xeon/Phi
 -----------------
 
-After installing Boost and HWLOC, the build procedure is almost the same as 
-for how to build HPX on Unix Variants with the sole difference that you have 
+After installing Boost and HWLOC, the build procedure is almost the same as
+for how to build HPX on Unix Variants with the sole difference that you have
 to enable the Xeon Phi in the CMake Build system. This is achieved by invoking
-CMake in the following way:: 
+CMake in the following way::
 
     cmake \
          -DCMAKE_TOOLCHAIN_FILE=/path/to/hpx/cmake/toolchains/XeonPhi.cmake \
@@ -367,38 +367,38 @@ the `documentation <http://stellar-group.github.io/hpx/docs/html/hpx/manual/buil
  Acknowledgements
 ******************
 
-We would like to acknowledge the NSF, DoE, DARPA, the Center for Computation 
-and Technology (CCT) at Louisiana State University, and the Department of 
+We would like to acknowledge the NSF, DoE, DARPA, the Center for Computation
+and Technology (CCT) at Louisiana State University, and the Department of
 Computer Science 3 - Computer Architecture at the University of Erlangen
-Nuremberg who fund and support our work. 
+Nuremberg who fund and support our work.
 
-We would also like to thank the following 
-organizations for granting us allocations of their compute resources: 
+We would also like to thank the following
+organizations for granting us allocations of their compute resources:
 LSU HPC, LONI, XSEDE, NERSC, and the Gauss Center for Supercomputing.
 
 HPX is currently funded by
 
-* The National Science Foundation through awards 1117470 (APX), 
-  1240655 (STAR), 1447831 (PXFS), and 1339782 (STORM). 
+* The National Science Foundation through awards 1117470 (APX),
+  1240655 (STAR), 1447831 (PXFS), and 1339782 (STORM).
 
-  Any opinions, findings, and conclusions or 
-  recommendations expressed in this material are those of the author(s) 
+  Any opinions, findings, and conclusions or
+  recommendations expressed in this material are those of the author(s)
   and do not necessarily reflect the views of the National Science Foundation.
 
-* The Department of Energy (DoE) through the award DE-SC0008714 (XPRESS). 
+* The Department of Energy (DoE) through the award DE-SC0008714 (XPRESS).
 
-  Neither the United States Government nor any agency thereof, nor any of 
-  their employees, makes any warranty, express or implied, or assumes any 
-  legal liability or responsibility for the accuracy, completeness, or 
-  usefulness of any information, apparatus, product, or process disclosed, 
-  or represents that its use would not infringe privately owned rights. 
-  Reference herein to any specific commercial product, process, or service 
-  by trade name, trademark, manufacturer, or otherwise does not necessarily 
-  constitute or imply its endorsement, recommendation, or favoring by the 
-  United States Government or any agency thereof. The views and opinions of 
-  authors expressed herein do not necessarily state or reflect those of the 
+  Neither the United States Government nor any agency thereof, nor any of
+  their employees, makes any warranty, express or implied, or assumes any
+  legal liability or responsibility for the accuracy, completeness, or
+  usefulness of any information, apparatus, product, or process disclosed,
+  or represents that its use would not infringe privately owned rights.
+  Reference herein to any specific commercial product, process, or service
+  by trade name, trademark, manufacturer, or otherwise does not necessarily
+  constitute or imply its endorsement, recommendation, or favoring by the
+  United States Government or any agency thereof. The views and opinions of
+  authors expressed herein do not necessarily state or reflect those of the
   United States Government or any agency thereof.
 
-* The Bavarian Research Foundation (Bayerische Forschungsstfitung) through 
-  the grant AZ-987-11. 
+* The Bavarian Research Foundation (Bayerische Forschungsstfitung) through
+  the grant AZ-987-11.
 
