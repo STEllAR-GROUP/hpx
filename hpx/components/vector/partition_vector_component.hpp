@@ -371,7 +371,6 @@ namespace hpx { namespace server
     typedef ::hpx::components::simple_component<                              \
         ::hpx::server::partition_vector<type>                                 \
     > BOOST_PP_CAT(__vector_, name);                                          \
-    template HPX_COMPONENT_EXPORT ::hpx::server::partition_vector<type>;      \
     HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(BOOST_PP_CAT(__vector_, name))     \
     /**/
 
