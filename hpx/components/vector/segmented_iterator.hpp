@@ -310,7 +310,7 @@ namespace hpx
             }
 
             if (is_at_end())
-                return other_.local_index_ - other.partition_.size();
+                return other.local_index_ - other.partition_.size();
 
             HPX_ASSERT(partition_ == other.partition_);
             return other.local_index_ - local_index_;
