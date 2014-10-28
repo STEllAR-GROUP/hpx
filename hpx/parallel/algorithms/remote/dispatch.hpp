@@ -124,13 +124,13 @@ namespace hpx { namespace parallel { namespace util { namespace remote
     dispatch_async(id_type const& id, Algo && algo,
         ExPolicy const& policy, IsSeq, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
-        typename BOOST_PP_CAT(algorithm_invoker_action, N)<
-                typename hpx::util::decay<Algo>::type, ExPolicy, IsSeq,
-                typename parallel::v1::detail::algorithm_result<
-                    ExPolicy, typename Algo::result_type
-                >::type,
-                BOOST_PP_ENUM(N, HPX_DISPATCH_DECAY_ARG, Arg)
-            > act;
+        BOOST_PP_CAT(algorithm_invoker_action, N)<
+            typename hpx::util::decay<Algo>::type, ExPolicy, IsSeq,
+            typename parallel::v1::detail::algorithm_result<
+                ExPolicy, typename Algo::result_type
+            >::type,
+            BOOST_PP_ENUM(N, HPX_DISPATCH_DECAY_ARG, Arg)
+        > act;
 
         return hpx::async_colocated(act, id, std::forward<Algo>(algo), policy,
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
