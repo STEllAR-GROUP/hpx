@@ -231,7 +231,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             >::type is_seq;
 
             if (first == last)
-                return;
+                return detail::algorithm_result<ExPolicy>::get();
 
             return for_each().call(
                 std::forward<ExPolicy>(policy),
