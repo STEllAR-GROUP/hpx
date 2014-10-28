@@ -237,6 +237,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::forward<ExPolicy>(policy),
                 first, last, std::forward<F>(f), is_seq());
         }
+
+        // forward declare the segmented version of this algorithm
+        template <typename ExPolicy, typename SegIter, typename F>
+        inline typename detail::algorithm_result<ExPolicy>::type
+        for_each_(ExPolicy && policy, SegIter first, SegIter last, F && f,
+            boost::mpl::true_);
+
         /// \endcond
     }
 
