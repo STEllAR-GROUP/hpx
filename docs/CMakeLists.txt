@@ -318,9 +318,9 @@ add_custom_target(git_docs
   COMMAND "${CMAKE_COMMAND}"
     -DHPX_SOURCE_DIR:PATH=${CMAKE_SOURCE_DIR}
     -DHPX_VERSION:STRING=${HPX_VERSION}
-    -DHPX_DOCUMENTATION_FILES=\"${documentation_dependencies}\"
-    -P "${CMAKE_SOURCE_DIR}/cmake/HPX_UpdateGitDocs.cmake"
-  VERBATIM)
+    -DHPX_DOCUMENTATION_FILES="${documentation_dependencies};${doxygen_dependencies}"
+    -P "${CMAKE_SOURCE_DIR}/cmake/HPX_UpdateGitDocs.cmake")
+#  VERBATIM)
 
 add_dependencies(git_docs docs)
 if(HPX_BUILD_DOCUMENTATION_SINGLEPAGE)
