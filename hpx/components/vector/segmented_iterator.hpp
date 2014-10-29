@@ -642,18 +642,15 @@ namespace hpx { namespace traits
 
         //  Conceptually this function is supposed to denote which segment
         //  the iterator is currently pointing to (i.e. just global iterator).
-        static segment_iterator segment(iterator& iter)
+        static segment_iterator segment(iterator iter)
         {
-//             if (iter.is_at_end())           // avoid dereferencing end iterator
-//                 return segment_iterator();
-
             return iter.get_data()->get_segment_iterator(
                 iter.get_global_index());
         }
 
         //  This function should specify which is the current segment and
         //  the exact position to which local iterator is pointing.
-        static local_iterator local(iterator& iter)
+        static local_iterator local(iterator iter)
         {
             if (iter.is_at_end())           // avoid dereferencing end iterator
                 return local_iterator();
@@ -663,7 +660,7 @@ namespace hpx { namespace traits
         }
 
         //  Build a full iterator from the segment and local iterators
-        static iterator compose(segment_iterator& seg_iter,
+        static iterator compose(segment_iterator seg_iter,
             local_iterator& local_iter)
         {
             vector<T>* data = seg_iter.get_data();
@@ -704,11 +701,8 @@ namespace hpx { namespace traits
 
         //  Conceptually this function is supposed to denote which segment
         //  the iterator is currently pointing to (i.e. just global iterator).
-        static segment_iterator segment(iterator& iter)
+        static segment_iterator segment(iterator iter)
         {
-//             if (iter.is_at_end())           // avoid dereferencing end iterator
-//                 return segment_iterator();
-
             return iter.get_data()->get_const_segment_iterator(
                 iter.get_global_index());
         }
