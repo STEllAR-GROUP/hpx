@@ -699,7 +699,8 @@ namespace hpx
         future<void> resize_async(std::size_t n, T const& val = T())
         {
             HPX_ASSERT(this->get_gid());
-            return hpx::async<server_type::resize_action>(this->get_gid(), n, val);
+            return hpx::async<typename server_type::resize_action>(
+                this->get_gid(), n, val);
         }
 
 //         future<std::size_t> capacity_async() const
@@ -753,7 +754,8 @@ namespace hpx
         future<T> get_value_async(std::size_t pos) const
         {
             HPX_ASSERT(this->get_gid());
-            return hpx::async<server_type::get_value_action>(this->get_gid(), pos);
+            return hpx::async<typename server_type::get_value_action>(
+                this->get_gid(), pos);
         }
 
 //         future<T> front_async() const
@@ -822,7 +824,7 @@ namespace hpx
         future<void> set_value_async(std::size_t pos, T_ && val)
         {
             HPX_ASSERT(this->get_gid());
-            return hpx::async<server_type::set_value_action>(
+            return hpx::async<typename server_type::set_value_action>(
                 this->get_gid(), pos, std::forward<T_>(val));
         }
 

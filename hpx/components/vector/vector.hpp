@@ -219,9 +219,11 @@ namespace hpx
         future<void> connect_to_helper(future<id_type> f)
         {
             using util::placeholders::_1;
+            typedef typename server::vector_configuration::get_action act;
+
             id_type id = f.get();
-            return async(server::vector_configuration::get_action(), id)
-                .then(util::bind(&vector::get_data_helper, this, id, _1));
+            return async(act(), id).then(
+                util::bind(&vector::get_data_helper, this, id, _1));
         }
 
     public:
