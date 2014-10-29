@@ -26,6 +26,41 @@ struct pfo
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
+void verify_values(hpx::vector<T> const& v, T const& val)
+{
+    typedef typename hpx::vector<T>::const_iterator const_iterator;
+
+    std::size_t size = 0;
+
+    const_iterator end = v.end();
+    for (const_iterator it = v.begin(); it != end; ++it, ++size)
+    {
+        HPX_TEST_EQ(*it, val);
+    }
+
+    HPX_TEST_EQ(size, v.size());
+}
+
+template <typename ExPolicy, typename T>
+void test_for_each(ExPolicy && policy, hpx::vector<T>& v, T val)
+{
+    hpx::parallel::for_each(hpx::parallel::seq, v.begin(), v.end(), pfo());
+    verify_values(v, ++val);
+
+    hpx::parallel::for_each(hpx::parallel::par, v.begin(), v.end(), pfo());
+    verify_values(v, ++val);
+
+    hpx::parallel::for_each(hpx::parallel::seq(hpx::parallel::task),
+        v.begin(), v.end(), pfo()).get();
+    verify_values(v, ++val);
+
+    hpx::parallel::for_each(hpx::parallel::par(hpx::parallel::task),
+        v.begin(), v.end(), pfo()).get();
+    verify_values(v, ++val);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+template <typename T>
 void for_each_tests()
 {
     std::size_t const length = 12;
@@ -38,6 +73,14 @@ void for_each_tests()
             v.begin(), v.end(), pfo());
         hpx::parallel::for_each(hpx::parallel::par(hpx::parallel::task),
             v.begin(), v.end(), pfo());
+    }
+
+    {
+        hpx::vector<T> v(length, T(0));
+        test_for_each(hpx::parallel::seq, v, T(0));
+        test_for_each(hpx::parallel::par, v, T(4));
+        test_for_each(hpx::parallel::seq(hpx::parallel::task), v, T(8));
+        test_for_each(hpx::parallel::par(hpx::parallel::task), v, T(12));
     }
 
 //     {
