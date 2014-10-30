@@ -28,11 +28,11 @@ namespace hpx { namespace components
     /// component instance.
     ///
     /// \param to_copy         [in] The global id of the component to copy
-    /// \param target_locality [in, optional] The locality where the copy 
-    ///                        should be created (default is same locality 
+    /// \param target_locality [in, optional] The locality where the copy
+    ///                        should be created (default is same locality
     ///                        as source).
     ///
-    /// \tparam  The only template argument specifies the component type to 
+    /// \tparam  The only template argument specifies the component type to
     ///          create.
     ///
     /// \returns A future representing the global id of the newly (copied)
@@ -48,13 +48,64 @@ namespace hpx { namespace components
 #else
     inline typename boost::enable_if<
         traits::is_component<Component>, future<naming::id_type>
-    >::type 
+    >::type
 #endif
-    copy(naming::id_type const& to_copy,
-        naming::id_type const& target_locality = naming::invalid_id)
+    copy(naming::id_type const& to_copy)
+    {
+        typedef server::copy_component_action_here<Component> action_type;
+        return async_colocated<action_type>(to_copy, to_copy);
+    }
+
+    template <typename Component>
+#if defined(DOXYGEN)
+    future<naming::id_type>
+#else
+    inline typename boost::enable_if<
+        traits::is_component<Component>, future<naming::id_type>
+    >::type
+#endif
+    copy(naming::id_type const& to_copy, naming::id_type const& target_locality)
     {
         typedef server::copy_component_action<Component> action_type;
         return async_colocated<action_type>(to_copy, to_copy, target_locality);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Copy given component to the specified target locality
+    ///
+    /// The function \a copy will create a copy of the component
+    /// referenced by the client side object \a to_copy on the locality
+    /// specified with \a target_locality. It returns a new client side object
+    /// future referring to the newly created component instance.
+    ///
+    /// \param to_copy         [in] The client side object representing the
+    ///                        component to copy
+    /// \param target_locality [in, optional] The locality where the copy
+    ///                        should be created (default is same locality
+    ///                        as source).
+    ///
+    /// \tparam  The only template argument specifies the component type to
+    ///          create.
+    ///
+    /// \returns A future representing the global id of the newly (copied)
+    ///          component instance.
+    ///
+    /// \note If the second argument is omitted (or is invalid_id) the
+    ///       new component instance is created on the locality of the
+    ///       component instance which is to be copied.
+    ///
+    template <typename Derived, typename Stub>
+    Derived
+    copy(client_base<Derived, Stub> const& to_copy,
+        naming::id_type const& target_locality = naming::invalid_id)
+    {
+        typedef typename client_base<Derived, Stub>::server_component_type
+            component_type;
+        typedef server::copy_component_action<component_type> action_type;
+
+        id_type id = to_copy.get_gid();
+        return Derived(async_colocated<action_type>(
+            to_copy, to_copy, target_locality));
     }
 }}
 

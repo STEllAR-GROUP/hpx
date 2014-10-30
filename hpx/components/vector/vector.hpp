@@ -384,6 +384,11 @@ namespace hpx
             return get_global_index(it, local_index, policy_);
         }
 
+        std::size_t get_partition(segment_iterator const& it) const
+        {
+            return std::distance(partitions_.begin(), it.base());
+        }
+
         // Return the local iterator referencing an element inside a segment
         // based on the given global index.
         local_iterator get_local_iterator(size_type global_index) const
@@ -560,147 +565,37 @@ namespace hpx
             verify_consistency();
         }
 
-// //        future<size_type>
-// //            max_size_helper(size_type num_partitions) const
-// //        {
-// //            if(num_partitions < 1)
-// //            {
-// //                HPX_ASSERT(num_partitions >= 0);
-// //                return partition_vector_stub::max_size_async(
-// //                        ((partitions_.at(num_partitions)).second).get()
-// //                                                                );
-// //            }
-// //            else
-// //                return hpx::lcos::local::dataflow(
-// //                    [](future<size_type> s1,
-// //                       future<size_type> s2) -> size_type
-// //                    {
-// //                        return s1.get() + s2.get();
-// //                    },
-// //                    partition_vector_stub::max_size_async(
-// //                        ((partitions_.at(num_partitions)).second).get()
-// //                                                             ),
-// //                    max_size_helper(num_partitions - 1)
-// //                                                );
-// //            }//end of max_size_helper
-//
-//
-//         //FASTER VERSION OF MAX_SIZE_HELPER
-//
-//         // PROGRAMMER DOCUMENTATION:
-//         //  This helper function return the number of element in the hpx::vector.
-//         //  Here we are dividing the sequence of partition_description_types into half and
-//         //  computing the max_size of the individual partition_vector and then adding
-//         //  them. Note this create the binary tree of height. Equal to log
-//         //  (num_partition_description_types in partitions_). Hence it might be efficient
-//         //  than previous implementation
-//         //
-//         // NOTE: This implementation does not need all the partition_vector of same
-//         //       size.
-//         //
-//         future<size_type> max_size_helper(partition_vector_type::const_iterator it_begin,
-//                                     partition_vector_type::const_iterator it_end) const
-//         {
-//             if((it_end - it_begin) == 1 )
-//                 return partition_vector_stub::max_size_async(
-//                                                     (it_begin->first).get()
-//                                                                 );
-//             else
-//             {
-//                 int mid = (it_end - it_begin)/2;
-//                 future<size_type> left_tree_size = max_size_helper(it_begin,
-//                                                              it_begin + mid);
-//                 future<size_type> right_tree_size = hpx::async(
-//                                                 launch::async,
-//                                                 hpx::util::bind(
-//                                                     &vector::max_size_helper,
-//                                                     this,
-//                                                     (it_begin + mid),
-//                                                     it_end
-//                                                                 )
-//                                                         );
-//
-//                 return hpx::lcos::local::dataflow(
-//                             [](future<size_type> s1, future<size_type> s2) -> size_type
-//                             {
-//                                 return s1.get() + s2.get();
-//                             },
-//                             std::move(left_tree_size),
-//                             std::move(right_tree_size)
-//                                                  );
-//             }
-//         }//end of max_size_helper
-//
-//
-// //        future<size_type>
-// //            capacity_helper(size_type num_partitions) const
-// //        {
-// //            if(num_partitions < 1)
-// //            {
-// //                HPX_ASSERT(num_partitions >= 0);
-// //                return partition_vector_stub::capacity_async(
-// //                          ((partitions_.at(num_partitions)).second).get()
-// //                                                         );
-// //            }
-// //            else
-// //                return hpx::lcos::local::dataflow(
-// //                    [](future<size_type> s1,
-// //                       future<size_type> s2) -> size_type
-// //                    {
-// //                        return s1.get() + s2.get();
-// //                    },
-// //                    partition_vector_stub::capacity_async(
-// //                        ((partitions_.at(num_partitions)).second).get()
-// //                                                       ),
-// //                    capacity_helper(num_partitions - 1)
-// //                                                );
-// //            }//end of capacity_helper
-//
-//         //FASTER VERSION OF CAPACITY_HELPER
-//
-//         // PROGRAMMER DOCUMENTATION:
-//         //  This helper function return the number of element in the hpx::vector.
-//         //  Here we are dividing the sequence of partition_description_types into half and
-//         //  computing the capacity of the individual partition_vector and then adding
-//         //  them. Note this create the binary tree of height Equal to log
-//         //  (num_partition_description_types in partitions_). Hence it might be efficient
-//         //  than previous implementation.
-//         //
-//         // NOTE: This implementation does not need all the partition_vector of same
-//         //       size.
-//         //
-//         future<size_type> capacity_helper(partition_vector_type::const_iterator it_begin,
-//                                     partition_vector_type::const_iterator it_end) const
-//         {
-//             if((it_end - it_begin) == 1 )
-//                 return partition_vector_stub::capacity_async(
-//                                                     (it_begin->first).get()
-//                                                           );
-//             else
-//             {
-//                 int mid = (it_end - it_begin)/2;
-//                 future<size_type> left_tree_size = capacity_helper(it_begin,
-//                                                              it_begin + mid);
-//                 future<size_type> right_tree_size = hpx::async(
-//                                                 launch::async,
-//                                                 hpx::util::bind(
-//                                                     &vector::capacity_helper,
-//                                                     this,
-//                                                     (it_begin + mid),
-//                                                     it_end
-//                                                                 )
-//                                                         );
-//
-//                 return hpx::lcos::local::dataflow(
-//                             [](future<size_type> s1, future<size_type> s2) -> size_type
-//                             {
-//                                 return s1.get() + s2.get();
-//                             },
-//                             std::move(left_tree_size),
-//                             std::move(right_tree_size)
-//                                                  );
-//             }
-//         }//end of capacity_helper
+        // Perform a deep copy from the given vector
+        void copy_from(vector const& rhs)
+        {
+            typedef typename partitions_vector_type::const_iterator const_iterator;
+
+            std::vector<future<id_type> > objs;
+            const_iterator end = rhs.partitions_.end();
+            for (const_iterator it = rhs.partitions_.begin(); it != end; ++it)
+            {
+                typedef typename partition_vector_client::server_component_type
+                    component_type;
+                objs.push_back(hpx::components::copy<component_type>(
+                    it->partition_.get()));
+            }
+            wait_all(objs);
+
+            partitions_vector_type partitions;
+            partitions.reserve(rhs.partitions_.size());
+            for (std::size_t i = 0; i != rhs.partitions_.size(); ++i)
+            {
+                partitions.push_back(partition_data(std::move(objs[i]),
+                    rhs.partitions_[i].size_, rhs.partitions_[i].locality_id_
+                ));
+            }
+
+            size_ = rhs.size_;
+            block_size_ = rhs.block_size_;
+            policy_ = rhs.policy_;
+            std::swap(partitions_, partitions);
+            registered_name_.clear();
+        }
 
     public:
         /// Default Constructor which create hpx::vector with
@@ -834,6 +729,29 @@ namespace hpx
             }
         }
 
+        /// Copy construction performs a deep copy of the right hand side
+        /// vector.
+        vector(vector const& rhs)
+          : size_(0),
+            block_size_(std::size_t(-1)),
+            policy_(distribution_policy::block)
+        {
+            if (rhs.size_ != 0)
+                copy_from(rhs);
+        }
+
+        vector(vector && rhs)
+          : size_(rhs.size_)
+            block_size_(rhs.block_size_),
+            partitions_(std::move(rhs.partitions_)),
+            policy_(rhs.policy_),
+            registered_name_(std::move(rhs.registered_name_))
+        {
+            rhs.size_ = 0;
+            rhs.block_size_ = std::size_t(-1);
+            rhs.policy_ = distribution_policy::block;
+        }
+
     public:
         /// \brief Array subscript operator. This does not throw any exception.
         ///
@@ -855,17 +773,34 @@ namespace hpx
             return get_value(pos);
         }
 
-//         /** @brief Copy assignment operator.
-//          *
-//          *  @param other    This the hpx::vector object which is to be copied
-//          *
-//          *  @return This return the reference to the newly created vector
-//          */
-//         vector& operator=(vector const& other)
-//         {
-//             this->partitions_ = other.partitions_;
-//             return *this;
-//         }
+        /// Copy assignment operator, performs deep copy of the right hand side
+        /// vector.
+        ///
+        /// \param rhs    This the hpx::vector object which is to be copied
+        ///
+        vector& operator=(vector const& rhs)
+        {
+            if (this != &rhs && rhs.size_ != 0)
+                copy_from(rhs);
+            return *this;
+        }
+
+        vector& operator=(vector && rhs)
+        {
+            if (this != &rhs)
+            {
+                size_ = rhs.size_;
+                block_size_ = rhs.block_size_;
+                partitions_ = std::move(rhs.partitions_);
+                policy_ = rhs.policy_;
+                registered_name_ = std::move(rhs.registered_name_);
+
+                rhs.size_ = 0;
+                rhs.block_size_ = std::size_t(-1);
+                rhs.policy_ = distribution_policy::block;
+            }
+            return *this;
+        }
 
         ///////////////////////////////////////////////////////////////////////
         // Capacity related API's in vector class
@@ -880,247 +815,15 @@ namespace hpx
             return size_;
         }
 
-//         /** @brief Asynchronous API for size().
-//          *
-//          * @return This return the hpx::future of return value of size()
-//          */
-//         future<size_type> size_async() const
-//         {
-//             HPX_ASSERT(partitions_.size() > 1);
-//             //Here end -1 is because we have the LAST in the vector
-//             return size_helper(partitions_.begin(),
-//                                partitions_.end() - 1);
-//         }
-//
-//         //MAX_SIZE
-//         /**  @brief Compute the maximum size of hpx::vector in terms of
-//          *           number of elements.
-//          *  @return Return maximum number of elements the vector can hold
-//          */
-//         size_type max_size() const
-//         {
-//             HPX_ASSERT(partitions_.size() > 1);
-//             //Here end -1 is because we have the LAST in the vector
-//             return max_size_helper(partitions_.begin(),
-//                                    partitions_.end() - 1
-//                                    ).get();
-//         }
-//
-//         /**  @brief Asynchronous API for max_size().
-//          *
-//          *  @return Return the hpx::future of return value of max_size()
-//          */
-//         future<size_type> max_size_async() const
-//         {
-//             HPX_ASSERT(partitions_.size() > 1);
-//             //Here end -1 is because we have the LAST in the vector
-//             return max_size_helper(partitions_.begin(),
-//                                    partitions_.end() - 1);
-//         }
-//
-// //            //RESIZE (without value)
-// //
-// //            void resize(size_type n)
-// //            {
-// //                if(n == 0)
-// //                    HPX_THROW_EXCEPTION(hpx::invalid_vector_error,
-// //                                        "resize",
-// //                                        "Invalid Vector: new_partition_size should be greater than zero");
-// //
-// //                std::vector<future<void>> resize_lazy_sync;
-// //                //Resizing the vector partitions
-// //                //AS we have to iterate until we hit LAST
-// //                BOOST_FOREACH(partition_vector_type const& p, std::make_pair(partitions_.begin(), partitions_.end() - 1) )
-// //                {
-// //                    resize_lazy_sync.push_back(partition_vector_stub::resize_async((p.second).get(), n));
-// //                }
-// //                HPX_ASSERT(partitions_.size() > 1); //As this function changes the size we should have LAST always.
-// //                //waiting for the resizing
-// //                hpx::wait_all(resize_lazy_sync);
-// //                adjust_base_index(partitions_.begin(), partitions_.end() - 1, n);
-// //            }
-// //            future<void> resize_async(size_type n)
-// //            {
-// //                //static_cast to resolve ambiguity of the overloaded function
-// //                return hpx::async(launch::async, hpx::util::bind(static_cast<void(vector::*)(std::size_t)>(&vector::resize), this, n));
-// //            }
-//
-//         // RESIZE (with value)
-//         // SEMANTIC DIFFERENCE:
-//         //    It is resize with respective partition not whole vector
-//         /** @brief Resize each partition so that it contain n elements. If
-//          *          the \a val is not it use default constructor instead.
-//          *
-//          *  This function resize the each partition so that it contains \a n
-//          *   elements. [Note that the \a n does not represent the total size of
-//          *   vector it is the size of each partition. This mean if \a n is 10 and
-//          *   num_partitions is 5 then total size of vector after resize is 10*5 = 50]
-//          *
-//          *  @param n    New size of the each partition
-//          *  @param val  Value to be copied if \a n is greater than the current
-//          *               size [Default is 0]
-//          *
-//          *  @exception hpx::invalid_vector_error If the \a n is equal to zero
-//          *              then it throw \a hpx::invalid_vector_error exception.
-//          */
-//         void resize(size_type n, VALUE_TYPE const& val = VALUE_TYPE())
-//         {
-//             if(n == 0)
-//                 HPX_THROW_EXCEPTION(
-//                     hpx::invalid_vector_error,
-//                     "resize",
-//                     "Invalid Vector: new_partition_size should be greater than zero"
-//                                     );
-//
-//             std::vector<future<void>> resize_lazy_sync;
-//             BOOST_FOREACH(partition_description_type const& p,
-//                           std::make_pair(partitions_.begin(),
-//                                          partitions_.end() - 1)
-//                          )
-//             {
-//                 resize_lazy_sync.push_back(
-//                                 partition_vector_stub::resize_async(
-//                                                         (p.first).get(),
-//                                                          n,
-//                                                          val)
-//                                            );
-//             }
-//             hpx::wait_all(resize_lazy_sync);
-//
-//             //To maintain the consistency in the base_index of each partition_description_type.
-//             adjust_base_index(partitions_.begin(),
-//                               partitions_.end() - 1,
-//                               n);
-//         }
-//
-//         /** @brief Asynchronous API for resize().
-//          *
-//          *  @param n    New size of the each partition
-//          *  @param val  Value to be copied if \a n is greater than the current size
-//          *               [Default is 0]
-//          *
-//          *  @return This return the hpx::future of type void [The void return
-//          *           type can help to check whether the action is completed or
-//          *           not]
-//          *
-//          *  @exception hpx::invalid_vector_error If the \a n is equal to zero
-//          *              then it throw \a hpx::invalid_vector_error exception.
-//          */
-//         future<void> resize_async(size_type n,
-//                                  VALUE_TYPE const& val = VALUE_TYPE())
-//         {
-//             //static_cast to resolve ambiguity of the overloaded function
-//             return hpx::async(launch::async,
-//                               hpx::util::bind(
-//                                 static_cast<
-//                                 void(vector::*)(size_type,
-//                                                 VALUE_TYPE const&)
-//                                             >
-//                                             (&vector::resize),
-//                                               this,
-//                                               n,
-//                                               val)
-//                               );
-//         }
-//
-//         //CAPACITY
-//
-//         /** @brief Compute the size of currently allocated storage capacity for
-//          *          vector.
-//          *
-//          *  @return Returns capacity of vector, expressed in terms of elements
-//          */
-//         size_type capacity() const
-//         {
-//             HPX_ASSERT(partitions_.size() > 1);
-//             //Here end -1 is because we have the LAST in the vector
-//             return capacity_helper(partitions_.begin(),
-//                                    partitions_.end() - 1
-//                                    ).get();
-//         }
-//
-//         /** @brief Asynchronous API for capacity().
-//          *
-//          *  @return Returns the hpx::future of return value of capacity()
-//          */
-//         future<size_type> capacity_async() const
-//         {
-//             HPX_ASSERT(partitions_.size() > 1);
-//             //Here end -1 is because we have the LAST in the vector
-//             return capacity_helper(partitions_.begin(),
-//                                    partitions_.end() - 1);
-//         }
-//
-//         //EMPTY
-//         /** @brief Return whether the vector is empty.
-//          *
-//          *  @return Return true if vector size is 0, false otherwise
-//          */
-//         bool empty() const
-//         {
-//             return !(this->size());
-//         }
-//
-//         /** @brief Asynchronous API for empty().
-//          *
-//          *  @return The hpx::future of return value empty()
-//          */
-//         future<bool> empty_async() const
-//         {
-//             return hpx::async(launch::async,
-//                               hpx::util::bind(&vector::empty, this));
-//         }
-//
-//         //RESERVE
-//         /** @brief Request the change in each partition capacity so that it
-//          *          can hold \a n elements. Throws the
-//          *          \a hpx::partition_error exception.
-//          *
-//          *  This function request for each partition capacity should be at
-//          *   least enough to contain \a n elements. For all partition in vector
-//          *   if its capacity is less than \a n then their reallocation happens
-//          *   to increase their capacity to \a n (or greater). In other cases
-//          *   the partition capacity does not got affected. It does not change the
-//          *   partition size. Hence the size of the vector does not affected.
-//          *
-//          * @param n Minimum capacity of partition
-//          *
-//          * @exception hpx::partition_error If \a n is greater than maximum size for
-//          *             at least one partition then function throw
-//          *             \a hpx::partition_error exception.
-//          */
-//         void reserve(size_type n)
-//         {
-//             std::vector<future<void>> reserve_lazy_sync;
-//             BOOST_FOREACH(partition_description_type const& p,
-//                           std::make_pair(partitions_.begin(),
-//                                          partitions_.end() - 1)
-//                           )
-//             {
-//                 reserve_lazy_sync.push_back(
-//                         partition_vector_stub::reserve_async((p.first).get(), n)
-//                                             );
-//             }
-//             hpx::wait_all(reserve_lazy_sync);
-//         }
-//
-//         /** @brief Asynchronous API for reserve().
-//          *
-//          *  @param n Minimum capacity of partition
-//          *
-//          *  @return This return the hpx::future of type void [The void return
-//          *           type can help to check whether the action is completed or
-//          *           not]
-//          *
-//          *  @exception hpx::partition_error If \a n is greater than maximum size
-//          *              for at least one partition then function throw
-//          *              \a hpx::partition_error exception.
-//          */
-//         future<void> reserve_async(size_type n)
-//         {
-//             return hpx::async(launch::async,
-//                               hpx::util::bind(&vector::reserve, this, n));
-//         }
+        /// Compute the distribution policy type used to create this vector.
+        ///
+        /// \return Return the distribution policy type used to create this
+        ///         vector instance
+        ///
+        BOOST_SCOPED_ENUM(distribution_policy) get_policy() const
+        {
+            return policy_;
+        }
 
         //
         //  Element access API's in vector class
@@ -1128,8 +831,7 @@ namespace hpx
 
         /// Returns the element at position \a pos in the vector container.
         ///
-        /// \param pos Position of the element in the vector [Note the first
-        ///         position in the partition is 0]
+        /// \param pos Position of the element in the vector
         ///
         /// \return Returns the value of the element at position represented by
         ///         \a pos.
@@ -1137,6 +839,19 @@ namespace hpx
         T get_value(size_type pos) const
         {
             return get_value_async(pos).get();
+        }
+
+        /// Returns the element at position \a pos in the vector container.
+        ///
+        /// \param part  Sequence number of the partition
+        /// \param pos   Position of the element in the partition
+        ///
+        /// \return Returns the value of the element at position represented by
+        ///         \a pos.
+        ///
+        T get_value(size_type part, size_type pos) const
+        {
+            return get_value_async(part, pos).get();
         }
 
         /// Asynchronous API for get_value().
@@ -1148,10 +863,21 @@ namespace hpx
         ///
         future<T> get_value_async(size_type pos) const
         {
-            std::size_t part = get_partition(pos);
-            std::size_t index = get_local_index(pos);
+            return get_value_async(get_partition(pos), get_local_index(pos));
+        }
+
+        /// Asynchronous API for get_value().
+        ///
+        /// \param part  Sequence number of the partition
+        /// \param pos   Position of the element in the partition
+        ///
+        /// \return Returns the hpx::future to value of the element at position
+        ///         represented by \a pos.
+        ///
+        future<T> get_value_async(size_type part, size_type pos) const
+        {
             return partition_vector_client(partitions_[part].partition_)
-                .get_value_async(index);
+                .get_value_async(pos);
         }
 
 //         //FRONT (never throws exception)
@@ -1288,63 +1014,6 @@ namespace hpx
 //                                                 val
 //                                                 ).get();
 //         }
-//
-//         /** @brief Asynchronous API for push_back().
-//          *
-//          *  @param val Value to be copied to new element
-//          *
-//          *  @return This return the hpx::future of type void [The void return
-//          *           type can help to check whether the action is completed or
-//          *           not]
-//          */
-//         future<void> push_back_async(VALUE_TYPE const& val)
-//         {
-//             return partition_vector_stub::push_back_async(
-//                             ((partitions_.end() - 2)->first).get(),
-//                                                         val
-//                                                         );
-//         }
-//
-//         //PUSH_BACK (With rval)
-//         /** @brief Add new element at the end of vector. The added element
-//          *          contain the \a val as value.
-//          *
-//          *  The value is added to the back to the last partition.
-//          *
-//          *  @param val Value to be moved to new element
-//          */
-//         void push_back(VALUE_TYPE const&& val)
-//         {
-//             partition_vector_stub::push_back_rval_async(
-//                             ((partitions_.end() - 2)->first).get(),
-//                                                     std::move(val)
-//                                                      ).get();
-//         }
-//
-//         /** @brief Asynchronous API for push_back(VALUE_TYPE const&& val).
-//          *
-//          *  @param val Value to be moved to new element
-//          */
-//         future<void> push_back_async(VALUE_TYPE const&& val)
-//         {
-//             return partition_vector_stub::push_back_rval_async(
-//                             ((partitions_.end() - 2)->first).get(),
-//                                                     std::move(val)
-//                                                             );
-//         }
-//
-//         //POP_BACK (Never throw exception)
-// //            void pop_back()
-// //            {
-// //                partition_vector_stub::pop_back_async(( (partitions_.end() - 2)->second).get()).get();
-// //                //TODO if following change the affect back() and further pop_back function
-// //                //checking if last element from the particular gid is popped up then delete that..
-// //                // (-2)I am retaining one gid in vector as otherwise it goes to invalid state and it makes a compulsion that we need to keep at least one element that is not good
-// //                if(partition_vector_stub::empty_async(( (partitions_.end() - 2)->second).get()).get() && partitions_.size() > 2)
-// //                    partitions_.pop_back();
-// //                HPX_ASSERT(partitions_.size() > 1); //As this function changes the size we should have LAST always.
-// //            }
-//
 
         /// Copy the value of \a val in the element at position \a pos in
         /// the vector container.
@@ -1358,6 +1027,19 @@ namespace hpx
             set_value_async(pos, std::forward<T_>(val)).get();
         }
 
+        /// Copy the value of \a val in the element at position \a pos in
+        /// the vector container.
+        ///
+        /// \param part  Sequence number of the partition
+        /// \param pos   Position of the element in the partition
+        /// \param val   The value to be copied
+        ///
+        template <typename T_>
+        void set_value(size_type part, size_type pos, T_ && val)
+        {
+            set_value_async(part, pos, std::forward<T_>(val)).get();
+        }
+
         /// Asynchronous API for set_value().
         ///
         /// \param pos   Position of the element in the vector
@@ -1369,10 +1051,24 @@ namespace hpx
         template <typename T_>
         future<void> set_value_async(size_type pos, T_ && val)
         {
-            std::size_t part = get_partition(pos);
-            std::size_t index = get_local_index(pos);
+            return set_value_async(get_partition(pos), get_local_index(pos),
+                std::forward<T_>(val));
+        }
+
+        /// Asynchronous API for set_value().
+        ///
+        /// \param part  Sequence number of the partition
+        /// \param pos   Position of the element in the partition
+        /// \param val   The value to be copied
+        ///
+        /// \return This returns the hpx::future of type void which gets ready
+        ///         once the operation is finished.
+        ///
+        template <typename T_>
+        future<void> set_value_async(size_type part, size_type pos, T_ && val)
+        {
             return partition_vector_client(partitions_[part].partition_)
-                .set_value_async(index, std::forward<T_>(val));
+                .set_value_async(pos, std::forward<T_>(val));
         }
 
 //             //CLEAR
@@ -1385,23 +1081,6 @@ namespace hpx
 // //                partition_vector_stub::clear_async((partitions_[0].second).get()).get();
 // //                HPX_ASSERT(partitions_.size() > 1); //As this function changes the size we should have LAST always.
 // //            }
-//
-//             //
-//             // HPX CUSTOM API's
-//             //
-//
-// //            //CREATE_partition
-// //            //TODO This statement can create Data Inconsistency :
-// //             //If size of partitions_ calculated and added to the base_index but not whole creation is completed and in betwen this som push_back on hpx::vector is done then that operation is losted
-// //            void create_partition(hpx::naming::id locality, std::size_t partition_size = 0, VALUE_TYPE val = 0.0)
-// //            {
-// //                partitions_.push_back(
-// //                        std::make_pair(
-// //                            partitions_.size(),
-// //                             hpx::components::new_<partition_partition_vector_type>(locality, partition_size, val)
-// //                                      )
-// //                                                    );
-// //            }//end of create partition
 
         ///////////////////////////////////////////////////////////////////////
         /// Return the iterator at the beginning of the first segment located

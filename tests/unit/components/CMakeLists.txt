@@ -16,6 +16,7 @@ set(tests
     migrate_component
     remote_object
     vector
+    vector_copy
     vector_algorithms
    )
 
