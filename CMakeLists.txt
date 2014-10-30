@@ -1,5 +1,5 @@
 # Copyright (c) 2007-2014 Hartmut Kaiser
-# Copyright (c) 2011-2013 Thomas Heller
+# Copyright (c) 2011-2014 Thomas Heller
 # Copyright (c) 2007-2008 Chirag Dekate
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2011 Vinay C Amatya
@@ -1097,11 +1097,7 @@ if (NOT DEFINED LIB)
 endif(NOT DEFINED LIB)
 
 if(HPX_FULL_RPATH)
-  list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/${LIB}" isSystemDir)
-  if(isSystemDir EQUAL -1)
-    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB}")
-  endif()
-  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH On)
+  hpx_include(SetFullRPATH)
 endif()
 ###############################################################################
 
