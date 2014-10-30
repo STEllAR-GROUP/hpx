@@ -166,19 +166,36 @@ namespace hpx { namespace server
         // Element access API's
         ///////////////////////////////////////////////////////////////////////
 
-        /** @brief Return the element at the position \a pos in the
-         *          partition_vector container. It does not throw the
-         *          exception.
-         *
-         *  @param pos Position of the element in the partition_vector [Note the
-         *              first position in the partition_vector is 0]
-         *  @return Return the value of the element at position represented
-         *           by \a pos [Note that this is not the reference to the
-         *           element]
-         */
+        /// Return the element at the position \a pos in the partition_vector
+        /// container.
+        ///
+        /// \param pos Position of the element in the partition_vector
+        ///
+        /// \return Return the value of the element at position represented
+        ///         by \a pos.
+        ///
         T get_value(size_type pos) const
         {
             return partition_vector_[pos];
+        }
+
+        /// Return the element at the position \a pos in the partition_vector
+        /// container.
+        ///
+        /// \param pos Positions of the elements in the partition_vector
+        ///
+        /// \return Return the values of the elements at position represented
+        ///         by \a pos.
+        ///
+        std::vector<T> get_values(std::vector<size_type> const& pos) const
+        {
+            std::vector<T> result;
+            result.reserve(pos.size());
+
+            for (std::size_t i = 0; i != pos.size(); ++i)
+                result.push_back(partition_vector_[pos[i]]);
+
+            return result;
         }
 
         /** @brief Access the value of first element in the partition_vector.
@@ -239,21 +256,35 @@ namespace hpx { namespace server
         //  This API is required as we do not returning the reference to the
         //  element in Any API.
 
-        /** @brief Copy the value of \a val in the element at position
-         *          \a pos in the partition_vector container. It throws the
-         *          \a hpx::out_of_range exception.
-         *
-         *  @param pos   Position of the element in the partition_vector [Note
-         *                the first position in the partition_vector is 0]
-         *  @param val   The value to be copied
-         *
-         */
+        /// Copy the value of \a val in the element at position \a pos in the
+        /// partition_vector container.
+        ///
+        /// \param pos   Position of the element in the partition_vector
+        ///
+        /// \param val   The value to be copied
+        ///
         void set_value(size_type pos, T const& val)
         {
             partition_vector_[pos] = val;
         }
 
-        //TODO deprecate it
+        /// Copy the value of \a val for the elements at positions \a pos in
+        /// the partition_vector container.
+        ///
+        /// \param pos   Positions of the elements in the partition_vector
+        ///
+        /// \param val   The value to be copied
+        ///
+        void set_values(std::vector<size_type> const& pos,
+            std::vector<T> const& val)
+        {
+            HPX_ASSERT(pos.size() == val.size());
+            HPX_ASSERT(pos.size() <= partition_vector_.size());
+
+            for (std::size_t i = 0; i != pos.size(); ++i)
+                partition_vector_[pos[i]] = val[i];
+        }
+
         /** @brief Remove all elements from the vector leaving the
             *          partition_vector with size 0.
             */
@@ -289,6 +320,8 @@ namespace hpx { namespace server
 
         /// Macro to define \a get_value function as an HPX component action.
         HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_TPL(partition_vector, get_value);
+        /// Macro to define \a get_value function as an HPX component action.
+        HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_TPL(partition_vector, get_values);
 
         /** @brief Macro to define \a front function as HPX component
             *          action type.
@@ -314,6 +347,7 @@ namespace hpx { namespace server
 
         /// Macro to define \a set_value function as an HPX component action.
         HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL(partition_vector, set_value);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL(partition_vector, set_values);
 
 //         /** @brief Macro to define \a clear function as HPX component action
 //             *          type.
@@ -339,8 +373,14 @@ namespace hpx { namespace server
         hpx::server::partition_vector<type>::get_value_action,                \
         BOOST_PP_CAT(__vector_get_value_action_, name));                      \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
+        hpx::server::partition_vector<type>::get_values_action,               \
+        BOOST_PP_CAT(__vector_get_values_action_, name));                     \
+    HPX_REGISTER_ACTION_DECLARATION(                                          \
         hpx::server::partition_vector<type>::set_value_action,                \
         BOOST_PP_CAT(__vector_set_value_action_, name));                      \
+    HPX_REGISTER_ACTION_DECLARATION(                                          \
+        hpx::server::partition_vector<type>::set_values_action,               \
+        BOOST_PP_CAT(__vector_set_values_action_, name));                     \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         hpx::server::partition_vector<type>::resize_action,                   \
         BOOST_PP_CAT(__vector_resize_action_, name));                         \
@@ -363,8 +403,14 @@ namespace hpx { namespace server
         ::hpx::server::partition_vector<type>::get_value_action,              \
         BOOST_PP_CAT(__vector_get_value_action_, name));                      \
     HPX_REGISTER_ACTION(                                                      \
+        ::hpx::server::partition_vector<type>::get_values_action,             \
+        BOOST_PP_CAT(__vector_get_values_action_, name));                     \
+    HPX_REGISTER_ACTION(                                                      \
         ::hpx::server::partition_vector<type>::set_value_action,              \
         BOOST_PP_CAT(__vector_set_value_action_, name));                      \
+    HPX_REGISTER_ACTION(                                                      \
+        ::hpx::server::partition_vector<type>::set_values_action,             \
+        BOOST_PP_CAT(__vector_set_values_action_, name));                     \
     HPX_REGISTER_ACTION(                                                      \
         hpx::server::partition_vector<type>::resize_action,                   \
         BOOST_PP_CAT(__vector_resize_action_, name));                         \
@@ -739,9 +785,9 @@ namespace hpx
         /// \return Returns the value of the element at position represented
         ///         by \a pos
         ///
-        T get_value(std::size_t pos) const
+        T get_value_sync(std::size_t pos) const
         {
-            return get_value_async(pos).get();
+            return get_value(pos).get();
         }
 
         /// Return the element at the position \a pos in the
@@ -751,10 +797,37 @@ namespace hpx
         ///
         /// \return This returns the value as the hpx::future
         ///
-        future<T> get_value_async(std::size_t pos) const
+        future<T> get_value(std::size_t pos) const
         {
             HPX_ASSERT(this->get_gid());
             return hpx::async<typename server_type::get_value_action>(
+                this->get_gid(), pos);
+        }
+
+        /// Returns the value at position \a pos in the partition_vector
+        /// component.
+        ///
+        /// \param pos  Position of the element in the partition_vector
+        ///
+        /// \return Returns the value of the element at position represented
+        ///         by \a pos
+        ///
+        std::vector<T> get_values_sync(std::vector<std::size_t> const& pos) const
+        {
+            return get_values(pos).get();
+        }
+
+        /// Return the element at the position \a pos in the
+        /// partition_vector container.
+        ///
+        /// \param pos Position of the element in the partition_vector
+        ///
+        /// \return This returns the value as the hpx::future
+        ///
+        future<std::vector<T> > get_values(std::vector<std::size_t> const& pos) const
+        {
+            HPX_ASSERT(this->get_gid());
+            return hpx::async<typename server_type::get_values_action>(
                 this->get_gid(), pos);
         }
 
@@ -807,9 +880,9 @@ namespace hpx
         /// \param val   The value to be copied
         ///
         template <typename T_>
-        void set_value(std::size_t pos, T_ && val)
+        void set_value_sync(std::size_t pos, T_ && val)
         {
-            set_value_async(pos, std::forward<T_>(val)).get();
+            set_value(pos, std::forward<T_>(val)).get();
         }
 
         /// Copy the value of \a val in the element at position
@@ -821,7 +894,7 @@ namespace hpx
         /// \return This returns the hpx::future of type void
         ///
         template <typename T_>
-        future<void> set_value_async(std::size_t pos, T_ && val)
+        future<void> set_value(std::size_t pos, T_ && val)
         {
             HPX_ASSERT(this->get_gid());
             return hpx::async<typename server_type::set_value_action>(

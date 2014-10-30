@@ -68,8 +68,11 @@ void copy_tests(hpx::vector<T> const& v1)
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T, typename DistPolicy>
-void copy_tests_with_policy(hpx::vector<T> const& v1, DistPolicy const& policy)
+void copy_tests_with_policy(std::size_t size, std::size_t localities,
+    DistPolicy const& policy)
 {
+    hpx::vector<T> v1(size, policy);
+
     hpx::vector<T> v2(v1);
     HPX_TEST(v2.get_policy() == policy.get_policy_type());
     compare_vectors(v1, v2);
@@ -91,6 +94,7 @@ template <typename T>
 void copy_tests()
 {
     std::size_t const length = 12;
+    std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
     {
         hpx::vector<T> v;
@@ -106,6 +110,30 @@ void copy_tests()
         hpx::vector<T> v(length, T(42));
         copy_tests(v);
     }
+
+    copy_tests_with_policy<T>(length, 1, hpx::block);
+    copy_tests_with_policy<T>(length, 3, hpx::block(3));
+    copy_tests_with_policy<T>(length, 3, hpx::block(3, localities));
+    copy_tests_with_policy<T>(length, localities.size(),
+        hpx::block(localities));
+
+    copy_tests_with_policy<T>(length, 1, hpx::cyclic);
+    copy_tests_with_policy<T>(length, 3, hpx::cyclic(3));
+    copy_tests_with_policy<T>(length, 3, hpx::cyclic(3, localities));
+    copy_tests_with_policy<T>(length, localities.size(),
+        hpx::cyclic(localities));
+
+    copy_tests_with_policy<T>(length, 1, hpx::block_cyclic);
+    copy_tests_with_policy<T>(length, 3, hpx::block_cyclic(3));
+    copy_tests_with_policy<T>(length, 3,
+        hpx::block_cyclic(3, localities));
+    copy_tests_with_policy<T>(length, localities.size(),
+        hpx::block_cyclic(localities));
+    copy_tests_with_policy<T>(length, 4, hpx::block_cyclic(4, 3));
+    copy_tests_with_policy<T>(length, 4,
+        hpx::block_cyclic(4, localities, 3));
+    copy_tests_with_policy<T>(length, localities.size(),
+        hpx::block_cyclic(localities, 3));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

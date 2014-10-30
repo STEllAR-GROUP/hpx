@@ -836,9 +836,9 @@ namespace hpx
         /// \return Returns the value of the element at position represented by
         ///         \a pos.
         ///
-        T get_value(size_type pos) const
+        T get_value_sync(size_type pos) const
         {
-            return get_value_async(pos).get();
+            return get_value(pos).get();
         }
 
         /// Returns the element at position \a pos in the vector container.
@@ -849,24 +849,26 @@ namespace hpx
         /// \return Returns the value of the element at position represented by
         ///         \a pos.
         ///
-        T get_value(size_type part, size_type pos) const
+        T get_value_sync(size_type part, size_type pos) const
         {
-            return get_value_async(part, pos).get();
+            return get_value(part, pos).get();
         }
 
-        /// Asynchronous API for get_value().
+        /// Returns the element at position \a pos in the vector container
+        /// asynchronously.
         ///
         /// \param pos Position of the element in the vector
         ///
         /// \return Returns the hpx::future to value of the element at position
         ///         represented by \a pos.
         ///
-        future<T> get_value_async(size_type pos) const
+        future<T> get_value(size_type pos) const
         {
-            return get_value_async(get_partition(pos), get_local_index(pos));
+            return get_value(get_partition(pos), get_local_index(pos));
         }
 
-        /// Asynchronous API for get_value().
+        /// Returns the element at position \a pos in the given partition in
+        /// the vector container asynchronously.
         ///
         /// \param part  Sequence number of the partition
         /// \param pos   Position of the element in the partition
@@ -874,10 +876,41 @@ namespace hpx
         /// \return Returns the hpx::future to value of the element at position
         ///         represented by \a pos.
         ///
-        future<T> get_value_async(size_type part, size_type pos) const
+        future<T> get_value(size_type part, size_type pos) const
         {
             return partition_vector_client(partitions_[part].partition_)
-                .get_value_async(pos);
+                .get_value(pos);
+        }
+
+        /// Returns the elements at the positions \a pos from the given
+        /// partition in the vector container.
+        ///
+        /// \param part  Sequence number of the partition
+        /// \param pos   Position of the element in the partition
+        ///
+        /// \return Returns the value of the element at position represented by
+        ///         \a pos.
+        ///
+        std::vector<T>
+        get_values_sync(size_type part, std::vector<size_type> const& pos) const
+        {
+            return get_values(part, pos).get();
+        }
+
+        /// Asynchronously returns the elements at the positions \a pos from
+        /// the given partition in the vector container.
+        ///
+        /// \param part  Sequence number of the partition
+        /// \param pos   Positions of the elements in the vector
+        ///
+        /// \return Returns the hpx::future to values of the elements at the
+        ///         given positions represented by \a pos.
+        ///
+        future<std::vector<T> >
+        get_values(size_type part, std::vector<size_type> const& pos) const
+        {
+            return partition_vector_client(partitions_[part].partition_)
+                .get_values(pos)
         }
 
 //         //FRONT (never throws exception)
@@ -1022,9 +1055,9 @@ namespace hpx
         /// \param val   The value to be copied
         ///
         template <typename T_>
-        void set_value(size_type pos, T_ && val)
+        void set_value_sync(size_type pos, T_ && val)
         {
-            set_value_async(pos, std::forward<T_>(val)).get();
+            set_value(pos, std::forward<T_>(val)).get();
         }
 
         /// Copy the value of \a val in the element at position \a pos in
@@ -1035,12 +1068,13 @@ namespace hpx
         /// \param val   The value to be copied
         ///
         template <typename T_>
-        void set_value(size_type part, size_type pos, T_ && val)
+        void set_value_sync(size_type part, size_type pos, T_ && val)
         {
-            set_value_async(part, pos, std::forward<T_>(val)).get();
+            set_value(part, pos, std::forward<T_>(val)).get();
         }
 
-        /// Asynchronous API for set_value().
+        /// Asynchronous set the element at position \a pos of the partition
+        /// \a part to the given value \a val.
         ///
         /// \param pos   Position of the element in the vector
         /// \param val   The value to be copied
@@ -1049,13 +1083,14 @@ namespace hpx
         ///         once the operation is finished.
         ///
         template <typename T_>
-        future<void> set_value_async(size_type pos, T_ && val)
+        future<void> set_value(size_type pos, T_ && val)
         {
-            return set_value_async(get_partition(pos), get_local_index(pos),
+            return set_value(get_partition(pos), get_local_index(pos),
                 std::forward<T_>(val));
         }
 
-        /// Asynchronous API for set_value().
+        /// Asynchronously set the element at position \a pos in
+        /// the partition \part to the given value \a val.
         ///
         /// \param part  Sequence number of the partition
         /// \param pos   Position of the element in the partition
@@ -1065,14 +1100,47 @@ namespace hpx
         ///         once the operation is finished.
         ///
         template <typename T_>
-        future<void> set_value_async(size_type part, size_type pos, T_ && val)
+        future<void> set_value(size_type part, size_type pos, T_ && val)
         {
             return partition_vector_client(partitions_[part].partition_)
-                .set_value_async(pos, std::forward<T_>(val));
+                .set_value(pos, std::forward<T_>(val));
+        }
+
+        /// Copy the values of \a val to the elements at positions \a pos in
+        /// the partition \part of the vector container.
+        ///
+        /// \param part  Sequence number of the partition
+        /// \param pos   Position of the element in the vector
+        /// \param val   The value to be copied
+        ///
+        void set_values_sync(size_type part, std::vector<size_type> const& pos,
+            std::vector<T> const& val)
+        {
+            set_value(pos, val).get();
+        }
+
+        /// Asynchronously set the element at position \a pos in
+        /// the partition \part to the given value \a val.
+        ///
+        /// \param part  Sequence number of the partition
+        /// \param pos   Position of the element in the partition
+        /// \param val   The value to be copied
+        ///
+        /// \return This returns the hpx::future of type void which gets ready
+        ///         once the operation is finished.
+        ///
+        future<void>
+        set_values(size_type part, std::vector<size_type> const& pos,
+            std::vector<T> const& val)
+        {
+            HPX_ASSERT(pos.size() == val.size());
+            return partition_vector_client(partitions_[part].partition_)
+                .set_values(pos, val);
         }
 
 //             //CLEAR
-//             //TODO if number of partitions is kept constant every time then clear should modified (clear each partition_vector one by one).
+//             //TODO if number of partitions is kept constant every time then
+//             // clear should modified (clear each partition_vector one by one).
 // //            void clear()
 // //            {
 // //                //It is keeping one gid hence iterator does not go in an invalid state

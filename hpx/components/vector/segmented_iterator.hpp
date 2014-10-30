@@ -59,13 +59,13 @@ namespace hpx
 
             operator T() const
             {
-                return v_.get_value(index_);
+                return v_.get_value_sync(index_);
             }
 
             template <typename T_>
             vector_value_proxy& operator=(T_ && value)
             {
-                v_.set_value(index_, std::forward<T_>(value));
+                v_.set_value_sync(index_, std::forward<T_>(value));
                 return *this;
             }
 
@@ -582,7 +582,7 @@ namespace hpx
         typename base_type::reference dereference() const
         {
             HPX_ASSERT(!is_at_end());
-            return data_->get_value(global_index_);
+            return data_->get_value_sync(global_index_);
         }
 
         void increment()
