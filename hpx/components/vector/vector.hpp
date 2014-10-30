@@ -741,7 +741,7 @@ namespace hpx
         }
 
         vector(vector && rhs)
-          : size_(rhs.size_)
+          : size_(rhs.size_),
             block_size_(rhs.block_size_),
             partitions_(std::move(rhs.partitions_)),
             policy_(rhs.policy_),
