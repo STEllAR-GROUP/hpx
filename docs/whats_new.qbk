@@ -25,8 +25,8 @@ Here is a list of the important tickets we closed for this release.
 
 [heading General Changes]
 
-We have had over 1400 commits since the last release and we have closed
-over 180 tickets (bugs, feature requests, pull requests, etc.). These are by
+We have had over 1500 commits since the last release and we have closed
+over 200 tickets (bugs, feature requests, pull requests, etc.). These are by
 far the largest numbers of commits and resolved issues for any of the __hpx__
 releases so far.
 We are especially happy about the large number of people who contributed for
@@ -70,14 +70,18 @@ the first time to __hpx__.
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1296] - Rename make_error_future to make_exceptional_future, adjust
+                 to N4123
 * [issue 1295] - building issue
 * [issue 1293] - Transpose example
 * [issue 1292] - Wrong abs() function used in example
 * [issue 1291] - non-syncronized shift operators have been removed
+* [issue 1290] - RDTSCP is defined as true for Xeon Phi build
 * [issue 1289] - Fixing 1288
 * [issue 1288] - Add new performance counters
 * [issue 1287] - Hierarchy scheduler broken performance counters
 * [issue 1286] - Algorithm cleanup
+* [issue 1285] - Broken Links in Documentation
 * [issue 1284] - Uninitialized copy
 * [issue 1283] - missing boost::scoped_ptr includes
 * [issue 1282] - Update documentation of build options for schedulers
@@ -103,12 +107,14 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1259] - Avoid double-linking Boost on Windows
 * [issue 1257] - Adding additional parameter to create_thread
 * [issue 1256] - added buildbot changes to release notes
+* [issue 1255] - Cannot build MiniGhost
 * [issue 1253] - hpx::thread defects
 * [issue 1252] - HPX_PREFIX is too fragile
 * [issue 1250] - switch_to_fiber_emulation does not work properly
 * [issue 1249] - Documentation is generated under Release folder
 * [issue 1248] - Fix usage of hpx_generic_coroutine_context and get tests
                  passing on powerpc
+* [issue 1247] - Dynamic linking error
 * [issue 1246] - Make cpuid.cpp C++11 compliant
 * [issue 1245] - HPX fails on startup (setting thread affinity mask)
 * [issue 1244] - HPX_WITH_RDTSC configure test fails, but should succeed
@@ -291,6 +297,7 @@ Here is a list of the important tickets we closed for this release.
                  CTest/hpx_run_test should configure hpx.os_threads
 * [issue 925]  - regression_dataflow_791 needs to be brought in line with HPX
                  standards
+* [issue 899]  - Fix race conditions in regression tests
 * [issue 879]  - Hung test leads to cascading test failure; make tests should
                  support the MPI parcelport
 * [issue 865]  - future<T> and friends shall work for movable only Ts
