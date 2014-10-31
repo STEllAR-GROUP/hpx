@@ -129,6 +129,13 @@ namespace hpx { namespace components { namespace server
 
         void tidy();
 
+        // This component type requires valid locality id for its actions to
+        // be invoked
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return naming::is_locality(id);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 

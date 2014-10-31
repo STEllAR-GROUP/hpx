@@ -28,7 +28,13 @@ namespace hpx { namespace components { namespace server
             components::set_component_type<plain_function<Action> >(type);
         }
 
-        /// This is the default hook implementation for decorate_action which 
+        // This component type requires valid id for its actions to be invoked
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return naming::is_locality(id);
+        }
+
+        /// This is the default hook implementation for decorate_action which
         /// does no hooking at all.
         template <typename F>
         static threads::thread_function_type

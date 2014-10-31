@@ -37,10 +37,10 @@ namespace hpx { namespace actions
         typedef action<Component, result_type, arguments_type, Derived>
             base_type;
 
-        // Only non-localities are valid targets for a component action
+        // Let the component decide whether the id is valid
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
 
     protected:
@@ -220,10 +220,10 @@ namespace hpx { namespace actions
         typedef action<Component, result_type, arguments_type, Derived>
             base_type;
 
-        // Only non-localities are valid targets for a component action
+        // Let the component decide whether the id is valid
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
 
     protected:

@@ -288,6 +288,12 @@ namespace hpx { namespace components
             hpx::threads::register_work_plain(data, initial_state); //-V106
         }
 
+        // This component type requires valid id for its actions to be invoked
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return !naming::is_locality(id);
+        }
+
         // This component type does not support migration.
         static BOOST_CONSTEXPR bool supports_migration() { return false; }
 
@@ -295,6 +301,7 @@ namespace hpx { namespace components
         void pin() {}
         void unpin() {}
         boost::uint32_t pin_count() const { return 0; }
+
         void mark_as_migrated()
         {
             // If this assertion is triggered then this component instance is

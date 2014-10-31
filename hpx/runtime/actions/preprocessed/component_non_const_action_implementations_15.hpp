@@ -33,7 +33,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -224,7 +224,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -431,7 +431,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -622,7 +622,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -829,7 +829,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -1020,7 +1020,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -1227,7 +1227,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -1418,7 +1418,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -1625,7 +1625,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -1816,7 +1816,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -2023,7 +2023,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -2214,7 +2214,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -2421,7 +2421,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -2612,7 +2612,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -2819,7 +2819,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -3010,7 +3010,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -3217,7 +3217,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -3408,7 +3408,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -3615,7 +3615,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -3806,7 +3806,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -4013,7 +4013,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -4204,7 +4204,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -4411,7 +4411,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -4602,7 +4602,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -4809,7 +4809,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -5000,7 +5000,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -5207,7 +5207,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -5398,7 +5398,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -5605,7 +5605,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
@@ -5796,7 +5796,7 @@ namespace hpx { namespace actions
         
         static bool is_target_valid(naming::id_type const& id)
         {
-            return !naming::is_locality(id);
+            return Component::is_target_valid(id);
         }
     protected:
         
