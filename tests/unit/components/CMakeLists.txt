@@ -15,9 +15,10 @@ set(tests
     inheritance_3_classes_concrete
     migrate_component
     remote_object
-    vector
-    vector_copy
     vector_algorithms
+    vector_copy
+    vector_handle_values
+    vector
    )
 
 

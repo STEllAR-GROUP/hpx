@@ -910,7 +910,7 @@ namespace hpx
         get_values(size_type part, std::vector<size_type> const& pos) const
         {
             return partition_vector_client(partitions_[part].partition_)
-                .get_values(pos)
+                .get_values(pos);
         }
 
 //         //FRONT (never throws exception)

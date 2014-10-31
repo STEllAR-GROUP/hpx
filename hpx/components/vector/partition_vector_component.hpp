@@ -901,6 +901,34 @@ namespace hpx
                 this->get_gid(), pos, std::forward<T_>(val));
         }
 
+        /// Copy the value of \a val in the element at position
+        /// \a pos in the partition_vector container.
+        ///
+        /// \param pos   Position of the element in the partition_vector
+        /// \param val   The value to be copied
+        ///
+        void set_values_sync(std::vector<std::size_t> const& pos,
+            std::vector<T> const& val)
+        {
+            set_value(pos, val).get();
+        }
+
+        /// Copy the value of \a val in the element at position
+        /// \a pos in the partition_vector component.
+        ///
+        /// \param pos  Position of the element in the partition_vector
+        /// \param val  Value to be copied
+        ///
+        /// \return This returns the hpx::future of type void
+        ///
+        future<void> set_values(std::vector<std::size_t> const& pos,
+            std::vector<T> const& val)
+        {
+            HPX_ASSERT(this->get_gid());
+            return hpx::async<typename server_type::set_values_action>(
+                this->get_gid(), pos, val);
+        }
+
 //         void clear()
 //         {
 //             HPX_ASSERT(this->get_gid());
