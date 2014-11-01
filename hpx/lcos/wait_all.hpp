@@ -117,19 +117,24 @@ namespace hpx { namespace lcos
         ///////////////////////////////////////////////////////////////////////
         template <typename Future, typename Enable = void>
         struct is_future_or_shared_state
-          : boost::mpl::false_
-        {};
-
-        template <typename Future>
-        struct is_future_or_shared_state<Future,
-                typename boost::enable_if<traits::is_future<Future> >::type>
-          : boost::mpl::true_
+          : traits::is_future<Future>
         {};
 
         template <typename R>
         struct is_future_or_shared_state<
                 boost::intrusive_ptr<future_data<R> > >
           : boost::mpl::true_
+        {};
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Range, typename Enable = void>
+        struct is_future_or_shared_state_range
+            : boost::mpl::false_
+        {};
+
+        template <typename T>
+        struct is_future_or_shared_state_range<std::vector<T> >
+            : is_future_or_shared_state<T>
         {};
 
         ///////////////////////////////////////////////////////////////////////
@@ -180,25 +185,25 @@ namespace hpx { namespace lcos
             template <typename TupleIter, typename Iter>
             void await_range(TupleIter iter, Iter next, Iter end)
             {
+                typedef typename std::iterator_traits<Iter>::value_type
+                    future_type;
+                typedef typename detail::future_or_shared_state_result<
+                        future_type
+                    >::type future_result_type;
+
                 for (/**/; next != end; ++next)
                 {
-                    if (!next->is_ready())
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data<future_result_type>
+                    > next_future_data = lcos::detail::get_shared_state(*next);
+
+                    if (!next_future_data->is_ready())
                     {
                         // Attach a continuation to this future which will
                         // re-evaluate it and continue to the next element
                         // in the sequence (if any).
                         void (wait_all_frame::*f)(TupleIter, Iter, Iter) =
                             &wait_all_frame::await_range;
-
-                        typedef typename std::iterator_traits<Iter>::value_type
-                            future_type;
-                        typedef typename detail::future_or_shared_state_result<
-                                future_type
-                            >::type future_result_type;
-
-                        boost::intrusive_ptr<
-                            lcos::detail::future_data<future_result_type>
-                        > next_future_data = lcos::detail::get_shared_state(*next);
 
                         next_future_data->set_on_completed(util::bind(
                             f, this, std::move(iter),
@@ -277,7 +282,8 @@ namespace hpx { namespace lcos
 
                 typedef typename detail::is_future_or_shared_state<future_type>::type
                     is_future;
-                typedef typename traits::is_future_range<future_type>::type is_range;
+                typedef typename detail::is_future_or_shared_state_range<future_type>::type
+                    is_range;
 
                 await_next(std::forward<TupleIter>(iter), is_future(), is_range());
             }
