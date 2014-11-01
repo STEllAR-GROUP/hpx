@@ -14,10 +14,6 @@ struct test_server
         hpx::components::simple_component_base<test_server>
     >
 {
-    typedef hpx::components::migration_support<
-        hpx::components::simple_component_base<test_server>
-    > base_type;
-
     test_server() {}
     ~test_server() {}
 
@@ -33,16 +29,8 @@ struct test_server
     test_server(test_server const& rhs) {}
     test_server(test_server && rhs) {}
 
-    test_server& operator=(test_server const & rhs)
-    {
-        this->base_type::operator=(rhs);
-        return *this;
-    }
-    test_server& operator=(test_server && rhs)
-    {
-        this->base_type::operator=(std::move(rhs));
-        return *this;
-    }
+    test_server& operator=(test_server const &) { return *this; }
+    test_server& operator=(test_server &&) { return *this; }
 
     HPX_DEFINE_COMPONENT_CONST_ACTION(test_server, call, call_action);
 
