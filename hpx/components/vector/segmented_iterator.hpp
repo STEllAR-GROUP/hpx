@@ -198,7 +198,7 @@ namespace hpx
 
             if (is_at_end())
             {
-                if (other.data_)
+                if (!other.data_)
                     return other.local_index_ - other.partition_.size();
                 return other.local_index_ - other.data_->size();
             }
@@ -347,8 +347,8 @@ namespace hpx
 
             if (is_at_end())
             {
-                if (other.data_)
-                    return other.local_index_ - other->partition_.size();
+                if (!other.data_)
+                    return other.local_index_ - other.partition_.size();
                 return other.local_index_ - other.data_->size();
             }
 
