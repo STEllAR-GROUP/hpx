@@ -98,8 +98,15 @@ namespace hpx
         local_vector_iterator(partition_vector<T> partition,
                 size_type local_index)
           : partition_(partition),
+            local_index_(local_index)
+        {}
+
+        local_vector_iterator(partition_vector<T> partition,
+                size_type local_index,
+                boost::shared_ptr<server::partition_vector<T> > const& data)
+          : partition_(partition),
             local_index_(local_index),
-            data_(partition.get_ptr())
+            data_(data)
         {}
 
         typedef typename std::vector<T>::iterator base_iterator_type;
@@ -108,10 +115,12 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         base_iterator_type base_iterator()
         {
+            HPX_ASSERT(data_);
             return data_->begin() + local_index_;
         }
         base_const_iterator_type base_iterator() const
         {
+            HPX_ASSERT(data_);
             return data_->cbegin() + local_index_;
         }
 
@@ -153,6 +162,8 @@ namespace hpx
         typename base_type::reference dereference() const
         {
             HPX_ASSERT(!is_at_end());
+//             if (!data_)
+//                 return partition_.get_value_sync(local_index_);
             return *(data_->begin() + local_index_);
         }
 
@@ -180,12 +191,17 @@ namespace hpx
             {
                 if (is_at_end())
                     return 0;
-
-                return data_->size() - local_index_;
+                if (data_)
+                    return data_->size() - local_index_;
+                return partition_.size() - local_index_;
             }
 
             if (is_at_end())
+            {
+                if (other.data_)
+                    return other.local_index_ - other.partition_.size();
                 return other.local_index_ - other.data_->size();
+            }
 
             HPX_ASSERT(partition_ == other.partition_);
             return other.local_index_ - local_index_;
@@ -231,8 +247,15 @@ namespace hpx
         const_local_vector_iterator(partition_vector<T> partition,
                 size_type local_index)
           : partition_(partition),
+            local_index_(local_index)
+        {}
+
+        const_local_vector_iterator(partition_vector<T> partition,
+                size_type local_index,
+                boost::shared_ptr<server::partition_vector<T> > const& data)
+          : partition_(partition),
             local_index_(local_index),
-            data_(partition.get_ptr())
+            data_(data)
         {}
 
         typedef typename std::vector<T>::const_iterator base_iterator_type;
@@ -241,10 +264,12 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         base_const_iterator_type base_iterator()
         {
+            HPX_ASSERT(data_);
             return data_->cbegin() + local_index_;
         }
         base_const_iterator_type base_iterator() const
         {
+            HPX_ASSERT(data_);
             return data_->cbegin() + local_index_;
         }
 
@@ -286,6 +311,8 @@ namespace hpx
         typename base_type::reference dereference() const
         {
             HPX_ASSERT(!is_at_end());
+//             if (!data_)
+//                 return partition_.get_value_sync(local_index_);
             return *base_iterator();
         }
 
@@ -313,12 +340,17 @@ namespace hpx
             {
                 if (is_at_end())
                     return 0;
-
-                return data_->size() - local_index_;
+                if (data_)
+                    return data_->size() - local_index_;
+                return partition_.size() - local_index_;
             }
 
             if (is_at_end())
+            {
+                if (other.data_)
+                    return other.local_index_ - other->partition_.size();
                 return other.local_index_ - other.data_->size();
+            }
 
             HPX_ASSERT(partition_ == other.partition_);
             return other.local_index_ - local_index_;
@@ -675,7 +707,8 @@ namespace hpx { namespace traits
             if (seg_iter.is_at_end())       // avoid dereferencing end iterator
                 return local_iterator();
 
-            return local_iterator(seg_iter.base()->partition_, 0);
+            return local_iterator(seg_iter.base()->partition_, 0,
+                seg_iter.base()->local_data_);
         }
 
         //  This function should specify the local iterator which is at the
@@ -734,7 +767,8 @@ namespace hpx { namespace traits
             if (seg_iter.is_at_end())       // avoid dereferencing end iterator
                 return local_iterator();
 
-            return local_iterator(seg_iter.base()->partition_, 0);
+            return local_iterator(seg_iter.base()->partition_, 0,
+                seg_iter.base()->local_data_);
         }
 
         //  This function should specify the local iterator which is at the

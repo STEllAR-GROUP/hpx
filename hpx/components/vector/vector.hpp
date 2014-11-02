@@ -66,10 +66,30 @@ namespace hpx
         typedef hpx::server::partition_vector<T> partition_vector_server;
         typedef hpx::partition_vector<T> partition_vector_client;
 
+        struct partition_data : server::vector_configuration::partition_data
+        {
+            typedef server::vector_configuration::partition_data base_type;
+
+            partition_data(future<id_type> && part, std::size_t size,
+                    boost::uint32_t locality_id)
+              : base_type(std::move(part), size, locality_id)
+            {}
+
+            partition_data(id_type const& part, std::size_t size,
+                    boost::uint32_t locality_id)
+              : base_type(part, size, locality_id)
+            {}
+
+            partition_data(base_type && base)
+              : base_type(std::move(base))
+            {}
+
+            boost::shared_ptr<partition_vector_server> local_data_;
+        };
+
         // The list of partitions belonging to this vector.
         // Each partition is described by it's corresponding client object, its
         // size, and locality id.
-        typedef server::vector_configuration::partition_data partition_data;
         typedef std::vector<partition_data> partitions_vector_type;
 
         size_type size_;                // overall size of the vector
@@ -205,9 +225,15 @@ namespace hpx
             future<server::vector_configuration::config_data> f)
         {
             server::vector_configuration::config_data data = f.get();
+
+            partitions_.clear();
+            partitions_.reserve(data.partitions_.size());
+
             size_ = data.size_;
             block_size_ = data.block_size_;
-            partitions_ = std::move(data.partitions_);
+            std::move(data.partitions_.begin(), data.partitions_.end(),
+                std::back_inserter(partitions_));
+
             policy_ = static_cast<BOOST_SCOPED_ENUM(distribution_policy)>(
                 data.policy_);
 
@@ -237,10 +263,16 @@ namespace hpx
         // Register this vector with AGAS using the given symbolic name
         future<void> register_as(std::string const& symbolic_name)
         {
+            std::vector<server::vector_configuration::partition_data> partitions;
+            partitions.reserve(partitions_.size());
+
+            std::copy(partitions_.begin(), partitions_.end(),
+                std::back_inserter(partitions));
+
             server::vector_configuration::config_data data(
-                size_, block_size_, partitions_, int(policy_));
+                size_, block_size_, std::move(partitions), int(policy_));
             base_type::reset(hpx::new_<server::vector_configuration>(
-                hpx::find_here(), data));
+                hpx::find_here(), std::move(data)));
 
             registered_name_ = symbolic_name;
             return base_type::register_as(symbolic_name);
@@ -400,7 +432,8 @@ namespace hpx
             std::size_t local_index = get_local_index(global_index);
             HPX_ASSERT(local_index != std::size_t(-1));
 
-            return local_iterator(partitions_[part].partition_, local_index);
+            return local_iterator(partitions_[part].partition_, local_index,
+                partitions_[part].local_data_);
         }
 
         const_local_iterator get_const_local_iterator(size_type global_index) const
@@ -412,7 +445,8 @@ namespace hpx
             std::size_t local_index = get_local_index(global_index);
             HPX_ASSERT(local_index != std::size_t(-1));
 
-            return const_local_iterator(partitions_[part].partition_, local_index);
+            return const_local_iterator(partitions_[part].partition_,
+                local_index, partitions_[part].local_data_);
         }
 
         // Return the segment iterator referencing a segment based on the
@@ -455,6 +489,12 @@ namespace hpx
                 locality, count, size, val);
         }
 
+        void get_ptr_helper(std::size_t loc,
+            future<boost::shared_ptr<partition_vector_server> > && f)
+        {
+            partitions_[loc].local_data_ = f.get();
+        }
+
         template <typename DistPolicy, typename Create>
         void create(std::vector<id_type> const& localities,
             DistPolicy const& policy, Create && creator)
@@ -468,7 +508,6 @@ namespace hpx
             // create as many partitions as required
             std::vector<future<std::vector<id_type> > > ids;
             ids.reserve(num_localities);
-
             for (std::size_t loc = 0; loc != num_localities; ++loc)
             {
                 // create as many partitions on a given locality as required
@@ -479,6 +518,9 @@ namespace hpx
             hpx::wait_all(ids);
 
             // now initialize our data structures
+            boost::uint32_t this_locality = get_locality_id();
+            std::vector<future<void> > ptrs;
+
             std::size_t num_part = 0;
             std::size_t allocated_size = 0;
             for (std::size_t loc = 0; loc != num_localities; ++loc)
@@ -493,6 +535,14 @@ namespace hpx
                     std::size_t size = (std::min)(part_size, size_-allocated_size);
                     partitions_.push_back(partition_data(objs[l], size, locality));
 
+                    if (locality == this_locality)
+                    {
+                        using util::placeholders::_1;
+                        ptrs.push_back(get_ptr<partition_vector_server>(
+                            partitions_.back().partition_.get()).then(
+                                util::bind(&vector::get_ptr_helper, this, l, _1)));
+                    }
+
                     allocated_size += size;
                     if (++num_part == num_parts)
                     {
@@ -505,7 +555,7 @@ namespace hpx
                                     partitions_.back().partition_
                                 ).resize(size);
                         }
-                        return;
+                        break;
                     }
                     else
                     {
@@ -513,6 +563,8 @@ namespace hpx
                     }
                 }
             }
+
+            wait_all(ptrs);
         }
 
         template <typename DistPolicy>
@@ -581,14 +633,28 @@ namespace hpx
             }
             wait_all(objs);
 
+            boost::uint32_t this_locality = get_locality_id();
+            std::vector<future<void> > ptrs;
+
             partitions_vector_type partitions;
             partitions.reserve(rhs.partitions_.size());
             for (std::size_t i = 0; i != rhs.partitions_.size(); ++i)
             {
+                boost::int32_t locality = rhs.partitions_[i].locality_id_;
+
                 partitions.push_back(partition_data(std::move(objs[i]),
-                    rhs.partitions_[i].size_, rhs.partitions_[i].locality_id_
-                ));
+                    rhs.partitions_[i].size_, locality));
+
+                if (locality == this_locality)
+                {
+                    using util::placeholders::_1;
+                    ptrs.push_back(get_ptr<partition_vector_server>(
+                        partitions_[i].partition_.get()).then(
+                            util::bind(&vector::get_ptr_helper, this, i, _1)));
+                }
             }
+
+            wait_all(ptrs);
 
             size_ = rhs.size_;
             block_size_ = rhs.block_size_;
@@ -756,7 +822,7 @@ namespace hpx
         /// \brief Array subscript operator. This does not throw any exception.
         ///
         /// \param pos Position of the element in the vector [Note the first
-        ///             position in the partition is 0]
+        ///            position in the partition is 0]
         ///
         /// \return Returns the value of the element at position represented by
         ///         \a pos.
@@ -770,7 +836,7 @@ namespace hpx
         }
         T operator[](size_type pos) const
         {
-            return get_value(pos);
+            return get_value_sync(pos);
         }
 
         /// Copy assignment operator, performs deep copy of the right hand side
@@ -878,6 +944,12 @@ namespace hpx
         ///
         future<T> get_value(size_type part, size_type pos) const
         {
+            if (partitions_[part].local_data_)
+            {
+                return make_ready_future(
+                    partitions_[part].local_data_->get_value(pos));
+            }
+
             return partition_vector_client(partitions_[part].partition_)
                 .get_value(pos);
         }
@@ -909,6 +981,12 @@ namespace hpx
         future<std::vector<T> >
         get_values(size_type part, std::vector<size_type> const& pos) const
         {
+            if (partitions_[part].local_data_)
+            {
+                return make_ready_future(
+                    partitions_[part].local_data_->get_values(pos));
+            }
+
             return partition_vector_client(partitions_[part].partition_)
                 .get_values(pos);
         }
@@ -1102,6 +1180,13 @@ namespace hpx
         template <typename T_>
         future<void> set_value(size_type part, size_type pos, T_ && val)
         {
+            if (partitions_[part].local_data_)
+            {
+                partitions_[part].local_data_->
+                    set_value(pos, std::forward<T_>(val));
+                return make_ready_future();
+            }
+
             return partition_vector_client(partitions_[part].partition_)
                 .set_value(pos, std::forward<T_>(val));
         }
@@ -1134,6 +1219,13 @@ namespace hpx
             std::vector<T> const& val)
         {
             HPX_ASSERT(pos.size() == val.size());
+
+            if (partitions_[part].local_data_)
+            {
+                partitions_[part].local_data_->set_values(pos, val);
+                return make_ready_future();
+            }
+
             return partition_vector_client(partitions_[part].partition_)
                 .set_values(pos, val);
         }

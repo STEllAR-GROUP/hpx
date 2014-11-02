@@ -293,65 +293,29 @@ namespace hpx { namespace server
             partition_vector_.clear();
         }
 
-//         /** @brief Macro to define \a size function as HPX component action
-//         *           type.
-//         */
-//         HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(partition_vector, size);
-//         /** @brief Macro to define \a max_size function as HPX component
-//             *          action type.
-//             */
+        /// Macros to define HPX component actions for all exported functions.
+        HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_TPL(partition_vector, size);
+
 //         HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(partition_vector, max_size);
 
-        /// Macro to define \a resize function as an HPX component action.
         HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL(partition_vector, resize);
 
-//         /** @brief Macro to define \a capacity function as HPX component
-//             *          action type.
-//             */
 //         HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(partition_vector, capacity);
-//         /** @brief Macro to define \a empty function as HPX component action
-//             *          type.
-//             */
 //         HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(partition_vector, empty);
-//         /** @brief Macro to define \a reserve function as HPX component
-//             *          action type.
-//             */
 //         HPX_DEFINE_COMPONENT_ACTION(partition_vector, reserve);
 
-        /// Macro to define \a get_value function as an HPX component action.
         HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_TPL(partition_vector, get_value);
-        /// Macro to define \a get_value function as an HPX component action.
         HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_TPL(partition_vector, get_values);
 
-        /** @brief Macro to define \a front function as HPX component
-            *          action type.
-            */
 //         HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(partition_vector, front);
-//         /** @brief Macro to define \a back function as HPX component
-//             *          action type.
-//             */
 //         HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(partition_vector, back);
-//
-//         /** @brief Macro to define \a assign function as HPX component
-//             *          action type.
-//             */
 //         HPX_DEFINE_COMPONENT_ACTION(partition_vector, assign);
-//         /** @brief Macro to define \a push_back function as HPX component
-//             *          action type.
-//             */
 //         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_vector, push_back);
-//         /** @brief Macro to define \a pop_back function as HPX component
-//             *          action type.
-//             */
 //         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_vector, pop_back);
 
-        /// Macro to define \a set_value function as an HPX component action.
         HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL(partition_vector, set_value);
         HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL(partition_vector, set_values);
 
-//         /** @brief Macro to define \a clear function as HPX component action
-//             *          type.
-//             */
 //         HPX_DEFINE_COMPONENT_ACTION(partition_vector, clear);
     };
 }}
@@ -381,6 +345,9 @@ namespace hpx { namespace server
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         hpx::server::partition_vector<type>::set_values_action,               \
         BOOST_PP_CAT(__vector_set_values_action_, name));                     \
+    HPX_REGISTER_ACTION_DECLARATION(                                          \
+        hpx::server::partition_vector<type>::size_action,                     \
+        BOOST_PP_CAT(__vector_size_action_, name));                           \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         hpx::server::partition_vector<type>::resize_action,                   \
         BOOST_PP_CAT(__vector_resize_action_, name));                         \
@@ -412,6 +379,9 @@ namespace hpx { namespace server
         ::hpx::server::partition_vector<type>::set_values_action,             \
         BOOST_PP_CAT(__vector_set_values_action_, name));                     \
     HPX_REGISTER_ACTION(                                                      \
+        hpx::server::partition_vector<type>::size_action,                     \
+        BOOST_PP_CAT(__vector_size_action_, name));                           \
+    HPX_REGISTER_ACTION(                                                      \
         hpx::server::partition_vector<type>::resize_action,                   \
         BOOST_PP_CAT(__vector_resize_action_, name));                         \
     typedef ::hpx::components::simple_component<                              \
@@ -419,64 +389,6 @@ namespace hpx { namespace server
     > BOOST_PP_CAT(__vector_, name);                                          \
     HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(BOOST_PP_CAT(__vector_, name))     \
     /**/
-
-// // Capacity related action declaration
-// /** @brief Macro to register \a size component action type.*/
-// HPX_REGISTER_ACTION_DECLARATION(
-//     hpx::server::partition_vector::size_action,
-//     partition_vector_size_action);
-// /** @brief Macro to register \a max_size component action type.*/
-// HPX_REGISTER_ACTION_DECLARATION(
-//     hpx::server::partition_vector::max_size_action,
-//     partition_vector_max_size_action);
-// /** @brief Macro to register \a capacity component action type.*/
-// HPX_REGISTER_ACTION_DECLARATION(
-//     hpx::server::partition_vector::capacity_action,
-//     partition_vector_capacity_action);
-// /** @brief Macro to register \a empty component action type.*/
-// HPX_REGISTER_ACTION_DECLARATION(
-//     hpx::server::partition_vector::empty_action,
-//     partition_vector_empty_action);
-// /** @brief Macro to register \a reserve component action type.*/
-// HPX_REGISTER_ACTION_DECLARATION(
-//     hpx::server::partition_vector::reserve_action,
-//     partition_vector_reserve_action);
-
-// Element access component action declaration
-/// \brief Macro to register \a get_value component action type.
-// HPX_REGISTER_ACTION_DECLARATION(
-//     hpx::server::partition_vector::get_value_action,
-//     partition_vector_get_value_action);
-// /** @brief Macro to register \a front component action type.*/
-// HPX_REGISTER_ACTION_DECLARATION(
-//     hpx::server::partition_vector::front_action,
-//     partition_vector_front_action);
-// /** @brief Macro to register \a back component action type.*/
-// HPX_REGISTER_ACTION_DECLARATION(
-//     hpx::server::partition_vector::back_action,
-//     partition_vector_back_action);
-
-//Modifiers component action declaration
-// /** @brief Macro to register \a assign component action type.*/
-// HPX_REGISTER_ACTION_DECLARATION(
-//     hpx::server::partition_vector::assign_action,
-//     partition_vector_assign_action);
-// /** @brief Macro to register \a push_back component action type.*/
-// HPX_REGISTER_ACTION_DECLARATION(
-//     hpx::server::partition_vector::push_back_action,
-//     partition_vector_push_back_action);
-// /** @brief Macro to register \a pop_back component action type.*/
-// HPX_REGISTER_ACTION_DECLARATION(
-//     hpx::server::partition_vector::pop_back_action,
-//     partition_vector_pop_back_action);
-// /** @brief Macro to register \a set_value component action type.*/
-// HPX_REGISTER_ACTION_DECLARATION_TEMPLATE(
-//     (template <typename T>),
-//     (hpx::server::partition_vector<T>::set_value_action))
-// /** @brief Macro to register \a clear component action type.*/
-// HPX_REGISTER_ACTION_DECLARATION(
-//     hpx::server::partition_vector::clear_action,
-//     partition_vector_clear_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 // namespace hpx { namespace stubs
@@ -497,18 +409,6 @@ namespace hpx { namespace server
 //
 //     public:
 //         typedef typename base_type::size_type size_type;
-//
-//         /// \brief Calculate the size of the partition_vector component.
-//         ///
-//         /// \param gid  The global id of the partition_vector component register
-//         ///              with HPX
-//         ///
-//         /// \return This returns size as the hpx::future of type size_type
-//         ///
-// //         static future<size_type> size_async(id_type const& gid)
-// //         {
-// //             return hpx::async<base_type::size_action>(gid);
-// //         }
 //
 //         /** @brief Calculate the maximum size of the partition_vector component
 //          *          in terms of number of elements.
@@ -695,20 +595,31 @@ namespace hpx
         // Return the pinned pointer to the underlying component
         boost::shared_ptr<server::partition_vector<T> > get_ptr() const
         {
-            return hpx::get_ptr<server::partition_vector<T> >(this->get_gid()).get();
+            error_code ec(lightweight);
+            return hpx::get_ptr<server::partition_vector<T> >(this->get_gid()).get(ec);
         }
 
         ///////////////////////////////////////////////////////////////////////
         //  Capacity related API's in partition_vector client class
-//         future<std::size_t> size_async() const
-//         {
-//             HPX_ASSERT(this->get_gid());
-//             return this->base_type::size_async(this->get_gid());
-//         }
-//         std::size_t size() const
-//         {
-//             return size_async().get();
-//         }
+
+        /// Asynchronously return the size of the partition_vector component.
+        ///
+        /// \return This returns size as the hpx::future of type size_type
+        ///
+        future<std::size_t> size_async() const
+        {
+            HPX_ASSERT(this->get_gid());
+            return hpx::async<typename server_type::size_action>(this->get_gid());
+        }
+
+        /// Return the size of the partition_vector component.
+        ///
+        /// \return This returns size as the hpx::future of type size_type
+        ///
+        std::size_t size() const
+        {
+            return size_async().get();
+        }
 
 //         future<std::size_t> max_size_async() const
 //         {

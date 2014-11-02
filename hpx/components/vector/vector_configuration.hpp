@@ -62,10 +62,10 @@ namespace hpx { namespace server
             {}
 
             config_data(std::size_t size, std::size_t block_size,
-                    std::vector<partition_data> const& partitions, int policy)
+                    std::vector<partition_data> && partitions, int policy)
               : size_(size),
                 block_size_(block_size),
-                partitions_(partitions),
+                partitions_(std::move(partitions)),
                 policy_(policy)
             {}
 

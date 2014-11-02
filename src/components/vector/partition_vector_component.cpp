@@ -5,7 +5,7 @@
 
 /// \file src/components/vector/partition_vector_component.cpp
 
-/// \brief Define the necessary component action boilerplate code.
+/// \brief Define the necessary component boilerplate code.
 ///
 /// This file defines the necessary component boilerplate code which is
 /// required for proper functioning of components in the context of HPX.

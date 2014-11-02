@@ -3,11 +3,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// This is the eighth in a series of examples demonstrating the development
-// of a fully distributed solver for a simple 1D heat distribution problem.
-//
-// This example builds on example seven.
-
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/local/detail/invoke_when_ready.hpp>
@@ -19,10 +14,8 @@
 #include <algorithm>
 #include <vector>
 
-// Constant to shift column index
-#define COL_SHIFT 1000.00
-// Constant to shift row index
-#define ROW_SHIFT 0.001
+#define COL_SHIFT 1000.00           // Constant to shift column index
+#define ROW_SHIFT 0.001             // Constant to shift row index
 
 bool verbose = false;
 
@@ -176,8 +169,12 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(block_component_type, block_component);
 typedef block_component::get_sub_block_action get_sub_block_action;
 HPX_REGISTER_ACTION(get_sub_block_action);
 
-void transpose(hpx::future<sub_block> A, hpx::future<sub_block> B, hpx::future<boost::uint64_t> block_order, hpx::future<boost::uint64_t> tile_size);
-double test_results(boost::uint64_t order, boost::uint64_t block_order, std::vector<block> & trans, boost::uint64_t blocks_start, boost::uint64_t blocks_end);
+void transpose(hpx::future<sub_block> A, hpx::future<sub_block> B,
+    hpx::future<boost::uint64_t> block_order,
+    hpx::future<boost::uint64_t> tile_size);
+double test_results(boost::uint64_t order, boost::uint64_t block_order,
+    std::vector<block> & trans, boost::uint64_t blocks_start,
+    boost::uint64_t blocks_end);
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
@@ -194,11 +191,12 @@ int hpx_main(boost::program_options::variables_map& vm)
         boost::uint64_t tile_size = order;
 
         if(vm.count("tile_size"))
-          tile_size = vm["tile_size"].as<boost::uint64_t>();
+            tile_size = vm["tile_size"].as<boost::uint64_t>();
 
-        verbose = vm.count("verbose");
+        verbose = vm.count("verbose") ? true : false;
 
-        boost::uint64_t bytes = 2.0 * sizeof(double) * order * order;
+        boost::uint64_t bytes =
+            static_cast<boost::uint64_t>(2.0 * sizeof(double) * order * order);
 
         boost::uint64_t num_blocks = num_localities * num_local_blocks;
 
@@ -254,8 +252,10 @@ int hpx_main(boost::program_options::variables_map& vm)
         for_each(par, boost::begin(range), boost::end(range),
             [&](boost::uint64_t b)
             {
-                boost::shared_ptr<block_component> A_ptr = hpx::get_ptr<block_component>(A[b].get_gid()).get();
-                boost::shared_ptr<block_component> B_ptr = hpx::get_ptr<block_component>(B[b].get_gid()).get();
+                boost::shared_ptr<block_component> A_ptr =
+                    hpx::get_ptr<block_component>(A[b].get_gid()).get();
+                boost::shared_ptr<block_component> B_ptr =
+                    hpx::get_ptr<block_component>(B[b].get_gid()).get();
 
                 for(boost::uint64_t i = 0; i < order; ++i)
                 {
@@ -273,7 +273,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         double avgtime = 0.0;
         double maxtime = 0.0;
         double mintime = 366.0 * 24.0*3600.0; // set the minimum time to a large value;
-                                             // one leap year should be enough
+                                              // one leap year should be enough
         for(boost::uint64_t iter = 0; iter < iterations; ++iter)
         {
             hpx::util::high_resolution_timer t;
@@ -334,7 +334,8 @@ int hpx_main(boost::program_options::variables_map& vm)
             if(errsq < epsilon)
             {
                 std::cout << "Solution validates\n";
-                avgtime = avgtime/static_cast<double>((std::max)(iterations-1, static_cast<boost::uint64_t>(1)));
+                avgtime = avgtime/static_cast<double>(
+                    (std::max)(iterations-1, static_cast<boost::uint64_t>(1)));
                 std::cout
                   << "Rate (MB/s): " << 1.e-6 * bytes/mintime << ", "
                   << "Avg time (s): " << avgtime << ", "
@@ -342,7 +343,7 @@ int hpx_main(boost::program_options::variables_map& vm)
                   << "Max time (s): " << maxtime << "\n";
 
                 if(verbose)
-                  std::cout << "Squared errors: " << errsq << "\n";
+                    std::cout << "Squared errors: " << errsq << "\n";
             }
             else
             {
@@ -368,9 +369,11 @@ int main(int argc, char* argv[])
         ("iterations", value<boost::uint64_t>()->default_value(10),
          "# iterations")
         ("tile_size", value<boost::uint64_t>(),
-         "Number of tiles to divide the individual matrix blocks for improved cache and TLB performance")
+         "Number of tiles to divide the individual matrix blocks for improved "
+         "cache and TLB performance")
         ("num_blocks", value<boost::uint64_t>()->default_value(1),
-         "Number of blocks to divide the individual matrix blocks for improved cache and TLB performance")
+         "Number of blocks to divide the individual matrix blocks for "
+         "improved cache and TLB performance")
         ( "verbose", "Verbose output")
     ;
 
@@ -382,7 +385,9 @@ int main(int argc, char* argv[])
     return hpx::init(desc_commandline, argc, argv, cfg);
 }
 
-void transpose(hpx::future<sub_block> Af, hpx::future<sub_block> Bf, hpx::future<boost::uint64_t> block_order_fut, hpx::future<boost::uint64_t> tile_size_fut)
+void transpose(hpx::future<sub_block> Af, hpx::future<sub_block> Bf,
+    hpx::future<boost::uint64_t> block_order_fut,
+    hpx::future<boost::uint64_t> tile_size_fut)
 {
     const sub_block A(Af.get());
     sub_block B(Bf.get());
@@ -416,7 +421,9 @@ void transpose(hpx::future<sub_block> Af, hpx::future<sub_block> Bf, hpx::future
     }
 }
 
-double test_results(boost::uint64_t order, boost::uint64_t block_order, std::vector<block> & trans, boost::uint64_t blocks_start, boost::uint64_t blocks_end)
+double test_results(boost::uint64_t order, boost::uint64_t block_order,
+    std::vector<block> & trans, boost::uint64_t blocks_start,
+    boost::uint64_t blocks_end)
 {
     using hpx::parallel::for_each;
     using hpx::parallel::par;
@@ -445,7 +452,7 @@ double test_results(boost::uint64_t order, boost::uint64_t block_order, std::vec
         );
 
     if(verbose)
-      std::cout << " Squared sum of differences: " << errsq << "\n";
+        std::cout << " Squared sum of differences: " << errsq << "\n";
 
     return errsq;
 }
