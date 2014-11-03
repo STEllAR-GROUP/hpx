@@ -19,8 +19,6 @@ set(function_argument_limit_preprocessing_files
   "hpx/util/bind.hpp"
   "hpx/util/bind_action.hpp"
   "hpx/util/deferred_call.hpp"
-  "hpx/util/invoke.hpp"
-  "hpx/util/invoke_fused.hpp"
   "hpx/util/unwrapped.hpp"
   "hpx/lcos/local/detail/invoke_when_ready.hpp")
 foreach(file ${function_argument_limit_preprocessing_files})
