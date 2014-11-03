@@ -904,7 +904,15 @@ namespace hpx
         ///
         T get_value_sync(size_type pos) const
         {
-            return get_value(pos).get();
+            std::size_t part = get_partition(pos);
+            std::size_t idx = get_local_index(pos);
+
+            partition_data const& part_data = partitions_[part];
+            if (part_data.local_data_)
+                return part_data.local_data_->get_value(idx);
+
+            return partition_vector_client(part_data.partition_)
+                .get_value_sync(idx);
         }
 
         /// Returns the element at position \a pos in the vector container.
@@ -917,7 +925,12 @@ namespace hpx
         ///
         T get_value_sync(size_type part, size_type pos) const
         {
-            return get_value(part, pos).get();
+            partition_data const& part_data = partitions_[part];
+            if (part_data.local_data_)
+                return part_data.local_data_->get_value(pos);
+
+            return partition_vector_client(part_data.partition_)
+                .get_value_sync(pos);
         }
 
         /// Returns the element at position \a pos in the vector container
@@ -981,13 +994,11 @@ namespace hpx
         future<std::vector<T> >
         get_values(size_type part, std::vector<size_type> const& pos) const
         {
-            if (partitions_[part].local_data_)
-            {
-                return make_ready_future(
-                    partitions_[part].local_data_->get_values(pos));
-            }
+            partition_data const& part_data = partitions_[part];
+            if (part_data.local_data_)
+                return make_ready_future(part_data.local_data_->get_values(pos));
 
-            return partition_vector_client(partitions_[part].partition_)
+            return partition_vector_client(part_data.partition_)
                 .get_values(pos);
         }
 
@@ -1135,7 +1146,19 @@ namespace hpx
         template <typename T_>
         void set_value_sync(size_type pos, T_ && val)
         {
-            set_value(pos, std::forward<T_>(val)).get();
+            std::size_t part = get_partition(pos);
+            std::size_t idx = get_local_index(pos);
+
+            partition_data const& part_data = partitions_[part];
+            if (part_data.local_data_)
+            {
+                part_data.local_data_->set_value(idx, std::forward<T_>(val));
+            }
+            else
+            {
+                partition_vector_client(part_data.partition_)
+                    .set_value_sync(idx, std::forward<T_>(val));
+            }
         }
 
         /// Copy the value of \a val in the element at position \a pos in
@@ -1148,7 +1171,16 @@ namespace hpx
         template <typename T_>
         void set_value_sync(size_type part, size_type pos, T_ && val)
         {
-            set_value(part, pos, std::forward<T_>(val)).get();
+            partition_data const& part_data = partitions_[part];
+            if (part_data.local_data_)
+            {
+                part_data.local_data_->set_value(pos, std::forward<T_>(val));
+            }
+            else
+            {
+                partition_vector_client(part_data.partition_)
+                    .set_value_sync(pos, std::forward<T_>(val));
+            }
         }
 
         /// Asynchronous set the element at position \a pos of the partition
@@ -1180,14 +1212,14 @@ namespace hpx
         template <typename T_>
         future<void> set_value(size_type part, size_type pos, T_ && val)
         {
-            if (partitions_[part].local_data_)
+            partition_data const& part_data = partitions_[part];
+            if (part_data.local_data_)
             {
-                partitions_[part].local_data_->
-                    set_value(pos, std::forward<T_>(val));
+                part_data.local_data_->set_value(pos, std::forward<T_>(val));
                 return make_ready_future();
             }
 
-            return partition_vector_client(partitions_[part].partition_)
+            return partition_vector_client(part_data.partition_)
                 .set_value(pos, std::forward<T_>(val));
         }
 
