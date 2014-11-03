@@ -32,11 +32,9 @@
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
-#if !defined(HPX_GCC44_WORKAROUND)
 #include <hpx/lcos/broadcast.hpp>
 #if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
 #include <hpx/lcos/reduce.hpp>
-#endif
 #endif
 
 #include <hpx/util/assert.hpp>
@@ -547,8 +545,6 @@ namespace hpx { namespace components { namespace server
     }
 }}}
 
-#if !defined(HPX_GCC44_WORKAROUND)
-
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::server::runtime_support::call_shutdown_functions_action
     call_shutdown_functions_action;
@@ -568,7 +564,6 @@ HPX_REGISTER_REDUCE_ACTION_DECLARATION(dijkstra_termination_action, std_logical_
 HPX_REGISTER_REDUCE_ACTION(dijkstra_termination_action, std_logical_or_type)
 
 #endif
-#endif
 
 namespace hpx { namespace components { namespace server
 {
@@ -577,23 +572,8 @@ namespace hpx { namespace components { namespace server
     void invoke_shutdown_functions(
         std::vector<naming::id_type> const& localities, bool pre_shutdown)
     {
-#if !defined(HPX_GCC44_WORKAROUND)
         call_shutdown_functions_action act;
         lcos::broadcast(act, localities, pre_shutdown).get();
-#else
-        std::vector<lcos::future<void> > lazy_actions;
-        BOOST_FOREACH(naming::id_type const& id, localities)
-        {
-            using components::stubs::runtime_support;
-            lazy_actions.push_back(
-                std::move(runtime_support::call_shutdown_functions_async(
-                    id, pre_shutdown)));
-        }
-
-        // wait for all localities to finish executing their registered
-        // shutdown functions
-        wait_all(lazy_actions);
-#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////

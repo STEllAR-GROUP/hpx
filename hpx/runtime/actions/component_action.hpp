@@ -23,14 +23,6 @@
 
 #include <boost/preprocessor/cat.hpp>
 
-#if defined(HPX_GCC44_WORKAROUND)
-
-// use a special version of action implementation for gcc 4.4 which has only
-// a partial implementation of decltype (i.e. __typeof__)
-#include <hpx/runtime/actions/gcc44/component_action.hpp>
-
-#else
-
 #include <cstdlib>
 #include <stdexcept>
 
@@ -70,5 +62,3 @@ namespace hpx { namespace actions
 #include <hpx/runtime/actions/component_action_implementations.hpp>
 
 #endif
-#endif
-
