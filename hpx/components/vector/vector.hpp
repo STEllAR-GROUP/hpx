@@ -94,6 +94,7 @@ namespace hpx
 
         size_type size_;                // overall size of the vector
         size_type block_size_;          // cycle stride
+        size_type partition_size_;      // cached partition size
 
         // This is the vector representing the base_index and corresponding
         // global ID's of the underlying partition_vectors.
@@ -163,7 +164,7 @@ namespace hpx
             case distribution_policy::cyclic:
                 // overall size must be multiple of partition size
                 {
-                    std::size_t part_size = get_partition_size();
+                    std::size_t part_size = partition_size_;
                     if (part_size != std::size_t(-1) &&
                         (size_ % part_size) != 0)
                     {
@@ -181,9 +182,9 @@ namespace hpx
             case distribution_policy::block_cyclic:
                 {
                     if (block_size_ == std::size_t(-1))
-                        block_size_ = get_partition_size();
+                        block_size_ = partition_size_;
 
-                    std::size_t part_size = get_partition_size();
+                    std::size_t part_size = partition_size_;
                     if (part_size != std::size_t(-1) &&
                         (size_ % part_size) != 0)
                     {
@@ -237,6 +238,7 @@ namespace hpx
             policy_ = static_cast<BOOST_SCOPED_ENUM(distribution_policy)>(
                 data.policy_);
 
+            partition_size_ = get_partition_size();
             base_type::reset(std::move(id));
         }
 
@@ -290,7 +292,7 @@ namespace hpx
             {
             case distribution_policy::block:
                 {
-                    std::size_t part_size = get_partition_size();
+                    std::size_t part_size = partition_size_;
                     if (part_size != 0)
                         return global_index / part_size;
                 }
@@ -337,9 +339,8 @@ namespace hpx
             {
             case distribution_policy::block:
                 {
-                    std::size_t part_size = get_partition_size();
-                    if (part_size != 0)
-                        return global_index % part_size;
+                    if (partition_size_ != 0)
+                        return global_index % partition_size_;
                 }
                 break;
 
@@ -384,7 +385,7 @@ namespace hpx
             size_type local_index,
             BOOST_SCOPED_ENUM(distribution_policy) policy)
         {
-            std::size_t part_size = get_partition_size();
+            std::size_t part_size = partition_size_;
             if (part_size == 0)
                 return std::size_t(-1);
 
@@ -402,7 +403,7 @@ namespace hpx
             size_type local_index,
             BOOST_SCOPED_ENUM(distribution_policy) policy) const
         {
-            std::size_t part_size = get_partition_size();
+            std::size_t part_size = partition_size_;
             if (part_size == 0)
                 return std::size_t(-1);
 
@@ -565,6 +566,9 @@ namespace hpx
             }
 
             wait_all(ptrs);
+
+            // cache our partition size
+            partition_size_ = get_partition_size();
         }
 
         template <typename DistPolicy>
@@ -658,6 +662,7 @@ namespace hpx
 
             size_ = rhs.size_;
             block_size_ = rhs.block_size_;
+            partition_size_ = rhs.partition_size_;
             policy_ = rhs.policy_;
             std::swap(partitions_, partitions);
             registered_name_.clear();
@@ -671,6 +676,7 @@ namespace hpx
         vector()
           : size_(0),
             block_size_(std::size_t(-1)),
+            partition_size_(std::size_t(-1)),
             policy_(distribution_policy::block)
         {}
 
@@ -679,6 +685,7 @@ namespace hpx
         vector(std::string const& symbolic_name)
           : size_(0),
             block_size_(std::size_t(-1)),
+            partition_size_(std::size_t(-1)),
             policy_(distribution_policy::block)
         {
             connect_to(symbolic_name).get();
@@ -691,6 +698,7 @@ namespace hpx
         vector(size_type size)
           : size_(size),
             block_size_(std::size_t(-1)),
+            partition_size_(std::size_t(-1)),
             policy_(distribution_policy::block)
         {
             if (size != 0)
@@ -708,6 +716,7 @@ namespace hpx
         vector(size_type size, T const& val)
           : size_(size),
             block_size_(std::size_t(-1)),
+            partition_size_(std::size_t(-1)),
             policy_(distribution_policy::block)
         {
             if (size != 0)
@@ -736,6 +745,7 @@ namespace hpx
         vector(size_type size, DistPolicy const& policy)
           : size_(size),
             block_size_(policy.get_block_size()),
+            partition_size_(std::size_t(-1)),
             policy_(policy.get_policy_type())
         {
             if (size != 0)
@@ -746,6 +756,7 @@ namespace hpx
                 std::string const& symbolic_name)
           : size_(size),
             block_size_(policy.get_block_size()),
+            partition_size_(std::size_t(-1)),
             policy_(policy.get_policy_type())
         {
             if (size != 0)
@@ -768,6 +779,7 @@ namespace hpx
         vector(size_type size, T const& val, DistPolicy const& policy)
           : size_(size),
             block_size_(policy.get_block_size()),
+            partition_size_(std::size_t(-1)),
             policy_(policy.get_policy_type())
         {
             if (size != 0)
@@ -778,6 +790,7 @@ namespace hpx
                 std::string const& symbolic_name)
           : size_(size),
             block_size_(policy.get_block_size()),
+            partition_size_(std::size_t(-1)),
             policy_(policy.get_policy_type())
         {
             if (size != 0)
@@ -809,12 +822,14 @@ namespace hpx
         vector(vector && rhs)
           : size_(rhs.size_),
             block_size_(rhs.block_size_),
+            partition_size_(rhs.partition_size_),
             partitions_(std::move(rhs.partitions_)),
             policy_(rhs.policy_),
             registered_name_(std::move(rhs.registered_name_))
         {
             rhs.size_ = 0;
             rhs.block_size_ = std::size_t(-1);
+            rhs.partition_size_ = std::size_t(-1);
             rhs.policy_ = distribution_policy::block;
         }
 
@@ -857,12 +872,14 @@ namespace hpx
             {
                 size_ = rhs.size_;
                 block_size_ = rhs.block_size_;
+                partition_size_ = rhs.partition_size_;
                 partitions_ = std::move(rhs.partitions_);
                 policy_ = rhs.policy_;
                 registered_name_ = std::move(rhs.registered_name_);
 
                 rhs.size_ = 0;
                 rhs.block_size_ = std::size_t(-1);
+                rhs.partition_size_ = std::size_t(-1);
                 rhs.policy_ = distribution_policy::block;
             }
             return *this;
@@ -904,15 +921,7 @@ namespace hpx
         ///
         T get_value_sync(size_type pos) const
         {
-            std::size_t part = get_partition(pos);
-            std::size_t idx = get_local_index(pos);
-
-            partition_data const& part_data = partitions_[part];
-            if (part_data.local_data_)
-                return part_data.local_data_->get_value(idx);
-
-            return partition_vector_client(part_data.partition_)
-                .get_value_sync(idx);
+            return get_value_sync(get_partition(pos), get_local_index(pos));
         }
 
         /// Returns the element at position \a pos in the vector container.
@@ -979,7 +988,12 @@ namespace hpx
         std::vector<T>
         get_values_sync(size_type part, std::vector<size_type> const& pos) const
         {
-            return get_values(part, pos).get();
+            partition_data const& part_data = partitions_[part];
+            if (part_data.local_data_)
+                return part_data.local_data_->get_values(pos);
+
+            return partition_vector_client(part_data.partition_)
+                .get_values_sync(pos);
         }
 
         /// Asynchronously returns the elements at the positions \a pos from
@@ -1146,19 +1160,8 @@ namespace hpx
         template <typename T_>
         void set_value_sync(size_type pos, T_ && val)
         {
-            std::size_t part = get_partition(pos);
-            std::size_t idx = get_local_index(pos);
-
-            partition_data const& part_data = partitions_[part];
-            if (part_data.local_data_)
-            {
-                part_data.local_data_->set_value(idx, std::forward<T_>(val));
-            }
-            else
-            {
-                partition_vector_client(part_data.partition_)
-                    .set_value_sync(idx, std::forward<T_>(val));
-            }
+            return set_value_sync(get_partition(pos), get_local_index(pos),
+                std::forward<T_>(val));
         }
 
         /// Copy the value of \a val in the element at position \a pos in
