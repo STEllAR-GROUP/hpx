@@ -20,7 +20,7 @@ struct pfo
     template <typename T>
     void operator()(T& val) const
     {
-        ++val;
+        val = val + 1;
     }
 };
 

@@ -50,6 +50,44 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T>
+        struct local_vector_value_proxy
+        {
+            local_vector_value_proxy(local_vector_iterator<T> const& it)
+              : it_(it)
+            {}
+
+            operator T() const
+            {
+                if (!it_.get_data())
+                {
+                    return it_.get_partition().get_value_sync(
+                        it_.get_local_index());
+                }
+                return *(it_.get_data()->begin() + it_.get_local_index());
+            }
+
+            template <typename T_>
+            local_vector_value_proxy& operator=(T_ && value)
+            {
+                if (!it_.get_data())
+                {
+                    it_.get_partition().set_value_sync(
+                        it_.get_local_index(), std::forward<T_>(value));
+                }
+                else
+                {
+                    *(it_.get_data()->begin() + it_.get_local_index()) =
+                        std::forward<T_>(value);
+                }
+                return *this;
+            }
+
+            local_vector_iterator<T> const& it_;
+        };
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename T>
         struct vector_value_proxy
         {
@@ -80,13 +118,15 @@ namespace hpx
     template <typename T>
     class local_vector_iterator
       : public boost::iterator_facade<
-            local_vector_iterator<T>, T, std::random_access_iterator_tag
+            local_vector_iterator<T>, T, std::random_access_iterator_tag,
+            detail::local_vector_value_proxy<T>
         >
     {
     private:
         typedef std::size_t size_type;
         typedef boost::iterator_facade<
-                local_vector_iterator<T>, T, std::random_access_iterator_tag
+                local_vector_iterator<T>, T, std::random_access_iterator_tag,
+                detail::local_vector_value_proxy<T>
             > base_type;
 
     public:
@@ -162,9 +202,7 @@ namespace hpx
         typename base_type::reference dereference() const
         {
             HPX_ASSERT(!is_at_end());
-//             if (!data_)
-//                 return partition_.get_value_sync(local_index_);
-            return *(data_->begin() + local_index_);
+            return detail::local_vector_value_proxy<T>(*this);
         }
 
         void increment()
@@ -208,10 +246,19 @@ namespace hpx
         }
 
     public:
-        partition_vector<T>& get_client() { return partition_; }
-        partition_vector<T> const& get_client() const { return partition_; }
+        partition_vector<T>& get_partition() { return partition_; }
+        partition_vector<T> get_partition() const { return partition_; }
 
         size_type get_local_index() const { return local_index_; }
+
+        boost::shared_ptr<server::partition_vector<T> >& get_data()
+        {
+            return data_;
+        }
+        boost::shared_ptr<server::partition_vector<T> > const& get_data() const
+        {
+            return data_;
+        }
 
     protected:
         // refer to a partition of the vector
@@ -221,21 +268,21 @@ namespace hpx
         size_type local_index_;
 
         // caching address of component
-        mutable boost::shared_ptr<server::partition_vector<T> > data_;
+        boost::shared_ptr<server::partition_vector<T> > data_;
     };
 
     template <typename T>
     class const_local_vector_iterator
       : public boost::iterator_facade<
             const_local_vector_iterator<T>, T const,
-            std::random_access_iterator_tag
+            std::random_access_iterator_tag, T const
         >
     {
     private:
         typedef std::size_t size_type;
         typedef boost::iterator_facade<
                 const_local_vector_iterator<T>, T const,
-                std::random_access_iterator_tag
+                std::random_access_iterator_tag, T const
             > base_type;
 
     public:
@@ -311,8 +358,6 @@ namespace hpx
         typename base_type::reference dereference() const
         {
             HPX_ASSERT(!is_at_end());
-//             if (!data_)
-//                 return partition_.get_value_sync(local_index_);
             return *base_iterator();
         }
 
@@ -357,7 +402,7 @@ namespace hpx
         }
 
     public:
-        partition_vector<T> const& get_client() const { return partition_; }
+        partition_vector<T> const& get_partition() const { return partition_; }
         size_type get_local_index() const { return local_index_; }
 
     protected:
@@ -368,7 +413,7 @@ namespace hpx
         size_type local_index_;
 
         // caching address of component
-        mutable boost::shared_ptr<server::partition_vector<T> > data_;
+        boost::shared_ptr<server::partition_vector<T> > data_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
