@@ -6,10 +6,6 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
-
-// pxfs_file.hpp requires boost 1.56.0
-#if BOOST_VERSION >= 105600
-
 #include <hpx/components/io/pxfs_file.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/lcos.hpp>
@@ -149,13 +145,3 @@ int main(int argc, char* argv[])
 
     return hpx::util::report_errors();
 }
-
-#else
-
-int main(int argc, char* argv[])
-{
-    hpx::cerr << argv[0] << " requires at least Boost 1.56.0!" << hpx::endl;
-    return hpx::util::report_errors();
-}
-
-#endif

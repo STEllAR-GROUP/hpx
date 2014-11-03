@@ -83,6 +83,12 @@ else()
   set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
 endif()
 
+# If the found Boost installation is < 1.56, we need to include extra
+# intrusive_ptr header file 
+if(Boost_VERSION LESS 105600)
+  set(Boost_INCLUDE_DIRS  "${hpx_SOURCE_DIR}/external/intrusive_ptr" ${Boost_INCLUDE_DIRS})
+endif()
+
 set(Boost_LIBRARIES ${Boost_TMP_LIBRARIES})
 set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} ${hpx_SOURCE_DIR}/external/cache)
 set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} ${hpx_SOURCE_DIR}/external/endian)

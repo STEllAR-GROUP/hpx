@@ -1404,6 +1404,16 @@ if(Boost_VERSION LESS 105300)
     PATTERN ".git" EXCLUDE)
 endif()
 
+if(Boost_VERSION LESS 105600)
+  # add intrusive_ptr header for older Boost versions only
+  install(
+    DIRECTORY external/intrusive_ptr/boost
+    DESTINATION include/hpx/external
+    COMPONENT core
+    FILES_MATCHING PATTERN "*.hpp"
+    PATTERN ".git" EXCLUDE)
+endif()
+
 install(
   FILES "${hpx_SOURCE_DIR}/LICENSE_1_0.txt"
   DESTINATION share/hpx-${HPX_VERSION}
