@@ -74,6 +74,12 @@ namespace hpx { namespace actions
         typedef action<Component, result_type, arguments_type, Derived>
             base_type;
 
+        // Let the component decide whether the id is valid
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return Component::is_target_valid(id);
+        }
+
     protected:
         /// The \a thread_function will be registered as the thread
         /// function of a thread. It encapsulates the execution of the
@@ -279,6 +285,12 @@ namespace hpx { namespace actions
             BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived>
             base_type;
+
+        // Let the component decide whether the id is valid
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return Component::is_target_valid(id);
+        }
 
     protected:
         /// The \a thread_function will be registered as the thread

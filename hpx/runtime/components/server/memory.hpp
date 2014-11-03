@@ -133,6 +133,9 @@ namespace hpx { namespace components { namespace server
         HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(memory, load128);
 #endif
 
+        // This component type requires valid id for its actions to be invoked
+        static bool is_target_valid(naming::id_type const& id) { return true; }
+
         /// This is the default hook implementation for decorate_action which
         /// does no hooking at all.
         template <typename F>
