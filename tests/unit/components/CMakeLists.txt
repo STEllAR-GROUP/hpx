@@ -13,10 +13,10 @@ set(tests
     inheritance_3_classes_1_abstract
     inheritance_3_classes_2_abstract
     inheritance_3_classes_concrete
+    local_file
     migrate_component
     remote_object
    )
-
 
 set(action_invoke_no_more_than_PARAMETERS
     LOCALITIES 2
@@ -57,6 +57,9 @@ set(inheritance_3_classes_2_abstract_FLAGS
 set(inheritance_3_classes_concrete_FLAGS
     DEPENDENCIES iostreams_component)
 
+set(local_file_FLAGS
+    DEPENDENCIES iostreams_component local_file_component)
+
 foreach(test ${tests})
   set(sources
       ${test}.cpp)
@@ -86,3 +89,52 @@ foreach(test ${tests})
 
 endforeach()
 
+###############################################################################
+
+find_package(OrangeFS)
+
+if(ORANGEFS_FOUND)
+
+  set(ofs_tests
+      orangefs_file
+      pxfs_file
+      )
+
+  set(orangefs_file_FLAGS
+      DEPENDENCIES iostreams_component orangefs_file_component)
+
+  set(pxfs_file_FLAGS
+      DEPENDENCIES iostreams_component ${ORANGEFS_LIBRARY})
+
+  # add OrangeFS header files directory
+  include_directories(${ORANGEFS_INCLUDE_DIR})
+
+  foreach(test ${ofs_tests})
+    set(sources
+      ${test}.cpp)
+
+    source_group("Source Files" FILES ${sources})
+
+    # add example executable
+    add_hpx_executable(${test}_test
+                       SOURCES ${sources}
+                       ${${test}_FLAGS}
+                       EXCLUDE_FROM_ALL
+                       HPX_PREFIX ${HPX_BUILD_PREFIX}
+                       FOLDER "Tests/Unit/Components")
+
+    add_hpx_unit_test("components" ${test} ${${test}_PARAMETERS})
+
+    # add a custom target for this example
+    add_hpx_pseudo_target(tests.unit.components.${test})
+
+    # make pseudo-targets depend on master pseudo-target
+    add_hpx_pseudo_dependencies(tests.unit.components
+                                tests.unit.components.${test})
+
+    # add dependencies to pseudo-target
+    add_hpx_pseudo_dependencies(tests.unit.components.${test}
+                                ${test}_test_exe)
+
+  endforeach()
+endif()
