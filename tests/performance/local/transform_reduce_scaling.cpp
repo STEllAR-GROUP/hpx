@@ -27,7 +27,7 @@ struct Point
 void measure_transform_reduce(std::size_t size)
 {
     std::vector<Point> data_representation(size, 
-        Point{std::rand(), std::rand()});
+        Point{double(std::rand()), double(std::rand())});
 
     //invode transform_reduce
     double result = 
@@ -46,7 +46,7 @@ void measure_transform_reduce(std::size_t size)
 void measure_transform_reduce_old(std::size_t size)
 {
     std::vector<Point> data_representation(size,
-        Point{std::rand(), std::rand()});
+        Point{double(std::rand()), double(std::rand())});
 
     //invode old reduce
     Point result =
