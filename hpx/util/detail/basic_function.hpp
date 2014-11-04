@@ -5,8 +5,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !BOOST_PP_IS_ITERATING
-
 #ifndef HPX_UTIL_DETAIL_BASIC_FUNCTION_HPP
 #define HPX_UTIL_DETAIL_BASIC_FUNCTION_HPP
 
@@ -21,9 +19,6 @@
 
 #include <boost/static_assert.hpp>
 #include <boost/mpl/bool.hpp>
-#include <boost/preprocessor/iteration/iterate.hpp>
-#include <boost/preprocessor/repetition/enum_params.hpp>
-#include <boost/preprocessor/repetition/enum_binary_params.hpp>
 #include <boost/type_traits/is_pointer.hpp>
 #include <boost/type_traits/is_member_pointer.hpp>
 
@@ -193,20 +188,20 @@ namespace hpx { namespace util { namespace detail
     template <typename VTablePtr, typename Sig>
     class basic_function;
 
-    template <typename VTablePtr, typename R>
-    class basic_function<VTablePtr, R()>
-      : public function_base<VTablePtr, R()>
+    template <typename VTablePtr, typename R, typename ...Ts>
+    class basic_function<VTablePtr, R(Ts...)>
+      : public function_base<VTablePtr, R(Ts...)>
     {
         HPX_MOVABLE_BUT_NOT_COPYABLE(basic_function);
 
-        typedef function_base<VTablePtr, R()> base_type;
+        typedef function_base<VTablePtr, R(Ts...)> base_type;
 
     public:
         typedef R result_type;
 
         template <typename T>
         struct is_callable
-          : traits::is_callable<T()>
+          : traits::is_callable<T(Ts...)>
         {};
 
         basic_function() BOOST_NOEXCEPT
@@ -223,9 +218,9 @@ namespace hpx { namespace util { namespace detail
             return *this;
         }
 
-        BOOST_FORCEINLINE R operator()() const
+        BOOST_FORCEINLINE R operator()(Ts... vs) const
         {
-            return this->vptr->invoke(&this->object);
+            return this->vptr->invoke(&this->object, std::forward<Ts>(vs)...);
         }
 
         template <typename T>
@@ -257,103 +252,5 @@ namespace hpx { namespace util { namespace detail
         return f.empty();
     }
 }}}
-
-#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/util/detail/preprocessed/basic_function.hpp>
-#else
-
-#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/basic_function_" HPX_LIMIT_STR ".hpp")
-#endif
-
-#define BOOST_PP_ITERATION_PARAMS_1                                             \
-    (                                                                           \
-        3                                                                       \
-      , (                                                                       \
-            1                                                                   \
-          , HPX_FUNCTION_ARGUMENT_LIMIT                                         \
-          , <hpx/util/detail/basic_function.hpp>                                \
-        )                                                                       \
-    )                                                                           \
-/**/
-#include BOOST_PP_ITERATE()
-
-#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(output: null)
-#endif
-
-#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-
-#endif
-
-#else
-
-#define N BOOST_PP_ITERATION()
-
-namespace hpx { namespace util { namespace detail
-{
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename VTablePtr,
-        typename R, BOOST_PP_ENUM_PARAMS(N, typename A)>
-    class basic_function<VTablePtr, R(BOOST_PP_ENUM_PARAMS(N, A))>
-      : public function_base<VTablePtr, R(BOOST_PP_ENUM_PARAMS(N, A))>
-    {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(basic_function);
-
-        typedef function_base<VTablePtr, R(BOOST_PP_ENUM_PARAMS(N, A))> base_type;
-
-    public:
-        typedef R result_type;
-
-        template <typename T>
-        struct is_callable
-          : traits::is_callable<T(BOOST_PP_ENUM_PARAMS(N, A))>
-        {};
-
-        basic_function() BOOST_NOEXCEPT
-          : base_type()
-        {}
-
-        basic_function(basic_function&& other) BOOST_NOEXCEPT
-          : base_type(static_cast<base_type&&>(other))
-        {}
-
-        basic_function& operator=(basic_function&& other) BOOST_NOEXCEPT
-        {
-            base_type::operator=(static_cast<base_type&&>(other));
-            return *this;
-        }
-
-        BOOST_FORCEINLINE R operator()(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)) const
-        {
-            return this->vptr->invoke(&this->object,
-                HPX_ENUM_FORWARD_ARGS(N, A, a));
-        }
-
-        template <typename T>
-        T* target() BOOST_NOEXCEPT
-        {
-            BOOST_STATIC_ASSERT_MSG(
-                is_callable<T>::value
-              , "T shall be Callable with the function signature"
-            );
-
-            return base_type::template target<T>();
-        }
-
-        template <typename T>
-        T* target() const BOOST_NOEXCEPT
-        {
-            BOOST_STATIC_ASSERT_MSG(
-                is_callable<T>::value
-              , "T shall be Callable with the function signature"
-            );
-
-            return base_type::template target<T>();
-        }
-    };
-}}}
-
-#undef N
 
 #endif

@@ -19,17 +19,8 @@ namespace hpx { namespace detail
     template <typename Tuple>
     struct apply_colocated_bound_tuple;
 
-    template <
-        BOOST_PP_ENUM_PARAMS(
-            HPX_TUPLE_LIMIT
-          , typename T
-        )
-    >
-    struct apply_colocated_bound_tuple<
-        util::tuple<
-            BOOST_PP_ENUM_PARAMS(HPX_TUPLE_LIMIT, T)
-        >
-    >
+    template <typename ...Ts>
+    struct apply_colocated_bound_tuple<util::tuple<Ts...> >
     {
         typedef
             util::tuple<
@@ -40,7 +31,7 @@ namespace hpx { namespace detail
                       , hpx::id_type
                     >
                 >
-              , BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(HPX_TUPLE_LIMIT), T)
+              , Ts...
             >
             type;
     };

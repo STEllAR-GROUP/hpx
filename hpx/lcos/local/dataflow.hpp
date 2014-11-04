@@ -290,7 +290,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 next_type;
 
             typedef
-                typename util::detail::decay_unwrap<
+                typename util::decay_unwrap<
                     typename boost::fusion::result_of::deref<Iter>::type
                 >::type
                 future_type;
@@ -342,7 +342,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         void await(Policy&, Iter iter, boost::mpl::false_)
         {
             typedef
-                typename util::detail::decay_unwrap<
+                typename util::decay_unwrap<
                     typename boost::fusion::result_of::deref<Iter>::type
                 >::type
                 future_type;

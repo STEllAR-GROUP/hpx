@@ -10,17 +10,6 @@
 
 # add headers to preprocessing
 set(function_argument_limit_preprocessing_files
-  "hpx/util/detail/basic_function.hpp"
-  "hpx/util/detail/basic_function.hpp"
-  "hpx/util/detail/define_bind_action_function_operators.hpp"
-  "hpx/util/detail/define_bind_function_operators.hpp"
-  "hpx/util/detail/empty_function.hpp"
-  "hpx/util/detail/vtable/callable_vtable.hpp"
-  "hpx/util/bind.hpp"
-  "hpx/util/bind_action.hpp"
-  "hpx/util/deferred_call.hpp"
-  "hpx/util/invoke.hpp"
-  "hpx/util/invoke_fused.hpp"
   "hpx/util/unwrapped.hpp"
   "hpx/lcos/local/detail/invoke_when_ready.hpp")
 foreach(file ${function_argument_limit_preprocessing_files})
@@ -28,8 +17,7 @@ foreach(file ${function_argument_limit_preprocessing_files})
 endforeach()
 
 set(tuple_argument_limit_preprocessing_files
-  "hpx/util/tuple.hpp"
-  "hpx/util/zip_iterator.hpp")
+  "hpx/util/tuple.hpp")
 foreach(file ${tuple_argument_limit_preprocessing_files})
   hpx_partial_preprocess_header(${file} LIMIT HPX_LIMIT)
 endforeach()
