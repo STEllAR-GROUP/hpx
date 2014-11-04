@@ -11,10 +11,13 @@ set(tests
     async_continue
     async_local
     async_remote
+    broadcast
+    broadcast_apply
     composable_guard
     condition_variable
     barrier
     dataflow
+    fold
     future
     future_ref
     future_then
@@ -25,28 +28,10 @@ set(tests
     local_mutex
     packaged_action
     promise
+    reduce
     shared_future
     unwrapped
    )
-
-# include some of the tests for non-gcc 4.4 only
-set(non_gcc_44 true)
-if(CMAKE_COMPILER_IS_GNUCXX AND HPX_GCC_VERSION_CHECK)
-  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.5)
-    set(non_gcc_44 false)
-  endif()
-endif()
-
-
-if(non_gcc_44)
-  set(tests
-      ${tests}
-      broadcast
-      broadcast_apply
-      fold
-      reduce
-     )
-endif()
 
 set(apply_colocated_PARAMETERS LOCALITIES 2)
 set(apply_remote_PARAMETERS LOCALITIES 2)

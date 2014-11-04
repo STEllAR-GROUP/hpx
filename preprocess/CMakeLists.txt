@@ -56,7 +56,6 @@ set(action_argument_limit_preprocessing_files
   "hpx/lcos/local/dataflow.hpp"
   "hpx/lcos/local/packaged_task.hpp"
   "hpx/runtime/actions/component_action_implementations.hpp"
-  "hpx/runtime/actions/gcc44/component_action_implementations.hpp"
   "hpx/runtime/actions/component_const_action_implementations.hpp"
   "hpx/runtime/actions/component_non_const_action_implementations.hpp"
   "hpx/runtime/actions/construct_continuation_function_objects.hpp"
@@ -71,7 +70,6 @@ set(action_argument_limit_preprocessing_files
   "hpx/runtime/applier/apply_colocated_callback.hpp"
   "hpx/runtime/components/new.hpp"
   "hpx/runtime/components/server/runtime_support_implementations.hpp"
-  "hpx/runtime/components/server/gcc44/runtime_support_implementations.hpp"
   "hpx/runtime/components/server/create_component_with_args.hpp"
   "hpx/runtime/components/server/runtime_support_create_component_decl.hpp")
 if(HPX_HAVE_SECURITY)

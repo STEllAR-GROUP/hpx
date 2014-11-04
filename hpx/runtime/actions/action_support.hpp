@@ -949,9 +949,6 @@ namespace hpx { namespace actions
 #if defined(HPX_HAVE_CXX11_DECLTYPE)
 #  define HPX_TYPEOF(x)       decltype(x)
 #  define HPX_TYPEOF_TPL(x)   decltype(x)
-#elif defined(HPX_GCC44_WORKAROUND)
-#  define HPX_TYPEOF(x)       __typeof__(x)
-#  define HPX_TYPEOF_TPL(x)   __typeof__(x)
 #else
 #  define HPX_TYPEOF(x)       BOOST_TYPEOF(x)
 #  define HPX_TYPEOF_TPL(x)   BOOST_TYPEOF_TPL(x)

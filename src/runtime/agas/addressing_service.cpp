@@ -25,9 +25,7 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/lcos/wait_all.hpp>
-#if !defined(HPX_GCC44_WORKAROUND)
 #include <hpx/lcos/broadcast.hpp>
-#endif
 
 #include <boost/format.hpp>
 #include <boost/icl/closed_interval.hpp>
@@ -2110,16 +2108,12 @@ future<hpx::id_type> addressing_service::on_symbol_namespace_event(
 
 }}
 
-#if !defined(HPX_GCC44_WORKAROUND)
-
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::agas::server::symbol_namespace::service_action
     symbol_namespace_service_action;
 
 HPX_REGISTER_BROADCAST_ACTION_DECLARATION(symbol_namespace_service_action)
 HPX_REGISTER_BROADCAST_ACTION(symbol_namespace_service_action)
-
-#endif
 
 namespace hpx { namespace agas
 {
@@ -2147,21 +2141,8 @@ bool addressing_service::iterate_ids(
     try {
         request req(symbol_ns_iterate_names, f);
 
-#if !defined(HPX_GCC44_WORKAROUND)
         symbol_namespace_service_action act;
         lcos::broadcast(act, detail::find_all_symbol_namespace_services(), req).get(ec);
-#else
-        BOOST_FOREACH(naming::id_type id, hpx::find_all_localities())
-        {
-            naming::id_type service_id(
-                stubs::symbol_namespace::get_service_instance(id.get_gid(), ec),
-                naming::id_type::unmanaged);
-            if (ec) return false;
-
-            stubs::symbol_namespace::service(service_id, req, action_priority_, ec);
-            if (ec) return false;
-        }
-#endif
 
         return !ec;
     }
