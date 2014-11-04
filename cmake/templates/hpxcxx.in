@@ -31,6 +31,7 @@
      pkgconfpath += [
          os.path.join(os.environ["HPX_LOCATION"],"lib","pkgconfig")]
  pkgconfpath += [
+     os.path.join(@HPX_PREFIX@,"lib","pkgconfig"),
      os.path.join(os.path.dirname(sys.argv[0]),"..","lib","pkgconfig"),
      os.path.join("opt","hpx","lib","pkgconfig"),
      os.path.join("usr","bin","hpx","lib","pkgconfig"),

@@ -1244,6 +1244,10 @@ configure_file("${hpx_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
 configure_file("${hpx_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
                "${CMAKE_BINARY_DIR}/bin/hpxrun.py"
                @ONLY)
+# Configure hpxcxx
+configure_file("${hpx_SOURCE_DIR}/cmake/templates/hpxcxx.in"
+               "${CMAKE_BINARY_DIR}/bin/hpxcxx"
+               @ONLY)
 
 ################################################################################
 # installation instructions
