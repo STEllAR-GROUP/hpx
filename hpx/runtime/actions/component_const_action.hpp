@@ -138,27 +138,6 @@ namespace hpx { namespace actions
         }
     };
 
-#if BOOST_WORKAROUND(BOOST_MSVC, == 1600)
-    namespace detail
-    {
-        template <typename Obj, typename Result>
-        struct synthesize_const_mf<Obj, Result (*)()>
-        {
-            typedef Result (Obj::*type)() const;
-        };
-
-        template <typename Obj, typename Result>
-        struct synthesize_const_mf<Obj, Result (Obj::*)() const>
-        {
-            typedef Result (Obj::*type)() const;
-        };
-
-        template <typename Result>
-        typename boost::mpl::identity<Result (*)()>::type
-        replicate_type(Result (*p)());
-    }
-#endif
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Result,
         Result (Component::*F)() const, typename Derived>

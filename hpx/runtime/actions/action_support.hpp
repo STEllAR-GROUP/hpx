@@ -969,69 +969,6 @@ namespace hpx { namespace actions
         hpx::actions::make_direct_action<HPX_TYPEOF_TPL(&f), &f> /**/         \
     /**/
 
-#if BOOST_WORKAROUND(BOOST_MSVC, == 1600)
-    // workarounds for VC2010
-    #define HPX_MAKE_COMPONENT_ACTION(component, f)                           \
-        hpx::actions::make_action<                                            \
-            HPX_TYPEOF(component::f) component::*, &component::f>  /**/       \
-    /**/
-    #define HPX_MAKE_DIRECT_COMPONENT_ACTION(component, f)                    \
-        hpx::actions::make_direct_action<                                     \
-            HPX_TYPEOF(component::f) component::*, &component::f>  /**/       \
-    /**/
-
-    #define HPX_MAKE_COMPONENT_ACTION_TPL(component, f)                       \
-        hpx::actions::make_action<                                            \
-            HPX_TYPEOF_TPL(component::f) component::*, &component::f>  /**/   \
-    /**/
-    #define HPX_MAKE_DIRECT_COMPONENT_ACTION_TPL(component, f)                \
-        hpx::actions::make_direct_action<                                     \
-            HPX_TYPEOF_TPL(component::f) component::*, &component::f>  /**/   \
-    /**/
-
-    namespace detail
-    {
-        template <typename Obj, typename F>
-        struct synthesize_const_mf;
-
-        template <typename F> F replicate_type(F);
-    }
-
-    #define HPX_MAKE_CONST_COMPONENT_ACTION(component, f)                     \
-        hpx::actions::make_action<                                            \
-            hpx::actions::detail::synthesize_const_mf<                        \
-                component, HPX_TYPEOF(                                        \
-                    hpx::actions::detail::replicate_type(&component::f)       \
-                )                                                             \
-            >::type, &component::f>  /**/                                     \
-    /**/
-    #define HPX_MAKE_CONST_DIRECT_COMPONENT_ACTION(component, f)              \
-        hpx::actions::make_direct_action<                                     \
-            hpx::actions::detail::synthesize_const_mf<                        \
-                component, HPX_TYPEOF(                                        \
-                    hpx::actions::detail::replicate_type(&component::f)       \
-                )                                                             \
-            >::type, &component::f>  /**/                                     \
-    /**/
-
-    #define HPX_MAKE_CONST_COMPONENT_ACTION_TPL(component, f)                 \
-        hpx::actions::make_action<                                            \
-            typename hpx::actions::detail::synthesize_const_mf<               \
-                component, HPX_TYPEOF_TPL(                                    \
-                    hpx::actions::detail::replicate_type(&component::f)       \
-                )                                                             \
-            >::type, &component::f>  /**/                                     \
-    /**/
-    #define HPX_MAKE_CONST_DIRECT_COMPONENT_ACTION_TPL(component, f)          \
-        hpx::actions::make_direct_action<                                     \
-            typename hpx::actions::detail::synthesize_const_mf<               \
-                component, HPX_TYPEOF_TPL(                                    \
-                    hpx::actions::detail::replicate_type(&component::f)       \
-                )                                                             \
-            >::type, &component::f>  /**/                                     \
-    /**/
-#else
-    // the implementation on conforming compilers is almost trivial
     #define HPX_MAKE_COMPONENT_ACTION(component, f)                           \
         HPX_MAKE_ACTION(component::f)                                         \
     /**/
@@ -1057,7 +994,6 @@ namespace hpx { namespace actions
     #define HPX_MAKE_CONST_DIRECT_COMPONENT_ACTION_TPL(component, f)          \
         HPX_MAKE_DIRECT_ACTION_TPL(component::f)                              \
     /**/
-#endif
 
     /// \endcond
 }}
