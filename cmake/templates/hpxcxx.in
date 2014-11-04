@@ -13,7 +13,7 @@
  component = False
  minusc = False
  output = None
- args = ["g++"]
+ args = ["@CMAKE_CXX_COMPILER@"]
  libs = []
 
  def remove_suffix(nm):
@@ -31,7 +31,7 @@
      pkgconfpath += [
          os.path.join(os.environ["HPX_LOCATION"],"lib","pkgconfig")]
  pkgconfpath += [
-     os.path.join(@HPX_PREFIX@,"lib","pkgconfig"),
+     os.path.join("@HPX_PREFIX@","lib","pkgconfig"),
      os.path.join(os.path.dirname(sys.argv[0]),"..","lib","pkgconfig"),
      os.path.join("opt","hpx","lib","pkgconfig"),
      os.path.join("usr","bin","hpx","lib","pkgconfig"),
@@ -55,7 +55,7 @@
  The hpxcxx command requires that you build either
  a component, an application, or that you specify
  the -c flag. All other flags are passed through
- to the underlying g++ compiler.
+ to the underlying @CXX@ compiler.
  """
      sys.exit(2)
 
