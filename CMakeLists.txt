@@ -851,7 +851,7 @@ if(HPX_COMPILER_WARNINGS)
     hpx_add_compile_flag_if_available(-Wno-cast-align LANGUAGES CXX)
 
     # We never want trampolines
-    hpx_add_compile_flag_if_available(-Wt)
+    #hpx_add_compile_flag_if_available(-Wt)
 
     # These are usually benign and can't be suppressed because of
     # interface requirements
@@ -928,7 +928,7 @@ else()
   # These come from within Boost. Detection for this flag fails with GCC 4.4,
   # 4.5 and 4.6.
   if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.6)
-    hpx_add_compile_flag_if_available(-Wno-delete-non-virtual-dtor LANGUAGES CXX C)
+    #hpx_add_compile_flag_if_available(-Wno-delete-non-virtual-dtor LANGUAGES CXX C)
   endif()
 
   # Check if our libraries have unresolved symbols
@@ -1252,6 +1252,12 @@ configure_file("${hpx_SOURCE_DIR}/cmake/templates/hpxcxx.in"
 ################################################################################
 # installation instructions
 ################################################################################
+install(
+  DIRECTORY ${CMAKE_BINARY_DIR}/bin/
+  DESTINATION hpx/bin/
+  COMPONENT core
+  FILES_MATCHING PATTERN "hpxcxx")
+
 install( # install all hpx header files
   DIRECTORY hpx/
   DESTINATION include/hpx
