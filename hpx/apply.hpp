@@ -3,8 +3,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !BOOST_PP_IS_ITERATING
-
 #if !defined(HPX_APPLY_APR_16_20012_0943AM)
 #define HPX_APPLY_APR_16_20012_0943AM
 
@@ -16,137 +14,63 @@
 #include <hpx/runtime/applier/apply_continue.hpp>
 #include <hpx/runtime/applier/apply_colocated.hpp>
 #include <hpx/util/bind_action.hpp>
+#include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/traits/is_callable.hpp>
 
-#include <boost/preprocessor/enum.hpp>
-#include <boost/preprocessor/enum_params.hpp>
-#include <boost/preprocessor/iterate.hpp>
 #include <boost/mpl/identity.hpp>
 #include <boost/utility/enable_if.hpp>
 
-#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/preprocessed/apply.hpp>
-#else
-
-#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/apply_" HPX_LIMIT_STR ".hpp")
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
-    ///////////////////////////////////////////////////////////////////////////
-    // simply launch the given function or function object asynchronously
-    template <typename F>
-    bool apply(threads::executor& sched, F && f)
-    {
-        sched.add(std::forward<F>(f), "hpx::apply");
-        return false;   // executed locally
-    }
-
-    template <typename F>
-    typename boost::enable_if_c<
-        traits::detail::is_callable_not_action<F()>::value
-     && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , bool
-    >::type
-    apply(F && f)
-    {
-        threads::register_thread_nullary(
-            util::deferred_call(
-                std::forward<F>(f)
-            ), "hpx::apply");
-        return false;   // executed locally
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // apply a bound action
-    template <typename Action, typename BoundArgs>
-    bool apply(hpx::util::detail::bound_action<Action, BoundArgs> const& bound)
-    {
-        return bound.apply();
-    }
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// bring in all N-nary overloads for apply
-#define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (1, HPX_ACTION_ARGUMENT_LIMIT, <hpx/apply.hpp>))                      \
-    /**/
-
-#include BOOST_PP_ITERATE()
-
-#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(output: null)
-#endif
-
-#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-#else
-
-#define N BOOST_PP_ITERATION()
-
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
     // Define apply() overloads for plain local functions and function objects.
 
     // simply launch the given function or function object asynchronously
-    template <typename F, BOOST_PP_ENUM_PARAMS(N, typename A)>
+    template <typename F, typename ...Ts>
     typename boost::enable_if_c<
         traits::detail::is_callable_not_action<
-            F(BOOST_PP_ENUM_PARAMS(N, A))>::value
+            typename util::decay<F>::type(typename util::decay<Ts>::type...)
+        >::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , bool
     >::type
-    apply(threads::executor& sched, F && f,
-        HPX_ENUM_FWD_ARGS(N, A, a))
+    apply(threads::executor& sched, F&& f, Ts&&... vs)
     {
         sched.add(
-            util::deferred_call(
-                std::forward<F>(f),
-                HPX_ENUM_FORWARD_ARGS(N, A, a)
-            ), "hpx::apply");
+            util::deferred_call(std::forward<F>(f), std::forward<Ts>(vs)...),
+            "hpx::apply");
         return false;
     }
 
-    template <typename F, BOOST_PP_ENUM_PARAMS(N, typename A)>
+    template <typename F, typename ...Ts>
     typename boost::enable_if_c<
         traits::detail::is_callable_not_action<
-            F(BOOST_PP_ENUM_PARAMS(N, A))>::value
+            typename util::decay<F>::type(typename util::decay<Ts>::type...)
+        >::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , bool
     >::type
-    apply(F && f, HPX_ENUM_FWD_ARGS(N, A, a))
+    apply(F&& f, Ts&&... vs)
     {
         threads::register_thread_nullary(
-            util::deferred_call(
-                std::forward<F>(f),
-                HPX_ENUM_FORWARD_ARGS(N, A, a)
-            ), "hpx::apply");
+            util::deferred_call(std::forward<F>(f), std::forward<Ts>(vs)...),
+            "hpx::apply");
         return false;
     }
 
-    // define apply() overloads for bound actions
-    template <
-        typename Action, typename BoundArgs
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
-    >
+    ///////////////////////////////////////////////////////////////////////////
+    // Define apply() overloads for bound actions
+    template <typename Action, typename BoundArgs, typename ...Ts>
     bool apply(
         hpx::util::detail::bound_action<Action, BoundArgs> const& bound
-      , HPX_ENUM_FWD_ARGS(N, A, a)
+      , Ts&&... vs
     )
     {
-        return bound.apply(HPX_ENUM_FORWARD_ARGS(N, A, a));
+        return bound.apply(std::forward<Ts>(vs)...);
     }
 }
 
-#undef N
-
 #endif
-
