@@ -238,6 +238,25 @@ namespace hpx
             policy_ = static_cast<BOOST_SCOPED_ENUM(distribution_policy)>(
                 data.policy_);
 
+            boost::uint32_t this_locality = get_locality_id();
+            std::vector<future<void> > ptrs;
+
+            typedef typename partitions_vector_type::const_iterator const_iterator;
+
+            std::size_t l = 0;
+            const_iterator end = partitions_.cend();
+            for (const_iterator it = partitions_.cbegin(); it != end; ++it, ++l)
+            {
+                if (it->locality_id_ == this_locality)
+                {
+                    using util::placeholders::_1;
+                    ptrs.push_back(get_ptr<partition_vector_server>(
+                        it->partition_.get()).then(
+                            util::bind(&vector::get_ptr_helper, this, l, _1)));
+                }
+            }
+            wait_all(ptrs);
+
             partition_size_ = get_partition_size();
             base_type::reset(std::move(id));
         }
@@ -294,7 +313,10 @@ namespace hpx
                 {
                     std::size_t part_size = partition_size_;
                     if (part_size != 0)
-                        return global_index / part_size;
+                    {
+                        return (part_size != size_) ?
+                            (global_index / part_size) : 0;
+                    }
                 }
                 break;
 
@@ -302,7 +324,10 @@ namespace hpx
                 {
                     std::size_t num_parts = partitions_.size();
                     if (num_parts != 0)
-                        return global_index % num_parts;
+                    {
+                        return (num_parts > 1) ?
+                            (global_index % num_parts) : global_index;
+                    }
                 }
                 break;
 
@@ -316,7 +341,7 @@ namespace hpx
                         if (num_parts != 0)
                         {
                             std::size_t block_num = global_index % num_blocks;
-                            return block_num / (num_blocks / num_parts);
+                            return (block_num * num_parts) / num_blocks;
                         }
                     }
                 }
@@ -340,7 +365,10 @@ namespace hpx
             case distribution_policy::block:
                 {
                     if (partition_size_ != 0)
-                        return global_index % partition_size_;
+                    {
+                        return (partition_size_ != size_) ?
+                            (global_index % partition_size_) : global_index;
+                    }
                 }
                 break;
 
@@ -348,7 +376,7 @@ namespace hpx
                 {
                     std::size_t num_parts = partitions_.size();
                     if (num_parts != 0)
-                        return global_index / num_parts;
+                        return (num_parts > 1) ? (global_index / num_parts) : 0;
                 }
                 break;
 
@@ -417,60 +445,119 @@ namespace hpx
             return get_global_index(it, local_index, policy_);
         }
 
-        std::size_t get_partition(segment_iterator const& it) const
+        ///////////////////////////////////////////////////////////////////////
+        util::bounds_iterator<2, false>
+        get_bounds_iterator(segment_iterator it, size_type local_index = 0)
+        {
+            std::size_t num_parts = partitions_.size();
+            util::bounds<2> bnds({
+                    std::ptrdiff_t(num_parts),
+                    std::ptrdiff_t(partition_size_)
+                });
+            util::index<2> idx({
+                    std::ptrdiff_t(get_partition(it)),
+                    std::ptrdiff_t(local_index)
+                });
+
+            return util::bounds_iterator<2, false>(bnds, idx,
+                num_parts ? partitions_.back().size_ : std::ptrdiff_t(-1));
+        }
+
+        util::bounds_iterator<2, false>
+        get_bounds_iterator(const_segment_iterator it, size_type local_index = 0) const
+        {
+            std::size_t num_parts = partitions_.size();
+            util::bounds<2> bnds({
+                    std::ptrdiff_t(num_parts),
+                    std::ptrdiff_t(partition_size_)
+                });
+            util::index<2> idx({
+                    std::ptrdiff_t(get_partition(it)),
+                    std::ptrdiff_t(local_index)
+                });
+
+            return util::bounds_iterator<2, false>(bnds, idx,
+                num_parts ? partitions_.back().size_ : std::ptrdiff_t(-1));
+        }
+
+        util::bounds_iterator<2, false>
+        get_bounds_begin_iterator() const
+        {
+            std::size_t num_parts = partitions_.size();
+            util::bounds<2> bnds({
+                    std::ptrdiff_t(num_parts),
+                    std::ptrdiff_t(partition_size_)
+                });
+
+            return util::bounds_iterator<2, false>(bnds.begin(),
+                num_parts ? partitions_.back().size_ : std::ptrdiff_t(-1));
+        }
+
+        util::bounds_iterator<2, false>
+        get_bounds_end_iterator() const
+        {
+            std::size_t num_parts = partitions_.size();
+            util::bounds<2> bnds({
+                    std::ptrdiff_t(num_parts),
+                    std::ptrdiff_t(partition_size_)
+                });
+
+            return util::bounds_iterator<2, false>(bnds.end(),
+                num_parts ? partitions_.back().size_ : std::ptrdiff_t(-1));
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        std::size_t get_partition(segment_iterator const& it)
         {
             return std::distance(partitions_.begin(), it.base());
         }
 
+        std::size_t get_partition(const_segment_iterator const& it) const
+        {
+            return std::distance(partitions_.cbegin(), it.base());
+        }
+
         // Return the local iterator referencing an element inside a segment
         // based on the given global index.
-        local_iterator get_local_iterator(size_type global_index) const
+        local_iterator get_local_iterator(size_type part, size_type index) const
         {
-            std::size_t part = get_partition(global_index);
             if (part == std::size_t(-1))
                 return local_iterator();
 
-            std::size_t local_index = get_local_index(global_index);
-            HPX_ASSERT(local_index != std::size_t(-1));
-
-            return local_iterator(partitions_[part].partition_, local_index,
+            return local_iterator(partitions_[part].partition_, index,
                 partitions_[part].local_data_);
         }
 
-        const_local_iterator get_const_local_iterator(size_type global_index) const
+        const_local_iterator get_const_local_iterator(
+            size_type part, size_type index) const
         {
-            std::size_t part = get_partition(global_index);
             if (part == std::size_t(-1))
                 return const_local_iterator();
 
-            std::size_t local_index = get_local_index(global_index);
-            HPX_ASSERT(local_index != std::size_t(-1));
-
             return const_local_iterator(partitions_[part].partition_,
-                local_index, partitions_[part].local_data_);
+                index, partitions_[part].local_data_);
         }
 
         // Return the segment iterator referencing a segment based on the
         // given global index.
-        segment_iterator get_segment_iterator(size_type global_index)
+        segment_iterator get_segment_iterator(size_type part)
         {
-            std::size_t part = get_partition(global_index);
             if (part == std::size_t(-1) || part == partitions_.size())
                 return segment_iterator(this, partitions_.end());
 
-            return segment_iterator(this, partitions_.begin() + part,
+            segment_iterator it(this, partitions_.begin() + part,
                 partitions_.end());
+            return it;
         }
 
-        const_segment_iterator get_const_segment_iterator(
-            size_type global_index) const
+        const_segment_iterator get_const_segment_iterator(size_type part) const
         {
-            std::size_t part = get_partition(global_index);
             if (part == std::size_t(-1))
                 return const_segment_iterator(this, partitions_.cend());
 
-            return const_segment_iterator(this, partitions_.cbegin() + part,
+            const_segment_iterator it(this, partitions_.cbegin() + part,
                 partitions_.cend());
+            return it;
         }
 
     protected:
@@ -569,6 +656,23 @@ namespace hpx
 
             // cache our partition size
             partition_size_ = get_partition_size();
+
+            // make sure the block size is correctly initialized
+            switch (policy_)
+            {
+            default:
+            case distribution_policy::block:
+                break;
+
+            case distribution_policy::cyclic:
+                block_size_ = partition_size_;
+                break;
+
+            case distribution_policy::block_cyclic:
+                if (block_size_ == std::size_t(-1))
+                    block_size_ = partition_size_;
+                break;
+            }
         }
 
         template <typename DistPolicy>
@@ -697,7 +801,7 @@ namespace hpx
         ///
         vector(size_type size)
           : size_(size),
-            block_size_(std::size_t(-1)),
+            block_size_(1),
             partition_size_(std::size_t(-1)),
             policy_(distribution_policy::block)
         {
@@ -715,7 +819,7 @@ namespace hpx
         ///
         vector(size_type size, T const& val)
           : size_(size),
-            block_size_(std::size_t(-1)),
+            block_size_(1),
             partition_size_(std::size_t(-1)),
             policy_(distribution_policy::block)
         {
@@ -724,7 +828,7 @@ namespace hpx
         }
         vector(size_type size, T const& val, std::string const& symbolic_name)
           : size_(size),
-            block_size_(std::size_t(-1)),
+            block_size_(1),
             policy_(distribution_policy::block)
         {
             if (size != 0)
@@ -812,7 +916,7 @@ namespace hpx
         /// vector.
         vector(vector const& rhs)
           : size_(0),
-            block_size_(std::size_t(-1)),
+            block_size_(1),
             policy_(distribution_policy::block)
         {
             if (rhs.size_ != 0)
@@ -828,7 +932,7 @@ namespace hpx
             registered_name_(std::move(rhs.registered_name_))
         {
             rhs.size_ = 0;
-            rhs.block_size_ = std::size_t(-1);
+            rhs.block_size_ = 1;
             rhs.partition_size_ = std::size_t(-1);
             rhs.policy_ = distribution_policy::block;
         }
@@ -847,7 +951,8 @@ namespace hpx
         ///
         detail::vector_value_proxy<T> operator[](size_type pos)
         {
-            return detail::vector_value_proxy<T>(*this, pos);
+            return detail::vector_value_proxy<T>(*this, get_partition(pos),
+                get_local_index(pos));
         }
         T operator[](size_type pos) const
         {
@@ -878,7 +983,7 @@ namespace hpx
                 registered_name_ = std::move(rhs.registered_name_);
 
                 rhs.size_ = 0;
-                rhs.block_size_ = std::size_t(-1);
+                rhs.block_size_ = 1;
                 rhs.partition_size_ = std::size_t(-1);
                 rhs.policy_ = distribution_policy::block;
             }
@@ -1280,53 +1385,42 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         /// Return the iterator at the beginning of the first segment located
         /// on the given locality.
-        iterator
-        begin(boost::uint32_t id = naming::invalid_locality_id)
+        iterator begin()
         {
-            return iterator(this, get_global_index(segment_begin(id), 0,
-                distribution_policy::block));
+            return iterator(this, get_bounds_begin_iterator());
         }
 
         /// \brief Return the const_iterator at the beginning of the vector.
-        const_iterator
-        begin(boost::uint32_t id = naming::invalid_locality_id) const
+        const_iterator begin() const
         {
-            return const_iterator(this, get_global_index(segment_cbegin(id), 0,
-                distribution_policy::block));
+            return const_iterator(this, get_bounds_begin_iterator(), block_size_);
         }
 
         /// \brief Return the const_iterator at the beginning of the vector.
-        const_iterator
-        cbegin(boost::uint32_t id = naming::invalid_locality_id) const
+        const_iterator cbegin() const
         {
-            return const_iterator(this, get_global_index(segment_cbegin(id), 0,
-                distribution_policy::block));
+            return const_iterator(this, get_bounds_begin_iterator(), block_size_);
         }
 
         /// \brief Return the iterator at the end of the vector.
-        iterator
-        end(boost::uint32_t id = naming::invalid_locality_id)
+        iterator end()
         {
-            return iterator(this, get_global_index(segment_end(id), 0,
-                distribution_policy::block));
+            return iterator(this, get_bounds_end_iterator());
         }
 
         /// \brief Return the const_iterator at the end of the vector.
-        const_iterator
-        end(boost::uint32_t id = naming::invalid_locality_id) const
+        const_iterator end() const
         {
-            return const_iterator(this, get_global_index(segment_cend(id), 0,
-                distribution_policy::block));
+            return const_iterator(this, get_bounds_end_iterator());
         }
 
         /// \brief Return the const_iterator at the end of the vector.
-        const_iterator
-        cend(boost::uint32_t id = naming::invalid_locality_id) const
+        const_iterator cend() const
         {
-            return const_iterator(this, get_global_index(segment_cend(id), 0,
-                distribution_policy::block));
+            return const_iterator(this, get_bounds_end_iterator());
         }
 
+        ///////////////////////////////////////////////////////////////////////
         /// Return the iterator at the beginning of the first segment located
         /// on the given locality.
         iterator begin(id_type const& id)
@@ -1368,6 +1462,45 @@ namespace hpx
         {
             HPX_ASSERT(naming::is_locality(id));
             return cend(naming::get_locality_from_id(id));
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        iterator begin(boost::uint32_t id)
+        {
+            return iterator(this, get_bounds_iterator(segment_begin(id)),
+                block_size_);
+        }
+
+        /// \brief Return the const_iterator at the beginning of the vector.
+        const_iterator begin(boost::uint32_t id) const
+        {
+            return const_iterator(this, get_bounds_iterator(segment_cbegin(id)),
+                block_size_);
+        }
+
+        /// \brief Return the const_iterator at the beginning of the vector.
+        const_iterator cbegin(boost::uint32_t id) const
+        {
+            return const_iterator(this, get_bounds_iterator(segment_cbegin(id)),
+                block_size_);
+        }
+
+        /// \brief Return the iterator at the end of the vector.
+        iterator end(boost::uint32_t id)
+        {
+            return iterator(this, get_bounds_iterator(segment_end(id)));
+        }
+
+        /// \brief Return the const_iterator at the end of the vector.
+        const_iterator end(boost::uint32_t id) const
+        {
+            return const_iterator(this, get_bounds_iterator(segment_cend(id)));
+        }
+
+        /// \brief Return the const_iterator at the end of the vector.
+        const_iterator cend(boost::uint32_t id) const
+        {
+            return const_iterator(this, get_bounds_iterator(segment_cend(id)));
         }
 
         ///////////////////////////////////////////////////////////////////////
