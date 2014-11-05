@@ -223,7 +223,7 @@ namespace hpx
         // Connect this vector to the existing vector using the given symbolic
         // name.
         void get_data_helper(id_type id,
-            future<server::vector_configuration::config_data> f)
+            future<server::vector_configuration::config_data> && f)
         {
             server::vector_configuration::config_data data = f.get();
 
@@ -263,7 +263,7 @@ namespace hpx
 
         // this will be called by the base class once the registered id becomes
         // available
-        future<void> connect_to_helper(future<id_type> f)
+        future<void> connect_to_helper(future<id_type> && f)
         {
             using util::placeholders::_1;
             typedef typename server::vector_configuration::get_action act;
