@@ -252,7 +252,8 @@ namespace hpx
                     using util::placeholders::_1;
                     ptrs.push_back(get_ptr<partition_vector_server>(
                         it->partition_.get()).then(
-                            util::bind(&vector::get_ptr_helper, this, l, _1)));
+                            util::bind(&vector::get_ptr_helper, this, l, 
+                                boost::ref(partitions_), _1)));
                 }
             }
             wait_all(ptrs);
