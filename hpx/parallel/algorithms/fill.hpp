@@ -41,7 +41,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter, typename T>
             static hpx::util::unused_type
-            sequential(ExPolicy const&, InIter first, InIter last, T val)
+            sequential(ExPolicy const&, InIter first, InIter last, 
+                T const& val)
             {
                 std::fill(first, last, val);
                 return hpx::util::unused;
@@ -49,12 +50,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter, typename T>
             static typename detail::algorithm_result<ExPolicy>::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last, T val)
+            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+                 T const& val)
             {
                 typedef typename detail::algorithm_result<ExPolicy>::type
                     result_type;
                 typedef typename std::iterator_traits<FwdIter>::value_type type;
 
+                if(first == last)
+                    return detail::algorithm_result<ExPolicy>::get();
+                
                 return hpx::util::void_guard<result_type>(),
                     for_each_n<FwdIter>().call(
                         policy, first, std::distance(first, last),
@@ -140,7 +145,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename T>
             static OutIter
-            sequential(ExPolicy const&, OutIter first, std::size_t count, T val)
+            sequential(ExPolicy const&, OutIter first, std::size_t count, 
+                T const& val)
             {
                 return std::fill_n(first, count, val);
             }
@@ -148,10 +154,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename T>
             static typename detail::algorithm_result<ExPolicy, OutIter>::type
             parallel(ExPolicy const& policy, OutIter first, std::size_t count,
-                T val)
+                T const& val)
             {
                 typedef typename std::iterator_traits<OutIter>::value_type type;
-
+                
                 return
                     for_each_n<OutIter>().call(
                         policy, first, count,
