@@ -18,7 +18,7 @@ HPX_REGISTER_VECTOR(int);
 struct pfo
 {
     template <typename T>
-    void operator()(T& val) const
+    void operator()(T && val) const
     {
         val = val + 1;
     }
@@ -70,9 +70,9 @@ void for_each_tests()
         hpx::parallel::for_each(hpx::parallel::seq, v.begin(), v.end(), pfo());
         hpx::parallel::for_each(hpx::parallel::par, v.begin(), v.end(), pfo());
         hpx::parallel::for_each(hpx::parallel::seq(hpx::parallel::task),
-            v.begin(), v.end(), pfo());
+            v.begin(), v.end(), pfo()).get();
         hpx::parallel::for_each(hpx::parallel::par(hpx::parallel::task),
-            v.begin(), v.end(), pfo());
+            v.begin(), v.end(), pfo()).get();
     }
 
     {
