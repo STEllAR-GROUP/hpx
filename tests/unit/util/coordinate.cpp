@@ -103,73 +103,11 @@ void test_bounds3()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void test_bounds2_max_last()
-{
-    hpx::util::bounds<2> bnds({ N1, N2 });
-
-    {
-        hpx::util::bounds_iterator<2, false> it (boost::begin(bnds), N2 - 1);
-        hpx::util::bounds_iterator<2, false> end (boost::end(bnds));
-
-        std::size_t count = 0;
-        for (/**/; it != end; ++it)
-        {
-            ++count;
-        }
-        HPX_TEST_EQ(count, N1 * N2 - 1);
-    }
-
-    {
-        hpx::util::bounds_iterator<2, false> it (boost::begin(bnds), N2 - 1);
-        hpx::util::bounds_iterator<2, false> end (boost::end(bnds));
-
-        std::size_t count = 0;
-        for (/**/; it != end; it += 1)
-        {
-            ++count;
-        }
-        HPX_TEST_EQ(count, N1 * N2 - 1);
-    }
-}
-
-void test_bounds3_max_last()
-{
-    hpx::util::bounds<3> bnds({ N1, N2, N3 });
-
-    {
-        hpx::util::bounds_iterator<3, false> it (boost::begin(bnds), N3 - 2);
-        hpx::util::bounds_iterator<3, false> end (boost::end(bnds));
-
-        std::size_t count = 0;
-        for (/**/; it != end; ++it)
-        {
-            ++count;
-        }
-        HPX_TEST_EQ(count, N1 * N2 * N3 - 2);
-    }
-
-    {
-        hpx::util::bounds_iterator<3, false> it (boost::begin(bnds), N3 - 2);
-        hpx::util::bounds_iterator<3, false> end (boost::end(bnds));
-
-        std::size_t count = 0;
-        for (/**/; it != end; it += 1)
-        {
-            ++count;
-        }
-        HPX_TEST_EQ(count, N1 * N2 * N3 - 2);
-    }
-}
-
-///////////////////////////////////////////////////////////////////////////////
 int main()
 {
     test_bounds1();
     test_bounds2();
     test_bounds3();
-
-    test_bounds2_max_last();
-    test_bounds3_max_last();
 
     return 0;
 }

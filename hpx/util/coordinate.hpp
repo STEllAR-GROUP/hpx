@@ -25,7 +25,7 @@ namespace hpx { namespace util
     // forward declaration
     template <int Rank> class index;
     template <int Rank> class bounds;
-    template <int Rank, bool Full = true> class bounds_iterator;
+    template <int Rank> class bounds_iterator;
 
     ///////////////////////////////////////////////////////////////////////////
     // [coord.index], class template index
@@ -409,7 +409,7 @@ namespace hpx { namespace util
     }
 
     // [coord.bounds.iterator], class template bounds_iterator
-    template <int Rank, bool Full>
+    template <int Rank>
     class bounds_iterator
     {
     public:
@@ -583,157 +583,10 @@ namespace hpx { namespace util
         index<Rank> index_;
     };
 
-    // Specialization which allows for the outermost range to be shorter for
-    // the last iteration of the inner bounds.
     template <int Rank>
-    class bounds_iterator<Rank, false> : public bounds_iterator<Rank>
-    {
-    public:
-        explicit bounds_iterator(bounds_iterator<Rank> const& bnds,
-                difference_type max_last_index = difference_type(-1))
-          : bounds_iterator<Rank>(bnds)
-        {
-            if (max_last_index != difference_type(-1))
-            {
-                for (int i = 0; i < Rank - 1; ++i)
-                    max_last_index_[i] = this->bounds_[i] - 1;
-                max_last_index_[Rank - 1] = max_last_index;
-            }
-        }
-
-        explicit bounds_iterator(bounds<Rank> const& bnd,
-                index<Rank> const& idx,
-                difference_type max_last_index = difference_type(-1))
-          : bounds_iterator<Rank>(bnd, idx)
-        {
-            if (max_last_index != difference_type(-1))
-            {
-                for (int i = 0; i < Rank - 1; ++i)
-                    max_last_index_[i] = this->bounds_[i] - 1;
-                max_last_index_[Rank - 1] = max_last_index;
-            }
-        }
-
-        explicit bounds_iterator(bounds<Rank> const& bnd,
-                difference_type max_last_index)
-          : bounds_iterator<Rank>(bnd, index<2>())
-        {
-            if (max_last_index != difference_type(-1))
-            {
-                for (int i = 0; i < Rank - 1; ++i)
-                    max_last_index_[i] = this->bounds_[i] - 1;
-                max_last_index_[Rank - 1] = max_last_index;
-            }
-        }
-
-        //! Requires: *this is not the past-the-end iterator.
-        //! Effects: Equivalent to:
-        //!          for (auto i = Rank - 1; i >= 0; --i) {
-        //!              if (++index_[i] < bounds_[i])
-        //!                   return *this;
-        //!              index_[i] = 0;
-        //!          }
-        //!          index_ = unspecified past-the-end value;
-        //! Returns: *this.
-        bounds_iterator& operator++()
-        {
-            for (int i = Rank - 1; i >= 0; --i)
-            {
-                ++this->index_[i];
-
-                if (this->index_ == max_last_index_)
-                    break;
-
-                if (this->index_[i] < this->bounds_[i])
-                    return *this;
-
-                index_[i] = 0;
-            }
-
-            this->index_[0] = this->bounds_[0];
-            for (int i = 1; i < Rank; ++i)
-                this->index_[i] = 0;
-
-            return *this;
-        }
-
-        bounds_iterator operator++(int)
-        {
-            bounds_iterator r(*this);
-            ++(*this);
-            return r;
-        }
-
-        //! Requires: There exists a bounds_iterator<Rank> it such that
-        //! *this == ++it.
-        //! Effects: *this = it.
-        //! Returns: *this.
-        bounds_iterator& operator--()
-        {
-            for (int i = Rank - 1; i >= 0; --i)
-            {
-                if (--this->index_[i] >= 0)
-                    return *this;
-                this->index_[i] = this->bounds_[i] - 1;
-            }
-            // index_[Rank - 1] == -1;
-            return *this;
-        }
-
-        bounds_iterator operator--(int)
-        {
-            bounds_iterator r(*this);
-            --(*this);
-            return r;
-        }
-
-        bounds_iterator operator+(difference_type n) const
-        {
-            return bounds_iterator(*this) += n;
-        }
-
-        bounds_iterator& operator+=(difference_type n)
-        {
-            for (int i = Rank - 1; i >= 0 && n != 0; --i)
-            {
-                std::ptrdiff_t nx = this->index_[i] + n;
-
-                if (nx >= this->bounds_[i])
-                    this->index_[i] = nx % this->bounds_[i];
-                else
-                {
-                    this->index_[i] = nx;
-                    return *this;
-                }
-
-                if (this->index_ == max_last_index_)
-                    break;
-
-                n = nx / this->bounds_[i];
-            }
-
-            index_[0] = bounds_[0];
-            return *this;
-        }
-
-        bounds_iterator operator-(difference_type n) const
-        {
-            return bounds_iterator(*this) -= n;
-        }
-
-        bounds_iterator& operator-=(difference_type n)
-        {
-            return (*this += (-n));
-        }
-
-    private:
-        index<Rank> max_last_index_;
-    };
-
-    template <int Rank, bool Full>
-    bounds_iterator<Rank, Full> operator+(
-        typename bounds_iterator<Rank, Full>::difference_type n,
-        bounds_iterator<Rank, Full> const& rhs)
+    bounds_iterator<Rank> operator+(
+        typename bounds_iterator<Rank>::difference_type n,
+        bounds_iterator<Rank> const& rhs)
     {
         return rhs + n;
     }

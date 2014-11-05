@@ -16,7 +16,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/naming.hpp>
 #include <hpx/include/util.hpp>
-#include <hpx/util/coordinate.hpp>
 
 #include <hpx/components/vector/partition_vector_component.hpp>
 
@@ -92,25 +91,23 @@ namespace hpx
         template <typename T>
         struct vector_value_proxy
         {
-            vector_value_proxy(hpx::vector<T>& v, std::size_t part,
-                    std::size_t index)
-              : v_(v), part_(part), index_(index)
+            vector_value_proxy(hpx::vector<T>& v, std::size_t index)
+              : v_(v), index_(index)
             {}
 
             operator T() const
             {
-                return v_.get_value_sync(part_, index_);
+                return v_.get_value_sync(index_);
             }
 
             template <typename T_>
             vector_value_proxy& operator=(T_ && value)
             {
-                v_.set_value_sync(part_, index_, std::forward<T_>(value));
+                v_.set_value_sync(index_, std::forward<T_>(value));
                 return *this;
             }
 
             vector<T>& v_;
-            std::size_t part_;
             std::size_t index_;
         };
     }
@@ -538,23 +535,21 @@ namespace hpx
 
         // constructors
         vector_iterator()
-          : data_(0), index_(), step_(1)
+          : data_(0), global_index_(size_type(-1))
         {}
 
-        vector_iterator(vector<T>* data,
-                util::bounds_iterator<2, false> const& global_index,
-                std::size_t block_size = 1)
-          : data_(data), index_(global_index), step_(block_size)
+        vector_iterator(vector<T>* data, size_type global_index)
+          : data_(data), global_index_(global_index)
         {}
 
         vector<T>* get_data() { return data_; }
         vector<T> const* get_data() const { return data_; }
 
-        util::index<2> const& get_index() const { return *index_; }
+        size_type get_global_index() const { return global_index_; }
 
         bool is_at_end() const
         {
-            return data_ == 0;
+            return data_ == 0 || global_index_ == size_type(-1);
         }
 
     protected:
@@ -564,31 +559,31 @@ namespace hpx
         {
             if (is_at_end())
                 return other.is_at_end();
-            return data_ == other.data_ && index_ == other.index_;
+            return data_ == other.data_ && global_index_ == other.global_index_;
         }
 
         typename base_type::reference dereference() const
         {
             HPX_ASSERT(!is_at_end());
-            return detail::vector_value_proxy<T>(*data_, (*index_)[0], (*index_)[1]);
+            return detail::vector_value_proxy<T>(*data_, global_index_);
         }
 
         void increment()
         {
             HPX_ASSERT(!is_at_end());
-            index_ += step_;
+            ++global_index_;
         }
 
         void decrement()
         {
             HPX_ASSERT(!is_at_end());
-            index_ -= step_;
+            --global_index_;
         }
 
         void advance(std::ptrdiff_t n)
         {
             HPX_ASSERT(!is_at_end());
-            index_ += n * step_;
+            global_index_ += n;
         }
 
         std::ptrdiff_t distance_to(vector_iterator const& other) const
@@ -597,14 +592,14 @@ namespace hpx
             {
                 if (is_at_end())
                     return 0;
-                return data_->size() - index_;
+                return data_->size() - global_index_;
             }
 
             if(is_at_end())
-                return other.index_ - other.data_->size();
+                return other.global_index_ - other.data_->size();
 
             HPX_ASSERT(data_ == other.data_);
-            return other.index_ - index_;
+            return other.global_index_ - global_index_;
         }
 
     protected:
@@ -612,10 +607,7 @@ namespace hpx
         vector<T>* data_;
 
         // global position in the referenced vector
-        util::bounds_iterator<2, false> index_;
-
-        // step size for this iterator
-        std::ptrdiff_t step_;
+        size_type global_index_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -639,21 +631,19 @@ namespace hpx
 
         // constructors
         const_vector_iterator()
-          : data_(0), index_(size_type(-1)), step_(1)
+          : data_(0), global_index_(size_type(-1))
         {}
 
-        const_vector_iterator(vector<T> const* data,
-                util::bounds_iterator<2, false> const& global_index,
-                std::size_t block_size = 1)
-          : data_(data), index_(global_index), step_(block_size)
+        const_vector_iterator(vector<T> const* data, size_type global_index)
+          : data_(data), global_index_(global_index)
         {}
 
         vector<T> const* get_data() const { return data_; }
-        util::index<2> const& get_index() const { return *index_; }
+        size_type get_global_index() const { return global_index_; }
 
         bool is_at_end() const
         {
-            return data_ == 0;
+            return data_ == 0 || global_index_ == size_type(-1);
         }
 
     protected:
@@ -663,31 +653,31 @@ namespace hpx
         {
             if (is_at_end())
                 return other.is_at_end();
-            return data_ == other.data_ && index_ == other.index_;
+            return data_ == other.data_ && global_index_ == other.global_index_;
         }
 
         typename base_type::reference dereference() const
         {
             HPX_ASSERT(!is_at_end());
-            return data_->get_value_sync((*index_)[0], (*index_)[1]);
+            return data_->get_value_sync(global_index_);
         }
 
         void increment()
         {
             HPX_ASSERT(!is_at_end());
-            index_ += step_;
+            ++global_index_;
         }
 
         void decrement()
         {
             HPX_ASSERT(!is_at_end());
-            index_ -= step_;
+            --global_index_;
         }
 
         void advance(std::ptrdiff_t n)
         {
             HPX_ASSERT(!is_at_end());
-            index_ += n * step_;
+            global_index_ += n;
         }
 
         std::ptrdiff_t distance_to(const_vector_iterator const& other) const
@@ -696,14 +686,14 @@ namespace hpx
             {
                 if (is_at_end())
                     return 0;
-                return data_->size() - index_;
+                return data_->size() - global_index_;
             }
 
             if(is_at_end())
-                return other.index_ - other.data_->size();
+                return other.global_index_ - other.data_->size();
 
             HPX_ASSERT(data_ == other.data_);
-            return other.index_ - index_;
+            return other.global_index_ - global_index_;
         }
 
     protected:
@@ -711,10 +701,7 @@ namespace hpx
         vector<T> const* data_;
 
         // global position in the referenced vector
-        util::bounds_iterator<2, false> index_;
-
-        // step size for this iterator
-        std::ptrdiff_t step_;
+        size_type global_index_;
     };
 }
 
@@ -734,8 +721,8 @@ namespace hpx { namespace traits
         //  the iterator is currently pointing to (i.e. just global iterator).
         static segment_iterator segment(iterator iter)
         {
-            util::index<2> idx(iter.get_index());
-            return iter.get_data()->get_segment_iterator(idx[0]);
+            return iter.get_data()->get_segment_iterator(
+                iter.get_global_index());
         }
 
         //  This function should specify which is the current segment and
@@ -745,8 +732,8 @@ namespace hpx { namespace traits
             if (iter.is_at_end())           // avoid dereferencing end iterator
                 return local_iterator();
 
-            util::index<2> idx(iter.get_index());
-            return iter.get_data()->get_local_iterator(idx[0], idx[1]);
+            return iter.get_data()->get_local_iterator(
+                iter.get_global_index());
         }
 
         //  Build a full iterator from the segment and local iterators
@@ -755,7 +742,7 @@ namespace hpx { namespace traits
         {
             vector<T>* data = seg_iter.get_data();
             std::size_t index = local_iter.get_local_index();
-            return iterator(data, data->get_bounds_iterator(seg_iter, index));
+            return iterator(data, data->get_global_index(seg_iter, index));
         }
 
         //  This function should specify the local iterator which is at the
@@ -794,8 +781,8 @@ namespace hpx { namespace traits
         //  the iterator is currently pointing to (i.e. just global iterator).
         static segment_iterator segment(iterator iter)
         {
-            util::index<2> idx(iter.get_index());
-            return iter.get_data()->get_const_segment_iterator(idx[0]);
+            return iter.get_data()->get_const_segment_iterator(
+                iter.get_global_index());
         }
 
         //  This function should specify which is the current segment and
@@ -805,8 +792,8 @@ namespace hpx { namespace traits
             if (iter.is_at_end())           // avoid dereferencing end iterator
                 return local_iterator();
 
-            util::index<2> idx(iter.get_index());
-            return iter.get_data()->get_const_local_iterator(idx[0], idx[1]);
+            return iter.get_data()->get_const_local_iterator(
+                iter.get_global_index());
         }
 
         //  Build a full iterator from the segment and local iterators
@@ -815,7 +802,7 @@ namespace hpx { namespace traits
         {
             vector<T> const* data = seg_iter.get_data();
             std::size_t index = local_iter.get_local_index();
-            return iterator(data, data->get_bounds_iterator(seg_iter, index));
+            return iterator(data, data->get_global_index(seg_iter, index));
         }
 
         //  This function should specify the local iterator which is at the
