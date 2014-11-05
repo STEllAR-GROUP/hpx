@@ -524,9 +524,10 @@ namespace hpx
         }
 
         void get_ptr_helper(std::size_t loc,
+            partitions_vector_type& partitions,
             future<boost::shared_ptr<partition_vector_server> > && f)
         {
-            partitions_[loc].local_data_ = f.get();
+            partitions[loc].local_data_ = f.get();
         }
 
         template <typename DistPolicy, typename Create>
@@ -574,7 +575,8 @@ namespace hpx
                         using util::placeholders::_1;
                         ptrs.push_back(get_ptr<partition_vector_server>(
                             partitions_.back().partition_.get()).then(
-                                util::bind(&vector::get_ptr_helper, this, l, _1)));
+                                util::bind(&vector::get_ptr_helper, this, l,
+                                    boost::ref(partitions_), _1)));
                     }
 
                     allocated_size += size;
@@ -703,8 +705,9 @@ namespace hpx
                 {
                     using util::placeholders::_1;
                     ptrs.push_back(get_ptr<partition_vector_server>(
-                        partitions_[i].partition_.get()).then(
-                            util::bind(&vector::get_ptr_helper, this, i, _1)));
+                        partitions[i].partition_.get()).then(
+                            util::bind(&vector::get_ptr_helper, this, i,
+                                boost::ref(partitions), _1)));
                 }
             }
 
