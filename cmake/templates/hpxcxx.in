@@ -55,7 +55,7 @@
  The hpxcxx command requires that you build either
  a component, an application, or that you specify
  the -c flag. All other flags are passed through
- to the underlying @CXX@ compiler.
+ to the underlying C++ compiler.
  """
      sys.exit(2)
 
