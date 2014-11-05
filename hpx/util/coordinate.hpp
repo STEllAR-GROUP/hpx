@@ -526,14 +526,15 @@ namespace hpx { namespace util
                 std::ptrdiff_t nx = index_[i] + n;
 
                 if (nx >= bounds_[i])
+                {
+                    n = nx / bounds_[i];
                     index_[i] = nx % bounds_[i];
+                }
                 else
                 {
                     index_[i] = nx;
                     return *this;
                 }
-
-                n = nx / bounds_[i];
             }
 
             index_[0] = bounds_[0];
