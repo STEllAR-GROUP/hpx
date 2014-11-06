@@ -252,7 +252,7 @@ namespace hpx
                     using util::placeholders::_1;
                     ptrs.push_back(get_ptr<partition_vector_server>(
                         it->partition_.get()).then(
-                            util::bind(&vector::get_ptr_helper, this, l, 
+                            util::bind(&vector::get_ptr_helper, this, l,
                                 boost::ref(partitions_), _1)));
                 }
             }
@@ -697,7 +697,7 @@ namespace hpx
             partitions.reserve(rhs.partitions_.size());
             for (std::size_t i = 0; i != rhs.partitions_.size(); ++i)
             {
-                boost::int32_t locality = rhs.partitions_[i].locality_id_;
+                boost::uint32_t locality = rhs.partitions_[i].locality_id_;
 
                 partitions.push_back(partition_data(std::move(objs[i]),
                     rhs.partitions_[i].size_, locality));
