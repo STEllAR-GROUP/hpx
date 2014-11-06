@@ -332,6 +332,7 @@ namespace hpx { namespace util
         {
             for (std::size_t i = 0; i < rank; ++i)
                 vs_[i] += rhs[i];
+            return *this;
         }
 
         //! Effects: For all i in the range [0, Rank), subtracts the ith
@@ -891,6 +892,7 @@ namespace hpx { namespace util
         bounds& operator+=(const index<1>& rhs)
         {
             vs_ += rhs[0];
+            return *this;
         }
 
         //! Effects: For all i in the range [0, Rank), subtracts the ith
