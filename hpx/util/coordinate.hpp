@@ -12,6 +12,7 @@
 #include <hpx/util/assert.hpp>
 
 #include <algorithm>
+#include <numeric>
 #include <cstddef>
 #if !defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX)
 #include <initializer_list>
