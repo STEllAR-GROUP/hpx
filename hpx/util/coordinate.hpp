@@ -63,7 +63,7 @@ namespace hpx { namespace util
         }
 #else
         template <std::size_t N>
-        index(value_type il[N])
+        index(value_type const il[N])
         {
             HPX_ASSERT(N == std::size_t(rank) && "size must be equal to Rank");
             std::copy(il, il + N, vs_ + 0);
@@ -232,7 +232,7 @@ namespace hpx { namespace util
         }
 #else
         template <std::size_t N>
-        bounds(value_type il[N])
+        bounds(value_type const il[N])
         {
             HPX_ASSERT(N == std::size_t(rank) && "size must be equal to Rank");
             std::copy(il, il + N, vs_ + 0);
