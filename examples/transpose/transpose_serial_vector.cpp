@@ -1,10 +1,12 @@
 //  Copyright (c) 2014 Thomas Heller
+//  Copyright (c) 2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/include/vector.hpp>
 
 #include <algorithm>
 #include <vector>
@@ -14,20 +16,15 @@
 
 bool verbose = false;
 
-typedef std::vector<double> block;
-typedef double* sub_block;
+double test_results(boost::uint64_t order, hpx::vector<double> const & trans);
 
-void transpose(sub_block A, sub_block B, boost::uint64_t block_order,
-    boost::uint64_t tile_size);
-double test_results(boost::uint64_t order, boost::uint64_t block_order,
-    std::vector<block> const & trans);
+HPX_REGISTER_VECTOR(double);
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
     boost::uint64_t order = vm["matrix_size"].as<boost::uint64_t>();
     boost::uint64_t iterations = vm["iterations"].as<boost::uint64_t>();
-    boost::uint64_t num_blocks = vm["num_blocks"].as<boost::uint64_t>();
     boost::uint64_t tile_size = order;
 
     if(vm.count("tile_size"))
@@ -38,11 +35,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     boost::uint64_t bytes =
         static_cast<boost::uint64_t>(2.0 * sizeof(double) * order * order);
 
-    boost::uint64_t block_order = order / num_blocks;
-    boost::uint64_t col_block_size = order * block_order;
-
-    std::vector<block> A(num_blocks, block(col_block_size));
-    std::vector<block> B(num_blocks, block(col_block_size));
+    hpx::vector<double> A(order * order);
+    hpx::vector<double> B(order * order);
 
     std::cout
         << "Serial Matrix transpose: B = A^T\n"
@@ -54,19 +48,13 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout
         << "Number of iterations  = " << iterations << "\n";
 
-
     // Fill the original matrix, set transpose to known garbage value.
-    for(boost::uint64_t b = 0; b < num_blocks; ++b)
+    for(boost::uint64_t i = 0; i < order; ++i)
     {
-        for(boost::uint64_t i = 0; i < order; ++i)
+        for(boost::uint64_t j = 0; j < order; ++j)
         {
-            for(boost::uint64_t j = 0; j < block_order; ++j)
-            {
-                double col_val = COL_SHIFT * (b*block_order + j);
-
-                A[b][i * block_order + j] = col_val + ROW_SHIFT * i;
-                B[b][i * block_order + j] = -1.0;
-            }
+            A[i * order + j] = COL_SHIFT * j + ROW_SHIFT * i;
+            B[i * order + j] = -1.0;
         }
     }
 
@@ -79,16 +67,32 @@ int hpx_main(boost::program_options::variables_map& vm)
     {
         hpx::util::high_resolution_timer t;
 
-        for(boost::uint64_t b = 0; b < num_blocks; ++b)
+        if(tile_size < order)
         {
-            for(boost::uint64_t phase = 0; phase < num_blocks; ++phase)
+            for(boost::uint64_t i = 0; i < order; i += tile_size)
             {
-                const boost::uint64_t block_size = block_order * block_order;
-                const boost::uint64_t from_block = phase;
-                const boost::uint64_t from_phase = b;
-                const boost::uint64_t A_offset = from_phase * block_size;
-                const boost::uint64_t B_offset = phase * block_size;
-                transpose(&A[from_block][A_offset], &B[b][B_offset], block_order, tile_size);
+                for(boost::uint64_t j = 0; j < order; j += tile_size)
+                {
+                    boost::uint64_t i_max = (std::min)(order, i + tile_size);
+                    for(boost::uint64_t it = i; it < i_max; ++it)
+                    {
+                        boost::uint64_t j_max = (std::min)(order, j + tile_size);
+                        for(boost::uint64_t jt = j; jt < j_max; ++jt)
+                        {
+                            B[it + order * jt] = A[jt + order * it];
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            for(boost::uint64_t i = 0; i < order; ++i)
+            {
+                for(boost::uint64_t j = 0; j < order; ++j)
+                {
+                    B[i + order * j] = A[j + order * i];
+                }
             }
         }
 
@@ -101,7 +105,7 @@ int hpx_main(boost::program_options::variables_map& vm)
             mintime = (std::min)(mintime, elapsed);
         }
 
-        errsq += test_results(order, block_order, B);
+        errsq += test_results(order, B);
     } // end of iter loop
 
     // Analyze and output results
@@ -110,7 +114,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     if(errsq < epsilon)
     {
         std::cout << "Solution validates\n";
-        avgtime = avgtime/static_cast<double>((std::max)(iterations-1, static_cast<boost::uint64_t>(1)));
+        avgtime = avgtime/static_cast<double>(
+            (std::max)(iterations-1, static_cast<boost::uint64_t>(1)));
         std::cout
           << "Rate (MB/s): " << 1.e-6 * bytes/mintime << ", "
           << "Avg time (s): " << avgtime << ", "
@@ -144,69 +149,27 @@ int main(int argc, char* argv[])
         ("tile_size", value<boost::uint64_t>(),
          "Number of tiles to divide the individual matrix blocks for improved "
          "cache and TLB performance")
-        ("num_blocks", value<boost::uint64_t>()->default_value(256),
-         "Number of blocks to divide the individual matrix blocks for improved "
-         "cache and TLB performance")
         ( "verbose", "Verbose output")
     ;
 
-    // Initialize and run HPX, this example is serial and therefor only needs
-    // on thread. We just use hpx::init to parse our command line arguments
+    // Initialize and run HPX, this example is serial and therefor only needs on thread,
+    // We just use hpx::init to parse our command line arguments
     std::vector<std::string> cfg;
     cfg.push_back("hpx.os_threads!=1");
 
     return hpx::init(desc_commandline, argc, argv, cfg);
 }
 
-void transpose(sub_block A, sub_block B, boost::uint64_t block_order,
-    boost::uint64_t tile_size)
-{
-    if(tile_size < block_order)
-    {
-        for(boost::uint64_t i = 0; i < block_order; i += tile_size)
-        {
-            for(boost::uint64_t j = 0; j < block_order; j += tile_size)
-            {
-                boost::uint64_t i_max = (std::min)(block_order, i + tile_size);
-                for(boost::uint64_t it = i; it < i_max; ++it)
-                {
-                    boost::uint64_t j_max = (std::min)(block_order, j + tile_size);
-                    for(boost::uint64_t jt = j; jt < j_max; ++jt)
-                    {
-                        B[it + block_order * jt] = A[jt + block_order * it];
-                    }
-                }
-            }
-        }
-    }
-    else
-    {
-        for(boost::uint64_t i = 0; i < block_order; ++i)
-        {
-            for(boost::uint64_t j = 0; j < block_order; ++j)
-            {
-                B[i + block_order * j] = A[j + block_order * i];
-            }
-        }
-    }
-}
-
-double test_results(boost::uint64_t order, boost::uint64_t block_order,
-    std::vector<block> const & trans)
+double test_results(boost::uint64_t order, hpx::vector<double> const & trans)
 {
     double errsq = 0.0;
 
-    for(boost::uint64_t b = 0; b < trans.size(); ++b)
+    for(boost::uint64_t i = 0; i < order; ++i)
     {
-        for(boost::uint64_t i = 0; i < order; ++i)
+        for(boost::uint64_t j = 0; j < order; ++j)
         {
-            double col_val = COL_SHIFT * i;
-            for(boost::uint64_t j = 0; j < block_order; ++j)
-            {
-                double diff = trans[b][i * block_order + j] -
-                  (col_val + ROW_SHIFT * (b * block_order + j));
-                errsq += diff * diff;
-            }
+            double diff = trans[i * order + j] - (COL_SHIFT*i + ROW_SHIFT * j);
+            errsq += diff * diff;
         }
     }
 

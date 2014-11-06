@@ -133,6 +133,10 @@ namespace hpx { namespace traits
     // Customization point for streaming with util::any
     template <typename T, typename Enable = void>
     struct supports_streaming_with_any;
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Iterator, typename Enable = void>
+    struct segmented_iterator_traits;
 }}
 
 #endif

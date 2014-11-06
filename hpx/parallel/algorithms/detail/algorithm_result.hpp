@@ -45,6 +45,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         static void get() {}
 
         static void get(hpx::util::unused_type) {}
+
+        static type get(hpx::future<void> && t)
+        {
+            t.wait();
+        }
     };
 
     template <typename T>

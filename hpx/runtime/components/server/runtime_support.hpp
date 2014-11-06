@@ -148,6 +148,9 @@ namespace hpx { namespace components { namespace server
         template <typename Component>
         naming::gid_type create_component0();
 
+        template <typename Component>
+        std::vector<naming::gid_type> bulk_create_component1(std::size_t count);
+
         // bring in all overloads for create_componentN(...)
         #include <hpx/runtime/components/server/runtime_support_create_component_decl.hpp>
 
@@ -483,6 +486,56 @@ namespace hpx { namespace components { namespace server
             << " of type: " << components::get_component_type_name(type);
 
         return id;
+    }
+
+    template <typename Component>
+    std::vector<naming::gid_type>
+    runtime_support::bulk_create_component1(std::size_t count)
+    {
+        components::component_type const type =
+            components::get_component_type<
+                typename Component::wrapped_type>();
+
+        component_map_mutex_type::scoped_lock l(cm_mtx_);
+        component_map_type::const_iterator it = components_.find(type);
+        if (it == components_.end()) {
+            hpx::util::osstream strm;
+            strm << "attempt to create component(s) instance of "
+                << "invalid/unknown type: "
+                << components::get_component_type_name(type)
+                << " (component type not found in map)";
+            HPX_THROW_EXCEPTION(hpx::bad_component_type,
+                "runtime_support::create_component",
+                hpx::util::osstream_get_string(strm));
+            return std::vector<naming::gid_type>();
+        }
+
+        if (!(*it).second.first) {
+            hpx::util::osstream strm;
+            strm << "attempt to create component instance(s) of "
+                << "invalid/unknown type: "
+                << components::get_component_type_name(type)
+                << " (map entry is NULL)";
+            HPX_THROW_EXCEPTION(hpx::bad_component_type,
+                "runtime_support::create_component",
+                hpx::util::osstream_get_string(strm));
+            return std::vector<naming::gid_type>();
+        }
+
+        std::vector<naming::gid_type> ids;
+        ids.reserve(count);
+
+        boost::shared_ptr<component_factory_base> factory((*it).second.first);
+        {
+            util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
+            for (std::size_t i = 0; i != count; ++i)
+                ids.push_back(factory->create());
+        }
+        LRT_(info) << "successfully created " << count
+                   << " component(s) of type: "
+                   << components::get_component_type_name(type);
+
+        return std::move(ids);
     }
 
     template <typename Component>

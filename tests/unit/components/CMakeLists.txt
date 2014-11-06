@@ -15,6 +15,10 @@ set(tests
     inheritance_3_classes_concrete
     migrate_component
     remote_object
+    vector_algorithms
+    vector_copy
+    vector_handle_values
+    vector
    )
 
 
@@ -56,6 +60,9 @@ set(inheritance_3_classes_2_abstract_FLAGS
 
 set(inheritance_3_classes_concrete_FLAGS
     DEPENDENCIES iostreams_component)
+
+set(vector_FLAGS DEPENDENCIES vector_component)
+set(vector_algorithms_FLAGS DEPENDENCIES vector_component)
 
 foreach(test ${tests})
   set(sources

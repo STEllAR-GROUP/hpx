@@ -34,11 +34,19 @@
 #else
 
 #define N BOOST_PP_ITERATION()
+#define M BOOST_PP_DEC(N)
 
     template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>
     naming::gid_type BOOST_PP_CAT(create_component, N)(
         BOOST_PP_ENUM_BINARY_PARAMS(N, A, a));
 
+#if N > 1
+    template <typename Component, BOOST_PP_ENUM_PARAMS(M, typename A)>
+    std::vector<naming::gid_type> BOOST_PP_CAT(bulk_create_component, N)(
+        std::size_t count, BOOST_PP_ENUM_BINARY_PARAMS(M, A, a));
+#endif
+
+#undef M
 #undef N
 
 #endif

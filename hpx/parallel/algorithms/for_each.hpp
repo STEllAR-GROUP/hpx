@@ -9,6 +9,7 @@
 #define HPX_PARALLEL_DETAIL_FOR_EACH_MAY_29_2014_0932PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/traits/segemented_iterator_traits.hpp>
 #include <hpx/util/void_guard.hpp>
 #include <hpx/util/move.hpp>
 
@@ -26,6 +27,7 @@
 #include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
+#include <boost/type_traits/is_same.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -212,6 +214,36 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         std::forward<F>(f), boost::mpl::false_());
             }
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        // non-segmented implementation
+        template <typename ExPolicy, typename InIter, typename F>
+        inline typename detail::algorithm_result<ExPolicy>::type
+        for_each_(ExPolicy && policy, InIter first, InIter last, F && f,
+            boost::mpl::false_)
+        {
+            typedef typename std::iterator_traits<InIter>::iterator_category
+                iterator_category;
+
+            typedef typename boost::mpl::or_<
+                parallel::is_sequential_execution_policy<ExPolicy>,
+                boost::is_same<std::input_iterator_tag, iterator_category>
+            >::type is_seq;
+
+            if (first == last)
+                return detail::algorithm_result<ExPolicy>::get();
+
+            return for_each().call(
+                std::forward<ExPolicy>(policy),
+                first, last, std::forward<F>(f), is_seq());
+        }
+
+        // forward declare the segmented version of this algorithm
+        template <typename ExPolicy, typename SegIter, typename F>
+        inline typename detail::algorithm_result<ExPolicy>::type
+        for_each_(ExPolicy && policy, SegIter first, SegIter last, F && f,
+            boost::mpl::true_);
+
         /// \endcond
     }
 
@@ -293,14 +325,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
             "Requires at least input iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>
-        >::type is_seq;
+        typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;
+        typedef typename iterator_traits::is_segmented_iterator is_segmented;
 
-        return detail::for_each().call(
-            std::forward<ExPolicy>(policy),
-            first, last, std::forward<F>(f), is_seq());
+        return detail::for_each_(
+            std::forward<ExPolicy>(policy), first, last,
+            std::forward<F>(f), is_segmented());
     }
 }}}
 
