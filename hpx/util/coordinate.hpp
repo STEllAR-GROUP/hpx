@@ -56,7 +56,8 @@ namespace hpx { namespace util
         //! component of *this with *(il.begin() + i).
         index(std::initializer_list<value_type> il)
         {
-            HPX_ASSERT(il.size() == rank && "il.size() must be equal to Rank");
+            HPX_ASSERT(il.size() == std::size_t(rank) &&
+                "il.size() must be equal to Rank");
             std::copy(il.begin(), il.end(), vs_ + 0);
         }
 #else
@@ -224,7 +225,8 @@ namespace hpx { namespace util
         //! component of *this with *(il.begin() + i).
         bounds(std::initializer_list<value_type> il)
         {
-            HPX_ASSERT(il.size() == rank && "il.size() must be equal to Rank");
+            HPX_ASSERT(il.size() == std::size_t(rank) &&
+                "il.size() must be equal to Rank");
             std::copy(il.begin(), il.end(), vs_ + 0);
         }
 #else
