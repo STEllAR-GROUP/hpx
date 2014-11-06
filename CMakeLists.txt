@@ -1256,6 +1256,9 @@ install(
   DIRECTORY ${CMAKE_BINARY_DIR}/bin/
   DESTINATION hpx/bin/
   COMPONENT core
+  FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                   GROUP_READ GROUP_EXECUTE
+                   WORLD_READ WORLD_EXECUTE
   FILES_MATCHING PATTERN "hpxcxx")
 
 install( # install all hpx header files
