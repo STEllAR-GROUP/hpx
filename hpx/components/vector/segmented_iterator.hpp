@@ -123,13 +123,14 @@ namespace hpx
         >
     {
     private:
-        typedef std::size_t size_type;
         typedef boost::iterator_facade<
                 local_vector_iterator<T>, T, std::random_access_iterator_tag,
                 detail::local_vector_value_proxy<T>
             > base_type;
 
     public:
+        typedef std::size_t size_type;
+
         // constructors
         local_vector_iterator()
           : partition_(), local_index_(size_type(-1))
@@ -279,13 +280,14 @@ namespace hpx
         >
     {
     private:
-        typedef std::size_t size_type;
         typedef boost::iterator_facade<
                 const_local_vector_iterator<T>, T const,
                 std::random_access_iterator_tag, T const
             > base_type;
 
     public:
+        typedef std::size_t size_type;
+
         // constructors
         const_local_vector_iterator()
           : partition_(), local_index_(size_type(-1))
@@ -523,13 +525,13 @@ namespace hpx
         >
     {
     private:
-        typedef std::size_t size_type;
         typedef boost::iterator_facade<
                 vector_iterator<T>, T, std::random_access_iterator_tag,
                 detail::vector_value_proxy<T>
             > base_type;
 
     public:
+        typedef std::size_t size_type;
         typedef typename vector<T>::segment_iterator segment_iterator;
         typedef typename vector<T>::local_iterator local_iterator;
 
@@ -619,13 +621,13 @@ namespace hpx
         >
     {
     private:
-        typedef std::size_t size_type;
         typedef boost::iterator_facade<
                 const_vector_iterator<T>, T const,
                 std::random_access_iterator_tag, T const
             > base_type;
 
     public:
+        typedef std::size_t size_type;
         typedef typename vector<T>::const_segment_iterator segment_iterator;
         typedef typename vector<T>::const_local_iterator local_iterator;
 
