@@ -1441,27 +1441,26 @@ namespace hpx
                 .set_values(pos, val);
         }
 
-        // TODO beschreibung
-        template< class It1, class It2>
-        future<void>
-        set_values(size_type part, It1 const pos_first, It1 const pos_last,
-                                   It2 const val_first, It2 const val_last)
-        {
-            HPX_ASSERT( std::distance(pos_first, pos_last) ==
-                        std__distance(val_first, val_last) );
+        //template< class It1, class It2>
+        //future<void>
+        //set_values(size_type part, It1 const pos_first, It1 const pos_last,
+                                   //It2 const val_first, It2 const val_last)
+        //{
+            //HPX_ASSERT( std::distance(pos_first, pos_last) ==
+                        //std__distance(val_first, val_last) );
 
             
-            if (partitions_[part].local_data_)
-            {
-                partitions_[part].local_data_->set_values_it(pos_first, pos_last,
-                        val_first, val_last);
-                return make_ready_future();
-            }
+            //if (partitions_[part].local_data_)
+            //{
+                //partitions_[part].local_data_->set_values_it(pos_first, pos_last,
+                        //val_first, val_last);
+                //return make_ready_future();
+            //}
 
-            return partition_vector_client(partitions_[part].partition_)
-                .set_values_it( std::vector<std::size_t>(pos_first, pos_last),
-                                std::vector<T>(val_first, val_last) ); //TODO clever way?
-        }
+            //return partition_vector_client(partitions_[part].partition_)
+                //.set_values_it( std::vector<std::size_t>(pos_first, pos_last),
+                                //std::vector<T>(val_first, val_last) ); //TODO clever way?
+        //}
 
         //TODO beschreibung
         future<void>
@@ -1501,11 +1500,9 @@ namespace hpx
                     // this is the end of a block containing indexes ('pos')
                     // of the same partition ('part').
                     // set asyncorn values for this block
-                    std::vector<std::size_t> pos_local =
-                        get_local_indices(pos_block_begin, pos_it);
                     part_futures.push_back( set_values( part_cur,
-                            pos_local.begin(), pos_local.end(),
-                            val_block_begin, val_it) );
+                            get_local_indices(pos_block_begin, pos_it),
+                            std::vector<T>(val_block_begin, val_it) ) );
 
                     // reset block varibles to start a new one from here
                     part_cur = part;
