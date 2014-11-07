@@ -1084,51 +1084,6 @@ namespace hpx
         }
 
         // TODO Test
-        std::vector<T>
-        get_values_sync(std::vector<size_type> const & pos_vec) const
-        {
-            std::vector<T> values_vec();
-            values_vec.reserve(pos_vec.size());
-
-            // check if position vector is empty
-            // the follwoing code needs at least one element.
-            if (0 == pos_vec.size()){
-                return values_vec;
-            }
-
-            //
-            size_type part_cur = get_partition( pos_vec[0] );
-            std::vector<size_type>::iterator part_begin = pos_vec.begin();
-
-            //for (size_t i=0; i!=pos_vec.size(); i++){
-            for (std::vector<size_type>::iterator it = pos_vec.begin();
-                    it != pos_vec.end(); it++){
-
-                size_type pos_global = *it;
-                size_type part = get_partition(pos_global);
-                size_type pos_local = get_local_index(pos_global);
-
-                if ( part != part_cur ){
-                    // this is the end of a block containing indexes ('pos')
-                    // of the same partition ('part').
-                    // get values for this block and append them to value_vec
-                    std::vector<T> values_part = get_values_sync( part_cur,
-                            get_local_indices(part_begin, it) );
-                    std::move( values_part.begin(), values_part.end(),
-                               std::back_inserter(values_vec) );
-
-                    // start a new block from here
-                    part_cur = part;
-                    part_begin = it;
-
-                }
-            }
-
-            return values_vec;
-        }
-
-
-        // TODO Test
         // TODO beschreibenun
         future< std::vector<T> >
         get_values(std::vector<size_type> const & pos_vec) const
@@ -1139,30 +1094,36 @@ namespace hpx
                 return make_ready_future( std::vector<T>() );
             }
 
-            //
+            // current partition index of the block
             size_type part_cur = get_partition( pos_vec[0] );
+            // iterator to the begin of current block
             std::vector<size_type>::iterator part_begin = pos_vec.begin();
+            // vector holding futures of the values for all blocks
             std::vector< future< std::vector<T> > > part_values_future;
 
-            //for (size_t i=0; i!=pos_vec.size(); i++){
+            //for (size_t i=0; i!=pos_vec.size(); ++i){
             for (std::vector<size_type>::iterator it = pos_vec.begin();
-                    it != pos_vec.end(); it++){
+                    it != pos_vec.end(); ++it){
 
-                size_type pos_global = *it;
-                size_type part = get_partition(pos_global);
-                size_type pos_local = get_local_index(pos_global);
+                // get the partition of the current position
+                size_type part = get_partition(*it);
 
-                if ( part != part_cur ){
+                // if the partition of the current position is the same
+                // as the rest of the current block go to next position
+                if ( part == part_cur) continue;
+                // if the partition of the current position is NOT the same
+                // as the positions before the block ends here
+                else
+                {
                     // this is the end of a block containing indexes ('pos')
                     // of the same partition ('part').
                     // get asyncorn values for this block
                     part_values_future.push_back( get_values( part_cur,
                             get_local_indices(part_begin, it) ) );
 
-                    // start a new block from here
+                    // reset block varibles to start a new one from here
                     part_cur = part;
                     part_begin = it;
-
                 }
             }
 
@@ -1181,6 +1142,51 @@ namespace hpx
                         }
 
                     }, std::move( part_values_future) ); //TODO move nötig?
+        }
+
+        // TODO Test
+        std::vector<T>
+        get_values_sync(std::vector<size_type> const & pos_vec) const
+        {
+            //std::vector<T> values_vec();
+            //values_vec.reserve(pos_vec.size());
+
+            //// check if position vector is empty
+            //// the follwoing code needs at least one element.
+            //if (0 == pos_vec.size()){
+                //return values_vec;
+            //}
+
+            ////
+            //size_type part_cur = get_partition( pos_vec[0] );
+            //std::vector<size_type>::iterator part_begin = pos_vec.begin();
+
+            ////for (size_t i=0; i!=pos_vec.size(); ++i){
+            //for (std::vector<size_type>::iterator it = pos_vec.begin();
+                    //it != pos_vec.end(); ++it){
+
+                //size_type pos_global = *it;
+                //size_type part = get_partition(pos_global);
+
+                //if ( part != part_cur ){
+                    //// this is the end of a block containing indexes ('pos')
+                    //// of the same partition ('part').
+                    //// get values for this block and append them to value_vec
+                    //std::vector<T> values_part = get_values_sync( part_cur,
+                            //get_local_indices(part_begin, it) );
+                    //std::move( values_part.begin(), values_part.end(),
+                               //std::back_inserter(values_vec) );
+
+                    //// start a new block from here
+                    //part_cur = part;
+                    //part_begin = it;
+
+                //}
+            //}
+
+            //return values_vec;
+
+            return get_values(pos_vec).get();
         }
 
 
@@ -1433,6 +1439,89 @@ namespace hpx
 
             return partition_vector_client(partitions_[part].partition_)
                 .set_values(pos, val);
+        }
+
+        // TODO beschreibung
+        template< class It1, class It2>
+        future<void>
+        set_values(size_type part, It1 const pos_first, It1 const pos_last,
+                                   It2 const val_first, It2 const val_last)
+        {
+            HPX_ASSERT( std::distance(pos_first, pos_last) ==
+                        std__distance(val_first, val_last) );
+
+            
+            if (partitions_[part].local_data_)
+            {
+                partitions_[part].local_data_->set_values_it(pos_first, pos_last,
+                        val_first, val_last);
+                return make_ready_future();
+            }
+
+            return partition_vector_client(partitions_[part].partition_)
+                .set_values_it( std::vector<std::size_t>(pos_first, pos_last),
+                                std::vector<T>(val_first, val_last) ); //TODO clever way?
+        }
+
+        //TODO beschreibung
+        future<void>
+        set_values(std::vector<size_type> const& pos, std::vector<T> const& val)
+        {
+            HPX_ASSERT(pos.size() == val.size());
+
+            // check if position vector is empty
+            // the follwoing code needs at least one element.
+            if (0 == pos.size()){
+                return make_ready_future();
+            }
+
+            // partition index of the current block
+            size_type part_cur = get_partition( pos[0] );
+            // iterator to the begin of current block
+            std::vector<size_type>::iterator  pos_block_begin = pos.begin();
+            typename std::vector<T>::iterator val_block_begin = val.begin();
+            // vector holding futures of the state for all blocks
+            std::vector< future<void> > part_futures;
+
+            // going through the position vector
+            std::vector<size_type>::iterator  pos_it = pos.begin();
+            typename std::vector<T>::iterator val_it = val.begin();
+            for (; pos_it != pos.end(); ++pos_it, ++val_it){
+
+                // get the partition of the current position
+                size_type part = get_partition(*pos_it);
+
+                // if the partition of the current position is the same
+                // as the rest of the current block go to next position
+                if ( part == part_cur) continue;
+                // if the partition of the current position is NOT the same
+                // as the positions before the block ends here
+                else
+                {
+                    // this is the end of a block containing indexes ('pos')
+                    // of the same partition ('part').
+                    // set asyncorn values for this block
+                    std::vector<std::size_t> pos_local =
+                        get_local_indices(pos_block_begin, pos_it);
+                    part_futures.push_back( set_values( part_cur,
+                            pos_local.begin(), pos_local.end(),
+                            val_block_begin, val_it) );
+
+                    // reset block varibles to start a new one from here
+                    part_cur = part;
+                    pos_block_begin = pos_it;
+                    val_block_begin = val_it;
+                }
+            }
+
+            return hpx::when_all(part_futures);
+        }
+
+        void
+        set_values_sync(std::vector<size_type> const& pos,
+                        std::vector<T> const& val)
+        {
+            return set_value(pos, val).get();
         }
 
 //             //CLEAR
