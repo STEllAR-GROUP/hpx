@@ -28,6 +28,8 @@
 #include <cstdint>
 #include <iostream>
 #include <memory>
+#include <iterator>
+#include <algorithm>
 
 #include <boost/format.hpp>
 #include <boost/cstdint.hpp>
@@ -408,6 +410,17 @@ namespace hpx
             return std::size_t(-1);
         }
 
+        // Return the local indices inside the segment corresponding to the
+        // given global indices
+        std::vector<size_t>
+        get_local_indices(std::vector<size_type> indices) const
+        {
+            for (size_type& index : indices){
+                index = get_local_index(index);
+            }
+
+            return indices;
+        }
         // Return the global index corresponding to the local index inside the
         // given segment.
         std::size_t get_global_index(segment_iterator const& it,
@@ -1069,6 +1082,109 @@ namespace hpx
             return partition_vector_client(part_data.partition_)
                 .get_values(pos);
         }
+
+        // TODO Test
+        std::vector<T>
+        get_values_sync(std::vector<size_type> const & pos_vec) const
+        {
+            std::vector<T> values_vec();
+            values_vec.reserve(pos_vec.size());
+
+            // check if position vector is empty
+            // the follwoing code needs at least one element.
+            if (0 == pos_vec.size()){
+                return values_vec;
+            }
+
+            //
+            size_type part_cur = get_partition( pos_vec[0] );
+            std::vector<size_type>::iterator part_begin = pos_vec.begin();
+
+            //for (size_t i=0; i!=pos_vec.size(); i++){
+            for (std::vector<size_type>::iterator it = pos_vec.begin();
+                    it != pos_vec.end(); it++){
+
+                size_type pos_global = *it;
+                size_type part = get_partition(pos_global);
+                size_type pos_local = get_local_index(pos_global);
+
+                if ( part != part_cur ){
+                    // this is the end of a block containing indexes ('pos')
+                    // of the same partition ('part').
+                    // get values for this block and append them to value_vec
+                    std::vector<T> values_part = get_values_sync( part_cur,
+                            get_local_indices(part_begin, it) );
+                    std::move( values_part.begin(), values_part.end(),
+                               std::back_inserter(values_vec) );
+
+                    // start a new block from here
+                    part_cur = part;
+                    part_begin = it;
+
+                }
+            }
+
+            return values_vec;
+        }
+
+
+        // TODO Test
+        // TODO beschreibenun
+        future< std::vector<T> >
+        get_values(std::vector<size_type> const & pos_vec) const
+        {
+            // check if position vector is empty
+            // the follwoing code needs at least one element.
+            if (0 == pos_vec.size()){
+                return make_ready_future( std::vector<T>() );
+            }
+
+            //
+            size_type part_cur = get_partition( pos_vec[0] );
+            std::vector<size_type>::iterator part_begin = pos_vec.begin();
+            std::vector< future< std::vector<T> > > part_values_future;
+
+            //for (size_t i=0; i!=pos_vec.size(); i++){
+            for (std::vector<size_type>::iterator it = pos_vec.begin();
+                    it != pos_vec.end(); it++){
+
+                size_type pos_global = *it;
+                size_type part = get_partition(pos_global);
+                size_type pos_local = get_local_index(pos_global);
+
+                if ( part != part_cur ){
+                    // this is the end of a block containing indexes ('pos')
+                    // of the same partition ('part').
+                    // get asyncorn values for this block
+                    part_values_future.push_back( get_values( part_cur,
+                            get_local_indices(part_begin, it) ) );
+
+                    // start a new block from here
+                    part_cur = part;
+                    part_begin = it;
+
+                }
+            }
+
+            // when all values are here merge them to one vector
+            // and return a future to this vector
+            return lcos::local::dataflow(launch::async, [&pos_vec]
+                    (std::vector< future< std::vector<T> > > part_values)
+                    {
+                        std::vector<T> value_vec;
+                        value_vec.reserve( pos_vec.size() );
+
+                        for (future< std::vector<T> >& vec_f : part_values){
+                            std::vector<T> values = vec_f.get();
+                            std::move( values.begin(), values.end(),
+                                std::back_inserter(value_vec) );
+                        }
+
+                    }, std::move( part_values_future) ); //TODO move nötig?
+        }
+
+
+
 
 //         //FRONT (never throws exception)
 //         /** @brief Access the value of first element in the vector.
