@@ -11,6 +11,8 @@
 #include <hpx/parallel/segmented_algorithms/for_each.hpp>
 
 #include <vector>
+#include <iostream>
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
@@ -79,15 +81,46 @@ void handle_values_tests(hpx::vector<T>& v)
     compare_vectors(values, result);
 }
 
+template <typename T>
+void handle_values_tests_distributed_access(hpx::vector<T>& v)
+{
+    fill_vector (v, T(42));
+
+    std::vector<std::size_t> positions(5);
+    fill_vector(positions, 0, 2);
+    std::vector<std::size_t> positions2(5);
+    fill_vector(positions2, 1, 2);
+
+    std::vector<T> values(positions.size());
+    fill_vector(values, T(48), T(3));
+    std::vector<T> values2(positions2.size());
+    fill_vector(values2, T(42), T(0));
+
+    v.set_values(positions, values);
+    std::vector<T> result  = v.get_values_sync(positions );
+    std::vector<T> result2 = v.get_values_sync(positions2);
+
+    compare_vectors(values , result);
+    compare_vectors(values2, result2);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 template <typename T, typename DistPolicy>
 void handle_values_tests_with_policy(std::size_t size, std::size_t localities,
     DistPolicy const& policy)
 {
+    {
     hpx::vector<T> v(size, policy);
     handle_values_tests(v);
+    }
+
+    {
+    hpx::vector<T> v(size, policy);
+    handle_values_tests_distributed_access(v);
+    }
 }
 
-///////////////////////////////////////////////////////////////////////////////
 template <typename T>
 void handle_values_tests()
 {
@@ -98,7 +131,10 @@ void handle_values_tests()
         hpx::vector<T> v(length);
         handle_values_tests(v);
     }
-
+    {
+        hpx::vector<T> v(length);
+        handle_values_tests_distributed_access(v);
+    }
     {
         hpx::vector<T> v(length, T(42));
         handle_values_tests(v);

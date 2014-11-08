@@ -198,6 +198,7 @@ namespace hpx { namespace server
             return result;
         }
 
+
         /** @brief Access the value of first element in the partition_vector.
          *
          *  Calling the function on empty container cause undefined behavior.
@@ -839,6 +840,7 @@ namespace hpx
             return hpx::async<typename server_type::set_values_action>(
                 this->get_gid(), pos, val);
         }
+
 
 //         void clear()
 //         {
