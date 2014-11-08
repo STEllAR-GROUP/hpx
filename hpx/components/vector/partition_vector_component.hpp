@@ -286,21 +286,6 @@ namespace hpx { namespace server
                 partition_vector_[pos[i]] = val[i];
         }
 
-        //template< class It1, class It2 >
-        //void set_values_it(It1 const pos_first, It1 const pos_last,
-                        //It2 const val_first, It2 const val_last)
-        //{
-            //HPX_ASSERT( std::distance(pos_first, pos_last) ==
-                        //std__distance(val_first, val_last) );
-
-            //It1 pos_it = pos_first;
-            //It2 val_it = val_first;
-            //for (;pos_it != pos_last; ++pos_it){
-                //partition_vector_[*pos_it] = *val_it++;
-            //}
-        //}
-
-
         /** @brief Remove all elements from the vector leaving the
             *          partition_vector with size 0.
             */
@@ -331,7 +316,6 @@ namespace hpx { namespace server
 
         HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL(partition_vector, set_value);
         HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL(partition_vector, set_values);
-        //HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL(partition_vector, set_values_it);
 
 //         HPX_DEFINE_COMPONENT_ACTION(partition_vector, clear);
     };
@@ -857,14 +841,6 @@ namespace hpx
                 this->get_gid(), pos, val);
         }
 
-        //template< class It1, class It2 >
-        //future<void> set_values_it(It1 const pos_first, It1 const pos_last,
-                        //It2 const val_first, It2 const val_last)
-        //{
-            //HPX_ASSERT(this->get_grid());
-            //return hpx::async<typename server_type::set_values_it_action>(
-                    //this->get_grid(), pos_first, pos_last, val_first, val_last);
-        //}
 
 //         void clear()
 //         {

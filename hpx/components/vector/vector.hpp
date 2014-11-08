@@ -1179,44 +1179,6 @@ namespace hpx
         std::vector<T>
         get_values_sync(std::vector<size_type> const & pos_vec) const
         {
-            //std::vector<T> values_vec();
-            //values_vec.reserve(pos_vec.size());
-
-            //// check if position vector is empty
-            //// the follwoing code needs at least one element.
-            //if (0 == pos_vec.size()){
-                //return values_vec;
-            //}
-
-            ////
-            //size_type part_cur = get_partition( pos_vec[0] );
-            //std::vector<size_type>::iterator part_begin = pos_vec.begin();
-
-            ////for (size_t i=0; i!=pos_vec.size(); ++i){
-            //for (std::vector<size_type>::iterator it = pos_vec.begin();
-                    //it != pos_vec.end(); ++it){
-
-                //size_type pos_global = *it;
-                //size_type part = get_partition(pos_global);
-
-                //if ( part != part_cur ){
-                    //// this is the end of a block containing indexes ('pos')
-                    //// of the same partition ('part').
-                    //// get values for this block and append them to value_vec
-                    //std::vector<T> values_part = get_values_sync( part_cur,
-                            //get_local_indices(part_begin, it) );
-                    //std::move( values_part.begin(), values_part.end(),
-                               //std::back_inserter(values_vec) );
-
-                    //// start a new block from here
-                    //part_cur = part;
-                    //part_begin = it;
-
-                //}
-            //}
-
-            //return values_vec;
-
             return get_values(pos_vec).get();
         }
 
@@ -1471,27 +1433,6 @@ namespace hpx
             return partition_vector_client(partitions_[part].partition_)
                 .set_values(pos, val);
         }
-
-        //template< class It1, class It2>
-        //future<void>
-        //set_values(size_type part, It1 const pos_first, It1 const pos_last,
-                                   //It2 const val_first, It2 const val_last)
-        //{
-            //HPX_ASSERT( std::distance(pos_first, pos_last) ==
-                        //std__distance(val_first, val_last) );
-
-            
-            //if (partitions_[part].local_data_)
-            //{
-                //partitions_[part].local_data_->set_values_it(pos_first, pos_last,
-                        //val_first, val_last);
-                //return make_ready_future();
-            //}
-
-            //return partition_vector_client(partitions_[part].partition_)
-                //.set_values_it( std::vector<std::size_t>(pos_first, pos_last),
-                                //std::vector<T>(val_first, val_last) );
-        //}
 
         /// Asynchronously set the element at position \a pos
         /// to the given value \a val.
