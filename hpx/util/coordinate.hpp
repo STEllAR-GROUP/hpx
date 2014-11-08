@@ -12,6 +12,7 @@
 #include <hpx/util/assert.hpp>
 
 #include <algorithm>
+#include <numeric>
 #include <cstddef>
 #if !defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX)
 #include <initializer_list>
@@ -56,20 +57,21 @@ namespace hpx { namespace util
         //! component of *this with *(il.begin() + i).
         index(std::initializer_list<value_type> il)
         {
-            HPX_ASSERT(il.size() == rank && "il.size() must be equal to Rank");
+            HPX_ASSERT(il.size() == std::size_t(rank) &&
+                "il.size() must be equal to Rank");
             std::copy(il.begin(), il.end(), vs_ + 0);
         }
 #else
         template <std::size_t N>
-        index(value_type il[N])
+        index(value_type const il[N])
         {
-            HPX_ASSERT(N == rank && "size must be equal to Rank");
+            HPX_ASSERT(N == std::size_t(rank) && "size must be equal to Rank");
             std::copy(il, il + N, vs_ + 0);
         }
 
         index(value_type const* il, std::size_t size)
         {
-            HPX_ASSERT(size == rank && "size must be equal to Rank");
+            HPX_ASSERT(size == std::size_t(rank) && "size must be equal to Rank");
             std::copy(il, il + size, vs_ + 0);
         }
 #endif
@@ -93,7 +95,7 @@ namespace hpx { namespace util
         //! Returns: A reference to the nth component of *this.
         reference operator[](size_type n)
         {
-            HPX_ASSERT(n < rank && "n must be less than Rank");
+            HPX_ASSERT(n < std::size_t(rank) && "n must be less than Rank");
             return vs_[n];
         }
 
@@ -101,7 +103,7 @@ namespace hpx { namespace util
         //! Returns: A reference to the nth component of *this.
         const_reference operator[](size_type n) const
         {
-            HPX_ASSERT(n < rank && "n must be less than Rank");
+            HPX_ASSERT(n < std::size_t(rank) && "n must be less than Rank");
             return vs_[n];
         }
 
@@ -224,20 +226,21 @@ namespace hpx { namespace util
         //! component of *this with *(il.begin() + i).
         bounds(std::initializer_list<value_type> il)
         {
-            HPX_ASSERT(il.size() == rank && "il.size() must be equal to Rank");
+            HPX_ASSERT(il.size() == std::size_t(rank) &&
+                "il.size() must be equal to Rank");
             std::copy(il.begin(), il.end(), vs_ + 0);
         }
 #else
         template <std::size_t N>
-        bounds(value_type il[N])
+        bounds(value_type const il[N])
         {
-            HPX_ASSERT(N == rank && "size must be equal to Rank");
+            HPX_ASSERT(N == std::size_t(rank) && "size must be equal to Rank");
             std::copy(il, il + N, vs_ + 0);
         }
 
         bounds(value_type const* il, std::size_t size)
         {
-            HPX_ASSERT(size == rank && "size must be equal to Rank");
+            HPX_ASSERT(size == std::size_t(rank) && "size must be equal to Rank");
             std::copy(il, il + size, vs_ + 0);
         }
 #endif
@@ -299,7 +302,7 @@ namespace hpx { namespace util
         //! Returns: A reference to the nth component of *this.
         reference operator[](size_type n)
         {
-            HPX_ASSERT(n < rank && "n must be less than Rank");
+            HPX_ASSERT(n < std::size_t(rank) && "n must be less than Rank");
             return vs_[n];
         }
 
@@ -307,7 +310,7 @@ namespace hpx { namespace util
         //! Returns: A reference to the nth component of *this.
         const_reference operator[](size_type n) const
         {
-            HPX_ASSERT(n < rank && "n must be less than Rank");
+            HPX_ASSERT(n < std::size_t(rank) && "n must be less than Rank");
             return vs_[n];
         }
 

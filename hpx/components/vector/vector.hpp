@@ -56,9 +56,15 @@ namespace hpx
         typedef T value_type;
         typedef T reference;
         typedef T const const_reference;
+
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40700
         typedef typename std::allocator_traits<allocator_type>::pointer pointer;
         typedef typename std::allocator_traits<allocator_type>::const_pointer
             const_pointer;
+#else
+        typedef T* pointer;
+        typedef T const* const_pointer;
+#endif
 
     private:
         typedef hpx::components::client_base<
