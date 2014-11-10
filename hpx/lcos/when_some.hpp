@@ -218,13 +218,11 @@ namespace hpx { namespace lcos
         template <typename Sequence>
         struct when_some;
 
-        template <typename Sequence, typename Callback>
-        struct set_when_on_completed_callback_impl
+        template <typename Sequence>
+        struct set_when_some_callback_impl
         {
-            explicit set_when_on_completed_callback_impl(
-                    when_some<Sequence>& when, Callback const& callback)
-              : when_(when),
-                callback_(callback)
+            explicit set_when_some_callback_impl(when_some<Sequence>& when)
+              : when_(when)
             {}
 
             template <typename Future>
@@ -242,7 +240,9 @@ namespace hpx { namespace lcos
                     shared_state_ptr const& shared_state =
                         lcos::detail::get_shared_state(future);
 
-                    shared_state->set_on_completed(Callback(callback_));
+                    shared_state->set_on_completed(util::bind(
+                        &when_some<Sequence>::on_future_ready, when_.shared_from_this(),
+                        threads::get_self_id()));
                 }
                 else {
                     if (when_.count_.fetch_add(1) + 1 == when_.needed_count_)
@@ -267,22 +267,19 @@ namespace hpx { namespace lcos
             }
 
             when_some<Sequence>& when_;
-            Callback const& callback_;
         };
 
-        template <typename Sequence, typename Callback>
-        void set_on_completed_callback(when_some<Sequence>& when,
-            Callback const& callback)
+        template <typename Sequence>
+        void set_on_completed_callback(when_some<Sequence>& when)
         {
-            set_when_on_completed_callback_impl<Sequence, Callback>
-                set_on_completed_callback_helper(when, callback);
-            set_on_completed_callback_helper.apply(when.lazy_values_);
+            set_when_some_callback_impl<Sequence> callback(when);
+            callback.apply(when.lazy_values_);
         }
 
         template <typename Sequence>
         struct when_some : boost::enable_shared_from_this<when_some<Sequence> > //-V690
         {
-        private:
+        public:
             void on_future_ready(threads::thread_id_type const& id)
             {
                 if (count_.fetch_add(1) + 1 == needed_count_)
@@ -314,10 +311,7 @@ namespace hpx { namespace lcos
             result_type operator()()
             {
                 // set callback functions to executed when future is ready
-                set_on_completed_callback(*this,
-                    util::bind(
-                        &when_some::on_future_ready, this->shared_from_this(),
-                        threads::get_self_id()));
+                set_on_completed_callback(*this);
 
                 // if all of the requested futures are already set, our
                 // callback above has already been called often enough, otherwise
