@@ -3,22 +3,25 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/detail/search.hpp
+/// \file parallel/algorithms/search.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_COPY_MAY_30_2014_0317PM)
-#define HPX_PARALLEL_DETAIL_COPY_MAY_30_2014_0317PM
+#if !defined(HPX_PARALLEL_algorithms_SEARCH_NOV_9_2014_0317PM)
+#define HPX_PARALLEL_algorithms_SEARCH_NOV_9_2014_0317PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/detail/algorithm_result.hpp>
-#include <hpx/parallel/detail/dispatch.hpp>
-#include <hpx/parallel/detail/predicates.hpp>
-#include <hpx/parallel/detail/for_each.hpp>
-#include <hpx/parallel/detail/is_negative.hpp>
+#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
+#include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/predicates.hpp>
+#include <hpx/parallel/algorithms/for_each.hpp>
+#include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
+
+#include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/parallel/util/loop.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -76,7 +79,8 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
 				util::cancellation_token<difference_type> tok(count);
 
-				return util::partitioner<ExPolicy, FwdIter, void>::call_with_index(
+				return util::partitioner<ExPolicy, FwdIter, FwdIter, void>::
+					call_with_index(
 					policy, first, count-(diff-1),
 					[=](std::size_t base_idx, FwdIter it, std::size_t part_size) mutable
 				{
@@ -107,7 +111,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
 							}
 						});
 				},
-				[=](std::vector<hpx::future<void> > &&) mutable
+				[=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
 				{
 					difference_type search_res = tok.get_data();
 					if( search_res != count)

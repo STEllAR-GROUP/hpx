@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/search.hpp>
+#include <hpx/include/parallel_search.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include "test_utils.hpp"
@@ -37,8 +37,8 @@ void test_search1(ExPolicy const& policy, IteratorTag)
     HPX_TEST(index == iterator(test_index));
 }
 
-template <typename IteratorTag>
-void test_search1(hpx::parallel::task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_search1_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -53,7 +53,7 @@ void test_search1(hpx::parallel::task_execution_policy, IteratorTag)
     std::size_t h[] = { 1, 2 };
 
     hpx::future<iterator> f =
-        hpx::parallel::search(hpx::parallel::task,
+        hpx::parallel::search(p,
             iterator(boost::begin(c)), iterator(boost::end(c)),
             boost::begin(h), boost::end(h));
     f.wait();
@@ -71,13 +71,16 @@ void test_search1()
     test_search1(seq, IteratorTag());
     test_search1(par, IteratorTag());
     test_search1(par_vec, IteratorTag());
-    test_search1(task, IteratorTag());
+
+    test_search1_async(seq(task), IteratorTag());
+	test_search1_async(par(task), IteratorTag());
 
 
     test_search1(execution_policy(seq), IteratorTag());
     test_search1(execution_policy(par), IteratorTag());
     test_search1(execution_policy(par_vec), IteratorTag());
-    test_search1(execution_policy(task), IteratorTag());
+	test_search1(execution_policy(seq(task)), IteratorTag());
+    test_search1(execution_policy(par(task)), IteratorTag());
 }
 
 void search_test1()
@@ -115,7 +118,7 @@ void test_search2(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_search2(hpx::parallel::task_execution_policy, IteratorTag)
+void test_search2(hpx::parallel::parallel_task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -192,7 +195,7 @@ void test_search3(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_search3(hpx::parallel::task_execution_policy, IteratorTag)
+void test_search3(hpx::parallel::parallel_task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -272,7 +275,7 @@ void test_search4(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_search4(hpx::parallel::task_execution_policy, IteratorTag)
+void test_search4(hpx::parallel::parallel_task_execution_policy, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -363,8 +366,8 @@ void test_search_exception(ExPolicy const& policy, IteratorTag)
     HPX_TEST(caught_exception);
 }
 
-template <typename IteratorTag>
-void test_search_exception(hpx::parallel::task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_search_async_exception(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -380,7 +383,7 @@ void test_search_exception(hpx::parallel::task_execution_policy, IteratorTag)
     bool caught_exception = false;
     try {
         hpx::future<decorated_iterator> f =
-            hpx::parallel::search(hpx::parallel::task,
+            hpx::parallel::search(p,
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::runtime_error("test"); }),
@@ -395,8 +398,8 @@ void test_search_exception(hpx::parallel::task_execution_policy, IteratorTag)
     catch(hpx::exception_list const& e) {
         caught_exception = true;
         test::test_num_exceptions<
-            hpx::parallel::task_execution_policy, IteratorTag
-        >::call(hpx::parallel::task, e);
+            ExPolicy, IteratorTag
+        >::call(p, e);
     }
     catch(...) {
         HPX_TEST(false);
@@ -412,11 +415,15 @@ void test_search_exception()
     //If the execution policy object is of type vector_execution_policy,
     //  std::terminate shall be called. therefore we do not test exceptions
     //  with a vector execution policy
+	test_search_exception(seq, IteratorTag());
     test_search_exception(par, IteratorTag());
-    test_search_exception(task, IteratorTag());
+
+    test_search_async_exception(seq(task), IteratorTag());
+	test_search_async_exception(par(task), IteratorTag());
 
     test_search_exception(execution_policy(par), IteratorTag());
-    test_search_exception(execution_policy(task), IteratorTag());
+    test_search_exception(execution_policy(seq(task)), IteratorTag());
+	test_search_exception(execution_policy(par(task)), IteratorTag());
 }
 
 void search_exception_test()
@@ -463,8 +470,8 @@ void test_search_bad_alloc(ExPolicy const& policy, IteratorTag)
     HPX_TEST(caught_bad_alloc);
 }
 
-template <typename IteratorTag>
-void test_search_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_search_async_bad_alloc(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -479,7 +486,7 @@ void test_search_bad_alloc(hpx::parallel::task_execution_policy, IteratorTag)
     bool caught_bad_alloc = false;
     try {
         hpx::future<decorated_iterator> f =
-            hpx::parallel::search(hpx::parallel::task,
+            hpx::parallel::search(p,
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::bad_alloc(); }),
@@ -512,11 +519,14 @@ void test_search_bad_alloc()
     // with a vector execution policy
     test_search_bad_alloc(par, IteratorTag());
     test_search_bad_alloc(seq, IteratorTag());
-    test_search_bad_alloc(task, IteratorTag());
+
+    test_search_async_bad_alloc(seq(task), IteratorTag());
+	test_search_async_bad_alloc(par(task), IteratorTag());
 
     test_search_bad_alloc(execution_policy(par), IteratorTag());
     test_search_bad_alloc(execution_policy(seq), IteratorTag());
-    test_search_bad_alloc(execution_policy(task), IteratorTag());
+    test_search_bad_alloc(execution_policy(seq(task)), IteratorTag());
+	test_search_bad_alloc(execution_policy(par(task)), IteratorTag());
 }
 
 void search_bad_alloc_test()

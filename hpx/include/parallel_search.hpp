@@ -7,6 +7,6 @@
 #if !defined(HPX_PARALLEL_SEARCH_OCT_25_130PM)
 #define HPX_PARALLEL_SEARCH_OCT_25_130PM
 
-#include <hpx/parallel/detail/search.hpp>
+#include <hpx/parallel/algorithms/search.hpp>
 
 #endif
