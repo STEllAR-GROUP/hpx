@@ -53,6 +53,15 @@ namespace hpx { namespace components
             if (gid_) applier::unbind_gid_local(gid_);
         }
 
+        // Copy construction and copy assignment should not copy the gid_.
+        simple_component_base(simple_component_base const&)
+        {}
+
+        simple_component_base& operator=(simple_component_base const&)
+        {
+            return *this;
+        }
+
         /// \brief finalize() will be called just before the instance gets
         ///        destructed
         void finalize() {}

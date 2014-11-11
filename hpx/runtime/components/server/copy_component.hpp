@@ -20,6 +20,21 @@ namespace hpx { namespace components { namespace server
     /// \brief Copy given component to the specified target locality
     namespace detail
     {
+        // If we know that the new component has to be created local to the old
+        // one, we can avoid doing serialization.
+        template <typename Component>
+        naming::id_type copy_component_here_postproc(
+            future<boost::shared_ptr<Component> > f)
+        {
+            // This is executed on the locality where the component lives.
+            hpx::components::server::runtime_support* rts =
+                hpx::get_runtime_support_ptr();
+
+            return traits::get_remote_result<
+                    id_type, naming::gid_type
+                >::call(rts->copy_create_component<Component>(f.get(), true));
+        }
+
         template <typename Component>
         naming::id_type copy_component_postproc(
             future<boost::shared_ptr<Component> > f,
@@ -28,21 +43,33 @@ namespace hpx { namespace components { namespace server
             using stubs::runtime_support;
 
             boost::shared_ptr<Component> ptr = f.get();
-            if (!target_locality)
+            if (!target_locality || target_locality == find_here())
             {
                 // This is executed on the locality where the component lives,
                 // if no target_locality is given we have to create the copy on
                 // the locality of the component.
-                return runtime_support::copy_create_component<Component>(
-                    hpx::find_here(), ptr, true);
+                hpx::components::server::runtime_support* rts =
+                    hpx::get_runtime_support_ptr();
+
+                return traits::get_remote_result<
+                        id_type, naming::gid_type
+                    >::call(rts->copy_create_component<Component>(ptr, true));
             }
 
             return runtime_support::copy_create_component<Component>(
-                target_locality, ptr, target_locality == find_here());
+                target_locality, ptr, false);
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Component>
+    future<naming::id_type> copy_component_here(naming::id_type const& to_copy)
+    {
+        future<boost::shared_ptr<Component> > f =
+            get_ptr<Component>(to_copy);
+        return f.then(&detail::copy_component_here_postproc<Component>);
+    }
+
     template <typename Component>
     future<naming::id_type> copy_component(naming::id_type const& to_copy,
         naming::id_type const& target_locality)
@@ -54,14 +81,28 @@ namespace hpx { namespace components { namespace server
     }
 
     template <typename Component>
+    struct copy_component_action_here
+      : ::hpx::actions::plain_result_action1<
+            future<naming::id_type>
+          , naming::id_type const&
+          , &copy_component_here<Component>
+          , copy_component_action_here<Component> >
+    {};
+
+    template <typename Component>
     struct copy_component_action
       : ::hpx::actions::plain_result_action2<
-            future<naming::id_type>,
-            naming::id_type const&, naming::id_type const&
+            future<naming::id_type>
+          , naming::id_type const&, naming::id_type const&
           , &copy_component<Component>
           , copy_component_action<Component> >
     {};
 }}}
+
+HPX_REGISTER_PLAIN_ACTION_TEMPLATE(
+    (template <typename Component>),
+    (hpx::components::server::copy_component_action_here<Component>)
+)
 
 HPX_REGISTER_PLAIN_ACTION_TEMPLATE(
     (template <typename Component>),

@@ -3,21 +3,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// This is the eighth in a series of examples demonstrating the development
-// of a fully distributed solver for a simple 1D heat distribution problem.
-//
-// This example builds on example seven.
-
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
 #include <algorithm>
 #include <vector>
 
-// Constant to shift column index
-#define COL_SHIFT 1000.00
-// Constant to shift row index
-#define ROW_SHIFT 0.001
+#define COL_SHIFT 1000.00           // Constant to shift column index
+#define ROW_SHIFT 0.001             // Constant to shift row index
 
 bool verbose = false;
 
@@ -31,11 +24,12 @@ int hpx_main(boost::program_options::variables_map& vm)
     boost::uint64_t tile_size = order;
 
     if(vm.count("tile_size"))
-      tile_size = vm["tile_size"].as<boost::uint64_t>();
+        tile_size = vm["tile_size"].as<boost::uint64_t>();
 
-    verbose = vm.count("verbose");
+    verbose = vm.count("verbose") ? true : false;
 
-    boost::uint64_t bytes = 2.0 * sizeof(double) * order * order;
+    boost::uint64_t bytes =
+        static_cast<boost::uint64_t>(2.0 * sizeof(double) * order * order);
 
     std::vector<double> A(order * order);
     std::vector<double> B(order * order);
@@ -64,7 +58,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     double avgtime = 0.0;
     double maxtime = 0.0;
     double mintime = 366.0 * 24.0*3600.0; // set the minimum time to a large value;
-                                         // one leap year should be enough
+                                          // one leap year should be enough
     for(boost::uint64_t iter = 0; iter < iterations; ++iter)
     {
         hpx::util::high_resolution_timer t;
@@ -75,16 +69,17 @@ int hpx_main(boost::program_options::variables_map& vm)
             {
                 for(boost::uint64_t j = 0; j < order; j += tile_size)
                 {
-                    for(boost::uint64_t it = i; it < (std::min)(order, i + tile_size); ++it)
+                    boost::uint64_t i_max = (std::min)(order, i + tile_size);
+                    for(boost::uint64_t it = i; it < i_max; ++it)
                     {
-                        for(boost::uint64_t jt = j; jt < (std::min)(order, j + tile_size); ++jt)
+                        boost::uint64_t j_max = (std::min)(order, j + tile_size);
+                        for(boost::uint64_t jt = j; jt < j_max; ++jt)
                         {
                             B[it + order * jt] = A[jt + order * it];
                         }
                     }
                 }
             }
-
         }
         else
         {
@@ -115,7 +110,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     if(errsq < epsilon)
     {
         std::cout << "Solution validates\n";
-        avgtime = avgtime/static_cast<double>((std::max)(iterations-1, static_cast<boost::uint64_t>(1)));
+        avgtime = avgtime/static_cast<double>(
+            (std::max)(iterations-1, static_cast<boost::uint64_t>(1)));
         std::cout
           << "Rate (MB/s): " << 1.e-6 * bytes/mintime << ", "
           << "Avg time (s): " << avgtime << ", "
@@ -123,7 +119,7 @@ int hpx_main(boost::program_options::variables_map& vm)
           << "Max time (s): " << maxtime << "\n";
 
         if(verbose)
-          std::cout << "Squared errors: " << errsq << "\n";
+            std::cout << "Squared errors: " << errsq << "\n";
     }
     else
     {
@@ -147,7 +143,8 @@ int main(int argc, char* argv[])
         ("iterations", value<boost::uint64_t>()->default_value(10),
          "# iterations")
         ("tile_size", value<boost::uint64_t>(),
-         "Number of tiles to divide the individual matrix blocks for improved cache and TLB performance")
+         "Number of tiles to divide the individual matrix blocks for improved "
+         "cache and TLB performance")
         ( "verbose", "Verbose output")
     ;
 
@@ -173,7 +170,7 @@ double test_results(boost::uint64_t order, std::vector<double> const & trans)
     }
 
     if(verbose)
-      std::cout << " Squared sum of differences: " << errsq << "\n";
+        std::cout << " Squared sum of differences: " << errsq << "\n";
 
     return errsq;
 }

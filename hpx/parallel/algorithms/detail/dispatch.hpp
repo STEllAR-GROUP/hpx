@@ -25,6 +25,7 @@
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 
 #include <boost/mpl/bool.hpp>
+#include <boost/serialization/serialization.hpp>
 
 #include <string>
 
@@ -115,6 +116,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         explicit algorithm(char const* const name) : name_(name) {}
 
         char const* const name_;
+
+        template <typename Archive>
+        void serialize(Archive& ar, unsigned int)
+        {
+        }
     };
 }}}}
 
@@ -134,7 +140,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         ExPolicy, result_type
     >::type
     call(ExPolicy const& policy, HPX_ENUM_FWD_ARGS(N, Arg, arg),
-        boost::mpl::true_)
+        boost::mpl::true_) const
     {
         try {
             return parallel::v1::detail::algorithm_result<
@@ -152,7 +158,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         sequential_task_execution_policy, result_type
     >::type
     operator()(sequential_task_execution_policy const& policy,
-        HPX_ENUM_FWD_ARGS(N, Arg, arg))
+        HPX_ENUM_FWD_ARGS(N, Arg, arg)) const
     {
         try {
             return parallel::v1::detail::algorithm_result<
@@ -172,7 +178,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         sequential_task_execution_policy, result_type
     >::type
     call(sequential_task_execution_policy const& policy,
-        HPX_ENUM_FWD_ARGS(N, Arg, arg), boost::mpl::true_)
+        HPX_ENUM_FWD_ARGS(N, Arg, arg), boost::mpl::true_) const
     {
         try {
             hpx::future<result_type> result =
@@ -197,7 +203,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         parallel_task_execution_policy, result_type
     >::type
     call(parallel_task_execution_policy const& policy,
-        HPX_ENUM_FWD_ARGS(N, Arg, arg), boost::mpl::true_)
+        HPX_ENUM_FWD_ARGS(N, Arg, arg), boost::mpl::true_) const
     {
         try {
             return parallel::v1::detail::algorithm_result<
@@ -215,7 +221,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     template <typename ExPolicy, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     typename parallel::v1::detail::algorithm_result<ExPolicy, result_type>::type
     call(ExPolicy const& policy, HPX_ENUM_FWD_ARGS(N, Arg, arg),
-        boost::mpl::false_)
+        boost::mpl::false_) const
     {
         return Derived::parallel(policy, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
@@ -223,16 +229,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     result_type call(parallel::v1::execution_policy const& policy,
-        HPX_ENUM_FWD_ARGS(N, Arg, arg), boost::mpl::false_)
+        HPX_ENUM_FWD_ARGS(N, Arg, arg), boost::mpl::false_) const
     {
         HPX_PARALLEL_DISPATCH(policy, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     result_type call(parallel::v1::execution_policy const& policy,
-         HPX_ENUM_FWD_ARGS(N, Arg, arg), boost::mpl::true_)
+         HPX_ENUM_FWD_ARGS(N, Arg, arg), boost::mpl::true_) const
     {
-        return call(seq, HPX_ENUM_FORWARD_ARGS(N, Arg, arg), boost::mpl::true_());
+        return call(seq, HPX_ENUM_FORWARD_ARGS(N, Arg, arg),
+            boost::mpl::true_());
     }
 
 #undef N

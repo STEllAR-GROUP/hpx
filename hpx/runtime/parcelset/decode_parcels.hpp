@@ -236,7 +236,6 @@ namespace hpx { namespace parcelset
         buffer->parcels_decoded_ = true;
     }
 
-
     template <typename Parcelport, typename Connection, typename Buffer>
     void decode_parcels(Parcelport & parcelport, Connection & connection,
         boost::shared_ptr<Buffer> buffer)
@@ -248,7 +247,6 @@ namespace hpx { namespace parcelset
             static_cast<std::size_t>(
                 static_cast<boost::uint32_t>(buffer->num_chunks_.first));
 
-//        boost::shared_ptr<std::vector<std::vector<char> > > in_chunks(in_chunks_);
         boost::shared_ptr<std::vector<util::serialization_chunk> > chunks;
         if (num_zero_copy_chunks != 0) {
             // decode chunk information
@@ -288,8 +286,17 @@ namespace hpx { namespace parcelset
                 (*chunks)[index] = util::create_index_chunk(first, second);
                 ++index;
             }
-            //HPX_ASSERT(index == num_zero_copy_chunks + num_non_zero_copy_chunks);
+#if defined(HPX_DEBUG)
+            // make sure that all spots have been populated
+            for (std::size_t i = 0;
+                 i != num_zero_copy_chunks + num_non_zero_copy_chunks;
+                 ++i)
+            {
+                HPX_ASSERT((*chunks)[i].size_ != 0);
+            }
+#endif
         }
+
         bool first_message = false;
 #if defined(HPX_HAVE_SECURITY)
         if(connection.first_message_)
@@ -301,12 +308,12 @@ namespace hpx { namespace parcelset
         HPX_ASSERT(!buffer->parcels_decoded_);
         if(hpx::is_running() && parcelport.async_serialization())
         {
-                hpx::applier::register_thread_nullary(
-                    util::bind(
-                        util::one_shot(&decode_parcels_impl<Parcelport, Buffer>),
-                        boost::ref(parcelport), buffer, chunks, first_message),
-                    "decode_parcels",
-                    threads::pending, true, threads::thread_priority_boost);
+            hpx::applier::register_thread_nullary(
+                util::bind(
+                    util::one_shot(&decode_parcels_impl<Parcelport, Buffer>),
+                    boost::ref(parcelport), buffer, chunks, first_message),
+                "decode_parcels",
+                threads::pending, true, threads::thread_priority_boost);
         }
         else
         {
