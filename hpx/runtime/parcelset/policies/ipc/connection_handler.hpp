@@ -9,10 +9,10 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-#include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 #include <hpx/runtime/parcelset/policies/ipc/acceptor.hpp>
 #include <hpx/runtime/parcelset/policies/ipc/data_buffer_cache.hpp>
+#include <hpx/runtime/parcelset/policies/ipc/locality.hpp>
 
 
 namespace hpx { namespace parcelset {
@@ -49,6 +49,8 @@ namespace hpx { namespace parcelset {
 
     namespace policies { namespace ipc
     {
+        parcelset::locality parcelport_address(util::runtime_configuration const & ini);
+
         class HPX_EXPORT connection_handler
           : public parcelport_impl<connection_handler>
         {
@@ -79,7 +81,11 @@ namespace hpx { namespace parcelset {
             std::string get_locality_name() const;
 
             boost::shared_ptr<sender> create_connection(
-                naming::locality const& l, error_code& ec);
+                parcelset::locality const& l, error_code& ec);
+
+            parcelset::locality agas_locality(util::runtime_configuration const & ini) const;
+
+            parcelset::locality create_locality() const;
 
         private:
             // helper functions for receiving parcels

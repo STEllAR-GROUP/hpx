@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -28,6 +29,127 @@
 
 namespace hpx { namespace agas
 {
+#if 0
+    struct HPX_EXPORT request
+    {
+
+        template <typename Impl>
+        struct data;
+        struct data_base
+        {
+            virtual boost::int32_t action_code() = 0;
+
+            template <typename Impl>
+            void validate(error_code& ec = throws)
+            {
+                if(Impl::action_code() != action_code())
+                {
+                    HPX_THROWS_IF(ec, bad_parameter,
+                        "request::get_credit",
+                        "invalid operation for request type");
+                }
+            }
+
+            template <typename Impl>
+            Impl & get(error_code& ec = throws)
+            {
+                validate<Impl>(ec);
+                return *static_cast<impl<Impl>*>(this).impl_;
+            }
+
+            template <typename Impl>
+            Impl get(error_code& ec = throws) const
+            {
+                validate<Impl>(ec);
+                return *static_cast<impl<Impl>*>(this).impl_;
+            }
+
+            virtual ~impl_base()
+            {}
+        };
+
+        template <typename Impl>
+        struct data : data_base
+        {
+            explicit impl(Impl const& impl)
+              : impl_(impl)
+            {}
+
+            explicit data(Impl&& impl)
+              : impl_(std::move(impl))
+            {}
+
+            boost::int32_t action_code()
+            {
+                return Impl::action_code();
+            }
+
+            Impl impl_;
+        };
+
+        template <typename Impl>
+        static void load_request(util::portable_binary_iarchive & ar, data_base & data)
+        {
+            Impl impl;
+            ar & impl;
+            data = data<Impl>(std::move(impl));
+        }
+
+        template <typename Impl>
+        static void save_request(util::portable_binary_oarchive & ar, data_base & data)
+        {
+            ar & data.get<Impl>();
+        }
+
+        template <typename Impl>
+        static void register_request(boost::uint32_t code, std::string const & name)
+        {
+            register_request_name(code, name);
+            register_request_save(code, &request::save_request<Impl>);
+            register_request_load(code, &request::load_request<Impl>);
+        }
+
+        template <typename Impl>
+        explicit request(Impl&& impl)
+          : data_(new data<Impl>(std::forward<Impl>(impl)))
+        {}
+
+        template <typename Impl>
+        Impl & get(error_code& ec = throws)
+        {
+            return data_->get<Impl>();
+        }
+
+        template <typename Impl>
+        Impl get(error_code& ec = throws) const
+        {
+            return data_->get<Impl>();
+        }
+
+        void save(util::portable_binary_oarchive & ar, unsigned)
+        {
+            if(!data_)
+            {
+                boost::uint32_t code(-1);
+                ar & code;
+            }
+            ar & data_->action_code();
+            save_request_impl(data_);
+        }
+
+        void load(util::portable_binary_oarchive & ar, unsigned)
+        {
+            boost::uint32_t code(-1);
+            ar & code;
+            if(code == boost::uint32_t(-1)) return;
+            load_request_impl(data_);
+        }
+
+        BOOST_SERIALIZATION_SPLIT_MEMBER(request);
+
+        HPX_STD_UNIQUE_PTR<data_base> data_;
+    };
+#endif
 
 // TODO: Ensure that multiple invocations of get_data get optimized into the
 // same jump table.
@@ -75,7 +197,7 @@ struct HPX_EXPORT request
 
     request(
         namespace_action_code type_
-      , naming::locality const& locality_
+      , parcelset::endpoints_type const & endpoints_
       , boost::uint64_t count_
       , boost::uint32_t num_threads_
       , naming::gid_type prefix_ = naming::gid_type()
@@ -83,7 +205,7 @@ struct HPX_EXPORT request
 
     request(
         namespace_action_code type_
-      , naming::locality const& locality_
+      , parcelset::endpoints_type const & endpoints_
         );
 
     request(
@@ -140,10 +262,19 @@ struct HPX_EXPORT request
     request(
         request const& other
         );
+    // move constructor
+    request(
+        request&& other
+        );
 
     // copy assignment
     request& operator=(
         request const& other
+        );
+
+    // move assignment
+    request& operator=(
+        request&& other
         );
 
     gva get_gva(
@@ -178,9 +309,9 @@ struct HPX_EXPORT request
         error_code& ec = throws
         ) const;
 
-    naming::locality get_locality(
+    parcelset::endpoints_type get_endpoints(
         error_code& ec = throws
-        ) const;
+    ) const;
 
     naming::gid_type get_gid(
         error_code& ec = throws

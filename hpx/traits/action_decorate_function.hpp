@@ -18,7 +18,7 @@ namespace hpx { namespace traits
     {
         template <typename F>
         static threads::thread_function_type
-        call(naming::address::address_type lva, F && f)
+        call(naming::address_type lva, F && f)
         {
             // by default we forward this to the component type
             typedef typename Action::component_type component_type;

@@ -7,7 +7,7 @@
 #ifndef HPX_PARCELSET_POLICIES_IBVERBS_SENDER_HPP
 #define HPX_PARCELSET_POLICIES_IBVERBS_SENDER_HPP
 
-#include <hpx/runtime/naming/locality.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/runtime/parcelset/policies/ibverbs/context.hpp>
 #include <hpx/runtime/parcelset/policies/ibverbs/messages.hpp>
@@ -42,13 +42,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
             HPX_STD_FUNCTION<
                 void(
                     boost::system::error_code const &
-                  , naming::locality const&
-                  ,  boost::shared_ptr<sender>
+                  , parcelset::locality const&
+                  , boost::shared_ptr<sender>
                 )
             >
             postprocess_function_type;
 
-        sender(connection_handler & handler, memory_pool & pool, naming::locality const& there,
+        sender(connection_handler & handler, memory_pool & pool, parcelset::locality const& there,
             performance_counters::parcels::gatherer& parcels_sent)
           : context_(), parcelport_(handler), there_(there), parcels_sent_(parcels_sent), memory_pool_(pool)
         {
@@ -65,12 +65,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         /// Get the window associated with the parcelport_connection.
         client_context& context() { return context_; }
 
-        void verify(naming::locality const & parcel_locality_id)
+        void verify(parcelset::locality const & parcel_locality_id)
         {
             HPX_ASSERT(parcel_locality_id == there_);
         }
 
-        naming::locality const& destination() const
+        parcelset::locality const& destination() const
         {
             return there_;
         }
@@ -238,7 +238,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         connection_handler & parcelport_;
 
         /// the other (receiving) end of this connection
-        naming::locality there_;
+        parcelset::locality there_;
         /// Counters and their data containers.
         util::high_resolution_timer timer_;
         performance_counters::parcels::gatherer& parcels_sent_;

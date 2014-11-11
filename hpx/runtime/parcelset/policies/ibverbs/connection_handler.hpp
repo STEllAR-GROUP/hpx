@@ -9,11 +9,11 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-#include <hpx/runtime/naming/locality.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 #include <hpx/runtime/parcelset/policies/ibverbs/acceptor.hpp>
 #include <hpx/runtime/parcelset/policies/ibverbs/memory_pool.hpp>
-
+#include <hpx/runtime/parcelset/policies/ibverbs/locality.hpp>
 
 namespace hpx { namespace parcelset {
     namespace policies { namespace ibverbs
@@ -49,6 +49,8 @@ namespace hpx { namespace parcelset {
 
     namespace policies { namespace ibverbs
     {
+        parcelset::locality parcelport_address(util::runtime_configuration const & ini);
+
         class HPX_EXPORT connection_handler
           : public parcelport_impl<connection_handler>
         {
@@ -83,7 +85,11 @@ namespace hpx { namespace parcelset {
             std::string get_locality_name() const;
 
             boost::shared_ptr<sender> create_connection(
-                naming::locality const& l, error_code& ec);
+                parcelset::locality const& l, error_code& ec);
+
+            parcelset::locality agas_locality(util::runtime_configuration const & ini) const;
+
+            parcelset::locality create_locality() const;
 
             void add_sender(boost::shared_ptr<sender> const& sender_connection);
 

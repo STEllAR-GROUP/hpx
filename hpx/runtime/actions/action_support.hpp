@@ -336,8 +336,8 @@ namespace hpx { namespace actions
 
         /// Return a pointer to the message handler to be used for this action.
         virtual parcelset::policies::message_handler* get_message_handler(
-            parcelset::parcelhandler* ph, naming::locality const& loc,
-            parcelset::connection_type t, parcelset::parcel const& p) const = 0;
+            parcelset::parcelhandler* ph, parcelset::locality const& loc,
+            parcelset::parcel const& p) const = 0;
 
 #if defined(HPX_HAVE_SECURITY)
         /// Return the set of capabilities required to invoke this action
@@ -716,11 +716,11 @@ namespace hpx { namespace actions
 
         /// Return a pointer to the message handler to be used for this action.
         parcelset::policies::message_handler* get_message_handler(
-            parcelset::parcelhandler* ph, naming::locality const& loc,
-            parcelset::connection_type t, parcelset::parcel const& p) const
+            parcelset::parcelhandler* ph, parcelset::locality const& loc,
+            parcelset::parcel const& p) const
         {
             return traits::action_message_handler<derived_type>::
-                call(ph, loc, t, p);
+                call(ph, loc, p);
         }
 
 #if defined(HPX_HAVE_SECURITY)

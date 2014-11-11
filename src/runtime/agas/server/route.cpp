@@ -37,9 +37,6 @@ namespace hpx { namespace agas { namespace server
         {
             mutex_type::scoped_lock l(mutex_);
 
-            if (!locality_)
-                locality_ = rt.here();
-
             cache_addresses.reserve(size);
             for (std::size_t i = 0; i != size; ++i)
             {
@@ -66,21 +63,15 @@ namespace hpx { namespace agas { namespace server
                     gva const g = boost::fusion::at_c<1>(r).resolve(
                         ids[i].get_gid(), boost::fusion::at_c<0>(r));
 
-                    addrs[i].locality_ = g.endpoint;
+                    addrs[i].locality_ = g.prefix;
                     addrs[i].type_ = g.type;
                     addrs[i].address_ = g.lva();
-                }
-                else
-                {
-                    cache_addresses.push_back(
-                        boost::fusion::make_vector(
-                            naming::gid_type(), gva(), naming::invalid_locality_id));
                 }
             }
         }
 
         // either send the parcel on its way or execute actions locally
-        if (addrs[0].locality_ == locality_)
+        if (addrs[0].locality_ == get_locality())
         {
             // destination is local
             rt.get_applier().schedule_action(p);
@@ -95,13 +86,13 @@ namespace hpx { namespace agas { namespace server
         {
             // asynchronously update cache on source locality
             naming::id_type source = p.get_source();
-            for (std::size_t i = 0; i != size; ++i)
+            for (std::size_t i = 0; i != cache_addresses.size(); ++i)
             {
                 resolved_type const& r = cache_addresses[i];
                 if (boost::fusion::at_c<0>(r))
                 {
                     gva const& g = boost::fusion::at_c<1>(r);
-                    naming::address addr(g.endpoint, g.type, g.lva());
+                    naming::address addr(g.prefix, g.type, g.lva());
 
                     using components::stubs::runtime_support;
                     runtime_support::update_agas_cache_entry_colocated(

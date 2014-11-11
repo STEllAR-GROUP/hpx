@@ -166,7 +166,7 @@ namespace hpx { namespace parcelset
                         archive >> p;
 #endif
                         // make sure this parcel ended up on the right locality
-                        HPX_ASSERT(p.get_destination_locality() == pp.here());
+                        HPX_ASSERT(hpx::get_locality() ? p.get_destination_locality() == hpx::get_locality() : true);
 
                         // be sure not to measure add_parcel as serialization time
                         boost::int64_t add_parcel_time = timer.elapsed_nanoseconds();
@@ -288,7 +288,7 @@ namespace hpx { namespace parcelset
                 (*chunks)[index] = util::create_index_chunk(first, second);
                 ++index;
             }
-            HPX_ASSERT(index == num_zero_copy_chunks + num_non_zero_copy_chunks);
+            //HPX_ASSERT(index == num_zero_copy_chunks + num_non_zero_copy_chunks);
         }
         bool first_message = false;
 #if defined(HPX_HAVE_SECURITY)

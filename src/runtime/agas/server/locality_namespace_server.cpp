@@ -279,14 +279,14 @@ response locality_namespace::allocate(
     using boost::fusion::at_c;
 
     // parameters
-    naming::locality ep = req.get_locality();
+    parcelset::endpoints_type endpoints = req.get_endpoints();
     boost::uint64_t const count = req.get_count();
     boost::uint32_t const num_threads = req.get_num_threads();
     naming::gid_type const suggested_prefix = req.get_suggested_prefix();
 
     mutex_type::scoped_lock l(mutex_);
 
-    partition_table_type::iterator it = partitions_.find(ep)
+    partition_table_type::iterator it = partitions_.find(endpoints)
                                  , end = partitions_.end();
 
     // If the endpoint is in the table, then this is a resize.
@@ -299,7 +299,7 @@ response locality_namespace::allocate(
             LAGAS_(info) << (boost::format(
                 "locality_namespace::allocate, ep(%1%), count(%2%), "
                 "prefix(%3%), response(repeated_request)")
-                % ep
+                % endpoints
                 % count
                 % at_c<0>(it->second));
 
@@ -373,7 +373,7 @@ response locality_namespace::allocate(
         partition_table_type::iterator pit;
 
         if (HPX_UNLIKELY(!util::insert_checked(partitions_.insert(
-                std::make_pair(ep, partition_type(prefix, num_threads))), pit)))
+                std::make_pair(endpoints, partition_type(prefix, num_threads))), pit)))
         {
             // If this branch is taken, then the partition table was updated
             // at some point after we first checked it, which would indicate
@@ -385,7 +385,7 @@ response locality_namespace::allocate(
               , boost::str(boost::format(
                     "partition table insertion failed due to a locking "
                     "error or memory corruption, endpoint(%1%), "
-                    "prefix(%2%)") % ep % prefix));
+                    "prefix(%2%)") % endpoints % prefix));
             return response();
         }
 
@@ -401,7 +401,7 @@ response locality_namespace::allocate(
               , "locality_namespace::allocate"
               , boost::str(boost::format(
                     "reverse partition table insertion failed, prefix(%1%), "
-                    "endpoint(%2%)") % prefix % ep));
+                    "endpoint(%2%)") % prefix % endpoints));
             return response();
         }
 
@@ -410,9 +410,9 @@ response locality_namespace::allocate(
         // table so that parcels can be sent to the memory of a locality.
         if (primary_)
         {
-            const gva g(ep, components::component_runtime_support, count);
-
             naming::gid_type id(naming::get_gid_from_locality_id(prefix));
+            const gva g(id, components::component_runtime_support, count);
+
             request req(primary_ns_bind_gid, id, g, prefix);
             response resp = primary_->service(req, ec);
             if (ec) return resp;
@@ -421,7 +421,7 @@ response locality_namespace::allocate(
         LAGAS_(info) << (boost::format(
             "locality_namespace::allocate, ep(%1%), count(%2%), "
             "prefix(%3%)")
-            % ep % count % prefix);
+            % endpoints % count % prefix);
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -439,11 +439,11 @@ response locality_namespace::resolve_locality(
     using boost::fusion::at_c;
 
     // parameters
-    naming::locality ep = req.get_locality();
+    parcelset::endpoints_type endpoints = req.get_endpoints();
 
     mutex_type::scoped_lock l(mutex_);
 
-    partition_table_type::iterator pit = partitions_.find(ep)
+    partition_table_type::iterator pit = partitions_.find(endpoints)
                                  , pend = partitions_.end();
 
     if (pit != pend)
@@ -451,8 +451,8 @@ response locality_namespace::resolve_locality(
         boost::uint32_t const prefix = at_c<0>(pit->second);
 
         LAGAS_(info) << (boost::format(
-            "locality_namespace::resolve_locality, ep(%1%), prefix(%2%)")
-            % ep % prefix);
+            "locality_namespace::resolve_locality, endpoints(%1%), prefix(%2%)")
+            % endpoints % prefix);
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -461,8 +461,8 @@ response locality_namespace::resolve_locality(
     }
 
     LAGAS_(info) << (boost::format(
-        "locality_namespace::resolve_locality, ep(%1%), response(no_success)")
-        % ep);
+        "locality_namespace::resolve_locality, endpoints(%1%), response(no_success)")
+        % endpoints);
 
     if (&ec != &throws)
         ec = make_success_code();
@@ -479,11 +479,11 @@ response locality_namespace::free(
     using boost::fusion::at_c;
 
     // parameters
-    naming::locality ep = req.get_locality();
+    parcelset::endpoints_type endpoints = req.get_endpoints();
 
     mutex_type::scoped_lock l(mutex_);
 
-    partition_table_type::iterator pit = partitions_.find(ep)
+    partition_table_type::iterator pit = partitions_.find(endpoints)
                                  , pend = partitions_.end();
 
     if (pit != pend)
@@ -505,9 +505,11 @@ response locality_namespace::free(
             if (ec) return resp;
         }
 
+        /*
         LAGAS_(info) << (boost::format(
             "locality_namespace::free, ep(%1%)")
             % ep);
+        */
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -515,10 +517,12 @@ response locality_namespace::free(
         return response(locality_ns_free);
     }
 
+    /*
     LAGAS_(info) << (boost::format(
         "locality_namespace::free, ep(%1%), "
         "response(no_success)")
         % ep);
+    */
 
     if (&ec != &throws)
         ec = make_success_code();
@@ -563,13 +567,20 @@ response locality_namespace::resolved_localities(
 
     mutex_type::scoped_lock l(mutex_);
 
-    std::vector<naming::locality> localities;
+    std::map<naming::gid_type, parcelset::endpoints_type> localities;
 
     partition_table_type::const_iterator it = partitions_.begin()
                                        , end = partitions_.end();
 
     for (; it != end; ++it)
-        localities.push_back((*it).first);
+    {
+        localities.insert(
+            std::make_pair(
+                naming::get_gid_from_locality_id(at_c<0>(it->second))
+              , it->first
+            )
+        );
+    }
 
     LAGAS_(info) << (boost::format(
         "locality_namespace::resolved_localities, localities(%1%)")

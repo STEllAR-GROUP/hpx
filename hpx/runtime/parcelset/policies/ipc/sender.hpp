@@ -7,10 +7,11 @@
 #ifndef HPX_PARCELSET_POLICIES_IPC_SENDER_HPP
 #define HPX_PARCELSET_POLICIES_IPC_SENDER_HPP
 
-#include <hpx/runtime/naming/locality.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/runtime/parcelset/policies/ipc/data_window.hpp>
 #include <hpx/runtime/parcelset/policies/ipc/data_buffer_cache.hpp>
+#include <hpx/runtime/parcelset/policies/ipc/locality.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
@@ -25,15 +26,15 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
     public:
         /// Construct a sending parcelport_connection with the given io_service.
         sender(boost::asio::io_service& io_service,
-            naming::locality const& here, naming::locality const& there,
+            parcelset::locality const& here, parcelset::locality const& there,
             data_buffer_cache& cache,
             performance_counters::parcels::gatherer& parcels_sent,
             std::size_t connection_count)
           : window_(io_service), there_(there), parcels_sent_(parcels_sent),
             cache_(cache)
         {
-            std::string fullname(here.get_address() + "." +
-                boost::lexical_cast<std::string>(here.get_port()) + "." +
+            std::string fullname(here.get<locality>().address() + "." +
+                boost::lexical_cast<std::string>(here.get<locality>().port()) + "." +
                 boost::lexical_cast<std::string>(connection_count));
 
             window_.set_option(data_window::bound_to(fullname));
@@ -50,7 +51,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         /// Get the window associated with the sender.
         data_window& window() { return window_; }
 
-        void verify(naming::locality const & parcel_locality_id)
+        void verify(parcelset::locality const & parcel_locality_id)
         {
             HPX_ASSERT(parcel_locality_id == there_);
         }
@@ -98,7 +99,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
                     boost::make_tuple(handler, parcel_postprocess)));
         }
 
-        naming::locality const& destination() const
+        parcelset::locality const& destination() const
         {
             return there_;
         }
@@ -167,7 +168,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         data_window window_;
 
         /// the other (receiving) end of this connection
-        naming::locality there_;
+        parcelset::locality there_;
 
         /// Counters and their data containers.
         util::high_resolution_timer timer_;

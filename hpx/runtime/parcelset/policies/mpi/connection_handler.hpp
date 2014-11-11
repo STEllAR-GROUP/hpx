@@ -9,9 +9,9 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-#include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 #include <hpx/runtime/parcelset/policies/mpi/acceptor.hpp>
+#include <hpx/runtime/parcelset/policies/mpi/locality.hpp>
 
 namespace hpx { namespace parcelset {
     namespace policies { namespace mpi
@@ -47,6 +47,8 @@ namespace hpx { namespace parcelset {
 
     namespace policies { namespace mpi
     {
+        parcelset::locality parcelport_address(util::runtime_configuration const & ini);
+
         class HPX_EXPORT connection_handler
           : public parcelport_impl<connection_handler>
         {
@@ -79,12 +81,15 @@ namespace hpx { namespace parcelset {
             std::string get_locality_name() const;
 
             boost::shared_ptr<sender> create_connection(
-                naming::locality const& l, error_code& ec);
+                parcelset::locality const& l, error_code& ec);
 
             void enable_parcel_handling(bool new_state);
 
             void add_sender(boost::shared_ptr<sender> const& sender_connection);
             void close_sender_connection(int tag, int rank);
+
+            parcelset::locality agas_locality(util::runtime_configuration const & ini) const;
+            parcelset::locality create_locality() const;
 
         private:
             int get_next_tag();
@@ -93,7 +98,7 @@ namespace hpx { namespace parcelset {
             MPI_Comm communicator_;
             // handle messages
             acceptor acceptor_;
-            
+
             hpx::lcos::local::spinlock close_mtx_;
             std::vector<std::pair<int, int> > pending_close_requests_;
 

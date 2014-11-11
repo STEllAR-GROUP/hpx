@@ -9,16 +9,19 @@
 #if defined(HPX_PARCELPORT_IBVERBS)
 
 #include <hpx/exception_list.hpp>
-#include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/parcelset/policies/ibverbs/connection_handler.hpp>
 #include <hpx/runtime/parcelset/policies/ibverbs/acceptor.hpp>
 #include <hpx/runtime/parcelset/policies/ibverbs/sender.hpp>
 #include <hpx/runtime/parcelset/policies/ibverbs/receiver.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/asio_util.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/assign/std/vector.hpp>
+#include <boost/io/ios_state.hpp>
+#include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/ip/host_name.hpp>
 #include <boost/shared_ptr.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -29,6 +32,29 @@ namespace hpx
 
 namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 {
+    parcelset::locality parcelport_address(util::runtime_configuration const & ini)
+    {
+        // load all components as described in the configuration information
+        std::string ibverbs_address = ini.get_ibverbs_address();
+        if (ini.has_section("hpx.parcel")) {
+            util::section const* sec = ini.get_section("hpx.parcel");
+            if (NULL != sec) {
+                return parcelset::locality(
+                    locality(
+                        ibverbs_address
+                      , hpx::util::get_entry_as<boost::uint16_t>(*sec, "port", HPX_INITIAL_IP_PORT)
+                    )
+                );
+            }
+        }
+        return
+            parcelset::locality(
+                locality(
+                    ibverbs_address
+                  , HPX_INITIAL_IP_PORT
+                )
+            );
+    }
     std::vector<std::string> connection_handler::runtime_configuration()
     {
         std::vector<std::string> lines;
@@ -63,13 +89,19 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
     connection_handler::connection_handler(util::runtime_configuration const& ini,
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
             HPX_STD_FUNCTION<void()> const& on_stop_thread)
-      : base_type(ini, on_start_thread, on_stop_thread)
+      : base_type(ini, parcelport_address(ini), on_start_thread, on_stop_thread)
       , memory_pool_(memory_chunk_size(ini), max_memory_chunks(ini))
       , stopped_(false)
       , handling_messages_(false)
       , handling_accepts_(false)
       , use_io_pool_(true)
     {
+        if (here_.get_type() != connection_ibverbs) {
+            HPX_THROW_EXCEPTION(network_error, "ibverbs::parcelport::parcelport",
+                "this parcelport was instantiated to represent an unexpected "
+                "locality type: " + get_connection_type_name(here_.get_type()));
+        }
+
         // we never do zero copy optimization for this parcelport
         allow_zero_copy_optimizations_ = false;
 
@@ -110,9 +142,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         // initialize network
         std::size_t tried = 0;
         exception_list errors;
-        naming::locality::iterator_type end = accept_end(here_);
-        for (naming::locality::iterator_type it =
-                accept_begin(here_, io_service_pool_.get_io_service(0), true);
+        util::endpoint_iterator_type end = util::accept_end();
+        for (util::endpoint_iterator_type it =
+                util::accept_begin(here_.get<locality>(), io_service_pool_.get_io_service(0));
              it != end; ++it, ++tried)
         {
             try {
@@ -205,7 +237,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
     }
 
     boost::shared_ptr<sender> connection_handler::create_connection(
-        naming::locality const& l, error_code& ec)
+        parcelset::locality const& l, error_code& ec)
     {
         boost::asio::io_service& io_service = io_service_pool_.get_io_service(0);
         boost::shared_ptr<sender> sender_connection(new sender(*this, memory_pool_, l, parcels_sent_));
@@ -215,9 +247,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         for (std::size_t i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
         {
             try {
-                naming::locality::iterator_type end = connect_end(l);
-                for (naming::locality::iterator_type it =
-                        connect_begin(l, io_service, true);
+                util::endpoint_iterator_type end = util::connect_end();
+                for (util::endpoint_iterator_type it =
+                        util::connect_begin(l.get<locality>(), io_service);
                       it != end; ++it)
                 {
                     boost::asio::ip::tcp::endpoint const& ep = *it;
@@ -270,6 +302,18 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
             ec = make_success_code();
 
         return sender_connection;
+    }
+
+    parcelset::locality connection_handler::agas_locality(util::runtime_configuration const & ini) const
+    {
+        // ibverbs can't be used for bootstrapping
+        HPX_ASSERT(false);
+        return parcelset::locality();
+    }
+
+    parcelset::locality connection_handler::create_locality() const
+    {
+        return parcelset::locality(locality());
     }
 
     void connection_handler::add_sender(
@@ -452,7 +496,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
     bool connection_handler::do_receives()
     {
         hpx::util::high_resolution_timer t;
-        hpx::lcos::local::spinlock::scoped_try_lock l(receivers_mtx_);
+        hpx::lcos::local::spinlock::scoped_lock l(receivers_mtx_);
 
         for(
             receivers_type::iterator it = receivers_.begin();

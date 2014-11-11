@@ -86,7 +86,7 @@ public:
 
         if (!gid_)
         {
-            naming::address addr(applier::get_applier().here(),
+            naming::address addr(get_locality(),
                 components::get_component_type<wrapped_type>(),
                 std::size_t(static_cast<this_component_type const*>(this)));
 

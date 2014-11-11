@@ -78,8 +78,7 @@ namespace hpx { namespace components
         {
             if (!gid_)
             {
-                applier::applier& appl = hpx::applier::get_applier();
-                naming::address addr(appl.here(),
+                naming::address addr(get_locality(),
                     components::get_component_type<wrapped_type>(),
                     boost::uint64_t(static_cast<this_component_type const*>(this)));
 
@@ -100,6 +99,7 @@ namespace hpx { namespace components
                 }
                 else
                 {
+                    applier::applier& appl = hpx::applier::get_applier();
                     gid_ = assign_gid;
                     naming::detail::strip_credits_from_gid(gid_);
 

@@ -790,9 +790,9 @@ namespace hpx
         return rt ? *rt : NULL;
     }
 
-    naming::locality const& get_locality()
+    naming::gid_type const & get_locality()
     {
-        return get_runtime().here();
+        return get_runtime().get_parcel_handler().get_locality();
     }
 
     void report_error(std::size_t num_thread, boost::exception_ptr const& e)
