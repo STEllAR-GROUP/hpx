@@ -9,6 +9,9 @@
 #if defined(DOXYGEN)
 namespace hpx
 {
+    ///////////////////////////////////////////////////////////////////////////
+    /// Result type for \a when_some, contains a sequence of futures and
+    /// indices pointing to ready futures.
     template <typename Sequence>
     struct when_some_result
     {
@@ -37,11 +40,14 @@ namespace hpx
     /// \note The future returned by the function \a when_some becomes ready
     ///       when at least \a n argument futures have become ready.
     ///
-    /// \return   Returns a future holding the same list of futures as has
-    ///           been passed to when_some.
-    ///           - future<vector<future<R>>>: If the input cardinality is
-    ///             unknown at compile time and the futures are all of the
-    ///             same type.
+    /// \return   Returns a when_some_result holding the same list of futures
+    ///           as has been passed to when_some and indices pointing to
+    ///           ready futures.
+    ///           - future<when_some_result<vector<future<R>>>>: If the input
+    ///             cardinality is unknown at compile time and the futures
+    ///             are all of the same type. The order of the futures in the
+    ///             output vector will be the same as given by the input
+    ///             iterator.
     ///
     /// \note Calling this version of \a when_some where first == last, returns
     ///       a future with an empty vector that is immediately ready.
@@ -73,11 +79,14 @@ namespace hpx
     /// \note The future returned by the function \a when_some becomes ready
     ///       when at least \a n argument futures have become ready.
     ///
-    /// \return   Returns a future holding the same list of futures as has
-    ///           been passed to when_some.
-    ///           - future<vector<future<R>>>: If the input cardinality is
-    ///             unknown at compile time and the futures are all of the
-    ///             same type.
+    /// \return   Returns a when_some_result holding the same list of futures
+    ///           as has been passed to when_some and indices pointing to
+    ///           ready futures.
+    ///           - future<when_some_result<vector<future<R>>>>: If the input
+    ///             cardinality is unknown at compile time and the futures
+    ///             are all of the same type. The order of the futures in the
+    ///             output vector will be the same as given by the input
+    ///             iterator.
     ///
     /// \note Each future and shared_future is waited upon and then copied into
     ///       the collection of the output (returned) future, maintaining the
@@ -107,11 +116,16 @@ namespace hpx
     /// \note The future returned by the function \a when_some becomes ready
     ///       when at least \a n argument futures have become ready.
     ///
-    /// \return   Returns a future holding the same list of futures as has
-    ///           been passed to when_some.
-    ///           - future<tuple<future<R0>, future<R1>, future<R2>...>>: If
-    ///             inputs are fixed in number and are of heterogeneous types.
-    ///             The inputs can be any arbitrary number of future objects.
+    /// \return   Returns a when_some_result holding the same list of futures
+    ///           as has been passed to when_some and an index pointing to a
+    ///           ready future..
+    ///           - future<when_some_result<tuple<future<T0>, future<T1>...>>>:
+    ///             If inputs are fixed in number and are of heterogeneous
+    ///             types. The inputs can be any arbitrary number of future
+    ///             objects.
+    ///           - future<when_some_result<tuple<>>> if \a when_some is
+    ///             called with zero arguments.
+    ///             The returned future will be initially ready.
     ///
     /// \note Each future and shared_future is waited upon and then copied into
     ///       the collection of the output (returned) future, maintaining the
@@ -142,11 +156,14 @@ namespace hpx
     /// \note The future returned by the function \a when_some_n becomes ready
     ///       when at least \a n argument futures have become ready.
     ///
-    /// \return   Returns a future holding the same list of futures as has
-    ///           been passed to when_some_n.
-    ///           - future<vector<future<R>>>: If the input cardinality is
-    ///             unknown at compile time and the futures are all of the
-    ///             same type.
+    /// \return   Returns a when_some_result holding the same list of futures
+    ///           as has been passed to when_some and indices pointing to
+    ///           ready futures.
+    ///           - future<when_some_result<vector<future<R>>>>: If the input
+    ///             cardinality is unknown at compile time and the futures
+    ///             are all of the same type. The order of the futures in the
+    ///             output vector will be the same as given by the input
+    ///             iterator.
     ///
     /// \note Calling this version of \a when_some_n where count == 0, returns
     ///       a future with the same elements as the arguments that is
@@ -375,7 +392,7 @@ namespace hpx { namespace lcos
 
                 return std::move(lazy_values_);
             }
-            
+
             mutable mutex_type mtx_;
             result_type lazy_values_;
             boost::atomic<std::size_t> count_;

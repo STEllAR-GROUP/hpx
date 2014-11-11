@@ -9,6 +9,9 @@
 #if defined(DOXYGEN)
 namespace hpx
 {
+    ///////////////////////////////////////////////////////////////////////////
+    /// Result type for \a when_any, contains a sequence of futures and an 
+    /// index pointing to a ready future.
     template <typename Sequence>
     struct when_any_result
     {
@@ -31,12 +34,14 @@ namespace hpx
     ///                 this is pre-initialized to \a hpx#throws the function
     ///                 will throw on error instead.
     ///
-    /// \return   Returns a future holding the same list of futures as has
-    ///           been passed to when_any.
-    ///           - future<vector<future<R>>>: If the input cardinality is
-    ///             unknown at compile time and the futures are all of the
-    ///             same type. The order of the futures in the output vector
-    ///             will be the same as given by the input iterator.
+    /// \return   Returns a when_any_result holding the same list of futures
+    ///           as has been passed to when_any and an index pointing to a
+    ///           ready future.
+    ///           - future<when_any_result<vector<future<R>>>>: If the input
+    ///             cardinality is unknown at compile time and the futures
+    ///             are all of the same type. The order of the futures in the
+    ///             output vector will be the same as given by the input
+    ///             iterator.
     ///
     /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
     ///           function doesn't throw but returns the result code using the
@@ -59,11 +64,14 @@ namespace hpx
     ///                 this is pre-initialized to \a hpx#throws the function
     ///                 will throw on error instead.
     ///
-    /// \return   Returns a future holding the same list of futures as has
-    ///           been passed to when_any.
-    ///           - future<vector<future<R>>>: If the input cardinality is
-    ///             unknown at compile time and the futures are all of the
-    ///             same type.
+    /// \return   Returns a when_any_result holding the same list of futures
+    ///           as has been passed to when_any and an index pointing to a
+    ///           ready future.
+    ///           - future<when_any_result<vector<future<R>>>>: If the input
+    ///             cardinality is unknown at compile time and the futures
+    ///             are all of the same type. The order of the futures in the
+    ///             output vector will be the same as given by the input
+    ///             iterator.
     ///
     /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
     ///           function doesn't throw but returns the result code using the
@@ -86,12 +94,15 @@ namespace hpx
     ///                 this is pre-initialized to \a hpx#throws the function
     ///                 will throw on error instead.
     ///
-    /// \return   Returns a future holding the same list of futures as has
-    ///           been passed to when_any.
-    ///           - future<tuple<future<T0>, future<T1>, future<T2>...>>: If
-    ///             inputs are fixed in number and are of heterogeneous types.
-    ///             The inputs can be any arbitrary number of future objects.
-    ///           - future<tuple<>> if \a when_any is called with zero arguments.
+    /// \return   Returns a when_any_result holding the same list of futures
+    ///           as has been passed to when_any and an index pointing to a
+    ///           ready future..
+    ///           - future<when_any_result<tuple<future<T0>, future<T1>...>>>:
+    ///             If inputs are fixed in number and are of heterogeneous
+    ///             types. The inputs can be any arbitrary number of future
+    ///             objects.
+    ///           - future<when_any_result<tuple<>>> if \a when_any is called
+    ///             with zero arguments.
     ///             The returned future will be initially ready.
     ///
     /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
@@ -116,12 +127,14 @@ namespace hpx
     ///                 this is pre-initialized to \a hpx#throws the function
     ///                 will throw on error instead.
     ///
-    /// \return   Returns a future holding the same list of futures as has
-    ///           been passed to when_any_n.
-    ///           - future<vector<future<R>>>: If the input cardinality is
-    ///             unknown at compile time and the futures are all of the
-    ///             same type. The order of the futures in the output vector
-    ///             will be the same as given by the input iterator.
+    /// \return   Returns a when_any_result holding the same list of futures
+    ///           as has been passed to when_any and an index pointing to a
+    ///           ready future.
+    ///           - future<when_any_result<vector<future<R>>>>: If the input
+    ///             cardinality is unknown at compile time and the futures
+    ///             are all of the same type. The order of the futures in the
+    ///             output vector will be the same as given by the input
+    ///             iterator.
     ///
     /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
     ///           function doesn't throw but returns the result code using the
