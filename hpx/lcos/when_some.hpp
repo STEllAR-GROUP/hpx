@@ -9,6 +9,13 @@
 #if defined(DOXYGEN)
 namespace hpx
 {
+    template <typename Sequence>
+    struct when_some_result
+    {
+        std::vector<std::size_t> indices;
+        Sequence futures;
+    };
+
     /// The function \a when_some is an operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
     /// returns a new future object representing the same list of futures
@@ -44,7 +51,8 @@ namespace hpx
     ///       The future returned by \a when_some will not throw an exception,
     ///       but the futures held in the output collection may.
     template <typename InputIter>
-    future<vector<future<typename std::iterator_traits<InputIter>::value_type>>>
+    future<when_some_result<
+        vector<future<typename std::iterator_traits<InputIter>::value_type>>>>
     when_some(std::size_t n, Iterator first, Iterator last, error_code& ec = throws);
 
     /// The function \a when_some is an operator allowing to join on the result
@@ -77,7 +85,7 @@ namespace hpx
     ///       The future returned by \a when_some will not throw an exception,
     ///       but the futures held in the output collection may.
     template <typename R>
-    future<std::vector<future<R>>>
+    future<when_some_result<std::vector<future<R>>>>
     when_some(std::size_t n, std::vector<future<R>>&& futures,
         error_code& ec = throws);
 
@@ -111,7 +119,7 @@ namespace hpx
     ///       The future returned by \a when_some will not throw an exception,
     ///       but the futures held in the output collection may.
     template <typename ...T>
-    future<tuple<future<T>...>>
+    future<when_some_result<tuple<future<T>...>>>
     when_some(std::size_t n, T &&... futures, error_code& ec = throws);
 
     /// The function \a when_some_n is an operator allowing to join on the result
@@ -150,7 +158,8 @@ namespace hpx
     ///       The future returned by \a when_some_n will not throw an exception,
     ///       but the futures held in the output collection may.
     template <typename InputIter>
-    future<vector<future<typename std::iterator_traits<InputIter>::value_type>>>
+    future<when_some_result<
+        vector<future<typename std::iterator_traits<InputIter>::value_type>>>>
     when_some_n(std::size_t n, Iterator first, std::size_t count,
         error_code& ec = throws);
 }
@@ -192,6 +201,31 @@ namespace hpx
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
 {
+    template <typename Sequence>
+    struct when_some_result
+    {
+        when_some_result()
+          : indices()
+          , futures()
+        {}
+
+        explicit when_some_result(Sequence&& futures)
+          : indices()
+          , futures(std::move(futures))
+        {}
+
+        when_some_result(when_some_result const& rhs)
+          : indices(rhs.indices), futures(rhs.futures)
+        {}
+
+        when_some_result(when_some_result&& rhs)
+          : indices(std::move(rhs.indices)), futures(std::move(rhs.futures))
+        {}
+
+        std::vector<std::size_t> indices;
+        Sequence futures;
+    };
+
     namespace detail
     {
         template <typename Future>
@@ -222,34 +256,38 @@ namespace hpx { namespace lcos
         struct set_when_some_callback_impl
         {
             explicit set_when_some_callback_impl(when_some<Sequence>& when)
-              : when_(when)
+              : when_(when), idx_(0)
             {}
 
             template <typename Future>
             void operator()(Future& future) const
             {
                 std::size_t counter = when_.count_.load(boost::memory_order_seq_cst);
-                if (counter < when_.needed_count_ && !future.is_ready()) {
-                    // handle future only if not enough futures are ready yet
-                    // also, do not touch any futures which are already ready
+                if (counter < when_.needed_count_) {
+                    if (!future.is_ready()) {
+                        // handle future only if not enough futures are ready yet
+                        // also, do not touch any futures which are already ready
 
-                    typedef
-                        typename lcos::detail::shared_state_ptr_for<Future>::type
-                        shared_state_ptr;
+                        typedef
+                            typename lcos::detail::shared_state_ptr_for<Future>::type
+                            shared_state_ptr;
 
-                    shared_state_ptr const& shared_state =
-                        lcos::detail::get_shared_state(future);
+                        shared_state_ptr const& shared_state =
+                            lcos::detail::get_shared_state(future);
 
-                    shared_state->set_on_completed(util::bind(
-                        &when_some<Sequence>::on_future_ready, when_.shared_from_this(),
-                        threads::get_self_id()));
-                }
-                else {
-                    if (when_.count_.fetch_add(1) + 1 == when_.needed_count_)
-                    {
-                        when_.goal_reached_on_calling_thread_ = true;
+                        shared_state->set_on_completed(util::bind(
+                            &when_some<Sequence>::on_future_ready, when_.shared_from_this(),
+                            idx_, threads::get_self_id()));
+                    }
+                    else {
+                        when_.lazy_values_.indices.push_back(idx_);
+                        if (when_.count_.fetch_add(1) + 1 == when_.needed_count_)
+                        {
+                            when_.goal_reached_on_calling_thread_ = true;
+                        }
                     }
                 }
+                ++idx_;
             }
 
             template <typename Sequence_>
@@ -267,28 +305,37 @@ namespace hpx { namespace lcos
             }
 
             when_some<Sequence>& when_;
+            mutable std::size_t idx_;
         };
 
         template <typename Sequence>
         void set_on_completed_callback(when_some<Sequence>& when)
         {
             set_when_some_callback_impl<Sequence> callback(when);
-            callback.apply(when.lazy_values_);
+            callback.apply(when.lazy_values_.futures);
         }
 
         template <typename Sequence>
         struct when_some : boost::enable_shared_from_this<when_some<Sequence> > //-V690
         {
+            typedef lcos::local::spinlock mutex_type;
+
         public:
-            void on_future_ready(threads::thread_id_type const& id)
+            void on_future_ready(std::size_t idx, threads::thread_id_type const& id)
             {
                 if (count_.fetch_add(1) + 1 == needed_count_)
                 {
                     // reactivate waiting thread only if it's not us
-                    if (id != threads::get_self_id())
+                    if (id != threads::get_self_id()) {
+                        {
+                            typename mutex_type::scoped_lock l(this->mtx_);
+                            lazy_values_.indices.push_back(idx);
+                        }
                         threads::set_thread_state(id, threads::pending);
-                    else
+                    } else {
+                        lazy_values_.indices.push_back(idx);
                         goal_reached_on_calling_thread_ = true;
+                    }
                 }
             }
 
@@ -299,7 +346,7 @@ namespace hpx { namespace lcos
 
         public:
             typedef Sequence argument_type;
-            typedef Sequence result_type;
+            typedef when_some_result<Sequence> result_type;
 
             when_some(argument_type && lazy_values, std::size_t n)
               : lazy_values_(std::move(lazy_values))
@@ -328,7 +375,8 @@ namespace hpx { namespace lcos
 
                 return std::move(lazy_values_);
             }
-
+            
+            mutable mutex_type mtx_;
             result_type lazy_values_;
             boost::atomic<std::size_t> count_;
             std::size_t needed_count_;
@@ -338,7 +386,7 @@ namespace hpx { namespace lcos
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
-    lcos::future<std::vector<Future> >
+    lcos::future<when_some_result<std::vector<Future> > >
     when_some(std::size_t n,
         std::vector<Future>& lazy_values,
         error_code& ec = throws)
@@ -371,7 +419,7 @@ namespace hpx { namespace lcos
             boost::make_shared<detail::when_some<result_type> >(
                 std::move(lazy_values_), n);
 
-        lcos::local::futures_factory<result_type()> p(
+        lcos::local::futures_factory<when_some_result<result_type>()> p(
             util::bind(&detail::when_some<result_type>::operator(), f));
 
         p.apply();
@@ -379,7 +427,7 @@ namespace hpx { namespace lcos
     }
 
     template <typename Future>
-    lcos::future<std::vector<Future> > //-V659
+    lcos::future<when_some_result<std::vector<Future> > > //-V659
     when_some(std::size_t n,
         std::vector<Future> && lazy_values,
         error_code& ec = throws)
@@ -388,9 +436,9 @@ namespace hpx { namespace lcos
     }
 
     template <typename Iterator>
-    lcos::future<std::vector<
+    lcos::future<when_some_result<std::vector<
         typename lcos::detail::future_iterator_traits<Iterator>::type
-    > >
+    > > >
     when_some(std::size_t n, Iterator begin, Iterator end,
         error_code& ec = throws)
     {
@@ -407,9 +455,9 @@ namespace hpx { namespace lcos
     }
 
     template <typename Iterator>
-    lcos::future<std::vector<
+    lcos::future<when_some_result<std::vector<
         typename lcos::detail::future_iterator_traits<Iterator>::type
-    > >
+    > > >
     when_some_n(std::size_t n, Iterator begin, std::size_t count,
         error_code& ec = throws)
     {
@@ -428,7 +476,7 @@ namespace hpx { namespace lcos
         return lcos::when_some(n, lazy_values_, ec);
     }
 
-    inline lcos::future<HPX_STD_TUPLE<> >
+    inline lcos::future<when_some_result<HPX_STD_TUPLE<> > >
     when_some(std::size_t n, error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<> result_type;
@@ -437,13 +485,14 @@ namespace hpx { namespace lcos
 
         if (n == 0)
         {
-            return lcos::make_ready_future(std::move(lazy_values));
+            return lcos::make_ready_future(
+                when_some_result<result_type>(std::move(lazy_values)));
         }
 
         HPX_THROWS_IF(ec, hpx::bad_parameter,
             "hpx::lcos::when_some",
             "number of results to wait for is out of bounds");
-        return lcos::make_ready_future(result_type());
+        return lcos::make_ready_future(when_some_result<result_type>());
     }
 }}
 
@@ -468,6 +517,7 @@ namespace hpx { namespace lcos
 
 namespace hpx
 {
+    using lcos::when_some_result;
     using lcos::when_some;
     using lcos::when_some_n;
 }
@@ -490,7 +540,8 @@ namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
     template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-    lcos::future<HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_SOME_DECAY_FUTURE, _)> >
+    lcos::future<when_some_result<
+        HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_SOME_DECAY_FUTURE, _)> > >
     when_some(std::size_t n, HPX_ENUM_FWD_ARGS(N, T, f),
         error_code& ec = throws)
     {
@@ -502,7 +553,8 @@ namespace hpx { namespace lcos
 
         if (n == 0)
         {
-            return lcos::make_ready_future(std::move(lazy_values));
+            return lcos::make_ready_future(
+                when_some_result<result_type>(std::move(lazy_values)));
         }
 
         if (n > N)
@@ -510,14 +562,14 @@ namespace hpx { namespace lcos
             HPX_THROWS_IF(ec, hpx::bad_parameter,
                 "hpx::lcos::when_some",
                 "number of results to wait for is out of bounds");
-            return lcos::make_ready_future(result_type());
+            return lcos::make_ready_future(when_some_result<result_type>());
         }
 
         boost::shared_ptr<detail::when_some<result_type> > f =
             boost::make_shared<detail::when_some<result_type> >(
                 std::move(lazy_values), n);
 
-        lcos::local::futures_factory<result_type()> p(
+        lcos::local::futures_factory<when_some_result<result_type>()> p(
             util::bind(&detail::when_some<result_type>::operator(), f));
 
         p.apply();

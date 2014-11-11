@@ -1469,26 +1469,28 @@ void test_wait_for_two_out_of_five_futures()
     hpx::lcos::local::packaged_task<int()> pt5(make_int_slowly);
     hpx::lcos::shared_future<int> f5 = pt5.get_future();
 
-    typedef HPX_STD_TUPLE<
+    typedef hpx::when_some_result<HPX_STD_TUPLE<
         hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
-      , hpx::lcos::shared_future<int> > result_type;
+      , hpx::lcos::shared_future<int> > > result_type;
     hpx::lcos::future<result_type> r = hpx::when_some(count, f1, f2, f3, f4, f5);
 
     result_type result = r.get();
 
-    HPX_TEST(!HPX_STD_GET(0, result).is_ready());
-    HPX_TEST(HPX_STD_GET(1, result).is_ready());
-    HPX_TEST(!HPX_STD_GET(2, result).is_ready());
-    HPX_TEST(HPX_STD_GET(3, result).is_ready());
-    HPX_TEST(!HPX_STD_GET(4, result).is_ready());
     HPX_TEST(!f1.is_ready());
     HPX_TEST(f2.is_ready());
     HPX_TEST(!f3.is_ready());
     HPX_TEST(f4.is_ready());
     HPX_TEST(!f5.is_ready());
+
+    HPX_TEST_EQ(result.indices.size(), count);
+    HPX_TEST(!HPX_STD_GET(0, result.futures).is_ready());
+    HPX_TEST(HPX_STD_GET(1, result.futures).is_ready());
+    HPX_TEST(!HPX_STD_GET(2, result.futures).is_ready());
+    HPX_TEST(HPX_STD_GET(3, result.futures).is_ready());
+    HPX_TEST(!HPX_STD_GET(4, result.futures).is_ready());
 }
 
 void test_wait_for_three_out_of_five_futures()
@@ -1509,12 +1511,12 @@ void test_wait_for_three_out_of_five_futures()
     hpx::lcos::shared_future<int> f5 = pt5.get_future();
     pt5();
 
-    typedef HPX_STD_TUPLE<
+    typedef hpx::when_some_result<HPX_STD_TUPLE<
         hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
-      , hpx::lcos::shared_future<int> > result_type;
+      , hpx::lcos::shared_future<int> > > result_type;
     hpx::lcos::future<result_type> r = hpx::when_some(count, f1, f2, f3, f4, f5);
 
     result_type result = r.get();
@@ -1525,11 +1527,12 @@ void test_wait_for_three_out_of_five_futures()
     HPX_TEST(!f4.is_ready());
     HPX_TEST(f5.is_ready());
 
-    HPX_TEST(HPX_STD_GET(0, result).is_ready());
-    HPX_TEST(!HPX_STD_GET(1, result).is_ready());
-    HPX_TEST(HPX_STD_GET(2, result).is_ready());
-    HPX_TEST(!HPX_STD_GET(3, result).is_ready());
-    HPX_TEST(HPX_STD_GET(4, result).is_ready());
+    HPX_TEST_EQ(result.indices.size(), count);
+    HPX_TEST(HPX_STD_GET(0, result.futures).is_ready());
+    HPX_TEST(!HPX_STD_GET(1, result.futures).is_ready());
+    HPX_TEST(HPX_STD_GET(2, result.futures).is_ready());
+    HPX_TEST(!HPX_STD_GET(3, result.futures).is_ready());
+    HPX_TEST(HPX_STD_GET(4, result.futures).is_ready());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
