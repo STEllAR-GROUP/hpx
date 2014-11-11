@@ -8,32 +8,48 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
+#include <hpx/include/iostreams.hpp>
 
+using hpx::components::stub_base;
 using hpx::components::client_base;
-using hpx::components::simple_component;
-using hpx::components::simple_component_base;
-using hpx::components::new_;
+using hpx::components::managed_component;
+using hpx::components::managed_component_base;
 
 using hpx::find_here;
+using hpx::async;
 
-struct hello_world_server : simple_component_base<hello_world_server>
+using hpx::cout;
+using hpx::flush;
+
+struct hello_world_server : managed_component_base<hello_world_server>
 {
+    void print() const { cout << "hello world\n" << flush; }
+
+    HPX_DEFINE_COMPONENT_CONST_ACTION(hello_world_server, print, print_action);
 };
 
-typedef simple_component<hello_world_server> server_type;
+typedef managed_component<hello_world_server> server_type;
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server_type, hello_world_server);
+
+typedef hello_world_server::print_action print_action;
+HPX_REGISTER_ACTION_DECLARATION(print_action);
+HPX_REGISTER_ACTION(print_action);
 
 struct hello_world : client_base<hello_world, hello_world_server>
 {
     typedef client_base<hello_world, hello_world_server> base_type;
 
     hello_world(hpx::future<hpx::id_type> && id) : base_type(std::move(id)) {}
+
+    void print() { async<print_action>(this->get_gid()).get(); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    hello_world hw = new_<hello_world_server>(find_here());
+    hello_world hw = hello_world::create(find_here());
+
+    hw.print();
 
     return 0;
 }
