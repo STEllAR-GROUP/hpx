@@ -29,7 +29,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 {
     class connection_handler;
 
-    ibv_mr register_buffer(connection_handler & handler,
+    ibverbs_mr register_buffer(connection_handler & handler,
         ibv_pd * pd, char * buffer, std::size_t size, int access);
 
     class receiver
@@ -42,7 +42,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         typedef bool(receiver::*next_function_type)(boost::system::error_code &);
     public:
         /// Construct a listening parcelport_connection with the given io_service.
-        receiver(connection_handler& parcelport, memory_pool & pool)
+        receiver(connection_handler& parcelport, util::memory_chunk_pool & pool)
           : context_(), parcelport_(parcelport), memory_pool_(pool)
         {
         }
@@ -106,6 +106,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
                     // decode the received parcels.
                     decode_parcels(pp, *this, buffer_);
+                    mr_.reset();
                     return true;
                 }
             }
@@ -132,9 +133,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                       , &buffer_->data_[0]
                       , buffer_->data_.size()
                       , IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE);
+                    adapted_mr_ = *mr_.mr_;
+                    adapted_mr_.addr = &buffer_->data_[0];
+                    adapted_mr_.length = buffer_->data_.size();
 
                     // write the newly received mr ...
-                    context_.connection().send_mr(&mr_, ec);
+                    context_.connection().send_mr(&adapted_mr_, ec);
                     return next(&receiver::sent_mr);
                 }
             }
@@ -190,8 +194,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         /// The handler used to process the incoming request.
         connection_handler& parcelport_;
 
-        memory_pool & memory_pool_;
-        ibv_mr mr_;
+        util::memory_chunk_pool & memory_pool_;
+        ibverbs_mr mr_;
+        ibv_mr adapted_mr_;
 
         /// Counters and timers for parcels received.
         util::high_resolution_timer timer_;

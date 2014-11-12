@@ -91,6 +91,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
             HPX_STD_FUNCTION<void()> const& on_stop_thread)
       : base_type(ini, parcelport_address(ini), on_start_thread, on_stop_thread)
       , memory_pool_(memory_chunk_size(ini), max_memory_chunks(ini))
+      , mr_cache_size_(max_memory_chunks(ini) * 4) // <-- FIXME: Find better value here
       , stopped_(false)
       , handling_messages_(false)
       , handling_accepts_(false)
@@ -166,9 +167,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 "ibverbs::connection_handler::run", errors.get_message());
             return false;
         }
-        time_send = 0;
-        time_recv = 0;
-        time_acct = 0;
 
         handling_accepts_ = true;
         boost::asio::io_service& io_service = io_service_pool_.get_io_service(1);
@@ -195,10 +193,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
             hpx::lcos::local::spinlock::yield(k);
             ++k;
         }
-
-        std::cout << "Time for accepting: " << time_acct << "\n";
-        std::cout << "Time for sending: " << time_send << "\n";
-        std::cout << "Time for receiving: " << time_recv << "\n";
 
         // cancel all pending accept operations
         boost::system::error_code ec;
@@ -348,69 +342,44 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 );
                 return 0;
             }
-            memory_pool_.register_chunk(pd);
             pd_map_.insert(std::make_pair(context, pd));
-            mr_map_.insert(std::make_pair(pd, mr_cache_type()));
+            mr_map_.insert(std::make_pair(pd, mr_cache_type(mr_cache_size_)));
             return pd;
         }
         return it->second;
 
     }
 
-    ibv_mr register_buffer(connection_handler & conn, ibv_pd * pd, char * buffer, std::size_t size, int access)
+    ibverbs_mr register_buffer(connection_handler & conn, ibv_pd * pd, char * buffer, std::size_t size, int access)
     {
         return conn.register_buffer(pd, buffer, size, access);
     }
 
-    ibv_mr connection_handler::register_buffer(ibv_pd * pd, char * buffer, std::size_t size, int access)
+    ibverbs_mr connection_handler::register_buffer(ibv_pd * pd, char * buffer, std::size_t size, int access)
     {
-        ibv_mr result = memory_pool_.get_mr(pd, buffer, size);
-        if(result.addr == 0)
+
+        chunk_pair chunk = memory_pool_.get_chunk_address(buffer, size);
+        hpx::lcos::local::spinlock::scoped_lock l(mr_map_mtx_);
+        typedef mr_map_type::iterator pd_iterator;
+        pd_iterator it = mr_map_.find(pd);
+        HPX_ASSERT(it != mr_map_.end());
+
+        mr_cache_type & mr_cache = it->second;
+        ibverbs_mr result;
+        if(mr_cache.get_entry(chunk, result))
         {
-            hpx::lcos::local::spinlock::scoped_lock l(mr_map_mtx_);
-            typedef mr_map_type::iterator iterator;
-            iterator it = mr_map_.find(pd);
-            HPX_ASSERT(it != mr_map_.end());
-
-            typedef mr_cache_type::iterator jterator;
-            jterator jt = it->second.find(buffer);
-            if(jt == it->second.end())
-            {
-                ibverbs_mr mr
-                    = ibverbs_mr(
-                        pd
-                      , buffer
-                      , size
-                      , access
-                    );
-                it->second.insert(std::make_pair(buffer, mr));
-                return *mr.mr_;
-            }
-            return *jt->second.mr_;
+            return result;
         }
-        return result;
-    }
+        // register new one
+        result =
+            ibverbs_mr(
+                pd
+              , chunk.first
+              , chunk.second
+              , access
+            );
+        mr_cache.insert(chunk, result);
 
-    ibv_mr get_mr(connection_handler & conn, ibv_pd * pd, char * buffer, std::size_t size)
-    {
-        return conn.get_mr(pd, buffer, size);
-    }
-
-    ibv_mr connection_handler::get_mr(ibv_pd * pd, char * buffer, std::size_t size)
-    {
-        ibv_mr result = memory_pool_.get_mr(pd, buffer, size);
-        if(result.addr == 0)
-        {
-            hpx::lcos::local::spinlock::scoped_lock l(mr_map_mtx_);
-            typedef mr_map_type::iterator iterator;
-            iterator it = mr_map_.find(pd);
-            HPX_ASSERT(it != mr_map_.end());
-
-            typedef mr_cache_type::iterator jterator;
-            jterator jt = it->second.find(buffer);
-            HPX_ASSERT(jt != it->second.end());
-            return *jt->second.mr_;
-        }
         return result;
     }
 
@@ -489,7 +458,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 ++it;
             }
         }
-        time_send += t.elapsed();
         return !senders_.empty();
     }
 
@@ -520,7 +488,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 }
                 ++it;
         }
-        time_recv += t.elapsed();
         return !receivers_.empty();
     }
 
@@ -540,7 +507,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                     receivers_.push_back(rcv);
                 }
             }
-            time_acct += t.elapsed();
 
             hpx::lcos::local::spinlock::yield(k);
         }

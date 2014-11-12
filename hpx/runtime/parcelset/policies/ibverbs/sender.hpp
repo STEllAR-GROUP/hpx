@@ -24,7 +24,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
     void add_sender(connection_handler & handler,
         boost::shared_ptr<sender> const& sender_connection);
 
-    ibv_mr register_buffer(connection_handler & handler,
+    ibverbs_mr register_buffer(connection_handler & handler,
         ibv_pd * pd, char * buffer, std::size_t size, int access);
 
     class sender
@@ -48,7 +48,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
             >
             postprocess_function_type;
 
-        sender(connection_handler & handler, memory_pool & pool, parcelset::locality const& there,
+        sender(connection_handler & handler, util::memory_chunk_pool & pool, parcelset::locality const& there,
             performance_counters::parcels::gatherer& parcels_sent)
           : context_(), parcelport_(handler), there_(there), parcels_sent_(parcels_sent), memory_pool_(pool)
         {
@@ -125,6 +125,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                     postprocess_function_type pp;
                     std::swap(pp, postprocess_);
                     pp(ec, there_, shared_from_this());
+                    mr_.reset();
                     return true;
                 }
             }
@@ -150,7 +151,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                   , context_.pd_
                   , &buffer_->data_[0]
                   , buffer_->data_.size()
-                  , IBV_ACCESS_LOCAL_WRITE);
+                  , IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE);
+
+                adapted_mr_ = *mr_.mr_;
+                adapted_mr_.addr = &buffer_->data_[0];
+                adapted_mr_.length = buffer_->data_.size();
+
                 return next(&sender::sent_size);
             }
         }
@@ -190,7 +196,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         {
             context_.connection().write_remote(
                 &buffer_->data_[0]
-              , &mr_
+              , &adapted_mr_
               , buffer_->data_.size()
               , boost::system::throws
             );
@@ -243,8 +249,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         util::high_resolution_timer timer_;
         performance_counters::parcels::gatherer& parcels_sent_;
 
-        memory_pool & memory_pool_;
-        ibv_mr mr_;
+        util::memory_chunk_pool & memory_pool_;
+        ibverbs_mr mr_;
+        ibv_mr adapted_mr_;
     };
 }}}}
 
