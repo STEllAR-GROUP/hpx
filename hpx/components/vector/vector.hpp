@@ -20,13 +20,12 @@
 #include <hpx/include/util.hpp>
 #include <hpx/include/components.hpp>
 
-#include <hpx/components/vector/segmented_iterator.hpp>
+#include <hpx/components/vector/vector_segmented_iterator.hpp>
 #include <hpx/components/vector/partition_vector_component.hpp>
 #include <hpx/components/vector/vector_configuration.hpp>
 #include <hpx/components/vector/distribution_policy.hpp>
 
 #include <cstdint>
-#include <iostream>
 #include <memory>
 #include <iterator>
 #include <algorithm>

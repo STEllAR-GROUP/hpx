@@ -19,17 +19,14 @@
 
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/util.hpp>
-#include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/util/detail/count_num_args.hpp>
 
 #include <iostream>
 #include <tuple>
 #include <vector>
 #include <string>
 
-/// \brief Defines the type of value stored by elements in the partition_vector.
 namespace hpx { namespace server
 {
     /// \brief This is the basic wrapper class for stl vector.
@@ -392,182 +389,6 @@ namespace hpx { namespace server
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
-// namespace hpx { namespace stubs
-// {
-//     /** @brief This is the low level interface to the partition_vector.
-//      *
-//      * This class contain the implementation of the low level interface to
-//      *  the partition_vector. All the function provides asynchronous interface
-//      *  which mean every function does not block the caller and returns the
-//      *  future as return value.
-//      */
-//     template <typename T>
-//     struct partition_vector
-//       : public hpx::components::stub_base<server::partition_vector>
-//     {
-//     private:
-//         typedef hpx::server::partition_vector base_type;
-//
-//     public:
-//         typedef typename base_type::size_type size_type;
-//
-//         /** @brief Calculate the maximum size of the partition_vector component
-//          *          in terms of number of elements.
-//          *
-//          *  @param gid  The global id of the partition_vector component register
-//          *               with HPX
-//          *
-//          *  @return This returns maximum size as the hpx::future of size_type
-//          */
-// //         static future<size_type> max_size_async(id_type const& gid)
-// //         {
-// //             return hpx::async<base_type::max_size_action>(gid);
-// //         }
-//
-//         /** @brief Calculate the capacity of the partition_vector component.
-//          *
-//          *  @param gid  The global id of the partition_vector component register
-//          *               with HPX
-//          *
-//          *  @return This returns capacity as the hpx::future of size_type
-//          */
-// //         static future<size_type> capacity_async(id_type const& gid)
-// //         {
-// //             return hpx::async<base_type::capacity_action>(gid);
-// //         }
-//
-//         /** @brief Check whether partition_vector component is empty.
-//          *
-//          *  @param gid  The global id of the partition_vector component register
-//          *               with HPX
-//          *
-//          *  @return This function returns result as the hpx::future of type
-//          *           bool
-//          */
-// //         static future<bool> empty_async(id_type const& gid)
-// //         {
-// //             return hpx::async<base_type::empty_action>(gid);
-// //         }
-//
-//         /** @brief Reserve the storage space for partition_vector component.
-//          *          Throws the \a hpx::length_error exception.
-//          *
-//          *  @param gid  The global id of the partition_vector component register
-//          *               with HPX
-//          *  @param n    Minimum size of the partition_vector
-//          *
-//          *  @exception hpx::length_error If \a n is greater than maximum
-//          *              size then function throw \a hpx::length_error
-//          *              exception.
-//          *
-//          *  @return This returns the hpx::future of type void [The void return
-//          *           type can help to check whether the action is completed
-//          *           or not]
-//          */
-// //         static future<void> reserve_async(id_type const& gid, size_type n)
-// //         {
-// //             return hpx::async<base_type::reserve_action>(gid, n);
-// //         }
-//
-//         ///////////////////////////////////////////////////////////////////////
-//         //  Element Access API's in stubs class
-//         ///////////////////////////////////////////////////////////////////////
-//
-//         /** @brief Access the value of first element in partition_vector
-//          *          component.
-//          *
-//          *  @param gid  The global id of the partition_vector component
-//          *               register with HPX
-//          *
-//          *  @return This return value as the hpx::future
-//          */
-// //         static future<T> front_async(id_type const& gid)
-// //         {
-// //             return hpx::async<base_type::front_action>(gid);
-// //         }
-//
-//         /** @brief Access the value of last element in partition_vector
-//          *          component.
-//          *
-//          *  @param gid  The global id of the partition_vector component register
-//          *               with HPX
-//          *
-//          *  @return This return value as the hpx::future
-//          */
-// //         static future<T> back_async(id_type const& gid)
-// //         {
-// //             return hpx::async<base_type::back_action>(gid);
-// //         }
-//
-//         ///////////////////////////////////////////////////////////////////////
-//         //  Modifiers API's in stubs class
-//         ///////////////////////////////////////////////////////////////////////
-//
-//         /** @brief Assign the new content to the elements in partition_vector
-//          *          component, replacing the current content and modifying
-//          *          the size accordingly.
-//          *
-//          *  @param gid  The global id of the partition_vector component register
-//          *               with HPX
-//          *  @param n    New size of the partition_vector
-//          *  @param val  Value to fill the container with
-//          *
-//          *  @return This return the hpx::future of type void [The void
-//          *           return type can help to check whether the action is
-//          *           completed or not]
-//          */
-// //         static future<void>
-// //         assign_async(id_type const& gid, size_type n, T const& val)
-// //         {
-// //             return hpx::async<base_type::assign_action>(gid, n, val);
-// //         }
-//
-//         /** @brief Add the new element at the end of partition_vector component.
-//          *
-//          *  @param gid  The global id of the partition_vector component register
-//          *               with HPX
-//          *  @param val  Value to be copied to new element
-//          *
-//          *  @return This return the hpx::future of type void [The void
-//          *           return type can help to check whether the action is
-//          *           completed or not]
-//          */
-// //         template <typename T_>
-// //         static future<void> push_back_async(id_type const& gid, T_ && val)
-// //         {
-// //             return hpx::async<base_type::push_back_action>(
-// //                 gid, std::forward<T_>(val));
-// //         }
-//
-//         /** @brief Remove the last element from partition_vector effectively
-//          *          reducing the size by one. The removed element is destroyed.
-//          *  @param gid  The global id of the partition_vector component register
-//          *               with HPX
-//          *  @return This return the hpx::future of type void [The void
-//          *           return type can help to check whether the action is
-//          *           completed or not].
-//          */
-// //         static future<void> pop_back_async(id_type const& gid)
-// //         {
-// //             return hpx::async<base_type::pop_back_action>(gid);
-// //         }
-//
-//         /** @brief Remove all elements from the vector leaving the
-//          *          partition_vector with size 0.
-//          *  @param gid  The global id of the partition_vector component register
-//          *               with HPX
-//          *  @return This return the hpx::future of type void [The void
-//          *           return type can help to check whether the action is
-//          *           completed or not].
-//          */
-// //         static future<void> clear_async(id_type const& gid)
-// //         {
-// //             return hpx::async<base_type::clear_action>(gid);
-// //         }
-//     };
-// }}
-
-///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
     template <typename T>
@@ -822,7 +643,7 @@ namespace hpx
         void set_values_sync(std::vector<std::size_t> const& pos,
             std::vector<T> const& val)
         {
-            set_value(pos, val).get();
+            set_values(pos, val).get();
         }
 
         /// Copy the value of \a val in the element at position
