@@ -25,20 +25,20 @@ namespace hpx
     {
         template <
             typename Action, typename RemoteResult
-          , typename F, typename ...Ts>
+          , typename Cont, typename ...Ts>
         typename boost::enable_if_c<
             util::tuple_size<typename Action::arguments_type>::value == sizeof...(Ts)
           , lcos::future<
                 typename traits::promise_local_result<
-                    typename result_of_async_continue<Action, F>::type
+                    typename result_of_async_continue<Action, Cont>::type
                 >::type
             >
         >::type
-        async_continue_r(naming::id_type const& gid, F&& f, Ts&&... vs)
+        async_continue_r(Cont&& cont, naming::id_type const& gid, Ts&&... vs)
         {
             typedef
                 typename traits::promise_local_result<
-                    typename result_of_async_continue<Action, F>::type
+                    typename result_of_async_continue<Action, Cont>::type
                 >::type
             result_type;
 
@@ -51,52 +51,52 @@ namespace hpx
             lcos::promise<result_type, RemoteResult> p;
             apply<Action>(
                 new hpx::actions::typed_continuation<continuation_result_type>(
-                    p.get_gid(), std::forward<F>(f))
+                    p.get_gid(), std::forward<Cont>(cont))
               , gid, std::forward<Ts>(vs)...);
             return p.get_future();
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename F, typename ...Ts>
+    template <typename Action, typename Cont, typename ...Ts>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == sizeof...(Ts)
       , lcos::future<
             typename traits::promise_local_result<
-                typename detail::result_of_async_continue<Action, F>::type
+                typename detail::result_of_async_continue<Action, Cont>::type
             >::type
         >
     >::type
-    async_continue(naming::id_type const& gid, F&& f, Ts&&... vs)
+    async_continue(Cont&& cont, naming::id_type const& gid, Ts&&... vs)
     {
         typedef
             typename traits::promise_local_result<
-                typename detail::result_of_async_continue<Action, F>::type
+                typename detail::result_of_async_continue<Action, Cont>::type
             >::type
         result_type;
 
         return detail::async_continue_r<Action, result_type>(
-            gid, std::forward<F>(f), std::forward<Ts>(vs)...);
+            std::forward<Cont>(cont), gid, std::forward<Ts>(vs)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Component, typename Result, typename Arguments,
-        typename Derived, typename F, typename ...Ts>
+        typename Derived, typename Cont, typename ...Ts>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == sizeof...(Ts)
       , lcos::future<
             typename traits::promise_local_result<
-                typename detail::result_of_async_continue<Derived, F>::type
+                typename detail::result_of_async_continue<Derived, Cont>::type
             >::type
         >
     >::type
     async_continue(
         hpx::actions::action<Component, Result, Arguments, Derived> /*act*/
-      , naming::id_type const& gid, F&& f, Ts&&... vs)
+      , Cont&& cont, naming::id_type const& gid, Ts&&... vs)
     {
         return async_continue<Derived>(
-            gid, std::forward<F>(f), std::forward<Ts>(vs)...);
+            std::forward<Cont>(cont), gid, std::forward<Ts>(vs)...);
     }
 }
 

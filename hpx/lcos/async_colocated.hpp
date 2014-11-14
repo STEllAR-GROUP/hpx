@@ -99,11 +99,11 @@ namespace hpx
 
         using util::placeholders::_2;
         return detail::async_continue_r<action_type, remote_result_type>(
-            service_target, util::functional::async_continuation(
+            util::functional::async_continuation(
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2, gid)
                   , std::forward<Ts>(vs)...)
-                ), req);
+                ), service_target, req);
     }
 
     ///////////////////////////////////////////////////////////////////////////
