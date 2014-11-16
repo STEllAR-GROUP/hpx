@@ -9,7 +9,12 @@
 /// required for proper functioning of components in the context of HPX.
 
 #include <hpx/include/components.hpp>
+
 #include <hpx/components/unordered/partition_unordered_map_component.hpp>
+#include <hpx/components/unordered/unordered_map.hpp>
+
+HPX_DISTRIBUTED_METADATA(hpx::server::unordered_map_config_data,
+    hpx_server_unordered_map_config_data);
 
 HPX_REGISTER_COMPONENT_MODULE();
 

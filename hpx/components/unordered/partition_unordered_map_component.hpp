@@ -145,9 +145,9 @@ namespace hpx { namespace server
         /// \return Return the value of the element at position represented
         ///         by \a pos.
         ///
-        T get_value(Key const& key) const
+        T get_value(Key const& key)
         {
-            return partition_unordered_map_[pos];
+            return partition_unordered_map_[key];
         }
 
         /// Return the element at the position \a pos in the partition_unordered_map
@@ -158,7 +158,7 @@ namespace hpx { namespace server
         /// \return Return the values of the elements at position represented
         ///         by \a pos.
         ///
-        std::vector<T> get_values(std::vector<Key> const& keys) const
+        std::vector<T> get_values(std::vector<Key> const& keys)
         {
             std::vector<T> result;
             result.reserve(keys.size());
@@ -213,8 +213,8 @@ namespace hpx { namespace server
         /// Macros to define HPX component actions for all exported functions.
         HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_TPL(partition_unordered_map, size);
 
-        HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_TPL(partition_unordered_map, get_value);
-        HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_TPL(partition_unordered_map, get_values);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL(partition_unordered_map, get_value);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL(partition_unordered_map, get_values);
 
         HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL(partition_unordered_map, set_value);
         HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL(partition_unordered_map, set_values);
@@ -243,25 +243,22 @@ namespace hpx { namespace server
     /**/
 
 #define HPX_REGISTER_UNORDERED_MAP_DECLARATION_5(key, type, hash, equal, name)\
+    typedef ::hpx::server::partition_unordered_map<key, type, hash, equal>    \
+        BOOST_PP_CAT(partition_unordered_map, __LINE__);                      \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
-        hpx::server::partition_unordered_map<key, type, hash, equal>::        \
-            get_value_action,                                                 \
+        BOOST_PP_CAT(partition_unordered_map, __LINE__)::get_value_action,    \
         BOOST_PP_CAT(__unordered_map_get_value_action_, name));               \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
-        hpx::server::partition_unordered_map<key, type, hash, equal>::        \
-            get_values_action,                                                \
+        BOOST_PP_CAT(partition_unordered_map, __LINE__)::get_values_action,   \
         BOOST_PP_CAT(__unordered_map_get_values_action_, name));              \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
-        hpx::server::partition_unordered_map<key, type, hash, equal>::        \
-            set_value_action,                                                 \
+        BOOST_PP_CAT(partition_unordered_map, __LINE__)::set_value_action,    \
         BOOST_PP_CAT(__unordered_map_set_value_action_, name));               \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
-        hpx::server::partition_unordered_map<key, type, hash, equal>::        \
-            set_values_action,                                                \
+        BOOST_PP_CAT(partition_unordered_map, __LINE__)::set_values_action,   \
         BOOST_PP_CAT(__unordered_map_set_values_action_, name));              \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
-        hpx::server::partition_unordered_map<key, type, hash, equal>::        \
-            size_action,                                                      \
+        BOOST_PP_CAT(partition_unordered_map, __LINE__)::size_action,         \
         BOOST_PP_CAT(__unordered_map_size_action_, name));                    \
     /**/
 
@@ -287,28 +284,25 @@ namespace hpx { namespace server
     /**/
 
 #define HPX_REGISTER_UNORDERED_MAP_5(key, type, hash, equal, name)            \
+    typedef ::hpx::server::partition_unordered_map<key, type, hash, equal>    \
+        BOOST_PP_CAT(partition_unordered_map, __LINE__);                      \
     HPX_REGISTER_ACTION(                                                      \
-        ::hpx::server::partition_unordered_map<key, type, hash, equal>::      \
-            get_value_action,                                                 \
+        BOOST_PP_CAT(partition_unordered_map, __LINE__)::get_value_action,    \
         BOOST_PP_CAT(__unordered_map_get_value_action_, name));               \
     HPX_REGISTER_ACTION(                                                      \
-        ::hpx::server::partition_unordered_map<key, type, hash, equal>::      \
-            get_values_action,                                                \
+        BOOST_PP_CAT(partition_unordered_map, __LINE__)::get_values_action,   \
         BOOST_PP_CAT(__unordered_map_get_values_action_, name));              \
     HPX_REGISTER_ACTION(                                                      \
-        ::hpx::server::partition_unordered_map<key, type, hash, equal>::      \
-            set_value_action,                                                 \
+        BOOST_PP_CAT(partition_unordered_map, __LINE__)::set_value_action,    \
         BOOST_PP_CAT(__unordered_map_set_value_action_, name));               \
     HPX_REGISTER_ACTION(                                                      \
-        ::hpx::server::partition_unordered_map<key, type, hash, equal>::      \
-            set_values_action,                                                \
+        BOOST_PP_CAT(partition_unordered_map, __LINE__)::set_values_action,   \
         BOOST_PP_CAT(__unordered_map_set_values_action_, name));              \
     HPX_REGISTER_ACTION(                                                      \
-        hpx::server::partition_unordered_map<key, type, hash, equal>::        \
-            size_action,                                                      \
+        BOOST_PP_CAT(partition_unordered_map, __LINE__)::size_action,         \
         BOOST_PP_CAT(__unordered_map_size_action_, name));                    \
     typedef ::hpx::components::simple_component<                              \
-        ::hpx::server::partition_unordered_map<key, type, hash, equal>        \
+        BOOST_PP_CAT(partition_unordered_map, __LINE__)                       \
     > BOOST_PP_CAT(__unordered_map_, name);                                   \
     HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(BOOST_PP_CAT(__unordered_map_, name)) \
     /**/

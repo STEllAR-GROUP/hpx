@@ -17,6 +17,7 @@
 #include <hpx/include/naming.hpp>
 #include <hpx/include/util.hpp>
 
+#include <hpx/traits/segemented_iterator_traits.hpp>
 #include <hpx/components/unordered/partition_unordered_map_component.hpp>
 
 #include <cstdint>
@@ -34,6 +35,10 @@ namespace hpx
     template <typename Key, typename T, typename Hash = std::hash<Key>,
         typename KeyEqual = std::equal_to<Key> >
     class partition_unordered_map;
+
+    template <typename Key, typename T, typename Hash = std::hash<Key>,
+        typename KeyEqual = std::equal_to<Key> >
+    class unordered_map;
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
