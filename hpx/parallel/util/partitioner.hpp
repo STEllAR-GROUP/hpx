@@ -239,17 +239,24 @@ namespace hpx { namespace parallel { namespace util
                         std::advance(first, count);
                     }
                 }
+                catch (std::bad_alloc const&) {
+                    return hpx::make_error_future<R>(
+                        boost::current_exception());
+                }
                 catch (...) {
-                    detail::handle_local_exceptions<ExPolicy>::call(
-                        boost::current_exception(), errors);
+                    errors.push_back(boost::current_exception());
                 }
 
-                // wait for all tasks to finish
-                hpx::wait_all(workitems);
-                detail::handle_local_exceptions<ExPolicy>::call(
-                    workitems, errors);
-
-                return f2(std::move(workitems));
+				// wait for all tasks to finish
+                return hpx::lcos::local::dataflow(
+                    [f2, errors](std::vector<hpx::future<Result> > && r) mutable -> R
+                    {
+                        detail::handle_local_exceptions<
+                                parallel_task_execution_policy
+                            >::call(r, errors);
+                        return f2(std::move(r));
+                    },
+					std::move(workitems));
             }
 
             template <typename FwdIter, typename F1, typename F2>
