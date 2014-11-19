@@ -161,8 +161,8 @@ void test_search2()
     test_search2(execution_policy(par), IteratorTag());
     test_search2(execution_policy(par_vec), IteratorTag());
 
-    test_search2(execution_policy(seq(task), IteratorTag());
-    test_search2(execution_policy(par(task), IteartorTag());
+    test_search2(execution_policy(seq(task)), IteratorTag());
+    test_search2(execution_policy(par(task)), IteratorTag());
 }
 
 void search_test2()
@@ -234,8 +234,8 @@ void test_search3()
     test_search3(par, IteratorTag());
     test_search3(par_vec, IteratorTag());
 
-    test_search3_async(seq(task), IteartorTag());
-    test_serach3_async(par(task), IteartorTag());
+    test_search3_async(seq(task), IteratorTag());
+    test_search3_async(par(task), IteratorTag());
 
     test_search3(execution_policy(seq), IteratorTag());
     test_search3(execution_policy(par), IteratorTag());
