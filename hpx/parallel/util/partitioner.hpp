@@ -240,7 +240,7 @@ namespace hpx { namespace parallel { namespace util
                     }
                 }
                 catch (std::bad_alloc const&) {
-                    return hpx::make_error_future<R>(
+                    return hpx::make_exceptional_future<R>(
                         boost::current_exception());
                 }
                 catch (...) {
@@ -377,7 +377,7 @@ namespace hpx { namespace parallel { namespace util
                     }
                 }
                 catch (std::bad_alloc const&) {
-                    return hpx::make_error_future<R>(
+                    return hpx::make_exceptional_future<R>(
                         boost::current_exception());
                 }
                 catch (...) {
@@ -388,7 +388,8 @@ namespace hpx { namespace parallel { namespace util
                 return hpx::lcos::local::dataflow(
                     [f2, errors](std::vector<hpx::future<Result> > && r) mutable
                     {
-                        detail::handle_local_exceptions<task_execution_policy>
+                        detail::handle_local_exceptions<
+							parallel_task_execution_policy>
                             ::call(r, errors);
                         return f2(std::move(r));
                     },
