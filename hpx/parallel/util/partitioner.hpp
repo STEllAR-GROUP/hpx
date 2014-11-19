@@ -535,7 +535,7 @@ namespace hpx { namespace parallel { namespace util
                 std::size_t chunk_size, Data && data)
             {
                 return static_partitioner<
-                    task_execution_policy, R, Result
+                    parallel_task_execution_policy, R, Result
                 >::call_with_data(policy, first, count,
                     std::forward<F1>(f1), std::forward<F2>(f2),
                     chunk_size, std::forward<Data>(data));

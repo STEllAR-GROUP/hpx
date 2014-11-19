@@ -9,14 +9,13 @@
 #define HPX_PARALLEL_DETAIL_COPY_MAY_30_2014_0317PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/move.hpp>
-
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
+#include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
+#include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <algorithm>
