@@ -73,13 +73,13 @@ void test_search1()
     test_search1(par_vec, IteratorTag());
 
     test_search1_async(seq(task), IteratorTag());
-	test_search1_async(par(task), IteratorTag());
+    test_search1_async(par(task), IteratorTag());
 
 
     test_search1(execution_policy(seq), IteratorTag());
     test_search1(execution_policy(par), IteratorTag());
     test_search1(execution_policy(par_vec), IteratorTag());
-	test_search1(execution_policy(seq(task)), IteratorTag());
+    test_search1(execution_policy(seq(task)), IteratorTag());
     test_search1(execution_policy(par(task)), IteratorTag());
 }
 
@@ -341,15 +341,15 @@ void test_search_exception()
     //If the execution policy object is of type vector_execution_policy,
     //  std::terminate shall be called. therefore we do not test exceptions
     //  with a vector execution policy
-	test_search_exception(seq, IteratorTag());
+    test_search_exception(seq, IteratorTag());
     test_search_exception(par, IteratorTag());
 
     test_search_async_exception(seq(task), IteratorTag());
-	test_search_async_exception(par(task), IteratorTag());
+    test_search_async_exception(par(task), IteratorTag());
 
     test_search_exception(execution_policy(par), IteratorTag());
     test_search_exception(execution_policy(seq(task)), IteratorTag());
-	test_search_exception(execution_policy(par(task)), IteratorTag());
+    test_search_exception(execution_policy(par(task)), IteratorTag());
 }
 
 void search_exception_test()
@@ -447,12 +447,12 @@ void test_search_bad_alloc()
     test_search_bad_alloc(seq, IteratorTag());
 
     test_search_async_bad_alloc(seq(task), IteratorTag());
-	test_search_async_bad_alloc(par(task), IteratorTag());
+    test_search_async_bad_alloc(par(task), IteratorTag());
 
     test_search_bad_alloc(execution_policy(par), IteratorTag());
     test_search_bad_alloc(execution_policy(seq), IteratorTag());
     test_search_bad_alloc(execution_policy(seq(task)), IteratorTag());
-	test_search_bad_alloc(execution_policy(par(task)), IteratorTag());
+    test_search_bad_alloc(execution_policy(par(task)), IteratorTag());
 }
 
 void search_bad_alloc_test()

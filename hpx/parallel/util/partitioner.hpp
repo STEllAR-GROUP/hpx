@@ -247,7 +247,7 @@ namespace hpx { namespace parallel { namespace util
                     errors.push_back(boost::current_exception());
                 }
 
-				// wait for all tasks to finish
+                // wait for all tasks to finish
                 return hpx::lcos::local::dataflow(
                     [f2, errors](std::vector<hpx::future<Result> > && r) mutable -> R
                     {
@@ -256,7 +256,7 @@ namespace hpx { namespace parallel { namespace util
                             >::call(r, errors);
                         return f2(std::move(r));
                     },
-					std::move(workitems));
+                    std::move(workitems));
             }
 
             template <typename FwdIter, typename F1, typename F2>
@@ -389,7 +389,7 @@ namespace hpx { namespace parallel { namespace util
                     [f2, errors](std::vector<hpx::future<Result> > && r) mutable
                     {
                         detail::handle_local_exceptions<
-							parallel_task_execution_policy>
+                            parallel_task_execution_policy>
                             ::call(r, errors);
                         return f2(std::move(r));
                     },

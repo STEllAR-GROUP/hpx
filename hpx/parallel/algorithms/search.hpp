@@ -32,100 +32,100 @@
 
 namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
-	///////////////////////////////////////////////////////////////////////////
-	// search 
-	namespace detail
-	{
-		/// \cond NOINTERNAL
-		template<typename FwdIter>
-		struct search: public detail::algorithm<search<FwdIter>, FwdIter>
-		{
-			search()
-				: search::algorithm("search")
-			{}
+    ///////////////////////////////////////////////////////////////////////////
+    // search 
+    namespace detail
+    {
+        /// \cond NOINTERNAL
+        template<typename FwdIter>
+        struct search: public detail::algorithm<search<FwdIter>, FwdIter>
+        {
+            search()
+                : search::algorithm("search")
+            {}
 
-			template <typename ExPolicy, typename FwdIter2, typename Pred>
-			static FwdIter
-			sequential(ExPolicy const&, FwdIter first, FwdIter last, FwdIter2 s_first,
-				FwdIter2 s_last, Pred && op)
-			{
-				return std::search(first, last, s_first, s_last, op);
-			}
+            template <typename ExPolicy, typename FwdIter2, typename Pred>
+            static FwdIter
+            sequential(ExPolicy const&, FwdIter first, FwdIter last, FwdIter2 s_first,
+                FwdIter2 s_last, Pred && op)
+            {
+                return std::search(first, last, s_first, s_last, op);
+            }
 
-			template <typename ExPolicy, typename FwdIter2, typename Pred>
-			static typename detail::algorithm_result<ExPolicy, FwdIter>::type
-			parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
-				FwdIter2 s_first, FwdIter2 s_last, Pred && op)
-			{
-				typedef typename std::iterator_traits<FwdIter>::reference reference;
-				typedef typename std::iterator_traits<FwdIter>::difference_type
-					difference_type;
-				typedef typename std::iterator_traits<FwdIter2>::difference_type
-					s_difference_type;
+            template <typename ExPolicy, typename FwdIter2, typename Pred>
+            static typename detail::algorithm_result<ExPolicy, FwdIter>::type
+            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+                FwdIter2 s_first, FwdIter2 s_last, Pred && op)
+            {
+                typedef typename std::iterator_traits<FwdIter>::reference reference;
+                typedef typename std::iterator_traits<FwdIter>::difference_type
+                    difference_type;
+                typedef typename std::iterator_traits<FwdIter2>::difference_type
+                    s_difference_type;
 
-				s_difference_type diff = std::distance(s_first, s_last);
-				if(diff <= 0) 
-				{
-					return detail::algorithm_result<ExPolicy, FwdIter>::get(
-						std::move(last));
-				}
+                s_difference_type diff = std::distance(s_first, s_last);
+                if(diff <= 0) 
+                {
+                    return detail::algorithm_result<ExPolicy, FwdIter>::get(
+                        std::move(last));
+                }
 
-				difference_type count = std::distance(first, last);
-				if(diff > count)
-				{
-					return detail::algorithm_result<ExPolicy, FwdIter>::get(
-						std::move(last));
-				}
+                difference_type count = std::distance(first, last);
+                if(diff > count)
+                {
+                    return detail::algorithm_result<ExPolicy, FwdIter>::get(
+                        std::move(last));
+                }
 
-				util::cancellation_token<difference_type> tok(count);
+                util::cancellation_token<difference_type> tok(count);
 
-				return util::partitioner<ExPolicy, FwdIter, FwdIter, void>::
-					call_with_index(
-					policy, first, count-(diff-1),
-					[=](std::size_t base_idx, FwdIter it, std::size_t part_size) mutable
-				{
+                return util::partitioner<ExPolicy, FwdIter, FwdIter, void>::
+                    call_with_index(
+                    policy, first, count-(diff-1),
+                    [=](std::size_t base_idx, FwdIter it, std::size_t part_size) mutable
+                {
 
-					FwdIter curr = it;
+                    FwdIter curr = it;
 
-					util::loop_idx_n(
-						base_idx, it, part_size, tok,
-						[=, &tok, &curr](reference v, std::size_t i)
-						{
-							++curr;
-							if (op(v, *s_first))
-							{
-								difference_type local_count = 1;
-								FwdIter2 needle = s_first;
-								FwdIter mid = curr;
+                    util::loop_idx_n(
+                        base_idx, it, part_size, tok,
+                        [=, &tok, &curr](reference v, std::size_t i)
+                        {
+                            ++curr;
+                            if (op(v, *s_first))
+                            {
+                                difference_type local_count = 1;
+                                FwdIter2 needle = s_first;
+                                FwdIter mid = curr;
 
-								for(difference_type len = 0;
-									local_count != diff && len != count;
-									++local_count, ++len, ++mid)
-								{
-									if(*mid != *++needle)
-										break;
-								}
+                                for(difference_type len = 0;
+                                    local_count != diff && len != count;
+                                    ++local_count, ++len, ++mid)
+                                {
+                                    if(*mid != *++needle)
+                                        break;
+                                }
 
-								if(local_count == diff)
-									tok.cancel(i);
-							}
-						});
-				},
-				[=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
-				{
-					difference_type search_res = tok.get_data();
-					if( search_res != count)
-						std::advance(first, search_res);
-					else
-						first = last;
+                                if(local_count == diff)
+                                    tok.cancel(i);
+                            }
+                        });
+                },
+                [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
+                {
+                    difference_type search_res = tok.get_data();
+                    if( search_res != count)
+                        std::advance(first, search_res);
+                    else
+                        first = last;
 
-					return std::move(first);
-				});
-			}
-		};
-	}
+                    return std::move(first);
+                });
+            }
+        };
+    }
 
-		    /// Searches the range [first, last) for any elements in the range [s_first, s_last).
+            /// Searches the range [first, last) for any elements in the range [s_first, s_last).
     /// Uses opeartor== to compare elements.
     ///
     /// \note   Complexity: at most (S*N) comparisons where
@@ -176,136 +176,136 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           Additionally if the size of the subsequence is empty or no subsequence
     ///           is found, \a last is also returned.
     ///           
-	template <typename ExPolicy, typename FwdIter, typename FwdIter2>
-	inline typename boost::enable_if<
-		is_execution_policy<ExPolicy>,
-		typename detail::algorithm_result<ExPolicy, FwdIter>::type
-	>::type
-	search(ExPolicy && policy, FwdIter first, FwdIter last,
-		FwdIter2 s_first, FwdIter2 s_last)
-	{
-		typedef typename std::iterator_traits<FwdIter>::iterator_category
-			iterator_category;
-		typedef typename std::iterator_traits<FwdIter2>::iterator_category
-			s_iterator_category;
+    template <typename ExPolicy, typename FwdIter, typename FwdIter2>
+    inline typename boost::enable_if<
+        is_execution_policy<ExPolicy>,
+        typename detail::algorithm_result<ExPolicy, FwdIter>::type
+    >::type
+    search(ExPolicy && policy, FwdIter first, FwdIter last,
+        FwdIter2 s_first, FwdIter2 s_last)
+    {
+        typedef typename std::iterator_traits<FwdIter>::iterator_category
+            iterator_category;
+        typedef typename std::iterator_traits<FwdIter2>::iterator_category
+            s_iterator_category;
 
-		BOOST_STATIC_ASSERT_MSG(
-			(boost::is_base_of<
-				std::input_iterator_tag, iterator_category
-			>::value),
-			"Requires at least input iterator.");
+        BOOST_STATIC_ASSERT_MSG(
+            (boost::is_base_of<
+                std::input_iterator_tag, iterator_category
+            >::value),
+            "Requires at least input iterator.");
 
-		BOOST_STATIC_ASSERT_MSG(
-			(boost::is_base_of<
-				std::forward_iterator_tag, s_iterator_category
-			>::value),
-			"Subsequence requires at least forward iterator.");
-		
-		typedef typename boost::mpl::or_<
-			is_sequential_execution_policy<ExPolicy>,
-			boost::is_same<std::input_iterator_tag, iterator_category>
-		>::type is_seq;
+        BOOST_STATIC_ASSERT_MSG(
+            (boost::is_base_of<
+                std::forward_iterator_tag, s_iterator_category
+            >::value),
+            "Subsequence requires at least forward iterator.");
+        
+        typedef typename boost::mpl::or_<
+            is_sequential_execution_policy<ExPolicy>,
+            boost::is_same<std::input_iterator_tag, iterator_category>
+        >::type is_seq;
 
-		return detail::search<FwdIter>().call(
-			std::forward<ExPolicy>(policy),
-			first, last, s_first, s_last,
-			detail::equal_to(), is_seq());
-	}
+        return detail::search<FwdIter>().call(
+            std::forward<ExPolicy>(policy),
+            first, last, s_first, s_last,
+            detail::equal_to(), is_seq());
+    }
 
-	///////////////////////////////////////////////////////////////////////////
-	// search_n
-	namespace detail
-	{
-		/// \cond NOINTERNAL
-		template<typename FwdIter>
-		struct search_n: public detail::algorithm<search_n<FwdIter>, FwdIter>
-		{
-			search_n()
-				: search_n::algorithm("search_n")
-			{}
+    ///////////////////////////////////////////////////////////////////////////
+    // search_n
+    namespace detail
+    {
+        /// \cond NOINTERNAL
+        template<typename FwdIter>
+        struct search_n: public detail::algorithm<search_n<FwdIter>, FwdIter>
+        {
+            search_n()
+                : search_n::algorithm("search_n")
+            {}
 
-			template <typename ExPolicy, typename FwdIter2, typename Pred>
-			static FwdIter
-			sequential(ExPolicy const&, FwdIter first, std::size_t count, FwdIter2 s_first,
-				FwdIter2 s_last, Pred && op)
-			{
-				return std::search(first, std::next(first, count),
-					s_first, s_last, op);
-			}
+            template <typename ExPolicy, typename FwdIter2, typename Pred>
+            static FwdIter
+            sequential(ExPolicy const&, FwdIter first, std::size_t count, FwdIter2 s_first,
+                FwdIter2 s_last, Pred && op)
+            {
+                return std::search(first, std::next(first, count),
+                    s_first, s_last, op);
+            }
 
-			template <typename ExPolicy, typename FwdIter2, typename Pred>
-			static typename detail::algorithm_result<ExPolicy, FwdIter>::type
-			parallel(ExPolicy const& policy, FwdIter first, std::size_t count,
-				FwdIter2 s_first, FwdIter2 s_last, Pred && op)
-			{
-				typedef typename std::iterator_traits<FwdIter>::reference reference;
-				typedef typename std::iterator_traits<FwdIter>::difference_type
-					difference_type;
-				typedef typename std::iterator_traits<FwdIter2>::difference_type
-					s_difference_type;
+            template <typename ExPolicy, typename FwdIter2, typename Pred>
+            static typename detail::algorithm_result<ExPolicy, FwdIter>::type
+            parallel(ExPolicy const& policy, FwdIter first, std::size_t count,
+                FwdIter2 s_first, FwdIter2 s_last, Pred && op)
+            {
+                typedef typename std::iterator_traits<FwdIter>::reference reference;
+                typedef typename std::iterator_traits<FwdIter>::difference_type
+                    difference_type;
+                typedef typename std::iterator_traits<FwdIter2>::difference_type
+                    s_difference_type;
 
-				s_difference_type diff = std::distance(s_first, s_last);
-				if(diff <= 0)
-				{
-					return detail::algorithm_result<ExPolicy, FwdIter>::get(
-						std::move(first));
-				}
+                s_difference_type diff = std::distance(s_first, s_last);
+                if(diff <= 0)
+                {
+                    return detail::algorithm_result<ExPolicy, FwdIter>::get(
+                        std::move(first));
+                }
 
-				if(diff > count)
-				{
-					return detail::algorithm_result<ExPolicy, FwdIter>::get(
-						std::move(first));
-				}
+                if(diff > count)
+                {
+                    return detail::algorithm_result<ExPolicy, FwdIter>::get(
+                        std::move(first));
+                }
 
-				util::cancellation_token<difference_type> tok(count);
+                util::cancellation_token<difference_type> tok(count);
 
-				return util::partitioner<ExPolicy, FwdIter, FwdIter, void>::
-					call_with_index(
-					policy, first, count-(diff-1),
-					[=](std::size_t base_idx, FwdIter it, std::size_t part_size) mutable
-				{
+                return util::partitioner<ExPolicy, FwdIter, FwdIter, void>::
+                    call_with_index(
+                    policy, first, count-(diff-1),
+                    [=](std::size_t base_idx, FwdIter it, std::size_t part_size) mutable
+                {
 
-					FwdIter curr = it;
+                    FwdIter curr = it;
 
-					util::loop_idx_n(
-						base_idx, it, part_size, tok,
-						[=, &tok, &curr](reference v, std::size_t i)
-						{
-							++curr;
-							if (op(v, *s_first))
-							{
-								difference_type local_count = 1;
-								FwdIter2 needle = s_first;
-								FwdIter mid = curr;
+                    util::loop_idx_n(
+                        base_idx, it, part_size, tok,
+                        [=, &tok, &curr](reference v, std::size_t i)
+                        {
+                            ++curr;
+                            if (op(v, *s_first))
+                            {
+                                difference_type local_count = 1;
+                                FwdIter2 needle = s_first;
+                                FwdIter mid = curr;
 
-								for(difference_type len = 0;
-									local_count != diff && len != count;
-									++local_count, ++len, ++mid)
-								{
-									if(*mid != *++needle)
-										break;
-								}
+                                for(difference_type len = 0;
+                                    local_count != diff && len != count;
+                                    ++local_count, ++len, ++mid)
+                                {
+                                    if(*mid != *++needle)
+                                        break;
+                                }
 
-								if(local_count == diff)
-									tok.cancel(i);
-							}
-						});
-				},
-				[=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
-				{
-					difference_type search_res = tok.get_data();
-					if( search_res != count)
-						std::advance(first, search_res);
-					else
-						first = last;
+                                if(local_count == diff)
+                                    tok.cancel(i);
+                            }
+                        });
+                },
+                [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
+                {
+                    difference_type search_res = tok.get_data();
+                    if( search_res != count)
+                        std::advance(first, search_res);
+                    else
+                        first = last;
 
-					return std::move(first);
-				});
-			}
-		};
-	}
+                    return std::move(first);
+                });
+            }
+        };
+    }
 
-	/// Searches the range [first, last) for any elements in the range [s_first, s_last).
+    /// Searches the range [first, last) for any elements in the range [s_first, s_last).
     /// Uses opeartor== to compare elements.
     ///
     /// \note   Complexity: at most (S*N) comparisons where
@@ -356,41 +356,41 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           Additionally if the size of the subsequence is empty or no subsequence
     ///           is found, \a last is also returned.
     ///      
-	template <typename ExPolicy, typename FwdIter, typename FwdIter2>
-	inline typename boost::enable_if<
-		is_execution_policy<ExPolicy>,
-		typename detail::algorithm_result<ExPolicy, FwdIter>::type
-	>::type
-	search_n(ExPolicy && policy, FwdIter first, std::size_t count,
-		FwdIter2 s_first, FwdIter2 s_last)
-	{
-		typedef typename std::iterator_traits<FwdIter>::iterator_category
-			iterator_category;
-		typedef typename std::iterator_traits<FwdIter2>::iterator_category
-			s_iterator_category;
+    template <typename ExPolicy, typename FwdIter, typename FwdIter2>
+    inline typename boost::enable_if<
+        is_execution_policy<ExPolicy>,
+        typename detail::algorithm_result<ExPolicy, FwdIter>::type
+    >::type
+    search_n(ExPolicy && policy, FwdIter first, std::size_t count,
+        FwdIter2 s_first, FwdIter2 s_last)
+    {
+        typedef typename std::iterator_traits<FwdIter>::iterator_category
+            iterator_category;
+        typedef typename std::iterator_traits<FwdIter2>::iterator_category
+            s_iterator_category;
 
-		BOOST_STATIC_ASSERT_MSG(
-			(boost::is_base_of<
-				std::input_iterator_tag, iterator_category
-			>::value),
-			"Requires at least input iterator.");
+        BOOST_STATIC_ASSERT_MSG(
+            (boost::is_base_of<
+                std::input_iterator_tag, iterator_category
+            >::value),
+            "Requires at least input iterator.");
 
-		BOOST_STATIC_ASSERT_MSG(
-			(boost::is_base_of<
-				std::forward_iterator_tag, s_iterator_category
-			>::value),
-			"Subsequence requires at least forward iterator.");
-		
-		typedef typename boost::mpl::or_<
-			is_sequential_execution_policy<ExPolicy>,
-			boost::is_same<std::input_iterator_tag, iterator_category>
-		>::type is_seq;
+        BOOST_STATIC_ASSERT_MSG(
+            (boost::is_base_of<
+                std::forward_iterator_tag, s_iterator_category
+            >::value),
+            "Subsequence requires at least forward iterator.");
+        
+        typedef typename boost::mpl::or_<
+            is_sequential_execution_policy<ExPolicy>,
+            boost::is_same<std::input_iterator_tag, iterator_category>
+        >::type is_seq;
 
-		return detail::search_n<FwdIter>().call(
-			std::forward<ExPolicy>(policy),
-			first, count, s_first, s_last,
-			detail::equal_to(), is_seq());
-	}
+        return detail::search_n<FwdIter>().call(
+            std::forward<ExPolicy>(policy),
+            first, count, s_first, s_last,
+            detail::equal_to(), is_seq());
+    }
 }}}
 
 #endif

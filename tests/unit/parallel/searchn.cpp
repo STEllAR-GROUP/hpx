@@ -73,13 +73,13 @@ void test_search_n1()
     test_search_n1(par_vec, IteratorTag());
 
     test_search_n1_async(seq(task), IteratorTag());
-	test_search_n1_async(par(task), IteratorTag());
+    test_search_n1_async(par(task), IteratorTag());
 
 
     test_search_n1(execution_policy(seq), IteratorTag());
     test_search_n1(execution_policy(par), IteratorTag());
     test_search_n1(execution_policy(par_vec), IteratorTag());
-	test_search_n1(execution_policy(seq(task)), IteratorTag());
+    test_search_n1(execution_policy(seq(task)), IteratorTag());
     test_search_n1(execution_policy(par(task)), IteratorTag());
 }
 
@@ -263,8 +263,8 @@ void test_search_n4(ExPolicy const& policy, IteratorTag)
     // fill vector with random values above 2 
     std::fill(boost::begin(c), boost::end(c), (std::rand() % 100) + 3);
     // create subsequence before the middle of the vector, and only run
-	// search_n on half of C
-	int index = rand() % (c.size()/2 - 2);
+    // search_n on half of C
+    int index = rand() % (c.size()/2 - 2);
     c[index] = 1;
     c[index] = 2;
 
@@ -289,8 +289,8 @@ void test_search_n4_async(ExPolicy const& p, IteratorTag)
     // fill vector with random values above 2 
     std::fill(boost::begin(c), boost::end(c), (std::rand() % 100) + 3);
     // create subsequence before the middle of the vector, and only run
-	// search_n on half of C
-	int index = rand() % (c.size()/2 - 2);
+    // search_n on half of C
+    int index = rand() % (c.size()/2 - 2);
     c[index] = 1;
     c[index] = 2;
 
@@ -425,15 +425,15 @@ void test_search_n_exception()
     //If the execution policy object is of type vector_execution_policy,
     //  std::terminate shall be called. therefore we do not test exceptions
     //  with a vector execution policy
-	test_search_n_exception(seq, IteratorTag());
+    test_search_n_exception(seq, IteratorTag());
     test_search_n_exception(par, IteratorTag());
 
     test_search_n_async_exception(seq(task), IteratorTag());
-	test_search_n_async_exception(par(task), IteratorTag());
+    test_search_n_async_exception(par(task), IteratorTag());
 
     test_search_n_exception(execution_policy(par), IteratorTag());
     test_search_n_exception(execution_policy(seq(task)), IteratorTag());
-	test_search_n_exception(execution_policy(par(task)), IteratorTag());
+    test_search_n_exception(execution_policy(par(task)), IteratorTag());
 }
 
 void search_n_exception_test()
@@ -531,12 +531,12 @@ void test_search_n_bad_alloc()
     test_search_n_bad_alloc(seq, IteratorTag());
 
     test_search_n_async_bad_alloc(seq(task), IteratorTag());
-	test_search_n_async_bad_alloc(par(task), IteratorTag());
+    test_search_n_async_bad_alloc(par(task), IteratorTag());
 
     test_search_n_bad_alloc(execution_policy(par), IteratorTag());
     test_search_n_bad_alloc(execution_policy(seq), IteratorTag());
     test_search_n_bad_alloc(execution_policy(seq(task)), IteratorTag());
-	test_search_n_bad_alloc(execution_policy(par(task)), IteratorTag());
+    test_search_n_bad_alloc(execution_policy(par(task)), IteratorTag());
 }
 
 void search_n_bad_alloc_test()
