@@ -54,7 +54,7 @@ void test_search_n1_async(ExPolicy const& p, IteratorTag)
 
     hpx::future<iterator> f =
         hpx::parallel::search_n(p,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
+            iterator(boost::begin(c)), c.size(),
             boost::begin(h), boost::end(h));
     f.wait();
 
@@ -136,7 +136,7 @@ void test_search_n2_async(ExPolicy const& p, IteratorTag)
 
     hpx::future<iterator> f =
         hpx::parallel::search_n(p,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
+            iterator(boost::begin(c)), c.size(),
             boost::begin(h), boost::end(h));
     f.wait();
 
@@ -216,7 +216,7 @@ void test_search_n3_async(ExPolicy const& p, IteratorTag)
     // separate partitions.
     hpx::future<iterator> f =
         hpx::parallel::search_n(p,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
+            iterator(boost::begin(c)), c.size(),
             boost::begin(h), boost::end(h));
     f.wait();
 
@@ -264,9 +264,9 @@ void test_search_n4(ExPolicy const& policy, IteratorTag)
     std::fill(boost::begin(c), boost::end(c), (std::rand() % 100) + 3);
     // create subsequence before the middle of the vector, and only run
     // search_n on half of C
-    int index = rand() % (c.size()/2 - 2);
-    c[index] = 1;
-    c[index] = 2;
+    int dx = rand() % (c.size()/2 - 2);
+    c[dx] = 1;
+    c[dx] = 2;
 
     std::size_t h[] = { 1, 2 };
 
@@ -290,9 +290,9 @@ void test_search_n4_async(ExPolicy const& p, IteratorTag)
     std::fill(boost::begin(c), boost::end(c), (std::rand() % 100) + 3);
     // create subsequence before the middle of the vector, and only run
     // search_n on half of C
-    int index = rand() % (c.size()/2 - 2);
-    c[index] = 1;
-    c[index] = 2;
+    int dx = rand() % (c.size()/2 - 2);
+    c[dx] = 1;
+    c[dx] = 2;
 
     std::size_t h[] = { 1, 2 };
 
@@ -300,7 +300,7 @@ void test_search_n4_async(ExPolicy const& p, IteratorTag)
     // separate partitions.
     hpx::future<iterator> f =
         hpx::parallel::search_n(p,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
+            iterator(boost::begin(c)), c.size(),
             boost::begin(h), boost::end(h));
     f.wait();
 
@@ -359,9 +359,7 @@ void test_search_n_exception(ExPolicy const& policy, IteratorTag)
             decorated_iterator(
                 boost::begin(c),
                 [](){ throw std::runtime_error("test"); }),
-            decorated_iterator(
-                boost::end(c),
-                [](){ throw std::runtime_error("test"); }),
+            c.size(),
             boost::begin(h), boost::end(h));
         HPX_TEST(false);
     }
@@ -397,10 +395,8 @@ void test_search_n_async_exception(ExPolicy const& p, IteratorTag)
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::runtime_error("test"); }),
-                decorated_iterator(
-                    boost::end(c),
-                    [](){ throw std::runtime_error("test"); }),
-            boost::begin(h), boost::end(h));
+                c.size(),
+                boost::begin(h), boost::end(h));
         f.get();
 
         HPX_TEST(false);
@@ -464,9 +460,7 @@ void test_search_n_bad_alloc(ExPolicy const& policy, IteratorTag)
             decorated_iterator(
                 boost::begin(c),
                 [](){ throw std::bad_alloc(); }),
-            decorated_iterator(
-                boost::end(c),
-                [](){ throw std::bad_alloc(); }),
+            c.size(),
             boost::begin(h), boost::end(h));
         HPX_TEST(false);
     }
@@ -500,9 +494,7 @@ void test_search_n_async_bad_alloc(ExPolicy const& p, IteratorTag)
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::bad_alloc(); }),
-                decorated_iterator(
-                    boost::end(c),
-                    [](){ throw std::bad_alloc(); }),
+                c.size(),
                 boost::begin(h), boost::end(h));
 
         f.get();

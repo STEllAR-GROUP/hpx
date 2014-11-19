@@ -296,8 +296,6 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     difference_type search_res = tok.get_data();
                     if( search_res != count)
                         std::advance(first, search_res);
-                    else
-                        first = last;
 
                     return std::move(first);
                 });

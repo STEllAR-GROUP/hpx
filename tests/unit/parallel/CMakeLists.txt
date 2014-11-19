@@ -44,6 +44,7 @@ set(tests
     rotate
     rotate_copy
     search
+    searchn
     swapranges
     task_region
     transform
