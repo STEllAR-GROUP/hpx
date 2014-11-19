@@ -88,7 +88,7 @@ void search_test1()
     test_search1<std::random_access_iterator_tag>();
     test_search1<std::forward_iterator_tag>();
 }
-/*
+
 template <typename ExPolicy, typename IteratorTag>
 void test_search2(ExPolicy const& policy, IteratorTag)
 {
@@ -112,13 +112,13 @@ void test_search2(ExPolicy const& policy, IteratorTag)
         iterator(boost::begin(c)), iterator(boost::end(c)),
         boost::begin(h), boost::end(h));
 
-    base_iterator test_index = boost::begin(c) + c.size()-2;
+    base_iterator test_index = boost::begin(c);
 
     HPX_TEST(index == iterator(test_index));
 }
 
-template <typename IteratorTag>
-void test_search2(hpx::parallel::parallel_task_execution_policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_search2_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -135,13 +135,13 @@ void test_search2(hpx::parallel::parallel_task_execution_policy, IteratorTag)
     std::size_t h[] = { 1, 2 };
 
     hpx::future<iterator> f =
-        hpx::parallel::search(hpx::parallel::task,
+        hpx::parallel::search(p,
             iterator(boost::begin(c)), iterator(boost::end(c)),
             boost::begin(h), boost::end(h));
     f.wait();
 
     // create iterator at position of value to be found
-    base_iterator test_index = boost::begin(c) + c.size()-2;
+    base_iterator test_index = boost::begin(c);
 
     HPX_TEST(f.get() == iterator(test_index));
 }
@@ -153,13 +153,16 @@ void test_search2()
     test_search2(seq, IteratorTag());
     test_search2(par, IteratorTag());
     test_search2(par_vec, IteratorTag());
-    test_search2(task, IteratorTag());
 
+    test_search2_async(seq(task), IteratorTag());
+    test_search2_async(par(task), IteratorTag());
 
     test_search2(execution_policy(seq), IteratorTag());
     test_search2(execution_policy(par), IteratorTag());
     test_search2(execution_policy(par_vec), IteratorTag());
-    test_search2(execution_policy(task), IteratorTag());
+
+    test_search2(execution_policy(seq(task), IteratorTag());
+    test_search2(execution_policy(par(task), IteartorTag());
 }
 
 void search_test2()
@@ -190,12 +193,12 @@ void test_search3(ExPolicy const& policy, IteratorTag)
         boost::begin(h), boost::end(h));
 
     base_iterator test_index = boost::begin(c);
-
+ 
     HPX_TEST(index == iterator(test_index));
 }
-
-template <typename IteratorTag>
-void test_search3(hpx::parallel::parallel_task_execution_policy, IteratorTag)
+ 
+template <typename ExPolicy, typename IteratorTag>
+void test_search3_async(ExPolicy const& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -212,7 +215,7 @@ void test_search3(hpx::parallel::parallel_task_execution_policy, IteratorTag)
     // create only two partitions, splitting the desired sub sequence into
     // separate partitions.
     hpx::future<iterator> f =
-        hpx::parallel::search(hpx::parallel::task,
+        hpx::parallel::search(p,
             iterator(boost::begin(c)), iterator(boost::end(c)),
             boost::begin(h), boost::end(h));
     f.wait();
@@ -230,13 +233,16 @@ void test_search3()
     test_search3(seq, IteratorTag());
     test_search3(par, IteratorTag());
     test_search3(par_vec, IteratorTag());
-    test_search3(task, IteratorTag());
 
+    test_search3_async(seq(task), IteartorTag());
+    test_serach3_async(par(task), IteartorTag());
 
     test_search3(execution_policy(seq), IteratorTag());
     test_search3(execution_policy(par), IteratorTag());
     test_search3(execution_policy(par_vec), IteratorTag());
-    test_search3(execution_policy(task), IteratorTag());
+
+    test_search3(execution_policy(seq(task)), IteratorTag());
+    test_search3(execution_policy(par(task)), IteratorTag());
 }
 
 void search_test3()
@@ -245,86 +251,6 @@ void search_test3()
     test_search3<std::forward_iterator_tag>();
 }
 
-template <typename ExPolicy, typename IteratorTag>
-void test_search4(ExPolicy const& policy, IteratorTag)
-{
-    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
-
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
-    std::vector<std::size_t> c(10007);
-    // fill vector with random values above 2
-    std::fill(boost::begin(c), boost::end(c), (std::rand() % 100) + 3);
-    // create subsequence in middle of vector
-    c[c.size()/2] = 1;
-    c[c.size()/2 + 1] = 2;
-
-    std::size_t h[] = { 1, 2 };
-
-    iterator index = hpx::parallel::search(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)),
-        boost::begin(h), boost::end(h),
-        [](std::size_t v1, std::size_t v2) {
-            return !(v1 != v2);
-        });
-
-    base_iterator test_index = boost::begin(c) + c.size()/2;
-
-    HPX_TEST(index == iterator(test_index));
-}
-
-template <typename IteratorTag>
-void test_search4(hpx::parallel::parallel_task_execution_policy, IteratorTag)
-{
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
-    std::vector<std::size_t> c(10007);
-    // fill vector with random values above 2
-    std::fill(boost::begin(c), boost::end(c), (std::rand() % 100) + 3);
-    // create subsequence in middle of vector
-    c[c.size()/2] = 1;
-    c[c.size()/2 + 1] = 2;
-
-    std::size_t h[] = { 1, 2 };
-
-    hpx::future<iterator> f =
-        hpx::parallel::search(hpx::parallel::task,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
-            boost::begin(h), boost::end(h),
-            [](std::size_t v1, std::size_t v2) {
-                return !(v1 != v2);
-        });
-    f.wait();
-
-    //create iterator at position of value to be found
-    base_iterator test_index = boost::begin(c) + c.size()/2;
-
-    HPX_TEST(f.get() == iterator(test_index));
-}
-
-template <typename IteratorTag>
-void test_search4()
-{
-    using namespace hpx::parallel;
-    test_search4(seq, IteratorTag());
-    test_search4(par, IteratorTag());
-    test_search4(par_vec, IteratorTag());
-    test_search4(task, IteratorTag());
-
-    test_search4(execution_policy(seq), IteratorTag());
-    test_search4(execution_policy(par), IteratorTag());
-    test_search4(execution_policy(par_vec), IteratorTag());
-    test_search4(execution_policy(task), IteratorTag());
-}
-
-void search_test4()
-{
-    test_search4<std::random_access_iterator_tag>();
-    test_search4<std::forward_iterator_tag>();
-}
-*/
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
 void test_search_exception(ExPolicy const& policy, IteratorTag)
@@ -546,9 +472,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::srand(seed);
 
     search_test1();
-    //search_test2();
-    //search_test3();
-    //search_test4();
+    search_test2();
+    search_test3();
     search_exception_test();
     search_bad_alloc_test();
     return hpx::finalize();
