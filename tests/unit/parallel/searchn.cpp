@@ -266,7 +266,7 @@ void test_search_n4(ExPolicy const& policy, IteratorTag)
     // search_n on half of C
     int dx = rand() % (c.size()/2 - 2);
     c[dx] = 1;
-    c[dx] = 2;
+    c[dx+1] = 2;
 
     std::size_t h[] = { 1, 2 };
 
@@ -274,7 +274,7 @@ void test_search_n4(ExPolicy const& policy, IteratorTag)
         iterator(boost::begin(c)), c.size()/2,
         boost::begin(h), boost::end(h));
 
-    base_iterator test_index = boost::begin(c) + c.size()/2;
+    base_iterator test_index = boost::begin(c) + dx;
 
     HPX_TEST(index == iterator(test_index));
 }
@@ -292,7 +292,7 @@ void test_search_n4_async(ExPolicy const& p, IteratorTag)
     // search_n on half of C
     int dx = rand() % (c.size()/2 - 2);
     c[dx] = 1;
-    c[dx] = 2;
+    c[dx+1] = 2;
 
     std::size_t h[] = { 1, 2 };
 
@@ -305,7 +305,7 @@ void test_search_n4_async(ExPolicy const& p, IteratorTag)
     f.wait();
 
     //create iterator at position of value to be found
-    base_iterator test_index = boost::begin(c);
+    base_iterator test_index = boost::begin(c) + dx;
 
     HPX_TEST(f.get() == iterator(test_index));
 }
@@ -333,6 +333,95 @@ void search_n_test4()
 {
     test_search_n4<std::random_access_iterator_tag>();
     test_search_n4<std::forward_iterator_tag>();
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_search_n5(ExPolicy const& policy, IteratorTag)
+{
+    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    // fill vector with random values above 2
+    std::fill(boost::begin(c), boost::end(c), (std::rand() % 100) + 3);
+    // create subsequence in middle of vector
+    c[c.size()/2] = 1;
+    c[c.size()/2 + 1] = 2;
+
+    std::size_t h[] = { 1, 2 };
+    
+    auto op =
+        [](std::size_t a, std::size_t b)
+        {
+            return !(a != b);
+        };
+
+    iterator index = hpx::parallel::search_n(policy,
+        iterator(boost::begin(c)), c.size(),
+        boost::begin(h), boost::end(h), op);
+
+    base_iterator test_index = boost::begin(c) + c.size()/2;
+
+    HPX_TEST(index == iterator(test_index));
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_search_n5_async(ExPolicy const& p, IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    // fill vector with random values above 2
+    std::fill(boost::begin(c), boost::end(c), (std::rand() % 100) + 3);
+    // create subsequence in middle of vector
+    c[c.size()/2] = 1;
+    c[c.size()/2 + 1] = 2;
+
+    std::size_t h[] = { 1, 2 };
+
+    auto op = 
+        [](std::size_t a, std::size_t b)
+        {
+            return !(a != b);
+        };
+
+    hpx::future<iterator> f =
+        hpx::parallel::search_n(p,
+            iterator(boost::begin(c)), c.size(),
+            boost::begin(h), boost::end(h), op);
+    f.wait();
+
+    // create iterator at position of value to be found
+    base_iterator test_index = boost::begin(c) + c.size()/2;
+
+    HPX_TEST(f.get() == iterator(test_index));
+}
+
+template <typename IteratorTag>
+void test_search_n5()
+{
+    using namespace hpx::parallel;
+    test_search_n5(seq, IteratorTag());
+    test_search_n5(par, IteratorTag());
+    test_search_n5(par_vec, IteratorTag());
+
+    test_search_n5_async(seq(task), IteratorTag());
+    test_search_n5_async(par(task), IteratorTag());
+
+    test_search_n5(execution_policy(seq), IteratorTag());
+    test_search_n5(execution_policy(par), IteratorTag());
+    test_search_n5(execution_policy(par_vec), IteratorTag());
+    test_search_n5(execution_policy(seq(task)), IteratorTag());
+    test_search_n5(execution_policy(par(task)), IteratorTag());
+}
+
+void search_n_test5()
+{
+    test_search_n5<std::random_access_iterator_tag>();
+    test_search_n5<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -550,6 +639,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     search_n_test1();
     search_n_test2();
     search_n_test3();
+    search_n_test4();
+    search_n_test5();
     search_n_exception_test();
     search_n_bad_alloc_test();
     return hpx::finalize();
