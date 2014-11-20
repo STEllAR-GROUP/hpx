@@ -36,10 +36,10 @@ namespace hpx { namespace util { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Left, typename Right>
-    struct _make_index_pack_join;
+    struct make_index_pack_join;
 
     template <std::size_t... Left, std::size_t... Right>
-    struct _make_index_pack_join<
+    struct make_index_pack_join<
         pack_c<std::size_t, Left...>
       , pack_c<std::size_t, Right...>
     > : pack_c<std::size_t, Left..., (sizeof...(Left) + Right)...>
@@ -47,7 +47,7 @@ namespace hpx { namespace util { namespace detail
 
     template <std::size_t N>
     struct make_index_pack
-      : _make_index_pack_join<
+      : make_index_pack_join<
             typename make_index_pack<N / 2>::type
           , typename make_index_pack<N - N / 2>::type
         >
