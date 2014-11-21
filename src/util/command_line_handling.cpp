@@ -295,6 +295,13 @@ namespace hpx { namespace util
 
         bool debug_clp = node != std::size_t(-1) && vm.count("hpx:debug-clp");
 
+        if (vm.count("hpx:ini")) {
+            std::vector<std::string> cfg =
+                vm["hpx:ini"].as<std::vector<std::string> >();
+            std::copy(cfg.begin(), cfg.end(), std::back_inserter(ini_config));
+            cfgmap.add(cfg);
+        }
+
         // create host name mapping
         util::map_hostnames mapnames(debug_clp);
 
@@ -469,12 +476,6 @@ namespace hpx { namespace util
             // store node number in configuration
             ini_config += "hpx.locality!=" +
                 boost::lexical_cast<std::string>(node);
-        }
-
-        if (vm.count("hpx:ini")) {
-            std::vector<std::string> cfg =
-                vm["hpx:ini"].as<std::vector<std::string> >();
-            std::copy(cfg.begin(), cfg.end(), std::back_inserter(ini_config));
         }
 
         if (vm.count("hpx:hpx")) {
