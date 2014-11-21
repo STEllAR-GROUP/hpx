@@ -387,45 +387,47 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
                 OutIter dest, F && f)
             {
-              typedef hpx::util::zip_iterator<FwdIter, char*> zip_iterator;
-              typedef typename zip_iterator::reference reference;
+                typedef hpx::util::zip_iterator<FwdIter, char*> zip_iterator;
+                typedef typename zip_iterator::reference reference;
 
-              std::size_t count = std::distance(first,last);
-              boost::shared_array<char> flags(new char[count]);
+                std::size_t count = std::distance(first,last);
+                boost::shared_array<char> flags(new char[count]);
 
-              typedef std::pair<std::size_t, std::size_t> pair_type;
+                typedef std::pair<std::size_t, std::size_t> pair_type;
 
-              using hpx::util::make_zip_iterator;
-              return util::partitioner<ExPolicy, OutIter, pair_type>::
-                call_with_index(
-                  policy, make_zip_iterator(first, flags.get()), count,
-                  [f](std::size_t base_idx,
-                    zip_iterator part_begin, std::size_t part_size)
-                  {
-                        std::size_t curr = 0;
-                        util::loop_n(part_begin, part_size,
-                        [&curr, &f](zip_iterator d)
+                using hpx::util::make_zip_iterator;
+                return util::partitioner<ExPolicy, OutIter, pair_type>::
+                    call_with_index(
+                        policy, make_zip_iterator(first, flags.get()), count,
+                        [f](std::size_t base_idx,
+                        zip_iterator part_begin, std::size_t part_size)
                         {
-                          using hpx::util::get;
-                          if(f(get<0>(*d)))
-                          {
-                            get<1>(*d) = 1;
-                            ++curr;
-                          }
-                          else
-                          {
-                            get<1>(*d) = 0;
-                          }
-                        });
-                        return std::make_pair(curr, base_idx);
-                  },
-                  hpx::util::unwrapped(
-                    [=](std::vector<pair_type> && r)
-                    {
-                      return copy_if_helper(policy, std::forward<std::vector<pair_type> >(r),
-                        first, count, dest, flags);
-                    })
-                  );
+                            std::size_t curr = 0;
+                            util::loop_n(part_begin, part_size,
+                            [&curr, &f](zip_iterator d)
+                            {
+                                using hpx::util::get;
+                                if(f(get<0>(*d)))
+                            {
+                                get<1>(*d) = 1;
+                                ++curr;
+                            }
+                            else
+                            {
+                                get<1>(*d) = 0;
+                            }
+                            });
+                            return std::make_pair(curr, base_idx);
+                        },
+                        hpx::util::unwrapped(
+                            [=](std::vector<pair_type> && r)
+                            {
+                                return 
+                                    copy_if_helper(policy,
+                                        std::forward<std::vector<pair_type> >(r),
+                                        first, count, dest, flags);
+                            })
+                    );
             }
         };
         /// \endcond
