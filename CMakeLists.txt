@@ -467,6 +467,12 @@ if(HPX_THREAD_DEBUG_INFO)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_DEADLOCK_DETECTION)
 endif()
 
+# run hpx_main on all localities by default
+hpx_option(HPX_RUN_MAIN_EVERYWHERE BOOL "Run hpx_main by default on all localities (default: OFF)." OFF ADVANCED)
+if(HPX_RUN_MAIN_EVERYWHERE)
+  hpx_add_config_define(HPX_RUN_MAIN_EVERYWHERE)
+endif()
+
 # Options for our plugins
 hpx_option(HPX_WITH_COMPRESSION_BZIP2 BOOL "Enable bzip2 compression for parcel data (default: OFF)." OFF ADVANCED)
 hpx_option(HPX_WITH_COMPRESSION_SNAPPY BOOL "Enable snappy compression for parcel data (default: OFF)." OFF ADVANCED)
