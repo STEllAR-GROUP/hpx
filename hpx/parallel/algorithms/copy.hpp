@@ -296,28 +296,28 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         add_pairs(std::pair<std::size_t, std::size_t> const& lhs,
                   std::pair<std::size_t, std::size_t> const& rhs)
         {
-          //we care about the first pair only
-          return std::make_pair(lhs.first + rhs.first, 0);
+            //we care about the first pair only
+            return std::make_pair(lhs.first + rhs.first, 0);
         }
 
         template <typename FwdIter, typename Op>
         typename std::iterator_traits<FwdIter>::value_type
         sequential_exclusive_scan(FwdIter first, FwdIter last, Op && op)
         {
-          typedef typename std::iterator_traits<FwdIter>::value_type value_type;
-          if(first == last)
-            return std::make_pair(0, 0);
+            typedef typename std::iterator_traits<FwdIter>::value_type value_type;
+            if(first == last)
+                return std::make_pair(0, 0);
 
-          value_type tmp = *first;
-          value_type sum = op(std::make_pair(0,0), tmp);
+            value_type tmp = *first;
+            value_type sum = op(std::make_pair(0,0), tmp);
 
-          for(++first; first != last; ++first)
-          {
-            tmp = *first;
-            sum = op(sum, tmp);
-          }
+            for(++first; first != last; ++first)
+            {
+                tmp = *first;
+                sum = op(sum, tmp);
+            }
 
-          return sum;
+            return sum;
         }
 
         template <typename ExPolicy, typename Pair, typename FwdIter1,
@@ -327,45 +327,44 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
           FwdIter1 first, std::size_t count, FwdIter2 dest,
           boost::shared_array<char> flags)
         {
-          typedef hpx::util::zip_iterator<FwdIter1, char*> zip_iterator;
-          typedef typename zip_iterator::reference reference;
-          typedef typename detail::algorithm_result<ExPolicy, FwdIter2>::type
-            result_type;
+            typedef hpx::util::zip_iterator<FwdIter1, char*> zip_iterator;
+            typedef typename zip_iterator::reference reference;
+            typedef typename detail::algorithm_result<ExPolicy, FwdIter2>::type
+                result_type;
 
-          std::size_t chunk_size = (results.size() > 1) ? results[1].second : count;
+            std::size_t chunk_size = (results.size() > 1) ? results[1].second : count;
 
-          Pair sum = sequential_exclusive_scan(boost::begin(results),
-            boost::end(results), &add_pairs);
+            Pair sum = sequential_exclusive_scan(boost::begin(results),
+                boost::end(results), &add_pairs);
 
-          using hpx::util::make_zip_iterator;
-          return
-            util::partitioner<ExPolicy, FwdIter2, void>::
-              call_with_data(policy,
-                make_zip_iterator(first, flags.get()), count,
-                [dest](Pair const& data, zip_iterator part_begin,
-                  std::size_t part_size)
-                {
-                  FwdIter2 out_iter = dest;
-                  std::advance(out_iter, std::get<0>(data));
-
-                  util::loop_n(part_begin, part_size,
-                    [&dest, &out_iter](zip_iterator d)
+            using hpx::util::make_zip_iterator;
+            return util::partitioner<ExPolicy, FwdIter2, void>::
+                call_with_data(policy,
+                    make_zip_iterator(first, flags.get()), count,
+                    [dest](Pair const& data, zip_iterator part_begin,
+                        std::size_t part_size)
                     {
-                      using hpx::util::get;
-                      if(get<1>(*d))
-                        *out_iter++ = get<0>(*d);
-                    });
+                        FwdIter2 out_iter = dest;
+                        std::advance(out_iter, std::get<0>(data));
 
-                  return data;
-                },
-                hpx::util::unwrapped(
-                  [=](std::vector<Pair> &&) -> FwdIter2
-                  {
-                    std::advance(dest, std::get<0>(sum));
-                    return dest;
-                  }
-                ),
-                chunk_size, results);
+                        util::loop_n(part_begin, part_size,
+                        [&dest, &out_iter](zip_iterator d)
+                        {
+                            using hpx::util::get;
+                            if(get<1>(*d))
+                            *out_iter++ = get<0>(*d);
+                        });
+
+                        return data;
+                    },
+                    hpx::util::unwrapped(
+                        [=](std::vector<Pair> &&) -> FwdIter2
+                        {
+                            std::advance(dest, std::get<0>(sum));
+                            return dest;
+                        }
+                    ),
+                    chunk_size, results);
         }
 
         template <typename OutIter>

@@ -197,7 +197,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         BOOST_STATIC_ASSERT_MSG(
             (boost::is_base_of<
-                std::forward_iterator_tag, s_iterator_category
+                std::input_iterator_tag, s_iterator_category
             >::value),
             "Subsequence requires at least forward iterator.");
         
@@ -285,7 +285,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         BOOST_STATIC_ASSERT_MSG(
             (boost::is_base_of<
-                std::forward_iterator_tag, s_iterator_category
+                std::input_iterator_tag, s_iterator_category
             >::value),
             "Subsequence requires at least forward iterator.");
         
@@ -463,7 +463,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         BOOST_STATIC_ASSERT_MSG(
             (boost::is_base_of<
-                std::forward_iterator_tag, s_iterator_category
+                std::input_iterator_tag, s_iterator_category
             >::value),
             "Subsequence requires at least forward iterator.");
         
@@ -551,7 +551,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         BOOST_STATIC_ASSERT_MSG(
             (boost::is_base_of<
-                std::forward_iterator_tag, s_iterator_category
+                std::input_iterator_tag, s_iterator_category
             >::value),
             "Subsequence requires at least forward iterator.");
         
