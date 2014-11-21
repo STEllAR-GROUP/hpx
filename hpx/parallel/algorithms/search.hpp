@@ -126,7 +126,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     }
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
-    /// Uses opeartor== to compare elements.
+    /// Uses the operator== to compare elements.
     ///
     /// \note   Complexity: at most (S*N) comparisons where
     ///         \a S = distance(s_first, s_last) and
@@ -136,13 +136,13 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter      The type of the source iterators used for the
+    /// \tparam FwdIter     The type of the source iterators used for the
     ///                     first range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    /// \tparam FwdIter2     The type of the source iterators used for the
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the source iterators used for the
     ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
@@ -156,21 +156,21 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param s_last       Refers to the end of the sequence of elements of
     ///                     the algorithm will be searching for.
     ///
-    /// The comparison operations in the parallel \a find_first_of algorithm invoked
+    /// The comparison operations in the parallel \a search algorithm invoked
     /// with an execution policy object of type \a sequential_execution_policy
     /// execute in sequential order in the calling thread.
     ///
-    /// The comparison operations in the parallel \a find_first_of algorithm invoked
+    /// The comparison operations in the parallel \a search algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a find_first_of algorithm returns a \a hpx::future<FwdIter> if the
+    /// \returns  The \a search algorithm returns a \a hpx::future<FwdIter> if the
     ///           execution policy is of type \a task_execution_policy and
     ///           returns \a FwdIter otherwise.
-    ///           The \a find_first_of algorithm returns an iterator to the beginning of
-    ///           the last subsequence [s_first, s_last) in range [first, last).
+    ///           The \a search algorithm returns an iterator to the beginning of
+    ///           the first subsequence [s_first, s_last) in range [first, last).
     ///           If the length of the subsequence [s_first, s_last) is greater
     ///           than the length of the range [first, last), \a last is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
@@ -213,7 +213,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     }
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
-    /// Uses opeartor== to compare elements.
+    /// Uses a provided predicate to compare elements.
     ///
     /// \note   Complexity: at most (S*N) comparisons where
     ///         \a S = distance(s_first, s_last) and
@@ -242,22 +242,26 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     the algorithm will be searching for.
     /// \param s_last       Refers to the end of the sequence of elements of
     ///                     the algorithm will be searching for.
+    /// \param op           Refers to the binary predicate which returns true if the 
+    ///                     elements should be treated as equal. the signature of
+    ///                     the function should be equivalent to
+    ///                     \code bool pred(const Type1 &a, const Type2 &b); \endcode
     ///
-    /// The comparison operations in the parallel \a find_first_of algorithm invoked
+    /// The comparison operations in the parallel \a search algorithm invoked
     /// with an execution policy object of type \a sequential_execution_policy
     /// execute in sequential order in the calling thread.
     ///
-    /// The comparison operations in the parallel \a find_first_of algorithm invoked
+    /// The comparison operations in the parallel \a search algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a find_first_of algorithm returns a \a hpx::future<FwdIter> if the
+    /// \returns  The \a search algorithm returns a \a hpx::future<FwdIter> if the
     ///           execution policy is of type \a task_execution_policy and
     ///           returns \a FwdIter otherwise.
-    ///           The \a find_first_of algorithm returns an iterator to the beginning of
-    ///           the last subsequence [s_first, s_last) in range [first, last).
+    ///           The \a search algorithm returns an iterator to the beginning of
+    ///           the first subsequence [s_first, s_last) in range [first, last).
     ///           If the length of the subsequence [s_first, s_last) is greater
     ///           than the length of the range [first, last), \a last is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
@@ -391,12 +395,12 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
         };
     }
 
-    /// Searches the range [first, last) for any elements in the range [s_first, s_last).
-    /// Uses opeartor== to compare elements.
+    /// Searches the range [first, first+count) for any elements in the range [s_first, s_last).
+    /// Uses the operator== to compare elements.
     ///
     /// \note   Complexity: at most (S*N) comparisons where
     ///         \a S = distance(s_first, s_last) and
-    ///         \a N = distance(first, last).
+    ///         \a N = count.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -415,32 +419,32 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     of the first range the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements of
+    /// \param count        Refers to the range of elements of
     ///                     the first range the algorithm will be applied to.
     /// \param s_first      Refers to the beginning of the sequence of elements
     ///                     the algorithm will be searching for.
     /// \param s_last       Refers to the end of the sequence of elements of
     ///                     the algorithm will be searching for.
     ///
-    /// The comparison operations in the parallel \a find_first_of algorithm invoked
+    /// The comparison operations in the parallel \a search_n algorithm invoked
     /// with an execution policy object of type \a sequential_execution_policy
     /// execute in sequential order in the calling thread.
     ///
-    /// The comparison operations in the parallel \a find_first_of algorithm invoked
+    /// The comparison operations in the parallel \a search_n algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a find_first_of algorithm returns a \a hpx::future<FwdIter> if the
+    /// \returns  The \a search_n algorithm returns a \a hpx::future<FwdIter> if the
     ///           execution policy is of type \a task_execution_policy and
     ///           returns \a FwdIter otherwise.
-    ///           The \a find_first_of algorithm returns an iterator to the beginning of
-    ///           the last subsequence [s_first, s_last) in range [first, last).
+    ///           The \a search_n algorithm returns an iterator to the beginning of
+    ///           the first subsequence [s_first, s_last) in range [first, first+count).
     ///           If the length of the subsequence [s_first, s_last) is greater
-    ///           than the length of the range [first, last), \a last is returned.
+    ///           than the length of the range [first, first+count), \a first is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
-    ///           is found, \a last is also returned.
+    ///           is found, \a first is also returned.
     ///      
     template <typename ExPolicy, typename FwdIter, typename FwdIter2>
     inline typename boost::enable_if<
@@ -479,11 +483,11 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     }
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
-    /// Uses opeartor== to compare elements.
+    /// Uses a provided predicate to compare elements.
     ///
     /// \note   Complexity: at most (S*N) comparisons where
     ///         \a S = distance(s_first, s_last) and
-    ///         \a N = distance(first, last).
+    ///         \a N = count.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -502,32 +506,36 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     of the first range the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements of
+    /// \param count        Refers to the range of elements of
     ///                     the first range the algorithm will be applied to.
     /// \param s_first      Refers to the beginning of the sequence of elements
     ///                     the algorithm will be searching for.
     /// \param s_last       Refers to the end of the sequence of elements of
     ///                     the algorithm will be searching for.
+    /// \param op           Refers to the binary predicate which returns true if the 
+    ///                     elements should be treated as equal. the signature of
+    ///                     the function should be equivalent to
+    ///                     \code bool pred(const Type1 &a, const Type2 &b); \endcode
     ///
-    /// The comparison operations in the parallel \a find_first_of algorithm invoked
+    /// The comparison operations in the parallel \a search_n algorithm invoked
     /// with an execution policy object of type \a sequential_execution_policy
     /// execute in sequential order in the calling thread.
     ///
-    /// The comparison operations in the parallel \a find_first_of algorithm invoked
+    /// The comparison operations in the parallel \a search_n algorithm invoked
     /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a task_execution_policy are permitted to execute in an unordered
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a find_first_of algorithm returns a \a hpx::future<FwdIter> if the
+    /// \returns  The \a search_n algorithm returns a \a hpx::future<FwdIter> if the
     ///           execution policy is of type \a task_execution_policy and
     ///           returns \a FwdIter otherwise.
-    ///           The \a find_first_of algorithm returns an iterator to the beginning of
-    ///           the last subsequence [s_first, s_last) in range [first, last).
+    ///           The \a search_n algorithm returns an iterator to the beginning of
+    ///           the last subsequence [s_first, s_last) in range [first, first+count).
     ///           If the length of the subsequence [s_first, s_last) is greater
-    ///           than the length of the range [first, last), \a last is returned.
+    ///           than the length of the range [first, first+count), \a first is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
-    ///           is found, \a last is also returned.
+    ///           is found, \a first is also returned.
     ///      
     template <typename ExPolicy, typename FwdIter, typename FwdIter2,
         typename Pred>
