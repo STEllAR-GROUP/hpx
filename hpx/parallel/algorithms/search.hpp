@@ -33,7 +33,7 @@
 namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
     ///////////////////////////////////////////////////////////////////////////
-    // search 
+    // search
     namespace detail
     {
         /// \cond NOINTERNAL
@@ -64,7 +64,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     s_difference_type;
 
                 s_difference_type diff = std::distance(s_first, s_last);
-                if(diff <= 0) 
+                if(diff <= 0)
                 {
                     return detail::algorithm_result<ExPolicy, FwdIter>::get(
                         std::move(last));
@@ -175,7 +175,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           than the length of the range [first, last), \a last is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
     ///           is found, \a last is also returned.
-    ///           
+    ///
     template <typename ExPolicy, typename FwdIter, typename FwdIter2>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
@@ -200,7 +200,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::input_iterator_tag, s_iterator_category
             >::value),
             "Subsequence requires at least forward iterator.");
-        
+
         typedef typename boost::mpl::or_<
             is_sequential_execution_policy<ExPolicy>,
             boost::is_same<std::input_iterator_tag, iterator_category>
@@ -242,7 +242,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     the algorithm will be searching for.
     /// \param s_last       Refers to the end of the sequence of elements of
     ///                     the algorithm will be searching for.
-    /// \param op           Refers to the binary predicate which returns true if the 
+    /// \param op           Refers to the binary predicate which returns true if the
     ///                     elements should be treated as equal. the signature of
     ///                     the function should be equivalent to
     ///                     \code bool pred(const Type1 &a, const Type2 &b); \endcode
@@ -266,7 +266,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           than the length of the range [first, last), \a last is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
     ///           is found, \a last is also returned.
-    ///           
+    ///
     template <typename ExPolicy, typename FwdIter, typename FwdIter2,
         typename Pred>
     inline typename boost::enable_if<
@@ -292,7 +292,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::input_iterator_tag, s_iterator_category
             >::value),
             "Subsequence requires at least forward iterator.");
-        
+
         typedef typename boost::mpl::or_<
             is_sequential_execution_policy<ExPolicy>,
             boost::is_same<std::input_iterator_tag, iterator_category>
@@ -343,7 +343,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         std::move(first));
                 }
 
-                if(diff > count)
+                if(diff > s_difference_type(count))
                 {
                     return detail::algorithm_result<ExPolicy, FwdIter>::get(
                         std::move(first));
@@ -445,7 +445,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           than the length of the range [first, first+count), \a first is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
     ///           is found, \a first is also returned.
-    ///      
+    ///
     template <typename ExPolicy, typename FwdIter, typename FwdIter2>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
@@ -470,7 +470,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::input_iterator_tag, s_iterator_category
             >::value),
             "Subsequence requires at least forward iterator.");
-        
+
         typedef typename boost::mpl::or_<
             is_sequential_execution_policy<ExPolicy>,
             boost::is_same<std::input_iterator_tag, iterator_category>
@@ -512,7 +512,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     the algorithm will be searching for.
     /// \param s_last       Refers to the end of the sequence of elements of
     ///                     the algorithm will be searching for.
-    /// \param op           Refers to the binary predicate which returns true if the 
+    /// \param op           Refers to the binary predicate which returns true if the
     ///                     elements should be treated as equal. the signature of
     ///                     the function should be equivalent to
     ///                     \code bool pred(const Type1 &a, const Type2 &b); \endcode
@@ -536,7 +536,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           than the length of the range [first, first+count), \a first is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
     ///           is found, \a first is also returned.
-    ///      
+    ///
     template <typename ExPolicy, typename FwdIter, typename FwdIter2,
         typename Pred>
     inline typename boost::enable_if<
@@ -562,7 +562,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::input_iterator_tag, s_iterator_category
             >::value),
             "Subsequence requires at least forward iterator.");
-        
+
         typedef typename boost::mpl::or_<
             is_sequential_execution_policy<ExPolicy>,
             boost::is_same<std::input_iterator_tag, iterator_category>
