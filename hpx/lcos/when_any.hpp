@@ -10,7 +10,7 @@
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// Result type for \a when_any, contains a sequence of futures and an 
+    /// Result type for \a when_any, contains a sequence of futures and an
     /// index pointing to a ready future.
     template <typename Sequence>
     struct when_any_result
@@ -186,15 +186,18 @@ namespace hpx { namespace lcos
     template <typename Sequence>
     struct when_any_result
     {
-        static const std::size_t index_error = static_cast<std::size_t>(-1);
+        static std::size_t index_error()
+        {
+            return static_cast<std::size_t>(-1);
+        }
 
         when_any_result()
-          : index(static_cast<size_t>(index_error))
+          : index(static_cast<size_t>(index_error()))
           , futures()
         {}
 
         explicit when_any_result(Sequence&& futures)
-          : index(index_error)
+          : index(index_error())
           , futures(std::move(futures))
         {}
 
@@ -205,7 +208,7 @@ namespace hpx { namespace lcos
         when_any_result(when_any_result&& rhs)
           : index(rhs.index), futures(std::move(rhs.futures))
         {
-            rhs.index = index_error;
+            rhs.index = index_error();
         }
 
         std::size_t index;
@@ -229,7 +232,7 @@ namespace hpx { namespace lcos
             void operator()(Future& future) const
             {
                 std::size_t index = when_.index_.load(boost::memory_order_seq_cst);
-                if (index == when_any_result<Sequence>::index_error) {
+                if (index == when_any_result<Sequence>::index_error()) {
                     if (!future.is_ready()) {
                         // handle future only if not enough futures are ready yet
                         // also, do not touch any futures which are already ready
@@ -288,7 +291,7 @@ namespace hpx { namespace lcos
             void on_future_ready(std::size_t idx, threads::thread_id_type const& id)
             {
                 std::size_t index_not_initialized =
-                    when_any_result<Sequence>::index_error;
+                    when_any_result<Sequence>::index_error();
                 if (index_.compare_exchange_strong(index_not_initialized, idx))
                 {
                     // reactivate waiting thread only if it's not us
@@ -310,7 +313,7 @@ namespace hpx { namespace lcos
 
             when_any(argument_type && lazy_values)
               : lazy_values_(std::move(lazy_values))
-              , index_(when_any_result<Sequence>::index_error)
+              , index_(when_any_result<Sequence>::index_error())
               , goal_reached_on_calling_thread_(false)
             {}
 
@@ -330,7 +333,7 @@ namespace hpx { namespace lcos
                 }
 
                 // that should not happen
-                HPX_ASSERT(index_.load() != when_any_result<Sequence>::index_error);
+                HPX_ASSERT(index_.load() != when_any_result<Sequence>::index_error());
 
                 lazy_values_.index = index_.load();
                 return std::move(lazy_values_);
