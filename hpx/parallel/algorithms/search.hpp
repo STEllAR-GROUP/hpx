@@ -5,8 +5,8 @@
 
 /// \file parallel/algorithms/search.hpp
 
-#if !defined(HPX_PARALLEL_algorithms_SEARCH_NOV_9_2014_0317PM)
-#define HPX_PARALLEL_algorithms_SEARCH_NOV_9_2014_0317PM
+#if !defined(HPX_PARALLEL_ALGORITHMS_SEARCH_NOV_9_2014_0317PM)
+#define HPX_PARALLEL_ALGORITHMS_SEARCH_NOV_9_2014_0317PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
@@ -122,6 +122,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 });
             }
         };
+        /// \endcond
     }
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
@@ -391,6 +392,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 });
             }
         };
+        /// \endcond
     }
 
     /// Searches the range [first, first+count) for any elements in the range [s_first, s_last).
