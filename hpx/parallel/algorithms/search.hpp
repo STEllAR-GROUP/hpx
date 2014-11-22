@@ -84,7 +84,6 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     policy, first, count-(diff-1),
                     [=](std::size_t base_idx, FwdIter it, std::size_t part_size) mutable
                 {
-
                     FwdIter curr = it;
 
                     util::loop_idx_n(
@@ -356,7 +355,6 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     policy, first, count-(diff-1),
                     [=](std::size_t base_idx, FwdIter it, std::size_t part_size) mutable
                 {
-
                     FwdIter curr = it;
 
                     util::loop_idx_n(
@@ -371,7 +369,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                 FwdIter mid = curr;
 
                                 for(difference_type len = 0;
-                                    local_count != diff && len != count;
+                                    local_count != diff && len != difference_type(count);
                                     ++local_count, ++len, ++mid)
                                 {
                                     if(*mid != *++needle)
@@ -386,7 +384,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
                 {
                     difference_type search_res = tok.get_data();
-                    if( search_res != count)
+                    if(search_res != s_difference_type(count))
                         std::advance(first, search_res);
 
                     return std::move(first);
