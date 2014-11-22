@@ -76,7 +76,7 @@ namespace hpx { namespace plugins { namespace parcel
         stopped_(false)
     {}
 
-    void coalescing_message_handler::put_parcel(parcelset::parcel& p,
+    void coalescing_message_handler::put_parcel(parcelset::locality const & dest, parcelset::parcel& p,
         write_handler_type const& f)
     {
         mutex_type::scoped_lock l(mtx_);
@@ -84,12 +84,12 @@ namespace hpx { namespace plugins { namespace parcel
             l.unlock();
 
             // this instance should not buffer parcels anymore
-            pp_->put_parcel(p, f);
+            pp_->put_parcel(dest, p, f);
             return;
         }
 
         detail::message_buffer::message_buffer_append_state s =
-            buffer_.append(p, f);
+            buffer_.append(dest, p, f);
 
         switch(s) {
         case detail::message_buffer::first_message:

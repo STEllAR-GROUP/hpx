@@ -304,17 +304,20 @@ namespace hpx { namespace applier
     ///////////////////////////////////////////////////////////////////////////
     hpx::util::thread_specific_ptr<applier*, applier::tls_tag> applier::applier_;
 
-    applier::applier(parcelset::parcelhandler &ph, threads::threadmanager_base& tm,
-                boost::uint64_t rts, boost::uint64_t mem)
+    applier::applier(parcelset::parcelhandler &ph, threads::threadmanager_base& tm)
       : parcel_handler_(ph), thread_manager_(tm)
-      , runtime_support_id_(parcel_handler_.get_locality().get_msb(),
-            rts, naming::id_type::unmanaged)
-      , memory_id_(parcel_handler_.get_locality().get_msb(),
-            mem, naming::id_type::unmanaged)
 #if defined(HPX_HAVE_SECURITY)
       , verify_capabilities_(false)
 #endif
     {}
+
+    void applier::initialize(boost::uint64_t rts, boost::uint64_t mem)
+    {
+        runtime_support_id_ = naming::id_type(parcel_handler_.get_locality().get_msb(),
+                rts, naming::id_type::unmanaged);
+        memory_id_ = naming::id_type(parcel_handler_.get_locality().get_msb(),
+            mem, naming::id_type::unmanaged);
+    }
 
     naming::resolver_client& applier::get_agas_client()
     {
@@ -329,11 +332,6 @@ namespace hpx { namespace applier
     threads::threadmanager_base& applier::get_thread_manager()
     {
         return thread_manager_;
-    }
-
-    naming::locality const& applier::here() const
-    {
-        return hpx::get_locality();
     }
 
     naming::gid_type const& applier::get_raw_locality(error_code& ec) const
@@ -438,7 +436,7 @@ namespace hpx { namespace applier
             caps_sender = cert.get_type().get_capability();
 #endif
         int comptype = act->get_component_type();
-        naming::locality dest = p.get_destination_locality();
+        naming::gid_type dest = p.get_destination_locality();
 
         // fetch the set of destinations
         std::size_t size = p.size();

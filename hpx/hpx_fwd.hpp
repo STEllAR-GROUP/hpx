@@ -104,9 +104,10 @@ namespace hpx
         // NOTE: we do not export the symbol here as id_type was already exported and generates a warning on gcc otherwise
         struct id_type;
         struct HPX_API_EXPORT address;
-        class HPX_API_EXPORT locality;
 
         HPX_API_EXPORT resolver_client& get_agas_client();
+
+        typedef boost::uint64_t address_type;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -123,6 +124,10 @@ namespace hpx
             connection_mpi = 4,
             connection_last
         };
+
+        class HPX_API_EXPORT locality;
+
+        typedef std::vector<locality> endpoints_type;
 
         class HPX_API_EXPORT parcel;
         class HPX_API_EXPORT parcelport;
@@ -148,7 +153,7 @@ namespace hpx
 
         HPX_API_EXPORT policies::message_handler* get_message_handler(
             parcelhandler* ph, char const* name, char const* type, std::size_t num,
-            std::size_t interval, naming::locality const& l, connection_type t,
+            std::size_t interval, locality const& l,
             error_code& ec = throws);
 
         HPX_API_EXPORT void do_background_work();
@@ -523,8 +528,8 @@ namespace hpx
     HPX_API_EXPORT runtime& get_runtime();
     HPX_API_EXPORT runtime* get_runtime_ptr();
 
-    /// The function \a get_locality returns a reference to the locality
-    HPX_API_EXPORT naming::locality const& get_locality();
+    /// The function \a get_locality returns a reference to the locality prefix
+    HPX_API_EXPORT naming::gid_type const& get_locality();
 
     /// The function \a get_runtime_instance_number returns a unique number
     /// associated with the runtime instance the current thread is running in.

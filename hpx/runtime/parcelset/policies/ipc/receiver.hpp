@@ -9,6 +9,7 @@
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
 #include <hpx/runtime/parcelset/policies/ipc/data_window.hpp>
 #include <hpx/runtime/parcelset/policies/ipc/data_buffer.hpp>
+#include <hpx/runtime/parcelset/policies/ipc/locality.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 
@@ -30,12 +31,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
     public:
         /// Construct a listening receiver with the given io_service.
         receiver(boost::asio::io_service& io_service,
-                naming::locality here,
+                parcelset::locality here,
                 connection_handler& parcelport)
           : window_(io_service), parcelport_(parcelport)
         {
-            std::string fullname(here.get_address() + "." +
-                boost::lexical_cast<std::string>(here.get_port()));
+            std::string fullname(here.get<locality>().address() + "." +
+                boost::lexical_cast<std::string>(here.get<locality>().port()));
             window_.set_option(data_window::bound_to(fullname));
         }
 

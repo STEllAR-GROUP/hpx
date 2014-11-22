@@ -9,11 +9,12 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-#include <hpx/runtime/naming/locality.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 #include <hpx/runtime/parcelset/policies/ibverbs/acceptor.hpp>
-#include <hpx/runtime/parcelset/policies/ibverbs/memory_pool.hpp>
+#include <hpx/runtime/parcelset/policies/ibverbs/locality.hpp>
 
+#include <hpx/util/memory_chunk_pool.hpp>
 
 namespace hpx { namespace parcelset {
     namespace policies { namespace ibverbs
@@ -49,6 +50,8 @@ namespace hpx { namespace parcelset {
 
     namespace policies { namespace ibverbs
     {
+        parcelset::locality parcelport_address(util::runtime_configuration const & ini);
+
         class HPX_EXPORT connection_handler
           : public parcelport_impl<connection_handler>
         {
@@ -83,14 +86,17 @@ namespace hpx { namespace parcelset {
             std::string get_locality_name() const;
 
             boost::shared_ptr<sender> create_connection(
-                naming::locality const& l, error_code& ec);
+                parcelset::locality const& l, error_code& ec);
+
+            parcelset::locality agas_locality(util::runtime_configuration const & ini) const;
+
+            parcelset::locality create_locality() const;
 
             void add_sender(boost::shared_ptr<sender> const& sender_connection);
 
             ibv_pd *get_pd(ibv_context *context, boost::system::error_code & ec);
 
-            ibv_mr register_buffer(ibv_pd * pd, char * buffer, std::size_t size, int access);
-            ibv_mr get_mr(ibv_pd * pd, char * buffer, std::size_t);
+            ibverbs_mr register_buffer(ibv_pd * pd, char * buffer, std::size_t size, int access);
 
         private:
             // helper functions for receiving parcels
@@ -99,15 +105,22 @@ namespace hpx { namespace parcelset {
             bool do_receives();
             void handle_accepts();
 
-            memory_pool memory_pool_;
+            util::memory_chunk_pool memory_pool_;
 
             typedef std::map<ibv_context *, ibv_pd *> pd_map_type;
             hpx::lcos::local::spinlock pd_map_mtx_;
             pd_map_type pd_map_;
 
+            std::size_t mr_cache_size_;
+
+            typedef std::pair<char *, util::memory_chunk_pool::size_type> chunk_pair;
+            typedef boost::cache::entries::lru_entry<ibverbs_mr> mr_cache_entry_type;
+            typedef boost::cache::local_cache<chunk_pair, mr_cache_entry_type> mr_cache_type;
+            /*
             typedef
-                std::map<void *, ibverbs_mr>
+                std::map<chunk_pair, ibverbs_mr>
                 mr_cache_type;
+            */
             typedef
                 std::map<ibv_pd *, mr_cache_type>
                 mr_map_type;
@@ -128,10 +141,6 @@ namespace hpx { namespace parcelset {
             hpx::lcos::local::spinlock senders_mtx_;
             typedef std::list<boost::shared_ptr<sender> > senders_type;
             senders_type senders_;
-
-            double time_send;
-            double time_recv;
-            double time_acct;
 
             boost::atomic<bool> stopped_;
             boost::atomic<bool> handling_messages_;

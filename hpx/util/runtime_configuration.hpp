@@ -11,7 +11,6 @@
 #include <string>
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/components/static_factory_data.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/plugin/dll.hpp>
@@ -56,13 +55,6 @@ namespace hpx { namespace util
         // sequence number of first usable pu
         boost::uint32_t get_first_used_core() const;
         void set_first_used_core(boost::uint32_t);
-
-        // Get the AGAS locality to use
-        naming::locality get_agas_locality() const;
-        void set_agas_locality(naming::locality const & agas_locality);
-
-        // Get the HPX network address to use
-        naming::locality get_parcelport_address() const;
 
         // Get the IP of the ibverbs adapter to use
         std::string get_ibverbs_address() const;
@@ -149,7 +141,6 @@ namespace hpx { namespace util
 
     private:
         mutable boost::uint32_t num_localities;
-        naming::locality agas_locality_;
         std::ptrdiff_t small_stacksize;
         std::ptrdiff_t medium_stacksize;
         std::ptrdiff_t large_stacksize;

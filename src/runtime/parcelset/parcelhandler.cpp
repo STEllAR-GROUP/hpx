@@ -12,6 +12,7 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util/mpi_environment.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
@@ -131,10 +132,10 @@ namespace hpx { namespace parcelset
     ///////////////////////////////////////////////////////////////////////////
     policies::message_handler* get_message_handler(
         parcelhandler* ph, char const* action, char const* type, std::size_t num,
-        std::size_t interval, naming::locality const& loc, connection_type t,
+        std::size_t interval, locality const& loc,
         error_code& ec)
     {
-        return ph->get_message_handler(action, type, num, interval, loc, t, ec);
+        return ph->get_message_handler(action, type, num, interval, loc, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -186,15 +187,58 @@ namespace hpx { namespace parcelset
     }
 
     parcelhandler::parcelhandler(naming::resolver_client& resolver,
-            threads::threadmanager_base* tm, parcelhandler_queue_base* policy)
+            threads::threadmanager_base* tm, parcelhandler_queue_base* policy,
+            HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
+            HPX_STD_FUNCTION<void()> const& on_stop_thread)
       : resolver_(resolver),
         pports_(connection_last),
+        endpoints_(connection_last),
         tm_(tm),
         parcels_(policy),
         use_alternative_parcelports_(false),
         enable_parcel_handling_(true),
         count_routed_(0)
-    {}
+    {
+#if defined(HPX_PARCELPORT_IPC)
+        std::string enable_ipc =
+            get_config_entry("hpx.parcel.ipc.enable", "0");
+
+        if (hpx::util::safe_lexical_cast<int>(enable_ipc, 0))
+        {
+            attach_parcelport(parcelport::create(
+                connection_ipc, hpx::get_config(),
+                on_start_thread, on_stop_thread), false);
+        }
+#endif
+#if defined(HPX_PARCELPORT_IBVERBS)
+        std::string enable_ibverbs =
+            get_config_entry("hpx.parcel.ibverbs.enable", "0");
+
+        if (hpx::util::safe_lexical_cast<int>(enable_ibverbs, 0))
+        {
+            attach_parcelport(parcelport::create(
+                connection_ibverbs, hpx::get_config(),
+                on_start_thread, on_stop_thread), false);
+        }
+#endif
+#if defined(HPX_PARCELPORT_MPI)
+        if (util::mpi_environment::enabled()) {
+            attach_parcelport(parcelport::create(
+                connection_mpi, hpx::get_config(),
+                on_start_thread, on_stop_thread), false);
+        }
+#endif
+
+#if defined(HPX_PARCELPORT_TCP)
+        std::string enable_tcp =
+            get_config_entry("hpx.parcel.tcp.enable", "1");
+        if (hpx::util::safe_lexical_cast<int>(enable_tcp, 1)) {
+            attach_parcelport(parcelport::create(
+                connection_tcp, hpx::get_config(),
+                on_start_thread, on_stop_thread), false);
+        }
+#endif
+    }
 
     std::vector<std::string> parcelhandler::load_runtime_configuration()
     {
@@ -276,78 +320,42 @@ namespace hpx { namespace parcelset
         return ini_defs;
     }
 
+    boost::shared_ptr<parcelport> parcelhandler::get_bootstrap_parcelport() const
+    {
+        std::string pptype = get_config_entry("hpx.parcel.bootstrap", "tcp");
 
-    void parcelhandler::initialize(boost::shared_ptr<parcelport> pp)
+        int type = get_connection_type_from_name(pptype);
+        if (type == connection_unknown)
+        {
+#if defined(HPX_PARCELPORT_MPI)
+            if (util::mpi_environment::enabled())
+                type = connection_mpi;
+            else
+#endif
+            type = connection_tcp;
+        }
+
+        return pports_[type];
+    }
+
+
+    void parcelhandler::initialize()
     {
         HPX_ASSERT(parcels_);
 
-        // AGAS v2 registers itself in the client before the parcelhandler
-        // is booted.
-        locality_ = resolver_.get_local_locality();
-
         parcels_->set_parcelhandler(this);
-
-        attach_parcelport(pp, false);
-
-        util::io_service_pool *pool = 0;
-#if defined(HPX_PARCELPORT_MPI)
-        bool tcp_bootstrap = (get_config_entry("hpx.parcel.bootstrap", "tcp") == "tcp");
-        if (tcp_bootstrap)
+        for(int i = 0; i < connection_type::connection_last; ++i)
         {
-            pool = pports_[connection_tcp]->get_thread_pool("parcel_pool_tcp");
-        }
-        else
-        {
-            pool = pports_[connection_mpi]->get_thread_pool("parcel_pool_mpi");
-        }
-#else
-        pool = pports_[connection_tcp]->get_thread_pool("parcel_pool_tcp");
-#endif
-        HPX_ASSERT(0 != pool);
-
-
-#if defined(HPX_PARCELPORT_IPC)
-        std::string enable_ipc =
-            get_config_entry("hpx.parcel.ipc.enable", "0");
-
-        if (hpx::util::safe_lexical_cast<int>(enable_ipc, 0))
-        {
-            attach_parcelport(parcelport::create(
-                connection_ipc, hpx::get_config(),
-                pool->get_on_start_thread(), pool->get_on_stop_thread()));
-        }
-#endif
-#if defined(HPX_PARCELPORT_IBVERBS)
-        std::string enable_ibverbs =
-            get_config_entry("hpx.parcel.ibverbs.enable", "0");
-
-        if (hpx::util::safe_lexical_cast<int>(enable_ibverbs, 0))
-        {
-            attach_parcelport(parcelport::create(
-                connection_ibverbs, hpx::get_config(),
-                pool->get_on_start_thread(), pool->get_on_stop_thread()));
-        }
-#endif
-#if defined(HPX_PARCELPORT_MPI)
-        if (tcp_bootstrap)
-        {
-            if (util::mpi_environment::enabled()) {
-                attach_parcelport(parcelport::create(
-                    connection_mpi, hpx::get_config(),
-                    pool->get_on_start_thread(), pool->get_on_stop_thread()));
+            if(pports_[i])
+            {
+                if(pports_[i] != get_bootstrap_parcelport())
+                    pports_[i]->run(false);
+                else
+                {
+                    pports_[i]->register_event_handler(boost::bind(&parcelhandler::parcel_sink, this, _1));
+                }
             }
         }
-        else
-        {
-            std::string enable_tcp =
-                get_config_entry("hpx.parcel.tcp.enable", "1");
-            if (hpx::util::safe_lexical_cast<int>(enable_tcp, 1)) {
-                attach_parcelport(parcelport::create(
-                    connection_tcp, hpx::get_config(),
-                    pool->get_on_start_thread(), pool->get_on_stop_thread()));
-            }
-        }
-#endif
     }
 
     void parcelhandler::list_parcelport(util::osstream& strm, connection_type t,
@@ -403,7 +411,7 @@ namespace hpx { namespace parcelset
     parcelport* parcelhandler::find_parcelport(connection_type type,
         error_code& ec) const
     {
-        if (!pports_[type]) { //-V108
+        if (HPX_UNLIKELY(!pports_[type])) { //-V108
             HPX_THROWS_IF(ec, bad_parameter, "parcelhandler::find_parcelport",
                 "cannot find parcelport for connection type " +
                     get_connection_type_name(type));
@@ -427,22 +435,29 @@ namespace hpx { namespace parcelset
 
         // add the new parcelport to the list of parcel-ports we care about
         pports_[pp->get_type()] = pp;
+
+        // add the endpoint of the new parcelport
+        HPX_ASSERT(pp->get_type() == pp->here().get_type());
+        endpoints_[pp->get_type()] = pp->here();
     }
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Make sure the specified locality is not held by any
     /// connection caches anymore
-    void parcelhandler::remove_from_connection_cache(naming::locality const& loc)
+    void parcelhandler::remove_from_connection_cache(endpoints_type const& endpoints)
     {
-        parcelport* pp = find_parcelport(loc.get_type());
-        if (!pp) {
-            HPX_THROW_EXCEPTION(network_error,
-                "parcelhandler::remove_from_connection_cache",
-                "cannot find parcelport for connection type " +
-                    get_connection_type_name(loc.get_type()));
-            return;
+        BOOST_FOREACH(locality const & loc, endpoints)
+        {
+            boost::shared_ptr<parcelport> pp = pports_[loc.get_type()];
+            if (!pp) {
+                HPX_THROW_EXCEPTION(network_error,
+                    "parcelhandler::remove_from_connection_cache",
+                    "cannot find parcelport for connection type " +
+                        get_connection_type_name(loc.get_type()));
+                return;
+            }
+            pp->remove_from_connection_cache(loc);
         }
-        pp->remove_from_connection_cache(loc);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -485,6 +500,11 @@ namespace hpx { namespace parcelset
         return resolver_;
     }
 
+    naming::gid_type const& parcelhandler::get_locality() const
+    {
+        return resolver_.get_local_locality();
+    }
+
     bool parcelhandler::get_raw_remote_localities(
         std::vector<naming::gid_type>& locality_ids,
         components::component_type type, error_code& ec) const
@@ -495,7 +515,7 @@ namespace hpx { namespace parcelset
         if (ec || !result) return false;
 
         std::remove_copy(allprefixes.begin(), allprefixes.end(),
-            std::back_inserter(locality_ids), locality_);
+            std::back_inserter(locality_ids), get_locality());
 
         return !locality_ids.empty();
     }
@@ -510,70 +530,113 @@ namespace hpx { namespace parcelset
         return !locality_ids.empty();
     }
 
-    connection_type parcelhandler::find_appropriate_connection_type(
-        naming::locality const& dest)
+    locality parcelhandler::find_appropriate_destination(
+        naming::gid_type const& dest_gid)
     {
-        connection_type dest_type = dest.get_type();
+        mutex_type::scoped_lock l(resolved_endpoints_mtx_);
+        resolved_endpoints_type::iterator lit = resolved_endpoints_.find(dest_gid);
+
+        if(lit == resolved_endpoints_.end())
+        {
+            HPX_THROW_EXCEPTION(network_error, "parcelhandler::find_appropriate_destination",
+                "The locality gid cannot be resolved to a valid endpoint");
+            return locality();
+        }
+        endpoints_type const & dest_endpoints = lit->second;
 
 #if defined(HPX_PARCELPORT_IPC)
-        if (dest_type == connection_tcp || dest_type == connection_mpi) {
-            std::string enable_ipc =
-                get_config_entry("hpx.parcel.ipc.enable", "0");
-
-            // if destination is on the same network node, use shared memory
-            // otherwise fall back to tcp
-            if (use_alternative_parcelports_ &&
-                dest.get_address() == here().get_address() &&
-                hpx::util::safe_lexical_cast<int>(enable_ipc, 0))
+        std::string enable_ipc =
+            get_config_entry("hpx.parcel.ipc.enable", "0");
+        if(use_alternative_parcelports_ && hpx::util::safe_lexical_cast<int>(enable_ipc, 0))
+        {
+            // Find ipc parcelport endpoints ...
+            locality here = find_endpoint(endpoints_, connection_ipc);
+            locality dest = find_endpoint(dest_endpoints, connection_ipc);
+            if(here == dest && pports_[connection_ipc])
             {
-                if (pports_[connection_ipc])
-                    return connection_ipc;
+                return dest;
             }
         }
 #endif
 #if defined(HPX_PARCELPORT_IBVERBS)
-        // FIXME: add check if ibverbs are really available for this destination.
+        // FIXME: add check if ibverbs is really available for this destination.
 
-        if (dest_type == connection_tcp || dest_type == connection_mpi) {
-            std::string enable_ibverbs =
-                get_config_entry("hpx.parcel.ibverbs.enable", "0");
-            if (use_alternative_parcelports_ &&
-                hpx::util::safe_lexical_cast<int>(enable_ibverbs, 0))
+        std::string enable_ibverbs =
+            get_config_entry("hpx.parcel.ibverbs.enable", "0");
+        if (use_alternative_parcelports_ && hpx::util::safe_lexical_cast<int>(enable_ibverbs, 0))
+        {
+            // Find ibverbs parcelport endpoints ...
+            locality dest = find_endpoint(dest_endpoints, connection_ibverbs);
+            if(dest && pports_[connection_ibverbs])
             {
-                if (pports_[connection_ibverbs])
-                    return connection_ibverbs;
+                return dest;
             }
         }
 #endif
 #if defined(HPX_PARCELPORT_MPI)
         // FIXME: add check if MPI is really available for this destination.
 
-        if (dest_type == connection_tcp || dest_type == connection_mpi) {
-            if ((use_alternative_parcelports_ ||
-                 get_config_entry("hpx.parcel.bootstrap", "tcp") == "mpi") &&
-                 util::mpi_environment::enabled() &&
-                 dest.get_rank() != -1)
+        if ((use_alternative_parcelports_ ||
+             get_config_entry("hpx.parcel.bootstrap", "tcp") == "mpi") &&
+             util::mpi_environment::enabled())
+        {
+            // Find MPI parcelport endpoints ...
+            locality dest = find_endpoint(dest_endpoints, connection_mpi);
+            if(dest && pports_[connection_mpi])
             {
-                if (pports_[connection_mpi])
-                    return connection_mpi;
-            }
-        }
-        else if (dest.get_type() == connection_mpi) {
-            // fall back to TCP/IP if MPI is disabled
-            if (!util::mpi_environment::enabled())
-            {
-                if (pports_[connection_tcp])
-                    return connection_tcp;
+                return dest;
             }
         }
 #endif
-        return dest_type;
+#if defined(HPX_PARCELPORT_TCP)
+        // FIXME: add check if tcp is really available for this destination.
+
+        std::string enable_tcp =
+            get_config_entry("hpx.parcel.tcp.enable", "0");
+        if (hpx::util::safe_lexical_cast<int>(enable_tcp, 0))
+        {
+            // Find ibverbs parcelport endpoints ...
+            locality dest = find_endpoint(dest_endpoints, connection_tcp);
+            if(dest && pports_[connection_tcp])
+            {
+                return dest;
+            }
+        }
+#endif
+
+        HPX_THROW_EXCEPTION(network_error, "parcelhandler::find_appropriate_destination",
+            "The locality gid cannot be resolved to a valid endpoint.");
+        return locality();
+    }
+
+    locality parcelhandler::find_endpoint(endpoints_type const & eps, connection_type type)
+    {
+        locality res;
+        BOOST_FOREACH(locality const & loc, eps)
+        {
+            if(loc.get_type() == type)
+            {
+                res = loc;
+                break;
+            }
+        }
+        return res;
     }
 
     // this function  will be called right after pre_main
     void parcelhandler::set_resolved_localities(
-        std::vector<naming::locality> const& localities)
+        std::map<naming::gid_type, endpoints_type> const& localities)
     {
+        mutex_type::scoped_lock l(resolved_endpoints_mtx_);
+        if(resolved_endpoints_.empty())
+        {
+            resolved_endpoints_ = localities;
+            return;
+        }
+        BOOST_FOREACH(resolved_endpoints_type::value_type const & resolved, localities)
+        {
+            resolved_endpoints_[resolved.first] = resolved.second;
+        }
     }
 
     /// Return the reference to an existing io_service
@@ -637,7 +700,9 @@ namespace hpx { namespace parcelset
 
 #if !defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
         if (!addrs[0])
+        {
             resolved_locally = resolver_.resolve_local(ids[0], addrs[0]);
+        }
 #else
         std::size_t size = p.size();
 
@@ -663,6 +728,7 @@ namespace hpx { namespace parcelset
         // If we were able to resolve the address(es) locally we send the
         // parcel directly to the destination.
         if (resolved_locally) {
+
             // re-wrap the given parcel-sent handler
             using util::placeholders::_1;
             write_handler_type wrapped_f =
@@ -670,16 +736,16 @@ namespace hpx { namespace parcelset
 
             // dispatch to the message handler which is associated with the
             // encapsulated action
-            connection_type t = find_appropriate_connection_type(addrs[0].locality_);
+            parcelset::locality dest = find_appropriate_destination(addrs[0].locality_);
             policies::message_handler* mh =
-                p.get_message_handler(this, addrs[0].locality_, t);
+                p.get_message_handler(this, dest);
 
             if (mh) {
-                mh->put_parcel(p, wrapped_f);
+                mh->put_parcel(dest, p, wrapped_f);
                 return;
             }
 
-            find_parcelport(t)->put_parcel(p, wrapped_f);
+            find_parcelport(dest.get_type())->put_parcel(dest, p, wrapped_f);
             return;
         }
 
@@ -732,7 +798,7 @@ namespace hpx { namespace parcelset
     policies::message_handler* parcelhandler::get_message_handler(
         char const* action, char const* message_handler_type,
         std::size_t num_messages, std::size_t interval,
-        naming::locality const& loc, connection_type t, error_code& ec)
+        locality const& loc, error_code& ec)
     {
         mutex_type::scoped_lock l(handlers_mtx_);
         handler_key_type key(loc, action);
@@ -743,7 +809,7 @@ namespace hpx { namespace parcelset
             {
                 util::scoped_unlock<mutex_type::scoped_lock> ul(l);
                 p.reset(hpx::create_message_handler(message_handler_type,
-                    action, find_parcelport(t), num_messages, interval, ec));
+                    action, find_parcelport(loc.get_type()), num_messages, interval, ec));
             }
 
             it = handlers_.find(key);

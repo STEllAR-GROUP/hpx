@@ -18,7 +18,6 @@
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
-#include <hpx/runtime/naming/locality.hpp>
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
@@ -27,8 +26,6 @@
 #include <map>
 
 #include <boost/format.hpp>
-#include <boost/fusion/include/vector.hpp>
-#include <boost/fusion/include/at_c.hpp>
 
 namespace hpx { namespace agas
 {
@@ -126,7 +123,6 @@ struct HPX_EXPORT primary_namespace
     gva_table_type gvas_;
     refcnt_table_type refcnts_;
     std::string instance_name_;
-    naming::locality locality_;
     naming::gid_type next_id_;      // next available gid
     boost::uint32_t locality_id_;   // our locality id
 
@@ -396,8 +392,7 @@ struct HPX_EXPORT primary_namespace
 
     static parcelset::policies::message_handler* get_message_handler(
         parcelset::parcelhandler* ph
-      , naming::locality const& loc
-      , parcelset::connection_type t
+      , parcelset::locality const& loc
       , parcelset::parcel const& p
         );
 
@@ -424,13 +419,12 @@ namespace hpx { namespace traits
     {
         static parcelset::policies::message_handler* call(
             parcelset::parcelhandler* ph
-          , naming::locality const& loc
-          , parcelset::connection_type t
+          , parcelset::locality const& loc
           , parcelset::parcel const& p
             )
         {
             return agas::server::primary_namespace::get_message_handler(
-                ph, loc, t, p);
+                ph, loc, p);
         }
     };
 

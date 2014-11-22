@@ -98,7 +98,7 @@ struct HPX_EXPORT response
 
     response(
         namespace_action_code type_
-      , std::vector<naming::locality> const& localities_
+      , std::map<naming::gid_type, parcelset::endpoints_type> const & localities_
       , error status_ = success
         );
 
@@ -127,7 +127,7 @@ struct HPX_EXPORT response
         error_code& ec = throws
         ) const;
 
-    std::vector<naming::locality> get_resolved_localities(
+    std::map<naming::gid_type, parcelset::endpoints_type> get_resolved_localities(
         error_code& ec = throws
         ) const;
 
@@ -339,9 +339,9 @@ struct get_remote_result<std::vector<boost::uint32_t>, agas::response>
 };
 
 template <>
-struct get_remote_result<std::vector<naming::locality>, agas::response>
+struct get_remote_result<std::map<naming::gid_type, parcelset::endpoints_type>, agas::response>
 {
-    static std::vector<naming::locality> call(
+    static std::map<naming::gid_type, parcelset::endpoints_type> call(
         agas::response const& rep
         )
     {

@@ -9,7 +9,6 @@
 
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/util/stringstream.hpp>
@@ -26,11 +25,8 @@ namespace hpx { namespace components { namespace server
     void destroy(naming::gid_type const& gid, naming::address const& addr,
         error_code& ec = throws)
     {
-        // retrieve the local address bound to the given global id
-        applier::applier& appl = hpx::applier::get_applier();
-
         // make sure this component is located here
-        if (appl.here() != addr.locality_)
+        if (get_locality() != addr.locality_)
         {
             // This component might have been migrated, find out where it is
             // and instruct that locality to delete it.

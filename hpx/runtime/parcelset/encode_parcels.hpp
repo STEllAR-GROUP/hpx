@@ -138,14 +138,6 @@ namespace hpx { namespace parcelset
     {
         typedef parcel_buffer<typename Connection::buffer_type> parcel_buffer_type;
 
-#if defined(HPX_DEBUG)
-        // make sure that all parcels go to the same locality
-        BOOST_FOREACH(parcel const& p, pv)
-        {
-            naming::locality const locality_id = p.get_destination_locality();
-            HPX_ASSERT(locality_id == connection.destination());
-        }
-#endif
         // collect argument sizes from parcels
         std::size_t arg_size = 0;
         boost::uint32_t dest_locality_id = pv[0].get_destination_locality_id();
@@ -296,6 +288,7 @@ namespace hpx { namespace parcelset
                 }
             }
         }
+
 
         return;
     }

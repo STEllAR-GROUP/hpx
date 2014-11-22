@@ -63,7 +63,7 @@ namespace boost { namespace cache
         typename CacheStorage = std::map<Key, Entry>,
         typename Statistics = statistics::no_statistics
     >
-    class local_cache : boost::noncopyable
+    class local_cache
     {
         ///////////////////////////////////////////////////////////////////////
         // The UpdatePolicy Concept expects to get passed references to
@@ -85,6 +85,8 @@ namespace boost { namespace cache
 
             Func f_;    // user supplied UpdatePolicy
         };
+
+        HPX_MOVABLE_BUT_NOT_COPYABLE(local_cache);
 
     public:
         typedef Key key_type;
@@ -132,6 +134,16 @@ namespace boost { namespace cache
                 insert_policy_type const& ip = insert_policy_type())
           : max_size_(max_size), current_size_(0),
             update_policy_(up), insert_policy_(ip)
+        {}
+
+        local_cache(local_cache&& other)
+          : max_size_(other.max_size_)
+          , current_size_(other.current_size_)
+          , store_(std::move(other.store_))
+          , entry_heap_(std::move(other.entry_heap_))
+          , update_policy_(std::move(other.update_policy_.f_))
+          , insert_policy_(std::move(other.insert_policy_))
+          , statistics_(std::move(other.statistics_))
         {}
 
         ///////////////////////////////////////////////////////////////////////

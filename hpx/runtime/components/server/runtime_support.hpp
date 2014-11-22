@@ -216,7 +216,7 @@ namespace hpx { namespace components { namespace server
         boost::int32_t get_instance_count(components::component_type);
 
         /// \brief Remove the given locality from our connection cache
-        void remove_from_connection_cache(naming::locality const& l);
+        void remove_from_connection_cache(parcelset::endpoints_type const& eps);
 
         /// \brief termination detection
 #if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
