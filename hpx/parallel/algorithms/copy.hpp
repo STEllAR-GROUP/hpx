@@ -9,14 +9,13 @@
 #define HPX_PARALLEL_DETAIL_COPY_MAY_30_2014_0317PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/move.hpp>
-
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
+#include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
+#include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <algorithm>
@@ -293,6 +292,81 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
+        inline std::pair<std::size_t, std::size_t>
+        add_pairs(std::pair<std::size_t, std::size_t> const& lhs,
+                  std::pair<std::size_t, std::size_t> const& rhs)
+        {
+            //we care about the first pair only
+            return std::make_pair(lhs.first + rhs.first, 0);
+        }
+
+        template <typename FwdIter, typename Op>
+        typename std::iterator_traits<FwdIter>::value_type
+        sequential_exclusive_scan(FwdIter first, FwdIter last, Op && op)
+        {
+            typedef typename std::iterator_traits<FwdIter>::value_type value_type;
+            if(first == last)
+                return std::make_pair(0, 0);
+
+            value_type tmp = *first;
+            value_type sum = op(std::make_pair(0,0), tmp);
+
+            for(++first; first != last; ++first)
+            {
+                tmp = *first;
+                sum = op(sum, tmp);
+            }
+
+            return sum;
+        }
+
+        template <typename ExPolicy, typename Pair, typename FwdIter1,
+          typename FwdIter2>
+        typename detail::algorithm_result<ExPolicy, FwdIter2>::type
+        copy_if_helper(ExPolicy const& policy, std::vector<Pair> && results,
+          FwdIter1 first, std::size_t count, FwdIter2 dest,
+          boost::shared_array<char> flags)
+        {
+            typedef hpx::util::zip_iterator<FwdIter1, char*> zip_iterator;
+            typedef typename zip_iterator::reference reference;
+            typedef typename detail::algorithm_result<ExPolicy, FwdIter2>::type
+                result_type;
+
+            std::size_t chunk_size = (results.size() > 1) ? results[1].second : count;
+
+            Pair sum = sequential_exclusive_scan(boost::begin(results),
+                boost::end(results), &add_pairs);
+
+            using hpx::util::make_zip_iterator;
+            return util::partitioner<ExPolicy, FwdIter2, void>::
+                call_with_data(policy,
+                    make_zip_iterator(first, flags.get()), count,
+                    [dest](Pair const& data, zip_iterator part_begin,
+                        std::size_t part_size)
+                    {
+                        FwdIter2 out_iter = dest;
+                        std::advance(out_iter, std::get<0>(data));
+
+                        util::loop_n(part_begin, part_size,
+                        [&dest, &out_iter](zip_iterator d)
+                        {
+                            using hpx::util::get;
+                            if(get<1>(*d))
+                            *out_iter++ = get<0>(*d);
+                        });
+
+                        return data;
+                    },
+                    hpx::util::unwrapped(
+                        [=](std::vector<Pair> &&) -> FwdIter2
+                        {
+                            std::advance(dest, std::get<0>(sum));
+                            return dest;
+                        }
+                    ),
+                    chunk_size, results);
+        }
+
         template <typename OutIter>
         struct copy_if : public detail::algorithm<copy_if<OutIter>, OutIter>
         {
@@ -313,21 +387,47 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
                 OutIter dest, F && f)
             {
-                typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
+                typedef hpx::util::zip_iterator<FwdIter, char*> zip_iterator;
                 typedef typename zip_iterator::reference reference;
-                typedef
-                    typename detail::algorithm_result<ExPolicy, OutIter>::type
-                result_type;
 
-                return get_iter<1, result_type>(
-                    for_each_n<zip_iterator>().call(policy,
-                        hpx::util::make_zip_iterator(first, dest),
-                        std::distance(first,last),
-                        [f](reference t) {
-                            if (f(hpx::util::get<0>(t)))
-                                hpx::util::get<1>(t) = hpx::util::get<0>(t); //-V573
+                std::size_t count = std::distance(first,last);
+                boost::shared_array<char> flags(new char[count]);
+
+                typedef std::pair<std::size_t, std::size_t> pair_type;
+
+                using hpx::util::make_zip_iterator;
+                return util::partitioner<ExPolicy, OutIter, pair_type>::
+                    call_with_index(
+                        policy, make_zip_iterator(first, flags.get()), count,
+                        [f](std::size_t base_idx,
+                        zip_iterator part_begin, std::size_t part_size)
+                        {
+                            std::size_t curr = 0;
+                            util::loop_n(part_begin, part_size,
+                            [&curr, &f](zip_iterator d)
+                            {
+                                using hpx::util::get;
+                                if(f(get<0>(*d)))
+                            {
+                                get<1>(*d) = 1;
+                                ++curr;
+                            }
+                            else
+                            {
+                                get<1>(*d) = 0;
+                            }
+                            });
+                            return std::make_pair(curr, base_idx);
                         },
-                        boost::mpl::false_()));
+                        hpx::util::unwrapped(
+                            [=](std::vector<pair_type> && r)
+                            {
+                                return 
+                                    copy_if_helper(policy,
+                                        std::forward<std::vector<pair_type> >(r),
+                                        first, count, dest, flags);
+                            })
+                    );
             }
         };
         /// \endcond

@@ -9,7 +9,7 @@ set(tests
     all_of
     any_of
     copy
-    copyif
+    #copyif
     copyn
     count
     countif
@@ -43,6 +43,8 @@ set(tests
     reverse_copy
     rotate
     rotate_copy
+    search
+    searchn
     swapranges
     task_region
     transform
