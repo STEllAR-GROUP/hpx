@@ -670,6 +670,13 @@ namespace hpx
             if (cfg.vm_.count("hpx:high-priority-threads")) {
                 num_high_priority_queues =
                     cfg.vm_["hpx:high-priority-threads"].as<std::size_t>();
+                if (num_high_priority_queues > cfg.num_threads_)
+                {
+                    throw std::logic_error("Invalid command line option: "
+                        "number of high priority threads ("
+                        "--hpx:high-priority-threads), should not be larger "
+                        "than number of threads (--hpx:threads)");
+                }
             }
 
             std::size_t pu_offset = std::size_t(-1);
@@ -769,6 +776,13 @@ namespace hpx
             if (cfg.vm_.count("hpx:high-priority-threads")) {
                 num_high_priority_queues =
                     cfg.vm_["hpx:high-priority-threads"].as<std::size_t>();
+                if (num_high_priority_queues > cfg.num_threads_)
+                {
+                    throw std::logic_error("Invalid command line option: "
+                        "number of high priority threads ("
+                        "--hpx:high-priority-threads), should not be larger "
+                        "than number of threads (--hpx:threads)");
+                }
             }
 
             bool numa_sensitive = false;
@@ -876,6 +890,13 @@ namespace hpx
             if (cfg.vm_.count("hpx:high-priority-threads")) {
                 num_high_priority_queues =
                     cfg.vm_["hpx:high-priority-threads"].as<std::size_t>();
+                if (num_high_priority_queues > cfg.num_threads_)
+                {
+                    throw std::logic_error("Invalid command line option: "
+                        "number of high priority threads ("
+                        "--hpx:high-priority-threads), should not be larger "
+                        "than number of threads (--hpx:threads)");
+                }
             }
 
             bool numa_sensitive = false;
@@ -960,6 +981,13 @@ namespace hpx
             if (cfg.vm_.count("hpx:high-priority-threads")) {
                 num_high_priority_queues =
                     cfg.vm_["hpx:high-priority-threads"].as<std::size_t>();
+                if (num_high_priority_queues > cfg.num_threads_)
+                {
+                    throw std::logic_error("Invalid command line option: "
+                        "number of high priority threads ("
+                        "--hpx:high-priority-threads), should not be larger "
+                        "than number of threads (--hpx:threads)");
+                }
             }
 
             bool numa_sensitive = false;
