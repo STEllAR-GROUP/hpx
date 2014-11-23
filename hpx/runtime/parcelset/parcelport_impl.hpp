@@ -183,9 +183,9 @@ namespace hpx { namespace parcelset
             // make sure all parcels go to the same locality
             for (std::size_t i = 1; i != dests.size(); ++i)
             {
-                locality_id == dests[i];
-                HPX_ASSERT(
-                    parcels[0].get_destination_locality() == parcels[i].get_destination_locality());
+                HPX_ASSERT(locality_id == dests[i]);
+                HPX_ASSERT(parcels[0].get_destination_locality() ==
+                    parcels[i].get_destination_locality());
             }
 #endif
 

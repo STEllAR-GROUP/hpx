@@ -28,7 +28,7 @@ namespace hpx { namespace parcelset
     class locality
     {
         template <typename Impl>
-        struct impl;
+        class impl;
 
         class impl_base
         {
