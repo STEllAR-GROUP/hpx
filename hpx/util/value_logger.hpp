@@ -13,8 +13,10 @@
 #include <boost/lockfree/primitives.hpp>
 #include <boost/lexical_cast.hpp>
 
-#if defined(BOOST_HAS_UNISTD_H)
-#include <unistd.h>
+#if defined(BOOST_WINDOWS)
+#  include <process.h>
+#elif defined(BOOST_HAS_UNISTD_H)
+#  include <unistd.h>
 #endif
 
 #include <hpx/util/logging.hpp>

@@ -29,6 +29,12 @@
 #include <boost/spirit/include/qi_alternative.hpp>
 #include <boost/spirit/include/qi_sequence.hpp>
 
+#if defined(BOOST_WINDOWS)
+#  include <process.h>
+#elif defined(BOOST_HAS_UNISTD_H)
+#  include <unistd.h>
+#endif
+
 #if (defined(__linux) || defined(linux) || defined(__linux__))
 #include <ifaddrs.h>
 #include <netinet/in.h>

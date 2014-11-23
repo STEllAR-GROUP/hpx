@@ -34,7 +34,7 @@ struct gva
         lva_(0),
         offset(0) {}
 
-    gva(naming::gid_type const& p,
+    explicit gva(naming::gid_type const& p,
         component_type t = components::component_invalid, boost::uint64_t c = 1,
         lva_type a = 0, boost::uint64_t o = 0)
       : prefix(p),
@@ -51,13 +51,13 @@ struct gva
         lva_(reinterpret_cast<lva_type>(a)),
         offset(o) {}
 
-    gva(lva_type a)
+    explicit gva(lva_type a)
       : type(components::component_invalid),
         count(0),
         lva_(a),
         offset(0) {}
 
-    gva(void* a)
+    explicit gva(void* a)
       : type(components::component_invalid),
         count(0),
         lva_(reinterpret_cast<lva_type>(a)),

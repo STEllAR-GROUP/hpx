@@ -20,6 +20,10 @@
 
 namespace hpx { namespace agas
 {
+#if defined(_MSC_VER)
+#pragma warning (push)
+#pragma warning (disable: 4521)
+#endif
     struct request::request_data
     {
         request_data()
@@ -234,6 +238,9 @@ namespace hpx { namespace agas
 
         data_type data;
     };
+#if defined(_MSC_VER)
+#pragma warning (pop)
+#endif
 
     request::request()
         : mc(invalid_request)
