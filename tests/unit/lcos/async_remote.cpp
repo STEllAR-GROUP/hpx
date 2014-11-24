@@ -54,7 +54,7 @@ void test_remote_async(hpx::id_type const& target)
             hpx::async(hpx::launch::all, inc, target, 42);
         HPX_TEST_EQ(f2.get(), 43);
     }
-    
+
     {
         increment_with_future_action inc;
         hpx::promise<boost::int32_t> p;
@@ -64,7 +64,7 @@ void test_remote_async(hpx::id_type const& target)
         hpx::future<boost::int32_t> f2 =
             hpx::async(hpx::launch::all, inc, target, f);
 
-        p.set_value(42);        
+        p.set_value(42);
         HPX_TEST_EQ(f1.get(), 43);
         HPX_TEST_EQ(f2.get(), 43);
     }
@@ -137,6 +137,19 @@ void test_remote_async(hpx::id_type const& target)
         hpx::future<boost::int32_t> f2 =
             hpx::async<call_action>(hpx::launch::all, dec, 42);
         HPX_TEST_EQ(f2.get(), 41);
+    }
+
+    {
+        increment_with_future_action inc;
+        hpx::shared_future<boost::int32_t> f =
+            hpx::async(hpx::launch::deferred, hpx::util::bind(&increment, 42));
+
+        hpx::future<boost::int32_t> f1 = hpx::async(inc, target, f);
+        hpx::future<boost::int32_t> f2 =
+            hpx::async(hpx::launch::all, inc, target, f);
+
+        HPX_TEST_EQ(f1.get(), 44);
+        HPX_TEST_EQ(f2.get(), 44);
     }
 }
 

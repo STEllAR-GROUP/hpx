@@ -205,6 +205,7 @@ namespace hpx { namespace lcos
                         void (wait_all_frame::*f)(TupleIter, Iter, Iter) =
                             &wait_all_frame::await_range;
 
+                        next_future_data->execute_deferred();
                         next_future_data->set_on_completed(util::bind(
                             f, this, std::move(iter),
                             std::move(next), std::move(end)));
@@ -259,6 +260,7 @@ namespace hpx { namespace lcos
                     void (wait_all_frame::*f)(TupleIter, true_, false_) =
                         &wait_all_frame::await_next;
 
+                    next_future_data->execute_deferred();
                     next_future_data->set_on_completed(hpx::util::bind(
                         f, this, std::move(iter), true_(), false_()));
                 }
