@@ -117,8 +117,9 @@ namespace hpx { namespace util
         // Return the endianess to be used for out-serialization
         std::string get_endian_out() const;
 
-        // Return maximally allowed message size
-        boost::uint64_t get_max_message_size() const;
+        // Return maximally allowed message sizes
+        boost::uint64_t get_max_inbound_message_size() const;
+        boost::uint64_t get_max_outbound_message_size() const;
 
     private:
         std::ptrdiff_t init_stack_size(char const* entryname,

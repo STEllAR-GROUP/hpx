@@ -328,9 +328,14 @@ namespace hpx { namespace parcelset
             HPX_STD_FUNCTION<void()> const& on_stop_thread);
 
         /// Return the configured maximal allowed message data size
-        boost::uint64_t get_max_message_size() const
+        boost::uint64_t get_max_inbound_message_size() const
         {
-            return max_message_size_;
+            return max_inbound_message_size_;
+        }
+
+        boost::uint64_t get_max_outbound_message_size() const
+        {
+            return max_outbound_message_size_;
         }
 
         /// Return whether it is allowed to apply array optimizations
@@ -375,7 +380,8 @@ namespace hpx { namespace parcelset
         locality here_;
 
         /// The maximally allowed message size
-        boost::uint64_t const max_message_size_;
+        boost::uint64_t const max_inbound_message_size_;
+        boost::uint64_t const max_outbound_message_size_;
 
         /// Parcel timers and their data containers.
         performance_counters::parcels::gatherer parcels_sent_;

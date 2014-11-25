@@ -224,6 +224,7 @@ sections, one for each component.
     max_connections = ${HPX_PARCEL_MAX_CONNECTIONS:<hpx_parcel_max_connections>}
     max_connections_per_locality = ${HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY:<hpx_parcel_max_connections_per_locality>}
     max_message_size = ${HPX_PARCEL_MAX_MESSAGE_SIZE:<hpx_parcel_max_message_size>}
+    max_outbound_message_size = ${HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE:<hpx_parcel_max_outbound_message_size>}
     array_optimization = ${HPX_PARCEL_ARRAY_OPTIMIZATION:1}
     zero_copy_optimization = ${HPX_PARCEL_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
     async_serialization = ${HPX_PARCEL_ASYNC_SERIALIZATION:1}
@@ -263,6 +264,10 @@ sections, one for each component.
      [This property defines the maximum allowed message size which will be
       transferrable through the parcel layer. The default depends on the compile
       time preprocessor constant `HPX_PARCEL_MAX_MESSAGE_SIZE` (`1000000000`) bytes.]]
+    [[`hpx.parcel.max_outbound_message_size`]
+     [This property defines the maximum allowed outbound coalesced message size which
+      will be transferrable through the parcel layer. The default depends on the compile
+      time preprocessor constant `HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE` (`1000000`) bytes.]]
     [[`hpx.parcel.array_optimization`]
      [This property defines whether this locality is allowed to utilize array
       optimizations during serialization of parcel data. The default is `1`.]]

@@ -42,7 +42,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 return parcelset::locality(
                     locality(
                         ibverbs_address
-                      , hpx::util::get_entry_as<boost::uint16_t>(*sec, "port", HPX_INITIAL_IP_PORT)
+                      , hpx::util::get_entry_as<boost::uint16_t>(
+                            *sec, "port", HPX_INITIAL_IP_PORT)
                     )
                 );
             }
@@ -298,7 +299,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         return sender_connection;
     }
 
-    parcelset::locality connection_handler::agas_locality(util::runtime_configuration const & ini) const
+    parcelset::locality connection_handler::agas_locality(
+        util::runtime_configuration const & ini) const
     {
         // ibverbs can't be used for bootstrapping
         HPX_ASSERT(false);
@@ -350,12 +352,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
     }
 
-    ibverbs_mr register_buffer(connection_handler & conn, ibv_pd * pd, char * buffer, std::size_t size, int access)
+    ibverbs_mr register_buffer(connection_handler & conn, ibv_pd * pd,
+        char * buffer, std::size_t size, int access)
     {
         return conn.register_buffer(pd, buffer, size, access);
     }
 
-    ibverbs_mr connection_handler::register_buffer(ibv_pd * pd, char * buffer, std::size_t size, int access)
+    ibverbs_mr connection_handler::register_buffer(ibv_pd * pd,
+        char * buffer, std::size_t size, int access)
     {
 
         chunk_pair chunk = memory_pool_.get_chunk_address(buffer, size);
@@ -498,7 +502,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         while(!stopped_)
         {
             hpx::util::high_resolution_timer t;
-            boost::shared_ptr<receiver> rcv = acceptor_.accept(*this, memory_pool_, boost::system::throws);
+            boost::shared_ptr<receiver> rcv = acceptor_.accept(
+                *this, memory_pool_, boost::system::throws);
             if(rcv)
             {
                 rcv->async_read(boost::system::throws);
