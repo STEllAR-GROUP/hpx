@@ -152,12 +152,12 @@ namespace hpx { namespace util
 #endif
 
             "[hpx.threadpools]",
-            "io_pool_size = ${HPX_NUM_IO_POOL_THREADS:"
-                BOOST_PP_STRINGIZE(HPX_NUM_IO_POOL_THREADS) "}",
-            "parcel_pool_size = ${HPX_NUM_PARCEL_POOL_THREADS:"
-                BOOST_PP_STRINGIZE(HPX_NUM_PARCEL_POOL_THREADS) "}",
-            "timer_pool_size = ${HPX_NUM_TIMER_POOL_THREADS:"
-                BOOST_PP_STRINGIZE(HPX_NUM_TIMER_POOL_THREADS) "}",
+            "io_pool_size = ${HPX_NUM_IO_POOL_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_NUM_IO_POOL_SIZE) "}",
+            "parcel_pool_size = ${HPX_NUM_PARCEL_POOL_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_NUM_PARCEL_POOL_SIZE) "}",
+            "timer_pool_size = ${HPX_NUM_TIMER_POOL_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_NUM_TIMER_POOL_SIZE) "}",
 
             "[hpx.commandline]",
             // enable aliasing

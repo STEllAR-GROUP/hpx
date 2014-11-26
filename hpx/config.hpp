@@ -316,14 +316,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// This defines the default number of OS-threads created for the different
 /// internal thread pools
-#if !defined(HPX_NUM_IO_POOL_THREADS)
-#  define HPX_NUM_IO_POOL_THREADS 2
+#if !defined(HPX_NUM_IO_POOL_SIZE)
+#  define HPX_NUM_IO_POOL_SIZE 2
 #endif
-#if !defined(HPX_NUM_PARCEL_POOL_THREADS)
-#  define HPX_NUM_PARCEL_POOL_THREADS 2
+#if !defined(HPX_NUM_PARCEL_POOL_SIZE)
+#  define HPX_NUM_PARCEL_POOL_SIZE 2
 #endif
-#if !defined(HPX_NUM_TIMER_POOL_THREADS)
-#  define HPX_NUM_TIMER_POOL_THREADS 2
+#if !defined(HPX_NUM_TIMER_POOL_SIZE)
+#  define HPX_NUM_TIMER_POOL_SIZE 2
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
