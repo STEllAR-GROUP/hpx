@@ -395,8 +395,9 @@ namespace hpx { namespace threads { namespace policies
             boost::int64_t& idle_loop_count, threads::thread_data_base*& thrd)
         {
             std::size_t queues_size = queues_.size();
+            std::size_t high_priority_queues = high_priority_queues_.size();
 
-            if (num_thread < high_priority_queues_.size())
+            if (num_thread < high_priority_queues)
             {
                 thread_queue_type* q = high_priority_queues_[num_thread];
                 bool result = q->get_next_thread(thrd);
@@ -441,7 +442,8 @@ namespace hpx { namespace threads { namespace policies
                     if (!test(this_numa_domain, idx) && !test(numa_domain, idx)) //-V560 //-V600 //-V111
                         continue;
 
-                    if (idx < high_priority_queues_.size())
+                    if (idx < high_priority_queues &&
+                        num_thread < high_priority_queues)
                     {
                         thread_queue_type* q = high_priority_queues_[idx];
                         if (q->get_next_thread(thrd))
@@ -471,7 +473,8 @@ namespace hpx { namespace threads { namespace policies
 
                     HPX_ASSERT(idx != num_thread);
 
-                    if (idx < high_priority_queues_.size())
+                    if (idx < high_priority_queues &&
+                        num_thread < high_priority_queues)
                     {
                         thread_queue_type* q = high_priority_queues_[idx];
                         if (q->get_next_thread(thrd))
@@ -814,6 +817,8 @@ namespace hpx { namespace threads { namespace policies
                 running, idle_loop_count, added) && result;
             if (0 != added) return result;
 
+            std::size_t high_priority_queues = high_priority_queues_.size();
+
             if (numa_sensitive_)
             {
                 // steal work items: first try to steal from other cores in
@@ -835,7 +840,8 @@ namespace hpx { namespace threads { namespace policies
                         if (!test(numa_domain_mask, topology_.get_pu_number(idx))) //-V600
                             continue;
 
-                        if (idx < high_priority_queues_.size())
+                        if (idx < high_priority_queues &&
+                            num_thread < high_priority_queues)
                         {
                             result = high_priority_queues_[num_thread]->
                                 wait_or_add_new(running, idle_loop_count,
@@ -879,7 +885,8 @@ namespace hpx { namespace threads { namespace policies
                         if (!test(numa_domain_mask, topology_.get_pu_number(idx))) //-V600
                             continue;
 
-                        if (idx < high_priority_queues_.size())
+                        if (idx < high_priority_queues &&
+                            num_thread < high_priority_queues)
                         {
                             result = high_priority_queues_[num_thread]->
                                 wait_or_add_new(running, idle_loop_count,
@@ -917,7 +924,8 @@ namespace hpx { namespace threads { namespace policies
 
                     HPX_ASSERT(idx != num_thread);
 
-                    if (idx < high_priority_queues_.size())
+                    if (idx < high_priority_queues &&
+                        num_thread < high_priority_queues)
                     {
                         result = high_priority_queues_[num_thread]->
                             wait_or_add_new(running, idle_loop_count, added,

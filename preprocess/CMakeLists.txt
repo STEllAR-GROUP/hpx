@@ -29,14 +29,6 @@ foreach(file ${lock_argument_limit_preprocessing_files})
 endforeach()
 
 set(action_argument_limit_preprocessing_files
-  "hpx/apply.hpp"
-  "hpx/async.hpp"
-  "hpx/lcos/async.hpp"
-  "hpx/lcos/async_fwd.hpp"
-  "hpx/lcos/async_continue.hpp"
-  "hpx/lcos/async_continue_fwd.hpp"
-  "hpx/lcos/async_colocated.hpp"
-  "hpx/lcos/async_colocated_fwd.hpp"
   "hpx/lcos/broadcast.hpp"
   "hpx/lcos/packaged_action_constructors.hpp"
   "hpx/lcos/packaged_action_constructors_direct.hpp"

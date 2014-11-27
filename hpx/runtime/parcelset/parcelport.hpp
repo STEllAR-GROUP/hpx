@@ -11,7 +11,7 @@
 #define HPX_PARCELSET_PARCELPORT_MAR_26_2008_1214PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/naming/locality.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/server/parcelport_queue.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
@@ -60,7 +60,7 @@ namespace hpx { namespace parcelset
         > read_handler_type;
 
         /// Construct the parcelport on the given locality.
-        parcelport(util::runtime_configuration const& ini, std::string const& type);
+        parcelport(util::runtime_configuration const& ini, locality const & here, std::string const& type);
 
         /// Virtual destructor
         virtual ~parcelport() {}
@@ -94,7 +94,7 @@ namespace hpx { namespace parcelset
         ///      void handler(boost::system::error_code const& err,
         ///                   std::size_t bytes_written);
         /// \endcode
-        virtual void put_parcel(parcel p, write_handler_type f) = 0;
+        virtual void put_parcel(locality const & dest, parcel p, write_handler_type f) = 0;
 
         /// Queues a list of parcels for transmission to another locality
         ///
@@ -111,7 +111,7 @@ namespace hpx { namespace parcelset
         ///      void handler(boost::system::error_code const& err,
         ///                   std::size_t bytes_written);
         /// \endcode
-        virtual void put_parcels(std::vector<parcel> parcels,
+        virtual void put_parcels(std::vector<locality> dests, std::vector<parcel> parcels,
             std::vector<write_handler_type> handlers) = 0;
 
         /// Send an early parcel through the TCP parcelport
@@ -120,10 +120,10 @@ namespace hpx { namespace parcelset
         ///                 parcel \a p will be modified in place, as it will
         ///                 get set the resolved destination address and parcel
         ///                 id (if not already set).
-        virtual void send_early_parcel(parcel& p) = 0;
+        virtual void send_early_parcel(locality const & dest, parcel& p) = 0;
 
         /// Cache specific functionality
-        virtual void remove_from_connection_cache(naming::locality const& loc) = 0;
+        virtual void remove_from_connection_cache(locality const& loc) = 0;
 
         /// Retrieve the type of the locality represented by this parcelport
         virtual connection_type get_type() const = 0;
@@ -182,10 +182,14 @@ namespace hpx { namespace parcelset
         ///
         /// This accessor returns a reference to the locality this parcelport
         /// is associated with.
-        naming::locality const& here() const
+        locality const& here() const
         {
             return here_;
         }
+
+        virtual locality create_locality() const = 0;
+
+        virtual locality agas_locality(util::runtime_configuration const & ini) const = 0;
 
         /// Performance counter data
 
@@ -323,15 +327,15 @@ namespace hpx { namespace parcelset
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
             HPX_STD_FUNCTION<void()> const& on_stop_thread);
 
-        static boost::shared_ptr<parcelport> create_bootstrap(
-            util::runtime_configuration const& cfg,
-            HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
-            HPX_STD_FUNCTION<void()> const& on_stop_thread);
-
         /// Return the configured maximal allowed message data size
-        boost::uint64_t get_max_message_size() const
+        boost::uint64_t get_max_inbound_message_size() const
         {
-            return max_message_size_;
+            return max_inbound_message_size_;
+        }
+
+        boost::uint64_t get_max_outbound_message_size() const
+        {
+            return max_outbound_message_size_;
         }
 
         /// Return whether it is allowed to apply array optimizations
@@ -366,17 +370,18 @@ namespace hpx { namespace parcelset
         /// The cache for pending parcels
         typedef std::pair<std::vector<parcel>, std::vector<write_handler_type> >
             map_second_type;
-        typedef std::map<naming::locality, map_second_type> pending_parcels_map;
+        typedef std::map<locality, map_second_type> pending_parcels_map;
         pending_parcels_map pending_parcels_;
 
-        typedef std::set<naming::locality> pending_parcels_destinations;
+        typedef std::set<locality> pending_parcels_destinations;
         pending_parcels_destinations parcel_destinations_;
 
         /// The local locality
-        naming::locality here_;
+        locality here_;
 
         /// The maximally allowed message size
-        boost::uint64_t const max_message_size_;
+        boost::uint64_t const max_inbound_message_size_;
+        boost::uint64_t const max_outbound_message_size_;
 
         /// Parcel timers and their data containers.
         performance_counters::parcels::gatherer parcels_sent_;

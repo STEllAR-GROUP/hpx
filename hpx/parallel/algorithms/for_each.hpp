@@ -9,7 +9,7 @@
 #define HPX_PARALLEL_DETAIL_FOR_EACH_MAY_29_2014_0932PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/traits/segemented_iterator_traits.hpp>
+#include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/void_guard.hpp>
 #include <hpx/util/move.hpp>
 

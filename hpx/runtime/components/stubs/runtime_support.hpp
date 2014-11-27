@@ -453,7 +453,7 @@ namespace hpx { namespace components { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         static void
         call_shutdown_functions_async(naming::id_type const& gid,
-            naming::locality const& l);
+            parcelset::endpoints_type const& endpoints);
     };
 }}}
 

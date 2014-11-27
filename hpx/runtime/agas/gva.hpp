@@ -18,7 +18,6 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/naming/locality.hpp>
 #include <hpx/util/safe_bool.hpp>
 
 namespace hpx { namespace agas
@@ -30,46 +29,43 @@ struct gva
     typedef boost::uint64_t lva_type;
 
     gva()
-      : endpoint(),
-        type(components::component_invalid),
+      : type(components::component_invalid),
         count(0),
         lva_(0),
         offset(0) {}
 
-    gva(naming::locality const& ep,
+    explicit gva(naming::gid_type const& p,
         component_type t = components::component_invalid, boost::uint64_t c = 1,
         lva_type a = 0, boost::uint64_t o = 0)
-      : endpoint(ep),
+      : prefix(p),
         type(t),
         count(c),
         lva_(a),
         offset(o) {}
 
-    gva(naming::locality const& ep, component_type t, boost::uint64_t c, void* a,
+    gva(naming::gid_type const& p, component_type t, boost::uint64_t c, void* a,
         boost::uint64_t o = 0)
-      : endpoint(ep),
+      : prefix(p),
         type(t),
         count(c),
         lva_(reinterpret_cast<lva_type>(a)),
         offset(o) {}
 
-    gva(lva_type a)
-      : endpoint(),
-        type(components::component_invalid),
+    explicit gva(lva_type a)
+      : type(components::component_invalid),
         count(0),
         lva_(a),
         offset(0) {}
 
-    gva(void* a)
-      : endpoint(),
-        type(components::component_invalid),
+    explicit gva(void* a)
+      : type(components::component_invalid),
         count(0),
         lva_(reinterpret_cast<lva_type>(a)),
         offset(0) {}
 
     gva& operator=(lva_type a)
     {
-        endpoint = naming::locality();
+        prefix = naming::gid_type();
         type = components::component_invalid;
         count = 0;
         lva_ = a;
@@ -79,7 +75,7 @@ struct gva
 
     gva& operator=(void* a)
     {
-        endpoint = naming::locality();
+        prefix = naming::gid_type();
         type = components::component_invalid;
         count = 0;
         lva_ = reinterpret_cast<lva_type>(a);
@@ -89,11 +85,11 @@ struct gva
 
     bool operator==(gva const& rhs) const
     {
-        return type     == rhs.type
-            && count    == rhs.count
-            && lva_     == rhs.lva_
-            && offset   == rhs.offset
-            && endpoint == rhs.endpoint;
+        return type   == rhs.type
+            && count  == rhs.count
+            && lva_   == rhs.lva_
+            && offset == rhs.offset
+            && prefix == rhs.prefix;
     }
 
     bool operator!=(gva const& rhs) const
@@ -131,7 +127,7 @@ struct gva
         return g;
     }
 
-    naming::locality endpoint;
+    naming::gid_type prefix;
     component_type type;
     boost::uint64_t count;
 
@@ -146,7 +142,7 @@ struct gva
 
     template<class Archive>
     void save(Archive& ar, const unsigned int version) const
-    { ar << endpoint << type << count << lva_ << offset; }
+    { ar << prefix << type << count << lva_ << offset; }
 
     template<class Archive>
     void load(Archive& ar, const unsigned int version)
@@ -155,7 +151,7 @@ struct gva
             HPX_THROW_EXCEPTION(version_too_new
               , "gva::load"
               , "trying to load GVA with unknown version");
-        ar >> endpoint >> type >> count >> lva_ >> offset;
+        ar >> prefix >> type >> count >> lva_ >> offset;
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -166,7 +162,7 @@ inline std::basic_ostream<Char, Traits>&
 operator<< (std::basic_ostream<Char, Traits>& os, gva const& addr)
 {
     boost::io::ios_flags_saver ifs(os);
-    os << "(" << addr.endpoint << " "
+    os << "(" << addr.prefix << " "
        << components::get_component_type_name(addr.type) << " "
        << addr.count << " "
        << std::showbase << std::hex << addr.lva() << " "

@@ -125,6 +125,10 @@ parallel::rotate                      "rotate" "hpx\.parallel\.v1\.rotate"
 parallel::rotate_copy                 "rotate_copy" "hpx\.parallel\.v1\.rotate_copy.*"
 
 # hpx/parallel/algorithms/swap_ranges.hpp
+parallel::search                      "search" "hpx\.parallel\.v1\.search_id.*"
+parallel::search_n                    "search_n" "hpx\.parallel\.v1\.search_n.*"
+
+# hpx/parallel/algorithms/swap_ranges.hpp
 parallel::swap_ranges                 "swap_ranges" "hpx\.parallel\.v1\.swap_ranges.*"
 
 # hpx/parallel/task_region.hpp

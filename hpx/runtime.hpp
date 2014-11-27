@@ -215,7 +215,8 @@ namespace hpx
 
         virtual naming::resolver_client& get_agas_client() = 0;
 
-        virtual naming::locality const& here() const = 0;
+        virtual parcelset::endpoints_type const& endpoints() const = 0;
+        virtual std::string here() const = 0;
 
         virtual applier::applier& get_applier() = 0;
 

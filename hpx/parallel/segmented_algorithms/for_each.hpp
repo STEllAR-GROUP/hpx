@@ -9,7 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/void_guard.hpp>
 #include <hpx/util/move.hpp>
-#include <hpx/traits/segemented_iterator_traits.hpp>
+#include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>

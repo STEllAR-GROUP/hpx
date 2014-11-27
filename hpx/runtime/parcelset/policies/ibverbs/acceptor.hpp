@@ -166,7 +166,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
         template <typename Parcelport>
         boost::shared_ptr<receiver> accept(
-            Parcelport & parcelport, memory_pool & pool, boost::system::error_code &ec)
+            Parcelport & parcelport, util::memory_chunk_pool & pool, boost::system::error_code &ec)
         {
             boost::shared_ptr<receiver> rcv;
             rdma_cm_event event;

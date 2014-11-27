@@ -29,6 +29,12 @@
 #include <boost/spirit/include/qi_alternative.hpp>
 #include <boost/spirit/include/qi_sequence.hpp>
 
+#if defined(BOOST_WINDOWS)
+#  include <process.h>
+#elif defined(BOOST_HAS_UNISTD_H)
+#  include <unistd.h>
+#endif
+
 #if (defined(__linux) || defined(linux) || defined(__linux__))
 #include <ifaddrs.h>
 #include <netinet/in.h>
@@ -146,12 +152,12 @@ namespace hpx { namespace util
 #endif
 
             "[hpx.threadpools]",
-            "io_pool_size = ${HPX_NUM_IO_POOL_THREADS:"
-                BOOST_PP_STRINGIZE(HPX_NUM_IO_POOL_THREADS) "}",
-            "parcel_pool_size = ${HPX_NUM_PARCEL_POOL_THREADS:"
-                BOOST_PP_STRINGIZE(HPX_NUM_PARCEL_POOL_THREADS) "}",
-            "timer_pool_size = ${HPX_NUM_TIMER_POOL_THREADS:"
-                BOOST_PP_STRINGIZE(HPX_NUM_TIMER_POOL_THREADS) "}",
+            "io_pool_size = ${HPX_NUM_IO_POOL_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_NUM_IO_POOL_SIZE) "}",
+            "parcel_pool_size = ${HPX_NUM_PARCEL_POOL_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_NUM_PARCEL_POOL_SIZE) "}",
+            "timer_pool_size = ${HPX_NUM_TIMER_POOL_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_NUM_TIMER_POOL_SIZE) "}",
 
             "[hpx.commandline]",
             // enable aliasing
@@ -439,88 +445,6 @@ namespace hpx { namespace util
         threads::policies::minimal_deadlock_detection =
             enable_minimal_deadlock_detection();
 #endif
-    }
-
-    // AGAS configuration information has to be stored in the global hpx.agas
-    // configuration section:
-    //
-    //    [hpx.agas]
-    //    address=<ip address>   # this defaults to HPX_INITIAL_IP_ADDRESS
-    //    port=<ip port>         # this defaults to HPX_INITIAL_IP_PORT
-    //
-    // TODO: implement for AGAS v2
-    naming::locality runtime_configuration::get_agas_locality() const
-    {
-        if(agas_locality_)
-        {
-            return agas_locality_;
-        }
-
-        // load all components as described in the configuration information
-        if (has_section("hpx.agas")) {
-            util::section const* sec = get_section("hpx.agas");
-            if (NULL != sec) {
-                return
-                    naming::locality(
-                        sec->get_entry("address", HPX_INITIAL_IP_ADDRESS)
-#if defined(HPX_PARCELPORT_IBVERBS) // FIXME
-                      , ""
-#endif
-                      , hpx::util::get_entry_as<boost::uint16_t>(*sec, "port", HPX_INITIAL_IP_PORT)
-#if defined(HPX_PARCELPORT_MPI)
-                      , mpi_environment::enabled() ? 0 : -1
-#endif
-                    );
-            }
-        }
-        return
-            naming::locality(
-                HPX_INITIAL_IP_ADDRESS
-#if defined(HPX_PARCELPORT_IBVERBS)
-              , ""
-#endif
-              , HPX_INITIAL_IP_PORT
-#if defined(HPX_PARCELPORT_MPI)
-              , mpi_environment::enabled() ? 0 : -1
-#endif
-            );
-    }
-
-    void runtime_configuration::set_agas_locality(naming::locality const & agas_locality)
-    {
-        agas_locality_ = agas_locality;
-    }
-
-    // HPX network address configuration information has to be stored in the
-    // global hpx configuration section:
-    //
-    //    [hpx.parcel]
-    //    address=<ip address>   # this defaults to HPX_INITIAL_IP_ADDRESS
-    //    port=<ip port>         # this defaults to HPX_INITIAL_IP_PORT
-    //
-    naming::locality runtime_configuration::get_parcelport_address() const
-    {
-        // load all components as described in the configuration information
-        if (has_section("hpx.parcel")) {
-            util::section const* sec = get_section("hpx.parcel");
-            if (NULL != sec) {
-                return naming::locality(
-                    sec->get_entry("address", HPX_INITIAL_IP_ADDRESS)
-#if defined(HPX_PARCELPORT_IBVERBS)
-                  , get_ibverbs_address()
-#endif
-                  , hpx::util::get_entry_as<boost::uint16_t>(*sec, "port", HPX_INITIAL_IP_PORT)
-                );
-            }
-        }
-        return
-            naming::locality(
-                HPX_INITIAL_IP_ADDRESS
-#if defined(HPX_PARCELPORT_IBVERBS)
-              , get_ibverbs_address()
-#endif
-              , HPX_INITIAL_IP_PORT
-            );
     }
 
     std::string runtime_configuration::get_ibverbs_address() const
@@ -951,16 +875,35 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     // Return maximally allowed message size
-    boost::uint64_t runtime_configuration::get_max_message_size() const
+    boost::uint64_t runtime_configuration::get_max_inbound_message_size() const
     {
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx.parcel");
             if (NULL != sec) {
-                return hpx::util::get_entry_as<boost::uint64_t>(
-                    *sec, "max_message_size", HPX_PARCEL_MAX_MESSAGE_SIZE);
+                boost::uint64_t maxsize =
+                    hpx::util::get_entry_as<boost::uint64_t>(
+                        *sec, "max_message_size", HPX_PARCEL_MAX_MESSAGE_SIZE);
+                if (maxsize > 0)
+                    return maxsize;
             }
         }
         return HPX_PARCEL_MAX_MESSAGE_SIZE;    // default is 1GByte
+    }
+
+    boost::uint64_t runtime_configuration::get_max_outbound_message_size() const
+    {
+        if (has_section("hpx")) {
+            util::section const* sec = get_section("hpx.parcel");
+            if (NULL != sec) {
+                boost::uint64_t maxsize =
+                    hpx::util::get_entry_as<boost::uint64_t>(
+                        *sec, "max_outbound_message_size",
+                        HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE);
+                if (maxsize > 0)
+                    return maxsize;
+            }
+        }
+        return HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE;    // default is 1GByte
     }
 
     ///////////////////////////////////////////////////////////////////////////

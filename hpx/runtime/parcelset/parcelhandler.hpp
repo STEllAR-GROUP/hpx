@@ -16,8 +16,8 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/naming/locality.hpp>
 
+#include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelhandler_queue_base.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
@@ -52,14 +52,14 @@ namespace hpx { namespace parcelset
         {
             // ensure the source locality id is set (if no component id is given)
             if (!p.get_source())
-                p.set_source(naming::id_type(locality_, naming::id_type::unmanaged));
+                p.set_source(naming::id_type(get_locality(), naming::id_type::unmanaged));
 
             // set the current local time for this locality
             p.set_start_time(get_current_time());
         }
 
         // find and return the specified parcelport
-        parcelport* find_parcelport(connection_type type,
+        parcelport* find_parcelport(connection_type t,
             error_code& ec = throws) const;
 
         // exception handling
@@ -68,7 +68,7 @@ namespace hpx { namespace parcelset
         void rethrow_exception();
 
     public:
-        typedef std::pair<naming::locality, std::string> handler_key_type;
+        typedef std::pair<locality, std::string> handler_key_type;
         typedef std::map<
             handler_key_type, boost::shared_ptr<policies::message_handler> >
         message_handler_map;
@@ -88,14 +88,18 @@ namespace hpx { namespace parcelset
         ///                 instance will be used for any parcel related
         ///                 transport operations the parcelhandler carries out.
         parcelhandler(naming::resolver_client& resolver,
-            threads::threadmanager_base* tm, parcelhandler_queue_base* policy);
+            threads::threadmanager_base* tm, parcelhandler_queue_base* policy,
+            HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
+            HPX_STD_FUNCTION<void()> const& on_stop_thread);
 
         ~parcelhandler() {}
 
         /// load runtime configuration settings ...
         static std::vector<std::string> load_runtime_configuration();
 
-        void initialize(boost::shared_ptr<parcelport> pp);
+        boost::shared_ptr<parcelport> get_bootstrap_parcelport() const;
+
+        void initialize();
 
         /// \brief Attach the given parcel port to this handler
         void attach_parcelport(boost::shared_ptr<parcelport> const& pp, bool run = true);
@@ -114,17 +118,6 @@ namespace hpx { namespace parcelset
         /// this parcelhandler has been initialized with.
         naming::resolver_client& get_resolver();
 
-        /// Allow access to parcelport instance.
-        ///
-        /// This accessor returns a reference to the parcelport object
-        /// the parcelhandler has been initialized with (see parcelhandler
-        /// constructors). This is the same \a parcelport instance this
-        /// parcelhandler has been initialized with.
-        parcelport& get_parcelport() const
-        {
-            return *find_parcelport(connection_tcp);
-        }
-
         /// Return the locality_id of this locality
         ///
         /// This accessor allows to retrieve the locality_id value being assigned to
@@ -135,13 +128,7 @@ namespace hpx { namespace parcelset
         ///     naming::id_type locality_id;
         ///     get_resolver().get_locality_id(here, locality_id);
         /// \endcode
-        ///
-        /// but doesn't require the full AGAS round trip as the prefix value
-        /// is cached inside the parcelhandler.
-        naming::gid_type const& get_locality() const
-        {
-            return locality_;
-        }
+        naming::gid_type const& get_locality() const;
 
         /// Return the list of all remote localities supporting the given
         /// component type
@@ -335,14 +322,11 @@ namespace hpx { namespace parcelset
             return util::high_resolution_timer::now();
         }
 
-        /// \brief Allow access to the locality of the parcelport this
-        /// parcelhandler is associated with.
-        ///
-        /// This accessor returns a reference to the locality of the parcelport
-        /// this parcelhandler is associated with.
-        naming::locality const& here() const
+        /// \brief Factory function used in serialization to create a given
+        /// locality endpoint
+        locality create_locality(connection_type type) const
         {
-            return find_parcelport(connection_tcp)->here();
+            return pports_[type]->create_locality();
         }
 
         /// Return the name of this locality as retrieved from the
@@ -368,10 +352,18 @@ namespace hpx { namespace parcelset
 
         /// \brief Make sure the specified locality is not held by any
         /// connection caches anymore
-        void remove_from_connection_cache(naming::locality const& loc);
+        void remove_from_connection_cache(endpoints_type const& endpoints);
+
+        /// \brief return the endpoints associated with this parcelhandler
+        /// \returns all connection information for the enabled parcelports
+        endpoints_type const & endpoints() const
+        {
+            return endpoints_;
+        }
+
 
         /// \brief set list of resolved localities
-        void set_resolved_localities(std::vector<naming::locality> const& l);
+        void set_resolved_localities(std::map<naming::gid_type, endpoints_type> const& l);
 
         void enable_alternative_parcelports()
         {
@@ -389,8 +381,8 @@ namespace hpx { namespace parcelset
         ///////////////////////////////////////////////////////////////////////
         policies::message_handler* get_message_handler(char const* action,
             char const* message_handler_type, std::size_t num_messages,
-             std::size_t interval, naming::locality const& loc,
-             connection_type t, error_code& ec = throws);
+             std::size_t interval, locality const& loc,
+             error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////////
         // Performance counter data
@@ -466,7 +458,8 @@ namespace hpx { namespace parcelset
 
         std::size_t get_outgoing_queue_length(bool reset) const;
 
-        connection_type find_appropriate_connection_type(naming::locality const& dest);
+        locality find_appropriate_destination(naming::gid_type const & dest_gid);
+        locality find_endpoint(endpoints_type const & eps, connection_type type);
 
         void register_counter_types(connection_type pp_type);
 
@@ -474,11 +467,16 @@ namespace hpx { namespace parcelset
         /// The AGAS client
         naming::resolver_client& resolver_;
 
-        /// The site prefix of the locality
-        naming::gid_type locality_;
-
         /// the parcelport this handler is associated with
         std::vector<boost::shared_ptr<parcelport> > pports_;
+
+        /// the endpoints corresponding to the parcelports
+        endpoints_type endpoints_;
+
+        /// the endpoints to resolved localities
+        mutex_type resolved_endpoints_mtx_;
+        typedef std::map<naming::gid_type, endpoints_type> resolved_endpoints_type;
+        resolved_endpoints_type resolved_endpoints_;
 
         /// the thread-manager to use (optional)
         threads::threadmanager_base* tm_;

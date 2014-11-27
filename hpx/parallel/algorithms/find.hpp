@@ -855,10 +855,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
     ///           returns \a InIter otherwise.
-    ///           The \a find_first_of algorithm returns an iterator to the beginning of
-    ///           the last subsequence [s_first, s_last) in range [first, last).
-    ///           If the length of the subsequence [s_first, s_last) is greater
-    ///           than the length of the range [first, last), \a last is returned.
+    ///           The \a find_first_of algorithm returns an iterator to the first element
+    ///           in the range [first, last) that is equal to an element from the range
+    ///           [s_first, s_last). If the length of the subsequence [s_first, s_last) is 
+    ///           greater than the length of the range [first, last), \a last is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
     ///           is found, \a last is also returned.
     ///
@@ -960,10 +960,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
     ///           returns \a InIter otherwise.
-    ///           The \a find_first_of algorithm returns an iterator to the beginning of
-    ///           the last subsequence [s_first, s_last) in range [first, last).
-    ///           If the length of the subsequence [s_first, s_last) is greater
-    ///           than the length of the range [first, last), \a last is returned.
+    ///           The \a find_first_of algorithm returns an iterator to the first element
+    ///           in the range [first, last) that is equal to an element from the range
+    ///           [s_first, s_last). If the length of the subsequence [s_first, s_last) is 
+    ///           greater than the length of the range [first, last), \a last is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
     ///           is found, \a last is also returned.
     ///           This overload of \a find_end is available if the user decides to provide the

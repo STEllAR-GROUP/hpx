@@ -44,20 +44,6 @@
 
 namespace hpx { namespace parcelset
 {
-    boost::shared_ptr<parcelport> parcelport::create_bootstrap(
-        util::runtime_configuration const& cfg,
-        HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
-        HPX_STD_FUNCTION<void()> const& on_stop_thread)
-    {
-        std::string pptype = cfg.get_entry("hpx.parcel.bootstrap", "tcp");
-
-        int type = get_connection_type_from_name(pptype);
-        if (type == connection_unknown)
-            type = connection_tcp;
-
-        return create(type, cfg, on_start_thread, on_stop_thread);
-    }
-
     /// load the runtime configuration parameters
     std::pair<std::vector<std::string>, bool> parcelport::runtime_configuration(int type)
     {
@@ -186,11 +172,12 @@ namespace hpx { namespace parcelset
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    parcelport::parcelport(util::runtime_configuration const& ini,
+    parcelport::parcelport(util::runtime_configuration const& ini, locality const & here,
             std::string const& type)
       : parcels_(),
-        here_(ini.get_parcelport_address()),
-        max_message_size_(ini.get_max_message_size()),
+        here_(here),
+        max_inbound_message_size_(ini.get_max_inbound_message_size()),
+        max_outbound_message_size_(ini.get_max_outbound_message_size()),
         allow_array_optimizations_(true),
         allow_zero_copy_optimizations_(true),
         enable_security_(false),
@@ -223,7 +210,7 @@ namespace hpx { namespace parcelset
     ///////////////////////////////////////////////////////////////////////////
     boost::uint64_t get_max_inbound_size(parcelport& pp)
     {
-        return pp.get_max_message_size();
+        return pp.get_max_inbound_message_size();
     }
 }}
 

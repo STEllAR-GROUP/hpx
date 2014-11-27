@@ -458,7 +458,7 @@ namespace hpx { namespace util
             mutex_type::scoped_lock lock(mtx_);
 
             // Check if this key already exists in the cache.
-            typename cache_type::iterator const it = cache_.find(l);
+            typename cache_type::iterator it = cache_.find(l);
             if (it != cache_.end())
             {
                 // Remove from LRU meta data.
@@ -590,7 +590,7 @@ namespace hpx { namespace util
             while (connections_ >= max_connections_)
             {
                 // Find the least recently used keys data.
-                const typename cache_type::iterator ct = cache_.find(*kt);
+                typename cache_type::iterator ct = cache_.find(*kt);
                 HPX_ASSERT(ct != cache_.end());
 
                 // If the entry is empty, ignore it and try the next least

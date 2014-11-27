@@ -171,7 +171,7 @@ namespace hpx
             {}
 
             void operator()(
-                std::pair<naming::locality const, destinations>& e) const
+                std::pair<parcelset::locality const, destinations>& e) const
             {
                 // Create a new parcel to be sent to the destination with the
                 // gid, action, and arguments
@@ -194,7 +194,7 @@ namespace hpx
             typedef typename hpx::actions::extract_action<Action>::type action_type_;
 
             // sort destinations
-            std::map<naming::locality, destinations> dests;
+            std::map<parcelset::locality, destinations> dests;
 
             std::size_t count = gids.size();
             for (std::size_t i = 0; i < count; ++i) {

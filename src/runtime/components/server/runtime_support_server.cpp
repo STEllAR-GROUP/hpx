@@ -388,14 +388,12 @@ namespace hpx { namespace components { namespace server
     {
         // Special case: component_memory_block.
         if (g.type == components::component_memory_block) {
-            applier::applier& appl = hpx::applier::get_applier();
-
             for (std::size_t i = 0; i != count; ++i)
             {
                 naming::gid_type target = gid + i;
 
                 // make sure this component is located here
-                if (appl.here() != g.endpoint)
+                if (get_locality() != g.prefix)
                 {
                     // FIXME: should the component be re-bound ?
                     hpx::util::osstream strm;
@@ -478,7 +476,7 @@ namespace hpx { namespace components { namespace server
         for (std::size_t i = 0; i != count; ++i)
         {
             naming::gid_type target(gid + i);
-            naming::address addr(g.endpoint, g.type, g.lva(target, gid));
+            naming::address addr(g.prefix, g.type, g.lva(target, gid));
 
 #if defined(HPX_DEBUG)
             bool found = false;
@@ -1000,13 +998,13 @@ namespace hpx { namespace components { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Remove the given locality from our connection cache
-    void runtime_support::remove_from_connection_cache(naming::locality const& l)
+    void runtime_support::remove_from_connection_cache(parcelset::endpoints_type const& eps)
     {
         runtime* rt = get_runtime_ptr();
         if (rt == 0) return;
 
         // instruct our connection cache to drop all connections it is holding
-        rt->get_parcel_handler().remove_from_connection_cache(l);
+        rt->get_parcel_handler().remove_from_connection_cache(eps);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1095,7 +1093,7 @@ namespace hpx { namespace components { namespace server
             }
 
             // Drop the locality from the partition table.
-            agas_client.unregister_locality(appl.here(), ec);
+            agas_client.unregister_locality(get_runtime().endpoints(), ec);
 
             // unregister fixed components
             agas_client.unbind_local(appl.get_runtime_support_raw_gid(), ec);
@@ -1232,7 +1230,7 @@ namespace hpx { namespace components { namespace server
         action_type act;
         BOOST_FOREACH(naming::id_type const& id, locality_ids)
         {
-            apply(act, id, rt->here());
+            apply(act, id, rt->endpoints());
         }
     }
 

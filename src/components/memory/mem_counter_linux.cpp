@@ -63,9 +63,9 @@ namespace hpx { namespace performance_counters { namespace memory
                   >> uint64_t_
                   ;
         }
-    
+
         qi::rule<Iterator, proc_statm(), ascii::space_type> start;
-    
+
         qi::uint_parser<boost::uint64_t> uint64_t_;
     };
 
@@ -94,20 +94,20 @@ namespace hpx { namespace performance_counters { namespace memory
     {
         std::string filename
             = boost::str(boost::format("/proc/%1%/statm") % pid);
-    
+
         ifstream_raii in(filename.c_str(), std::ios_base::in);
-    
+
         if (!in.get())
             return false;
-    
+
         in.get().unsetf(std::ios::skipws); // No white space skipping!
-    
+
         typedef boost::spirit::basic_istream_iterator<char> iterator;
-    
+
         iterator it(in.get()), end;
-    
+
         proc_statm_grammar<iterator> p;
-    
+
         if (!qi::phrase_parse(it, end, p, ascii::space, ps))
             return false;
         else

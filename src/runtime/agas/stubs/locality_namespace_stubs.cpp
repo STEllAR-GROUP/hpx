@@ -33,7 +33,8 @@ template lcos::future<response> locality_namespace::service_async<response>(
   , threads::thread_priority priority
     );
 
-template lcos::future<std::vector<naming::locality> > locality_namespace::service_async<std::vector<naming::locality> >(
+template lcos::future<std::map<naming::gid_type, parcelset::endpoints_type> >
+locality_namespace::service_async<std::map<naming::gid_type, parcelset::endpoints_type> >(
     naming::id_type const& gid
   , request const& req
   , threads::thread_priority priority

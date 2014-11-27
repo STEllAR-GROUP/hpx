@@ -8,7 +8,6 @@
 
 #if defined(HPX_PARCELPORT_MPI)
 #include <mpi.h>
-#include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/parcelset/policies/mpi/connection_handler.hpp>
 #include <hpx/runtime/parcelset/policies/mpi/sender.hpp>
 #include <hpx/runtime/parcelset/policies/mpi/receiver.hpp>
@@ -29,6 +28,17 @@ namespace hpx
 
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {
+    parcelset::locality parcelport_address(util::runtime_configuration const & ini)
+    {
+        // load all components as described in the configuration information
+        return
+            parcelset::locality(
+                locality(
+                    util::mpi_environment::rank()
+                )
+            );
+    }
+
     std::vector<std::string> connection_handler::runtime_configuration()
     {
         std::vector<std::string> lines;
@@ -51,7 +61,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
     connection_handler::connection_handler(util::runtime_configuration const& ini,
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
             HPX_STD_FUNCTION<void()> const& on_stop_thread)
-      : base_type(ini, on_start_thread, on_stop_thread)
+      : base_type(ini, parcelport_address(ini), on_start_thread, on_stop_thread)
       , stopped_(false)
       , handling_messages_(false)
       , next_tag_(1)
@@ -70,6 +80,21 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
     connection_handler::~connection_handler()
     {
+    }
+
+    parcelset::locality connection_handler::agas_locality(util::runtime_configuration const & ini) const
+    {
+        return
+            parcelset::locality(
+                locality(
+                    util::mpi_environment::enabled() ? 0 : -1
+                )
+            );
+    }
+
+    parcelset::locality connection_handler::create_locality() const
+    {
+        return parcelset::locality(locality());
     }
 
     bool connection_handler::do_run()
@@ -125,7 +150,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
     }
 
     boost::shared_ptr<sender> connection_handler::create_connection(
-        naming::locality const& l, error_code& ec)
+        parcelset::locality const& l, error_code& ec)
     {
         boost::shared_ptr<sender> sender_connection(new sender(
             communicator_, get_next_tag(), l,
@@ -312,12 +337,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 else
                 {
                     h.assert_valid();
-                    if (static_cast<std::size_t>(h.size()) > this->get_max_message_size())
+                    if (static_cast<std::size_t>(h.size()) > this->get_max_inbound_message_size())
                     {
                         // report this problem ...
-                        HPX_THROW_EXCEPTION(boost::asio::error::operation_not_supported,
+                        HPX_THROW_EXCEPTION(
+                            boost::asio::error::operation_not_supported,
                             "mpi::connection_handler::handle_messages",
-                            "The size of this message exceeds the maximum inbound data size");
+                            "The size of this message exceeds the maximum "
+                            "allowed inbound data size");
                         return;
                     }
                     if(rcv->async_read(h))
