@@ -337,12 +337,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 else
                 {
                     h.assert_valid();
-                    if (static_cast<std::size_t>(h.size()) > this->get_max_message_size())
+                    if (static_cast<std::size_t>(h.size()) > this->get_max_inbound_message_size())
                     {
                         // report this problem ...
-                        HPX_THROW_EXCEPTION(boost::asio::error::operation_not_supported,
+                        HPX_THROW_EXCEPTION(
+                            boost::asio::error::operation_not_supported,
                             "mpi::connection_handler::handle_messages",
-                            "The size of this message exceeds the maximum inbound data size");
+                            "The size of this message exceeds the maximum "
+                            "allowed inbound data size");
                         return;
                     }
                     if(rcv->async_read(h))

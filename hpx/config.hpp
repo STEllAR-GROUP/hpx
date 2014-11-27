@@ -263,6 +263,18 @@
 #  define HPX_PARCEL_MAX_MESSAGE_SIZE 1000000000
 #endif
 
+/// This defines the maximally allowed outbound  message size for coalescing
+/// messages transferred between localities. This value can be changed at
+/// runtime by setting the configuration parameter:
+///
+///   hpx.parcel.max_outbound_message_size = ...
+///
+/// (or by setting the corresponding environment variable
+/// HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE).
+#if !defined(HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE)
+#  define HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE 1000000
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 // This defines the number of bytes of overhead it takes to serialize a
 // parcel.
@@ -304,14 +316,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// This defines the default number of OS-threads created for the different
 /// internal thread pools
-#if !defined(HPX_NUM_IO_POOL_THREADS)
-#  define HPX_NUM_IO_POOL_THREADS 2
+#if !defined(HPX_NUM_IO_POOL_SIZE)
+#  define HPX_NUM_IO_POOL_SIZE 2
 #endif
-#if !defined(HPX_NUM_PARCEL_POOL_THREADS)
-#  define HPX_NUM_PARCEL_POOL_THREADS 2
+#if !defined(HPX_NUM_PARCEL_POOL_SIZE)
+#  define HPX_NUM_PARCEL_POOL_SIZE 2
 #endif
-#if !defined(HPX_NUM_TIMER_POOL_THREADS)
-#  define HPX_NUM_TIMER_POOL_THREADS 2
+#if !defined(HPX_NUM_TIMER_POOL_SIZE)
+#  define HPX_NUM_TIMER_POOL_SIZE 2
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

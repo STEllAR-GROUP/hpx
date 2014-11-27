@@ -34,7 +34,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 return parcelset::locality(
                     locality(
                         sec->get_entry("address", HPX_INITIAL_IP_ADDRESS)
-                      , hpx::util::get_entry_as<boost::uint16_t>(*sec, "port", HPX_INITIAL_IP_PORT)
+                      , hpx::util::get_entry_as<boost::uint16_t>(
+                            *sec, "port", HPX_INITIAL_IP_PORT)
                     )
                 );
             }
@@ -77,7 +78,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         std::size_t tried = 0;
         exception_list errors;
         util::endpoint_iterator_type end = util::accept_end();
-        for (util::endpoint_iterator_type it = util::accept_begin(here_.get<locality>(), io_service);
+        for (util::endpoint_iterator_type it =
+                util::accept_begin(here_.get<locality>(), io_service);
              it != end; ++it, ++tried)
         {
             try {
@@ -231,7 +233,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         return sender_connection;
     }
 
-    parcelset::locality connection_handler::agas_locality(util::runtime_configuration const & ini) const
+    parcelset::locality connection_handler::agas_locality(
+        util::runtime_configuration const & ini) const
     {
         // load all components as described in the configuration information
         if (ini.has_section("hpx.agas")) {
@@ -241,7 +244,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                     parcelset::locality(
                         locality(
                             sec->get_entry("address", HPX_INITIAL_IP_ADDRESS)
-                          , hpx::util::get_entry_as<boost::uint16_t>(*sec, "port", HPX_INITIAL_IP_PORT)
+                          , hpx::util::get_entry_as<boost::uint16_t>(
+                                *sec, "port", HPX_INITIAL_IP_PORT)
                         )
                     );
             }

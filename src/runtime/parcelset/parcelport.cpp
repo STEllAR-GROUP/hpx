@@ -176,7 +176,8 @@ namespace hpx { namespace parcelset
             std::string const& type)
       : parcels_(),
         here_(here),
-        max_message_size_(ini.get_max_message_size()),
+        max_inbound_message_size_(ini.get_max_inbound_message_size()),
+        max_outbound_message_size_(ini.get_max_outbound_message_size()),
         allow_array_optimizations_(true),
         allow_zero_copy_optimizations_(true),
         enable_security_(false),
@@ -209,7 +210,7 @@ namespace hpx { namespace parcelset
     ///////////////////////////////////////////////////////////////////////////
     boost::uint64_t get_max_inbound_size(parcelport& pp)
     {
-        return pp.get_max_message_size();
+        return pp.get_max_inbound_message_size();
     }
 }}
 

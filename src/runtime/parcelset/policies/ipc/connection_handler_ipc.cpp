@@ -38,7 +38,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
                 return parcelset::locality(
                     locality(
                         sec->get_entry("address", HPX_INITIAL_IP_ADDRESS)
-                      , hpx::util::get_entry_as<boost::uint16_t>(*sec, "port", HPX_INITIAL_IP_PORT)
+                      , hpx::util::get_entry_as<boost::uint16_t>(
+                            *sec, "port", HPX_INITIAL_IP_PORT)
                     )
                 );
             }
@@ -236,7 +237,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         return sender_connection;
     }
 
-    parcelset::locality connection_handler::agas_locality(util::runtime_configuration const & ini) const
+    parcelset::locality connection_handler::agas_locality(
+        util::runtime_configuration const & ini) const
     {
         // This parcelport cannot be used during bootstrapping
         HPX_ASSERT(false);

@@ -152,12 +152,12 @@ namespace hpx { namespace util
 #endif
 
             "[hpx.threadpools]",
-            "io_pool_size = ${HPX_NUM_IO_POOL_THREADS:"
-                BOOST_PP_STRINGIZE(HPX_NUM_IO_POOL_THREADS) "}",
-            "parcel_pool_size = ${HPX_NUM_PARCEL_POOL_THREADS:"
-                BOOST_PP_STRINGIZE(HPX_NUM_PARCEL_POOL_THREADS) "}",
-            "timer_pool_size = ${HPX_NUM_TIMER_POOL_THREADS:"
-                BOOST_PP_STRINGIZE(HPX_NUM_TIMER_POOL_THREADS) "}",
+            "io_pool_size = ${HPX_NUM_IO_POOL_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_NUM_IO_POOL_SIZE) "}",
+            "parcel_pool_size = ${HPX_NUM_PARCEL_POOL_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_NUM_PARCEL_POOL_SIZE) "}",
+            "timer_pool_size = ${HPX_NUM_TIMER_POOL_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_NUM_TIMER_POOL_SIZE) "}",
 
             "[hpx.commandline]",
             // enable aliasing
@@ -875,16 +875,35 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     // Return maximally allowed message size
-    boost::uint64_t runtime_configuration::get_max_message_size() const
+    boost::uint64_t runtime_configuration::get_max_inbound_message_size() const
     {
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx.parcel");
             if (NULL != sec) {
-                return hpx::util::get_entry_as<boost::uint64_t>(
-                    *sec, "max_message_size", HPX_PARCEL_MAX_MESSAGE_SIZE);
+                boost::uint64_t maxsize =
+                    hpx::util::get_entry_as<boost::uint64_t>(
+                        *sec, "max_message_size", HPX_PARCEL_MAX_MESSAGE_SIZE);
+                if (maxsize > 0)
+                    return maxsize;
             }
         }
         return HPX_PARCEL_MAX_MESSAGE_SIZE;    // default is 1GByte
+    }
+
+    boost::uint64_t runtime_configuration::get_max_outbound_message_size() const
+    {
+        if (has_section("hpx")) {
+            util::section const* sec = get_section("hpx.parcel");
+            if (NULL != sec) {
+                boost::uint64_t maxsize =
+                    hpx::util::get_entry_as<boost::uint64_t>(
+                        *sec, "max_outbound_message_size",
+                        HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE);
+                if (maxsize > 0)
+                    return maxsize;
+            }
+        }
+        return HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE;    // default is 1GByte
     }
 
     ///////////////////////////////////////////////////////////////////////////

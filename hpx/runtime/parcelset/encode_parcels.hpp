@@ -41,17 +41,6 @@ namespace hpx
 
 namespace hpx { namespace parcelset
 {
-    template <typename Connection>
-    boost::shared_ptr<parcel_buffer<typename Connection::buffer_type> >
-    encode_parcels(std::vector<parcel> const &, Connection & connection, int archive_flags_);
-
-    template <typename Connection>
-    boost::shared_ptr<parcel_buffer<typename Connection::buffer_type> >
-    encode_parcels(parcel const &p, Connection & connection, int archive_flags_)
-    {
-        return encode_parcels(std::vector<parcel>(1, p), connection, archive_flags_);
-    }
-
 #if defined(HPX_HAVE_SECURITY)
     template <typename Archive, typename Connection>
     void serialize_certificate(Archive& archive, Connection & connection,
@@ -132,9 +121,9 @@ namespace hpx { namespace parcelset
 #endif
 
     template <typename Connection>
-    void
+    std::size_t
     encode_parcels(std::vector<parcel> const & pv, Connection & connection,
-        int archive_flags_, bool enable_security)
+        int archive_flags_, std::size_t max_outbound_size, bool enable_security)
     {
         typedef parcel_buffer<typename Connection::buffer_type> parcel_buffer_type;
 
@@ -143,14 +132,17 @@ namespace hpx { namespace parcelset
         boost::uint32_t dest_locality_id = pv[0].get_destination_locality_id();
 
         boost::shared_ptr<parcel_buffer_type> buffer;
+        std::size_t parcels_sent = 0;
 
         // guard against serialization errors
         try {
             try {
-                // preallocate data_
-                BOOST_FOREACH(parcel const & p, pv)
+                // preallocate data
+                for (/**/; parcels_sent != pv.size(); ++parcels_sent)
                 {
-                    arg_size += traits::get_type_size(p);
+                    if (arg_size >= max_outbound_size)
+                        break;
+                    arg_size += traits::get_type_size(pv[0]);
                 }
 
                 buffer = connection.get_buffer(pv[0], arg_size);
@@ -180,16 +172,15 @@ namespace hpx { namespace parcelset
 #if defined(HPX_HAVE_SECURITY)
                     std::set<boost::uint32_t> localities;
 #endif
-                    std::size_t count = pv.size();
-                    archive << count; //-V128
+                    archive << parcels_sent; //-V128
 
-                    BOOST_FOREACH(parcel const& p, pv)
+                    for (std::size_t i = 0; i != parcels_sent; ++i)
                     {
 #if defined(HPX_HAVE_SECURITY)
                         if (enable_security)
-                            serialize_certificate(archive, connection, localities, p);
+                            serialize_certificate(archive, connection, localities, pv[i]);
 #endif
-                        archive << p;
+                        archive << pv[i];
                     }
 
                     arg_size = archive.bytes_written();
@@ -210,7 +201,7 @@ namespace hpx { namespace parcelset
                        "caught hpx::exception: "
                     << e.what();
                 hpx::report_error(boost::current_exception());
-                return;
+                return 0;
             }
             catch (boost::system::system_error const& e) {
                 LPT_(fatal)
@@ -218,14 +209,14 @@ namespace hpx { namespace parcelset
                        "caught boost::system::error: "
                     << e.what();
                 hpx::report_error(boost::current_exception());
-                return;
+                return 0;
             }
             catch (boost::exception const&) {
                 LPT_(fatal)
                     << "encode_parcels: "
                        "caught boost::exception";
                 hpx::report_error(boost::current_exception());
-                return;
+                return 0;
             }
             catch (std::exception const& e) {
                 // We have to repackage all exceptions thrown by the
@@ -233,6 +224,7 @@ namespace hpx { namespace parcelset
                 // e.what() description of the problem, due to slicing.
                 boost::throw_exception(boost::enable_error_info(
                     hpx::exception(serialization_error, e.what())));
+                return 0;
             }
         }
         catch (...) {
@@ -240,14 +232,14 @@ namespace hpx { namespace parcelset
                     << "encode_parcels: "
                    "caught unknown exception";
             hpx::report_error(boost::current_exception());
-            return;
+            return 0;
         }
 
         buffer->size_ = buffer->data_.size();
         buffer->data_size_ = arg_size;
 
         performance_counters::parcels::data_point& data = buffer->data_point_;
-        data.num_parcels_ = pv.size();
+        data.num_parcels_ = parcels_sent;
         data.bytes_ = arg_size;
         data.raw_bytes_ = buffer->data_.size();
 
@@ -267,9 +259,8 @@ namespace hpx { namespace parcelset
         std::size_t index = 0;
         BOOST_FOREACH(util::serialization_chunk& c, buffer->chunks_)
         {
-            if (c.type_ == util::chunk_type_pointer) {
+            if (c.type_ == util::chunk_type_pointer)
                 chunks.push_back(transmission_chunk_type(index, c.size_));
-            }
             ++index;
         }
 
@@ -289,8 +280,7 @@ namespace hpx { namespace parcelset
             }
         }
 
-
-        return;
+        return parcels_sent;
     }
 }}
 

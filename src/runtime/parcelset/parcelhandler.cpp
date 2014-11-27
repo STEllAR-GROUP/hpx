@@ -258,6 +258,8 @@ namespace hpx { namespace parcelset
                 BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY) "}",
             "max_message_size = ${HPX_PARCEL_MAX_MESSAGE_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_MESSAGE_SIZE) "}",
+            "max_outbound_message_size = ${HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE) "}",
 #ifdef BOOST_BIG_ENDIAN
             "endian_out = ${HPX_PARCEL_ENDIAN_OUT:big}",
 #else
@@ -289,7 +291,7 @@ namespace hpx { namespace parcelset
             {
                 ini_defs +=
                     "enable = ${HPX_PARCELPORT_" + name_uc + ":" + enable + "}",
-                    "io_pool_size = ${HPX_PARCEL_" + name_uc + "_IO_POOL_SIZE:"
+                    "parcel_pool_size = ${HPX_PARCEL_" + name_uc + "_PARCEL_POOL_SIZE:"
                         "$[hpx.threadpools.parcel_pool_size]}",
                     "max_connections =  ${HPX_PARCEL_" + name_uc + "_MAX_CONNECTIONS:"
                         "$[hpx.parcel.max_connections]}",
@@ -298,6 +300,8 @@ namespace hpx { namespace parcelset
                         "$[hpx.parcel.max_connections_per_locality]}",
                     "max_message_size =  ${HPX_PARCEL_" + name_uc +
                         "_MAX_MESSAGE_SIZE:$[hpx.parcel.max_message_size]}",
+                    "max_outbound_message_size =  ${HPX_PARCEL_" + name_uc +
+                        "_MAX_OUTBOUND_MESSAGE_SIZE:$[hpx.parcel.max_outbound_message_size]}",
                     "array_optimization = ${HPX_PARCEL_" + name_uc +
                         "_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}",
                     "zero_copy_optimization = ${HPX_PARCEL_" + name_uc +
