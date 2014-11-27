@@ -284,63 +284,65 @@ sections, one for each component.
       default is `0`.]]
 ]
 
+The following settings relate to the TCP/IP parcelport.
+
 [teletype]
 ``
-    [hpx.parcel.IBVERBS]
-    enable = ${HPX_PARCELPORT_IBVERBS:1}
-    array_optimization = ${HPX_PARCEL_IBVERBS_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
-    zero_copy_optimization = ${HPX_PARCEL_IBVERBS_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.zero_copy_optimization]}
-    async_serialization = ${HPX_PARCEL_IBVERBS_ASYNC_SERIALIZATION:$[hpx.parcel.async_serialization]}
-    enable_security = ${HPX_PARCEL_IBVERBS_ENABLE_SECURITY:$[hpx.parcel.enable_security]}
-    parcel_pool_size = ${HPX_PARCEL_IBVERBS_PARCEL_POOL_SIZE:$[hpx.threadpools.parcel_pool_size]}
-    max_connections =  ${HPX_PARCEL_IBVERBS_MAX_CONNECTIONS:$[hpx.parcel.max_connections]}
-    max_connections_per_locality = ${HPX_PARCEL_IBVERBS_MAX_CONNECTIONS_PER_LOCALITY:$[hpx.parcel.max_connections_per_locality]}
-    max_message_size =  ${HPX_PARCEL_IBVERBS_MAX_MESSAGE_SIZE:$[hpx.parcel.max_message_size]}
-    max_outbound_message_size =  ${HPX_PARCEL_IBVERBS_MAX_OUTBOUND_MESSAGE_SIZE:$[hpx.parcel.max_outbound_message_size]}
+    [hpx.parcel.tcp]
+    enable = ${HPX_PARCELPORT_TCP:1}
+    array_optimization = ${HPX_PARCEL_TCP_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
+    zero_copy_optimization = ${HPX_PARCEL_TCP_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.zero_copy_optimization]}
+    async_serialization = ${HPX_PARCEL_TCP_ASYNC_SERIALIZATION:$[hpx.parcel.async_serialization]}
+    enable_security = ${HPX_PARCEL_TCP_ENABLE_SECURITY:$[hpx.parcel.enable_security]}
+    parcel_pool_size = ${HPX_PARCEL_TCP_PARCEL_POOL_SIZE:$[hpx.threadpools.parcel_pool_size]}
+    max_connections =  ${HPX_PARCEL_TCP_MAX_CONNECTIONS:$[hpx.parcel.max_connections]}
+    max_connections_per_locality = ${HPX_PARCEL_TCP_MAX_CONNECTIONS_PER_LOCALITY:$[hpx.parcel.max_connections_per_locality]}
+    max_message_size =  ${HPX_PARCEL_TCP_MAX_MESSAGE_SIZE:$[hpx.parcel.max_message_size]}
+    max_outbound_message_size =  ${HPX_PARCEL_TCP_MAX_OUTBOUND_MESSAGE_SIZE:$[hpx.parcel.max_outbound_message_size]}
 ``
 [c++]
 
-[table:ini_hpx_parcel_IBVERBS
+[table:ini_hpx_parcel_tcp
     [[Property]                 [Description]]
-    [[`hpx.parcel.IBVERBS.enable`]
-     [Enable the use of the default IBVERBS parcelport. Note that the initial
+    [[`hpx.parcel.tcp.enable`]
+     [Enable the use of the default TCP parcelport. Note that the initial
       bootstrap of the overall __hpx__ application will be performed using the
-      default IBVERBS connections. This parcelport is enabled by default. This
+      default TCP connections. This parcelport is enabled by default. This
       will be disabled only if MPI is enabled (see below).]]
-    [[`hpx.parcel.IBVERBS.array_optimization`]
+    [[`hpx.parcel.tcp.array_optimization`]
      [This property defines whether this locality is allowed to utilize array
-      optimizations in the IBVERBS/IP parcelport during serialization of parcel data.
+      optimizations in the TCP/IP parcelport during serialization of parcel data.
       The default is the same value as set for `hpx.parcel.array_optimization`.]]
-    [[`hpx.parcel.IBVERBS.zero_copy_optimization`]
+    [[`hpx.parcel.tcp.zero_copy_optimization`]
      [This property defines whether this locality is allowed to utilize zero copy
-      optimizations in the IBVERBS/IP parcelport during serialization of parcel data.
+      optimizations in the TCP/IP parcelport during serialization of parcel data.
       The default is the same value as set for `hpx.parcel.zero_copy_optimization`.]]
-    [[`hpx.parcel.IBVERBS.async_serialization`]
+    [[`hpx.parcel.tcp.async_serialization`]
      [This property defines whether this locality is allowed to spawn a new thread
-      for serialization in the IBVERBS/IP parcelport (this is both for encoding and
+      for serialization in the TCP/IP parcelport (this is both for encoding and
       decoding parcels). The default is the same value as set for
       `hpx.parcel.async_serialization`.]]
-    [[`hpx.parcel.IBVERBS.enable_security`]
+    [[`hpx.parcel.tcp.enable_security`]
      [This property defines whether this locality is encrypting parcels in the
-      IBVERBS/IP parcelport. The default is the same value as set for
+      TCP/IP parcelport. The default is the same value as set for
       `hpx.parcel.enable_security`.]]
-    [[`hpx.parcel.IBVERBS.parcel_pool_size`]
+    [[`hpx.parcel.tcp.parcel_pool_size`]
      [The value of this property defines the number of OS-threads created for
-      the internal parcel thread pool of the IBVERBS parcel port. The default is
+      the internal parcel thread pool of the TCP parcel port. The default is
       taken from `hpx.threadpools.parcel_pool_size`.]]
-    [[`hpx.parcel.IBVERBS.max_connections`]
+    [[`hpx.parcel.tcp.max_connections`]
      [This property defines how many network connections between different
       localities are overall kept alive by each of locality. The default is
       taken from `hpx.parcel.max_connections`.]]
-    [[`hpx.parcel.IBVERBS.max_connections_per_locality`]
+    [[`hpx.parcel.tcp.max_connections_per_locality`]
      [This property defines the maximum number of network connections that one
       locality will open to another locality. The default is
       taken from `hpx.parcel.max_connections_per_locality`.]]
-    [[`hpx.parcel.IBVERBS.max_message_size`]
+    [[`hpx.parcel.tcp.max_message_size`]
      [This property defines the maximum allowed message size which will be
       transferrable through the parcel layer. The default is
       taken from `hpx.parcel.max_message_size`.]]
-    [[`hpx.parcel.IBVERBS.max_outbound_message_size`]
+    [[`hpx.parcel.tcp.max_outbound_message_size`]
      [This property defines the maximum allowed outbound coalesced message size which
       will be transferrable through the parcel layer. The default is
       taken from `hpx.parcel.max_outbound_connections`.]]
@@ -373,7 +375,7 @@ effect only if the compile time constant `HPX_PARCELPORT_IPC` is set
      [Enable the use of the shared memory parcelport for connections between
       localities running on the same node. Note that the initial bootstrap
       of the overall __hpx__ application will still be performed using the
-      default IBVERBS connections. This parcelport is disabled by default.]]
+      default ipc connections. This parcelport is disabled by default.]]
     [[`hpx.parcel.ipc.data_buffer_cache_size`]
      [This property specifies the number of cached data buffers used for
       interprocess communication between localities on the same node. The
