@@ -251,7 +251,7 @@ sections, one for each component.
     [[`hpx.parcel.bootstrap`]
      [This property defines which parcelport type should be used during
       application bootstrap. The default depends on the compile time preprocessor
-      constant `HPX_PARCEL_BOOTSTRAP` (`"IBVERBS"`).]]
+      constant `HPX_PARCEL_BOOTSTRAP` (`"tcp"`).]]
     [[`hpx.parcel.max_connections`]
      [This property defines how many network connections between different
       localities are overall kept alive by each of locality. The default depends
@@ -443,7 +443,7 @@ set to `ON`).
      [Enable the use of the ibverbs parcelport for connections between
       localities running on a node with infiniband capable hardware. Note
       that the initial bootstrap of the overall __hpx__ application will
-      still be performed using the default IBVERBS connections.
+      still be performed using the default TCP/IP connections.
       This parcelport is disabled by default.]]
     [[`hpx.parcel.ibverbs.buffer_size`]
      [This property specifies the size in bytes of the buffers registered to
