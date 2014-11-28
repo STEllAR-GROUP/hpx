@@ -17,9 +17,8 @@
 #include <hpx/include/naming.hpp>
 #include <hpx/include/util.hpp>
 
-#include <hpx/traits/segemented_iterator_traits.hpp>
-#include <hpx/components/vector/partition_vector_component.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
+#include <hpx/components/vector/partition_vector_component.hpp>
 
 #include <cstdint>
 #include <iterator>
