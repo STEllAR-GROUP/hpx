@@ -49,8 +49,6 @@ namespace hpx
 
     template <typename T, typename BaseIter>
     class local_segment_vector_iterator;
-//     template <typename T, typename BaseIter>
-//     class const_local_segment_vector_iterator;
 
     namespace server
     {

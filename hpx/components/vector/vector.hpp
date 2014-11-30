@@ -1647,41 +1647,49 @@ namespace hpx
                 vector_distribution_policy::block));
         }
 
+        ///////////////////////////////////////////////////////////////////////
+        /// Return the iterator at the beginning of the first partition of the
+        /// vector on the given locality.
         iterator begin(boost::uint32_t id)
         {
             return iterator(this, get_global_index(segment_begin(id), 0,
                 vector_distribution_policy::block));
         }
 
-        /// \brief Return the const_iterator at the beginning of the vector.
+        /// Return the iterator at the beginning of the first partition of the
+        /// vector on the given locality.
         const_iterator begin(boost::uint32_t id) const
         {
             return const_iterator(this, get_global_index(segment_cbegin(id), 0,
                 vector_distribution_policy::block));
         }
 
-        /// \brief Return the const_iterator at the beginning of the vector.
+        /// Return the iterator at the beginning of the first partition of the
+        /// vector on the given locality.
         const_iterator cbegin(boost::uint32_t id) const
         {
             return const_iterator(this, get_global_index(segment_cbegin(id), 0,
                 vector_distribution_policy::block));
         }
 
-        /// \brief Return the iterator at the end of the vector.
+        /// Return the iterator at the end of the last partition of the
+        /// vector on the given locality.
         iterator end(boost::uint32_t id)
         {
             return iterator(this, get_global_index(segment_end(id), 0,
                 vector_distribution_policy::block));
         }
 
-        /// \brief Return the const_iterator at the end of the vector.
+        /// Return the iterator at the end of the last partition of the
+        /// vector on the given locality.
         const_iterator end(boost::uint32_t id) const
         {
             return const_iterator(this, get_global_index(segment_cend(id), 0,
                 vector_distribution_policy::block));
         }
 
-        /// \brief Return the const_iterator at the end of the vector.
+        /// Return the iterator at the end of the last partition of the
+        /// vector on the given locality.
         const_iterator cend(boost::uint32_t id) const
         {
             return const_iterator(this, get_global_index(segment_cend(id), 0,
@@ -1697,35 +1705,40 @@ namespace hpx
             return begin(naming::get_locality_from_id(id));
         }
 
-        /// \brief Return the const_iterator at the beginning of the vector.
+        /// Return the iterator at the beginning of the first segment located
+        /// on the given locality.
         const_iterator begin(id_type const& id) const
         {
             HPX_ASSERT(naming::is_locality(id));
             return begin(naming::get_locality_from_id(id));
         }
 
-        /// \brief Return the const_iterator at the beginning of the vector.
+        /// Return the iterator at the beginning of the first segment located
+        /// on the given locality.
         const_iterator cbegin(id_type const& id) const
         {
             HPX_ASSERT(naming::is_locality(id));
             return cbegin(naming::get_locality_from_id(id));
         }
 
-        /// \brief Return the iterator at the end of the vector.
+        /// Return the iterator at the end of the last segment located
+        /// on the given locality.
         iterator end(id_type const& id)
         {
             HPX_ASSERT(naming::is_locality(id));
             return end(naming::get_locality_from_id(id));
         }
 
-        /// \brief Return the const_iterator at the end of the vector.
+        /// Return the iterator at the end of the last segment located
+        /// on the given locality.
         const_iterator end(id_type const& id) const
         {
             HPX_ASSERT(naming::is_locality(id));
             return end(naming::get_locality_from_id(id));
         }
 
-        /// \brief Return the const_iterator at the end of the vector.
+        /// Return the iterator at the end of the last segment located
+        /// on the given locality.
         const_iterator cend(id_type const& id) const
         {
             HPX_ASSERT(naming::is_locality(id));
