@@ -74,6 +74,17 @@ namespace hpx { namespace server
         {}
 
         ///////////////////////////////////////////////////////////////////////
+        data_type& get_data()
+        {
+            return partition_vector_;
+        }
+
+        data_type const& get_data() const
+        {
+            return partition_vector_;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         iterator_type begin()
         {
             return partition_vector_.begin();

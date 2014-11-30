@@ -111,7 +111,8 @@ namespace hpx
     class unordered_map
       : hpx::components::client_base<
             unordered_map<Key, T, Hash, KeyEqual>,
-            server::unordered_map_config_data>
+            hpx::components::server::distributed_metadata_base<
+                server::unordered_map_config_data> >
     {
     public:
         typedef std::allocator<T> allocator_type;
