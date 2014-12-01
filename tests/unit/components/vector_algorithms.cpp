@@ -18,9 +18,9 @@ HPX_REGISTER_VECTOR(int);
 struct pfo
 {
     template <typename T>
-    void operator()(T && val) const
+    void operator()(T& val) const
     {
-        val = val + 1;
+        ++val;
     }
 };
 
