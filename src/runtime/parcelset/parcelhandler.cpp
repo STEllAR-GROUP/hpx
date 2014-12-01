@@ -13,6 +13,7 @@
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/mpi_environment.hpp>
+#include <hpx/util/stringstream.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
@@ -542,8 +543,15 @@ namespace hpx { namespace parcelset
 
         if(lit == resolved_endpoints_.end())
         {
+            hpx::util::osstream oss;
+            oss << "The locality gid cannot be resolved to a valid endpoint.\n"
+                << "Got locality " << dest_gid << ". Available endpoints:\n";
+            BOOST_FOREACH(resolved_endpoints_type::value_type const & endpoints, resolved_endpoints_)
+            {
+                oss << "    " << endpoints.first << ": " << endpoints.second << "\n";
+            }
             HPX_THROW_EXCEPTION(network_error, "parcelhandler::find_appropriate_destination",
-                "The locality gid cannot be resolved to a valid endpoint");
+                hpx::util::osstream_get_string(oss));
             return locality();
         }
         endpoints_type const & dest_endpoints = lit->second;
