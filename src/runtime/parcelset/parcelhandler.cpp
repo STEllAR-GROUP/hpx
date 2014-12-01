@@ -609,7 +609,7 @@ namespace hpx { namespace parcelset
 #endif
 
         HPX_THROW_EXCEPTION(network_error, "parcelhandler::find_appropriate_destination",
-            "The locality gid cannot be resolved to a valid endpoint.");
+            "The locality gid cannot be resolved to a valid endpoint. No valid parcelport configured.");
         return locality();
     }
 
