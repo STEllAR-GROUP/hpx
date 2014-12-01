@@ -736,18 +736,19 @@ inline std::size_t get_number_of_bootstrap_connections(
 }
 
 big_boot_barrier::big_boot_barrier(
-    parcelset::parcelport& pp_
+    parcelset::parcelport* pp_
   , util::runtime_configuration const& ini_
 ):
     pp(pp_)
   , service_type(ini_.get_agas_service_mode())
-  , bootstrap_agas(pp_.agas_locality(ini_))
+  , bootstrap_agas(pp_ ? pp_->agas_locality(ini_) : parcelset::locality())
   , cond()
   , mtx()
   , connected(get_number_of_bootstrap_connections(ini_))
   , thunks(32)
 {
-    pp_.register_event_handler(&early_parcel_sink);
+    if(pp_)
+        pp_->register_event_handler(&early_parcel_sink);
 }
 
 void big_boot_barrier::apply(
@@ -756,11 +757,12 @@ void big_boot_barrier::apply(
   , parcelset::locality const & dest
   , actions::base_action* act
 ) { // {{{
+    HPX_ASSERT(pp);
     naming::address addr(naming::get_gid_from_locality_id(target_locality_id));
     parcelset::parcel p(naming::get_id_from_locality_id(target_locality_id), addr, act);
     if (!p.get_parcel_id())
         p.set_parcel_id(parcelset::parcel::generate_unique_id(source_locality_id));
-    pp.send_early_parcel(dest, p);
+    pp->send_early_parcel(dest, p);
 } // }}}
 
 void big_boot_barrier::apply_late(
@@ -879,7 +881,7 @@ void big_boot_barrier::trigger()
 struct bbb_tag;
 
 void create_big_boot_barrier(
-    parcelset::parcelport& pp_
+    parcelset::parcelport* pp_
   , util::runtime_configuration const& ini_
 ) {
     util::reinitializable_static<boost::shared_ptr<big_boot_barrier>, bbb_tag> bbb;

@@ -856,9 +856,6 @@ if(HPX_COMPILER_WARNINGS)
     hpx_add_compile_flag_if_available(-Wno-attributes LANGUAGES CXX)
     hpx_add_compile_flag_if_available(-Wno-cast-align LANGUAGES CXX)
 
-    # We never want trampolines
-    hpx_add_compile_flag_if_available(-Wt)
-
     # These are usually benign and can't be suppressed because of
     # interface requirements
     hpx_add_compile_flag_if_available(-Wno-unused-parameter)

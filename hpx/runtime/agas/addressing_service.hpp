@@ -207,7 +207,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
 protected:
     void launch_bootstrap(
-        parcelset::parcelport& pp
+        boost::shared_ptr<parcelset::parcelport> pp
       , parcelset::endpoints_type const & endpoints
       , util::runtime_configuration const& ini_
         );

@@ -29,7 +29,7 @@ namespace hpx { namespace agas
 struct HPX_EXPORT big_boot_barrier : boost::noncopyable
 {
   private:
-    parcelset::parcelport& pp;
+    parcelset::parcelport* pp;
 
     service_mode const service_type;
     parcelset::locality const bootstrap_agas;
@@ -66,7 +66,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     };
 
     big_boot_barrier(
-        parcelset::parcelport& pp_
+        parcelset::parcelport* pp_
       , util::runtime_configuration const& ini_
         );
 
@@ -107,7 +107,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
 };
 
 HPX_EXPORT void create_big_boot_barrier(
-    parcelset::parcelport& pp_
+    parcelset::parcelport* pp_
   , util::runtime_configuration const& ini_
     );
 

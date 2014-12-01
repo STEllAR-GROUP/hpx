@@ -13,6 +13,7 @@
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/mpi_environment.hpp>
+#include <hpx/util/runtime_configuration.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
@@ -199,6 +200,14 @@ namespace hpx { namespace parcelset
         enable_parcel_handling_(true),
         count_routed_(0)
     {
+        util::runtime_configuration const& cfg = hpx::get_config();
+        // load all parcelports as described in the configuration information
+        if (!cfg.has_section("hpx.plugins.parcelport")) {
+            LRT_(info) << "No parcelports found/loaded.";
+            return;     // no plugins to load
+        }
+
+        /** FIXME:
 #if defined(HPX_PARCELPORT_IPC)
         std::string enable_ipc =
             get_config_entry("hpx.parcel.ipc.enable", "0");
@@ -238,6 +247,7 @@ namespace hpx { namespace parcelset
                 on_start_thread, on_stop_thread), false);
         }
 #endif
+    ***/
     }
 
     std::vector<std::string> parcelhandler::load_runtime_configuration()

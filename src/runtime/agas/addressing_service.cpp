@@ -218,8 +218,8 @@ addressing_service::addressing_service(
   , state_(starting)
   , locality_()
 { // {{{
-    parcelset::parcelport & pp = *ph.get_bootstrap_parcelport();
-    create_big_boot_barrier(pp, ini_);
+    boost::shared_ptr<parcelset::parcelport> pp = ph.get_bootstrap_parcelport();
+    create_big_boot_barrier(pp ? pp.get() : 0, ini_);
 
     if (caching_)
         gva_cache_->reserve(ini_.get_agas_local_cache_size());
@@ -235,9 +235,10 @@ void addressing_service::initialize(
 {
     rts_lva_ = rts_lva;
     mem_lva_ = mem_lva;
-    parcelset::parcelport & pp = *ph.get_bootstrap_parcelport();
+    boost::shared_ptr<parcelset::parcelport> pp = ph.get_bootstrap_parcelport();
     // now, boot the parcel port
-    pp.run(false);
+    if(pp)
+        pp->run(false);
 
     if (service_type == service_mode_bootstrap)
     {
@@ -248,7 +249,7 @@ void addressing_service::initialize(
     else
     {
         launch_hosted();
-        get_big_boot_barrier().wait_hosted(pp.get_locality_name(),
+        get_big_boot_barrier().wait_hosted(pp ? pp->get_locality_name(): "",
             &hosted->primary_ns_server_, &hosted->symbol_ns_server_);
     }
 
@@ -297,7 +298,7 @@ namespace detail
 }
 
 void addressing_service::launch_bootstrap(
-    parcelset::parcelport& pp
+    boost::shared_ptr<parcelset::parcelport> pp
   , parcelset::endpoints_type const & endpoints
   , util::runtime_configuration const& ini_
     )
@@ -309,11 +310,11 @@ void addressing_service::launch_bootstrap(
     // store number of cores used by other processes
     boost::uint32_t cores_needed = rt.assign_cores();
     boost::uint32_t first_used_core = rt.assign_cores(
-        pp.get_locality_name(), cores_needed);
+        pp ? pp->get_locality_name() : "", cores_needed);
 
     util::runtime_configuration& cfg = rt.get_config();
     cfg.set_first_used_core(first_used_core);
-    HPX_ASSERT(pp.here() == pp.agas_locality(cfg));
+    HPX_ASSERT(pp ? pp->here() == pp->agas_locality(cfg) : true);
     rt.assign_cores();
 
     naming::gid_type const here =
