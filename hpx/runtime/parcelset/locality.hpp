@@ -85,15 +85,33 @@ namespace hpx { namespace parcelset
 
         locality & operator=(locality const & other)
         {
-            if(this != &other && other.impl_)
-                impl_.reset(other.impl_->clone());
+            if(this != &other)
+            {
+                if(other.impl_)
+                {
+                    impl_.reset(other.impl_->clone());
+                }
+                else
+                {
+                    impl_.reset();
+                }
+            }
             return *this;
         }
 
         locality & operator=(locality && other)
         {
-            if(this != &other && other.impl_)
-                impl_.reset(other.impl_->move());
+            if(this != &other)
+            {
+                if(other.impl_)
+                {
+                    impl_.reset(other.impl_->move());
+                }
+                else
+                {
+                    impl_.reset();
+                }
+            }
             return *this;
         }
 
