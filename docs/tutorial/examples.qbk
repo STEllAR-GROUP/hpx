@@ -158,7 +158,7 @@ functions which are not associated with any particular object (we will discuss
 other types of actions in the __accumulator_example__).
 In this block of code the function `fibonacci()` is declared. After the
 declaration, the function is wrapped in an action in the declaration
-[macroref HPX_PLAIN_ACTION `HPX_PLAIN_ACTION`]. This function takes two aruments: the name of the
+[macroref HPX_PLAIN_ACTION `HPX_PLAIN_ACTION`]. This function takes two arguments: the name of the
 function that is to be wrapped and the name of the action that you are
 creating.
 

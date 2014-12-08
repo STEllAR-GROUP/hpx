@@ -246,7 +246,7 @@ several (very often all) threads (when using __openmp__) or processes (__mpi__).
 For instance, an implicit global barrier is inserted after each loop parallelized
 using __openmp__ as the system synchronizes the threads used to execute the
 different iterations in parallel. In __mpi__ each of the communication steps
-imposes an explicit barrier onto the execution flow as (often all) nodes have be
+imposes an explicit barrier onto the execution flow as (often all) nodes have to be
 synchronized. Each of those barriers acts as an eye of the needle the overall
 execution is forced to be squeezed through. Even minimal fluctuations in the
 execution times of the parallel threads (jobs) causes them to wait. Additionally
@@ -266,7 +266,7 @@ There are certain attempts today to get back to those ideas and to incorporate
 them with modern architectures. For instance, a lot of work is being done in
 the area of constructing dataflow oriented execution trees. Our results show
 that employing dataflow techniques in combination with the other ideas, as
-outlined herein, considerabley improves scalability for many problems.
+outlined herein, considerably improves scalability for many problems.
 
 [heading:locality_control Adaptive Locality Control instead of Static Data Distribution]
 
