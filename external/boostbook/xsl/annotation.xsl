@@ -400,6 +400,14 @@
     </computeroutput>
   </xsl:template>
 
+  <xsl:template match="code[@language='c++']" mode="annotation">
+    <computeroutput>
+      <xsl:apply-templates mode="annotation">
+        <xsl:with-param name="highlight" select="true()"/>
+      </xsl:apply-templates>
+    </computeroutput>
+  </xsl:template>
+
   <xsl:template match="bold" mode="annotation">
     <emphasis role="bold">
       <xsl:apply-templates mode="annotation"/>

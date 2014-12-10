@@ -26,7 +26,6 @@
 #include <hpx/util/serialize_intrusive_ptr.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/register_locks_globally.hpp>
-#include <hpx/runtime/naming/address.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/lcos/local/spinlock_pool.hpp>
@@ -315,7 +314,7 @@ namespace hpx { namespace naming
         friend std::ostream& operator<< (std::ostream& os, gid_type const& id);
 
         friend class boost::serialization::access;
-        
+
         void save(util::portable_binary_oarchive& ar, const unsigned int version) const;
         void load(util::portable_binary_iarchive& ar, const unsigned int version);
 
@@ -667,11 +666,11 @@ namespace hpx { namespace naming
 // #if defined(HPX_DEBUG)
 //         // make sure we're using the operator- in proper contexts only
 //         boost::uint64_t lhs_internal_bits = detail::get_internal_bits(lhs.id_msb_);
-// 
+//
 //         boost::uint64_t msb_test =
 //             detail::strip_internal_bits_and_locality_from_gid(lhs.id_msb_) -
 //             detail::strip_internal_bits_and_locality_from_gid(rhs.id_msb_);
-// 
+//
 //         boost::uint32_t lhs_locality_id = naming::get_locality_id_from_gid(lhs.id_msb_);
 //         boost::uint32_t rhs_locality_id = naming::get_locality_id_from_gid(rhs.id_msb_);
 //         if (rhs_locality_id != naming::invalid_locality_id)
@@ -723,7 +722,7 @@ namespace hpx { namespace naming
             unknown_deleter = -1,
             unmanaged = 0,          // unmanaged GID
             managed = 1,            // managed GID
-            managed_move_credit = 2 // managed GID which will give up all 
+            managed_move_credit = 2 // managed GID which will give up all
                                     // credits when sent
         };
 

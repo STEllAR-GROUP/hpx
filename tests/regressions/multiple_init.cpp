@@ -17,14 +17,14 @@ int hpx_main(int argc, char ** argv)
     return hpx::finalize();
 }
 
-int main()
+int main(int argc, char **argv)
 {
     // Everything is fine on the first call
-    hpx::init();
+    hpx::init(argc, argv);
     HPX_TEST(invoked_init == 1);
 
     // Segfault on the call, now fixed
-    hpx::init();
+    hpx::init(argc, argv);
     HPX_TEST(invoked_init == 2);
 
     return hpx::util::report_errors();

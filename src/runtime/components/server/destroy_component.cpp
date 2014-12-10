@@ -25,10 +25,8 @@ namespace hpx { namespace components { namespace server
         naming::address const& addr, util::one_size_heap_list_base* heap,
         components::component_type type, error_code& ec)
     {
-        applier::applier& appl = hpx::applier::get_applier();
-
         // make sure this component is located here (lcos don't migrate)
-        if (appl.here() != addr.locality_)
+        if (get_locality() != addr.locality_)
         {
             hpx::util::osstream strm;
             strm << "global id " << gid << " is not bound to any local "

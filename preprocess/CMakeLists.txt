@@ -10,17 +10,6 @@
 
 # add headers to preprocessing
 set(function_argument_limit_preprocessing_files
-  "hpx/util/detail/basic_function.hpp"
-  "hpx/util/detail/basic_function.hpp"
-  "hpx/util/detail/define_bind_action_function_operators.hpp"
-  "hpx/util/detail/define_bind_function_operators.hpp"
-  "hpx/util/detail/empty_function.hpp"
-  "hpx/util/detail/vtable/callable_vtable.hpp"
-  "hpx/util/bind.hpp"
-  "hpx/util/bind_action.hpp"
-  "hpx/util/deferred_call.hpp"
-  "hpx/util/invoke.hpp"
-  "hpx/util/invoke_fused.hpp"
   "hpx/util/unwrapped.hpp"
   "hpx/lcos/local/detail/invoke_when_ready.hpp")
 foreach(file ${function_argument_limit_preprocessing_files})
@@ -28,8 +17,7 @@ foreach(file ${function_argument_limit_preprocessing_files})
 endforeach()
 
 set(tuple_argument_limit_preprocessing_files
-  "hpx/util/tuple.hpp"
-  "hpx/util/zip_iterator.hpp")
+  "hpx/util/tuple.hpp")
 foreach(file ${tuple_argument_limit_preprocessing_files})
   hpx_partial_preprocess_header(${file} LIMIT HPX_LIMIT)
 endforeach()
@@ -41,14 +29,6 @@ foreach(file ${lock_argument_limit_preprocessing_files})
 endforeach()
 
 set(action_argument_limit_preprocessing_files
-  "hpx/apply.hpp"
-  "hpx/async.hpp"
-  "hpx/lcos/async.hpp"
-  "hpx/lcos/async_fwd.hpp"
-  "hpx/lcos/async_continue.hpp"
-  "hpx/lcos/async_continue_fwd.hpp"
-  "hpx/lcos/async_colocated.hpp"
-  "hpx/lcos/async_colocated_fwd.hpp"
   "hpx/lcos/broadcast.hpp"
   "hpx/lcos/packaged_action_constructors.hpp"
   "hpx/lcos/packaged_action_constructors_direct.hpp"
@@ -56,7 +36,6 @@ set(action_argument_limit_preprocessing_files
   "hpx/lcos/local/dataflow.hpp"
   "hpx/lcos/local/packaged_task.hpp"
   "hpx/runtime/actions/component_action_implementations.hpp"
-  "hpx/runtime/actions/gcc44/component_action_implementations.hpp"
   "hpx/runtime/actions/component_const_action_implementations.hpp"
   "hpx/runtime/actions/component_non_const_action_implementations.hpp"
   "hpx/runtime/actions/construct_continuation_function_objects.hpp"
@@ -71,7 +50,6 @@ set(action_argument_limit_preprocessing_files
   "hpx/runtime/applier/apply_colocated_callback.hpp"
   "hpx/runtime/components/new.hpp"
   "hpx/runtime/components/server/runtime_support_implementations.hpp"
-  "hpx/runtime/components/server/gcc44/runtime_support_implementations.hpp"
   "hpx/runtime/components/server/create_component_with_args.hpp"
   "hpx/runtime/components/server/runtime_support_create_component_decl.hpp")
 if(HPX_HAVE_SECURITY)

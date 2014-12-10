@@ -128,6 +128,8 @@ the project through discussions, pull requests, documentation patches, etc.
 * Agustin Berge, who contributed patches fixing some very nasty hidden template
   meta-programming issues. He rewrote large parts of the API elements ensuring
   strict conformance with C++11/14.
+* Anton Bikineev for contributing changes to make using `boost::lexical_cast`
+  safer, he also contributed a thread safety fix to the iostreams module.
 * Pyry Jahkola, who contributed the Mac OS build system and build documentation
   on how to build HPX using Clang and libc++.
 * Mario Mulansky, who created an __hpx__ backend for his Boost.Odeint library, and

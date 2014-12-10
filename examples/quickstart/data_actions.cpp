@@ -21,6 +21,8 @@ struct plain_data
         hpx::components::set_component_type<plain_data<Action> >(type);
     }
 
+    static bool is_target_valid(hpx::naming::id_type const& id) { return true; }
+
     /// This is the default hook implementation for decorate_action which
     /// does no hooking at all.
     template <typename F>

@@ -92,7 +92,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs {
         ibverbs_mr() {}
 
         ibverbs_mr(ibv_pd *pd, void * buffer, std::size_t size, int access)
-          : size_(size)
         {
             ibv_mr * mr = ibv_reg_mr(pd, buffer, size, access);
             if(!mr)
@@ -104,12 +103,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs {
             mr_ = boost::shared_ptr<ibv_mr>(mr, deleter);
         }
 
-        boost::shared_ptr<ibv_mr> mr_;
-        std::size_t size_;
-    };
+        void reset()
+        {
+            mr_.reset();
+        }
 
-    typedef boost::cache::entries::lru_entry<ibverbs_mr> mr_cache_entry_type;
-    typedef boost::cache::local_cache<void *, mr_cache_entry_type> mr_cache_type;
+        boost::shared_ptr<ibv_mr> mr_;
+    };
 
 }}}}
 

@@ -9,15 +9,19 @@
 #if defined(HPX_PARCELPORT_IBVERBS)
 
 #include <hpx/exception_list.hpp>
-#include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/parcelset/policies/ibverbs/connection_handler.hpp>
 #include <hpx/runtime/parcelset/policies/ibverbs/acceptor.hpp>
 #include <hpx/runtime/parcelset/policies/ibverbs/sender.hpp>
 #include <hpx/runtime/parcelset/policies/ibverbs/receiver.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/asio_util.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/assign/std/vector.hpp>
+#include <boost/io/ios_state.hpp>
+#include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/ip/host_name.hpp>
 #include <boost/shared_ptr.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -28,6 +32,30 @@ namespace hpx
 
 namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 {
+    parcelset::locality parcelport_address(util::runtime_configuration const & ini)
+    {
+        // load all components as described in the configuration information
+        std::string ibverbs_address = ini.get_ibverbs_address();
+        if (ini.has_section("hpx.parcel")) {
+            util::section const* sec = ini.get_section("hpx.parcel");
+            if (NULL != sec) {
+                return parcelset::locality(
+                    locality(
+                        ibverbs_address
+                      , hpx::util::get_entry_as<boost::uint16_t>(
+                            *sec, "port", HPX_INITIAL_IP_PORT)
+                    )
+                );
+            }
+        }
+        return
+            parcelset::locality(
+                locality(
+                    ibverbs_address
+                  , HPX_INITIAL_IP_PORT
+                )
+            );
+    }
     std::vector<std::string> connection_handler::runtime_configuration()
     {
         std::vector<std::string> lines;
@@ -49,34 +77,37 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
     std::size_t connection_handler::memory_chunk_size(util::runtime_configuration const& ini)
     {
-        std::string memory_chunk_size =
-            ini.get_entry("hpx.parcel.ibverbs.memory_chunk_size", HPX_PARCELPORT_IBVERBS_MEMORY_CHUNK_SIZE);
-        return boost::lexical_cast<std::size_t>(memory_chunk_size);
+        return hpx::util::get_entry_as<std::size_t>(
+            ini, "hpx.parcel.ibverbs.memory_chunk_size", HPX_PARCELPORT_IBVERBS_MEMORY_CHUNK_SIZE);
     }
 
     std::size_t connection_handler::max_memory_chunks(util::runtime_configuration const& ini)
     {
-        std::string max_memory_chunks =
-            ini.get_entry("hpx.parcel.ibverbs.max_memory_chunks", HPX_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS);
-        return boost::lexical_cast<std::size_t>(max_memory_chunks);
+        return hpx::util::get_entry_as<std::size_t>(
+            ini, "hpx.parcel.ibverbs.max_memory_chunks", HPX_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS);
     }
 
     connection_handler::connection_handler(util::runtime_configuration const& ini,
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
             HPX_STD_FUNCTION<void()> const& on_stop_thread)
-      : base_type(ini, on_start_thread, on_stop_thread)
+      : base_type(ini, parcelport_address(ini), on_start_thread, on_stop_thread)
       , memory_pool_(memory_chunk_size(ini), max_memory_chunks(ini))
+      , mr_cache_size_(max_memory_chunks(ini) * 4) // <-- FIXME: Find better value here
       , stopped_(false)
       , handling_messages_(false)
       , handling_accepts_(false)
       , use_io_pool_(true)
     {
+        if (here_.get_type() != connection_ibverbs) {
+            HPX_THROW_EXCEPTION(network_error, "ibverbs::parcelport::parcelport",
+                "this parcelport was instantiated to represent an unexpected "
+                "locality type: " + get_connection_type_name(here_.get_type()));
+        }
+
         // we never do zero copy optimization for this parcelport
         allow_zero_copy_optimizations_ = false;
 
-        std::string use_io_pool =
-            ini.get_entry("hpx.parcel.ibverbs.use_io_pool", "1");
-        if(boost::lexical_cast<int>(use_io_pool) == 0)
+        if(hpx::util::get_entry_as<int>(ini, "hpx.parcel.ibverbs.use_io_pool", "1") == 0)
         {
             use_io_pool_ = false;
         }
@@ -113,9 +144,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         // initialize network
         std::size_t tried = 0;
         exception_list errors;
-        naming::locality::iterator_type end = accept_end(here_);
-        for (naming::locality::iterator_type it =
-                accept_begin(here_, io_service_pool_.get_io_service(0), true);
+        util::endpoint_iterator_type end = util::accept_end();
+        for (util::endpoint_iterator_type it =
+                util::accept_begin(here_.get<locality>(), io_service_pool_.get_io_service(0));
              it != end; ++it, ++tried)
         {
             try {
@@ -137,9 +168,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 "ibverbs::connection_handler::run", errors.get_message());
             return false;
         }
-        time_send = 0;
-        time_recv = 0;
-        time_acct = 0;
 
         handling_accepts_ = true;
         boost::asio::io_service& io_service = io_service_pool_.get_io_service(1);
@@ -166,10 +194,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
             hpx::lcos::local::spinlock::yield(k);
             ++k;
         }
-
-        std::cout << "Time for accepting: " << time_acct << "\n";
-        std::cout << "Time for sending: " << time_send << "\n";
-        std::cout << "Time for receiving: " << time_recv << "\n";
 
         // cancel all pending accept operations
         boost::system::error_code ec;
@@ -208,7 +232,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
     }
 
     boost::shared_ptr<sender> connection_handler::create_connection(
-        naming::locality const& l, error_code& ec)
+        parcelset::locality const& l, error_code& ec)
     {
         boost::asio::io_service& io_service = io_service_pool_.get_io_service(0);
         boost::shared_ptr<sender> sender_connection(new sender(*this, memory_pool_, l, parcels_sent_));
@@ -218,9 +242,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         for (std::size_t i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
         {
             try {
-                naming::locality::iterator_type end = connect_end(l);
-                for (naming::locality::iterator_type it =
-                        connect_begin(l, io_service, true);
+                util::endpoint_iterator_type end = util::connect_end();
+                for (util::endpoint_iterator_type it =
+                        util::connect_begin(l.get<locality>(), io_service);
                       it != end; ++it)
                 {
                     boost::asio::ip::tcp::endpoint const& ep = *it;
@@ -275,6 +299,19 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         return sender_connection;
     }
 
+    parcelset::locality connection_handler::agas_locality(
+        util::runtime_configuration const & ini) const
+    {
+        // ibverbs can't be used for bootstrapping
+        HPX_ASSERT(false);
+        return parcelset::locality();
+    }
+
+    parcelset::locality connection_handler::create_locality() const
+    {
+        return parcelset::locality(locality());
+    }
+
     void connection_handler::add_sender(
         boost::shared_ptr<sender> const& sender_connection)
     {
@@ -307,69 +344,46 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 );
                 return 0;
             }
-            memory_pool_.register_chunk(pd);
             pd_map_.insert(std::make_pair(context, pd));
-            mr_map_.insert(std::make_pair(pd, mr_cache_type()));
+            mr_map_.insert(std::make_pair(pd, mr_cache_type(mr_cache_size_)));
             return pd;
         }
         return it->second;
 
     }
 
-    ibv_mr register_buffer(connection_handler & conn, ibv_pd * pd, char * buffer, std::size_t size, int access)
+    ibverbs_mr register_buffer(connection_handler & conn, ibv_pd * pd,
+        char * buffer, std::size_t size, int access)
     {
         return conn.register_buffer(pd, buffer, size, access);
     }
 
-    ibv_mr connection_handler::register_buffer(ibv_pd * pd, char * buffer, std::size_t size, int access)
+    ibverbs_mr connection_handler::register_buffer(ibv_pd * pd,
+        char * buffer, std::size_t size, int access)
     {
-        ibv_mr result = memory_pool_.get_mr(pd, buffer, size);
-        if(result.addr == 0)
+
+        chunk_pair chunk = memory_pool_.get_chunk_address(buffer, size);
+        hpx::lcos::local::spinlock::scoped_lock l(mr_map_mtx_);
+        typedef mr_map_type::iterator pd_iterator;
+        pd_iterator it = mr_map_.find(pd);
+        HPX_ASSERT(it != mr_map_.end());
+
+        mr_cache_type & mr_cache = it->second;
+        ibverbs_mr result;
+        if(mr_cache.get_entry(chunk, result))
         {
-            hpx::lcos::local::spinlock::scoped_lock l(mr_map_mtx_);
-            typedef mr_map_type::iterator iterator;
-            iterator it = mr_map_.find(pd);
-            HPX_ASSERT(it != mr_map_.end());
-
-            typedef mr_cache_type::iterator jterator;
-            jterator jt = it->second.find(buffer);
-            if(jt == it->second.end())
-            {
-                ibverbs_mr mr
-                    = ibverbs_mr(
-                        pd
-                      , buffer
-                      , size
-                      , access
-                    );
-                it->second.insert(std::make_pair(buffer, mr));
-                return *mr.mr_;
-            }
-            return *jt->second.mr_;
+            return result;
         }
-        return result;
-    }
+        // register new one
+        result =
+            ibverbs_mr(
+                pd
+              , chunk.first
+              , chunk.second
+              , access
+            );
+        mr_cache.insert(chunk, result);
 
-    ibv_mr get_mr(connection_handler & conn, ibv_pd * pd, char * buffer, std::size_t size)
-    {
-        return conn.get_mr(pd, buffer, size);
-    }
-
-    ibv_mr connection_handler::get_mr(ibv_pd * pd, char * buffer, std::size_t size)
-    {
-        ibv_mr result = memory_pool_.get_mr(pd, buffer, size);
-        if(result.addr == 0)
-        {
-            hpx::lcos::local::spinlock::scoped_lock l(mr_map_mtx_);
-            typedef mr_map_type::iterator iterator;
-            iterator it = mr_map_.find(pd);
-            HPX_ASSERT(it != mr_map_.end());
-
-            typedef mr_cache_type::iterator jterator;
-            jterator jt = it->second.find(buffer);
-            HPX_ASSERT(jt != it->second.end());
-            return *jt->second.mr_;
-        }
         return result;
     }
 
@@ -448,14 +462,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 ++it;
             }
         }
-        time_send += t.elapsed();
         return !senders_.empty();
     }
 
     bool connection_handler::do_receives()
     {
         hpx::util::high_resolution_timer t;
-        hpx::lcos::local::spinlock::scoped_try_lock l(receivers_mtx_);
+        hpx::lcos::local::spinlock::scoped_lock l(receivers_mtx_);
 
         for(
             receivers_type::iterator it = receivers_.begin();
@@ -479,7 +492,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 }
                 ++it;
         }
-        time_recv += t.elapsed();
         return !receivers_.empty();
     }
 
@@ -490,7 +502,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         while(!stopped_)
         {
             hpx::util::high_resolution_timer t;
-            boost::shared_ptr<receiver> rcv = acceptor_.accept(*this, memory_pool_, boost::system::throws);
+            boost::shared_ptr<receiver> rcv = acceptor_.accept(
+                *this, memory_pool_, boost::system::throws);
             if(rcv)
             {
                 rcv->async_read(boost::system::throws);
@@ -499,7 +512,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                     receivers_.push_back(rcv);
                 }
             }
-            time_acct += t.elapsed();
 
             hpx::lcos::local::spinlock::yield(k);
         }

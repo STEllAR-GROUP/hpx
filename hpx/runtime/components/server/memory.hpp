@@ -106,20 +106,6 @@ namespace hpx { namespace components { namespace server
         }
 
         ///////////////////////////////////////////////////////////////////////
-#if defined(HPX_GCC44_WORKAROUND)
-        // gcc 4.4 does not like direct action in this context
-        HPX_DEFINE_COMPONENT_ACTION(memory, store8);
-        HPX_DEFINE_COMPONENT_ACTION(memory, store16);
-        HPX_DEFINE_COMPONENT_ACTION(memory, store32);
-        HPX_DEFINE_COMPONENT_ACTION(memory, store64);
-        HPX_DEFINE_COMPONENT_ACTION(memory, store128);
-
-        HPX_DEFINE_COMPONENT_CONST_ACTION(memory, load8);
-        HPX_DEFINE_COMPONENT_CONST_ACTION(memory, load16);
-        HPX_DEFINE_COMPONENT_CONST_ACTION(memory, load32);
-        HPX_DEFINE_COMPONENT_CONST_ACTION(memory, load64);
-        HPX_DEFINE_COMPONENT_CONST_ACTION(memory, load128);
-#else
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(memory, store8);
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(memory, store16);
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(memory, store32);
@@ -131,7 +117,9 @@ namespace hpx { namespace components { namespace server
         HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(memory, load32);
         HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(memory, load64);
         HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(memory, load128);
-#endif
+
+        // This component type requires valid id for its actions to be invoked
+        static bool is_target_valid(naming::id_type const& id) { return true; }
 
         /// This is the default hook implementation for decorate_action which
         /// does no hooking at all.

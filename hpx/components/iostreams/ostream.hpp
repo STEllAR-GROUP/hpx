@@ -12,6 +12,7 @@
 
 #include <iterator>
 #include <ios>
+#include <iostream>
 
 #include <boost/swap.hpp>
 #include <boost/noncopyable.hpp>
@@ -77,8 +78,47 @@ namespace hpx { namespace iostreams
         };
 
         ///////////////////////////////////////////////////////////////////////
+        inline std::ostream& get_outstream(cout_tag)
+        {
+            return std::cout;
+        }
+
+        inline std::ostream& get_outstream(cerr_tag)
+        {
+            return std::cerr;
+        }
+
+        std::stringstream& get_consolestream();
+
+        inline std::ostream& get_outstream(consolestream_tag)
+        {
+            return get_consolestream();
+        }
+
+        inline char const* const get_outstream_name(cout_tag)
+        {
+            return "/locality#console/output_stream#cout";
+        }
+
+        inline char const* const get_outstream_name(cerr_tag)
+        {
+            return "/locality#console/output_stream#cerr";
+        }
+
+        inline char const* const get_outstream_name(consolestream_tag)
+        {
+            return "/locality#console/output_stream#consolestream";
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        hpx::future<naming::id_type>
+        create_ostream(char const* name, std::ostream& strm);
+
         template <typename Tag>
-        hpx::future<naming::id_type> create_ostream(Tag tag);
+        hpx::future<naming::id_type> create_ostream(Tag tag)
+        {
+            return create_ostream(get_outstream_name(tag), detail::get_outstream(tag));
+        }
 
         void register_ostreams();
         void unregister_ostreams();
@@ -93,6 +133,8 @@ namespace hpx { namespace iostreams
     private:
         typedef components::client_base<ostream, stubs::output_stream> base_type;
         typedef detail::ostream_creator<char>::stream_type stream_base_type;
+        typedef stream_base_type::traits_type stream_traits_type;
+        typedef BOOST_IOSTREAMS_BASIC_OSTREAM(char, stream_traits_type) std_stream_type;
         typedef detail::ostream_creator<char>::iterator_type iterator_type;
         typedef lcos::local::recursive_mutex mutex_type;
 
@@ -250,7 +292,12 @@ namespace hpx { namespace iostreams
             return streaming_operator_lazy(subject);
         }
 
-        using stream_base_type::operator<<;
+        ///////////////////////////////////////////////////////////////////////
+        ostream& operator<<(std_stream_type& (*manip_fun)(std_stream_type&))
+        {
+            mutex_type::scoped_lock l(mtx_);
+            return streaming_operator_lazy(manip_fun);
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////

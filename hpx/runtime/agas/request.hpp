@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -75,7 +76,7 @@ struct HPX_EXPORT request
 
     request(
         namespace_action_code type_
-      , naming::locality const& locality_
+      , parcelset::endpoints_type const & endpoints_
       , boost::uint64_t count_
       , boost::uint32_t num_threads_
       , naming::gid_type prefix_ = naming::gid_type()
@@ -83,7 +84,7 @@ struct HPX_EXPORT request
 
     request(
         namespace_action_code type_
-      , naming::locality const& locality_
+      , parcelset::endpoints_type const & endpoints_
         );
 
     request(
@@ -140,10 +141,19 @@ struct HPX_EXPORT request
     request(
         request const& other
         );
+    // move constructor
+    request(
+        request&& other
+        );
 
     // copy assignment
     request& operator=(
         request const& other
+        );
+
+    // move assignment
+    request& operator=(
+        request&& other
         );
 
     gva get_gva(
@@ -178,9 +188,9 @@ struct HPX_EXPORT request
         error_code& ec = throws
         ) const;
 
-    naming::locality get_locality(
+    parcelset::endpoints_type get_endpoints(
         error_code& ec = throws
-        ) const;
+    ) const;
 
     naming::gid_type get_gid(
         error_code& ec = throws

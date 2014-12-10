@@ -9,7 +9,7 @@
 <!DOCTYPE chapter PUBLIC "-//Boost//DTD BoostBook XML V1.0//EN"
   "http://www.boost.org/tools/boostbook/dtd/boostbook.dtd">
 <chapter xmlns:xi="http://www.w3.org/2001/XInclude" id="boostbook.together"
-         last-revision="$Date: 2009-04-12 06:21:59 -0500 (Sun, 12 Apr 2009) $">
+         last-revision="$Date$">
   <title>Bringing Together a BoostBook Document</title>
 
   <section id="boostbook.linking">

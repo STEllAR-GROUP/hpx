@@ -18,8 +18,8 @@
 #endif
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (4, (1, HPX_ACTION_ARGUMENT_LIMIT,                                        \
-    "hpx/runtime/actions/component_non_const_action_implementations.hpp", 2)) \
+    (3, (1, HPX_ACTION_ARGUMENT_LIMIT,                                        \
+    "hpx/runtime/actions/component_non_const_action_implementations.hpp"))    \
     /**/
 
 #include BOOST_PP_ITERATE()
@@ -38,8 +38,6 @@
 #else // defined(BOOST_PP_IS_ITERATING)
 
 #define N BOOST_PP_ITERATION()
-
-#if BOOST_PP_ITERATION_FLAGS() == 2
 
 #define HPX_ACTION_DIRECT_ARGUMENT(z, n, data)                                \
     BOOST_PP_COMMA_IF(n)                                                      \
@@ -73,6 +71,12 @@ namespace hpx { namespace actions
             BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived>
             base_type;
+
+        // Let the component decide whether the id is valid
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return Component::is_target_valid(id);
+        }
 
     protected:
         /// The \a thread_function will be registered as the thread
@@ -280,6 +284,12 @@ namespace hpx { namespace actions
         typedef action<Component, result_type, arguments_type, Derived>
             base_type;
 
+        // Let the component decide whether the id is valid
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return Component::is_target_valid(id);
+        }
+
     protected:
         /// The \a thread_function will be registered as the thread
         /// function of a thread. It encapsulates the execution of the
@@ -482,9 +492,6 @@ namespace hpx { namespace actions
 #undef HPX_REMOVE_QUALIFIERS
 #undef HPX_ACTION_DIRECT_ARGUMENT
 
-#endif // #if BOOST_PP_ITERATION_FLAGS() == 2
-
 #undef N
 
 #endif
-

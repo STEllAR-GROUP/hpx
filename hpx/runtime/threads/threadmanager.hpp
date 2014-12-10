@@ -426,6 +426,13 @@ namespace hpx { namespace threads
             std::size_t num = std::size_t(-1), bool reset = false) = 0;
         virtual boost::int64_t get_executed_thread_phases(
             std::size_t num = std::size_t(-1), bool reset = false) = 0;
+
+#ifdef HPX_THREAD_MAINTAIN_IDLE_RATES
+        virtual boost::int64_t get_thread_phase_duration(
+            std::size_t num = std::size_t(-1), bool reset = false) = 0;
+        virtual boost::int64_t get_thread_duration(
+            std::size_t num = std::size_t(-1), bool reset = false) = 0;
+#endif
 #endif
 
 #if defined(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)

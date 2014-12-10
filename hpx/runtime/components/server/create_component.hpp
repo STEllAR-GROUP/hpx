@@ -9,7 +9,6 @@
 
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/util/stringstream.hpp>
 

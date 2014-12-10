@@ -42,12 +42,12 @@ namespace hpx { namespace agas
         {}
 
         template <typename Tuple>
-        response_data(const Tuple& tuple)
+        response_data(Tuple const & tuple)
           : data(tuple)
         {}
 
         template <typename Tuple>
-        response_data& operator=(const Tuple& tuple)
+        response_data& operator=(Tuple const & tuple)
         {
             data = tuple;
             return *this;
@@ -143,7 +143,7 @@ namespace hpx { namespace agas
             // 0x9
             // primary_ns_esolved_localities
           , util::tuple<
-                std::vector<naming::locality>
+                std::map<naming::gid_type, parcelset::endpoints_type>
             >
             // 0xa
             // primary_ns_change_credit_one
@@ -328,7 +328,7 @@ namespace hpx { namespace agas
 
     response::response(
         namespace_action_code type_
-      , std::vector<naming::locality> const& localities_
+      , std::map<naming::gid_type, parcelset::endpoints_type> const & localities_
       , error status_
         )
       : mc(type_)
@@ -401,7 +401,8 @@ namespace hpx { namespace agas
         return data->get_data<response_data::subtype_prefixes, 0>(ec);
     }
 
-    std::vector<naming::locality> response::get_resolved_localities(
+    std::map<naming::gid_type, parcelset::endpoints_type>
+    response::get_resolved_localities(
         error_code& ec
         ) const
     {

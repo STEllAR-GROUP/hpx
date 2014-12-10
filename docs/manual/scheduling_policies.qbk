@@ -1,7 +1,7 @@
 [/
 =============================================================================
     Copyright (C) 2013 Patricia Grubel
-    Copyright (C) 2007-2013 Hartmut Kaiser
+    Copyright (C) 2007-2014 Hartmut Kaiser
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,17 +9,17 @@
 
 [section:schedulers __hpx__ Thread Scheduling Policies]
 
-The HPX runtime has seven thread scheduling policies: priority_local, local,
-global, abp, abp-priority, hierarchy and periodic priority. These policies can
-be specified from the command line using the command line option
+The HPX runtime has six thread scheduling policies: local-priority, local,
+abp-priority, hierarchy, static-priority, and periodic-priority. These policies
+can be specified from the command line using the command line option
 [hpx_cmdline `--hpx:queuing`]. In order to use a particular scheduling policy,
 the runtime system must be built with the appropriate scheduler flag turned on
-(e.g. `cmake -DHPX_LOCAL_SCHEDULER=ON`, see __cmake_options__ for more
+(e.g. `cmake -DHPX_THREAD_SCHEDULERS=local`, see __cmake_options__ for more
 information).
 
 [heading Priority Local Scheduling Policy (default policy)]
 
-* default or invoke using: [hpx_cmdline `--hpx:queuing=priority_local`] (or `-qpr`)
+* default or invoke using: [hpx_cmdline `--hpx:queuing=local-priority`] (or `-qpr`)
 
 The priority local scheduling policy maintains one queue per operating system
 (OS) thread. The OS thread pulls its work from this queue. By default the number
@@ -36,44 +36,32 @@ the command line option  [hpx_cmdline `--hpx:numa-sensitive`]. When NUMA
 sensitivity is turned on work stealing is done from queues associated with the
 same NUMA domain first, only after that work is stolen from other NUMA domains.
 
+This scheduler is enabled at build time by default and will be available always.
+
 [heading Static Priority Scheduling Policy]
 
 * invoke using: [hpx_cmdline `--hpx:queuing=static`] (or `-qs`)
-* flag to turn on for build: `HPX_STATIC_PRIORITY_SCHEDULER`
+* flag to turn on for build: `HPX_THREAD_SCHEDULERS=all` or
+  `HPX_THREAD_SCHEDULERS=static-priority`
 
 The static scheduling policy maintains one queue per OS thread from which each
-OS thread pulls its tasks (user threads). Threads are distributed in a round robin fashion. There is no thread stealing in this policy.
+OS thread pulls its tasks (user threads). Threads are distributed in a round
+robin fashion. There is no thread stealing in this policy.
 
 [heading Local Scheduling Policy]
 
 * invoke using: [hpx_cmdline `--hpx:queuing=local`] (or `-ql`)
-* flag to turn on for build: `HPX_LOCAL_SCHEDULER`
+* flag to turn on for build: `HPX_THREAD_SCHEDULERS=all` or
+  `HPX_THREAD_SCHEDULERS=local`
 
 The local scheduling policy maintains one queue per OS thread from which each
 OS thread pulls its tasks (user threads).
 
-[heading Global Scheduling Policy]
-
-* invoke using: [hpx_cmdline `--hpx:queuing global`] or -qg
-* flag to turn on for build: `HPX_GLOBAL_SCHEDULER`
-
-The global scheduling policy maintains one shared queue from which all OS
-threads pull tasks.
-
-
-[heading ABP Scheduling Policy]
-
-* invoke using: [hpx_cmdline `--hpx:queuing=abp`] (or `-qa`)
-* flag to turn on for build: `HPX_ABP_SCHEDULER`
-
-The ABP scheduling policy maintains a double ended lock free queue  for each
-OS thread. Threads are pushed on the top of the queue, and during work stealing
-threads are taken from the bottom of the queue.
-
 [heading Priority ABP Scheduling Policy]
 
-* invoke using: [hpx_cmdline `--hpx:queuing=priority_abp`]
-* flag to turn on for build: `HPX_ABP_PRIORITY_SCHEDULER`
+* invoke using: [hpx_cmdline `--hpx:queuing=abp-priority`]
+* flag to turn on for build: `HPX_THREAD_SCHEDULERS=all` or
+  `HPX_THREAD_SCHEDULERS=abp-priority`
 
 Priority ABP policy maintains a double ended lock free queue for each OS thread.
 By default the number of high priority queues is equal to the number of OS
@@ -83,7 +71,7 @@ are executed by the first OS threads before any other work is executed. When
 a queue is empty work will be taken from high priority queues first. There is
 one low priority queue from which threads will be scheduled only when there is
 no other work. For this scheduling policy there is an option to turn on NUMA
-sensitivity using the command line option [hpx_cmdline `--hpx:numa-senstive`].
+sensitivity using the command line option [hpx_cmdline `--hpx:numa-sensitive`].
 When NUMA sensitivity is turned on work stealing is done from queues associated
 with the same NUMA domain first, only after that work is stolen from other NUMA
 domains.
@@ -91,7 +79,8 @@ domains.
 [heading Hierarchy Scheduling Policy]
 
 * invoke using: [hpx_cmdline `--hpx:queuing=hierarchy`] (or `-qh`)
-* flag to turn on for build: `HPX_HIERARCHY_SCHEDULER`
+* flag to turn on for build: `HPX_THREAD_SCHEDULERS=all` or
+  `HPX_THREAD_SCHEDULERS=hierarchy`
 
 The hierarchy policy maintains a tree of work items. Every OS thread walks the
 tree to obtain new work.  Arity of the thread queue tree can be specified on
@@ -100,14 +89,15 @@ Work stealing is done from the parent queue in that tree.
 
 [heading Periodic Priority Scheduling Policy]
 
-* invoke using: [hpx_cmdline `--hpx:queuing=periodic`] (or `-qpe`)
-* flag to turn on for build: `HPX_PERIODIC_PRIORITY_SCHEDULER`
+* invoke using: [hpx_cmdline `--hpx:queuing=periodic-priority`] (or `-qpe`)
+* flag to turn on for build: `HPX_THREAD_SCHEDULERS=all` or
+  `HPX_THREAD_SCHEDULERS=periodic-priority`
 
-Maintains one queue of work items (user threads) for each OS thread. Maintains 
-a number of high priority queues (specified by 
-[hpx_cmdline `--hpx:high-priority-threads`]) and one low priority queue. High 
-priority threads are executed by the specified number of OS threads before any 
-other work is executed. Low priority threads are executed when no other work 
+Maintains one queue of work items (user threads) for each OS thread. Maintains
+a number of high priority queues (specified by
+[hpx_cmdline `--hpx:high-priority-threads`]) and one low priority queue. High
+priority threads are executed by the specified number of OS threads before any
+other work is executed. Low priority threads are executed when no other work
 is available.
 
 [/
@@ -116,24 +106,24 @@ is available.
     Are all the work queues FIFO except perhaps the deque ABP?
 
     What is the low priority thread for priority policies?
-    One of the comments says that there are exactly one queue per OS threads 
-    then an additional number of high-priority-threads queues plus an additional 
+    One of the comments says that there are exactly one queue per OS threads
+    then an additional number of high-priority-threads queues plus an additional
     low priority queue.
 
-    Is numa-sensitive only for local priority??? I know it says that in the 
-    documentation and error messages but seems to be available for abp 
+    Is numa-sensitive only for local priority??? I know it says that in the
+    documentation and error messages but seems to be available for abp
     priority and periodic priority
 
     There should be some way of verifying which policy is being used.
 
-    --hpx-high-priority-threads option ********* it seems to me this option 
-    should be =< number of OS threads but command line accepts any number. 
-    Okay so I'm confused, in the documentation for command line options it 
-    states: the number of operating system threads maintaining a high priority 
-    queue (default: number of OS threads), valid for 
-    --hpx:queuing=priority_local only examples/spell_check/example_text.txt
-    but in hpx_init.cpp the comment states: local scheduler with priority queue 
-    (one queue for each OS threads plus one separate queue for high priority 
+    --hpx-high-priority-threads option ********* it seems to me this option
+    should be =< number of OS threads but command line accepts any number.
+    Okay so I'm confused, in the documentation for command line options it
+    states: the number of operating system threads maintaining a high priority
+    queue (default: number of OS threads), valid for
+    --hpx:queuing=local-priority only examples/spell_check/example_text.txt
+    but in hpx_init.cpp the comment states: local scheduler with priority queue
+    (one queue for each OS threads plus one separate queue for high priority
     HPX-threads)
 
 
@@ -141,13 +131,13 @@ is available.
     initialization parameters:
     max count per queue (1000) this is for all policies
     number of queues  (OS threads) all except global
-    number of high priority queues (selectable on command line  local priority, 
+    number of high priority queues (selectable on command line  local priority,
     periodic and abp priority policies)
-    minimum add thread count (10)  for periodic priority policy the number of 
+    minimum add thread count (10)  for periodic priority policy the number of
     threads will be incremented in steps of this count
 
 
-    maximum number of active threads = 1000 is that per queue? I don't understand 
+    maximum number of active threads = 1000 is that per queue? I don't understand
     the comment:
     The maximum number of active threads this thread manager should
 

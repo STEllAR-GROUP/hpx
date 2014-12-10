@@ -271,7 +271,7 @@ namespace hpx { namespace lcos
             BOOST_FORCEINLINE
             void await_next(TupleIter iter, boost::mpl::true_, boost::mpl::false_)
             {
-                typedef typename util::detail::decay_unwrap<
+                typedef typename util::decay_unwrap<
                     typename boost::fusion::result_of::deref<TupleIter>::type
                 >::type future_type;
 
@@ -312,7 +312,7 @@ namespace hpx { namespace lcos
             BOOST_FORCEINLINE
             void await(TupleIter&& iter, boost::mpl::false_)
             {
-                typedef typename util::detail::decay_unwrap<
+                typedef typename util::decay_unwrap<
                     typename boost::fusion::result_of::deref<TupleIter>::type
                 >::type future_type;
 

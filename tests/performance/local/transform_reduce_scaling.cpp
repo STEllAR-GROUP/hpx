@@ -6,7 +6,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
-#include <hpx/include/algorithm.hpp>
+#include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/include/iostreams.hpp>
 #include "worker_timed.hpp"
 
@@ -18,15 +18,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 int test_count = 100;
 
-struct Point {
-    double x,y;
+struct Point
+{
+    double x, y;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 void measure_transform_reduce(std::size_t size)
 {
     std::vector<Point> data_representation(size, 
-        {std::rand(), std::rand()});
+        Point{double(std::rand()), double(std::rand())});
 
     //invode transform_reduce
     double result = 
@@ -45,7 +46,7 @@ void measure_transform_reduce(std::size_t size)
 void measure_transform_reduce_old(std::size_t size)
 {
     std::vector<Point> data_representation(size,
-        Point{std::rand(), std::rand()});
+        Point{double(std::rand()), double(std::rand())});
 
     //invode old reduce
     Point result =
@@ -97,6 +98,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     }
     return hpx::finalize();
 }
+
 int main(int argc, char* argv[])
 {
     std::vector<std::string> cfg;

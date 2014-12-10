@@ -453,7 +453,7 @@ cell compute(boost::uint64_t timestep, boost::uint64_t location)
   double e_kinetic = 0.5*middle.mom*middle.mom/middle.rho;
   double e_internal = middle.etot - e_kinetic;
   //dual energy formalism
-  if ( abs(e_internal) > 0.1*middle.etot)
+  if ( std::abs(e_internal) > 0.1*middle.etot)
     {
       //cout << (boost::format("gas is shocking!\n")) << flush;
       now.tau = pow(e_internal,(1.0/fluid_gamma));
@@ -493,7 +493,7 @@ double get_pressure(cell input)
   double e_internal = input.etot - e_kinetic;
 
   // dual energy
-  if ( abs(e_internal) > 0.001*input.etot )
+  if ( std::abs(e_internal) > 0.001*input.etot )
     {
       pressure = (fluid_gamma-1.0)*e_internal;
     }

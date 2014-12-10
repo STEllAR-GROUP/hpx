@@ -75,7 +75,7 @@ namespace hpx
             typedef typename hpx::actions::extract_action<Action>::type action_type;
 
             // sort destinations
-            std::map<naming::locality, destinations> dests;
+            std::map<parcelset::locality, destinations> dests;
 
             std::size_t count = gids.size();
             for (std::size_t i = 0; i < count; ++i) {

@@ -1,5 +1,5 @@
 # Copyright (c) 2007-2014 Hartmut Kaiser
-# Copyright (c) 2011-2013 Thomas Heller
+# Copyright (c) 2011-2014 Thomas Heller
 # Copyright (c) 2007-2008 Chirag Dekate
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2011 Vinay C Amatya
@@ -85,7 +85,7 @@ include(HPX_FortranCompiler)
 # Setup platform for which HPX should be compiled for.
 #
 include(HPX_SetPlatform)
-if(HPX_PLATFORM_UC STREQUAL "ANDROID")
+if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
   unset(HPX_LIBRARY_VERSION)
   unset(HPX_SOVERSION)
 endif()
@@ -348,7 +348,7 @@ hpx_option(HPX_HAVE_SWAP_CONTEXT_EMULATION BOOL "Emulate SwapContext API for cor
 # Scheduler configuration
 ################################################################################
 hpx_option(HPX_THREAD_SCHEDULERS STRING
-  "Which thread schedulers are build. Options are: all, abp, local, static-priority, hierarchy, and periodic-priority. For multiple enabled schedulers, separate with a semicolon (default: all)"
+  "Which thread schedulers are build. Options are: all, abp-priority, local, static-priority, hierarchy, and periodic-priority. For multiple enabled schedulers, separate with a semicolon (default: all)"
   "all"
   CATEGORY "Thread Manager" ADVANCED)
 
@@ -358,15 +358,15 @@ foreach(_scheduler ${HPX_THREAD_SCHEDULERS_UC})
     set(_all On)
     set(HPX_ALL_SCHEDULERS ON CACHE INTERNAL "")
   endif()
-  if(_scheduler STREQUAL "ABP" OR _all)
+  if(_scheduler STREQUAL "ABP-PRIORITY" OR _all)
     hpx_add_config_define(HPX_ABP_SCHEDULER)
-    set(HPX_LOCAL_SCHEDULER ON CACHE INTERNAL "")
+    set(HPX_ABP_SCHEDULER ON CACHE INTERNAL "")
   endif()
   if(_scheduler STREQUAL "LOCAL" OR _all)
     hpx_add_config_define(HPX_LOCAL_SCHEDULER)
     set(HPX_LOCAL_SCHEDULER ON CACHE INTERNAL "")
   endif()
-  if(_scheduler STREQUAL "STATIC_PRIORITY" OR _all)
+  if(_scheduler STREQUAL "STATIC-PRIORITY" OR _all)
     hpx_add_config_define(HPX_STATIC_PRIORITY_SCHEDULER)
     set(HPX_STATIC_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
   endif()
@@ -374,7 +374,7 @@ foreach(_scheduler ${HPX_THREAD_SCHEDULERS_UC})
     hpx_add_config_define(HPX_HIERARCHY_SCHEDULER)
     set(HPX_HIERARCHY_SCHEDULER ON CACHE INTERNAL "")
   endif()
-  if(_scheduler STREQUAL "PERIODIC_PRIORITY" OR _all)
+  if(_scheduler STREQUAL "PERIODIC-PRIORITY" OR _all)
     hpx_add_config_define(HPX_PERIODIC_PRIORITY_SCHEDULER)
     set(HPX_PERIODIC_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
   endif()
@@ -465,6 +465,12 @@ if(HPX_THREAD_DEBUG_INFO)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_PHASE_INFORMATION)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_DESCRIPTION)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_DEADLOCK_DETECTION)
+endif()
+
+# run hpx_main on all localities by default
+hpx_option(HPX_RUN_MAIN_EVERYWHERE BOOL "Run hpx_main by default on all localities (default: OFF)." OFF ADVANCED)
+if(HPX_RUN_MAIN_EVERYWHERE)
+  hpx_add_config_define(HPX_RUN_MAIN_EVERYWHERE)
 endif()
 
 # Options for our plugins
@@ -683,16 +689,16 @@ if(MSVC)
 endif()
 
 # Setup platform specific compiler options and check for compatible compilers
-if(HPX_PLATFORM_UC STREQUAL "NATIVE")
+if("${HPX_PLATFORM_UC}" STREQUAL "NATIVE")
   hpx_info("Compiling with the native toolset")
-elseif(HPX_PLATFORM_UC STREQUAL "ANDROID")
+elseif("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
   hpx_info("Compiling for Android devices")
-elseif(HPX_PLATFORM_UC STREQUAL "XEONPHI")
+elseif("${HPX_PLATFORM_UC}" STREQUAL "XEONPHI")
   hpx_info("Compiling for Intel Xeon Phi devices")
   if(NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
     hpx_error("HPX on the MIC can only be compiled with the Intel compiler.")
   endif()
-elseif(HPX_PLATFORM_UC STREQUAL "BLUEGENEQ")
+elseif("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
   if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     hpx_error("HPX on the BG/Q can only be compiled with bgclang")
   endif()
@@ -973,8 +979,12 @@ else()
   # a serializing instruction.
   hpx_cpuid("rdtsc" HPX_WITH_RDTSC
     DEFINITIONS HPX_HAVE_RDTSC)
-  hpx_cpuid("rdtscp" HPX_WITH_RDTSCP
-    DEFINITIONS HPX_HAVE_RDTSCP)
+
+  # XeonPhi's do not support RDTSCP
+  if(NOT ("${HPX_PLATFORM_UC}" STREQUAL "XEONPHI"))
+    hpx_cpuid("rdtscp" HPX_WITH_RDTSCP
+      DEFINITIONS HPX_HAVE_RDTSCP)
+  endif()
 
   if(NOT HPX_WITH_RDTSC AND NOT HPX_WITH_RDTSCP)
     hpx_warn("Neither rdtsc nor rdtscp is available; some performance counters may report incorrect results")
@@ -1040,7 +1050,7 @@ if(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
   if(NOT Boost_CONTEXT_FOUND)
     hpx_error("The usage of Boost.Context was selected but Boost.Context was not found (Version 1.51 or higher is required).")
   endif()
-  if(HPX_PLATFORM_UC STREQUAL "BLUEGENEQ")
+  if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
     if(Boost_VERSION LESS 105600)
       hpx_error("On BlueGene/Q, Boost.Context can only be used with a Boost >=1.56")
     endif()
@@ -1075,7 +1085,7 @@ endif()
 # HPX_PREFIX
 # The prefix is the default search path for HPX plugins
 ################################################################################
-if(${HPX_PLATFORM_UC} STREQUAL "ANDROID")
+if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
   set(HPX_PREFIX "lib")
   set(HPX_BUILD_PREFIX "lib")
 else()
@@ -1093,11 +1103,7 @@ if (NOT DEFINED LIB)
 endif(NOT DEFINED LIB)
 
 if(HPX_FULL_RPATH)
-  list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/${LIB}" isSystemDir)
-  if(isSystemDir EQUAL -1)
-    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB}")
-  endif()
-  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH On)
+  hpx_include(SetFullRPATH)
 endif()
 ###############################################################################
 
@@ -1372,7 +1378,7 @@ if(Boost_VERSION LESS 104900)
     PATTERN ".git" EXCLUDE)
 endif()
 
-if(HPX_PLATFORM_UC STREQUAL "XEONPHI")
+if("${HPX_PLATFORM_UC}" STREQUAL "XEONPHI")
   # FIXME: push changes upstream
   install(
     DIRECTORY external/asio/boost

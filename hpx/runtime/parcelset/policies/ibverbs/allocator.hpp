@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/runtime/parcelset/policies/ibverbs/memory_pool.hpp>
+#include <hpx/util/memory_chunk_pool.hpp>
 
 namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 {
@@ -30,7 +30,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         };
 
         allocator() throw() : memory_pool_(0) { HPX_ASSERT(false); };
-        allocator(memory_pool & mp) throw() : memory_pool_(&mp) {};
+        allocator(util::memory_chunk_pool & mp) throw() : memory_pool_(&mp) {};
         allocator(allocator const & other) throw() : memory_pool_(other.memory_pool_) {};
 
         pointer address(reference x) const
@@ -76,7 +76,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
             *p = 0;
         }
 
-        memory_pool * memory_pool_;
+        util::memory_chunk_pool * memory_pool_;
     };
 }}}}
 

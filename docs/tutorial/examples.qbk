@@ -158,7 +158,7 @@ functions which are not associated with any particular object (we will discuss
 other types of actions in the __accumulator_example__).
 In this block of code the function `fibonacci()` is declared. After the
 declaration, the function is wrapped in an action in the declaration
-[macroref HPX_PLAIN_ACTION `HPX_PLAIN_ACTION`]. This function takes two aruments: the name of the
+[macroref HPX_PLAIN_ACTION `HPX_PLAIN_ACTION`]. This function takes two arguments: the name of the
 function that is to be wrapped and the name of the action that you are
 creating.
 
@@ -257,9 +257,9 @@ beginning with `main()`:
 
 In this excerpt of the code we again see the use of futures. This time
 the futures are stored in a vector so that they can easily be accessed.
-[funcref hpx::lcos::wait]`()` is a family of functions that wait on for an `std::vector<>`
+[funcref hpx::lcos::wait_all]`()` is a family of functions that wait on for an `std::vector<>`
 of futures to become ready. In this piece of code, we are using the synchronous
-version of [funcref hpx::lcos::wait]`()`, which takes one argument (the `std::vector<>` of
+version of [funcref hpx::lcos::wait_all]`()`, which takes one argument (the `std::vector<>` of
 futures to wait on). This function will not return until all the futures in the
 vector have been executed.
 
@@ -283,19 +283,19 @@ the action above:
 [hello_world_foreman]
 
 Now, before we discuss `hello_world_foreman()`, let's talk about the
-[funcref hpx::lcos::wait]`()` function. [funcref hpx::lcos::wait]`()` provides a way to make sure
+[funcref hpx::lcos::wait_each]`()` function. [funcref hpx::lcos::wait_each]`()` provides a way to make sure
 that all of the futures have finished being calculated without having to call
-[memberref hpx::lcos::future::get]`()` for each one. The version of [funcref hpx::lcos::wait]`()` used here performs an
+[memberref hpx::lcos::future::get]`()` for each one. The version of [funcref hpx::lcos::wait_each]`()` used here performs a
 non-blocking wait, which acts on an `std::vector<>`. It queries the state of
 the futures, waiting for them to finish. Whenever a future becomes marked as
-ready, [funcref hpx::lcos::wait]`()` invokes a callback function provided by the user,
+ready, [funcref hpx::lcos::wait_each]`()` invokes a callback function provided by the user,
 supplying the callback function with the index of the future in the
 `std::vector<>` and the result of the future.
 
 In `hello_world_foreman()`, an `std::set<>` called `attendance` keeps track of
 which OS-threads have printed out the hello world message. When the OS-thread
 prints out the statement, the future is marked as ready, and
-[funcref hpx::lcos::wait]`()` invokes the callback function, in this case a C+11 lambda.
+[funcref hpx::lcos::wait_each]`()` invokes the callback function, in this case a C++11 lambda.
 This lambda erases the OS-threads id from the set `attendance`, thus letting
 `hello_world_foreman()` know which OS-threads still need to print out hello
 world. However, if the future returns a value of -1, the future executed on an
@@ -306,7 +306,7 @@ the OS-thread id in `attendance`.
 Finally, let us look at `hello_world_worker()`. Here, `hello_world_worker()`
 checks to see if it is on the target OS-thread. If it is executing on the
 correct OS-thread, it prints out the hello world message and returns the
-OS-thread id to [funcref hpx::lcos::wait]`()` in `hello_world_foreman()`. If it is
+OS-thread id to [funcref hpx::lcos::wait_each]`()` in `hello_world_foreman()`. If it is
 not executing on the correct OS-thread, it returns a value of -1, which causes
 `hello_world_foreman()` to leave the OS-thread id in `attendance`.
 
@@ -360,7 +360,7 @@ accumulator instance.
 [teletype]
 
 The source code for this example can be found here:
-[hpx_link examples/accumulator/accumulators..accumulators].
+[hpx_link examples/accumulator/managed_accumulator_client.cpp..managed_accumulator_client.cpp].
 
 To compile this program, go to your __hpx__ build directory (see __getting_started__
 for information on configuring and building __hpx__) and enter:
@@ -370,7 +370,6 @@ for information on configuring and building __hpx__) and enter:
 ``
 
 To run the program type:
-
 
 ``
     ./bin/managed_accumulator_client
@@ -440,13 +439,13 @@ base class. There are currently two component base classes:
   component instances.
 
 The managed_accumulator component inherits from [classref hpx::components::locking_hock]`<>`.
-This allows the runtime system to ensure that all action invocations are 
-serialized. That means that the system ensures that no two actions are invoked 
-at the same time on a given component instance. This makes the component thread 
+This allows the runtime system to ensure that all action invocations are
+serialized. That means that the system ensures that no two actions are invoked
+at the same time on a given component instance. This makes the component thread
 safe and no additional locking has to be implemented by the user. Moreover,
 managed_accumulator component is a managed component, because it also inherits
-from [classref hpx::components::managed_component_base]`<>` (the template 
-argument passed to locking_hook is used as its base class). The following 
+from [classref hpx::components::managed_component_base]`<>` (the template
+argument passed to locking_hook is used as its base class). The following
 snippet shows the corresponding code:
 
 [import ../../examples/accumulator/accumulators/server/managed_accumulator.hpp]

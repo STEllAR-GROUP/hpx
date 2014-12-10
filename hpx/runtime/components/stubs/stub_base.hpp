@@ -12,6 +12,7 @@
 #include <hpx/util/move.hpp>
 
 #include <boost/preprocessor/enum_params.hpp>
+#include <boost/preprocessor/dec.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
@@ -39,10 +40,28 @@ namespace hpx { namespace components
                 ServerComponent>(gid);
         }
 
+        static lcos::future<std::vector<naming::id_type> >
+        bulk_create_async(naming::id_type const& gid, std::size_t count)
+        {
+            using stubs::runtime_support;
+            return runtime_support::bulk_create_component_async<
+                    ServerComponent
+                >(gid, count);
+        }
+
         static naming::id_type create(naming::id_type const& gid)
         {
             using stubs::runtime_support;
             return runtime_support::create_component<ServerComponent>(gid);
+        }
+
+        static std::vector<naming::id_type> bulk_create(
+            naming::id_type const& gid, std::size_t count)
+        {
+            using stubs::runtime_support;
+            return runtime_support::bulk_create_component<
+                    ServerComponent
+                >(gid, count);
         }
 
         static lcos::future<naming::id_type>
@@ -111,6 +130,38 @@ namespace hpx { namespace components
         )
 
 #undef HPX_STUB_BASE_CREATE
+
+#define HPX_STUB_BASE_BULK_CREATE(Z, N, D)                                    \
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>                      \
+        static lcos::future<std::vector<naming::id_type> >                    \
+        bulk_create_async(naming::id_type const& gid, std::size_t count,      \
+            HPX_ENUM_FWD_ARGS(N, Arg, arg))                                   \
+        {                                                                     \
+            using stubs::runtime_support;                                     \
+            return runtime_support::bulk_create_component_async<              \
+                    ServerComponent                                           \
+                >(gid, count, HPX_ENUM_FORWARD_ARGS(N , Arg, arg));           \
+        }                                                                     \
+                                                                              \
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>                      \
+        static std::vector<naming::id_type> bulk_create(                      \
+            naming::id_type const& gid, std::size_t count,                    \
+                HPX_ENUM_FWD_ARGS(N, Arg, arg))                               \
+        {                                                                     \
+            using stubs::runtime_support;                                     \
+            return runtime_support::bulk_create_component<ServerComponent>(   \
+                gid, count, HPX_ENUM_FORWARD_ARGS(N , Arg, arg));             \
+        }                                                                     \
+    /**/
+
+        BOOST_PP_REPEAT_FROM_TO(
+            1
+          , BOOST_PP_DEC(HPX_ACTION_ARGUMENT_LIMIT)
+          , HPX_STUB_BASE_BULK_CREATE
+          , _
+        )
+
+#undef HPX_STUB_BASE_BULK_CREATE
 
         /// Delete an existing component
         static void

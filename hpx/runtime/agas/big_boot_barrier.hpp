@@ -32,7 +32,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     parcelset::parcelport& pp;
 
     service_mode const service_type;
-    naming::address const bootstrap_agas;
+    parcelset::locality const bootstrap_agas;
 
     boost::condition_variable cond;
     boost::mutex mtx;
@@ -77,17 +77,19 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
             delete f;
     }
 
+    parcelset::locality here() { return bootstrap_agas; }
+
     void apply(
         boost::uint32_t source_prefix
       , boost::uint32_t prefix
-      , naming::address const& addr
+      , parcelset::locality const& dest
       , actions::base_action* act
         );
 
     void apply_late(
         boost::uint32_t source_prefix
       , boost::uint32_t prefix
-      , naming::address const& addr
+      , parcelset::locality const& dest
       , actions::base_action* act
         );
 

@@ -266,8 +266,7 @@ void primary_namespace::finalize()
 // Parcel routing forwards the message handler request to the routed action
 parcelset::policies::message_handler* primary_namespace::get_message_handler(
     parcelset::parcelhandler* ph
-  , naming::locality const& loc
-  , parcelset::connection_type t
+  , parcelset::locality const& loc
   , parcelset::parcel const& p
     )
 {
@@ -284,7 +283,7 @@ parcelset::policies::message_handler* primary_namespace::get_message_handler(
         return 0;
 
     parcelset::parcel routed_p = req.get_parcel();
-    return routed_p.get_message_handler(ph, loc, t);
+    return routed_p.get_message_handler(ph, loc);
 }
 
 util::binary_filter* primary_namespace::get_serialization_filter(
@@ -395,8 +394,8 @@ response primary_namespace::bind_gid(
             }
 
             // Store the new endpoint and offset
-            gaddr.endpoint = g.endpoint;
-            gaddr.type = g.type;
+            gaddr.prefix = g.prefix;
+            gaddr.type   = g.type;
             gaddr.lva(g.lva());
             gaddr.offset = g.offset;
             loc_id = locality_id;
@@ -899,7 +898,7 @@ void primary_namespace::resolve_free_list(
                 , "primary_namespace::resolve_free_list"
                 , boost::str(boost::format(
                     "encountered a GVA with an invalid type while "
-                    "performing a decrement, gid(%1%), gva:(%2%)")
+                    "performing a decrement, gid(%1%), gva(%2%)")
                     % gid % g));
             return;
         }

@@ -9,7 +9,7 @@ set(tests
     all_of
     any_of
     copy
-    copyif
+    #copyif
     copyn
     count
     countif
@@ -43,11 +43,17 @@ set(tests
     reverse_copy
     rotate
     rotate_copy
+    search
+    searchn
     swapranges
     task_region
     transform
     transform_binary
     transform_reduce
+    uninitialized_copy
+    uninitialized_copyn
+    uninitialized_fill
+    uninitialized_filln
    )
 
 set(task_region_FLAGS DEPENDENCIES iostreams_component)

@@ -41,14 +41,14 @@ int hpx_main()
     // test locally, fully equivalent to plain hpx::async
     {
         hpx::future<int> f1 = hpx::async_continue(
-            inc, hpx::find_here(), 42, make_continuation());
+            inc, make_continuation(), hpx::find_here(), 42);
         HPX_TEST_EQ(f1.get(), 43);
-        
+
         hpx::promise<boost::int32_t> p;
         hpx::shared_future<boost::int32_t> f = p.get_future();
 
         hpx::future<int> f2 = hpx::async_continue(
-            inc_f, hpx::find_here(), f, make_continuation());
+            inc_f, make_continuation(), hpx::find_here(), f);
 
         p.set_value(42);
         HPX_TEST_EQ(f2.get(), 43);
@@ -59,14 +59,14 @@ int hpx_main()
     if (!localities.empty())
     {
         hpx::future<int> f1 = hpx::async_continue(
-            inc, localities[0], 42, make_continuation());
+            inc, make_continuation(), localities[0], 42);
         HPX_TEST_EQ(f1.get(), 43);
-        
+
         hpx::promise<boost::int32_t> p;
         hpx::shared_future<boost::int32_t> f = p.get_future();
-        
+
         hpx::future<int> f2 = hpx::async_continue(
-            inc_f, localities[0], f, make_continuation());
+            inc_f, make_continuation(), localities[0], f);
 
         p.set_value(42);
         HPX_TEST_EQ(f2.get(), 43);
@@ -75,59 +75,59 @@ int hpx_main()
     // test chaining locally
     {
         hpx::future<int> f = hpx::async_continue(
-            inc, hpx::find_here(), 42, make_continuation(mult));
+            inc, make_continuation(mult), hpx::find_here(), 42);
         HPX_TEST_EQ(f.get(), 86);
 
-        f = hpx::async_continue(inc, hpx::find_here(), 42,
-            make_continuation(mult, make_continuation()));
+        f = hpx::async_continue(inc,
+            make_continuation(mult, make_continuation()), hpx::find_here(), 42);
         HPX_TEST_EQ(f.get(), 86);
 
-        f = hpx::async_continue(inc, hpx::find_here(), 42,
-            make_continuation(mult, make_continuation(inc)));
+        f = hpx::async_continue(inc,
+            make_continuation(mult, make_continuation(inc)), hpx::find_here() ,42);
         HPX_TEST_EQ(f.get(), 87);
 
-        f = hpx::async_continue(inc, hpx::find_here(), 42,
-            make_continuation(mult, make_continuation(inc, make_continuation())));
+        f = hpx::async_continue(inc,
+            make_continuation(mult, make_continuation(inc, make_continuation())), hpx::find_here(), 42);
         HPX_TEST_EQ(f.get(), 87);
     }
 
     // test chaining remotely, if possible
     if (!localities.empty())
     {
-        hpx::future<int> f = hpx::async_continue(inc, localities[0], 42,
-            make_continuation(mult, localities[0]));
+        hpx::future<int> f = hpx::async_continue(inc,
+            make_continuation(mult, localities[0]), localities[0], 42);
         HPX_TEST_EQ(f.get(), 86);
 
-        f = hpx::async_continue(inc, localities[0], 42,
-            make_continuation(mult, localities[0], make_continuation()));
+        f = hpx::async_continue(inc,
+            make_continuation(mult, localities[0], make_continuation()), localities[0], 42);
         HPX_TEST_EQ(f.get(), 86);
 
-        f = hpx::async_continue(inc, localities[0], 42,
+        f = hpx::async_continue(inc,
             make_continuation(mult, localities[0],
-                make_continuation(inc)));
+                make_continuation(inc)), localities[0], 42);
         HPX_TEST_EQ(f.get(), 87);
 
-        f = hpx::async_continue(inc, localities[0], 42,
+        f = hpx::async_continue(inc,
             make_continuation(mult, localities[0],
-                make_continuation(inc, make_continuation())));
+                make_continuation(inc, make_continuation())), localities[0], 42);
         HPX_TEST_EQ(f.get(), 87);
 
-        f = hpx::async_continue(inc, localities[0], 42,
+        f = hpx::async_continue(inc,
             make_continuation(mult, localities[0],
-                make_continuation(inc, localities[0])));
+                make_continuation(inc, localities[0])), localities[0], 42);
         HPX_TEST_EQ(f.get(), 87);
 
-        f = hpx::async_continue(inc, localities[0], 42,
+        f = hpx::async_continue(inc,
             make_continuation(mult, localities[0],
-                make_continuation(inc, localities[0], make_continuation())));
+                make_continuation(inc, localities[0], make_continuation())), localities[0], 42);
         HPX_TEST_EQ(f.get(), 87);
 
-        f = hpx::async_continue(inc, localities[0], 42,
-            make_continuation(mult));
+        f = hpx::async_continue(inc,
+            make_continuation(mult), localities[0], 42);
         HPX_TEST_EQ(f.get(), 86);
 
-        f = hpx::async_continue(inc, localities[0], 42,
-            make_continuation(mult, make_continuation()));
+        f = hpx::async_continue(inc,
+            make_continuation(mult, make_continuation()), localities[0], 42);
         HPX_TEST_EQ(f.get(), 86);
     }
 

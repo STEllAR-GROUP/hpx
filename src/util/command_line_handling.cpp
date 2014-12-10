@@ -16,6 +16,7 @@
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/util/mpi_environment.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/asio.hpp>
 #include <boost/lexical_cast.hpp>
@@ -214,7 +215,7 @@ namespace hpx { namespace util
                 if ("all" == threads_str)
                     threads = thread::hardware_concurrency(); //-V101
                 else
-                    threads = boost::lexical_cast<std::size_t>(threads_str);
+                    threads = hpx::util::safe_lexical_cast<std::size_t>(threads_str);
 
                 if (threads == 0)
                 {
@@ -278,7 +279,7 @@ namespace hpx { namespace util
                 if ("all" == cores_str)
                     num_cores = get_number_of_default_cores(env);
                 else
-                    num_cores = boost::lexical_cast<std::size_t>(cores_str);
+                    num_cores = hpx::util::safe_lexical_cast<std::size_t>(cores_str);
             }
 
             return num_cores;
@@ -293,6 +294,13 @@ namespace hpx { namespace util
         using namespace boost::assign;
 
         bool debug_clp = node != std::size_t(-1) && vm.count("hpx:debug-clp");
+
+        if (vm.count("hpx:ini")) {
+            std::vector<std::string> cfg =
+                vm["hpx:ini"].as<std::vector<std::string> >();
+            std::copy(cfg.begin(), cfg.end(), std::back_inserter(ini_config));
+            cfgmap.add(cfg);
+        }
 
         // create host name mapping
         util::map_hostnames mapnames(debug_clp);
@@ -407,6 +415,7 @@ namespace hpx { namespace util
             if (vm.count("hpx:worker")) {
                 mode_ = hpx::runtime_mode_worker;
 
+#if !defined(HPX_RUN_MAIN_EVERYWHERE)
                 // do not execute any explicit hpx_main except if asked
                 // otherwise
                 if (!vm.count("hpx:run-hpx-main") &&
@@ -414,6 +423,7 @@ namespace hpx { namespace util
                 {
                     util::detail::reset_function(hpx_main_f_);
                 }
+#endif
             }
             else if (vm.count("hpx:connect")) {
                 mode_ = hpx::runtime_mode_connect;
@@ -426,6 +436,7 @@ namespace hpx { namespace util
             // when connecting we need to select a unique port
             hpx_port = HPX_CONNECTING_IP_PORT;
 
+#if !defined(HPX_RUN_MAIN_EVERYWHERE)
             // do not execute any explicit hpx_main except if asked
             // otherwise
             if (!vm.count("hpx:run-hpx-main") &&
@@ -433,6 +444,7 @@ namespace hpx { namespace util
             {
                 util::detail::reset_function(hpx_main_f_);
             }
+#endif
         }
         else if (node != std::size_t(-1) || vm.count("hpx:node")) {
             // command line overwrites the environment
@@ -455,6 +467,7 @@ namespace hpx { namespace util
                     hpx_port = static_cast<boost::uint16_t>(hpx_port + node);
                     mode_ = hpx::runtime_mode_worker;
 
+#if !defined(HPX_RUN_MAIN_EVERYWHERE)
                     // do not execute any explicit hpx_main except if asked
                     // otherwise
                     if (!vm.count("hpx:run-hpx-main") &&
@@ -462,18 +475,13 @@ namespace hpx { namespace util
                     {
                         util::detail::reset_function(hpx_main_f_);
                     }
+#endif
                 }
             }
 
             // store node number in configuration
             ini_config += "hpx.locality!=" +
                 boost::lexical_cast<std::string>(node);
-        }
-
-        if (vm.count("hpx:ini")) {
-            std::vector<std::string> cfg =
-                vm["hpx:ini"].as<std::vector<std::string> >();
-            std::copy(cfg.begin(), cfg.end(), std::back_inserter(ini_config));
         }
 
         if (vm.count("hpx:hpx")) {
@@ -487,7 +495,7 @@ namespace hpx { namespace util
             }
         }
 
-        queuing_ = "priority_local";
+        queuing_ = "local-priority";
         if (vm.count("hpx:queuing"))
             queuing_ = vm["hpx:queuing"].as<std::string>();
 
@@ -525,6 +533,7 @@ namespace hpx { namespace util
             // should not run the AGAS server we assume to be in worker mode
             mode_ = hpx::runtime_mode_worker;
 
+#if !defined(HPX_RUN_MAIN_EVERYWHERE)
             // do not execute any explicit hpx_main except if asked
             // otherwise
             if (!vm.count("hpx:run-hpx-main") &&
@@ -532,6 +541,7 @@ namespace hpx { namespace util
             {
                 util::detail::reset_function(hpx_main_f_);
             }
+#endif
         }
 
         // write HPX and AGAS network parameters to the proper ini-file entries

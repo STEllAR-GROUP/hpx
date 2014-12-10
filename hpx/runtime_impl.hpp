@@ -10,8 +10,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/io_service_pool.hpp>
-#include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
@@ -244,14 +244,22 @@ namespace hpx {
             return action_manager_;
         }
 
-        /// \brief Allow access to the locality this runtime instance is
+        /// \brief Allow access to the locality endpoints this runtime instance is
         /// associated with.
         ///
-        /// This accessor returns a reference to the locality this runtime
+        /// This accessor returns a reference to the locality endpoints this runtime
         /// instance is associated with.
-        naming::locality const& here() const
+        parcelset::endpoints_type const& endpoints() const
         {
-            return parcel_port_->here();
+            return parcel_handler_.endpoints();
+        }
+
+        /// \brief Returns a string of the locality endpoints (usable in debug output)
+        std::string here() const
+        {
+            util::osstream strm;
+            strm << get_runtime().endpoints();
+            return util::osstream_get_string(strm);
         }
 
         /// \brief Return the number of executed HPX threads
@@ -361,12 +369,11 @@ namespace hpx {
         util::io_service_pool main_pool_;
         util::io_service_pool io_pool_;
         util::io_service_pool timer_pool_;
-        boost::shared_ptr<parcelset::parcelport> parcel_port_;
         scheduling_policy_type scheduler_;
         notification_policy_type notifier_;
         boost::scoped_ptr<hpx::threads::threadmanager_base> thread_manager_;
-        naming::resolver_client agas_client_;
         parcelset::parcelhandler parcel_handler_;
+        naming::resolver_client agas_client_;
         util::detail::init_logging init_logging_;
         applier::applier applier_;
         actions::action_manager action_manager_;

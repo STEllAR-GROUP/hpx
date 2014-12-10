@@ -7,7 +7,7 @@
 #if !defined(HPX_PARALLEL_REDUCE_JUN_28_2014_0827AM)
 #define HPX_PARALLEL_REDUCE_JUN_28_2014_0827AM
 
-#include <hpx/parallel/detail/reduce.hpp>
+#include <hpx/parallel/algorithms/reduce.hpp>
 
 #endif
 

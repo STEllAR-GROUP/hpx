@@ -14,7 +14,6 @@
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 
@@ -32,12 +31,13 @@ namespace hpx { namespace applier
     {
     public:
         // constructor
-        applier(parcelset::parcelhandler &ph, threads::threadmanager_base& tm,
-                boost::uint64_t rts, boost::uint64_t mem);
+        applier(parcelset::parcelhandler &ph, threads::threadmanager_base& tm);
 
         // destructor
         ~applier()
         {}
+
+        void initialize(boost::uint64_t rts, boost::uint64_t mem);
 
         /// \brief Allow access to the AGAS client instance used with this
         ///        \a applier.
@@ -59,13 +59,6 @@ namespace hpx { namespace applier
         /// This function returns a reference to the thread manager this
         /// applier instance has been created with.
         threads::threadmanager_base& get_thread_manager();
-
-        /// \brief Allow access to the locality this applier instance is
-        ///        associated with.
-        ///
-        /// This function returns a reference to the locality this applier
-        /// instance is associated with.
-        naming::locality const& here() const;
 
         /// \brief Allow access to the locality of the locality this applier
         ///        instance is associated with.
@@ -133,6 +126,7 @@ namespace hpx { namespace applier
         /// of the locality the runtime_support is responsible for
         naming::gid_type const& get_runtime_support_raw_gid() const
         {
+            HPX_ASSERT(runtime_support_id_);
             return runtime_support_id_.get_gid();
         }
 
@@ -140,6 +134,7 @@ namespace hpx { namespace applier
         /// of the locality the runtime_support is responsible for
         naming::id_type const& get_runtime_support_gid() const
         {
+            HPX_ASSERT(runtime_support_id_);
             return runtime_support_id_;
         }
 
@@ -147,6 +142,7 @@ namespace hpx { namespace applier
         /// of the locality the runtime_support is responsible for
         naming::gid_type const& get_memory_raw_gid() const
         {
+            HPX_ASSERT(memory_id_);
             return memory_id_.get_gid();
         }
 
@@ -154,6 +150,7 @@ namespace hpx { namespace applier
         /// of the locality the runtime_support is responsible for
         naming::id_type const& get_memory_gid() const
         {
+            HPX_ASSERT(memory_id_);
             return memory_id_;
         }
 

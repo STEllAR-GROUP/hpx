@@ -155,7 +155,7 @@ namespace hpx { namespace components { namespace stubs
     {
         // Determine whether the gid of the component to delete is local or
         // remote
-        if (g.endpoint == hpx::get_locality() ||
+        if (g.prefix == hpx::get_locality() ||
             agas::is_local_address_cached(gid))
         {
             // apply locally
@@ -377,11 +377,11 @@ namespace hpx { namespace components { namespace stubs
 
     ///////////////////////////////////////////////////////////////////////
     void runtime_support::call_shutdown_functions_async(
-        naming::id_type const& gid, naming::locality const& l)
+        naming::id_type const& gid, parcelset::endpoints_type const& endpoints)
     {
         typedef server::runtime_support::remove_from_connection_cache_action
             action_type;
-        hpx::apply<action_type>(gid, l);
+        hpx::apply<action_type>(gid, endpoints);
     }
 }}}
 

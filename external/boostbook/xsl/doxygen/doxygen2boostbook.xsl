@@ -202,6 +202,7 @@
         <xsl:attribute name="name">
           <xsl:value-of select="$name"/>
         </xsl:attribute>
+        <xsl:text>&#10;</xsl:text><!-- Newline -->
         
         <xsl:apply-templates>
           <xsl:with-param name="with-namespace-refs" 
@@ -209,6 +210,7 @@
           <xsl:with-param name="in-file" select="$in-file"/>
         </xsl:apply-templates>
       </namespace>
+      <xsl:text>&#10;</xsl:text><!-- Newline -->
     </xsl:if>
   </xsl:template>
 
@@ -301,6 +303,7 @@
         <xsl:apply-templates select="detaileddescription" mode="passthrough"/>
         <xsl:apply-templates select="inbodydescription" mode="passthrough"/>
       </enum>
+      <xsl:text>&#10;</xsl:text><!-- Newline -->
     </xsl:if>
   </xsl:template>
 
@@ -387,6 +390,7 @@
             <xsl:with-param name="header" select="location/attribute::file"/>
           </xsl:call-template>
         </xsl:attribute>
+        <xsl:text>&#10;</xsl:text><!-- Newline -->
         
         <xsl:if test="briefdescription/*|detaileddescription/*|inbodydescription/*">
           <xsl:apply-templates select="briefdescription/*" mode="passthrough"/>
@@ -400,6 +404,7 @@
           <xsl:with-param name="in-file" select="location/attribute::file"/>
         </xsl:apply-templates>
       </header>
+      <xsl:text>&#10;</xsl:text><!-- Newline -->
     </xsl:if>
   </xsl:template>
 
@@ -518,6 +523,7 @@
           <xsl:apply-templates select="detaileddescription" mode="passthrough"/>
           <xsl:apply-templates select="inbodydescription" mode="passthrough"/>
         </macro>
+        <xsl:text>&#10;</xsl:text><!-- Newline -->
       </xsl:when>
 
       <xsl:when test="@kind='function'">
@@ -717,29 +723,35 @@
       <xsl:when test="@kind='public-static-func'">
         <!-- TBD: pass on the fact that these are static functions -->
         <method-group name="public static functions">
+          <xsl:text>&#10;</xsl:text><!-- Newline -->
           <xsl:apply-templates>
             <xsl:with-param name="in-section" select="true()"/>
             <xsl:with-param name="in-file" select="$in-file"/>
           </xsl:apply-templates>
         </method-group>
+        <xsl:text>&#10;</xsl:text><!-- Newline -->
       </xsl:when>
       <xsl:when test="@kind='protected-static-func'">
         <!-- TBD: pass on the fact that these are static functions -->
         <method-group name="protected static functions">
+          <xsl:text>&#10;</xsl:text><!-- Newline -->
           <xsl:apply-templates>
             <xsl:with-param name="in-section" select="true()"/>
             <xsl:with-param name="in-file" select="$in-file"/>
           </xsl:apply-templates>
         </method-group>
+        <xsl:text>&#10;</xsl:text><!-- Newline -->
       </xsl:when>
       <xsl:when test="@kind='private-static-func'">
         <!-- TBD: pass on the fact that these are static functions -->
         <method-group name="private static functions">
+          <xsl:text>&#10;</xsl:text><!-- Newline -->
           <xsl:apply-templates>
             <xsl:with-param name="in-section" select="true()"/>
             <xsl:with-param name="in-file" select="$in-file"/>
           </xsl:apply-templates>
         </method-group>
+        <xsl:text>&#10;</xsl:text><!-- Newline -->
       </xsl:when>
       <xsl:when test="@kind='public-func'">
         <xsl:variable name="members" select="./memberdef"/>
@@ -750,21 +762,25 @@
         </xsl:variable>
         <xsl:if test="$num-internal-only &lt; count($members)">
           <method-group name="public member functions">
+            <xsl:text>&#10;</xsl:text><!-- Newline -->
             <xsl:apply-templates>
               <xsl:with-param name="in-section" select="true()"/>
               <xsl:with-param name="in-file" select="$in-file"/>
             </xsl:apply-templates>
           </method-group>
+          <xsl:text>&#10;</xsl:text><!-- Newline -->
           <xsl:apply-templates/>
         </xsl:if>
       </xsl:when>
       <xsl:when test="@kind='protected-func'">
         <method-group name="protected member functions">
+          <xsl:text>&#10;</xsl:text><!-- Newline -->
           <xsl:apply-templates>
             <xsl:with-param name="in-section" select="true()"/>
             <xsl:with-param name="in-file" select="$in-file"/>
           </xsl:apply-templates>
         </method-group>
+        <xsl:text>&#10;</xsl:text><!-- Newline -->
         <xsl:apply-templates/>
       </xsl:when>
       <xsl:when test="@kind='private-func'">
@@ -776,22 +792,26 @@
         </xsl:variable>
         <xsl:if test="$num-internal-only &lt; count($members)">
           <method-group name="private member functions">
+            <xsl:text>&#10;</xsl:text><!-- Newline -->
             <xsl:apply-templates>
               <xsl:with-param name="in-section" select="true()"/>
               <xsl:with-param name="in-file" select="$in-file"/>
             </xsl:apply-templates>
           </method-group>
+          <xsl:text>&#10;</xsl:text><!-- Newline -->
         </xsl:if>
         <xsl:apply-templates/>
       </xsl:when>
       <xsl:when test="@kind='friend'">
         <xsl:if test="./memberdef/detaileddescription/para or ./memberdef/briefdescription/para">
           <method-group name="friend functions">
+            <xsl:text>&#10;</xsl:text><!-- Newline -->
             <xsl:apply-templates>
               <xsl:with-param name="in-section" select="true()"/>
               <xsl:with-param name="in-file" select="$in-file"/>
             </xsl:apply-templates>
           </method-group>
+          <xsl:text>&#10;</xsl:text><!-- Newline -->
         </xsl:if>
       </xsl:when>
       <xsl:when test="@kind='public-static-attrib' or @kind='public-attrib'">
@@ -968,6 +988,7 @@
         
         <type><xsl:apply-templates select="type"/></type>
       </typedef>
+      <xsl:text>&#10;</xsl:text><!-- Newline -->
     </xsl:if>
   </xsl:template>
 
@@ -1035,6 +1056,162 @@
       <description>
         <xsl:apply-templates select="para" mode="passthrough"/>
       </description>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="function.attributes">
+
+    <!-- argsstring = '(arguments) [= delete] [= default] [constexpt]' -->
+    <xsl:variable name="extra-qualifiers-a">
+      <xsl:if test="contains(argsstring/text(), '(')">
+        <xsl:call-template name="strip-brackets">
+          <xsl:with-param name="text" select="substring-after(argsstring/text(), '(')" />
+        </xsl:call-template>
+      </xsl:if>
+    </xsl:variable>
+    <xsl:variable name="extra-qualifiers">
+      <xsl:if test="$extra-qualifiers-a">
+        <xsl:value-of select="concat(' ', normalize-space($extra-qualifiers-a), ' ')" />
+      </xsl:if>
+    </xsl:variable>
+
+    <!-- CV Qualifiers -->
+    <!-- Plus deleted and defaulted function markers as they're not properly
+         supported in boostbook -->
+
+    <!-- noexcept is complicated because is can have parameters.
+         TODO: should really remove the noexcept parameters before doing
+               anything else. -->
+    <xsl:variable name="noexcept">
+      <xsl:choose>
+        <xsl:when test="contains($extra-qualifiers, ' noexcept(')">
+          <xsl:call-template name="noexcept-if">
+            <xsl:with-param name="condition" select="substring-after($extra-qualifiers, ' noexcept(')" />
+          </xsl:call-template>
+        </xsl:when>
+
+        <xsl:when test="contains($extra-qualifiers, ' BOOST_NOEXCEPT_IF(')">
+          <xsl:call-template name="noexcept-if">
+            <xsl:with-param name="condition" select="substring-after($extra-qualifiers, ' BOOST_NOEXCEPT_IF(')" />
+          </xsl:call-template>
+        </xsl:when>
+
+        <xsl:when test="contains($extra-qualifiers, ' noexcept ') or contains($extra-qualifiers, ' BOOST_NOEXCEPT ')">
+          <xsl:value-of select="'noexcept '" />
+        </xsl:when>
+      </xsl:choose>
+    </xsl:variable>
+
+    <!-- Calculate constexpr now, so that we can avoid it getting confused
+         with const -->
+    <xsl:variable name="constexpr" select="
+        contains($extra-qualifiers, ' const expr ') or
+        contains($extra-qualifiers, ' BOOST_CONSTEXPR ') or
+        contains($extra-qualifiers, ' BOOST_CONSTEXPR_OR_CONST ')" />
+
+    <!-- The 'substring' trick includes the string if the condition is true -->
+    <xsl:variable name="cv-qualifiers" select="normalize-space(concat(
+        substring('constexpr ', 1, 999 * $constexpr),
+        substring('const ', 1, 999 * (not($constexpr) and @const='yes')),
+        substring('volatile ', 1, 999 * (@volatile='yes' or contains($extra-qualifiers, ' volatile '))),
+        $noexcept,
+        substring('= delete ', 1, 999 * contains($extra-qualifiers, ' =delete ')),
+        substring('= default ', 1, 999 * contains($extra-qualifiers, ' =default ')),
+        substring('= 0 ', 1, 999 * (@virt = 'pure-virtual')),
+        ''))" />
+
+    <!-- Specifiers -->
+    <xsl:variable name="specifiers" select="normalize-space(concat(
+        substring('explicit ', 1, 999 * (@explicit = 'yes')),
+        substring('virtual ', 1, 999 * (
+            @virtual='yes' or @virt='virtual' or @virt='pure-virtual')),
+        substring('static ', 1, 999 * (@static = 'yes')),
+        ''))" />
+
+    <xsl:if test="$cv-qualifiers">
+      <xsl:attribute name="cv">
+        <xsl:value-of select="$cv-qualifiers" />
+      </xsl:attribute>
+    </xsl:if>
+
+    <xsl:if test="$specifiers">
+      <xsl:attribute name="specifiers">
+        <xsl:value-of select="$specifiers" />
+      </xsl:attribute>
+    </xsl:if>
+
+  </xsl:template>
+
+  <!-- $condition = string after the opening bracket of the condition -->
+  <xsl:template name="noexcept-if">
+    <xsl:param name="condition"/>
+
+    <xsl:variable name="trailing">
+      <xsl:call-template name="strip-brackets">
+        <xsl:with-param name="text" select="$condition" />
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:choose>
+      <xsl:when test="string-length($trailing)">
+        <xsl:value-of select="concat(
+            'noexcept(',
+            substring($condition, 1, string-length($condition) - string-length($trailing)),
+            ') ')" />
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- Something has gone wrong so: -->
+        <xsl:value-of select="'noexcept(condition) '" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- $text = substring after the opening bracket -->
+  <xsl:template name="strip-brackets">
+    <xsl:param name="text"/>
+
+    <xsl:if test="contains($text, ')')">
+      <xsl:variable name="prefix1" select="substring-before($text, ')')" />
+      <xsl:variable name="prefix2" select="substring($prefix1, 1,
+          string-length(substring-before($prefix1, '(')) +
+          999 * not(contains($prefix1, '(')))" />
+      <xsl:variable name="prefix3" select="substring($prefix2, 1,
+          string-length(substring-before($prefix2, '&quot;')) +
+          999 * not(contains($prefix2, '&quot;')))" />
+      <xsl:variable name="prefix" select="substring($prefix3, 1,
+          string-length(substring-before($prefix3, &quot;'&quot;)) +
+          999 * not(contains($prefix3, &quot;'&quot;)))" />
+
+      <xsl:variable name="prefix-length" select="string-length($prefix)" />
+      <xsl:variable name="char" select="substring($text, $prefix-length + 1, 1)" />
+
+      <xsl:choose>
+        <xsl:when test="$char=')'">
+          <xsl:value-of select="substring($text, $prefix-length + 2)" />
+        </xsl:when>
+        <xsl:when test="$char='('">
+          <xsl:variable name="text2">
+            <xsl:call-template name="strip-brackets">
+              <xsl:with-param name="text" select="substring($text, $prefix-length + 2)" />
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:call-template name="strip-brackets">
+            <xsl:with-param name="text" select="$text2" />
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:when test="$char=&quot;'&quot;">
+          <!-- Not bothering with escapes, because this is crazy enough as it is -->
+          <xsl:call-template name="strip-brackets">
+            <xsl:with-param name="text" select="substring-after(substring($text, $prefix-length + 2), &quot;'&quot;)" />
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:when test="$char='&quot;'">
+          <!-- Not bothering with escapes, because this is crazy enough as it is -->
+          <xsl:call-template name="strip-brackets">
+            <xsl:with-param name="text" select="substring-after(substring($text, $prefix-length + 2), '&quot;')" />
+          </xsl:call-template>
+        </xsl:when>
+      </xsl:choose>
     </xsl:if>
   </xsl:template>
 
@@ -1125,6 +1302,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:if>
+    <xsl:text>&#10;</xsl:text><!-- Newline -->
   </xsl:template>
 
   <!-- Emit overload signatures -->
@@ -1164,20 +1342,10 @@
       <xsl:if test="@explicit = 'yes'">
         <xsl:attribute name="specifiers">explicit</xsl:attribute>
       </xsl:if>
-      <!-- CV Qualifiers -->
-      <xsl:if test="contains(argsstring/text(),'=delete') or contains(argsstring/text(),'=default')">
-        <xsl:attribute name="cv">
-          <!-- Cheat and add deleted and defaulted function markers to the CV qualifiers -->
-          <xsl:if test="contains(argsstring/text(),'=delete')">
-            <xsl:text>= delete</xsl:text>
-          </xsl:if>
-          <xsl:if test="contains(argsstring/text(),'=default')">
-            <xsl:text>= default</xsl:text>
-          </xsl:if>
-        </xsl:attribute>
-      </xsl:if>
+      <xsl:call-template name="function.attributes"/>
       <xsl:call-template name="function.children"/>
     </constructor>
+    <xsl:text>&#10;</xsl:text><!-- Newline -->
   </xsl:template>
 
   <!-- Handle Destructors -->
@@ -1185,41 +1353,21 @@
     <destructor>
       <xsl:call-template name="function.children"/>
     </destructor>
+    <xsl:text>&#10;</xsl:text><!-- Newline -->
   </xsl:template>
 
   <!-- Handle Copy Assignment -->
   <xsl:template name="copy-assignment">
     <copy-assignment>
-      <!-- CV Qualifiers -->
-      <xsl:if test="not (@const='no' and @volatile='no')">
-        <xsl:attribute name="cv">
-          <xsl:if test="@const='yes'">
-            <xsl:text>const</xsl:text>
-          </xsl:if>
-          <xsl:if test="@volatile='yes'">
-            <xsl:if test="@const='yes'">
-              <xsl:text> </xsl:text>
-            </xsl:if>
-            <xsl:text>volatile</xsl:text>
-          </xsl:if>
-          <!-- Cheat and add deleted and defaulted function markers to the CV qualifiers -->
-          <xsl:if test="contains(argsstring/text(),'=delete')">
-            <xsl:if test="@const='yes' or @volatile='yes'">
-              <xsl:text> </xsl:text>
-            </xsl:if>
-            <xsl:text>= delete</xsl:text>
-          </xsl:if>
-          <xsl:if test="contains(argsstring/text(),'=default')">
-            <xsl:if test="@const='yes' or @volatile='yes'">
-              <xsl:text> </xsl:text>
-            </xsl:if>
-            <xsl:text>= default</xsl:text>
-          </xsl:if>
-        </xsl:attribute>
-      </xsl:if>
+      <xsl:call-template name="function.attributes"/>
+      <!-- Return type -->
+      <xsl:element name="type">
+        <xsl:apply-templates select="type"/>
+      </xsl:element>
 
       <xsl:call-template name="function.children"/>
     </copy-assignment>
+    <xsl:text>&#10;</xsl:text><!-- Newline -->
   </xsl:template>
 
   <!-- Handle conversion operator -->
@@ -1228,32 +1376,7 @@
       <xsl:attribute name="name">
         <xsl:text>conversion-operator</xsl:text>
       </xsl:attribute>
-
-      <!-- CV Qualifiers -->
-      <xsl:if test="not (@const='no' and @volatile='no') or contains(argsstring/text(),'=delete')">
-        <xsl:attribute name="cv">
-          <xsl:if test="@const='yes'">
-            <xsl:text>const</xsl:text>
-          </xsl:if>
-          <xsl:if test="@volatile='yes'">
-            <xsl:if test="@const='yes'">
-              <xsl:text> </xsl:text>
-            </xsl:if>
-            <xsl:text>volatile</xsl:text>
-          </xsl:if>
-          <!-- Cheat and add deleted function markers to the CV qualifiers -->
-          <xsl:if test="contains(argsstring/text(),'=delete')">
-            <xsl:if test="@const='yes' or @volatile='yes'">
-              <xsl:text> </xsl:text>
-            </xsl:if>
-            <xsl:text>= delete</xsl:text>
-          </xsl:if>
-        </xsl:attribute>
-      </xsl:if>
-
-      <xsl:if test="@explicit = 'yes'">
-        <xsl:attribute name="specifiers">explicit</xsl:attribute>
-      </xsl:if>
+      <xsl:call-template name="function.attributes"/>
 
       <!-- Conversion type -->
       <type>
@@ -1262,6 +1385,7 @@
 
       <xsl:call-template name="function.children"/>
     </method>
+    <xsl:text>&#10;</xsl:text><!-- Newline -->
   </xsl:template>
 
   <!-- Handle methods -->
@@ -1270,45 +1394,16 @@
       <xsl:attribute name="name">
         <xsl:value-of select="name/text()"/>
       </xsl:attribute>
-
-      <!-- CV Qualifiers -->
-      <xsl:if test="not (@const='no' and @volatile='no') or contains(argsstring/text(),'=delete')">
-        <xsl:attribute name="cv">
-          <xsl:if test="@const='yes'">
-            <xsl:text>const</xsl:text>
-          </xsl:if>
-          <xsl:if test="@volatile='yes'">
-            <xsl:if test="@const='yes'">
-              <xsl:text> </xsl:text>
-            </xsl:if>
-            <xsl:text>volatile</xsl:text>
-          </xsl:if>
-          <!-- Cheat and add deleted function markers to the CV qualifiers -->
-          <xsl:if test="contains(argsstring/text(),'=default')">
-            <xsl:if test="@const='yes' or @volatile='yes'">
-              <xsl:text> </xsl:text>
-            </xsl:if>
-            <xsl:text>= default</xsl:text>
-          </xsl:if>
-        </xsl:attribute>
-      </xsl:if>
+      <xsl:call-template name="function.attributes"/>
 
       <!-- Return type -->
       <xsl:element name="type">
-        <!-- Cheat on virtual and static by dropping them into the type -->
-        <xsl:if test="@static='yes'">
-          <xsl:text>static </xsl:text>
-        </xsl:if>
-
-        <xsl:if test="@virtual='yes'">
-          <xsl:text>virtual </xsl:text>
-        </xsl:if>
-
         <xsl:apply-templates select="type"/>
       </xsl:element>
 
       <xsl:call-template name="function.children"/>
     </method>
+    <xsl:text>&#10;</xsl:text><!-- Newline -->
   </xsl:template>
 
   <!-- Handle member variables -->
@@ -1336,6 +1431,7 @@
       <xsl:apply-templates select="detaileddescription" mode="passthrough"/>
       <xsl:apply-templates select="inbodydescription" mode="passthrough"/>
     </data-member>
+    <xsl:text>&#10;</xsl:text><!-- Newline -->
     </xsl:if>
   </xsl:template>
 
@@ -1612,7 +1708,7 @@
 
   <!-- Handle program listings -->
   <xsl:template match="programlisting" mode="passthrough">
-    <programlisting>
+    <programlisting language="c++">
       <xsl:apply-templates mode="programlisting"/>
     </programlisting>
   </xsl:template>

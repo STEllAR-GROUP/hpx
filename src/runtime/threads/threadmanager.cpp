@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach, Katelyn Kufahl
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
@@ -138,6 +138,9 @@ namespace hpx { namespace threads
       : startup_(NULL),
         num_threads_(num_threads),
         thread_count_(0),
+#if defined(HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS) && defined(HPX_THREAD_MAINTAIN_IDLE_RATES)
+        timestamp_scale_(1.),
+#endif
         state_(starting),
         timer_pool_(timer_pool),
         thread_logger_("threadmanager_impl::register_thread"),
@@ -1121,6 +1124,24 @@ namespace hpx { namespace threads
                   static_cast<std::size_t>(paths.instanceindex_), _1),
               "worker-thread", shepherd_count
             },
+#ifdef HPX_THREAD_MAINTAIN_IDLE_RATES
+            // /threads{locality#%d/total}/time/average
+            // /threads{locality#%d/worker-thread%d}/time/average
+            { "time/average",
+              util::bind(&ti::get_thread_duration, this, -1, _1),
+              util::bind(&ti::get_thread_duration, this,
+                  static_cast<std::size_t>(paths.instanceindex_), _1),
+              "worker-thread", shepherd_count
+            },
+            // /threads{locality#%d/total}/time/average-phase
+            // /threads{locality#%d/worker-thread%d}/time/average-phase
+            { "time/average-phase",
+              util::bind(&ti::get_thread_phase_duration, this, -1, _1),
+              util::bind(&ti::get_thread_phase_duration, this,
+                  static_cast<std::size_t>(paths.instanceindex_), _1),
+              "worker-thread", shepherd_count
+            },
+#endif
 #endif
             // /threads{locality#%d/total}/count/instantaneous/all
             // /threads{locality#%d/worker-thread%d}/count/instantaneous/all
@@ -1352,6 +1373,20 @@ namespace hpx { namespace threads
               &performance_counters::locality_thread_counter_discoverer,
               ""
             },
+#ifdef HPX_THREAD_MAINTAIN_IDLE_RATES
+            { "/threads/time/average", performance_counters::counter_raw,
+              "returns the average time spent executing one HPX-thread",
+              HPX_PERFORMANCE_COUNTER_V1, counts_creator,
+              &performance_counters::locality_thread_counter_discoverer,
+              "ns"
+            },
+            { "/threads/time/average-phase", performance_counters::counter_raw,
+              "returns the average time spent executing one HPX-thread phase",
+              HPX_PERFORMANCE_COUNTER_V1, counts_creator,
+              &performance_counters::locality_thread_counter_discoverer,
+              "ns"
+            },
+#endif
 #endif
             { "/threads/count/instantaneous/all", performance_counters::counter_raw,
               "returns the overall current number of HPX-threads instantiated at the "
@@ -1503,6 +1538,28 @@ namespace hpx { namespace threads
             HPX_THROW_EXCEPTION(bad_parameter,
                 "threadmanager_impl::run", "number of threads is zero");
         }
+
+#if defined(HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS) && defined(HPX_THREAD_MAINTAIN_IDLE_RATES)
+        // scale timestamps to nanoseconds
+        boost::uint64_t base_timestamp = util::hardware::timestamp();
+        boost::uint64_t base_time = util::high_resolution_clock::now();
+        boost::uint64_t curr_timestamp = util::hardware::timestamp();
+        boost::uint64_t curr_time = util::high_resolution_clock::now();
+
+        while ((curr_time - base_time) <= 100000)
+        {
+            curr_timestamp = util::hardware::timestamp();
+            curr_time = util::high_resolution_clock::now();
+        }
+
+        if (curr_timestamp - base_timestamp != 0)
+        {
+            timestamp_scale_ = double(curr_time - base_time) /
+                double(curr_timestamp - base_timestamp);
+        }
+
+        LTM_(info) << "run: timestamp_scale: " << timestamp_scale_; //-V128
+#endif
 
         mutex_type::scoped_lock lk(mtx_);
         if (!threads_.empty() || (state_.load() == running))
@@ -1659,6 +1716,65 @@ namespace hpx { namespace threads
         }
         return result;
     }
+
+#ifdef HPX_THREAD_MAINTAIN_IDLE_RATES
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    boost::int64_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        get_thread_phase_duration(std::size_t num, bool reset)
+    {
+        if (num != std::size_t(-1)) {
+            double exec_total = static_cast<double>(exec_times[num]);
+            double num_phases = static_cast<double>(executed_thread_phases_[num]);
+
+            if (reset) {
+                executed_thread_phases_[num] = 0;
+                tfunc_times[num] = boost::uint64_t(-1);
+            }
+            return boost::uint64_t((exec_total * timestamp_scale_)/ num_phases);
+        }
+
+        double exec_total = std::accumulate(exec_times.begin(),
+            exec_times.end(), 0.);
+        double num_phases = std::accumulate(executed_thread_phases_.begin(),
+            executed_thread_phases_.end(), 0.);
+
+        if (reset) {
+            std::fill(executed_thread_phases_.begin(),
+                executed_thread_phases_.end(), 0LL);
+            std::fill(tfunc_times.begin(), tfunc_times.end(),
+                boost::uint64_t(-1));
+        }
+        return boost::uint64_t((exec_total * timestamp_scale_)/ num_phases);
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    boost::int64_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        get_thread_duration(std::size_t num, bool reset)
+    {
+        if (num != std::size_t(-1)) {
+            double exec_total = static_cast<double>(exec_times[num]);
+            double num_threads = static_cast<double>(executed_threads_[num]);
+
+            if (reset) {
+                executed_threads_[num] = 0;
+                tfunc_times[num] = boost::uint64_t(-1);
+            }
+            return boost::uint64_t((exec_total * timestamp_scale_)/ num_threads);
+        }
+
+        double exec_total = std::accumulate(exec_times.begin(),
+            exec_times.end(), 0.);
+        double num_threads = std::accumulate(executed_threads_.begin(),
+            executed_threads_.end(), 0.);
+
+        if (reset) {
+            std::fill(executed_threads_.begin(), executed_threads_.end(), 0LL);
+            std::fill(tfunc_times.begin(), tfunc_times.end(),
+                boost::uint64_t(-1));
+        }
+        return boost::uint64_t((exec_total * timestamp_scale_) / num_threads);
+    }
+#endif
 #endif
 
 #ifdef HPX_THREAD_MAINTAIN_IDLE_RATES
@@ -1673,12 +1789,14 @@ namespace hpx { namespace threads
             std::accumulate(tfunc_times.begin(), tfunc_times.end(), 0.);
 
         if (reset) {
-            std::fill(exec_times.begin(), exec_times.end(), 0);
-            std::fill(tfunc_times.begin(), tfunc_times.end(), 0);
+            std::fill(tfunc_times.begin(), tfunc_times.end(),
+                boost::uint64_t(-1));
         }
 
         if (std::abs(tfunc_total) < 1e-16)   // avoid division by zero
             return 10000LL;
+
+        HPX_ASSERT(tfunc_total > exec_total);
 
         double const percent = 1. - (exec_total / tfunc_total);
         return boost::int64_t(10000. * percent);    // 0.01 percent
@@ -1692,12 +1810,13 @@ namespace hpx { namespace threads
         double const tfunc_time = static_cast<double>(tfunc_times[num_thread]);
 
         if (reset) {
-            exec_times[num_thread] = 0;
-            tfunc_times[num_thread] = 0;
+            tfunc_times[num_thread] = boost::uint64_t(-1);
         }
 
         if (std::abs(tfunc_time) < 1e-16)   // avoid division by zero
             return 10000LL;
+
+        HPX_ASSERT(tfunc_time > exec_time);
 
         double const percent = 1. - (exec_time / tfunc_time);
         return boost::int64_t(10000. * percent);   // 0.01 percent
@@ -1717,13 +1836,15 @@ namespace hpx { namespace threads
             std::accumulate(tfunc_times.begin(), tfunc_times.end(), 0.);
 
         if (reset) {
-            std::fill(exec_times.begin(), exec_times.end(), 0);
-            std::fill(tfunc_times.begin(), tfunc_times.end(), 0);
+            std::fill(tfunc_times.begin(), tfunc_times.end(),
+                boost::uint64_t(-1));
         }
 
         // avoid division by zero
-        if (std::abs(tfunc_total - exec_total) == 0.0)
+        if (std::abs(tfunc_total - exec_total) < 1e-16)
             return 10000LL;
+
+        HPX_ASSERT(tfunc_total > exec_total);
 
         double const percent = (creation_total / (tfunc_total - exec_total));
         return boost::int64_t(10000. * percent);    // 0.01 percent
@@ -1741,13 +1862,15 @@ namespace hpx { namespace threads
             std::accumulate(tfunc_times.begin(), tfunc_times.end(), 0.);
 
         if (reset) {
-            std::fill(exec_times.begin(), exec_times.end(), 0);
-            std::fill(tfunc_times.begin(), tfunc_times.end(), 0);
+            std::fill(tfunc_times.begin(), tfunc_times.end(),
+                boost::uint64_t(-1));
         }
 
         // avoid division by zero
-        if (std::abs(tfunc_total - exec_total) == 0.0)
+        if (std::abs(tfunc_total - exec_total) < 1e-16)
             return 10000LL;
+
+        HPX_ASSERT(tfunc_total > exec_total);
 
         double const percent = (cleanup_total / (tfunc_total - exec_total));
         return boost::int64_t(10000. * percent);    // 0.01 percent

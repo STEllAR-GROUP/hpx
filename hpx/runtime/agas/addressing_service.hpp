@@ -26,10 +26,8 @@
 #include <hpx/state.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/include/async.hpp>
-#include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
 #include <map>
@@ -106,7 +104,6 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     bool const range_caching_;
     threads::thread_priority const action_priority_;
 
-    mutable naming::locality here_;
     boost::uint64_t rts_lva_;
     boost::uint64_t mem_lva_;
 
@@ -122,7 +119,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     naming::address symbol_ns_addr_;
 
     addressing_service(
-        parcelset::parcelport& pp
+        parcelset::parcelhandler& ph
       , util::runtime_configuration const& ini_
       , runtime_mode runtime_type_
         );
@@ -133,7 +130,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         destroy_big_boot_barrier();
     }
 
-    void initialize(parcelset::parcelport& pp);
+    void initialize(parcelset::parcelhandler& ph, boost::uint64_t rts_lva, boost::uint64_t mem_lva);
 
     void adjust_local_cache_size();
 
@@ -151,11 +148,6 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     naming::gid_type const& get_local_locality(error_code& ec = throws) const
     {
-        if (locality_ == naming::invalid_gid) {
-            HPX_THROWS_IF(ec, invalid_status,
-                "addressing_service::get_local_locality",
-                "local locality has not been initialized (yet)");
-        }
         return locality_;
     }
 
@@ -199,8 +191,6 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         error_code& ec = throws
         );
 
-    naming::locality const& get_here() const;
-
     void* get_hosted_primary_ns_ptr() const;
     void* get_hosted_symbol_ns_ptr() const;
 
@@ -218,6 +208,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 protected:
     void launch_bootstrap(
         parcelset::parcelport& pp
+      , parcelset::endpoints_type const & endpoints
       , util::runtime_configuration const& ini_
         );
 
@@ -287,7 +278,7 @@ public:
 
     /// \brief Add a locality to the runtime.
     bool register_locality(
-        naming::locality const& l
+        parcelset::endpoints_type const & endpoints
       , naming::gid_type& prefix
       , boost::uint32_t num_threads
       , error_code& ec = throws
@@ -296,14 +287,14 @@ public:
     /// \brief Resolve a locality to its prefix.
     ///
     /// \returns Returns 0 if the locality is not registered.
-    boost::uint32_t resolve_locality(
-        naming::locality const& l
+    naming::gid_type resolve_locality(
+        parcelset::endpoints_type const& endpoints
       , error_code& ec = throws
         );
 
     /// \brief Remove a locality from the runtime.
     bool unregister_locality(
-        naming::locality const& l
+        parcelset::endpoints_type const& endpoints
       , error_code& ec = throws
         );
 
@@ -381,14 +372,8 @@ public:
     ///                   if this is pre-initialized to \a hpx#throws
     ///                   the function will throw on error instead.
     ///
-    lcos::future<std::vector<naming::locality> > get_resolved_localities_async();
-
-    std::vector<naming::locality> get_resolved_localities(
-        error_code& ec = throws
-        )
-    {
-        return get_resolved_localities_async().get(ec);
-    }
+    std::map<naming::gid_type, parcelset::endpoints_type>
+    get_resolved_localities(error_code& ec = throws);
 
     /// \brief Query for the number of all known localities.
     ///
@@ -562,17 +547,6 @@ public:
       , naming::gid_type& upper_bound
       , error_code& ec = throws
         );
-
-    bool get_id_range(
-        naming::locality const& /*l*/           // obsolete, ignored
-      , boost::uint64_t count
-      , naming::gid_type& lower_bound
-      , naming::gid_type& upper_bound
-      , error_code& ec = throws
-        )
-    {
-        return get_id_range(count, lower_bound, upper_bound, ec);
-    }
 
     /// \brief Bind a global address to a local address.
     ///

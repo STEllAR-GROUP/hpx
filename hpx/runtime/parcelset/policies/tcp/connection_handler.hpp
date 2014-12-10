@@ -12,8 +12,9 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-#include <hpx/runtime/naming/locality.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
+#include <hpx/runtime/parcelset/policies/tcp/locality.hpp>
 
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ip/host_name.hpp>
@@ -53,6 +54,8 @@ namespace hpx { namespace parcelset
 
     namespace policies { namespace tcp
     {
+        parcelset::locality parcelport_address(util::runtime_configuration const & ini);
+
         class HPX_EXPORT connection_handler
           : public parcelport_impl<connection_handler>
         {
@@ -75,7 +78,7 @@ namespace hpx { namespace parcelset
             /// Start the handling of connections.
             bool do_run();
 
-            /// Stop the handling of connections.
+            /// Stop the handling of connectons.
             void do_stop();
 
             /// Retrieve the type of the locality represented by this parcelport
@@ -91,7 +94,11 @@ namespace hpx { namespace parcelset
             }
 
             boost::shared_ptr<sender> create_connection(
-                naming::locality const& l, error_code& ec);
+                parcelset::locality const& l, error_code& ec);
+
+            parcelset::locality agas_locality(util::runtime_configuration const & ini) const;
+
+            parcelset::locality create_locality() const;
 
         private:
             void handle_accept(boost::system::error_code const & e,

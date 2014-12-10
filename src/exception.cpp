@@ -17,7 +17,7 @@
 
 #if defined(BOOST_WINDOWS)
 #  include <process.h>
-#else
+#elif defined(BOOST_HAS_UNISTD_H)
 #  include <unistd.h>
 #endif
 

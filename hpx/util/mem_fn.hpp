@@ -10,12 +10,10 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/move.hpp>
 
-#include <utility>
-#include <boost/preprocessor/punctuation/comma_if.hpp>
-#include <boost/preprocessor/repetition/enum_trailing_params.hpp>
-#include <boost/preprocessor/repetition/repeat.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/type_traits/is_member_pointer.hpp>
+
+#include <utility>
 
 namespace hpx { namespace util
 {
@@ -42,34 +40,19 @@ namespace hpx { namespace util
             template <typename>
             struct result;
 
-#           define HPX_UTIL_MEM_FN_INVOKE(Z, N, D)                            \
-            template <typename This                                           \
-              , typename T BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)>      \
-            struct result<This(T BOOST_PP_ENUM_TRAILING_PARAMS(N, A))>        \
-              : util::invoke_result_of<                                       \
-                    MemPtr(T BOOST_PP_ENUM_TRAILING_PARAMS(N, A))>            \
-            {};                                                               \
-                                                                              \
-            template <typename T BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)>\
-            BOOST_FORCEINLINE                                                 \
-            typename util::invoke_result_of<                                  \
-                MemPtr(T BOOST_PP_ENUM_TRAILING_PARAMS(N, A))                 \
-            >::type                                                           \
-            operator()(T && t                                     \
-                BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, A, a)) const        \
-            {                                                                 \
-                return                                                        \
-                    util::invoke(f, std::forward<T>(t)                      \
-                        BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, A, a)); \
-            }                                                                 \
-            /**/
-            
-            BOOST_PP_REPEAT(
-                HPX_FUNCTION_ARGUMENT_LIMIT
-              , HPX_UTIL_MEM_FN_INVOKE, _
-            );
+            template <typename This, typename ...Ts>
+            struct result<This(Ts...)>
+              : util::invoke_result_of<MemPtr(Ts...)>
+            {};
 
-#           undef HPX_UTIL_MEM_FN_INVOKE
+            template <typename T, typename ...Ts>
+            BOOST_FORCEINLINE
+            typename result<mem_fn const(T, Ts...)>::type
+            operator()(T&& t, Ts&&... vs) const
+            {
+                return util::invoke(
+                    f, std::forward<T>(t), std::forward<Ts>(vs)...);
+            }
 
             MemPtr f;
         };

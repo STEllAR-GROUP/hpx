@@ -31,6 +31,46 @@ namespace hpx { namespace util
     // Addresses are supposed to have the format <hostname>[:port]
     HPX_API_EXPORT bool split_ip_address(std::string const& v, std::string& host,
         boost::uint16_t& port);
+
+    typedef boost::asio::ip::tcp::resolver::iterator endpoint_iterator_type;
+
+    endpoint_iterator_type connect_begin(std::string const & address, boost::uint16_t port,
+        boost::asio::io_service& io_service);
+
+    /// \brief Returns an iterator which when dereferenced will give an
+    ///        endpoint suitable for a call to connect() related to this
+    ///        locality
+    template <typename Locality>
+    endpoint_iterator_type connect_begin(Locality const& loc,
+        boost::asio::io_service& io_service)
+    {
+        return connect_begin(loc.address(), loc.port(), io_service);
+    }
+
+    inline endpoint_iterator_type connect_end()
+    {
+        return endpoint_iterator_type();
+    }
+
+    endpoint_iterator_type accept_begin(std::string const & address, boost::uint16_t port,
+        boost::asio::io_service& io_service);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Returns an iterator which when dereferenced will give an
+    ///        endpoint suitable for a call to accept() related to this
+    ///        locality
+    template <typename Locality>
+    endpoint_iterator_type accept_begin(Locality const& loc,
+        boost::asio::io_service& io_service)
+    {
+        return accept_begin(loc.address(), loc.port(), io_service);
+    }
+
+    inline endpoint_iterator_type accept_end()
+    {
+        return endpoint_iterator_type();
+    }
+
 }}
 
 #endif

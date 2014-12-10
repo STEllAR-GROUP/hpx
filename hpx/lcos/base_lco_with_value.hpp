@@ -49,7 +49,7 @@ namespace hpx { namespace lcos
 
         virtual void set_value (RemoteResult && result) = 0;
 
-        virtual result_type const& get_value(error_code& ec = throws) = 0;
+        virtual result_type get_value(error_code& ec = throws) = 0;
 
     public:
         // components must contain a typedef for wrapping_type defining the
@@ -100,27 +100,13 @@ namespace hpx { namespace lcos
         ///
         /// \param RemoteResult [in] The type of the result to be transferred
         ///               back to this LCO instance.
-#if defined(HPX_GCC44_WORKAROUND)
-        typedef hpx::actions::direct_action1<
-            base_lco_with_value, RemoteResult &&,
-            &base_lco_with_value::set_value_nonvirt
-        > set_value_action;
-#else
         HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL(base_lco_with_value,
             set_value_nonvirt, set_value_action);
-#endif
 
         /// The \a get_value_action may be used to query the value this LCO
         /// instance exposes as its 'result' value.
-#if defined(HPX_GCC44_WORKAROUND)
-        typedef hpx::actions::direct_result_action0<
-            base_lco_with_value, Result,
-            &base_lco_with_value::get_value_nonvirt
-        > get_value_action;
-#else
         HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL(base_lco_with_value,
             get_value_nonvirt, get_value_action);
-#endif
     };
 
     /// The base_lco<void> specialization is used whenever the set_event action

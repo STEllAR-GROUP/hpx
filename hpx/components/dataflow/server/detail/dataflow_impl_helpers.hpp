@@ -13,6 +13,7 @@
 #include <hpx/util/decay.hpp>
 
 #include <boost/mpl/at.hpp>
+#include <boost/fusion/container/vector.hpp>
 
 namespace hpx { namespace lcos { namespace server { namespace detail
 {

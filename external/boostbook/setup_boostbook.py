@@ -242,8 +242,8 @@ def find_user_config():
         JAM_CONFIG_IN_TEMP="yes"
         print "    Updating Boost.Jam configuration in %s... " % JAM_CONFIG_OUT
         return JAM_CONFIG_OUT
-    elif os.environ.has_key( "BOOST_ROOT" ) and os.path.exists( os.path.join( os.environ[ "BOOST_ROOT" ], "tools/build/v2/user-config.jam" ) ):
-        JAM_CONFIG_IN=os.path.join( os.environ[ "BOOST_ROOT" ], "tools/build/v2/user-config.jam" )
+    elif os.environ.has_key( "BOOST_ROOT" ) and os.path.exists( os.path.join( os.environ[ "BOOST_ROOT" ], "tools/build/user-config.jam" ) ):
+        JAM_CONFIG_IN=os.path.join( os.environ[ "BOOST_ROOT" ], "tools/build/user-config.jam" )
         print "    Found user-config.jam in BOOST_ROOT directory (%s)" % JAM_CONFIG_IN
         JAM_CONFIG_IN_TEMP="no"
         print "    Writing Boost.Jam configuration to %s... " % JAM_CONFIG_OUT
@@ -286,7 +286,7 @@ def setup_boostbook( tools_directory ):
 
     print "done."
 
-    print "Done! Execute \"bjam --v2\" in a documentation directory to generate"
+    print "Done! Execute \"b2\" in a documentation directory to generate"
     print "documentation with BoostBook. If you have not already, you will need"
     print "to compile Boost.Jam."
 

@@ -15,7 +15,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/algorithm.hpp>
+#include <hpx/include/parallel_algorithm.hpp>
 
 #include <boost/iterator/counting_iterator.hpp>
 

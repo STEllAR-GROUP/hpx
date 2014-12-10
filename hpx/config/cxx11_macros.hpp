@@ -341,6 +341,11 @@
 #  define BOOST_NO_CXX11_REF_QUALIFIERS
 #endif
 
+// Boost versions before 1.56 may define this unconditionally
+#if defined(BOOST_MSVC)
+#undef BOOST_NO_CXX11_VARIADIC_TEMPLATES
+#endif
+
 #endif
 //  ------------------ End of macros introduced at 1.56 ----------------------
 

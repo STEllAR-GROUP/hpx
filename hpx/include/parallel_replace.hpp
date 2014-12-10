@@ -7,7 +7,7 @@
 #if !defined(HPX_PARALLEL_REPLACE_AUG_18_2014_0148PM)
 #define HPX_PARALLEL_REPLACE_AUG_18_2014_0148PM
 
-#include <hpx/parallel/detail/replace.hpp>
+#include <hpx/parallel/algorithms/replace.hpp>
 
 #endif
 

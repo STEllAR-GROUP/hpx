@@ -509,19 +509,20 @@ namespace hpx { namespace threads { namespace policies
                     while(work_flag_tree[level][idx])
                     {
 #if defined(BOOST_WINDOWS)
-                    Sleep(1);
+                        Sleep(1);
 #elif defined(BOOST_HAS_PTHREADS)
-                    sched_yield();
+                        sched_yield();
 #else
 #endif
                     }
                 }
             }
 
-            dest->move_work_items_from(
-                tq
-              , tq->get_pending_queue_length()/d + 1
-            );
+            boost::int64_t count = tq->get_pending_queue_length()/d + 1;
+            dest->move_work_items_from(tq, count);
+
+            tq->increment_num_stolen_from_pending(count);
+            dest->increment_num_stolen_to_pending(count);
         }
 
         /// Return the next thread to be executed, return false if none is
@@ -541,7 +542,13 @@ namespace hpx { namespace threads { namespace policies
                 transfer_threads(num_thread/d, num_thread, 1, num_thread);
             }
 
-            return tq->get_next_thread(thrd);
+            bool result = tq->get_next_thread(thrd);
+
+            tq->increment_num_pending_accesses();
+            if (result)
+                return true;
+            tq->increment_num_pending_misses();
+            return result;
         }
 
         /// Schedule the passed thread

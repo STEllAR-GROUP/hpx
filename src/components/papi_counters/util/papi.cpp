@@ -198,7 +198,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
         for (it = boost::make_generator_iterator(gen); *it != 0; ++it)
         {
             std::string note;
-            if ((*it)->note && strlen((*it)->note) > 0)
+            if (strlen((*it)->note) > 0)
             { // is this actually provided anywhere??
                 note = "Note:\n";
                 note += (*it)->note;
@@ -240,7 +240,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
                         "%s")+                 // optional note
                             std::string(79, '-')+'\n');
         std::string note;
-        if (info.note && strlen(info.note) > 0)
+        if (strlen(info.note) > 0)
         {
             note = "Note:\n";
             note += info.note;

@@ -9,7 +9,7 @@
 <!DOCTYPE chapter PUBLIC "-//Boost//DTD BoostBook XML V1.0//EN"
   "http://www.boost.org/tools/boostbook/dtd/boostbook.dtd">
 <chapter xmlns:xi="http://www.w3.org/2001/XInclude" id="boostbook.documenting"
-         last-revision="$Date: 2008-07-12 14:16:17 -0500 (Sat, 12 Jul 2008) $">
+         last-revision="$Date$">
   <title>Documenting libraries</title>
     
   <para>BoostBook is an extension to <ulink
@@ -40,7 +40,7 @@
 &lt;!DOCTYPE library PUBLIC "-//Boost//DTD BoostBook XML V1.0//EN"
   "http://www.boost.org/tools/boostbook/dtd/boostbook.dtd"&gt;
 &lt;library name="Any" dirname="any" xmlns:xi="http://www.w3.org/2001/XInclude"
-  id="any" last-revision="$Date: 2008-07-12 14:16:17 -0500 (Sat, 12 Jul 2008) $"&gt;
+  id="any" last-revision="$Date$"&gt;
   &lt;libraryinfo&gt;
     &lt;author&gt;
       &lt;firstname&gt;Kevlin&lt;/firstname&gt;
@@ -99,7 +99,7 @@
       <varlistentry>
         <term><code>last-revision</code></term>
         <listitem>
-          <simpara>Always set to <code>$Date: 2008-07-12 14:16:17 -0500 (Sat, 12 Jul 2008) $</code>, which is
+          <simpara>Always set to <code>$Date$</code>, which is
           expanded by CVS to include the date and time that the file
           was last modified.</simpara>
         </listitem>

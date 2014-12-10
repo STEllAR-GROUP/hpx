@@ -398,7 +398,7 @@ naming::gid_type get_next_id(
 
     naming::resolver_client& agas_ = naming::get_agas_client();
     naming::gid_type lower_bound, upper_bound;
-    agas_.get_id_range(agas_.get_here(), count, lower_bound, upper_bound, ec);
+    agas_.get_id_range(count, lower_bound, upper_bound, ec);
     if (ec) return naming::invalid_gid;
 
     return lower_bound;

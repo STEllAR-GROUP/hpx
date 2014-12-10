@@ -184,7 +184,16 @@ namespace hpx { namespace threads { namespace detail
         }
         void take_snapshot()
         {
-            tfunc_time_ = util::hardware::timestamp() - start_timestamp_;
+            if (tfunc_time_ == boost::uint64_t(-1))
+            {
+                start_timestamp_ = util::hardware::timestamp();
+                tfunc_time_ = 0;
+                exec_time_ = 0;
+            }
+            else
+            {
+                tfunc_time_ = util::hardware::timestamp() - start_timestamp_;
+            }
         }
 
         boost::uint64_t start_timestamp_;

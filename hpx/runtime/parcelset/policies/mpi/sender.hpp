@@ -7,7 +7,7 @@
 #ifndef HPX_PARCELSET_POLICIES_MPI_SENDER_HPP
 #define HPX_PARCELSET_POLICIES_MPI_SENDER_HPP
 
-#include <hpx/runtime/naming/locality.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
@@ -34,8 +34,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             HPX_STD_FUNCTION<
                 void(
                     boost::system::error_code const &
-                  , naming::locality const&
-                  ,  boost::shared_ptr<sender>
+                  , parcelset::locality const&
+                  , boost::shared_ptr<sender>
                 )
             >
             postprocess_function_type;
@@ -45,7 +45,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         /// Construct a sending parcelport_connection with the given io_service.
         sender(MPI_Comm communicator,
             int tag,
-            naming::locality const& locality_id,
+            parcelset::locality const& locality_id,
             connection_handler & handler,
             performance_counters::parcels::gatherer& parcels_sent)
           : communicator_(communicator)
@@ -54,22 +54,24 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
           , sent_chunks_(0)
           , next_(0)
           , parcelport_(handler)
-          , there_(locality_id), parcels_sent_(parcels_sent)
+          , there_(locality_id)
+          , rank_(locality_id.get<locality>().rank())
+          , parcels_sent_(parcels_sent)
         {}
 
         ~sender()
         {
-            close_sender_connection(parcelport_, tag_, there_.get_rank());
+            close_sender_connection(parcelport_, tag_, rank_);
         }
 
-        naming::locality const& destination() const
+        parcelset::locality const& destination() const
         {
             return there_;
         }
 
-        void verify(naming::locality const & parcel_locality_id) const
+        void verify(parcelset::locality const & parcel_locality_id) const
         {
-            HPX_ASSERT(parcel_locality_id.get_rank() != util::mpi_environment::rank());
+            HPX_ASSERT(parcel_locality_id.get<locality>().rank() != util::mpi_environment::rank());
         }
 
         template <typename Handler, typename ParcelPostprocess>
@@ -89,7 +91,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
             // make header data structure
             header_ = header(
-                there_.get_rank()  // destination rank ...
+                rank_              // destination rank ...
               , tag_               // tag ...
               , *buffer_           // fill it with the buffer data ...
             );
@@ -348,7 +350,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         connection_handler & parcelport_;
 
         /// the other (receiving) end of this connection
-        naming::locality there_;
+        parcelset::locality there_;
+        boost::int32_t rank_;
 
         /// Counters and their data containers.
         util::high_resolution_timer timer_;

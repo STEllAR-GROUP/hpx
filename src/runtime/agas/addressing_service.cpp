@@ -21,12 +21,11 @@
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/lcos/wait_all.hpp>
-#if !defined(HPX_GCC44_WORKAROUND)
 #include <hpx/lcos/broadcast.hpp>
-#endif
 
 #include <boost/format.hpp>
 #include <boost/icl/closed_interval.hpp>
@@ -198,7 +197,7 @@ struct addressing_service::gva_erase_policy
 }; // }}}
 
 addressing_service::addressing_service(
-    parcelset::parcelport& pp
+    parcelset::parcelhandler& ph
   , util::runtime_configuration const& ini_
   , runtime_mode runtime_type_
     )
@@ -214,12 +213,12 @@ addressing_service::addressing_service(
   , range_caching_(caching_ ? ini_.get_agas_range_caching_mode() : false)
   , action_priority_(ini_.get_agas_dedicated_server() ?
         threads::thread_priority_normal : threads::thread_priority_boost)
-  , here_()         // defer initializing this
   , rts_lva_(0)
   , mem_lva_(0)
   , state_(starting)
   , locality_()
 { // {{{
+    parcelset::parcelport & pp = *ph.get_bootstrap_parcelport();
     create_big_boot_barrier(pp, ini_);
 
     if (caching_)
@@ -227,18 +226,24 @@ addressing_service::addressing_service(
 
     if (service_type == service_mode_bootstrap)
     {
-        launch_bootstrap(pp, ini_);
+        launch_bootstrap(pp, ph.endpoints(), ini_);
     }
 }
 
-void addressing_service::initialize(parcelset::parcelport& pp)
+void addressing_service::initialize(
+    parcelset::parcelhandler& ph, boost::uint64_t rts_lva, boost::uint64_t mem_lva)
 {
+    rts_lva_ = rts_lva;
+    mem_lva_ = mem_lva;
+    parcelset::parcelport & pp = *ph.get_bootstrap_parcelport();
     // now, boot the parcel port
     pp.run(false);
 
     if (service_type == service_mode_bootstrap)
     {
         get_big_boot_barrier().wait_bootstrap();
+
+        ph.set_resolved_localities(get_resolved_localities());
     }
     else
     {
@@ -249,18 +254,6 @@ void addressing_service::initialize(parcelset::parcelport& pp)
 
     set_status(running);
 } // }}}
-
-naming::locality const& addressing_service::get_here() const
-{
-    if (!here_) {
-        runtime* rt = get_runtime_ptr();
-        HPX_ASSERT(rt &&
-            rt->get_state() >= runtime::state_initialized &&
-            rt->get_state() < runtime::state_stopped);
-        here_ = rt->here();
-    }
-    return here_;
-}
 
 void* addressing_service::get_hosted_primary_ns_ptr() const
 {
@@ -305,6 +298,7 @@ namespace detail
 
 void addressing_service::launch_bootstrap(
     parcelset::parcelport& pp
+  , parcelset::endpoints_type const & endpoints
   , util::runtime_configuration const& ini_
     )
 { // {{{
@@ -319,42 +313,41 @@ void addressing_service::launch_bootstrap(
 
     util::runtime_configuration& cfg = rt.get_config();
     cfg.set_first_used_core(first_used_core);
-    cfg.set_agas_locality(ini_.get_parcelport_address());
+    HPX_ASSERT(pp.here() == pp.agas_locality(cfg));
     rt.assign_cores();
 
-    naming::locality const ep = ini_.get_parcelport_address();
     naming::gid_type const here =
         naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX);
 
     naming::gid_type const locality_gid = bootstrap_locality_namespace_gid();
-    gva locality_gva(ep,
+    gva locality_gva(here,
         server::locality_namespace::get_component_type(), 1U,
             static_cast<void*>(&bootstrap->locality_ns_server_));
-    locality_ns_addr_ = naming::address(ep,
+    locality_ns_addr_ = naming::address(here,
         server::locality_namespace::get_component_type(),
             static_cast<void*>(&bootstrap->locality_ns_server_));
 
     naming::gid_type const primary_gid = bootstrap_primary_namespace_gid();
-    gva primary_gva(ep,
+    gva primary_gva(here,
         server::primary_namespace::get_component_type(), 1U,
             static_cast<void*>(&bootstrap->primary_ns_server_));
-    primary_ns_addr_ = naming::address(ep,
+    primary_ns_addr_ = naming::address(here,
         server::primary_namespace::get_component_type(),
             static_cast<void*>(&bootstrap->primary_ns_server_));
 
     naming::gid_type const component_gid = bootstrap_component_namespace_gid();
-    gva component_gva(ep,
+    gva component_gva(here,
         server::component_namespace::get_component_type(), 1U,
             static_cast<void*>(&bootstrap->component_ns_server_));
-    component_ns_addr_ = naming::address(ep,
+    component_ns_addr_ = naming::address(here,
         server::component_namespace::get_component_type(),
             static_cast<void*>(&bootstrap->component_ns_server_));
 
     naming::gid_type const symbol_gid = bootstrap_symbol_namespace_gid();
-    gva symbol_gva(ep,
+    gva symbol_gva(here,
         server::symbol_namespace::get_component_type(), 1U,
             static_cast<void*>(&bootstrap->symbol_ns_server_));
-    symbol_ns_addr_ = naming::address(ep,
+    symbol_ns_addr_ = naming::address(here,
         server::symbol_namespace::get_component_type(),
             static_cast<void*>(&bootstrap->symbol_ns_server_));
 
@@ -363,9 +356,9 @@ void addressing_service::launch_bootstrap(
         boost::str(boost::format("hpx.locality!=%1%")
                   % naming::get_locality_id_from_gid(here)));
 
-    boost::uint32_t num_threads = boost::lexical_cast<boost::uint32_t>(
-        ini_.get_entry("hpx.os_threads", boost::uint32_t(1)));
-    request locality_req(locality_ns_allocate, ep, 4, num_threads); //-V112
+    boost::uint32_t num_threads = hpx::util::get_entry_as<boost::uint32_t>(
+        ini_, "hpx.os_threads", 1u);
+    request locality_req(locality_ns_allocate, endpoints, 4, num_threads); //-V112
     bootstrap->locality_ns_server_.remote_service(locality_req);
 
     naming::gid_type runtime_support_gid1(here);
@@ -373,7 +366,7 @@ void addressing_service::launch_bootstrap(
     naming::gid_type runtime_support_gid2(here);
     runtime_support_gid2.set_lsb(boost::uint64_t(0));
 
-    gva runtime_support_address(ep
+    gva runtime_support_address(here
       , components::get_component_type<components::server::runtime_support>()
       , 1U, rt.get_runtime_support_lva());
 
@@ -397,7 +390,7 @@ void addressing_service::launch_bootstrap(
         register_name("/0/locality#console", here);
 
     naming::gid_type lower, upper;
-    get_id_range(ep, HPX_INITIAL_GID_RANGE, lower, upper);
+    get_id_range(HPX_INITIAL_GID_RANGE, lower, upper);
     rt.get_id_pool().set_range(lower, upper);
 
 //    get_big_boot_barrier().wait();
@@ -497,14 +490,14 @@ std::vector<response> addressing_service::bulk_service(
 } // }}}
 
 bool addressing_service::register_locality(
-    naming::locality const& ep
+    parcelset::endpoints_type const & endpoints
   , naming::gid_type& prefix
   , boost::uint32_t num_threads
   , error_code& ec
     )
 { // {{{
     try {
-        request req(locality_ns_allocate, ep, 0, num_threads, prefix);
+        request req(locality_ns_allocate, endpoints, 0, num_threads, prefix);
         response rep;
 
         if (is_bootstrap())
@@ -525,13 +518,13 @@ bool addressing_service::register_locality(
     }
 } // }}}
 
-boost::uint32_t addressing_service::resolve_locality(
-    naming::locality const& ep
+naming::gid_type addressing_service::resolve_locality(
+    parcelset::endpoints_type const& endpoints
   , error_code& ec
     )
 { // {{{
     try {
-        request req(locality_ns_resolve_locality, ep);
+        request req(locality_ns_resolve_locality, endpoints);
         response rep;
 
         if (is_bootstrap())
@@ -540,25 +533,25 @@ boost::uint32_t addressing_service::resolve_locality(
             rep = hosted->locality_ns_.service(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
-            return 0;
+            return naming::invalid_gid;
 
-        return rep.get_locality_id();
+        return naming::get_gid_from_locality_id(rep.get_locality_id());
     }
     catch (hpx::exception const& e) {
         HPX_RETHROWS_IF(ec, e, "addressing_service::resolve_locality");
-        return 0;
+        return naming::invalid_gid;
     }
 } // }}}
 
 // TODO: We need to ensure that the locality isn't unbound while it still holds
 // referenced objects.
 bool addressing_service::unregister_locality(
-    naming::locality const& ep
+    parcelset::endpoints_type const& endpoints
   , error_code& ec
     )
 { // {{{
     try {
-        request req(locality_ns_free, ep);
+        request req(locality_ns_free, endpoints);
         response rep;
 
         if (is_bootstrap())
@@ -724,13 +717,24 @@ bool addressing_service::get_localities(
     }
 } // }}}
 
-lcos::future<std::vector<naming::locality> >
-    addressing_service::get_resolved_localities_async()
+std::map<naming::gid_type, parcelset::endpoints_type>
+    addressing_service::get_resolved_localities(error_code& ec)
 { // {{{ get_resolved_localities_async implementation
-    naming::id_type const target = bootstrap_locality_namespace_id();
     request req(locality_ns_resolved_localities);
-    return stubs::locality_namespace::service_async<
-        std::vector<naming::locality> >(target, req);
+    response rep;
+    if(is_bootstrap())
+        rep = bootstrap->locality_ns_server_.service(req, ec);
+    else
+        rep = hosted->locality_ns_.service(req, action_priority_, ec);
+
+    if(ec || success != rep.get_status())
+    {
+        HPX_THROWS_IF(ec, internal_server_error
+          , "addressing_service::get_reolved_localities"
+          , "unable to received resolved the locality endpoints");
+        return std::map<naming::gid_type, parcelset::endpoints_type>();
+    }
+    return rep.get_resolved_localities();
 } //}}}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -956,8 +960,8 @@ bool addressing_service::get_id_range(
     )
 { // {{{ get_id_range implementation
     try {
-        // naming::locality() is an obsolete, dummy argument
-        request req(primary_ns_allocate, naming::locality(), count, boost::uint32_t(-1));
+        // parcelset::endpoints_type() is an obsolete, dummy argument
+        request req(primary_ns_allocate, parcelset::endpoints_type(), count, boost::uint32_t(-1));
         response rep;
 
         if (is_bootstrap())
@@ -990,11 +994,11 @@ bool addressing_service::bind_range_local(
     )
 { // {{{ bind_range implementation
     try {
-        naming::locality const& ep = baseaddr.locality_;
+        naming::gid_type const& prefix = baseaddr.locality_;
 
         // Create a global virtual address from the legacy calling convention
-        // parameters.
-        gva const g(ep, baseaddr.type_, count, baseaddr.address_, offset);
+        // parameters
+        gva const g(prefix, baseaddr.type_, count, baseaddr.address_, offset);
 
         request req(primary_ns_bind_gid, lower_id, g,
             naming::get_locality_id_from_gid(lower_id));
@@ -1010,19 +1014,16 @@ bool addressing_service::bind_range_local(
         if (ec || (success != s && repeated_request != s))
             return false;
 
-        if (caching_)
+        if(range_caching_)
         {
-            if (range_caching_)
-            {
-                // Put the range into the cache.
-                update_cache_entry(lower_id, g, ec);
-            }
-            else
-            {
-                // Only put the first GID in the range into the cache.
-                gva const first_g = g.resolve(lower_id, lower_id);
-                update_cache_entry(lower_id, first_g, ec);
-            }
+            // Put the range into the cache.
+            update_cache_entry(lower_id, g, ec);
+        }
+        else
+        {
+            // Only put the first GID in the range into the cache
+            gva const first_g = g.resolve(lower_id, lower_id);
+            update_cache_entry(lower_id, first_g, ec);
         }
 
         if (ec)
@@ -1045,18 +1046,16 @@ bool addressing_service::bind_postproc(
     if (success != s && repeated_request != s)
         return false;
 
-    if (caching_)
+    if(range_caching_)
     {
-        if (range_caching_)
-            // Put the range into the cache.
-            update_cache_entry(lower_id, g);
-
-        else
-        {
-            // Only put the first GID in the range into the cache.
-            gva const first_g = g.resolve(lower_id, lower_id);
-            update_cache_entry(lower_id, first_g);
-        }
+        // Put the range into the cache.
+        update_cache_entry(lower_id, g);
+    }
+    else
+    {
+        // Only put the first GID in the range into the cache
+        gva const first_g = g.resolve(lower_id, lower_id);
+        update_cache_entry(lower_id, first_g);
     }
 
     return true;
@@ -1071,11 +1070,11 @@ hpx::future<bool> addressing_service::bind_range_async(
     )
 {
     // ask server
-    naming::locality const& ep = baseaddr.locality_;
+    naming::gid_type const& prefix = baseaddr.locality_;
 
     // Create a global virtual address from the legacy calling convention
     // parameters.
-    gva const g(ep, baseaddr.type_, count, baseaddr.address_, offset);
+    gva const g(prefix, baseaddr.type_, count, baseaddr.address_, offset);
 
     naming::id_type target(
         stubs::primary_namespace::get_service_instance(lower_id)
@@ -1131,7 +1130,7 @@ bool addressing_service::unbind_range_local(
         //hosted->gva_cache_->erase(ep);
 
         gva const& gaddr = rep.get_gva();
-        addr.locality_ = gaddr.endpoint;
+        addr.locality_ = gaddr.prefix;
         addr.type_ = gaddr.type;
         addr.address_ = gaddr.lva();
 
@@ -1184,7 +1183,7 @@ bool addressing_service::is_local_address_cached(
             return false;
     }
 
-    return addr.locality_ == get_here();
+    return addr.locality_ == get_local_locality();
 }
 
 // Return true if at least one address is local.
@@ -1232,11 +1231,10 @@ bool addressing_service::resolve_locally_known_addresses(
 
     if (is_local_lva_encoded_address(msb))
     {
-        addr.locality_ = get_here();
+        addr.locality_ = get_local_locality();
 
         // An LSB of 0 references the runtime support component
-        if (!rts_lva_)
-            rts_lva_ = get_runtime().get_runtime_support_lva();
+        HPX_ASSERT(rts_lva_);
 
         if (0 == lsb || lsb == rts_lva_)
         {
@@ -1245,8 +1243,7 @@ bool addressing_service::resolve_locally_known_addresses(
         }
         else
         {
-            if (!mem_lva_)
-                mem_lva_ = get_runtime().get_memory_lva();
+            HPX_ASSERT(mem_lva_);
 
             addr.type_ = components::component_memory;
             addr.address_ = mem_lva_;
@@ -1312,18 +1309,19 @@ bool addressing_service::resolve_full_local(
 
         gva const g = base_gva.resolve(id, base_gid);
 
-        addr.locality_ = g.endpoint;
+        addr.locality_ = g.prefix;
         addr.type_ = g.type;
         addr.address_ = g.lva();
 
-        if (caching_)
+        if(range_caching_)
         {
-            if (range_caching_)
-                // Put the gva range into the cache.
-                update_cache_entry(base_gid, base_gva, ec);
-            else
-                // Put the fully resolved gva into the cache.
-                update_cache_entry(id, g, ec);
+            // Put the range into the cache.
+            update_cache_entry(base_gid, base_gva, ec);
+        }
+        else
+        {
+            // Put the fully resolved gva into the cache.
+            update_cache_entry(id, g, ec);
         }
 
         if (ec)
@@ -1383,7 +1381,7 @@ bool addressing_service::resolve_cached(
 
         gva const& g = e.get();
 
-        addr.locality_ = g.endpoint;
+        addr.locality_ = g.prefix;
         addr.type_ = g.type;
         addr.address_ = g.lva(id, idbase.get_gid());
 
@@ -1440,7 +1438,7 @@ hpx::future<naming::address> addressing_service::resolve_async(
 
         if (ec)
         {
-            return make_error_future<naming::address>(
+            return hpx::make_exceptional_future<naming::address>(
                 hpx::detail::access_exception(ec));
         }
     }
@@ -1487,24 +1485,26 @@ naming::address addressing_service::resolve_full_postproc(
     }
 
     // Resolve the gva to the real resolved address (which is just a gva
-    // with as fully resolved LVA and an offset of zero).
+    // with as fully resolved LVA and and offset of zero).
     naming::gid_type base_gid = rep.get_base_gid();
     gva const base_gva = rep.get_gva();
 
     gva const g = base_gva.resolve(id, base_gid);
 
-    addr.locality_ = g.endpoint;
+    addr.locality_ = g.prefix;
     addr.type_ = g.type;
     addr.address_ = g.lva();
 
-    if (caching_)
+
+    if(range_caching_)
     {
-        if (range_caching_)
-            // Put the gva range into the cache.
-            update_cache_entry(base_gid, base_gva);
-        else
-            // Put the fully resolved gva into the cache.
-            update_cache_entry(id, g);
+        // Put the range into the cache.
+        update_cache_entry(base_gid, base_gva);
+    }
+    else
+    {
+        // Put the fully resolved gva into the cache.
+        update_cache_entry(id, g);
     }
 
     return addr;
@@ -1602,27 +1602,27 @@ bool addressing_service::resolve_full_local(
                 return false;
 
             // Resolve the gva to the real resolved address (which is just a gva
-            // with as fully resolved LVA and an offset of zero).
+            // with as fully resolved LVA and and offset of zero).
             naming::gid_type base_gid = reps[j].get_base_gid();
             gva const base_gva = reps[j].get_gva();
 
             gva const g = base_gva.resolve(gids[i], base_gid);
 
             naming::address& addr = addrs[i];
-            addr.locality_ = g.endpoint;
+            addr.locality_ = g.prefix;
             addr.type_ = g.type;
             addr.address_ = g.lva();
 
-            if (caching_)
+
+            if(range_caching_)
             {
-                if (range_caching_) {
-                    // Put the gva range into the cache.
-                    update_cache_entry(base_gid, base_gva, ec);
-                }
-                else {
-                    // Put the fully resolved gva into the cache.
-                    update_cache_entry(gids[i], g, ec);
-                }
+                // Put the range into the cache.
+                update_cache_entry(base_gid, base_gva, ec);
+            }
+            else
+            {
+                // Put the fully resolved gva into the cache.
+                update_cache_entry(gids[i], g, ec);
             }
 
             if (ec)
@@ -1663,11 +1663,11 @@ bool addressing_service::resolve_cached(
             if (was_resolved)
                 ++resolved;
 
-            if (addrs[i].locality_ == get_here())
+            if (addrs[i].locality_ == get_local_locality())
                 locals.set(i, true);
         }
 
-        else if (addrs[i].locality_ == get_here())
+        else if (addrs[i].locality_ == get_local_locality())
         {
             ++resolved;
             locals.set(i, true);
@@ -2109,16 +2109,12 @@ future<hpx::id_type> addressing_service::on_symbol_namespace_event(
 
 }}
 
-#if !defined(HPX_GCC44_WORKAROUND)
-
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::agas::server::symbol_namespace::service_action
     symbol_namespace_service_action;
 
 HPX_REGISTER_BROADCAST_ACTION_DECLARATION(symbol_namespace_service_action)
 HPX_REGISTER_BROADCAST_ACTION(symbol_namespace_service_action)
-
-#endif
 
 namespace hpx { namespace agas
 {
@@ -2146,21 +2142,8 @@ bool addressing_service::iterate_ids(
     try {
         request req(symbol_ns_iterate_names, f);
 
-#if !defined(HPX_GCC44_WORKAROUND)
         symbol_namespace_service_action act;
         lcos::broadcast(act, detail::find_all_symbol_namespace_services(), req).get(ec);
-#else
-        BOOST_FOREACH(naming::id_type id, hpx::find_all_localities())
-        {
-            naming::id_type service_id(
-                stubs::symbol_namespace::get_service_instance(id.get_gid(), ec),
-                naming::id_type::unmanaged);
-            if (ec) return false;
-
-            stubs::symbol_namespace::service(service_id, req, action_priority_, ec);
-            if (ec) return false;
-        }
-#endif
 
         return !ec;
     }

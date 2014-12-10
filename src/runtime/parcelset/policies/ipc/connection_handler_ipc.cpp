@@ -9,12 +9,12 @@
 #if defined(HPX_PARCELPORT_IPC)
 
 #include <hpx/exception_list.hpp>
-#include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/parcelset/policies/ipc/connection_handler.hpp>
 #include <hpx/runtime/parcelset/policies/ipc/acceptor.hpp>
 #include <hpx/runtime/parcelset/policies/ipc/sender.hpp>
 #include <hpx/runtime/parcelset/policies/ipc/receiver.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/util/asio_util.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
 #include <boost/asio/placeholders.hpp>
@@ -29,6 +29,30 @@ namespace hpx
 
 namespace hpx { namespace parcelset { namespace policies { namespace ipc
 {
+    parcelset::locality parcelport_address(util::runtime_configuration const & ini)
+    {
+        // load all components as described in the configuration information
+        if (ini.has_section("hpx.parcel")) {
+            util::section const* sec = ini.get_section("hpx.parcel");
+            if (NULL != sec) {
+                return parcelset::locality(
+                    locality(
+                        sec->get_entry("address", HPX_INITIAL_IP_ADDRESS)
+                      , hpx::util::get_entry_as<boost::uint16_t>(
+                            *sec, "port", HPX_INITIAL_IP_PORT)
+                    )
+                );
+            }
+        }
+        return
+            parcelset::locality(
+                locality(
+                    HPX_INITIAL_IP_ADDRESS
+                  , HPX_INITIAL_IP_PORT
+                )
+            );
+    }
+
     std::vector<std::string> connection_handler::runtime_configuration()
     {
         std::vector<std::string> lines;
@@ -46,11 +70,16 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
     connection_handler::connection_handler(util::runtime_configuration const& ini,
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
             HPX_STD_FUNCTION<void()> const& on_stop_thread)
-      : base_type(ini, on_start_thread, on_stop_thread)
+      : base_type(ini, parcelport_address(ini), on_start_thread, on_stop_thread)
       , acceptor_(0)
       , connection_count_(0)
       , data_buffer_cache_(ini.get_ipc_data_buffer_cache_size())
     {
+        if (here_.get_type() != connection_ipc) {
+            HPX_THROW_EXCEPTION(network_error, "ipc::parcelport::parcelport",
+                "this parcelport was instantiated to represent an unexpected "
+                "locality type: " + get_connection_type_name(here_.get_type()));
+        }
         // we never do zero copy optimization for this parcelport
         allow_zero_copy_optimizations_ = false;
     }
@@ -73,9 +102,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         // initialize network
         std::size_t tried = 0;
         exception_list errors;
-        naming::locality::iterator_type end = accept_end(here_);
-        for (naming::locality::iterator_type it =
-                accept_begin(here_, io_service_pool_.get_io_service(0));
+        util::endpoint_iterator_type end = util::accept_end();
+        for (util::endpoint_iterator_type it =
+                util::accept_begin(here_.get<locality>(), io_service_pool_.get_io_service(0));
              it != end; ++it, ++tried)
         {
             try {
@@ -146,7 +175,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
     }
 
     boost::shared_ptr<sender> connection_handler::create_connection(
-        naming::locality const& l, error_code& ec)
+        parcelset::locality const& l, error_code& ec)
     {
         boost::asio::io_service& io_service = io_service_pool_.get_io_service();
         boost::shared_ptr<sender> sender_connection(new sender(io_service,
@@ -157,9 +186,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         for (std::size_t i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
         {
             try {
-                naming::locality::iterator_type end = connect_end(l);
-                for (naming::locality::iterator_type it =
-                        connect_begin(l, io_service);
+                util::endpoint_iterator_type end = util::connect_end();
+                for (util::endpoint_iterator_type it =
+                        util::connect_begin(l.get<locality>(), io_service);
                       it != end; ++it)
                 {
                     boost::asio::ip::tcp::endpoint const& ep = *it;
@@ -206,6 +235,19 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
             ec = make_success_code();
 
         return sender_connection;
+    }
+
+    parcelset::locality connection_handler::agas_locality(
+        util::runtime_configuration const & ini) const
+    {
+        // This parcelport cannot be used during bootstrapping
+        HPX_ASSERT(false);
+        return parcelset::locality();
+    }
+
+    parcelset::locality connection_handler::create_locality() const
+    {
+        return parcelset::locality(locality());
     }
 
     // accepted new incoming connection

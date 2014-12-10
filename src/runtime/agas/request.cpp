@@ -17,26 +17,40 @@
 
 #include <boost/variant.hpp>
 #include <boost/mpl/at.hpp>
-#include <boost/fusion/include/at_c.hpp>
-#include <boost/fusion/include/value_at.hpp>
 
 namespace hpx { namespace agas
 {
+#if defined(_MSC_VER)
+#pragma warning (push)
+#pragma warning (disable: 4521)
+#endif
     struct request::request_data
     {
         request_data()
           : data(hpx::util::make_tuple())
         {}
 
-        template <typename Tuple>
-        request_data(const Tuple& tuple)
-          : data(tuple)
+        request_data(request_data&& other)
+          : data(std::move(other.data))
+        {}
+
+        request_data(request_data const& other)
+          : data(other.data)
+        {}
+
+        request_data(request_data& other)
+          : data(other.data)
         {}
 
         template <typename Tuple>
-        request_data& operator=(const Tuple& tuple)
+        explicit request_data(Tuple&& tuple)
+          : data(std::forward<Tuple>(tuple))
+        {}
+
+        template <typename Tuple>
+        request_data& operator=(Tuple&& tuple)
         {
-            data = tuple;
+            data = std::forward<Tuple>(tuple);
             return *this;
         }
 
@@ -99,16 +113,16 @@ namespace hpx { namespace agas
             // 0x4
             // primary_ns_allocate
           , util::tuple<
-                naming::locality // locality
-              , boost::uint64_t  // count
-              , boost::uint32_t  // num_threads
-              , naming::gid_type // suggested prefix
+                parcelset::endpoints_type // endpoints
+              , boost::uint64_t           // count
+              , boost::uint32_t           // num_threads
+              , naming::gid_type          // suggested prefix
             >
             // 0x5
             // primary_ns_free
             // primary_ns_resolve_locality
           , util::tuple<
-                naming::locality // locality
+                parcelset::endpoints_type // locality
             >
             // 0x6
             // component_ns_resolve_id
@@ -174,10 +188,11 @@ namespace hpx { namespace agas
             subtype Type
           , int N
         >
-        typename boost::fusion::result_of::value_at_c<
-            typename boost::mpl::at_c<
+        typename util::tuple_element<
+            N
+          , typename boost::mpl::at_c<
                 typename data_type::types, Type
-            >::type, N
+            >::type
         >::type
         get_data(
             error_code& ec = throws
@@ -187,8 +202,8 @@ namespace hpx { namespace agas
                 typename data_type::types, Type
             >::type vector_type;
 
-            typedef typename boost::fusion::result_of::value_at_c<
-                vector_type, N
+            typedef typename util::tuple_element<
+                N, vector_type
             >::type return_type;
 
             switch (data.which())
@@ -208,7 +223,7 @@ namespace hpx { namespace agas
                     if (&ec != &throws)
                         ec = make_success_code();
 
-                    return boost::fusion::at_c<N>(*v);
+                    return util::get<N>(*v);
                 }
 
                 default: {
@@ -223,6 +238,9 @@ namespace hpx { namespace agas
 
         data_type data;
     };
+#if defined(_MSC_VER)
+#pragma warning (pop)
+#endif
 
     request::request()
         : mc(invalid_request)
@@ -278,23 +296,23 @@ namespace hpx { namespace agas
 
     request::request(
         namespace_action_code type_
-      , naming::locality const& locality_
+      , parcelset::endpoints_type const & endpoints_
       , boost::uint64_t count_
       , boost::uint32_t num_threads_
       , naming::gid_type prefix_
         )
       : mc(type_)
-      , data(new request_data(util::make_tuple(locality_, count_, num_threads_, prefix_)))
+      , data(new request_data(util::make_tuple(endpoints_, count_, num_threads_, prefix_)))
     {
         // TODO: verification of namespace_action_code
     }
 
     request::request(
         namespace_action_code type_
-      , naming::locality const& locality_
+      , parcelset::endpoints_type const & endpoints_
         )
       : mc(type_)
-      , data(new request_data(util::make_tuple(locality_)))
+      , data(new request_data(util::make_tuple(endpoints_)))
     {
         // TODO: verification of namespace_action_code
     }
@@ -402,6 +420,17 @@ namespace hpx { namespace agas
       , data(new request_data(*other.data))
     {}
 
+    // move constructor
+    request::request(
+        request && other
+        )
+      : mc(other.mc)
+      , data(std::move(other.data))
+    {
+        other.mc = invalid_request;
+        other.data.reset(new request_data(util::make_tuple()));
+    }
+
     // copy assignment
     request& request::operator=(
         request const& other
@@ -409,6 +438,18 @@ namespace hpx { namespace agas
     {
         mc = other.mc;
         data.reset(new request_data(*other.data));
+        return *this;
+    }
+
+    // move assignment
+    request& request::operator=(
+        request&& other
+        )
+    {
+        mc = other.mc;
+        data = std::move(other.data);
+        other.mc = invalid_request;
+        other.data.reset(new request_data(util::make_tuple()));
         return *this;
     }
 
@@ -512,7 +553,7 @@ namespace hpx { namespace agas
         return data->get_data<request_data::subtype_parcel, 0>(ec);
     }
 
-    naming::locality request::get_locality(
+    parcelset::endpoints_type request::get_endpoints(
         error_code& ec
         ) const
     { // {{{
@@ -528,7 +569,7 @@ namespace hpx { namespace agas
                 HPX_THROWS_IF(ec, bad_parameter,
                     "request::get_locality",
                     "invalid operation for request type");
-                return naming::locality();
+                return parcelset::endpoints_type();
             }
         }
     } // }}}

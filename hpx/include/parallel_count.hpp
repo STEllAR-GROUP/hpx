@@ -7,7 +7,7 @@
 #if !defined(HPX_PARALLEL_COUNT_JUN_28_2014_0827AM)
 #define HPX_PARALLEL_COUNT_JUN_28_2014_0827AM
 
-#include <hpx/parallel/detail/count.hpp>
+#include <hpx/parallel/algorithms/count.hpp>
 
 #endif
 

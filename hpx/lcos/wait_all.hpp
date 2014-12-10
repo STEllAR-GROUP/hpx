@@ -25,7 +25,7 @@ namespace hpx
     ///       returns.
     ///
     template <typename InputIter>
-    void wait_all(InputIter first, InputIter last, error_code& ec = throws);
+    void wait_all(InputIter first, InputIter last);
 
     /// The function \a wait_all is a operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
@@ -40,7 +40,7 @@ namespace hpx
     ///       returns.
     ///
     template <typename R>
-    void wait_all(std::vector<future<R>>&& futures, error_code& ec = throws);
+    void wait_all(std::vector<future<R>>&& futures);
 
     /// The function \a wait_all is a operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
@@ -55,7 +55,7 @@ namespace hpx
     ///       returns.
     ///
     template <typename ...T>
-    void wait_all(T &&... futures, error_code& ec = throws);
+    void wait_all(T &&... futures);
 
     /// The function \a wait_all_n is a operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
@@ -76,8 +76,7 @@ namespace hpx
     ///       returns.
     ///
     template <typename InputIter>
-    InputIter wait_all_n(InputIter begin, std::size_t count,
-        error_code& ec = throws);
+    InputIter wait_all_n(InputIter begin, std::size_t count);
 }
 #else
 
@@ -118,19 +117,24 @@ namespace hpx { namespace lcos
         ///////////////////////////////////////////////////////////////////////
         template <typename Future, typename Enable = void>
         struct is_future_or_shared_state
-          : boost::mpl::false_
-        {};
-
-        template <typename Future>
-        struct is_future_or_shared_state<Future,
-                typename boost::enable_if<traits::is_future<Future> >::type>
-          : boost::mpl::true_
+          : traits::is_future<Future>
         {};
 
         template <typename R>
         struct is_future_or_shared_state<
                 boost::intrusive_ptr<future_data<R> > >
           : boost::mpl::true_
+        {};
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Range, typename Enable = void>
+        struct is_future_or_shared_state_range
+            : boost::mpl::false_
+        {};
+
+        template <typename T>
+        struct is_future_or_shared_state_range<std::vector<T> >
+            : is_future_or_shared_state<T>
         {};
 
         ///////////////////////////////////////////////////////////////////////
@@ -181,9 +185,19 @@ namespace hpx { namespace lcos
             template <typename TupleIter, typename Iter>
             void await_range(TupleIter iter, Iter next, Iter end)
             {
+                typedef typename std::iterator_traits<Iter>::value_type
+                    future_type;
+                typedef typename detail::future_or_shared_state_result<
+                        future_type
+                    >::type future_result_type;
+
                 for (/**/; next != end; ++next)
                 {
-                    if (!next->is_ready())
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data<future_result_type>
+                    > next_future_data = lcos::detail::get_shared_state(*next);
+
+                    if (!next_future_data->is_ready())
                     {
                         // Attach a continuation to this future which will
                         // re-evaluate it and continue to the next element
@@ -191,16 +205,7 @@ namespace hpx { namespace lcos
                         void (wait_all_frame::*f)(TupleIter, Iter, Iter) =
                             &wait_all_frame::await_range;
 
-                        typedef typename std::iterator_traits<Iter>::value_type
-                            future_type;
-                        typedef typename detail::future_or_shared_state_result<
-                                future_type
-                            >::type future_result_type;
-
-                        boost::intrusive_ptr<
-                            lcos::detail::future_data<future_result_type>
-                        > next_future_data = lcos::detail::get_shared_state(*next);
-
+                        next_future_data->execute_deferred();
                         next_future_data->set_on_completed(util::bind(
                             f, this, std::move(iter),
                             std::move(next), std::move(end)));
@@ -231,7 +236,7 @@ namespace hpx { namespace lcos
             BOOST_FORCEINLINE
             void await_next(TupleIter iter, boost::mpl::true_, boost::mpl::false_)
             {
-                typedef typename util::detail::decay_unwrap<
+                typedef typename util::decay_unwrap<
                     typename boost::fusion::result_of::deref<TupleIter>::type
                 >::type future_type;
 
@@ -255,6 +260,7 @@ namespace hpx { namespace lcos
                     void (wait_all_frame::*f)(TupleIter, true_, false_) =
                         &wait_all_frame::await_next;
 
+                    next_future_data->execute_deferred();
                     next_future_data->set_on_completed(hpx::util::bind(
                         f, this, std::move(iter), true_(), false_()));
                 }
@@ -272,13 +278,14 @@ namespace hpx { namespace lcos
             BOOST_FORCEINLINE
             void await(TupleIter&& iter, boost::mpl::false_)
             {
-                typedef typename util::detail::decay_unwrap<
+                typedef typename util::decay_unwrap<
                     typename boost::fusion::result_of::deref<TupleIter>::type
                 >::type future_type;
 
                 typedef typename detail::is_future_or_shared_state<future_type>::type
                     is_future;
-                typedef typename traits::is_future_range<future_type>::type is_range;
+                typedef typename detail::is_future_or_shared_state_range<future_type>::type
+                    is_range;
 
                 await_next(std::forward<TupleIter>(iter), is_future(), is_range());
             }
