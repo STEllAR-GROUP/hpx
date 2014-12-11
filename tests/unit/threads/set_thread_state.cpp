@@ -21,9 +21,6 @@ using boost::chrono::milliseconds;
 
 using hpx::naming::id_type;
 
-using hpx::actions::plain_action1;
-using hpx::actions::plain_action4;
-
 using hpx::applier::register_thread_nullary;
 
 using hpx::lcos::future;

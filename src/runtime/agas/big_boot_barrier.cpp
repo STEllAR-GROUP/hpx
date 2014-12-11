@@ -205,13 +205,13 @@ void notify_worker(notification_header const& header);
 // }}}
 
 // {{{ early action types
-typedef actions::plain_action1<
-    registration_header const&
+typedef actions::plain_action<
+    void (*)(registration_header const&)
   , register_worker
 > register_worker_action;
 
-typedef actions::plain_action1<
-    notification_header const&
+typedef actions::plain_action<
+    void (*)(notification_header const&)
   , notify_worker
 > notify_worker_action;
 // }}}
@@ -276,13 +276,13 @@ struct notification_header_security
 void register_worker_security(registration_header_security const& header);
 void notify_worker_security(notification_header_security const& header);
 
-typedef actions::plain_action1<
-    registration_header_security const&
+typedef actions::plain_action<
+    void (*)(registration_header_security const&)
   , register_worker_security
 > register_worker_security_action;
 
-typedef actions::plain_action1<
-    notification_header_security const&
+typedef actions::plain_action<
+    void (*)(notification_header_security const&)
   , notify_worker_security
 > notify_worker_security_action;
 #endif

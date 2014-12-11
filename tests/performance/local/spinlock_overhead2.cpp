@@ -33,8 +33,6 @@ using hpx::find_here;
 
 using hpx::naming::id_type;
 
-using hpx::actions::plain_result_action1;
-
 using hpx::lcos::future;
 using hpx::async;
 using hpx::lcos::wait_each;
