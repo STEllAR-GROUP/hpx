@@ -31,34 +31,23 @@ namespace hpx { namespace actions
     // declarations for main templates
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F, F funcptr, typename Derived>
-    class base_result_action0;
+    template <typename TF, TF F, typename Derived>
+    class component_base_action;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F, F funcptr, typename Derived = detail::this_type>
-    struct result_action0;
+    template <typename TF, TF F, typename Derived = detail::this_type>
+    struct component_action;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F, F funcptr, typename Derived = detail::this_type>
-    struct direct_result_action0;
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename F, F funcptr, typename Derived>
-    class base_action0;
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename F, F funcptr, typename Derived = detail::this_type>
-    struct action0;
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename F, F funcptr, typename Derived = detail::this_type>
-    struct direct_action0;
+    template <typename TF, TF F, typename Derived = detail::this_type>
+    struct component_direct_action;
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
 // bring in nullary actions and all other arities
 #include <hpx/runtime/actions/component_const_action.hpp>
 #include <hpx/runtime/actions/component_non_const_action.hpp>
-#include <hpx/runtime/actions/component_action_implementations.hpp>
+#include <hpx/runtime/actions/component_const_action_implementations.hpp>
+#include <hpx/runtime/actions/component_non_const_action_implementations.hpp>
 
 #endif

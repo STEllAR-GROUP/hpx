@@ -35,7 +35,6 @@ set(action_argument_limit_preprocessing_files
   "hpx/lcos/reduce.hpp"
   "hpx/lcos/local/dataflow.hpp"
   "hpx/lcos/local/packaged_task.hpp"
-  "hpx/runtime/actions/component_action_implementations.hpp"
   "hpx/runtime/actions/component_const_action_implementations.hpp"
   "hpx/runtime/actions/component_non_const_action_implementations.hpp"
   "hpx/runtime/actions/construct_continuation_function_objects.hpp"
