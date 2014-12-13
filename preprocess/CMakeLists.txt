@@ -39,7 +39,6 @@ set(action_argument_limit_preprocessing_files
   "hpx/runtime/actions/component_non_const_action_implementations.hpp"
   "hpx/runtime/actions/construct_continuation_function_objects.hpp"
   "hpx/runtime/actions/construct_continuation_functions.hpp"
-  "hpx/runtime/actions/define_function_operators.hpp"
   "hpx/runtime/actions/plain_action_implementations.hpp"
   "hpx/runtime/applier/apply_implementations.hpp"
   "hpx/runtime/applier/apply_implementations_callback.hpp"

@@ -853,6 +853,7 @@ namespace hpx { namespace actions
         typedef Component component_type;
         typedef Derived derived_type;
         typedef Arguments arguments_type;
+        static const std::size_t arity = util::tuple_size<Arguments>::value;
 
         typedef void action_tag;
 
