@@ -30,6 +30,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
 {
   private:
     parcelset::parcelport& pp;
+    parcelset::endpoints_type const& endpoints;
 
     service_mode const service_type;
     parcelset::locality const bootstrap_agas;
@@ -67,6 +68,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
 
     big_boot_barrier(
         parcelset::parcelport& pp_
+      , parcelset::endpoints_type const& endpoints_
       , util::runtime_configuration const& ini_
         );
 
@@ -78,6 +80,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     }
 
     parcelset::locality here() { return bootstrap_agas; }
+    parcelset::endpoints_type const &get_endpoints() { return endpoints; }
 
     void apply(
         boost::uint32_t source_prefix
@@ -108,6 +111,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
 
 HPX_EXPORT void create_big_boot_barrier(
     parcelset::parcelport& pp_
+  , parcelset::endpoints_type const& endpoints_
   , util::runtime_configuration const& ini_
     );
 

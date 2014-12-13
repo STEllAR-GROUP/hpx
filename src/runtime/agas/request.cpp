@@ -107,6 +107,7 @@ namespace hpx { namespace agas
             // 0x3
             // primary_ns_resolve_gid
             // primary_ns_change_credit_one
+            // locality_ns_resolve_locality_gid
           , util::tuple<
                 naming::gid_type // gid
             >

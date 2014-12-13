@@ -219,7 +219,7 @@ addressing_service::addressing_service(
   , locality_()
 { // {{{
     parcelset::parcelport & pp = *ph.get_bootstrap_parcelport();
-    create_big_boot_barrier(pp, ini_);
+    create_big_boot_barrier(pp, ph.endpoints(), ini_);
 
     if (caching_)
         gva_cache_->reserve(ini_.get_agas_local_cache_size());
@@ -541,6 +541,28 @@ naming::gid_type addressing_service::resolve_locality(
         HPX_RETHROWS_IF(ec, e, "addressing_service::resolve_locality");
         return naming::invalid_gid;
     }
+} // }}}
+
+future<parcelset::endpoints_type> addressing_service::resolve_locality_async(
+    naming::gid_type const & gid
+    )
+{ // {{{
+    request req(locality_ns_resolve_locality_gid, gid);
+    if (is_bootstrap())
+        return
+            make_ready_future(
+                bootstrap->locality_ns_server_.service(req, throws).get_endpoints()
+            );
+    else
+        return hosted->locality_ns_.service_async<parcelset::endpoints_type>(req, action_priority_);
+} // }}}
+
+parcelset::endpoints_type addressing_service::resolve_locality(
+    naming::gid_type const & gid
+  , error_code& ec
+    )
+{ // {{{
+    return resolve_locality_async(gid).get(ec);
 } // }}}
 
 // TODO: We need to ensure that the locality isn't unbound while it still holds

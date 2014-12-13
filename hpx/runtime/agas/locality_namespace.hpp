@@ -40,6 +40,15 @@ struct locality_namespace
         return this->base_type::service(this->get_gid(), req, priority, ec);
     }
 
+    template <typename Result>
+    future<Result> service_async(
+        request const& req
+      , threads::thread_priority priority = threads::thread_priority_default
+        )
+    {
+        return this->base_type::service_async<Result>(this->get_gid(), req, priority);
+    }
+
     void service_non_blocking(
         request const& req
       , threads::thread_priority priority = threads::thread_priority_default

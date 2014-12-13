@@ -154,7 +154,7 @@ struct notification_header
       , naming::address const& symbol_ns_address_
       , boost::uint32_t num_localities_
       , boost::uint32_t used_cores_
-      , std::map<naming::gid_type, parcelset::endpoints_type> const & resolved_localities_
+      , parcelset::endpoints_type const & agas_endpoints_
     ) :
         prefix(prefix_)
       , agas_locality(agas_locality_)
@@ -164,7 +164,7 @@ struct notification_header
       , symbol_ns_address(symbol_ns_address_)
       , num_localities(num_localities_)
       , used_cores(used_cores_)
-      , resolved_localities(resolved_localities_)
+      , agas_endpoints(agas_endpoints_)
     {}
 
     naming::gid_type prefix;
@@ -175,7 +175,7 @@ struct notification_header
     naming::address symbol_ns_address;
     boost::uint32_t num_localities;
     boost::uint32_t used_cores;
-    std::map<naming::gid_type, parcelset::endpoints_type> resolved_localities;
+    parcelset::endpoints_type agas_endpoints;
 
 #if defined(HPX_HAVE_SECURITY)
     components::security::signed_certificate root_certificate;
@@ -192,7 +192,7 @@ struct notification_header
         ar & symbol_ns_address;
         ar & num_localities;
         ar & used_cores;
-        ar & resolved_localities;
+        ar & agas_endpoints;
 #if defined(HPX_HAVE_SECURITY)
         ar & root_certificate;
 #endif
@@ -398,7 +398,7 @@ void register_worker(registration_header const& header)
 
     notification_header hdr (prefix, bbb.here(), locality_addr, primary_addr
       , component_addr, symbol_addr, rt.get_config().get_num_localities()
-      , first_core, agas_client.get_resolved_localities());
+      , first_core, bbb.get_endpoints());
 
 #if defined(HPX_HAVE_SECURITY)
     // wait for the root certificate to be available
@@ -583,7 +583,7 @@ void notify_worker(notification_header const& header)
     cfg.set_first_used_core(header.used_cores);
     rt.assign_cores();
 
-    rt.get_parcel_handler().set_resolved_localities(header.resolved_localities);
+    rt.get_parcel_handler().set_resolved_localities(naming::get_gid_from_locality_id(0), header.agas_endpoints);
 
 #if defined(HPX_HAVE_SECURITY)
     // initialize certificate store
@@ -737,9 +737,11 @@ inline std::size_t get_number_of_bootstrap_connections(
 
 big_boot_barrier::big_boot_barrier(
     parcelset::parcelport& pp_
+  , parcelset::endpoints_type const& endpoints_
   , util::runtime_configuration const& ini_
 ):
     pp(pp_)
+  , endpoints(endpoints_)
   , service_type(ini_.get_agas_service_mode())
   , bootstrap_agas(pp_.agas_locality(ini_))
   , cond()
@@ -880,6 +882,7 @@ struct bbb_tag;
 
 void create_big_boot_barrier(
     parcelset::parcelport& pp_
+  , parcelset::endpoints_type const& endpoints_
   , util::runtime_configuration const& ini_
 ) {
     util::reinitializable_static<boost::shared_ptr<big_boot_barrier>, bbb_tag> bbb;
@@ -889,7 +892,7 @@ void create_big_boot_barrier(
             "create_big_boot_barrier",
             "create_big_boot_barrier was called more than once");
     }
-    bbb.get().reset(new big_boot_barrier(pp_, ini_));
+    bbb.get().reset(new big_boot_barrier(pp_, endpoints_, ini_));
 }
 
 void destroy_big_boot_barrier()
