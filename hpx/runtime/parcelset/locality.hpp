@@ -42,8 +42,8 @@ namespace hpx { namespace parcelset
             virtual std::ostream & print(std::ostream & os) const = 0;
             virtual void save(util::portable_binary_oarchive & ar) const = 0;
             virtual void load(util::portable_binary_iarchive & ar) = 0;
-            virtual HPX_STD_UNIQUE_PTR<impl_base> clone() const = 0;
-            virtual HPX_STD_UNIQUE_PTR<impl_base> move() = 0;
+            virtual impl_base * clone() const = 0;
+            virtual impl_base * move() = 0;
 
             template <typename Impl>
             Impl & get()
@@ -85,15 +85,33 @@ namespace hpx { namespace parcelset
 
         locality & operator=(locality const & other)
         {
-            if(this != &other && other.impl_)
-                impl_ = other.impl_->clone();
+            if(this != &other)
+            {
+                if(other.impl_)
+                {
+                    impl_.reset(other.impl_->clone());
+                }
+                else
+                {
+                    impl_.reset();
+                }
+            }
             return *this;
         }
 
         locality & operator=(locality && other)
         {
-            if(this != &other && other.impl_)
-                impl_ = other.impl_->move();
+            if(this != &other)
+            {
+                if(other.impl_)
+                {
+                    impl_.reset(other.impl_->move());
+                }
+                else
+                {
+                    impl_.reset();
+                }
+            }
             return *this;
         }
 
@@ -211,14 +229,14 @@ namespace hpx { namespace parcelset
                 impl_.load(ar);
             }
 
-            HPX_STD_UNIQUE_PTR<impl_base> clone() const
+            impl_base * clone() const
             {
-                return HPX_STD_UNIQUE_PTR<impl_base>(new impl<Impl>(impl_));
+                return new impl<Impl>(impl_);
             }
 
-            HPX_STD_UNIQUE_PTR<impl_base> move()
+            impl_base * move()
             {
-                return HPX_STD_UNIQUE_PTR<impl_base>(new impl<Impl>(std::move(impl_)));
+                return new impl<Impl>(std::move(impl_));
             }
 
             Impl impl_;

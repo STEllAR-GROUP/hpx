@@ -31,7 +31,7 @@
 #include <boost/fusion/include/value_at.hpp>
 
 // The number of types that response's variant can represent.
-#define HPX_AGAS_RESPONSE_SUBTYPES 11
+#define HPX_AGAS_RESPONSE_SUBTYPES 12
 
 namespace hpx { namespace agas
 {
@@ -73,6 +73,7 @@ namespace hpx { namespace agas
           , subtype_string              = 0x8
           , subtype_resolved_localities = 0x9
           , subtype_added_credits       = 0xa
+          , subtype_endpoints           = 0xb
           // update HPX_AGAS_RESPONSE_SUBTYPES is you add more subtypes
         };
 
@@ -141,7 +142,7 @@ namespace hpx { namespace agas
                 std::string   // component typename
             >
             // 0x9
-            // primary_ns_esolved_localities
+            // primary_ns_resolved_localities
           , util::tuple<
                 std::map<naming::gid_type, parcelset::endpoints_type>
             >
@@ -150,6 +151,11 @@ namespace hpx { namespace agas
           , util::tuple<
                 boost::int64_t  // added credits
               , int             // dummy
+            >
+            // 0xb
+            // locality_ns_resolved_locality_gid
+          , util::tuple<
+                parcelset::endpoints_type  // associated endpoints
             >
         > data_type;
 
@@ -353,6 +359,18 @@ namespace hpx { namespace agas
     }
 
     response::response(
+        namespace_action_code type_
+      , parcelset::endpoints_type const & endpoints_
+      , error status_
+        )
+      : mc(type_)
+      , status(status_)
+      , data(new response_data(util::make_tuple(endpoints_)))
+    {
+        // TODO: verification of namespace_action_code
+    }
+
+    response::response(
         response const& other
         )
       : mc(other.mc)
@@ -407,6 +425,14 @@ namespace hpx { namespace agas
         ) const
     {
         return data->get_data<response_data::subtype_resolved_localities, 0>(ec);
+    }
+
+    parcelset::endpoints_type
+    response::get_endpoints(
+        error_code& ec
+        ) const
+    {
+        return data->get_data<response_data::subtype_endpoints, 0>(ec);
     }
 
     boost::uint32_t response::get_num_localities(

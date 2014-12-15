@@ -13,6 +13,7 @@
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/mpi_environment.hpp>
+#include <hpx/util/stringstream.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
@@ -552,9 +553,33 @@ namespace hpx { namespace parcelset
 
         if(lit == resolved_endpoints_.end())
         {
-            HPX_THROW_EXCEPTION(network_error, "parcelhandler::find_appropriate_destination",
-                "The locality gid cannot be resolved to a valid endpoint");
-            return locality();
+            // FIXME: get error here
+            endpoints_type eps;
+            {
+                hpx::util::scoped_unlock<mutex_type::scoped_lock> ull(l);
+                future<endpoints_type> feps = resolver_.resolve_locality_async(dest_gid);
+
+                if(0 == threads::get_self_ptr())
+                {
+                    while(!feps.is_ready()) ;
+                }
+                eps = feps.get();
+            }
+            if(eps.empty())
+            {
+                hpx::util::osstream oss;
+                oss << "The locality gid cannot be resolved to a valid endpoint.\n"
+                    << "Got locality " << dest_gid << " (" << get_locality() << ") . Available endpoints:\n";
+                BOOST_FOREACH(resolved_endpoints_type::value_type const & endpoints, resolved_endpoints_)
+                {
+                    oss << "    " << endpoints.first << ": " << endpoints.second << "\n";
+                }
+                HPX_THROW_EXCEPTION(network_error, "parcelhandler::find_appropriate_destination",
+                    hpx::util::osstream_get_string(oss));
+                return locality();
+            }
+
+            lit = resolved_endpoints_.insert(lit, std::make_pair(dest_gid, std::move(eps)));
         }
         endpoints_type const & dest_endpoints = lit->second;
 
@@ -619,7 +644,7 @@ namespace hpx { namespace parcelset
 #endif
 
         HPX_THROW_EXCEPTION(network_error, "parcelhandler::find_appropriate_destination",
-            "The locality gid cannot be resolved to a valid endpoint.");
+            "The locality gid cannot be resolved to a valid endpoint. No valid parcelport configured.");
         return locality();
     }
 
@@ -651,6 +676,14 @@ namespace hpx { namespace parcelset
         {
             resolved_endpoints_[resolved.first] = resolved.second;
         }
+    }
+
+    // this function  will be called right after pre_main
+    void parcelhandler::set_resolved_localities(
+        naming::gid_type gid, endpoints_type const& endpoints)
+    {
+        mutex_type::scoped_lock l(resolved_endpoints_mtx_);
+        resolved_endpoints_[gid] = endpoints;
     }
 
     /// Return the reference to an existing io_service

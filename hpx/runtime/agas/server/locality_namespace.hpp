@@ -213,6 +213,11 @@ struct HPX_EXPORT locality_namespace
       , error_code& ec = throws
         );
 
+    response resolve_locality_gid(
+        request const& req
+      , error_code& ec = throws
+        );
+
     response free(
         request const& req
       , error_code& ec = throws

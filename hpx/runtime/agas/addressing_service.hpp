@@ -292,6 +292,15 @@ public:
       , error_code& ec = throws
         );
 
+    future<parcelset::endpoints_type> resolve_locality_async(
+        naming::gid_type const & gid
+        );
+
+    parcelset::endpoints_type resolve_locality(
+        naming::gid_type const & gid
+      , error_code& ec = throws
+        );
+
     /// \brief Remove a locality from the runtime.
     bool unregister_locality(
         parcelset::endpoints_type const& endpoints

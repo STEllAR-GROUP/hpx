@@ -386,7 +386,7 @@
 // This defines the maximum number of connect retries to the AGAS service
 // allowing for some leeway during startup of the localities
 #if !defined(HPX_MAX_NETWORK_RETRIES)
-#  define HPX_MAX_NETWORK_RETRIES 100
+#  define HPX_MAX_NETWORK_RETRIES 1000
 #endif
 
 #if !defined(HPX_NETWORK_RETRIES_SLEEP)
