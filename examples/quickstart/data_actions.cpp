@@ -45,9 +45,8 @@ struct plain_data
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T, typename Derived>
 struct data_get_action_base
-    : public hpx::actions::action<plain_data<Derived>,
-        typename boost::remove_pointer<T>::type,
-        hpx::util::tuple<>, Derived>
+    : public hpx::actions::basic_action<plain_data<Derived>,
+        typename boost::remove_pointer<T>::type(), Derived>
 {};
 
 template <typename T, T Data, typename Derived = hpx::actions::detail::this_type>
@@ -133,8 +132,8 @@ public:
 ///////////////////////////////////////////////////////////////////////////
 template <typename T, typename Derived>
 struct data_set_action_base
-    : public hpx::actions::action<plain_data<Derived>, hpx::util::unused_type,
-        hpx::util::tuple<T>, Derived>
+    : public hpx::actions::basic_action<plain_data<Derived>, 
+        hpx::util::unused_type(T), Derived>
 {};
 
 template <typename T, T Data, typename Derived = hpx::actions::detail::this_type>

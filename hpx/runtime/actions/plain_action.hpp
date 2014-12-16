@@ -46,19 +46,14 @@ namespace hpx { namespace actions
     // zero argument version
     template <typename R, R (*F)(), typename Derived>
     class plain_base_action<R (*)(), F, Derived>
-      : public action<
+      : public basic_action<
             components::server::plain_function<Derived>,
-            R, hpx::util::tuple<>, Derived>
+            R(), Derived>
     {
     public:
-        typedef R result_type;
-        typedef typename detail::remote_action_result<R>::type
-            remote_result_type;
-
-        typedef hpx::util::tuple<> arguments_type;
-        typedef action<
+        typedef basic_action<
             components::server::plain_function<Derived>,
-            result_type, arguments_type, Derived
+            R(), Derived
         > base_type;
 
         // Only localities are valid targets for a plain action
@@ -210,19 +205,14 @@ namespace hpx { namespace actions
     //  zero parameter version, no result value
     template <void (*F)(), typename Derived>
     class plain_base_action<void (*)(), F, Derived>
-      : public action<
+      : public basic_action<
             components::server::plain_function<Derived>,
-            util::unused_type, hpx::util::tuple<>,
-            Derived>
+            util::unused_type(), Derived>
     {
     public:
-        typedef void result_type;
-        typedef util::unused_type remote_result_type;
-
-        typedef hpx::util::tuple<> arguments_type;
-        typedef action<
+        typedef basic_action<
             components::server::plain_function<Derived>,
-            result_type, arguments_type, Derived
+            util::unused_type(), Derived
         > base_type;
 
         // Only localities are valid targets for a plain action

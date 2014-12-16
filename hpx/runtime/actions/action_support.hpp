@@ -843,17 +843,23 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     /// \tparam Component         component type
-    /// \tparam Result            return type
-    /// \tparam Arguments         arguments (tuple)
+    /// \tparam Signature         return type and arguments
     /// \tparam Derived           derived action class
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived>
-    struct action
+    template <typename Component, typename Signature, typename Derived>
+    struct basic_action;
+
+    template <typename Component, typename R, typename ...Args, typename Derived>
+    struct basic_action<Component, R(Args...), Derived>
     {
         typedef Component component_type;
         typedef Derived derived_type;
-        typedef Arguments arguments_type;
-        static const std::size_t arity = util::tuple_size<Arguments>::value;
+        
+        typedef R result_type;
+        typedef typename traits::promise_local_result<R>::type local_result_type;
+        typedef typename detail::remote_action_result<R>::type remote_result_type;
+
+        static const std::size_t arity = sizeof...(Args);
+        typedef util::tuple<Args...> arguments_type;
 
         typedef void action_tag;
 
@@ -893,7 +899,6 @@ namespace hpx { namespace actions
         //    construct_continuation_thread_object_function()
         #include <hpx/runtime/actions/construct_continuation_functions.hpp>
 
-        typedef typename traits::promise_local_result<Result>::type local_result_type;
         typedef typename traits::is_future<local_result_type>::type is_future_pred;
 
         // bring in the definition for all overloads for operator()

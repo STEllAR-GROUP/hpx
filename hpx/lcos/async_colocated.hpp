@@ -108,14 +108,14 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     template <
-        typename Component, typename Result, typename Arguments,
-        typename Derived, typename ...Ts>
+        typename Component, typename Signature, typename Derived,
+        typename ...Ts>
     lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
     async_colocated(
-        hpx::actions::action<Component, Result, Arguments, Derived> /*act*/
+        hpx::actions::basic_action<Component, Signature, Derived> /*act*/
       , naming::id_type const& gid, Ts&&... vs)
     {
         return async_colocated<Derived>(gid, std::forward<Ts>(vs)...);

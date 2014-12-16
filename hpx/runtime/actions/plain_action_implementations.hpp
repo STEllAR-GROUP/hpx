@@ -63,22 +63,16 @@ namespace hpx { namespace actions
         typename R, BOOST_PP_ENUM_PARAMS(N, typename T),
         R (*F)(BOOST_PP_ENUM_PARAMS(N, T)), typename Derived>
     class plain_base_action<R (*)(BOOST_PP_ENUM_PARAMS(N, T)), F, Derived>
-      : public action<
+      : public basic_action<
             components::server::plain_function<Derived>,
-            R,
-            hpx::util::tuple<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
+            R(BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)),
             Derived>
     {
     public:
-        typedef R result_type;
-        typedef typename detail::remote_action_result<R>::type
-            remote_result_type;
-
-        typedef hpx::util::tuple<
-            BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
-        typedef action<
-            components::server::plain_function<Derived>, result_type,
-            arguments_type, Derived> base_type;
+        typedef basic_action<
+            components::server::plain_function<Derived>,
+            R(BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)), Derived>
+            base_type;
 
         // Only localities are valid targets for a plain action
         static bool is_target_valid(naming::id_type const& id)
@@ -208,22 +202,16 @@ namespace hpx { namespace actions
         BOOST_PP_ENUM_PARAMS(N, typename T),
         void (*F)(BOOST_PP_ENUM_PARAMS(N, T)), typename Derived>
     class plain_base_action<void (*)(BOOST_PP_ENUM_PARAMS(N, T)), F, Derived>
-      : public action<
+      : public basic_action<
             components::server::plain_function<Derived>,
-            util::unused_type,
-            hpx::util::tuple<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
+            util::unused_type(BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)),
             Derived>
     {
     public:
-        typedef void result_type;
-        typedef util::unused_type remote_result_type;
-
-        typedef
-            hpx::util::tuple<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>
-        arguments_type;
-        typedef action<
-            components::server::plain_function<Derived>, result_type,
-            arguments_type, Derived> base_type;
+        typedef basic_action<
+            components::server::plain_function<Derived>,
+            util::unused_type(BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)), Derived>
+            base_type;
 
         // Only localities are valid targets for a plain action
         static bool is_target_valid(naming::id_type const& id)

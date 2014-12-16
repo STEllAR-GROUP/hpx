@@ -14,7 +14,7 @@
             boost::mpl::false_, BOOST_SCOPED_ENUM(launch) policy,
             naming::id_type const& id, Ts&&... vs, error_code& ec = throws)
         {
-            return hpx::async<action>(policy, id,
+            return hpx::async<basic_action>(policy, id,
                 std::forward<Ts>(vs)...).get(ec);
         }
 
@@ -22,7 +22,7 @@
             boost::mpl::true_, BOOST_SCOPED_ENUM(launch) policy,
             naming::id_type const& id, Ts&&... vs, error_code& = throws)
         {
-            return hpx::async<action>(policy, id,
+            return hpx::async<basic_action>(policy, id,
                 std::forward<Ts>(vs)...);
         }
     };

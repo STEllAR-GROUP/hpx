@@ -54,14 +54,10 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Action
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename T)
       , typename F>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == N,
-        bool
-    >::type
-    apply_continue(naming::id_type const& gid
-      BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)
+    bool apply_continue(naming::id_type const& gid
+      BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, T, v)
       , F && f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
@@ -71,45 +67,32 @@ namespace hpx
             new hpx::actions::typed_continuation<result_type>(
                 std::forward<F>(f))
           , gid
-          BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+          BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, T, v));
     }
 
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
+        typename Component, typename Signature, typename Derived
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename T)
       , typename F>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == N,
-        bool
-    >::type
-    apply_continue(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > /*act*/
+    bool apply_continue(
+        hpx::actions::basic_action<Component, Signature, Derived> /*act*/
       , naming::id_type const& gid
-      BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)
+      BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, T, v)
       , F && f)
     {
         return apply_continue<Derived>(
             gid
-          BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg)
+          BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, T, v)
           , std::forward<F>(f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Action
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == N,
-        bool
-    >::type
-    apply_continue(
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename T)>
+    bool apply_continue(
         naming::id_type const& gid
-      BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)
+      BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, T, v)
       , naming::id_type const& cont)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
@@ -119,30 +102,21 @@ namespace hpx
             new hpx::actions::typed_continuation<result_type>(
                 cont, make_continuation())
           , gid
-          BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+          BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, T, v));
     }
 
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == N,
-        bool
-    >::type
-    apply_continue(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > /*act*/
+        typename Component, typename Signature, typename Derived
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename T)>
+    bool apply_continue(
+        hpx::actions::basic_action<Component, Signature, Derived> /*act*/
       , naming::id_type const& gid
-      BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)
+      BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, T, v)
       , naming::id_type const& cont)
     {
         return apply_continue<Derived>(
             gid
-          BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg)
+          BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, T, v)
           , cont);
     }
 }

@@ -218,16 +218,14 @@ namespace hpx { namespace lcos
         template <typename Action>
         struct make_fold_action
           : make_fold_action_impl<
-                Action
-              , util::tuple_size<typename Action::arguments_type>::value
+                Action, Action::arity
             >
         {};
 
         template <typename Action>
         struct make_fold_action<fold_with_index<Action> >
           : make_fold_action_impl<
-                fold_with_index<Action>
-              , util::tuple_size<typename Action::arguments_type>::value - 1
+                fold_with_index<Action>, Action::arity - 1
             >
         {};
 
@@ -627,21 +625,15 @@ namespace hpx { namespace lcos
     }
 
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
-      , typename FoldOp
-      , typename Init
+        typename Component, typename Signature, typename Derived
+      , typename FoldOp, typename Init
       BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
     >
     hpx::future<
         typename detail::fold_result<Derived>::type
     >
     fold(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > /* act */
+        hpx::actions::basic_action<Component, Signature, Derived> /* act */
       , std::vector<hpx::id_type> const & ids
       , FoldOp && fold_op
       , Init && init
@@ -679,21 +671,15 @@ namespace hpx { namespace lcos
     }
 
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
-      , typename FoldOp
-      , typename Init
+        typename Component, typename Signature, typename Derived
+      , typename FoldOp, typename Init
       BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
     >
     hpx::future<
         typename detail::fold_result<Derived>::type
     >
     fold_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > /* act */
+        hpx::actions::basic_action<Component, Signature, Derived> /* act */
       , std::vector<hpx::id_type> const & ids
       , FoldOp && fold_op
       , Init && init
@@ -756,21 +742,15 @@ namespace hpx { namespace lcos
     }
 
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
-      , typename FoldOp
-      , typename Init
+        typename Component, typename Signature, typename Derived
+      , typename FoldOp, typename Init
       BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
     >
     hpx::future<
         typename detail::fold_result<Derived>::type
     >
     inverse_fold(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > /* act */
+        hpx::actions::basic_action<Component, Signature, Derived> /* act */
       , std::vector<hpx::id_type> const & ids
       , FoldOp && fold_op
       , Init && init
@@ -808,21 +788,15 @@ namespace hpx { namespace lcos
     }
 
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
-      , typename FoldOp
-      , typename Init
+        typename Component, typename Signature, typename Derived
+      , typename FoldOp, typename Init
       BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
     >
     hpx::future<
         typename detail::fold_result<Derived>::type
     >
     inverse_fold_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > /* act */
+        hpx::actions::basic_action<Component, Signature, Derived> /* act */
       , std::vector<hpx::id_type> const & ids
       , FoldOp && fold_op
       , Init && init

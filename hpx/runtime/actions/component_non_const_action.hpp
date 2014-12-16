@@ -26,16 +26,10 @@ namespace hpx { namespace actions
         typename Component, typename R,
         R (Component::*F)(), typename Derived>
     class component_base_action<R (Component::*)(), F, Derived>
-      : public action<Component, R, hpx::util::tuple<>, Derived>
+      : public basic_action<Component, R(), Derived>
     {
     public:
-        typedef R result_type;
-        typedef typename detail::remote_action_result<R>::type
-            remote_result_type;
-
-        typedef hpx::util::tuple<> arguments_type;
-        typedef action<Component, result_type, arguments_type, Derived>
-            base_type;
+        typedef basic_action<Component, R(), Derived> base_type;
 
         // Let the component decide whether the id is valid
         static bool is_target_valid(naming::id_type const& id)
@@ -209,16 +203,10 @@ namespace hpx { namespace actions
     //  zero parameter version, no result value
     template <typename Component, void (Component::*F)(), typename Derived>
     class component_base_action<void (Component::*)(), F, Derived>
-      : public action<Component, util::unused_type,
-            hpx::util::tuple<>, Derived>
+      : public basic_action<Component, util::unused_type(), Derived>
     {
     public:
-        typedef util::unused_type result_type;
-        typedef util::unused_type remote_result_type;
-
-        typedef hpx::util::tuple<> arguments_type;
-        typedef action<Component, result_type, arguments_type, Derived>
-            base_type;
+        typedef basic_action<Component, util::unused_type(), Derived> base_type;
 
         // Let the component decide whether the id is valid
         static bool is_target_valid(naming::id_type const& id)

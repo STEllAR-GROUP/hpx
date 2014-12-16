@@ -16,11 +16,7 @@ namespace hpx
       , typename Callback
        
       , typename F>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == 0,
-        bool
-    >::type
-    apply_continue_cb(
+    bool apply_continue_cb(
         naming::id_type const& gid
       , Callback && cb
        
@@ -36,21 +32,12 @@ namespace hpx
            );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename Callback
        
       , typename F>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == 0,
-        bool
-    >::type
-    apply_continue_cb(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+    bool apply_continue_cb(
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , naming::id_type const& gid
       , Callback && cb
        
@@ -67,11 +54,7 @@ namespace hpx
         typename Action
       , typename Callback
        >
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == 0,
-        bool
-    >::type
-    apply_continue_cb(
+    bool apply_continue_cb(
         naming::id_type const& gid
       , Callback && cb
        
@@ -87,20 +70,11 @@ namespace hpx
            );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename Callback
        >
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == 0,
-        bool
-    >::type
-    apply_continue_cb(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+    bool apply_continue_cb(
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , naming::id_type const& gid
       , Callback && cb
        
@@ -119,16 +93,12 @@ namespace hpx
     template <
         typename Action
       , typename Callback
-      , typename Arg0
+      , typename T0
       , typename F>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == 1,
-        bool
-    >::type
-    apply_continue_cb(
+    bool apply_continue_cb(
         naming::id_type const& gid
       , Callback && cb
-      , Arg0 && arg0
+      , T0 && v0
       , F && f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
@@ -138,48 +108,35 @@ namespace hpx
                 std::forward<F>(f))
           , gid
           , std::forward<Callback>(cb)
-          , std::forward<Arg0>( arg0 ));
+          , std::forward<T0>( v0 ));
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename Callback
-      , typename Arg0
+      , typename T0
       , typename F>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == 1,
-        bool
-    >::type
-    apply_continue_cb(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+    bool apply_continue_cb(
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , naming::id_type const& gid
       , Callback && cb
-      , Arg0 && arg0
+      , T0 && v0
       , F && f)
     {
         return apply_continue_cb<Derived>(
             gid
           , std::forward<Callback>(cb)
-          , std::forward<Arg0>( arg0 )
+          , std::forward<T0>( v0 )
           , std::forward<F>(f));
     }
     
     template <
         typename Action
       , typename Callback
-      , typename Arg0>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == 1,
-        bool
-    >::type
-    apply_continue_cb(
+      , typename T0>
+    bool apply_continue_cb(
         naming::id_type const& gid
       , Callback && cb
-      , Arg0 && arg0
+      , T0 && v0
       , naming::id_type const& cont)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
@@ -189,32 +146,23 @@ namespace hpx
                 cont, make_continuation())
           , gid
           , std::forward<Callback>(cb)
-          , std::forward<Arg0>( arg0 ));
+          , std::forward<T0>( v0 ));
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename Callback
-      , typename Arg0>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == 1,
-        bool
-    >::type
-    apply_continue_cb(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+      , typename T0>
+    bool apply_continue_cb(
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , naming::id_type const& gid
       , Callback && cb
-      , Arg0 && arg0
+      , T0 && v0
       , naming::id_type const& cont)
     {
         return apply_continue_cb<Derived>(
             gid
           , std::forward<Callback>(cb)
-          , std::forward<Arg0>( arg0 )
+          , std::forward<T0>( v0 )
           , cont);
     }
 }
@@ -224,16 +172,12 @@ namespace hpx
     template <
         typename Action
       , typename Callback
-      , typename Arg0 , typename Arg1
+      , typename T0 , typename T1
       , typename F>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == 2,
-        bool
-    >::type
-    apply_continue_cb(
+    bool apply_continue_cb(
         naming::id_type const& gid
       , Callback && cb
-      , Arg0 && arg0 , Arg1 && arg1
+      , T0 && v0 , T1 && v1
       , F && f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
@@ -243,48 +187,35 @@ namespace hpx
                 std::forward<F>(f))
           , gid
           , std::forward<Callback>(cb)
-          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
+          , std::forward<T0>( v0 ) , std::forward<T1>( v1 ));
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename Callback
-      , typename Arg0 , typename Arg1
+      , typename T0 , typename T1
       , typename F>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == 2,
-        bool
-    >::type
-    apply_continue_cb(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+    bool apply_continue_cb(
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , naming::id_type const& gid
       , Callback && cb
-      , Arg0 && arg0 , Arg1 && arg1
+      , T0 && v0 , T1 && v1
       , F && f)
     {
         return apply_continue_cb<Derived>(
             gid
           , std::forward<Callback>(cb)
-          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 )
+          , std::forward<T0>( v0 ) , std::forward<T1>( v1 )
           , std::forward<F>(f));
     }
     
     template <
         typename Action
       , typename Callback
-      , typename Arg0 , typename Arg1>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == 2,
-        bool
-    >::type
-    apply_continue_cb(
+      , typename T0 , typename T1>
+    bool apply_continue_cb(
         naming::id_type const& gid
       , Callback && cb
-      , Arg0 && arg0 , Arg1 && arg1
+      , T0 && v0 , T1 && v1
       , naming::id_type const& cont)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
@@ -294,32 +225,23 @@ namespace hpx
                 cont, make_continuation())
           , gid
           , std::forward<Callback>(cb)
-          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
+          , std::forward<T0>( v0 ) , std::forward<T1>( v1 ));
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename Callback
-      , typename Arg0 , typename Arg1>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == 2,
-        bool
-    >::type
-    apply_continue_cb(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+      , typename T0 , typename T1>
+    bool apply_continue_cb(
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , naming::id_type const& gid
       , Callback && cb
-      , Arg0 && arg0 , Arg1 && arg1
+      , T0 && v0 , T1 && v1
       , naming::id_type const& cont)
     {
         return apply_continue_cb<Derived>(
             gid
           , std::forward<Callback>(cb)
-          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 )
+          , std::forward<T0>( v0 ) , std::forward<T1>( v1 )
           , cont);
     }
 }
@@ -329,16 +251,12 @@ namespace hpx
     template <
         typename Action
       , typename Callback
-      , typename Arg0 , typename Arg1 , typename Arg2
+      , typename T0 , typename T1 , typename T2
       , typename F>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == 3,
-        bool
-    >::type
-    apply_continue_cb(
+    bool apply_continue_cb(
         naming::id_type const& gid
       , Callback && cb
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2
+      , T0 && v0 , T1 && v1 , T2 && v2
       , F && f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
@@ -348,48 +266,35 @@ namespace hpx
                 std::forward<F>(f))
           , gid
           , std::forward<Callback>(cb)
-          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
+          , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ));
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename Callback
-      , typename Arg0 , typename Arg1 , typename Arg2
+      , typename T0 , typename T1 , typename T2
       , typename F>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == 3,
-        bool
-    >::type
-    apply_continue_cb(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+    bool apply_continue_cb(
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , naming::id_type const& gid
       , Callback && cb
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2
+      , T0 && v0 , T1 && v1 , T2 && v2
       , F && f)
     {
         return apply_continue_cb<Derived>(
             gid
           , std::forward<Callback>(cb)
-          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 )
+          , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 )
           , std::forward<F>(f));
     }
     
     template <
         typename Action
       , typename Callback
-      , typename Arg0 , typename Arg1 , typename Arg2>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == 3,
-        bool
-    >::type
-    apply_continue_cb(
+      , typename T0 , typename T1 , typename T2>
+    bool apply_continue_cb(
         naming::id_type const& gid
       , Callback && cb
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2
+      , T0 && v0 , T1 && v1 , T2 && v2
       , naming::id_type const& cont)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
@@ -399,32 +304,23 @@ namespace hpx
                 cont, make_continuation())
           , gid
           , std::forward<Callback>(cb)
-          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
+          , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ));
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename Callback
-      , typename Arg0 , typename Arg1 , typename Arg2>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == 3,
-        bool
-    >::type
-    apply_continue_cb(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+      , typename T0 , typename T1 , typename T2>
+    bool apply_continue_cb(
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , naming::id_type const& gid
       , Callback && cb
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2
+      , T0 && v0 , T1 && v1 , T2 && v2
       , naming::id_type const& cont)
     {
         return apply_continue_cb<Derived>(
             gid
           , std::forward<Callback>(cb)
-          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 )
+          , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 )
           , cont);
     }
 }
@@ -434,16 +330,12 @@ namespace hpx
     template <
         typename Action
       , typename Callback
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
+      , typename T0 , typename T1 , typename T2 , typename T3
       , typename F>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == 4,
-        bool
-    >::type
-    apply_continue_cb(
+    bool apply_continue_cb(
         naming::id_type const& gid
       , Callback && cb
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3
+      , T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3
       , F && f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
@@ -453,48 +345,35 @@ namespace hpx
                 std::forward<F>(f))
           , gid
           , std::forward<Callback>(cb)
-          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
+          , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ));
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename Callback
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
+      , typename T0 , typename T1 , typename T2 , typename T3
       , typename F>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == 4,
-        bool
-    >::type
-    apply_continue_cb(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+    bool apply_continue_cb(
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , naming::id_type const& gid
       , Callback && cb
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3
+      , T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3
       , F && f)
     {
         return apply_continue_cb<Derived>(
             gid
           , std::forward<Callback>(cb)
-          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 )
+          , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 )
           , std::forward<F>(f));
     }
     
     template <
         typename Action
       , typename Callback
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == 4,
-        bool
-    >::type
-    apply_continue_cb(
+      , typename T0 , typename T1 , typename T2 , typename T3>
+    bool apply_continue_cb(
         naming::id_type const& gid
       , Callback && cb
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3
+      , T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3
       , naming::id_type const& cont)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
@@ -504,32 +383,23 @@ namespace hpx
                 cont, make_continuation())
           , gid
           , std::forward<Callback>(cb)
-          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
+          , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ));
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename Callback
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == 4,
-        bool
-    >::type
-    apply_continue_cb(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+      , typename T0 , typename T1 , typename T2 , typename T3>
+    bool apply_continue_cb(
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , naming::id_type const& gid
       , Callback && cb
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3
+      , T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3
       , naming::id_type const& cont)
     {
         return apply_continue_cb<Derived>(
             gid
           , std::forward<Callback>(cb)
-          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 )
+          , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 )
           , cont);
     }
 }
@@ -539,16 +409,12 @@ namespace hpx
     template <
         typename Action
       , typename Callback
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4
       , typename F>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == 5,
-        bool
-    >::type
-    apply_continue_cb(
+    bool apply_continue_cb(
         naming::id_type const& gid
       , Callback && cb
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4
+      , T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4
       , F && f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
@@ -558,48 +424,35 @@ namespace hpx
                 std::forward<F>(f))
           , gid
           , std::forward<Callback>(cb)
-          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
+          , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ));
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename Callback
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4
       , typename F>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == 5,
-        bool
-    >::type
-    apply_continue_cb(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+    bool apply_continue_cb(
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , naming::id_type const& gid
       , Callback && cb
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4
+      , T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4
       , F && f)
     {
         return apply_continue_cb<Derived>(
             gid
           , std::forward<Callback>(cb)
-          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 )
+          , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 )
           , std::forward<F>(f));
     }
     
     template <
         typename Action
       , typename Callback
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == 5,
-        bool
-    >::type
-    apply_continue_cb(
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4>
+    bool apply_continue_cb(
         naming::id_type const& gid
       , Callback && cb
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4
+      , T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4
       , naming::id_type const& cont)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
@@ -609,32 +462,23 @@ namespace hpx
                 cont, make_continuation())
           , gid
           , std::forward<Callback>(cb)
-          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
+          , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ));
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename Callback
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == 5,
-        bool
-    >::type
-    apply_continue_cb(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4>
+    bool apply_continue_cb(
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , naming::id_type const& gid
       , Callback && cb
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4
+      , T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4
       , naming::id_type const& cont)
     {
         return apply_continue_cb<Derived>(
             gid
           , std::forward<Callback>(cb)
-          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 )
+          , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 )
           , cont);
     }
 }

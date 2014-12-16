@@ -57,19 +57,13 @@ namespace hpx { namespace actions
         R (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T)), typename Derived>
     class component_base_action<
             R (Component::*)(BOOST_PP_ENUM_PARAMS(N, T)), F, Derived>
-      : public action<
-            Component, R,
-            hpx::util::tuple<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
+      : public basic_action<
+            Component, R(BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)),
             Derived>
     {
     public:
-        typedef R result_type;
-        typedef typename detail::remote_action_result<R>::type
-            remote_result_type;
-
-        typedef hpx::util::tuple<
-            BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
-        typedef action<Component, result_type, arguments_type, Derived>
+        typedef basic_action<Component,
+            R(BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)), Derived>
             base_type;
 
         // Let the component decide whether the id is valid
@@ -270,18 +264,13 @@ namespace hpx { namespace actions
         void (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T)), typename Derived>
     class component_base_action<
             void (Component::*)(BOOST_PP_ENUM_PARAMS(N, T)), F, Derived>
-      : public action<
-            Component, util::unused_type,
-            hpx::util::tuple<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
+      : public basic_action<
+            Component, util::unused_type(BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)),
             Derived>
     {
     public:
-        typedef util::unused_type result_type;
-        typedef util::unused_type remote_result_type;
-
-        typedef hpx::util::tuple<
-            BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
-        typedef action<Component, result_type, arguments_type, Derived>
+        typedef basic_action<Component,
+            util::unused_type(BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)), Derived>
             base_type;
 
         // Let the component decide whether the id is valid
