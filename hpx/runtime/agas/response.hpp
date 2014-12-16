@@ -108,6 +108,12 @@ struct HPX_EXPORT response
       , error status_ = success
         );
 
+    response(
+        namespace_action_code type_
+      , parcelset::endpoints_type const& endpoints_
+      , error status_ = success
+        );
+
     ///////////////////////////////////////////////////////////////////////////
     // copy constructor
     response(
@@ -128,6 +134,10 @@ struct HPX_EXPORT response
         ) const;
 
     std::map<naming::gid_type, parcelset::endpoints_type> get_resolved_localities(
+        error_code& ec = throws
+        ) const;
+
+    parcelset::endpoints_type get_endpoints(
         error_code& ec = throws
         ) const;
 
@@ -346,6 +356,17 @@ struct get_remote_result<std::map<naming::gid_type, parcelset::endpoints_type>, 
         )
     {
         return rep.get_resolved_localities();
+    }
+};
+
+template <>
+struct get_remote_result<parcelset::endpoints_type, agas::response>
+{
+    static parcelset::endpoints_type call(
+        agas::response const& rep
+        )
+    {
+        return rep.get_endpoints();
     }
 };
 

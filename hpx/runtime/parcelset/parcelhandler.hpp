@@ -364,6 +364,7 @@ namespace hpx { namespace parcelset
 
         /// \brief set list of resolved localities
         void set_resolved_localities(std::map<naming::gid_type, endpoints_type> const& l);
+        void set_resolved_localities(naming::gid_type gid, endpoints_type const& l);
 
         void enable_alternative_parcelports()
         {

@@ -102,10 +102,10 @@ void hello_world_foreman()
         }
 
         // Wait for all of the futures to finish. The callback version of the
-        // hpx::lcos::wait function takes two arguments: a vector of futures,
+        // hpx::lcos::wait_each function takes two arguments: a vector of futures,
         // and a binary callback.  The callback takes two arguments; the first
         // is the index of the future in the vector, and the second is the
-        // return value of the future. hpx::lcos::wait doesn't return until
+        // return value of the future. hpx::lcos::wait_each doesn't return until
         // all the futures in the vector have returned.
         hpx::lcos::local::spinlock mtx;
         hpx::lcos::wait_each(futures,
@@ -149,8 +149,8 @@ int main()
         futures.push_back(hpx::async<action_type>(node));
     }
 
-    // The non-callback version of hpx::lcos::wait takes a single parameter,
-    // a future of vectors to wait on. hpx::wait_all only returns when
+    // The non-callback version of hpx::lcos::wait_all takes a single parameter,
+    // a vector of futures to wait on. hpx::wait_all only returns when
     // all of the futures have finished.
     hpx::wait_all(futures);
     return 0;

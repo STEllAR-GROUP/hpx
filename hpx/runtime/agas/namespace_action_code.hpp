@@ -32,6 +32,7 @@ enum namespace_action_code
     locality_ns_statistics_counter          = BOOST_BINARY_U(1100111),
     locality_ns_resolve_locality            = BOOST_BINARY_U(1101000),
     locality_ns_resolved_localities         = BOOST_BINARY_U(1101001),
+    locality_ns_resolve_locality_gid        = BOOST_BINARY_U(1101011),
 
     primary_ns_service                      = BOOST_BINARY_U(1000000),
     primary_ns_bulk_service                 = BOOST_BINARY_U(1000001),
