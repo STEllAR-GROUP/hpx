@@ -6,6 +6,7 @@
 add_subdirectory(components)
 
 set(tests
+    plain_action_1330
     plain_action_move_semantics
     plain_action_dataflow_move_semantics
     component_action_move_semantics
