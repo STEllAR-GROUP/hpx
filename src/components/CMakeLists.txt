@@ -14,7 +14,6 @@ set(subdirs
     papi_counters
     remote_object
     security
-    unordered
     vector
    )
 
