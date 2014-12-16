@@ -121,8 +121,8 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief This class implements the local iterator functionality for
-    /// the partitioned backend of a hpx::vector.
+    /// This class implements the local iterator functionality for the
+    /// partitioned backend of a hpx::vector.
     template <typename T>
     class local_vector_iterator
       : public boost::iterator_facade<
@@ -142,12 +142,6 @@ namespace hpx
         // constructors
         local_vector_iterator()
           : partition_(), local_index_(size_type(-1))
-        {}
-
-        local_vector_iterator(partition_vector<T> partition,
-                size_type local_index)
-          : partition_(partition),
-            local_index_(local_index)
         {}
 
         local_vector_iterator(partition_vector<T> partition,
@@ -302,12 +296,6 @@ namespace hpx
         {}
 
         const_local_vector_iterator(partition_vector<T> partition,
-                size_type local_index)
-          : partition_(partition),
-            local_index_(local_index)
-        {}
-
-        const_local_vector_iterator(partition_vector<T> partition,
                 size_type local_index,
                 boost::shared_ptr<server::partition_vector<T> > const& data)
           : partition_(partition),
@@ -427,7 +415,7 @@ namespace hpx
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief This class implement the segmented iterator for the hpx::vector
+    /// This class implement the segmented iterator for the hpx::vector
     template <typename T, typename BaseIter>
     class segment_vector_iterator
       : public boost::iterator_adaptor<
@@ -486,23 +474,28 @@ namespace hpx
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename BaseIterator>
-    struct is_requested_locality
+    namespace detail
     {
-        typedef typename std::iterator_traits<BaseIterator>::reference reference;
-
-        is_requested_locality(boost::uint32_t locality_id = naming::invalid_locality_id)
-          : locality_id_(locality_id)
-        {}
-
-        bool operator()(reference val) const
+        template <typename BaseIterator>
+        struct is_requested_locality
         {
-            return locality_id_ == naming::invalid_locality_id ||
-                   locality_id_ == val.locality_id_;
-        }
+            typedef typename std::iterator_traits<BaseIterator>::reference
+                reference;
 
-        boost::uint32_t locality_id_;
-    };
+            is_requested_locality(boost::uint32_t locality_id =
+                    naming::invalid_locality_id)
+              : locality_id_(locality_id)
+            {}
+
+            bool operator()(reference val) const
+            {
+                return locality_id_ == naming::invalid_locality_id ||
+                       locality_id_ == val.locality_id_;
+            }
+
+            boost::uint32_t locality_id_;
+        };
+    }
 
     /// This class implement the local segmented iterator for the hpx::vector
     template <typename T, typename BaseIter>
@@ -517,7 +510,7 @@ namespace hpx
                 local_segment_vector_iterator<T, BaseIter>, BaseIter,
                 std::vector<T>, std::forward_iterator_tag
             > base_type;
-        typedef is_requested_locality<BaseIter> predicate;
+        typedef detail::is_requested_locality<BaseIter> predicate;
 
     public:
         local_segment_vector_iterator(BaseIter const& end)
@@ -559,6 +552,8 @@ namespace hpx
 
             if (this->base() != end_)
                 data_ = this->base()->local_data_;
+            else
+                data_.reset();
         }
 
     private:
@@ -568,7 +563,7 @@ namespace hpx
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    /// This class implements the iterator functionality for hpx::vector.
+    /// This class implements the (global) iterator functionality for hpx::vector.
     template <typename T>
     class vector_iterator
       : public boost::iterator_facade<
