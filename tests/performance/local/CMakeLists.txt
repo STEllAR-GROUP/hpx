@@ -116,12 +116,14 @@ if(HPX_WITH_CXX11_LAMBDAS)
       transform_reduce_scaling
       spinlock_overhead1
       spinlock_overhead2
+      vector_foreach
      )
 
   set(spinlock_overhead1_FLAGS DEPENDENCIES iostreams_component)
   set(spinlock_overhead2_FLAGS DEPENDENCIES iostreams_component)
   set(foreach_scaling_FLAGS DEPENDENCIES iostreams_component)
   set(transform_reduce_scaling_FLAGS DEPENDENCIES iostreams_component)
+  set(vector_foreach_FLAGS DEPENDENCIES iostreams_component)
 endif()
 
 

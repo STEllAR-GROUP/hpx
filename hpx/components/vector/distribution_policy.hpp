@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_BLOCK_DISTRIBUTION_POLICY_HPP
-#define HPX_BLOCK_DISTRIBUTION_POLICY_HPP
+#ifndef HPX_VECTOR_DISTRIBUTION_POLICY_HPP
+#define HPX_VECTOR_DISTRIBUTION_POLICY_HPP
 
 #include <hpx/hpx_fwd.hpp>
 #include <boost/detail/scoped_enum_emulation.hpp>
@@ -18,7 +18,7 @@
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    BOOST_SCOPED_ENUM_START(distribution_policy)
+    BOOST_SCOPED_ENUM_START(vector_distribution_policy)
     {
         block         = 0,      ///< block distribution policy
         cyclic        = 1,      ///< cyclic distribution policy
@@ -69,9 +69,9 @@ namespace hpx
             return num_partitions_;
         }
 
-        BOOST_SCOPED_ENUM(distribution_policy) get_policy_type() const
+        BOOST_SCOPED_ENUM(vector_distribution_policy) get_policy_type() const
         {
-            return distribution_policy::block;
+            return vector_distribution_policy::block;
         }
 
     private:
@@ -138,9 +138,9 @@ namespace hpx
             return num_partitions_;
         }
 
-        BOOST_SCOPED_ENUM(distribution_policy) get_policy_type() const
+        BOOST_SCOPED_ENUM(vector_distribution_policy) get_policy_type() const
         {
-            return distribution_policy::cyclic;
+            return vector_distribution_policy::cyclic;
         }
 
     private:
@@ -227,9 +227,9 @@ namespace hpx
             return num_partitions_;
         }
 
-        BOOST_SCOPED_ENUM(distribution_policy) get_policy_type() const
+        BOOST_SCOPED_ENUM(vector_distribution_policy) get_policy_type() const
         {
-            return distribution_policy::block_cyclic;
+            return vector_distribution_policy::block_cyclic;
         }
 
         std::size_t get_block_size() const
@@ -260,6 +260,38 @@ namespace hpx
     };
 
     static block_cyclic_distribution_policy const block_cyclic;
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        /// \cond NOINTERNAL
+        template <typename T>
+        struct is_vector_distribution_policy
+          : boost::mpl::false_
+        {};
+
+        template <>
+        struct is_vector_distribution_policy<block_distribution_policy>
+          : boost::mpl::true_
+        {};
+
+        template <>
+        struct is_vector_distribution_policy<cyclic_distribution_policy>
+          : boost::mpl::true_
+        {};
+
+        template <>
+        struct is_vector_distribution_policy<block_cyclic_distribution_policy>
+          : boost::mpl::true_
+        {};
+        // \endcond
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    struct is_vector_distribution_policy
+      : detail::is_vector_distribution_policy<typename hpx::util::decay<T>::type>
+    {};
 }
 
 #endif

@@ -22,7 +22,6 @@
 
 #include <hpx/components/vector/vector_segmented_iterator.hpp>
 #include <hpx/components/vector/partition_vector_component.hpp>
-#include <hpx/components/vector/vector_configuration.hpp>
 #include <hpx/components/vector/distribution_policy.hpp>
 
 #include <cstdint>
@@ -32,6 +31,83 @@
 
 #include <boost/format.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/utility/enable_if.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace server
+{
+    ///////////////////////////////////////////////////////////////////////////
+    struct vector_config_data
+    {
+        // Each partition is described by it's corresponding client object, its
+        // size, and locality id.
+        struct partition_data
+        {
+            partition_data()
+                : size_(0), locality_id_(naming::invalid_locality_id)
+            {}
+
+            partition_data(future<id_type> && part, std::size_t size,
+                    boost::uint32_t locality_id)
+                : partition_(part.share()),
+                size_(size), locality_id_(locality_id)
+            {}
+
+            partition_data(id_type const& part, std::size_t size,
+                    boost::uint32_t locality_id)
+                : partition_(make_ready_future(part).share()),
+                size_(size), locality_id_(locality_id)
+            {}
+
+            id_type get_id() const
+            {
+                return partition_.get();
+            }
+
+            hpx::shared_future<id_type> partition_;
+            std::size_t size_;
+            boost::uint32_t locality_id_;
+
+        private:
+            friend class boost::serialization::access;
+
+            template <typename Archive>
+            void serialize(Archive& ar, unsigned)
+            {
+                ar & partition_ & size_ & locality_id_;
+            }
+        };
+
+        vector_config_data()
+          : size_(0), block_size_(0), policy_(0)
+        {}
+
+        vector_config_data(std::size_t size, std::size_t block_size,
+                std::vector<partition_data> && partitions, int policy)
+          : size_(size),
+            block_size_(block_size),
+            partitions_(std::move(partitions)),
+            policy_(policy)
+        {}
+
+        std::size_t size_;
+        std::size_t block_size_;
+        std::vector<partition_data> partitions_;
+        int policy_;
+
+    private:
+        friend class boost::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive& ar, unsigned)
+        {
+            ar & size_ & block_size_ & partitions_ & policy_;
+        }
+    };
+}}
+
+HPX_DISTRIBUTED_METADATA_DECLARATION(hpx::server::vector_config_data,
+    hpx_server_vector_config_data);
 
 namespace hpx
 {
@@ -44,7 +120,9 @@ namespace hpx
     ///
     template <typename T>
     class vector
-      : hpx::components::client_base<vector<T>, server::vector_configuration>
+      : hpx::components::client_base<vector<T>,
+            hpx::components::server::distributed_metadata_base<
+                server::vector_config_data> >
     {
     public:
         typedef std::allocator<T> allocator_type;
@@ -67,15 +145,17 @@ namespace hpx
 
     private:
         typedef hpx::components::client_base<
-                vector, server::vector_configuration
+                vector,
+                hpx::components::server::distributed_metadata_base<
+                    server::vector_config_data>
             > base_type;
 
         typedef hpx::server::partition_vector<T> partition_vector_server;
         typedef hpx::partition_vector<T> partition_vector_client;
 
-        struct partition_data : server::vector_configuration::partition_data
+        struct partition_data : server::vector_config_data::partition_data
         {
-            typedef server::vector_configuration::partition_data base_type;
+            typedef server::vector_config_data::partition_data base_type;
 
             partition_data(future<id_type> && part, std::size_t size,
                     boost::uint32_t locality_id)
@@ -108,7 +188,7 @@ namespace hpx
         partitions_vector_type partitions_;
 
         // parameters taken from distribution policy
-        BOOST_SCOPED_ENUM(distribution_policy) policy_;     // policy to use
+        BOOST_SCOPED_ENUM(vector_distribution_policy) policy_; // policy to use
 
         // will be set for created (non-attached) objects
         std::string registered_name_;
@@ -129,9 +209,21 @@ namespace hpx
                 T, typename partitions_vector_type::const_iterator
             > const_segment_iterator;
 
+        typedef local_segment_vector_iterator<
+                T, typename partitions_vector_type::iterator
+            > local_segment_iterator;
+        typedef local_segment_vector_iterator<
+                T, typename partitions_vector_type::const_iterator
+            > const_local_segment_iterator;
+
     private:
         friend class vector_iterator<T>;
         friend class const_vector_iterator<T>;
+
+        friend class segment_vector_iterator<
+            T, typename partitions_vector_type::iterator>;
+        friend class const_segment_vector_iterator<
+            T, typename partitions_vector_type::const_iterator>;
 
         std::size_t get_partition_size() const
         {
@@ -141,17 +233,17 @@ namespace hpx
 
         std::size_t get_global_index(std::size_t segment,
             std::size_t part_size, size_type local_index,
-            BOOST_SCOPED_ENUM(distribution_policy) policy) const
+            BOOST_SCOPED_ENUM(vector_distribution_policy) policy) const
         {
             switch (policy)
             {
-            case distribution_policy::block:
+            case vector_distribution_policy::block:
                 return segment * part_size + local_index;
 
-            case distribution_policy::cyclic:
+            case vector_distribution_policy::cyclic:
                 return segment + local_index * (part_size - 1);
 
-            case distribution_policy::block_cyclic:
+            case vector_distribution_policy::block_cyclic:
                 return (segment * part_size/block_size_) + local_index * (part_size - 1);
 
             default:
@@ -165,10 +257,10 @@ namespace hpx
             // verify consistency of parameters
             switch (policy_)
             {
-            case distribution_policy::block:
+            case vector_distribution_policy::block:
                 break;      // no limitations apply
 
-            case distribution_policy::cyclic:
+            case vector_distribution_policy::cyclic:
                 // overall size must be multiple of partition size
                 {
                     std::size_t part_size = partition_size_;
@@ -186,7 +278,7 @@ namespace hpx
                 }
                 break;
 
-            case distribution_policy::block_cyclic:
+            case vector_distribution_policy::block_cyclic:
                 {
                     if (block_size_ == std::size_t(-1))
                         block_size_ = partition_size_;
@@ -230,9 +322,9 @@ namespace hpx
         // Connect this vector to the existing vector using the given symbolic
         // name.
         void get_data_helper(id_type id,
-            future<server::vector_configuration::config_data> && f)
+            future<server::vector_config_data> && f)
         {
-            server::vector_configuration::config_data data = f.get();
+            server::vector_config_data data = f.get();
 
             partitions_.clear();
             partitions_.reserve(data.partitions_.size());
@@ -242,7 +334,7 @@ namespace hpx
             std::move(data.partitions_.begin(), data.partitions_.end(),
                 std::back_inserter(partitions_));
 
-            policy_ = static_cast<BOOST_SCOPED_ENUM(distribution_policy)>(
+            policy_ = static_cast<BOOST_SCOPED_ENUM(vector_distribution_policy)>(
                 data.policy_);
 
             boost::uint32_t this_locality = get_locality_id();
@@ -266,7 +358,7 @@ namespace hpx
             wait_all(ptrs);
 
             partition_size_ = get_partition_size();
-            base_type::reset(std::move(id));
+            this->base_type::reset(std::move(id));
         }
 
         // this will be called by the base class once the registered id becomes
@@ -274,7 +366,9 @@ namespace hpx
         future<void> connect_to_helper(future<id_type> && f)
         {
             using util::placeholders::_1;
-            typedef typename server::vector_configuration::get_action act;
+            typedef typename components::server::distributed_metadata_base<
+                    server::vector_config_data
+                >::get_action act;
 
             id_type id = f.get();
             return async(act(), id).then(
@@ -285,26 +379,28 @@ namespace hpx
         future<void> connect_to(std::string const& symbolic_name)
         {
             using util::placeholders::_1;
-            return base_type::connect_to(symbolic_name,
+            return this->base_type::connect_to(symbolic_name,
                 util::bind(&vector::connect_to_helper, this, _1));
         }
 
         // Register this vector with AGAS using the given symbolic name
         future<void> register_as(std::string const& symbolic_name)
         {
-            std::vector<server::vector_configuration::partition_data> partitions;
+            std::vector<server::vector_config_data::partition_data> partitions;
             partitions.reserve(partitions_.size());
 
             std::copy(partitions_.begin(), partitions_.end(),
                 std::back_inserter(partitions));
 
-            server::vector_configuration::config_data data(
+            server::vector_config_data data(
                 size_, block_size_, std::move(partitions), int(policy_));
-            base_type::reset(hpx::new_<server::vector_configuration>(
-                hpx::find_here(), std::move(data)));
+            this->base_type::reset(hpx::new_<
+                    components::server::distributed_metadata_base<
+                        server::vector_config_data> >(
+                    hpx::find_here(), std::move(data)));
 
             registered_name_ = symbolic_name;
-            return base_type::register_as(symbolic_name);
+            return this->base_type::register_as(symbolic_name);
         }
 
     public:
@@ -317,7 +413,7 @@ namespace hpx
 
             switch (policy_)
             {
-            case distribution_policy::block:
+            case vector_distribution_policy::block:
                 {
                     std::size_t part_size = partition_size_;
                     if (part_size != 0)
@@ -328,7 +424,7 @@ namespace hpx
                 }
                 break;
 
-            case distribution_policy::cyclic:
+            case vector_distribution_policy::cyclic:
                 {
                     std::size_t num_parts = partitions_.size();
                     if (num_parts != 0)
@@ -336,7 +432,7 @@ namespace hpx
                 }
                 break;
 
-            case distribution_policy::block_cyclic:
+            case vector_distribution_policy::block_cyclic:
                 {
                     HPX_ASSERT(block_size_ != 0);
                     std::size_t num_blocks = size_ / block_size_;
@@ -367,7 +463,7 @@ namespace hpx
 
             switch (policy_)
             {
-            case distribution_policy::block:
+            case vector_distribution_policy::block:
                 {
                     if (partition_size_ != 0)
                     {
@@ -377,7 +473,7 @@ namespace hpx
                 }
                 break;
 
-            case distribution_policy::cyclic:
+            case vector_distribution_policy::cyclic:
                 {
                     std::size_t num_parts = partitions_.size();
                     if (num_parts != 0)
@@ -388,7 +484,7 @@ namespace hpx
                 }
                 break;
 
-            case distribution_policy::block_cyclic:
+            case vector_distribution_policy::block_cyclic:
                 {
                     HPX_ASSERT(block_size_ != 0);
                     std::size_t num_blocks = size_ / block_size_;
@@ -428,50 +524,30 @@ namespace hpx
         }
         // Return the global index corresponding to the local index inside the
         // given segment.
-        std::size_t get_global_index(segment_iterator const& it,
+        template <typename SegmentIter>
+        std::size_t get_global_index(SegmentIter const& it,
             size_type local_index,
-            BOOST_SCOPED_ENUM(distribution_policy) policy)
+            BOOST_SCOPED_ENUM(vector_distribution_policy) policy) const
         {
             std::size_t part_size = partition_size_;
             if (part_size == 0)
                 return std::size_t(-1);
 
-            std::size_t segment = std::distance(partitions_.begin(), it.base());
+            std::size_t segment = it.base() - partitions_.cbegin();
             return get_global_index(segment, part_size, local_index, policy);
         }
 
-        std::size_t get_global_index(segment_iterator const& it,
-            size_type local_index)
-        {
-            return get_global_index(it, local_index, policy_);
-        }
-
-        std::size_t get_global_index(const_segment_iterator const& it,
-            size_type local_index,
-            BOOST_SCOPED_ENUM(distribution_policy) policy) const
-        {
-            std::size_t part_size = partition_size_;
-            if (part_size == 0)
-                return std::size_t(-1);
-
-            std::size_t segment = std::distance(partitions_.cbegin(), it.base());
-            return get_global_index(segment, part_size, local_index, policy);
-        }
-
-        std::size_t get_global_index(const_segment_iterator const& it,
+        template <typename SegmentIter>
+        std::size_t get_global_index(SegmentIter const& it,
             size_type local_index) const
         {
             return get_global_index(it, local_index, policy_);
         }
 
-        std::size_t get_partition(segment_iterator const& it) const
+        template <typename SegmentIter>
+        std::size_t get_partition(SegmentIter const& it) const
         {
             return std::distance(partitions_.begin(), it.base());
-        }
-
-        std::size_t get_partition(const_segment_iterator const& it) const
-        {
-            return std::distance(partitions_.cbegin(), it.base());
         }
 
         // Return the local iterator referencing an element inside a segment
@@ -508,10 +584,9 @@ namespace hpx
         {
             std::size_t part = get_partition(global_index);
             if (part == std::size_t(-1) || part == partitions_.size())
-                return segment_iterator(this, partitions_.end());
+                return segment_iterator(partitions_.end());
 
-            return segment_iterator(this, partitions_.begin() + part,
-                partitions_.end());
+            return segment_iterator(partitions_.begin() + part, this);
         }
 
         const_segment_iterator get_const_segment_iterator(
@@ -519,10 +594,9 @@ namespace hpx
         {
             std::size_t part = get_partition(global_index);
             if (part == std::size_t(-1))
-                return const_segment_iterator(this, partitions_.cend());
+                return const_segment_iterator(partitions_.cend());
 
-            return const_segment_iterator(this, partitions_.cbegin() + part,
-                partitions_.cend());
+            return const_segment_iterator(partitions_.cbegin() + part, this);
         }
 
     protected:
@@ -628,14 +702,14 @@ namespace hpx
             switch (policy_)
             {
             default:
-            case distribution_policy::block:
+            case vector_distribution_policy::block:
                 break;
 
-            case distribution_policy::cyclic:
+            case vector_distribution_policy::cyclic:
                 block_size_ = partition_size_;
                 break;
 
-            case distribution_policy::block_cyclic:
+            case vector_distribution_policy::block_cyclic:
                 if (block_size_ == std::size_t(-1))
                     block_size_ = partition_size_;
                 break;
@@ -742,14 +816,14 @@ namespace hpx
 
     public:
         /// Default Constructor which create hpx::vector with
-        /// \a num_partitions = 1 and \a partition_size = 0. Hence overall size
+        /// \a num_partitions = 0 and \a partition_size = 0. Hence overall size
         /// of the vector is 0.
         ///
         vector()
           : size_(0),
             block_size_(std::size_t(-1)),
             partition_size_(std::size_t(-1)),
-            policy_(distribution_policy::block)
+            policy_(vector_distribution_policy::block)
         {}
 
         /// Construct a new vector representation from the data associated with
@@ -758,7 +832,7 @@ namespace hpx
           : size_(0),
             block_size_(std::size_t(-1)),
             partition_size_(std::size_t(-1)),
-            policy_(distribution_policy::block)
+            policy_(vector_distribution_policy::block)
         {
             connect_to(symbolic_name).get();
         }
@@ -771,7 +845,7 @@ namespace hpx
           : size_(size),
             block_size_(1),
             partition_size_(std::size_t(-1)),
-            policy_(distribution_policy::block)
+            policy_(vector_distribution_policy::block)
         {
             if (size != 0)
                 create(hpx::block);
@@ -789,7 +863,7 @@ namespace hpx
           : size_(size),
             block_size_(1),
             partition_size_(std::size_t(-1)),
-            policy_(distribution_policy::block)
+            policy_(vector_distribution_policy::block)
         {
             if (size != 0)
                 create(val, hpx::block);
@@ -797,7 +871,7 @@ namespace hpx
         vector(size_type size, T const& val, std::string const& symbolic_name)
           : size_(size),
             block_size_(1),
-            policy_(distribution_policy::block)
+            policy_(vector_distribution_policy::block)
         {
             if (size != 0)
                 create(val, hpx::block);
@@ -814,7 +888,10 @@ namespace hpx
         ///                         created vector
         ///
         template <typename DistPolicy>
-        vector(size_type size, DistPolicy const& policy)
+        vector(size_type size, DistPolicy const& policy,
+                typename boost::enable_if<
+                        is_vector_distribution_policy<DistPolicy>
+                    >::type* = 0)
           : size_(size),
             block_size_(policy.get_block_size()),
             partition_size_(std::size_t(-1)),
@@ -825,7 +902,10 @@ namespace hpx
         }
         template <typename DistPolicy>
         vector(size_type size, DistPolicy const& policy,
-                std::string const& symbolic_name)
+                std::string const& symbolic_name,
+                typename boost::enable_if<
+                        is_vector_distribution_policy<DistPolicy>
+                    >::type* = 0)
           : size_(size),
             block_size_(policy.get_block_size()),
             partition_size_(std::size_t(-1)),
@@ -848,7 +928,10 @@ namespace hpx
         ///                         created vector
         ///
         template <typename DistPolicy>
-        vector(size_type size, T const& val, DistPolicy const& policy)
+        vector(size_type size, T const& val, DistPolicy const& policy,
+                typename boost::enable_if<
+                        is_vector_distribution_policy<DistPolicy>
+                    >::type* = 0)
           : size_(size),
             block_size_(policy.get_block_size()),
             partition_size_(std::size_t(-1)),
@@ -859,7 +942,10 @@ namespace hpx
         }
         template <typename DistPolicy>
         vector(size_type size, T const& val, DistPolicy const& policy,
-                std::string const& symbolic_name)
+                std::string const& symbolic_name,
+                typename boost::enable_if<
+                        is_vector_distribution_policy<DistPolicy>
+                    >::type* = 0)
           : size_(size),
             block_size_(policy.get_block_size()),
             partition_size_(std::size_t(-1)),
@@ -885,7 +971,7 @@ namespace hpx
         vector(vector const& rhs)
           : size_(0),
             block_size_(1),
-            policy_(distribution_policy::block)
+            policy_(vector_distribution_policy::block)
         {
             if (rhs.size_ != 0)
                 copy_from(rhs);
@@ -902,7 +988,7 @@ namespace hpx
             rhs.size_ = 0;
             rhs.block_size_ = 1;
             rhs.partition_size_ = std::size_t(-1);
-            rhs.policy_ = distribution_policy::block;
+            rhs.policy_ = vector_distribution_policy::block;
         }
 
     public:
@@ -952,7 +1038,7 @@ namespace hpx
                 rhs.size_ = 0;
                 rhs.block_size_ = 1;
                 rhs.partition_size_ = std::size_t(-1);
-                rhs.policy_ = distribution_policy::block;
+                rhs.policy_ = vector_distribution_policy::block;
             }
             return *this;
         }
@@ -975,7 +1061,7 @@ namespace hpx
         /// \return Return the distribution policy type used to create this
         ///         vector instance
         ///
-        BOOST_SCOPED_ENUM(distribution_policy) get_policy() const
+        BOOST_SCOPED_ENUM(vector_distribution_policy) get_policy() const
         {
             return policy_;
         }
@@ -1096,75 +1182,77 @@ namespace hpx
         /// \return Returns the value of the element at position represented by
         ///         \a pos.
         ///
-        future< std::vector<T> >
+        future<std::vector<T> >
         get_values(std::vector<size_type> const & pos_vec) const
         {
             // check if position vector is empty
-            // the follwoing code needs at least one element.
-            if (0 == pos_vec.size()){
-                return make_ready_future( std::vector<T>() );
-            }
+            // the following code needs at least one element.
+            if (0 == pos_vec.size())
+                return make_ready_future(std::vector<T>());
 
             // current partition index of the block
-            size_type part_cur = get_partition( pos_vec[0] );
+            size_type part_cur = get_partition(pos_vec[0]);
+
             // iterator to the begin of current block
             std::vector<size_type>::const_iterator part_begin = pos_vec.begin();
+
             // vector holding futures of the values for all blocks
-            std::vector< future< std::vector<T> > > part_values_future;
+            std::vector<future<std::vector<T> > > part_values_future;
             for (std::vector<size_type>::const_iterator it = pos_vec.begin();
-                    it != pos_vec.end(); ++it){
+                 it != pos_vec.end(); ++it)
+            {
                 // get the partition of the current position
                 size_type part = get_partition(*it);
 
                 // if the partition of the current position is the same
                 // as the rest of the current block go to next position
-                if ( part == part_cur) continue;
+                if (part == part_cur)
+                    continue;
+
                 // if the partition of the current position is NOT the same
                 // as the positions before the block ends here
                 else
                 {
                     // this is the end of a block containing indexes ('pos')
                     // of the same partition ('part').
-                    // get asyncorn values for this block
-                    part_values_future.push_back( get_values( part_cur,
-                            get_local_indices(std::vector<size_type>(part_begin, it)) ) );
+                    // get async values for this block
+                    part_values_future.push_back(get_values(part_cur,
+                        get_local_indices(std::vector<size_type>(part_begin, it))));
 
-                    // reset block varibles to start a new one from here
+                    // reset block variables to start a new one from here
                     part_cur = part;
                     part_begin = it;
                 }
             }
 
             // the end of the vector is also an end of a block
-            // get asyncorn values for this block
-            part_values_future.push_back( get_values( part_cur,
-                    get_local_indices(std::vector<size_type>(
-                    part_begin, pos_vec.end())) ) );
+            // get async values for this block
+            part_values_future.push_back(get_values(part_cur,
+                get_local_indices(std::vector<size_type>(
+                    part_begin, pos_vec.end()))));
 
             // This helper function unwraps the vectors from each partition
             // and merge them to one vector
             auto merge_func =
-                    [&pos_vec]
-                    (std::vector< future< std::vector<T> > > part_values_f)
+                [&pos_vec](std::vector<future<std::vector<T> > > && part_values_f)
                     -> std::vector<T>
-                    {
-                        std::vector<T> values;
-                        values.reserve( pos_vec.size() );
+                {
+                    std::vector<T> values;
+                    values.reserve(pos_vec.size());
 
-                        for (future< std::vector<T> >& part_f : part_values_f){
-                            std::vector<T> part_values = part_f.get();
-                            std::move( part_values.begin(), part_values.end(),
-                                       std::back_inserter(values) );
-                        }
-                        return values;
-                    };
+                    for (future<std::vector<T> >& part_f: part_values_f)
+                    {
+                        std::vector<T> part_values = part_f.get();
+                        std::move(part_values.begin(), part_values.end(),
+                            std::back_inserter(values));
+                    }
+                    return values;
+                };
 
             // when all values are here merge them to one vector
             // and return a future to this vector
-            using lcos::local::dataflow;
-            return dataflow(launch::async, merge_func,
-                            std::move( part_values_future)
-                           );
+            return lcos::local::dataflow(launch::async, merge_func,
+                std::move(part_values_future));
         }
 
         /// Returns the elements at the positions \a pos
@@ -1180,9 +1268,6 @@ namespace hpx
         {
             return get_values(pos_vec).get();
         }
-
-
-
 
 //         //FRONT (never throws exception)
 //         /** @brief Access the value of first element in the vector.
@@ -1448,43 +1533,46 @@ namespace hpx
             HPX_ASSERT(pos.size() == val.size());
 
             // check if position vector is empty
-            // the follwoing code needs at least one element.
-            if (0 == pos.size()){
+            // the following code needs at least one element.
+            if (0 == pos.size())
                 return make_ready_future();
-            }
 
             // partition index of the current block
-            size_type part_cur = get_partition( pos[0] );
+            size_type part_cur = get_partition(pos[0]);
+
             // iterator to the begin of current block
-            std::vector<size_type>::const_iterator  pos_block_begin = pos.begin();
+            std::vector<size_type>::const_iterator pos_block_begin = pos.begin();
             typename std::vector<T>::const_iterator val_block_begin = val.begin();
+
             // vector holding futures of the state for all blocks
-            std::vector< future<void> > part_futures;
+            std::vector<future<void> > part_futures;
 
             // going through the position vector
-            std::vector<size_type>::const_iterator  pos_it = pos.begin();
+            std::vector<size_type>::const_iterator pos_it = pos.begin();
             typename std::vector<T>::const_iterator val_it = val.begin();
-            for (; pos_it != pos.end(); ++pos_it, ++val_it){
-
+            for (/**/; pos_it != pos.end(); ++pos_it, ++val_it)
+            {
                 // get the partition of the current position
                 size_type part = get_partition(*pos_it);
 
                 // if the partition of the current position is the same
                 // as the rest of the current block go to next position
-                if ( part == part_cur) continue;
+                if (part == part_cur)
+                    continue;
+
                 // if the partition of the current position is NOT the same
                 // as the positions before the block ends here
                 else
                 {
                     // this is the end of a block containing indexes ('pos')
                     // of the same partition ('part').
-                    // set asyncorn values for this block
-                    part_futures.push_back( set_values( part_cur,
-                            get_local_indices(std::vector<size_type>(
+                    // set asynchronous values for this block
+                    part_futures.push_back(set_values(part_cur,
+                        get_local_indices(std::vector<size_type>(
                             pos_block_begin, pos_it)),
-                            std::vector<T>(val_block_begin, val_it) ) );
+                        std::vector<T>(val_block_begin, val_it)));
 
-                    // reset block varibles to start a new one from here
+                    // reset block variables to start a new one from here
                     part_cur = part;
                     pos_block_begin = pos_it;
                     val_block_begin = val_it;
@@ -1492,18 +1580,17 @@ namespace hpx
             }
 
             // the end of the vector is also an end of a block
-            // get asyncorn values for this block
-            part_futures.push_back( set_values( part_cur,
-                    get_local_indices(std::vector<size_type>(
+            // get asynchronous values for this block
+            part_futures.push_back(set_values(part_cur,
+                get_local_indices(std::vector<size_type>(
                     pos_block_begin, pos.end())),
-                    std::vector<T>(val_block_begin, val.end()) ) );
+                std::vector<T>(val_block_begin, val.end())));
 
             return when_all(part_futures);
         }
 
-        void
-        set_values_sync(std::vector<size_type> const& pos,
-                        std::vector<T> const& val)
+        void set_values_sync(std::vector<size_type> const& pos,
+            std::vector<T> const& val)
         {
             return set_value(pos, val).get();
         }
@@ -1523,51 +1610,94 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         /// Return the iterator at the beginning of the first segment located
         /// on the given locality.
-        iterator
-        begin(boost::uint32_t id = naming::invalid_locality_id)
+        iterator begin()
         {
-            return iterator(this, get_global_index(segment_begin(id), 0,
-                distribution_policy::block));
+            return iterator(this, get_global_index(segment_cbegin(), 0,
+                vector_distribution_policy::block));
         }
 
         /// \brief Return the const_iterator at the beginning of the vector.
-        const_iterator
-        begin(boost::uint32_t id = naming::invalid_locality_id) const
+        const_iterator begin() const
         {
-            return const_iterator(this, get_global_index(segment_cbegin(id), 0,
-                distribution_policy::block));
+            return const_iterator(this, get_global_index(segment_cbegin(), 0,
+                vector_distribution_policy::block));
         }
 
         /// \brief Return the const_iterator at the beginning of the vector.
-        const_iterator
-        cbegin(boost::uint32_t id = naming::invalid_locality_id) const
+        const_iterator cbegin() const
         {
-            return const_iterator(this, get_global_index(segment_cbegin(id), 0,
-                distribution_policy::block));
+            return const_iterator(this, get_global_index(segment_cbegin(), 0,
+                vector_distribution_policy::block));
         }
 
         /// \brief Return the iterator at the end of the vector.
-        iterator
-        end(boost::uint32_t id = naming::invalid_locality_id)
+        iterator end()
+        {
+            return iterator(this, get_global_index(segment_cend(), 0,
+                vector_distribution_policy::block));
+        }
+
+        /// \brief Return the const_iterator at the end of the vector.
+        const_iterator end() const
+        {
+            return const_iterator(this, get_global_index(segment_cend(), 0,
+                vector_distribution_policy::block));
+        }
+
+        /// \brief Return the const_iterator at the end of the vector.
+        const_iterator cend() const
+        {
+            return const_iterator(this, get_global_index(segment_cend(), 0,
+                vector_distribution_policy::block));
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        /// Return the iterator at the beginning of the first partition of the
+        /// vector on the given locality.
+        iterator begin(boost::uint32_t id)
+        {
+            return iterator(this, get_global_index(segment_begin(id), 0,
+                vector_distribution_policy::block));
+        }
+
+        /// Return the iterator at the beginning of the first partition of the
+        /// vector on the given locality.
+        const_iterator begin(boost::uint32_t id) const
+        {
+            return const_iterator(this, get_global_index(segment_cbegin(id), 0,
+                vector_distribution_policy::block));
+        }
+
+        /// Return the iterator at the beginning of the first partition of the
+        /// vector on the given locality.
+        const_iterator cbegin(boost::uint32_t id) const
+        {
+            return const_iterator(this, get_global_index(segment_cbegin(id), 0,
+                vector_distribution_policy::block));
+        }
+
+        /// Return the iterator at the end of the last partition of the
+        /// vector on the given locality.
+        iterator end(boost::uint32_t id)
         {
             return iterator(this, get_global_index(segment_end(id), 0,
-                distribution_policy::block));
+                vector_distribution_policy::block));
         }
 
-        /// \brief Return the const_iterator at the end of the vector.
-        const_iterator
-        end(boost::uint32_t id = naming::invalid_locality_id) const
+        /// Return the iterator at the end of the last partition of the
+        /// vector on the given locality.
+        const_iterator end(boost::uint32_t id) const
         {
             return const_iterator(this, get_global_index(segment_cend(id), 0,
-                distribution_policy::block));
+                vector_distribution_policy::block));
         }
 
-        /// \brief Return the const_iterator at the end of the vector.
-        const_iterator
-        cend(boost::uint32_t id = naming::invalid_locality_id) const
+        /// Return the iterator at the end of the last partition of the
+        /// vector on the given locality.
+        const_iterator cend(boost::uint32_t id) const
         {
             return const_iterator(this, get_global_index(segment_cend(id), 0,
-                distribution_policy::block));
+                vector_distribution_policy::block));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -1579,35 +1709,40 @@ namespace hpx
             return begin(naming::get_locality_from_id(id));
         }
 
-        /// \brief Return the const_iterator at the beginning of the vector.
+        /// Return the iterator at the beginning of the first segment located
+        /// on the given locality.
         const_iterator begin(id_type const& id) const
         {
             HPX_ASSERT(naming::is_locality(id));
             return begin(naming::get_locality_from_id(id));
         }
 
-        /// \brief Return the const_iterator at the beginning of the vector.
+        /// Return the iterator at the beginning of the first segment located
+        /// on the given locality.
         const_iterator cbegin(id_type const& id) const
         {
             HPX_ASSERT(naming::is_locality(id));
             return cbegin(naming::get_locality_from_id(id));
         }
 
-        /// \brief Return the iterator at the end of the vector.
+        /// Return the iterator at the end of the last segment located
+        /// on the given locality.
         iterator end(id_type const& id)
         {
             HPX_ASSERT(naming::is_locality(id));
             return end(naming::get_locality_from_id(id));
         }
 
-        /// \brief Return the const_iterator at the end of the vector.
+        /// Return the iterator at the end of the last segment located
+        /// on the given locality.
         const_iterator end(id_type const& id) const
         {
             HPX_ASSERT(naming::is_locality(id));
             return end(naming::get_locality_from_id(id));
         }
 
-        /// \brief Return the const_iterator at the end of the vector.
+        /// Return the iterator at the end of the last segment located
+        /// on the given locality.
         const_iterator cend(id_type const& id) const
         {
             HPX_ASSERT(naming::is_locality(id));
@@ -1615,82 +1750,122 @@ namespace hpx
         }
 
         ///////////////////////////////////////////////////////////////////////
-        segment_iterator
-        segment_begin(boost::uint32_t id = naming::invalid_locality_id)
+        // Return global segment iterator
+        segment_iterator segment_begin()
         {
-            return segment_iterator(this, partitions_.begin(),
-                partitions_.end(), id);
+            return segment_iterator(partitions_.begin(), this);
         }
 
-        const_segment_iterator
-        segment_begin(boost::uint32_t id = naming::invalid_locality_id) const
+        const_segment_iterator segment_begin() const
         {
-            return const_segment_iterator(this, partitions_.cbegin(),
-                partitions_.cend(), id);
+            return const_segment_iterator(partitions_.cbegin(), this);
         }
 
-        const_segment_iterator
-        segment_cbegin(boost::uint32_t id = naming::invalid_locality_id) const
+        const_segment_iterator segment_cbegin() const
         {
-            return const_segment_iterator(this, partitions_.cbegin(),
-                partitions_.cend(), id);
+            return const_segment_iterator(partitions_.cbegin(), this);
         }
 
-        segment_iterator
-        segment_end(boost::uint32_t id = naming::invalid_locality_id)
+        segment_iterator segment_end()
         {
-            return segment_iterator(this, partitions_.end());
+            return segment_iterator(partitions_.end());
         }
 
-        const_segment_iterator
-        segment_end(boost::uint32_t id = naming::invalid_locality_id) const
+        const_segment_iterator segment_end() const
         {
-            return const_segment_iterator(this, partitions_.cend());
+            return const_segment_iterator(partitions_.cend());
         }
 
-        const_segment_iterator
-        segment_cend(boost::uint32_t id = naming::invalid_locality_id) const
+        const_segment_iterator segment_cend() const
         {
-            return const_segment_iterator(this, partitions_.cend());
+            return const_segment_iterator(partitions_.cend());
         }
 
         ///////////////////////////////////////////////////////////////////////
-        segment_iterator segment_begin(id_type const& id)
+        // Return local segment iterator
+        local_segment_iterator segment_begin(boost::uint32_t id)
+        {
+            // local_segement_iterators are only valid on the locality where
+            // the data lives
+            HPX_ASSERT(id == hpx::get_locality_id());
+            return local_segment_iterator(partitions_.begin(),
+                partitions_.end(), id);
+        }
+
+        const_local_segment_iterator segment_begin(boost::uint32_t id) const
+        {
+            // local_segement_iterators are only valid on the locality where
+            // the data lives
+            HPX_ASSERT(id == hpx::get_locality_id());
+            return const_local_segment_iterator(partitions_.cbegin(),
+                partitions_.cend(), id);
+        }
+
+        const_local_segment_iterator segment_cbegin(boost::uint32_t id) const
+        {
+            // local_segement_iterators are only valid on the locality where
+            // the data lives
+            HPX_ASSERT(id == hpx::get_locality_id());
+            return const_local_segment_iterator(partitions_.cbegin(),
+                partitions_.cend(), id);
+        }
+
+        local_segment_iterator segment_end(boost::uint32_t id)
+        {
+            // local_segement_iterators are only valid on the locality where
+            // the data lives
+            HPX_ASSERT(id == hpx::get_locality_id());
+            return local_segment_iterator(partitions_.end());
+        }
+
+        const_local_segment_iterator segment_end(boost::uint32_t id) const
+        {
+            // local_segement_iterators are only valid on the locality where
+            // the data lives
+            HPX_ASSERT(id == hpx::get_locality_id());
+            return const_local_segment_iterator(partitions_.cend());
+        }
+
+        const_local_segment_iterator segment_cend(boost::uint32_t id) const
+        {
+            // local_segement_iterators are only valid on the locality where
+            // the data lives
+            HPX_ASSERT(id == hpx::get_locality_id());
+            return const_local_segment_iterator(partitions_.cend());
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        local_segment_iterator segment_begin(id_type const& id)
         {
             HPX_ASSERT(naming::is_locality(id));
             return segment_begin(naming::get_locality_from_id(id));
         }
 
-        const_segment_iterator
-        segment_begin(id_type const& id) const
+        const_local_segment_iterator segment_begin(id_type const& id) const
         {
             HPX_ASSERT(naming::is_locality(id));
             return segment_begin(naming::get_locality_from_id(id));
         }
 
-        const_segment_iterator
-        segment_cbegin(id_type const& id) const
+        const_local_segment_iterator segment_cbegin(id_type const& id) const
         {
             HPX_ASSERT(naming::is_locality(id));
             return segment_cbegin(naming::get_locality_from_id(id));
         }
 
-        segment_iterator
-        segment_end(id_type const& id)
+        local_segment_iterator segment_end(id_type const& id)
         {
             HPX_ASSERT(naming::is_locality(id));
             return segment_end(naming::get_locality_from_id(id));
         }
 
-        const_segment_iterator
-        segment_end(id_type const& id) const
+        const_local_segment_iterator segment_end(id_type const& id) const
         {
             HPX_ASSERT(naming::is_locality(id));
             return segment_end(naming::get_locality_from_id(id));
         }
 
-        const_segment_iterator
-        segment_cend(id_type const& id) const
+        const_local_segment_iterator segment_cend(id_type const& id) const
         {
             HPX_ASSERT(naming::is_locality(id));
             return segment_cend(naming::get_locality_from_id(id));

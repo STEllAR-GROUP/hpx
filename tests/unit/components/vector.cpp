@@ -68,11 +68,13 @@ void test_segmented_iteration(hpx::vector<T>& v, std::size_t size,
     typedef typename hpx::vector<T>::iterator iterator;
     typedef hpx::traits::segmented_iterator_traits<iterator> traits;
     typedef typename traits::segment_iterator segment_iterator;
+    typedef typename traits::local_segment_iterator local_segment_iterator;
     typedef typename traits::local_iterator local_iterator;
 
     typedef typename hpx::vector<T>::const_iterator const_iterator;
     typedef hpx::traits::segmented_iterator_traits<const_iterator> const_traits;
     typedef typename const_traits::segment_iterator const_segment_iterator;
+    typedef typename const_traits::local_segment_iterator const_local_segment_iterator;
     typedef typename const_traits::local_iterator const_local_iterator;
 
     HPX_TEST(!hpx::traits::segmented_iterator_traits<
@@ -80,6 +82,13 @@ void test_segmented_iteration(hpx::vector<T>& v, std::size_t size,
         >::is_segmented_iterator::value);
     HPX_TEST(!hpx::traits::segmented_iterator_traits<
             const_segment_iterator
+        >::is_segmented_iterator::value);
+
+    HPX_TEST(!hpx::traits::segmented_iterator_traits<
+            local_segment_iterator
+        >::is_segmented_iterator::value);
+    HPX_TEST(!hpx::traits::segmented_iterator_traits<
+            const_local_segment_iterator
         >::is_segmented_iterator::value);
 
     HPX_TEST(!hpx::traits::segmented_iterator_traits<
@@ -165,12 +174,12 @@ void test_segmented_iteration(hpx::vector<T>& v, std::size_t size,
     BOOST_FOREACH(hpx::id_type const& loc, hpx::find_all_localities())
     {
         boost::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
-        segment_iterator seg_end = v.segment_end(locality_id);
-        for (segment_iterator seg_it = v.segment_begin(locality_id);
+        local_segment_iterator seg_end = v.segment_end(locality_id);
+        for (local_segment_iterator seg_it = v.segment_begin(locality_id);
              seg_it != seg_end; ++seg_it, ++seg_count)
         {
-            local_iterator loc_end = traits::end(seg_it);
-            for (local_iterator lit = traits::begin(seg_it);
+            typename std::vector<T>::iterator loc_end = traits::end(seg_it);
+            for (typename std::vector<T>::iterator lit = traits::begin(seg_it);
                  lit != loc_end; ++lit, ++count)
             {
             }
@@ -184,12 +193,12 @@ void test_segmented_iteration(hpx::vector<T>& v, std::size_t size,
     BOOST_FOREACH(hpx::id_type const& loc, hpx::find_all_localities())
     {
         boost::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
-        const_segment_iterator seg_cend = v.segment_cend(locality_id);
-        for (const_segment_iterator seg_cit = v.segment_cbegin(locality_id);
+        const_local_segment_iterator seg_cend = v.segment_cend(locality_id);
+        for (const_local_segment_iterator seg_cit = v.segment_cbegin(locality_id);
              seg_cit != seg_cend; ++seg_cit, ++seg_count)
         {
-            const_local_iterator loc_cend = const_traits::end(seg_cit);
-            for (const_local_iterator lcit = const_traits::begin(seg_cit);
+            typename std::vector<T>::const_iterator loc_cend = const_traits::end(seg_cit);
+            for (typename std::vector<T>::const_iterator lcit = const_traits::begin(seg_cit);
                  lcit != loc_cend; ++lcit, ++count)
             {
             }

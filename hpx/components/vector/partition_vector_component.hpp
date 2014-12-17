@@ -21,6 +21,7 @@
 #include <hpx/include/util.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
+#include <hpx/util/detail/count_num_args.hpp>
 
 #include <iostream>
 #include <tuple>
@@ -71,6 +72,16 @@ namespace hpx { namespace server
         partition_vector(size_type partition_size, T const& val)
           : partition_vector_(partition_size, val)
         {}
+
+        ///////////////////////////////////////////////////////////////////////
+        data_type& get_data()
+        {
+            return partition_vector_;
+        }
+        data_type const& get_data() const
+        {
+            return partition_vector_;
+        }
 
         ///////////////////////////////////////////////////////////////////////
         iterator_type begin()
@@ -140,20 +151,19 @@ namespace hpx { namespace server
             partition_vector_.resize(n, val);
         }
 
-        /** @brief Request the change in partition_vector capacity so that it
-         *          can hold \a n elements. Throws the \a hpx::length_error
-         *          exception.
-         *
-         *  This function request partition_vector capacity should be at least
-         *   enough to contain n elements. If n is greater than current
-         *   partition_vector capacity, the function causes the partition_vector to
-         *   reallocate its storage increasing its capacity to n (or greater).
-         *  In other cases the partition_vector capacity does not got affected.
-         *  It does not change the partition_vector size.
-         *
-         * @param n minimum capacity of partition_vector
-         *
-         */
+        /// Request the change in partition_vector capacity so that it
+        /// can hold \a n elements.
+        ///
+        /// This function request partition_vector capacity should be at least
+        /// enough to contain n elements. If n is greater than current
+        /// partition_vector capacity, the function causes the partition_vector to
+        /// reallocate its storage increasing its capacity to n (or greater).
+        /// In other cases the partition_vector capacity does not got affected.
+        /// It does not change the partition_vector size.
+        ///
+        /// \param n minimum capacity of partition_vector
+        ///
+        ///
         void reserve(size_type n)
         {
             partition_vector_.reserve(n);
@@ -196,23 +206,23 @@ namespace hpx { namespace server
         }
 
 
-        /** @brief Access the value of first element in the partition_vector.
-         *
-         *  Calling the function on empty container cause undefined behavior.
-         *
-         * @return Return the value of the first element in the partition_vector
-         */
+        /// \brief Access the value of first element in the partition_vector.
+        ///
+        /// Calling the function on empty container cause undefined behavior.
+        ///
+        /// \return Return the value of the first element in the partition_vector
+        ///
         T front() const
         {
             return partition_vector_.front();
         }
 
-        /** @brief Access the value of last element in the partition_vector.
-         *
-         *  Calling the function on empty container cause undefined behavior.
-         *
-         * @return Return the value of the last element in the partition_vector
-         */
+        /// \brief Access the value of last element in the partition_vector.
+        ///
+        /// Calling the function on empty container cause undefined behavior.
+        ///
+        /// \return Return the value of the last element in the partition_vector
+        ///
         T back() const
         {
             return partition_vector_.back();
@@ -222,30 +232,30 @@ namespace hpx { namespace server
         // Modifiers API's in server class
         ///////////////////////////////////////////////////////////////////////
 
-        /** @brief Assigns new contents to the partition_vector, replacing its
-         *          current contents and modifying its size accordingly.
-         *
-         * @param n     new size of partition_vector
-         * @param val   Value to fill the container with
-         */
+        /// Assigns new contents to the partition_vector, replacing its
+        /// current contents and modifying its size accordingly.
+        ///
+        /// \param n     new size of partition_vector
+        /// \param val   Value to fill the container with
+        ///
         void assign(size_type n, T const& val)
         {
             partition_vector_.assign(n, val);
         }
 
-        /** @brief Add new element at the end of partition_vector. The added
-         *          element contain the \a val as value.
-         *
-         * @param val Value to be copied to new element
-         */
+        /// Add new element at the end of partition_vector. The added
+        /// element contain the \a val as value.
+        ///
+        /// \param val Value to be copied to new element
+        ///
         void push_back(T const& val)
         {
             partition_vector_.push_back(val);
         }
 
-        /** @brief Remove the last element from partition_vector effectively
-         *          reducing the size by one. The removed element is destroyed.
-         */
+        /// Remove the last element from partition_vector effectively
+        /// reducing the size by one. The removed element is destroyed.
+        ///
         void pop_back()
         {
             partition_vector_.pop_back();
@@ -283,9 +293,9 @@ namespace hpx { namespace server
                 partition_vector_[pos[i]] = val[i];
         }
 
-        /** @brief Remove all elements from the vector leaving the
-            *          partition_vector with size 0.
-            */
+        /// Remove all elements from the vector leaving the
+        /// partition_vector with size 0.
+        ///
         void clear()
         {
             partition_vector_.clear();
@@ -661,7 +671,6 @@ namespace hpx
             return hpx::async<typename server_type::set_values_action>(
                 this->get_gid(), pos, val);
         }
-
 
 //         void clear()
 //         {
