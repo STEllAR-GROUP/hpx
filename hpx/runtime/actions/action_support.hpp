@@ -853,7 +853,7 @@ namespace hpx { namespace actions
     {
         typedef Component component_type;
         typedef Derived derived_type;
-        
+
         typedef R result_type;
         typedef typename traits::promise_local_result<R>::type local_result_type;
         typedef typename detail::remote_action_result<R>::type remote_result_type;
@@ -939,16 +939,42 @@ namespace hpx { namespace actions
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename TF, TF F, typename Derived>
+    class basic_action_impl;
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename TF, TF F, typename Derived = detail::this_type>
+    struct action;
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename TF, TF F, typename Derived = detail::this_type>
+    struct direct_action;
+
+    ///////////////////////////////////////////////////////////////////////////
     // Base template allowing to generate a concrete action type from a function
     // pointer. It is instantiated only if the supplied pointer is not a
     // supported function pointer.
-    template <typename F, F funcptr, typename Derived = detail::this_type,
+    template <typename TF, TF F, typename Derived = detail::this_type,
         typename Direct = boost::mpl::false_>
     struct make_action;
 
-    template <typename F, F funcptr, typename Derived = detail::this_type>
+    template <typename TF, TF F, typename Derived>
+    struct make_action<TF, F, Derived, boost::mpl::false_>
+      : action<TF, F, Derived>
+    {
+        typedef action<TF, F, Derived> type;
+    };
+
+    template <typename TF, TF F, typename Derived>
+    struct make_action<TF, F, Derived, boost::mpl::true_>
+      : direct_action<TF, F, Derived>
+    {
+        typedef direct_action<TF, F, Derived> type;
+    };
+
+    template <typename TF, TF F, typename Derived = detail::this_type>
     struct make_direct_action
-      : make_action<F, funcptr, Derived, boost::mpl::true_>
+      : make_action<TF, F, Derived, boost::mpl::true_>
     {};
 
 // older compilers require BOOST_TYPEOF, newer compilers have decltype()

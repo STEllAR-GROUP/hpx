@@ -24,7 +24,7 @@ using hpx::finalize;
 
 using hpx::util::report_errors;
 
-using hpx::actions::plain_action;
+using hpx::actions::action;
 
 using hpx::lcos::wait_each;
 using hpx::async;
@@ -72,7 +72,7 @@ void null_thread()
     ++void_counter;
 }
 
-typedef plain_action<void (*)(), null_thread> null_action;
+typedef action<void (*)(), null_thread> null_action;
 
 HPX_REGISTER_PLAIN_ACTION(null_action);
 
@@ -85,7 +85,7 @@ bool null_result_thread()
     return true;
 }
 
-typedef plain_action<bool (*)(), null_result_thread> null_result_action;
+typedef action<bool (*)(), null_result_thread> null_result_action;
 
 HPX_REGISTER_PLAIN_ACTION(null_result_action);
 

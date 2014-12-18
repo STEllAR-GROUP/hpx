@@ -16,7 +16,7 @@ namespace hpx { namespace actions
         typename Component, typename R,
         typename T0,
         R (Component::*F)(T0) const, typename Derived>
-    class component_base_action<
+    class basic_action_impl<
             R (Component::*)(T0) const, F, Derived>
       : public basic_action<
             Component const, R(typename util::decay<T0>::type),
@@ -115,7 +115,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "component_base_action" << 1
+                << "basic_action_impl" << 1
                 << "::execute_function name("
                 << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
@@ -131,33 +131,20 @@ namespace hpx { namespace actions
         typename T0,
         R (Component::*F)(T0) const,
         typename Derived>
-    struct component_action<
+    struct action<
             R (Component::*)(T0) const, F, Derived>
-      : component_base_action<
+      : basic_action_impl<
             R (Component::*)(T0) const, F,
             typename detail::action_type<
-                component_action<
+                action<
                     R (Component::*)(T0) const, F, Derived>,
                 Derived
             >::type>
     {
         typedef typename detail::action_type<
-            component_action, Derived
+            action, Derived
         >::type derived_type;
         typedef boost::mpl::false_ direct_execution;
-    };
-    
-    template <
-        typename Component, typename R, typename T0,
-        R (Component::*F)(T0) const, typename Derived>
-    struct make_action<R (Component::*)(T0) const,
-            F, Derived, boost::mpl::false_>
-      : component_action<
-            R (Component::*)(T0) const, F, Derived>
-    {
-        typedef component_action<
-            R (Component::*)(T0) const, F, Derived
-        > type;
     };
     
     
@@ -166,18 +153,18 @@ namespace hpx { namespace actions
         typename T0,
         R (Component::*F)(T0) const,
         typename Derived>
-    struct component_direct_action<
+    struct direct_action<
             R (Component::*)(T0) const, F, Derived>
-      : component_base_action<
+      : basic_action_impl<
             R (Component::*)(T0) const, F,
             typename detail::action_type<
-                component_direct_action<
+                direct_action<
                     R (Component::*)(T0) const, F, Derived>,
                     Derived
             >::type>
     {
         typedef typename detail::action_type<
-            component_direct_action, Derived
+            direct_action, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         
@@ -188,24 +175,11 @@ namespace hpx { namespace actions
         }
     };
     
-    template <
-        typename Component, typename R, typename T0,
-        R (Component::*F)(T0) const, typename Derived>
-    struct make_action<R (Component::*)(T0) const,
-            F, Derived, boost::mpl::true_>
-      : component_direct_action<
-            R (Component::*)(T0) const, F, Derived>
-    {
-        typedef component_direct_action<
-            R (Component::*)(T0) const, F, Derived
-        > type;
-    };
-    
     
     template <
         typename Component, typename T0,
         void (Component::*F)(T0) const, typename Derived>
-    class component_base_action<
+    class basic_action_impl<
             void (Component::*)(T0) const, F, Derived>
       : public basic_action<
             Component const, util::unused_type(typename util::decay<T0>::type),
@@ -305,7 +279,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "component_base_action" << 1
+                << "basic_action_impl" << 1
                 << "::execute_function name("
                 << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
@@ -324,7 +298,7 @@ namespace hpx { namespace actions
         typename Component, typename R,
         typename T0 , typename T1,
         R (Component::*F)(T0 , T1) const, typename Derived>
-    class component_base_action<
+    class basic_action_impl<
             R (Component::*)(T0 , T1) const, F, Derived>
       : public basic_action<
             Component const, R(typename util::decay<T0>::type , typename util::decay<T1>::type),
@@ -423,7 +397,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "component_base_action" << 2
+                << "basic_action_impl" << 2
                 << "::execute_function name("
                 << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
@@ -439,33 +413,20 @@ namespace hpx { namespace actions
         typename T0 , typename T1,
         R (Component::*F)(T0 , T1) const,
         typename Derived>
-    struct component_action<
+    struct action<
             R (Component::*)(T0 , T1) const, F, Derived>
-      : component_base_action<
+      : basic_action_impl<
             R (Component::*)(T0 , T1) const, F,
             typename detail::action_type<
-                component_action<
+                action<
                     R (Component::*)(T0 , T1) const, F, Derived>,
                 Derived
             >::type>
     {
         typedef typename detail::action_type<
-            component_action, Derived
+            action, Derived
         >::type derived_type;
         typedef boost::mpl::false_ direct_execution;
-    };
-    
-    template <
-        typename Component, typename R, typename T0 , typename T1,
-        R (Component::*F)(T0 , T1) const, typename Derived>
-    struct make_action<R (Component::*)(T0 , T1) const,
-            F, Derived, boost::mpl::false_>
-      : component_action<
-            R (Component::*)(T0 , T1) const, F, Derived>
-    {
-        typedef component_action<
-            R (Component::*)(T0 , T1) const, F, Derived
-        > type;
     };
     
     
@@ -474,18 +435,18 @@ namespace hpx { namespace actions
         typename T0 , typename T1,
         R (Component::*F)(T0 , T1) const,
         typename Derived>
-    struct component_direct_action<
+    struct direct_action<
             R (Component::*)(T0 , T1) const, F, Derived>
-      : component_base_action<
+      : basic_action_impl<
             R (Component::*)(T0 , T1) const, F,
             typename detail::action_type<
-                component_direct_action<
+                direct_action<
                     R (Component::*)(T0 , T1) const, F, Derived>,
                     Derived
             >::type>
     {
         typedef typename detail::action_type<
-            component_direct_action, Derived
+            direct_action, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         
@@ -496,24 +457,11 @@ namespace hpx { namespace actions
         }
     };
     
-    template <
-        typename Component, typename R, typename T0 , typename T1,
-        R (Component::*F)(T0 , T1) const, typename Derived>
-    struct make_action<R (Component::*)(T0 , T1) const,
-            F, Derived, boost::mpl::true_>
-      : component_direct_action<
-            R (Component::*)(T0 , T1) const, F, Derived>
-    {
-        typedef component_direct_action<
-            R (Component::*)(T0 , T1) const, F, Derived
-        > type;
-    };
-    
     
     template <
         typename Component, typename T0 , typename T1,
         void (Component::*F)(T0 , T1) const, typename Derived>
-    class component_base_action<
+    class basic_action_impl<
             void (Component::*)(T0 , T1) const, F, Derived>
       : public basic_action<
             Component const, util::unused_type(typename util::decay<T0>::type , typename util::decay<T1>::type),
@@ -613,7 +561,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "component_base_action" << 2
+                << "basic_action_impl" << 2
                 << "::execute_function name("
                 << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
@@ -632,7 +580,7 @@ namespace hpx { namespace actions
         typename Component, typename R,
         typename T0 , typename T1 , typename T2,
         R (Component::*F)(T0 , T1 , T2) const, typename Derived>
-    class component_base_action<
+    class basic_action_impl<
             R (Component::*)(T0 , T1 , T2) const, F, Derived>
       : public basic_action<
             Component const, R(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type),
@@ -731,7 +679,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "component_base_action" << 3
+                << "basic_action_impl" << 3
                 << "::execute_function name("
                 << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
@@ -747,33 +695,20 @@ namespace hpx { namespace actions
         typename T0 , typename T1 , typename T2,
         R (Component::*F)(T0 , T1 , T2) const,
         typename Derived>
-    struct component_action<
+    struct action<
             R (Component::*)(T0 , T1 , T2) const, F, Derived>
-      : component_base_action<
+      : basic_action_impl<
             R (Component::*)(T0 , T1 , T2) const, F,
             typename detail::action_type<
-                component_action<
+                action<
                     R (Component::*)(T0 , T1 , T2) const, F, Derived>,
                 Derived
             >::type>
     {
         typedef typename detail::action_type<
-            component_action, Derived
+            action, Derived
         >::type derived_type;
         typedef boost::mpl::false_ direct_execution;
-    };
-    
-    template <
-        typename Component, typename R, typename T0 , typename T1 , typename T2,
-        R (Component::*F)(T0 , T1 , T2) const, typename Derived>
-    struct make_action<R (Component::*)(T0 , T1 , T2) const,
-            F, Derived, boost::mpl::false_>
-      : component_action<
-            R (Component::*)(T0 , T1 , T2) const, F, Derived>
-    {
-        typedef component_action<
-            R (Component::*)(T0 , T1 , T2) const, F, Derived
-        > type;
     };
     
     
@@ -782,18 +717,18 @@ namespace hpx { namespace actions
         typename T0 , typename T1 , typename T2,
         R (Component::*F)(T0 , T1 , T2) const,
         typename Derived>
-    struct component_direct_action<
+    struct direct_action<
             R (Component::*)(T0 , T1 , T2) const, F, Derived>
-      : component_base_action<
+      : basic_action_impl<
             R (Component::*)(T0 , T1 , T2) const, F,
             typename detail::action_type<
-                component_direct_action<
+                direct_action<
                     R (Component::*)(T0 , T1 , T2) const, F, Derived>,
                     Derived
             >::type>
     {
         typedef typename detail::action_type<
-            component_direct_action, Derived
+            direct_action, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         
@@ -804,24 +739,11 @@ namespace hpx { namespace actions
         }
     };
     
-    template <
-        typename Component, typename R, typename T0 , typename T1 , typename T2,
-        R (Component::*F)(T0 , T1 , T2) const, typename Derived>
-    struct make_action<R (Component::*)(T0 , T1 , T2) const,
-            F, Derived, boost::mpl::true_>
-      : component_direct_action<
-            R (Component::*)(T0 , T1 , T2) const, F, Derived>
-    {
-        typedef component_direct_action<
-            R (Component::*)(T0 , T1 , T2) const, F, Derived
-        > type;
-    };
-    
     
     template <
         typename Component, typename T0 , typename T1 , typename T2,
         void (Component::*F)(T0 , T1 , T2) const, typename Derived>
-    class component_base_action<
+    class basic_action_impl<
             void (Component::*)(T0 , T1 , T2) const, F, Derived>
       : public basic_action<
             Component const, util::unused_type(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type),
@@ -921,7 +843,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "component_base_action" << 3
+                << "basic_action_impl" << 3
                 << "::execute_function name("
                 << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
@@ -940,7 +862,7 @@ namespace hpx { namespace actions
         typename Component, typename R,
         typename T0 , typename T1 , typename T2 , typename T3,
         R (Component::*F)(T0 , T1 , T2 , T3) const, typename Derived>
-    class component_base_action<
+    class basic_action_impl<
             R (Component::*)(T0 , T1 , T2 , T3) const, F, Derived>
       : public basic_action<
             Component const, R(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type),
@@ -1039,7 +961,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "component_base_action" << 4
+                << "basic_action_impl" << 4
                 << "::execute_function name("
                 << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
@@ -1055,33 +977,20 @@ namespace hpx { namespace actions
         typename T0 , typename T1 , typename T2 , typename T3,
         R (Component::*F)(T0 , T1 , T2 , T3) const,
         typename Derived>
-    struct component_action<
+    struct action<
             R (Component::*)(T0 , T1 , T2 , T3) const, F, Derived>
-      : component_base_action<
+      : basic_action_impl<
             R (Component::*)(T0 , T1 , T2 , T3) const, F,
             typename detail::action_type<
-                component_action<
+                action<
                     R (Component::*)(T0 , T1 , T2 , T3) const, F, Derived>,
                 Derived
             >::type>
     {
         typedef typename detail::action_type<
-            component_action, Derived
+            action, Derived
         >::type derived_type;
         typedef boost::mpl::false_ direct_execution;
-    };
-    
-    template <
-        typename Component, typename R, typename T0 , typename T1 , typename T2 , typename T3,
-        R (Component::*F)(T0 , T1 , T2 , T3) const, typename Derived>
-    struct make_action<R (Component::*)(T0 , T1 , T2 , T3) const,
-            F, Derived, boost::mpl::false_>
-      : component_action<
-            R (Component::*)(T0 , T1 , T2 , T3) const, F, Derived>
-    {
-        typedef component_action<
-            R (Component::*)(T0 , T1 , T2 , T3) const, F, Derived
-        > type;
     };
     
     
@@ -1090,18 +999,18 @@ namespace hpx { namespace actions
         typename T0 , typename T1 , typename T2 , typename T3,
         R (Component::*F)(T0 , T1 , T2 , T3) const,
         typename Derived>
-    struct component_direct_action<
+    struct direct_action<
             R (Component::*)(T0 , T1 , T2 , T3) const, F, Derived>
-      : component_base_action<
+      : basic_action_impl<
             R (Component::*)(T0 , T1 , T2 , T3) const, F,
             typename detail::action_type<
-                component_direct_action<
+                direct_action<
                     R (Component::*)(T0 , T1 , T2 , T3) const, F, Derived>,
                     Derived
             >::type>
     {
         typedef typename detail::action_type<
-            component_direct_action, Derived
+            direct_action, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         
@@ -1112,24 +1021,11 @@ namespace hpx { namespace actions
         }
     };
     
-    template <
-        typename Component, typename R, typename T0 , typename T1 , typename T2 , typename T3,
-        R (Component::*F)(T0 , T1 , T2 , T3) const, typename Derived>
-    struct make_action<R (Component::*)(T0 , T1 , T2 , T3) const,
-            F, Derived, boost::mpl::true_>
-      : component_direct_action<
-            R (Component::*)(T0 , T1 , T2 , T3) const, F, Derived>
-    {
-        typedef component_direct_action<
-            R (Component::*)(T0 , T1 , T2 , T3) const, F, Derived
-        > type;
-    };
-    
     
     template <
         typename Component, typename T0 , typename T1 , typename T2 , typename T3,
         void (Component::*F)(T0 , T1 , T2 , T3) const, typename Derived>
-    class component_base_action<
+    class basic_action_impl<
             void (Component::*)(T0 , T1 , T2 , T3) const, F, Derived>
       : public basic_action<
             Component const, util::unused_type(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type),
@@ -1229,7 +1125,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "component_base_action" << 4
+                << "basic_action_impl" << 4
                 << "::execute_function name("
                 << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
@@ -1248,7 +1144,7 @@ namespace hpx { namespace actions
         typename Component, typename R,
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         R (Component::*F)(T0 , T1 , T2 , T3 , T4) const, typename Derived>
-    class component_base_action<
+    class basic_action_impl<
             R (Component::*)(T0 , T1 , T2 , T3 , T4) const, F, Derived>
       : public basic_action<
             Component const, R(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type),
@@ -1347,7 +1243,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "component_base_action" << 5
+                << "basic_action_impl" << 5
                 << "::execute_function name("
                 << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
@@ -1363,33 +1259,20 @@ namespace hpx { namespace actions
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         R (Component::*F)(T0 , T1 , T2 , T3 , T4) const,
         typename Derived>
-    struct component_action<
+    struct action<
             R (Component::*)(T0 , T1 , T2 , T3 , T4) const, F, Derived>
-      : component_base_action<
+      : basic_action_impl<
             R (Component::*)(T0 , T1 , T2 , T3 , T4) const, F,
             typename detail::action_type<
-                component_action<
+                action<
                     R (Component::*)(T0 , T1 , T2 , T3 , T4) const, F, Derived>,
                 Derived
             >::type>
     {
         typedef typename detail::action_type<
-            component_action, Derived
+            action, Derived
         >::type derived_type;
         typedef boost::mpl::false_ direct_execution;
-    };
-    
-    template <
-        typename Component, typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
-        R (Component::*F)(T0 , T1 , T2 , T3 , T4) const, typename Derived>
-    struct make_action<R (Component::*)(T0 , T1 , T2 , T3 , T4) const,
-            F, Derived, boost::mpl::false_>
-      : component_action<
-            R (Component::*)(T0 , T1 , T2 , T3 , T4) const, F, Derived>
-    {
-        typedef component_action<
-            R (Component::*)(T0 , T1 , T2 , T3 , T4) const, F, Derived
-        > type;
     };
     
     
@@ -1398,18 +1281,18 @@ namespace hpx { namespace actions
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         R (Component::*F)(T0 , T1 , T2 , T3 , T4) const,
         typename Derived>
-    struct component_direct_action<
+    struct direct_action<
             R (Component::*)(T0 , T1 , T2 , T3 , T4) const, F, Derived>
-      : component_base_action<
+      : basic_action_impl<
             R (Component::*)(T0 , T1 , T2 , T3 , T4) const, F,
             typename detail::action_type<
-                component_direct_action<
+                direct_action<
                     R (Component::*)(T0 , T1 , T2 , T3 , T4) const, F, Derived>,
                     Derived
             >::type>
     {
         typedef typename detail::action_type<
-            component_direct_action, Derived
+            direct_action, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         
@@ -1420,24 +1303,11 @@ namespace hpx { namespace actions
         }
     };
     
-    template <
-        typename Component, typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
-        R (Component::*F)(T0 , T1 , T2 , T3 , T4) const, typename Derived>
-    struct make_action<R (Component::*)(T0 , T1 , T2 , T3 , T4) const,
-            F, Derived, boost::mpl::true_>
-      : component_direct_action<
-            R (Component::*)(T0 , T1 , T2 , T3 , T4) const, F, Derived>
-    {
-        typedef component_direct_action<
-            R (Component::*)(T0 , T1 , T2 , T3 , T4) const, F, Derived
-        > type;
-    };
-    
     
     template <
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4) const, typename Derived>
-    class component_base_action<
+    class basic_action_impl<
             void (Component::*)(T0 , T1 , T2 , T3 , T4) const, F, Derived>
       : public basic_action<
             Component const, util::unused_type(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type),
@@ -1537,7 +1407,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "component_base_action" << 5
+                << "basic_action_impl" << 5
                 << "::execute_function name("
                 << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(

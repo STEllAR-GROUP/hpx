@@ -26,23 +26,6 @@
 #include <cstdlib>
 #include <stdexcept>
 
-namespace hpx { namespace actions
-{
-    // declarations for main templates
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename TF, TF F, typename Derived>
-    class component_base_action;
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename TF, TF F, typename Derived = detail::this_type>
-    struct component_action;
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename TF, TF F, typename Derived = detail::this_type>
-    struct component_direct_action;
-}}
-
 ///////////////////////////////////////////////////////////////////////////////
 // bring in nullary actions and all other arities
 #include <hpx/runtime/actions/component_const_action.hpp>

@@ -69,7 +69,7 @@ HPX_PLAIN_ACTION(hpx::detail::list_component_type,
 
 typedef
     hpx::util::detail::bound_action<
-        hpx::actions::plain_action<
+        hpx::actions::action<
             void (*)(std::string const&, const hpx::naming::gid_type&)
           , hpx::detail::list_symbolic_name
           , hpx::actions::detail::this_type
@@ -94,7 +94,7 @@ HPX_UTIL_REGISTER_FUNCTION(
 
 typedef
     hpx::util::detail::bound_action<
-        hpx::actions::plain_action<
+        hpx::actions::action<
             void (*)(std::string const&, int)
           , hpx::detail::list_component_type
           , hpx::actions::detail::this_type

@@ -24,8 +24,8 @@ using boost::program_options::value;
 
 using hpx::naming::id_type;
 
-using hpx::actions::plain_action;
-using hpx::actions::plain_direct_action;
+using hpx::actions::action;
+using hpx::actions::direct_action;
 
 using hpx::lcos::dataflow;
 
@@ -44,10 +44,10 @@ std::size_t pass_movable_object(movable_object const& obj)
 }
 
 // 'normal' actions (execution is scheduled on a new thread)
-typedef plain_action<
+typedef action<
     void (*)(movable_object const&), pass_movable_object_void
 > pass_movable_object_void_action;
-typedef plain_action<
+typedef action<
     std::size_t (*)(movable_object const&), pass_movable_object
 > pass_movable_object_action;
 
@@ -55,10 +55,10 @@ HPX_REGISTER_PLAIN_ACTION(pass_movable_object_void_action)
 HPX_REGISTER_PLAIN_ACTION(pass_movable_object_action)
 
 // direct actions (execution happens in the calling thread)
-typedef plain_direct_action<
+typedef direct_action<
     void (*)(movable_object const&), pass_movable_object_void
 > pass_movable_object_void_direct_action;
-typedef plain_direct_action<
+typedef direct_action<
     std::size_t (*)(movable_object const&), pass_movable_object
 > pass_movable_object_direct_action;
 
@@ -73,10 +73,10 @@ std::size_t pass_non_movable_object(non_movable_object const& obj)
 }
 
 // 'normal' actions (execution is scheduled on a new thread
-typedef plain_action<
+typedef action<
     void (*)(non_movable_object const&), pass_non_movable_object_void
 > pass_non_movable_object_void_action;
-typedef plain_action<
+typedef action<
     std::size_t (*)(non_movable_object const&), pass_non_movable_object
 > pass_non_movable_object_action;
 
@@ -84,10 +84,10 @@ HPX_REGISTER_PLAIN_ACTION(pass_non_movable_object_void_action)
 HPX_REGISTER_PLAIN_ACTION(pass_non_movable_object_action)
 
 // direct actions (execution happens in the calling thread)
-typedef plain_direct_action<
+typedef direct_action<
     void (*)(non_movable_object const&), pass_non_movable_object_void
 > pass_non_movable_object_void_direct_action;
-typedef plain_direct_action<
+typedef direct_action<
     std::size_t (*)(non_movable_object const&), pass_non_movable_object
 > pass_non_movable_object_direct_action;
 
@@ -105,11 +105,11 @@ movable_object return_movable_object()
 }
 
 // 'normal' actions (execution is scheduled on a new thread)
-typedef plain_action<
+typedef action<
     movable_object (*)(), return_movable_object
 > return_movable_object_action;
 
-typedef plain_action<
+typedef action<
     non_movable_object (*)(), return_non_movable_object
 > return_non_movable_object_action;
 
@@ -117,11 +117,11 @@ HPX_REGISTER_PLAIN_ACTION(return_movable_object_action)
 HPX_REGISTER_PLAIN_ACTION(return_non_movable_object_action)
 
 // direct actions (execution happens in the calling thread)
-typedef plain_direct_action<
+typedef direct_action<
     movable_object (*)(), return_movable_object
 > return_movable_object_direct_action;
 
-typedef plain_direct_action<
+typedef direct_action<
     non_movable_object (*)(), return_non_movable_object
 > return_non_movable_object_direct_action;
 

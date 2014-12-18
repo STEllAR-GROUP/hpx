@@ -21,7 +21,7 @@ namespace hpx { namespace components { namespace server
     // console logging happens here
     void console_error_sink(boost::exception_ptr const&);
 
-    typedef actions::plain_action<
+    typedef actions::action<
         void (*)(boost::exception_ptr const&), console_error_sink
     > console_error_sink_action;
 }}}

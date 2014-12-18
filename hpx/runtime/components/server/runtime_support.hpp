@@ -744,7 +744,7 @@ namespace hpx { namespace components { namespace server
 {
     template <typename Component>
     struct copy_create_component_action
-      : ::hpx::actions::component_action<
+      : ::hpx::actions::action<
             naming::gid_type (runtime_support::*)(
                 boost::shared_ptr<Component> const&, bool)
           , &runtime_support::copy_create_component<Component>
@@ -752,7 +752,7 @@ namespace hpx { namespace components { namespace server
     {};
     template <typename Component>
     struct migrate_component_here_action
-      : ::hpx::actions::component_action<
+      : ::hpx::actions::action<
             naming::gid_type (runtime_support::*)(
                 boost::shared_ptr<Component> const&, naming::id_type)
           , &runtime_support::migrate_component_to_here<Component>

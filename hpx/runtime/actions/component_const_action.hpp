@@ -25,7 +25,7 @@ namespace hpx { namespace actions
     template <
         typename Component, typename R,
         R (Component::*F)() const, typename Derived>
-    class component_base_action<R (Component::*)() const, F, Derived>
+    class basic_action_impl<R (Component::*)() const, F, Derived>
       : public basic_action<Component const, R(), Derived>
     {
     public:
@@ -87,7 +87,7 @@ namespace hpx { namespace actions
     public:
         /// \brief This static \a construct_thread_function allows to construct
         /// a proper thread function for a \a thread without having to
-        /// instantiate the \a component_base_action type. This is used by the \a
+        /// instantiate the \a basic_action_impl type. This is used by the \a
         /// applier in case no continuation has been supplied.
         template <typename Arguments>
         static threads::thread_function_type
@@ -103,7 +103,7 @@ namespace hpx { namespace actions
 
         /// \brief This static \a construct_thread_function allows to construct
         /// a proper thread function for a \a thread without having to
-        /// instantiate the \a component_base_action type. This is used by the \a
+        /// instantiate the \a basic_action_impl type. This is used by the \a
         /// applier in case a continuation has been supplied
         template <typename Arguments>
         static threads::thread_function_type
@@ -123,7 +123,7 @@ namespace hpx { namespace actions
             Arguments &&)
         {
             LTM_(debug)
-                << "component_base_action::execute_function: name("
+                << "basic_action_impl::execute_function: name("
                 << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component const>::call(lva)) << ")";
@@ -135,46 +135,34 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename R,
         R (Component::*F)() const, typename Derived>
-    struct component_action<R (Component::*)() const, F, Derived>
-      : component_base_action<
+    struct action<R (Component::*)() const, F, Derived>
+      : basic_action_impl<
             R (Component::*)() const, F,
             typename detail::action_type<
-                component_action<R (Component::*)() const, F, Derived>,
+                action<R (Component::*)() const, F, Derived>,
                 Derived
             >::type>
     {
         typedef typename detail::action_type<
-            component_action, Derived
+            action, Derived
         >::type derived_type;
 
         typedef boost::mpl::false_ direct_execution;
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Component, typename R,
-        R (Component::*F)() const, typename Derived>
-    struct make_action<R (Component::*)() const, F, Derived, boost::mpl::false_>
-      : component_action<R (Component::*)() const, F, Derived>
-    {
-        typedef component_action<
-            R (Component::*)() const, F, Derived
-        > type;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename R,
         R (Component::*F)() const, typename Derived>
-    struct component_direct_action<R (Component::*)() const, F, Derived>
-      : public component_base_action<
+    struct direct_action<R (Component::*)() const, F, Derived>
+      : public basic_action_impl<
             R (Component::*)() const, F,
             typename detail::action_type<
-                component_direct_action<R (Component::*)() const, F, Derived>,
+                direct_action<R (Component::*)() const, F, Derived>,
                 Derived
             >::type>
     {
         typedef typename detail::action_type<
-            component_direct_action, Derived
+            direct_action, Derived
         >::type derived_type;
 
         typedef boost::mpl::true_ direct_execution;
@@ -188,21 +176,9 @@ namespace hpx { namespace actions
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Component, typename R,
-        R (Component::*F)() const, typename Derived>
-    struct make_action<R (Component::*)() const, F, Derived, boost::mpl::true_>
-      : component_direct_action<R (Component::*)() const, F, Derived>
-    {
-        typedef component_direct_action<
-            R (Component::*)() const, F, Derived
-        > type;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
     //  zero parameter version, no result value
     template <typename Component, void (Component::*F)() const, typename Derived>
-    class component_base_action<void (Component::*)() const, F, Derived>
+    class basic_action_impl<void (Component::*)() const, F, Derived>
       : public basic_action<Component const, util::unused_type(), Derived>
     {
     public:
@@ -264,7 +240,7 @@ namespace hpx { namespace actions
     public:
         /// \brief This static \a construct_thread_function allows to construct
         /// a proper thread function for a \a thread without having to
-        /// instantiate the component_base_action type. This is used by the \a applier in
+        /// instantiate the basic_action_impl type. This is used by the \a applier in
         /// case no continuation has been supplied.
         template <typename Arguments>
         static threads::thread_function_type
@@ -280,7 +256,7 @@ namespace hpx { namespace actions
 
         /// \brief This static \a construct_thread_function allows to construct
         /// a proper thread function for a \a thread without having to
-        /// instantiate the component_base_action type. This is used by the \a applier in
+        /// instantiate the basic_action_impl type. This is used by the \a applier in
         /// case a continuation has been supplied
         template <typename Arguments>
         static threads::thread_function_type
@@ -300,7 +276,7 @@ namespace hpx { namespace actions
             Arguments &&)
         {
             LTM_(debug)
-                << "component_base_action::execute_function: name("
+                << "basic_action_impl::execute_function: name("
                 << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component const>::call(lva)) << ")";

@@ -62,7 +62,7 @@ namespace hpx { namespace actions
     template <
         typename R, BOOST_PP_ENUM_PARAMS(N, typename T),
         R (*F)(BOOST_PP_ENUM_PARAMS(N, T)), typename Derived>
-    class plain_base_action<R (*)(BOOST_PP_ENUM_PARAMS(N, T)), F, Derived>
+    class basic_action_impl<R (*)(BOOST_PP_ENUM_PARAMS(N, T)), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             R(BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)),
@@ -165,7 +165,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
 
             return F(BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args));
@@ -173,35 +173,11 @@ namespace hpx { namespace actions
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    //  N parameter version, direct execution with R
-    template <typename R, BOOST_PP_ENUM_PARAMS(N, typename T),
-        R (*F)(BOOST_PP_ENUM_PARAMS(N, T)), typename Derived>
-    struct make_action<R (*)(BOOST_PP_ENUM_PARAMS(N, T)), F, Derived, boost::mpl::false_>
-      : plain_action<R (*)(BOOST_PP_ENUM_PARAMS(N, T)), F, Derived>
-    {
-        typedef plain_action<
-            R (*)(BOOST_PP_ENUM_PARAMS(N, T)), F, Derived
-        > type;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    //  N parameter version, direct execution with result
-    template <typename Result, BOOST_PP_ENUM_PARAMS(N, typename T),
-        Result (*F)(BOOST_PP_ENUM_PARAMS(N, T)), typename Derived>
-    struct make_action<Result (*)(BOOST_PP_ENUM_PARAMS(N, T)), F, Derived, boost::mpl::true_>
-      : plain_direct_action<Result (*)(BOOST_PP_ENUM_PARAMS(N, T)), F, Derived>
-    {
-        typedef plain_direct_action<
-            Result (*)(BOOST_PP_ENUM_PARAMS(N, T)), F, Derived
-        > type;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
     //  N parameter version, no result type
     template <
         BOOST_PP_ENUM_PARAMS(N, typename T),
         void (*F)(BOOST_PP_ENUM_PARAMS(N, T)), typename Derived>
-    class plain_base_action<void (*)(BOOST_PP_ENUM_PARAMS(N, T)), F, Derived>
+    class basic_action_impl<void (*)(BOOST_PP_ENUM_PARAMS(N, T)), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             util::unused_type(BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)),
@@ -304,7 +280,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
 
             F(BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args));
@@ -321,7 +297,7 @@ namespace hpx { namespace traits
         typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_action<
+                hpx::actions::action<
                     R (*)(BOOST_PP_ENUM_PARAMS(N, Arg)), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -330,7 +306,7 @@ namespace hpx { namespace traits
         R (*F)(BOOST_PP_ENUM_PARAMS(N, Arg)), typename Derived, typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_direct_action<
+                hpx::actions::direct_action<
                     R (*)(BOOST_PP_ENUM_PARAMS(N, Arg)), F, Derived> >, Enable>
       : boost::mpl::false_
     {};

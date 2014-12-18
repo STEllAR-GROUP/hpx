@@ -15,7 +15,7 @@ namespace hpx { namespace actions
     template <
         typename R, typename T0,
         R (*F)(T0), typename Derived>
-    class plain_base_action<R (*)(T0), F, Derived>
+    class basic_action_impl<R (*)(T0), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             R(typename util::decay<T0>::type),
@@ -108,39 +108,17 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             return F(util::get< 0>(std::forward<Arguments>( args)));
         }
     };
     
     
-    template <typename R, typename T0,
-        R (*F)(T0), typename Derived>
-    struct make_action<R (*)(T0), F, Derived, boost::mpl::false_>
-      : plain_action<R (*)(T0), F, Derived>
-    {
-        typedef plain_action<
-            R (*)(T0), F, Derived
-        > type;
-    };
-    
-    
-    template <typename Result, typename T0,
-        Result (*F)(T0), typename Derived>
-    struct make_action<Result (*)(T0), F, Derived, boost::mpl::true_>
-      : plain_direct_action<Result (*)(T0), F, Derived>
-    {
-        typedef plain_direct_action<
-            Result (*)(T0), F, Derived
-        > type;
-    };
-    
-    
     template <
         typename T0,
         void (*F)(T0), typename Derived>
-    class plain_base_action<void (*)(T0), F, Derived>
+    class basic_action_impl<void (*)(T0), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             util::unused_type(typename util::decay<T0>::type),
@@ -233,7 +211,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             F(util::get< 0>(std::forward<Arguments>( args)));
             return util::unused;
@@ -247,7 +225,7 @@ namespace hpx { namespace traits
         typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_action<
+                hpx::actions::action<
                     R (*)(Arg0), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -255,7 +233,7 @@ namespace hpx { namespace traits
         R (*F)(Arg0), typename Derived, typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_direct_action<
+                hpx::actions::direct_action<
                     R (*)(Arg0), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -267,7 +245,7 @@ namespace hpx { namespace actions
     template <
         typename R, typename T0 , typename T1,
         R (*F)(T0 , T1), typename Derived>
-    class plain_base_action<R (*)(T0 , T1), F, Derived>
+    class basic_action_impl<R (*)(T0 , T1), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             R(typename util::decay<T0>::type , typename util::decay<T1>::type),
@@ -360,39 +338,17 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             return F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)));
         }
     };
     
     
-    template <typename R, typename T0 , typename T1,
-        R (*F)(T0 , T1), typename Derived>
-    struct make_action<R (*)(T0 , T1), F, Derived, boost::mpl::false_>
-      : plain_action<R (*)(T0 , T1), F, Derived>
-    {
-        typedef plain_action<
-            R (*)(T0 , T1), F, Derived
-        > type;
-    };
-    
-    
-    template <typename Result, typename T0 , typename T1,
-        Result (*F)(T0 , T1), typename Derived>
-    struct make_action<Result (*)(T0 , T1), F, Derived, boost::mpl::true_>
-      : plain_direct_action<Result (*)(T0 , T1), F, Derived>
-    {
-        typedef plain_direct_action<
-            Result (*)(T0 , T1), F, Derived
-        > type;
-    };
-    
-    
     template <
         typename T0 , typename T1,
         void (*F)(T0 , T1), typename Derived>
-    class plain_base_action<void (*)(T0 , T1), F, Derived>
+    class basic_action_impl<void (*)(T0 , T1), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             util::unused_type(typename util::decay<T0>::type , typename util::decay<T1>::type),
@@ -485,7 +441,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)));
             return util::unused;
@@ -499,7 +455,7 @@ namespace hpx { namespace traits
         typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_action<
+                hpx::actions::action<
                     R (*)(Arg0 , Arg1), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -507,7 +463,7 @@ namespace hpx { namespace traits
         R (*F)(Arg0 , Arg1), typename Derived, typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_direct_action<
+                hpx::actions::direct_action<
                     R (*)(Arg0 , Arg1), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -519,7 +475,7 @@ namespace hpx { namespace actions
     template <
         typename R, typename T0 , typename T1 , typename T2,
         R (*F)(T0 , T1 , T2), typename Derived>
-    class plain_base_action<R (*)(T0 , T1 , T2), F, Derived>
+    class basic_action_impl<R (*)(T0 , T1 , T2), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             R(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type),
@@ -612,39 +568,17 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             return F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)));
         }
     };
     
     
-    template <typename R, typename T0 , typename T1 , typename T2,
-        R (*F)(T0 , T1 , T2), typename Derived>
-    struct make_action<R (*)(T0 , T1 , T2), F, Derived, boost::mpl::false_>
-      : plain_action<R (*)(T0 , T1 , T2), F, Derived>
-    {
-        typedef plain_action<
-            R (*)(T0 , T1 , T2), F, Derived
-        > type;
-    };
-    
-    
-    template <typename Result, typename T0 , typename T1 , typename T2,
-        Result (*F)(T0 , T1 , T2), typename Derived>
-    struct make_action<Result (*)(T0 , T1 , T2), F, Derived, boost::mpl::true_>
-      : plain_direct_action<Result (*)(T0 , T1 , T2), F, Derived>
-    {
-        typedef plain_direct_action<
-            Result (*)(T0 , T1 , T2), F, Derived
-        > type;
-    };
-    
-    
     template <
         typename T0 , typename T1 , typename T2,
         void (*F)(T0 , T1 , T2), typename Derived>
-    class plain_base_action<void (*)(T0 , T1 , T2), F, Derived>
+    class basic_action_impl<void (*)(T0 , T1 , T2), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             util::unused_type(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type),
@@ -737,7 +671,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)));
             return util::unused;
@@ -751,7 +685,7 @@ namespace hpx { namespace traits
         typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_action<
+                hpx::actions::action<
                     R (*)(Arg0 , Arg1 , Arg2), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -759,7 +693,7 @@ namespace hpx { namespace traits
         R (*F)(Arg0 , Arg1 , Arg2), typename Derived, typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_direct_action<
+                hpx::actions::direct_action<
                     R (*)(Arg0 , Arg1 , Arg2), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -771,7 +705,7 @@ namespace hpx { namespace actions
     template <
         typename R, typename T0 , typename T1 , typename T2 , typename T3,
         R (*F)(T0 , T1 , T2 , T3), typename Derived>
-    class plain_base_action<R (*)(T0 , T1 , T2 , T3), F, Derived>
+    class basic_action_impl<R (*)(T0 , T1 , T2 , T3), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             R(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type),
@@ -864,39 +798,17 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             return F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)));
         }
     };
     
     
-    template <typename R, typename T0 , typename T1 , typename T2 , typename T3,
-        R (*F)(T0 , T1 , T2 , T3), typename Derived>
-    struct make_action<R (*)(T0 , T1 , T2 , T3), F, Derived, boost::mpl::false_>
-      : plain_action<R (*)(T0 , T1 , T2 , T3), F, Derived>
-    {
-        typedef plain_action<
-            R (*)(T0 , T1 , T2 , T3), F, Derived
-        > type;
-    };
-    
-    
-    template <typename Result, typename T0 , typename T1 , typename T2 , typename T3,
-        Result (*F)(T0 , T1 , T2 , T3), typename Derived>
-    struct make_action<Result (*)(T0 , T1 , T2 , T3), F, Derived, boost::mpl::true_>
-      : plain_direct_action<Result (*)(T0 , T1 , T2 , T3), F, Derived>
-    {
-        typedef plain_direct_action<
-            Result (*)(T0 , T1 , T2 , T3), F, Derived
-        > type;
-    };
-    
-    
     template <
         typename T0 , typename T1 , typename T2 , typename T3,
         void (*F)(T0 , T1 , T2 , T3), typename Derived>
-    class plain_base_action<void (*)(T0 , T1 , T2 , T3), F, Derived>
+    class basic_action_impl<void (*)(T0 , T1 , T2 , T3), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             util::unused_type(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type),
@@ -989,7 +901,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)));
             return util::unused;
@@ -1003,7 +915,7 @@ namespace hpx { namespace traits
         typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_action<
+                hpx::actions::action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -1011,7 +923,7 @@ namespace hpx { namespace traits
         R (*F)(Arg0 , Arg1 , Arg2 , Arg3), typename Derived, typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_direct_action<
+                hpx::actions::direct_action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -1023,7 +935,7 @@ namespace hpx { namespace actions
     template <
         typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         R (*F)(T0 , T1 , T2 , T3 , T4), typename Derived>
-    class plain_base_action<R (*)(T0 , T1 , T2 , T3 , T4), F, Derived>
+    class basic_action_impl<R (*)(T0 , T1 , T2 , T3 , T4), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             R(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type),
@@ -1116,39 +1028,17 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             return F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)));
         }
     };
     
     
-    template <typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
-        R (*F)(T0 , T1 , T2 , T3 , T4), typename Derived>
-    struct make_action<R (*)(T0 , T1 , T2 , T3 , T4), F, Derived, boost::mpl::false_>
-      : plain_action<R (*)(T0 , T1 , T2 , T3 , T4), F, Derived>
-    {
-        typedef plain_action<
-            R (*)(T0 , T1 , T2 , T3 , T4), F, Derived
-        > type;
-    };
-    
-    
-    template <typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
-        Result (*F)(T0 , T1 , T2 , T3 , T4), typename Derived>
-    struct make_action<Result (*)(T0 , T1 , T2 , T3 , T4), F, Derived, boost::mpl::true_>
-      : plain_direct_action<Result (*)(T0 , T1 , T2 , T3 , T4), F, Derived>
-    {
-        typedef plain_direct_action<
-            Result (*)(T0 , T1 , T2 , T3 , T4), F, Derived
-        > type;
-    };
-    
-    
     template <
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         void (*F)(T0 , T1 , T2 , T3 , T4), typename Derived>
-    class plain_base_action<void (*)(T0 , T1 , T2 , T3 , T4), F, Derived>
+    class basic_action_impl<void (*)(T0 , T1 , T2 , T3 , T4), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             util::unused_type(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type),
@@ -1241,7 +1131,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)));
             return util::unused;
@@ -1255,7 +1145,7 @@ namespace hpx { namespace traits
         typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_action<
+                hpx::actions::action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -1263,7 +1153,7 @@ namespace hpx { namespace traits
         R (*F)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4), typename Derived, typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_direct_action<
+                hpx::actions::direct_action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -1275,7 +1165,7 @@ namespace hpx { namespace actions
     template <
         typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5,
         R (*F)(T0 , T1 , T2 , T3 , T4 , T5), typename Derived>
-    class plain_base_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived>
+    class basic_action_impl<R (*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             R(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type),
@@ -1368,39 +1258,17 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             return F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)));
         }
     };
     
     
-    template <typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5,
-        R (*F)(T0 , T1 , T2 , T3 , T4 , T5), typename Derived>
-    struct make_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived, boost::mpl::false_>
-      : plain_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived>
-    {
-        typedef plain_action<
-            R (*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived
-        > type;
-    };
-    
-    
-    template <typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5,
-        Result (*F)(T0 , T1 , T2 , T3 , T4 , T5), typename Derived>
-    struct make_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived, boost::mpl::true_>
-      : plain_direct_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived>
-    {
-        typedef plain_direct_action<
-            Result (*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived
-        > type;
-    };
-    
-    
     template <
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5,
         void (*F)(T0 , T1 , T2 , T3 , T4 , T5), typename Derived>
-    class plain_base_action<void (*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived>
+    class basic_action_impl<void (*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             util::unused_type(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type),
@@ -1493,7 +1361,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)));
             return util::unused;
@@ -1507,7 +1375,7 @@ namespace hpx { namespace traits
         typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_action<
+                hpx::actions::action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -1515,7 +1383,7 @@ namespace hpx { namespace traits
         R (*F)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5), typename Derived, typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_direct_action<
+                hpx::actions::direct_action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -1527,7 +1395,7 @@ namespace hpx { namespace actions
     template <
         typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6,
         R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6), typename Derived>
-    class plain_base_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived>
+    class basic_action_impl<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             R(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type),
@@ -1620,39 +1488,17 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             return F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)));
         }
     };
     
     
-    template <typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6,
-        R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6), typename Derived>
-    struct make_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived, boost::mpl::false_>
-      : plain_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived>
-    {
-        typedef plain_action<
-            R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived
-        > type;
-    };
-    
-    
-    template <typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6,
-        Result (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6), typename Derived>
-    struct make_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived, boost::mpl::true_>
-      : plain_direct_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived>
-    {
-        typedef plain_direct_action<
-            Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived
-        > type;
-    };
-    
-    
     template <
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6,
         void (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6), typename Derived>
-    class plain_base_action<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived>
+    class basic_action_impl<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             util::unused_type(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type),
@@ -1745,7 +1591,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)));
             return util::unused;
@@ -1759,7 +1605,7 @@ namespace hpx { namespace traits
         typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_action<
+                hpx::actions::action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -1767,7 +1613,7 @@ namespace hpx { namespace traits
         R (*F)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6), typename Derived, typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_direct_action<
+                hpx::actions::direct_action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -1779,7 +1625,7 @@ namespace hpx { namespace actions
     template <
         typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7,
         R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), typename Derived>
-    class plain_base_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived>
+    class basic_action_impl<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             R(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type),
@@ -1872,39 +1718,17 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             return F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)));
         }
     };
     
     
-    template <typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7,
-        R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), typename Derived>
-    struct make_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived, boost::mpl::false_>
-      : plain_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived>
-    {
-        typedef plain_action<
-            R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived
-        > type;
-    };
-    
-    
-    template <typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7,
-        Result (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), typename Derived>
-    struct make_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived, boost::mpl::true_>
-      : plain_direct_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived>
-    {
-        typedef plain_direct_action<
-            Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived
-        > type;
-    };
-    
-    
     template <
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7,
         void (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), typename Derived>
-    class plain_base_action<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived>
+    class basic_action_impl<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             util::unused_type(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type),
@@ -1997,7 +1821,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)));
             return util::unused;
@@ -2011,7 +1835,7 @@ namespace hpx { namespace traits
         typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_action<
+                hpx::actions::action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -2019,7 +1843,7 @@ namespace hpx { namespace traits
         R (*F)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7), typename Derived, typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_direct_action<
+                hpx::actions::direct_action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -2031,7 +1855,7 @@ namespace hpx { namespace actions
     template <
         typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8,
         R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), typename Derived>
-    class plain_base_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived>
+    class basic_action_impl<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             R(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type),
@@ -2124,39 +1948,17 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             return F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)));
         }
     };
     
     
-    template <typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8,
-        R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), typename Derived>
-    struct make_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived, boost::mpl::false_>
-      : plain_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived>
-    {
-        typedef plain_action<
-            R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived
-        > type;
-    };
-    
-    
-    template <typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8,
-        Result (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), typename Derived>
-    struct make_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived, boost::mpl::true_>
-      : plain_direct_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived>
-    {
-        typedef plain_direct_action<
-            Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived
-        > type;
-    };
-    
-    
     template <
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8,
         void (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), typename Derived>
-    class plain_base_action<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived>
+    class basic_action_impl<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             util::unused_type(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type),
@@ -2249,7 +2051,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)));
             return util::unused;
@@ -2263,7 +2065,7 @@ namespace hpx { namespace traits
         typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_action<
+                hpx::actions::action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -2271,7 +2073,7 @@ namespace hpx { namespace traits
         R (*F)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8), typename Derived, typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_direct_action<
+                hpx::actions::direct_action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -2283,7 +2085,7 @@ namespace hpx { namespace actions
     template <
         typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9,
         R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), typename Derived>
-    class plain_base_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived>
+    class basic_action_impl<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             R(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type),
@@ -2376,39 +2178,17 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             return F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)) , util::get< 9>(std::forward<Arguments>( args)));
         }
     };
     
     
-    template <typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9,
-        R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), typename Derived>
-    struct make_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived, boost::mpl::false_>
-      : plain_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived>
-    {
-        typedef plain_action<
-            R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived
-        > type;
-    };
-    
-    
-    template <typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9,
-        Result (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), typename Derived>
-    struct make_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived, boost::mpl::true_>
-      : plain_direct_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived>
-    {
-        typedef plain_direct_action<
-            Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived
-        > type;
-    };
-    
-    
     template <
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9,
         void (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), typename Derived>
-    class plain_base_action<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived>
+    class basic_action_impl<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             util::unused_type(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type),
@@ -2501,7 +2281,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)) , util::get< 9>(std::forward<Arguments>( args)));
             return util::unused;
@@ -2515,7 +2295,7 @@ namespace hpx { namespace traits
         typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_action<
+                hpx::actions::action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -2523,7 +2303,7 @@ namespace hpx { namespace traits
         R (*F)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9), typename Derived, typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_direct_action<
+                hpx::actions::direct_action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -2535,7 +2315,7 @@ namespace hpx { namespace actions
     template <
         typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10,
         R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10), typename Derived>
-    class plain_base_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10), F, Derived>
+    class basic_action_impl<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             R(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type),
@@ -2628,39 +2408,17 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             return F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)) , util::get< 9>(std::forward<Arguments>( args)) , util::get< 10>(std::forward<Arguments>( args)));
         }
     };
     
     
-    template <typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10,
-        R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10), typename Derived>
-    struct make_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10), F, Derived, boost::mpl::false_>
-      : plain_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10), F, Derived>
-    {
-        typedef plain_action<
-            R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10), F, Derived
-        > type;
-    };
-    
-    
-    template <typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10,
-        Result (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10), typename Derived>
-    struct make_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10), F, Derived, boost::mpl::true_>
-      : plain_direct_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10), F, Derived>
-    {
-        typedef plain_direct_action<
-            Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10), F, Derived
-        > type;
-    };
-    
-    
     template <
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10,
         void (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10), typename Derived>
-    class plain_base_action<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10), F, Derived>
+    class basic_action_impl<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             util::unused_type(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type),
@@ -2753,7 +2511,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)) , util::get< 9>(std::forward<Arguments>( args)) , util::get< 10>(std::forward<Arguments>( args)));
             return util::unused;
@@ -2767,7 +2525,7 @@ namespace hpx { namespace traits
         typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_action<
+                hpx::actions::action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -2775,7 +2533,7 @@ namespace hpx { namespace traits
         R (*F)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10), typename Derived, typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_direct_action<
+                hpx::actions::direct_action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -2787,7 +2545,7 @@ namespace hpx { namespace actions
     template <
         typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11,
         R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11), typename Derived>
-    class plain_base_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11), F, Derived>
+    class basic_action_impl<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             R(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type),
@@ -2880,39 +2638,17 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             return F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)) , util::get< 9>(std::forward<Arguments>( args)) , util::get< 10>(std::forward<Arguments>( args)) , util::get< 11>(std::forward<Arguments>( args)));
         }
     };
     
     
-    template <typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11,
-        R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11), typename Derived>
-    struct make_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11), F, Derived, boost::mpl::false_>
-      : plain_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11), F, Derived>
-    {
-        typedef plain_action<
-            R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11), F, Derived
-        > type;
-    };
-    
-    
-    template <typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11,
-        Result (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11), typename Derived>
-    struct make_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11), F, Derived, boost::mpl::true_>
-      : plain_direct_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11), F, Derived>
-    {
-        typedef plain_direct_action<
-            Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11), F, Derived
-        > type;
-    };
-    
-    
     template <
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11,
         void (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11), typename Derived>
-    class plain_base_action<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11), F, Derived>
+    class basic_action_impl<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             util::unused_type(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type),
@@ -3005,7 +2741,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)) , util::get< 9>(std::forward<Arguments>( args)) , util::get< 10>(std::forward<Arguments>( args)) , util::get< 11>(std::forward<Arguments>( args)));
             return util::unused;
@@ -3019,7 +2755,7 @@ namespace hpx { namespace traits
         typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_action<
+                hpx::actions::action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -3027,7 +2763,7 @@ namespace hpx { namespace traits
         R (*F)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11), typename Derived, typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_direct_action<
+                hpx::actions::direct_action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -3039,7 +2775,7 @@ namespace hpx { namespace actions
     template <
         typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12,
         R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12), typename Derived>
-    class plain_base_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12), F, Derived>
+    class basic_action_impl<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             R(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type),
@@ -3132,39 +2868,17 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             return F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)) , util::get< 9>(std::forward<Arguments>( args)) , util::get< 10>(std::forward<Arguments>( args)) , util::get< 11>(std::forward<Arguments>( args)) , util::get< 12>(std::forward<Arguments>( args)));
         }
     };
     
     
-    template <typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12,
-        R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12), typename Derived>
-    struct make_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12), F, Derived, boost::mpl::false_>
-      : plain_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12), F, Derived>
-    {
-        typedef plain_action<
-            R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12), F, Derived
-        > type;
-    };
-    
-    
-    template <typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12,
-        Result (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12), typename Derived>
-    struct make_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12), F, Derived, boost::mpl::true_>
-      : plain_direct_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12), F, Derived>
-    {
-        typedef plain_direct_action<
-            Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12), F, Derived
-        > type;
-    };
-    
-    
     template <
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12,
         void (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12), typename Derived>
-    class plain_base_action<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12), F, Derived>
+    class basic_action_impl<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             util::unused_type(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type),
@@ -3257,7 +2971,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)) , util::get< 9>(std::forward<Arguments>( args)) , util::get< 10>(std::forward<Arguments>( args)) , util::get< 11>(std::forward<Arguments>( args)) , util::get< 12>(std::forward<Arguments>( args)));
             return util::unused;
@@ -3271,7 +2985,7 @@ namespace hpx { namespace traits
         typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_action<
+                hpx::actions::action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -3279,7 +2993,7 @@ namespace hpx { namespace traits
         R (*F)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12), typename Derived, typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_direct_action<
+                hpx::actions::direct_action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -3291,7 +3005,7 @@ namespace hpx { namespace actions
     template <
         typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13,
         R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13), typename Derived>
-    class plain_base_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13), F, Derived>
+    class basic_action_impl<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             R(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type),
@@ -3384,39 +3098,17 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             return F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)) , util::get< 9>(std::forward<Arguments>( args)) , util::get< 10>(std::forward<Arguments>( args)) , util::get< 11>(std::forward<Arguments>( args)) , util::get< 12>(std::forward<Arguments>( args)) , util::get< 13>(std::forward<Arguments>( args)));
         }
     };
     
     
-    template <typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13,
-        R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13), typename Derived>
-    struct make_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13), F, Derived, boost::mpl::false_>
-      : plain_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13), F, Derived>
-    {
-        typedef plain_action<
-            R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13), F, Derived
-        > type;
-    };
-    
-    
-    template <typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13,
-        Result (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13), typename Derived>
-    struct make_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13), F, Derived, boost::mpl::true_>
-      : plain_direct_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13), F, Derived>
-    {
-        typedef plain_direct_action<
-            Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13), F, Derived
-        > type;
-    };
-    
-    
     template <
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13,
         void (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13), typename Derived>
-    class plain_base_action<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13), F, Derived>
+    class basic_action_impl<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             util::unused_type(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type),
@@ -3509,7 +3201,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)) , util::get< 9>(std::forward<Arguments>( args)) , util::get< 10>(std::forward<Arguments>( args)) , util::get< 11>(std::forward<Arguments>( args)) , util::get< 12>(std::forward<Arguments>( args)) , util::get< 13>(std::forward<Arguments>( args)));
             return util::unused;
@@ -3523,7 +3215,7 @@ namespace hpx { namespace traits
         typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_action<
+                hpx::actions::action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -3531,7 +3223,7 @@ namespace hpx { namespace traits
         R (*F)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13), typename Derived, typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_direct_action<
+                hpx::actions::direct_action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -3543,7 +3235,7 @@ namespace hpx { namespace actions
     template <
         typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14,
         R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14), typename Derived>
-    class plain_base_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14), F, Derived>
+    class basic_action_impl<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             R(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type),
@@ -3636,39 +3328,17 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             return F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)) , util::get< 9>(std::forward<Arguments>( args)) , util::get< 10>(std::forward<Arguments>( args)) , util::get< 11>(std::forward<Arguments>( args)) , util::get< 12>(std::forward<Arguments>( args)) , util::get< 13>(std::forward<Arguments>( args)) , util::get< 14>(std::forward<Arguments>( args)));
         }
     };
     
     
-    template <typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14,
-        R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14), typename Derived>
-    struct make_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14), F, Derived, boost::mpl::false_>
-      : plain_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14), F, Derived>
-    {
-        typedef plain_action<
-            R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14), F, Derived
-        > type;
-    };
-    
-    
-    template <typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14,
-        Result (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14), typename Derived>
-    struct make_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14), F, Derived, boost::mpl::true_>
-      : plain_direct_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14), F, Derived>
-    {
-        typedef plain_direct_action<
-            Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14), F, Derived
-        > type;
-    };
-    
-    
     template <
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14,
         void (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14), typename Derived>
-    class plain_base_action<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14), F, Derived>
+    class basic_action_impl<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             util::unused_type(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type),
@@ -3761,7 +3431,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)) , util::get< 9>(std::forward<Arguments>( args)) , util::get< 10>(std::forward<Arguments>( args)) , util::get< 11>(std::forward<Arguments>( args)) , util::get< 12>(std::forward<Arguments>( args)) , util::get< 13>(std::forward<Arguments>( args)) , util::get< 14>(std::forward<Arguments>( args)));
             return util::unused;
@@ -3775,7 +3445,7 @@ namespace hpx { namespace traits
         typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_action<
+                hpx::actions::action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -3783,7 +3453,7 @@ namespace hpx { namespace traits
         R (*F)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14), typename Derived, typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_direct_action<
+                hpx::actions::direct_action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -3795,7 +3465,7 @@ namespace hpx { namespace actions
     template <
         typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15,
         R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15), typename Derived>
-    class plain_base_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15), F, Derived>
+    class basic_action_impl<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             R(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type , typename util::decay<T15>::type),
@@ -3888,39 +3558,17 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             return F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)) , util::get< 9>(std::forward<Arguments>( args)) , util::get< 10>(std::forward<Arguments>( args)) , util::get< 11>(std::forward<Arguments>( args)) , util::get< 12>(std::forward<Arguments>( args)) , util::get< 13>(std::forward<Arguments>( args)) , util::get< 14>(std::forward<Arguments>( args)) , util::get< 15>(std::forward<Arguments>( args)));
         }
     };
     
     
-    template <typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15,
-        R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15), typename Derived>
-    struct make_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15), F, Derived, boost::mpl::false_>
-      : plain_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15), F, Derived>
-    {
-        typedef plain_action<
-            R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15), F, Derived
-        > type;
-    };
-    
-    
-    template <typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15,
-        Result (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15), typename Derived>
-    struct make_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15), F, Derived, boost::mpl::true_>
-      : plain_direct_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15), F, Derived>
-    {
-        typedef plain_direct_action<
-            Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15), F, Derived
-        > type;
-    };
-    
-    
     template <
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15,
         void (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15), typename Derived>
-    class plain_base_action<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15), F, Derived>
+    class basic_action_impl<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             util::unused_type(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type , typename util::decay<T15>::type),
@@ -4013,7 +3661,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)) , util::get< 9>(std::forward<Arguments>( args)) , util::get< 10>(std::forward<Arguments>( args)) , util::get< 11>(std::forward<Arguments>( args)) , util::get< 12>(std::forward<Arguments>( args)) , util::get< 13>(std::forward<Arguments>( args)) , util::get< 14>(std::forward<Arguments>( args)) , util::get< 15>(std::forward<Arguments>( args)));
             return util::unused;
@@ -4027,7 +3675,7 @@ namespace hpx { namespace traits
         typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_action<
+                hpx::actions::action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -4035,7 +3683,7 @@ namespace hpx { namespace traits
         R (*F)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15), typename Derived, typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_direct_action<
+                hpx::actions::direct_action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -4047,7 +3695,7 @@ namespace hpx { namespace actions
     template <
         typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16,
         R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16), typename Derived>
-    class plain_base_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16), F, Derived>
+    class basic_action_impl<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             R(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type , typename util::decay<T15>::type , typename util::decay<T16>::type),
@@ -4140,39 +3788,17 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             return F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)) , util::get< 9>(std::forward<Arguments>( args)) , util::get< 10>(std::forward<Arguments>( args)) , util::get< 11>(std::forward<Arguments>( args)) , util::get< 12>(std::forward<Arguments>( args)) , util::get< 13>(std::forward<Arguments>( args)) , util::get< 14>(std::forward<Arguments>( args)) , util::get< 15>(std::forward<Arguments>( args)) , util::get< 16>(std::forward<Arguments>( args)));
         }
     };
     
     
-    template <typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16,
-        R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16), typename Derived>
-    struct make_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16), F, Derived, boost::mpl::false_>
-      : plain_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16), F, Derived>
-    {
-        typedef plain_action<
-            R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16), F, Derived
-        > type;
-    };
-    
-    
-    template <typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16,
-        Result (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16), typename Derived>
-    struct make_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16), F, Derived, boost::mpl::true_>
-      : plain_direct_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16), F, Derived>
-    {
-        typedef plain_direct_action<
-            Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16), F, Derived
-        > type;
-    };
-    
-    
     template <
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16,
         void (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16), typename Derived>
-    class plain_base_action<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16), F, Derived>
+    class basic_action_impl<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             util::unused_type(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type , typename util::decay<T15>::type , typename util::decay<T16>::type),
@@ -4265,7 +3891,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)) , util::get< 9>(std::forward<Arguments>( args)) , util::get< 10>(std::forward<Arguments>( args)) , util::get< 11>(std::forward<Arguments>( args)) , util::get< 12>(std::forward<Arguments>( args)) , util::get< 13>(std::forward<Arguments>( args)) , util::get< 14>(std::forward<Arguments>( args)) , util::get< 15>(std::forward<Arguments>( args)) , util::get< 16>(std::forward<Arguments>( args)));
             return util::unused;
@@ -4279,7 +3905,7 @@ namespace hpx { namespace traits
         typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_action<
+                hpx::actions::action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -4287,7 +3913,7 @@ namespace hpx { namespace traits
         R (*F)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16), typename Derived, typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_direct_action<
+                hpx::actions::direct_action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -4299,7 +3925,7 @@ namespace hpx { namespace actions
     template <
         typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17,
         R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17), typename Derived>
-    class plain_base_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17), F, Derived>
+    class basic_action_impl<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             R(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type , typename util::decay<T15>::type , typename util::decay<T16>::type , typename util::decay<T17>::type),
@@ -4392,39 +4018,17 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             return F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)) , util::get< 9>(std::forward<Arguments>( args)) , util::get< 10>(std::forward<Arguments>( args)) , util::get< 11>(std::forward<Arguments>( args)) , util::get< 12>(std::forward<Arguments>( args)) , util::get< 13>(std::forward<Arguments>( args)) , util::get< 14>(std::forward<Arguments>( args)) , util::get< 15>(std::forward<Arguments>( args)) , util::get< 16>(std::forward<Arguments>( args)) , util::get< 17>(std::forward<Arguments>( args)));
         }
     };
     
     
-    template <typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17,
-        R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17), typename Derived>
-    struct make_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17), F, Derived, boost::mpl::false_>
-      : plain_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17), F, Derived>
-    {
-        typedef plain_action<
-            R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17), F, Derived
-        > type;
-    };
-    
-    
-    template <typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17,
-        Result (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17), typename Derived>
-    struct make_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17), F, Derived, boost::mpl::true_>
-      : plain_direct_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17), F, Derived>
-    {
-        typedef plain_direct_action<
-            Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17), F, Derived
-        > type;
-    };
-    
-    
     template <
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17,
         void (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17), typename Derived>
-    class plain_base_action<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17), F, Derived>
+    class basic_action_impl<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             util::unused_type(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type , typename util::decay<T15>::type , typename util::decay<T16>::type , typename util::decay<T17>::type),
@@ -4517,7 +4121,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)) , util::get< 9>(std::forward<Arguments>( args)) , util::get< 10>(std::forward<Arguments>( args)) , util::get< 11>(std::forward<Arguments>( args)) , util::get< 12>(std::forward<Arguments>( args)) , util::get< 13>(std::forward<Arguments>( args)) , util::get< 14>(std::forward<Arguments>( args)) , util::get< 15>(std::forward<Arguments>( args)) , util::get< 16>(std::forward<Arguments>( args)) , util::get< 17>(std::forward<Arguments>( args)));
             return util::unused;
@@ -4531,7 +4135,7 @@ namespace hpx { namespace traits
         typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_action<
+                hpx::actions::action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16 , Arg17), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -4539,7 +4143,7 @@ namespace hpx { namespace traits
         R (*F)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16 , Arg17), typename Derived, typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_direct_action<
+                hpx::actions::direct_action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16 , Arg17), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -4551,7 +4155,7 @@ namespace hpx { namespace actions
     template <
         typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18,
         R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18), typename Derived>
-    class plain_base_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18), F, Derived>
+    class basic_action_impl<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             R(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type , typename util::decay<T15>::type , typename util::decay<T16>::type , typename util::decay<T17>::type , typename util::decay<T18>::type),
@@ -4644,39 +4248,17 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             return F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)) , util::get< 9>(std::forward<Arguments>( args)) , util::get< 10>(std::forward<Arguments>( args)) , util::get< 11>(std::forward<Arguments>( args)) , util::get< 12>(std::forward<Arguments>( args)) , util::get< 13>(std::forward<Arguments>( args)) , util::get< 14>(std::forward<Arguments>( args)) , util::get< 15>(std::forward<Arguments>( args)) , util::get< 16>(std::forward<Arguments>( args)) , util::get< 17>(std::forward<Arguments>( args)) , util::get< 18>(std::forward<Arguments>( args)));
         }
     };
     
     
-    template <typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18,
-        R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18), typename Derived>
-    struct make_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18), F, Derived, boost::mpl::false_>
-      : plain_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18), F, Derived>
-    {
-        typedef plain_action<
-            R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18), F, Derived
-        > type;
-    };
-    
-    
-    template <typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18,
-        Result (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18), typename Derived>
-    struct make_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18), F, Derived, boost::mpl::true_>
-      : plain_direct_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18), F, Derived>
-    {
-        typedef plain_direct_action<
-            Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18), F, Derived
-        > type;
-    };
-    
-    
     template <
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18,
         void (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18), typename Derived>
-    class plain_base_action<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18), F, Derived>
+    class basic_action_impl<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             util::unused_type(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type , typename util::decay<T15>::type , typename util::decay<T16>::type , typename util::decay<T17>::type , typename util::decay<T18>::type),
@@ -4769,7 +4351,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)) , util::get< 9>(std::forward<Arguments>( args)) , util::get< 10>(std::forward<Arguments>( args)) , util::get< 11>(std::forward<Arguments>( args)) , util::get< 12>(std::forward<Arguments>( args)) , util::get< 13>(std::forward<Arguments>( args)) , util::get< 14>(std::forward<Arguments>( args)) , util::get< 15>(std::forward<Arguments>( args)) , util::get< 16>(std::forward<Arguments>( args)) , util::get< 17>(std::forward<Arguments>( args)) , util::get< 18>(std::forward<Arguments>( args)));
             return util::unused;
@@ -4783,7 +4365,7 @@ namespace hpx { namespace traits
         typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_action<
+                hpx::actions::action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16 , Arg17 , Arg18), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -4791,7 +4373,7 @@ namespace hpx { namespace traits
         R (*F)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16 , Arg17 , Arg18), typename Derived, typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_direct_action<
+                hpx::actions::direct_action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16 , Arg17 , Arg18), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -4803,7 +4385,7 @@ namespace hpx { namespace actions
     template <
         typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19,
         R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19), typename Derived>
-    class plain_base_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19), F, Derived>
+    class basic_action_impl<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             R(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type , typename util::decay<T15>::type , typename util::decay<T16>::type , typename util::decay<T17>::type , typename util::decay<T18>::type , typename util::decay<T19>::type),
@@ -4896,39 +4478,17 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             return F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)) , util::get< 9>(std::forward<Arguments>( args)) , util::get< 10>(std::forward<Arguments>( args)) , util::get< 11>(std::forward<Arguments>( args)) , util::get< 12>(std::forward<Arguments>( args)) , util::get< 13>(std::forward<Arguments>( args)) , util::get< 14>(std::forward<Arguments>( args)) , util::get< 15>(std::forward<Arguments>( args)) , util::get< 16>(std::forward<Arguments>( args)) , util::get< 17>(std::forward<Arguments>( args)) , util::get< 18>(std::forward<Arguments>( args)) , util::get< 19>(std::forward<Arguments>( args)));
         }
     };
     
     
-    template <typename R, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19,
-        R (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19), typename Derived>
-    struct make_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19), F, Derived, boost::mpl::false_>
-      : plain_action<R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19), F, Derived>
-    {
-        typedef plain_action<
-            R (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19), F, Derived
-        > type;
-    };
-    
-    
-    template <typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19,
-        Result (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19), typename Derived>
-    struct make_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19), F, Derived, boost::mpl::true_>
-      : plain_direct_action<Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19), F, Derived>
-    {
-        typedef plain_direct_action<
-            Result (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19), F, Derived
-        > type;
-    };
-    
-    
     template <
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19,
         void (*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19), typename Derived>
-    class plain_base_action<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19), F, Derived>
+    class basic_action_impl<void (*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19), F, Derived>
       : public basic_action<
             components::server::plain_function<Derived>,
             util::unused_type(typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type , typename util::decay<T15>::type , typename util::decay<T16>::type , typename util::decay<T17>::type , typename util::decay<T18>::type , typename util::decay<T19>::type),
@@ -5021,7 +4581,7 @@ namespace hpx { namespace actions
             Arguments && args)
         {
             LTM_(debug)
-                << "plain_base_action::execute_function name("
+                << "basic_action_impl::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
             F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)) , util::get< 9>(std::forward<Arguments>( args)) , util::get< 10>(std::forward<Arguments>( args)) , util::get< 11>(std::forward<Arguments>( args)) , util::get< 12>(std::forward<Arguments>( args)) , util::get< 13>(std::forward<Arguments>( args)) , util::get< 14>(std::forward<Arguments>( args)) , util::get< 15>(std::forward<Arguments>( args)) , util::get< 16>(std::forward<Arguments>( args)) , util::get< 17>(std::forward<Arguments>( args)) , util::get< 18>(std::forward<Arguments>( args)) , util::get< 19>(std::forward<Arguments>( args)));
             return util::unused;
@@ -5035,7 +4595,7 @@ namespace hpx { namespace traits
         typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_action<
+                hpx::actions::action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16 , Arg17 , Arg18 , Arg19), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
@@ -5043,7 +4603,7 @@ namespace hpx { namespace traits
         R (*F)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16 , Arg17 , Arg18 , Arg19), typename Derived, typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_direct_action<
+                hpx::actions::direct_action<
                     R (*)(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16 , Arg17 , Arg18 , Arg19), F, Derived> >, Enable>
       : boost::mpl::false_
     {};
