@@ -79,7 +79,7 @@ namespace hpx { namespace parcelset
                 >
             >::type* = 0
         )
-          : impl_(new typename util::decay<impl<Impl> >::type(std::forward<Impl>(i)))
+          : impl_(new impl<typename util::decay<Impl>::type>(std::forward<Impl>(i)))
         {}
 
         locality(locality const & other)
