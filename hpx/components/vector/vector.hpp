@@ -1187,7 +1187,7 @@ namespace hpx
         {
             // check if position vector is empty
             // the following code needs at least one element.
-            if (0 == pos_vec.size())
+            if (pos_vec.empty())
                 return make_ready_future(std::vector<T>());
 
             // current partition index of the block
@@ -1534,7 +1534,7 @@ namespace hpx
 
             // check if position vector is empty
             // the following code needs at least one element.
-            if (0 == pos.size())
+            if (pos.empty())
                 return make_ready_future();
 
             // partition index of the current block
