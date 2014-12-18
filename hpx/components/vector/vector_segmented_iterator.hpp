@@ -17,14 +17,16 @@
 #include <hpx/include/naming.hpp>
 #include <hpx/include/util.hpp>
 
-#include <hpx/components/vector/partition_vector_component.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
+#include <hpx/traits/map_to_local_iterator.hpp>
+#include <hpx/components/vector/partition_vector_component.hpp>
 
 #include <cstdint>
 #include <iterator>
 
 #include <boost/integer.hpp>
 #include <boost/iterator/iterator_facade.hpp>
+#include <boost/iterator/iterator_adaptor.hpp>
 #include <boost/iterator/filter_iterator.hpp>
 
 #include <boost/serialization/serialization.hpp>
@@ -40,8 +42,13 @@ namespace hpx
     template <typename T> class vector_iterator;
     template <typename T> class const_vector_iterator;
 
-    template <typename T, typename BaseIter> class segment_vector_iterator;
-    template <typename T, typename BaseIter> class const_segment_vector_iterator;
+    template <typename T, typename BaseIter>
+    class segment_vector_iterator;
+    template <typename T, typename BaseIter>
+    class const_segment_vector_iterator;
+
+    template <typename T, typename BaseIter>
+    class local_segment_vector_iterator;
 
     namespace server
     {
@@ -114,8 +121,8 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief This class implements the local iterator functionality for
-    /// the partitioned backend of a hpx::vector.
+    /// This class implements the local iterator functionality for the
+    /// partitioned backend of a hpx::vector.
     template <typename T>
     class local_vector_iterator
       : public boost::iterator_facade<
@@ -135,12 +142,6 @@ namespace hpx
         // constructors
         local_vector_iterator()
           : partition_(), local_index_(size_type(-1))
-        {}
-
-        local_vector_iterator(partition_vector<T> partition,
-                size_type local_index)
-          : partition_(partition),
-            local_index_(local_index)
         {}
 
         local_vector_iterator(partition_vector<T> partition,
@@ -295,12 +296,6 @@ namespace hpx
         {}
 
         const_local_vector_iterator(partition_vector<T> partition,
-                size_type local_index)
-          : partition_(partition),
-            local_index_(local_index)
-        {}
-
-        const_local_vector_iterator(partition_vector<T> partition,
                 size_type local_index,
                 boost::shared_ptr<server::partition_vector<T> > const& data)
           : partition_(partition),
@@ -420,50 +415,21 @@ namespace hpx
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename BaseIterator>
-    struct is_requested_locality
-    {
-        typedef typename std::iterator_traits<BaseIterator>::reference reference;
-
-        is_requested_locality(boost::uint32_t locality_id = naming::invalid_locality_id)
-          : locality_id_(locality_id)
-        {}
-
-        bool operator()(reference val) const
-        {
-            return locality_id_ == naming::invalid_locality_id ||
-                   locality_id_ == val.locality_id_;
-        }
-
-        boost::uint32_t locality_id_;
-    };
-
-    /// \brief This class implement the segmented iterator for the hpx::vector
+    /// This class implement the segmented iterator for the hpx::vector
     template <typename T, typename BaseIter>
     class segment_vector_iterator
-      : public boost::filter_iterator<
-            is_requested_locality<BaseIter>, BaseIter
+      : public boost::iterator_adaptor<
+            segment_vector_iterator<T, BaseIter>, BaseIter
         >
     {
     private:
-        typedef boost::filter_iterator<
-            is_requested_locality<BaseIter>, BaseIter
-        > base_type;
-        typedef is_requested_locality<BaseIter> predicate;
+        typedef boost::iterator_adaptor<
+                segment_vector_iterator<T, BaseIter>, BaseIter
+            > base_type;
 
     public:
-        segment_vector_iterator()
-          : data_(0)
-        {}
-
-        segment_vector_iterator(vector<T>* data, BaseIter const& end)
-          : base_type(predicate(), end, end), data_(data)
-        {}
-
-        segment_vector_iterator(
-                vector<T>* data, BaseIter const& it, BaseIter const& end,
-                boost::uint32_t locality_id = naming::invalid_locality_id)
-          : base_type(predicate(locality_id), it, end), data_(data)
+        segment_vector_iterator(BaseIter const& it, vector<T>* data = 0)
+          : base_type(it), data_(data)
         {}
 
         vector<T>* get_data() { return data_; }
@@ -471,7 +437,8 @@ namespace hpx
 
         bool is_at_end() const
         {
-            return data_ == 0 || this->base() == this->end();
+            return data_ == 0 ||
+                this->base_type::base_reference() == data_->partitions_.end();
         }
 
     private:
@@ -480,36 +447,26 @@ namespace hpx
 
     template <typename T, typename BaseIter>
     class const_segment_vector_iterator
-      : public boost::filter_iterator<
-            is_requested_locality<BaseIter>, BaseIter
+      : public boost::iterator_adaptor<
+            const_segment_vector_iterator<T, BaseIter>, BaseIter
         >
     {
     private:
-        typedef boost::filter_iterator<
-            is_requested_locality<BaseIter>, BaseIter
-        > base_type;
-        typedef is_requested_locality<BaseIter> predicate;
+        typedef boost::iterator_adaptor<
+                const_segment_vector_iterator<T, BaseIter>, BaseIter
+            > base_type;
 
     public:
-        const_segment_vector_iterator()
-          : data_(0)
-        {}
-
-        const_segment_vector_iterator(vector<T> const* data, BaseIter const& end)
-          : base_type(predicate(), end, end), data_(data)
-        {}
-
-        const_segment_vector_iterator(
-                vector<T> const* data, BaseIter const& it, BaseIter const& end,
-                boost::uint32_t locality_id = naming::invalid_locality_id)
-          : base_type(predicate(locality_id), it, end), data_(data)
+        const_segment_vector_iterator(BaseIter const& it, vector<T> const* data = 0)
+          : base_type(it), data_(data)
         {}
 
         vector<T> const* get_data() const { return data_; }
 
         bool is_at_end() const
         {
-            return data_ == 0 || this->base() == this->end();
+            return data_ == 0 ||
+                this->base_type::base_reference() == data_->partitions_.end();
         }
 
     private:
@@ -517,7 +474,96 @@ namespace hpx
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief This class implements the iterator functionality for hpx::vector.
+    namespace detail
+    {
+        template <typename BaseIterator>
+        struct is_requested_locality
+        {
+            typedef typename std::iterator_traits<BaseIterator>::reference
+                reference;
+
+            is_requested_locality(boost::uint32_t locality_id =
+                    naming::invalid_locality_id)
+              : locality_id_(locality_id)
+            {}
+
+            bool operator()(reference val) const
+            {
+                return locality_id_ == naming::invalid_locality_id ||
+                       locality_id_ == val.locality_id_;
+            }
+
+            boost::uint32_t locality_id_;
+        };
+    }
+
+    /// This class implement the local segmented iterator for the hpx::vector
+    template <typename T, typename BaseIter>
+    class local_segment_vector_iterator
+      : public boost::iterator_adaptor<
+            local_segment_vector_iterator<T, BaseIter>, BaseIter,
+            std::vector<T>, std::forward_iterator_tag
+        >
+    {
+    private:
+        typedef boost::iterator_adaptor<
+                local_segment_vector_iterator<T, BaseIter>, BaseIter,
+                std::vector<T>, std::forward_iterator_tag
+            > base_type;
+        typedef detail::is_requested_locality<BaseIter> predicate;
+
+    public:
+        local_segment_vector_iterator(BaseIter const& end)
+          : base_type(end), predicate_(), end_(end)
+        {}
+
+        local_segment_vector_iterator(
+                BaseIter const& it, BaseIter const& end,
+                boost::uint32_t locality_id)
+          : base_type(it), predicate_(locality_id), end_(end)
+        {
+            satisfy_predicate();
+        }
+
+        bool is_at_end() const
+        {
+            return !data_ || this->base() == end_;
+        }
+
+    private:
+        friend class boost::iterator_core_access;
+
+        typename base_type::reference dereference() const
+        {
+            HPX_ASSERT(!is_at_end());
+            return data_->get_data();
+        }
+
+        void increment()
+        {
+            ++(this->base_reference());
+            satisfy_predicate();
+        }
+
+        void satisfy_predicate()
+        {
+            while (this->base() != end_ && !predicate_(*this->base()))
+                ++(this->base_reference());
+
+            if (this->base() != end_)
+                data_ = this->base()->local_data_;
+            else
+                data_.reset();
+        }
+
+    private:
+        boost::shared_ptr<server::partition_vector<T> > data_;
+        predicate predicate_;
+        BaseIter end_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// This class implements the (global) iterator functionality for hpx::vector.
     template <typename T>
     class vector_iterator
       : public boost::iterator_facade<
@@ -534,6 +580,7 @@ namespace hpx
     public:
         typedef std::size_t size_type;
         typedef typename vector<T>::segment_iterator segment_iterator;
+        typedef typename vector<T>::local_segment_iterator local_segment_iterator;
         typedef typename vector<T>::local_iterator local_iterator;
 
         // constructors
@@ -630,6 +677,7 @@ namespace hpx
     public:
         typedef std::size_t size_type;
         typedef typename vector<T>::const_segment_iterator segment_iterator;
+        typedef typename vector<T>::const_local_segment_iterator local_segment_iterator;
         typedef typename vector<T>::const_local_iterator local_iterator;
 
         // constructors
@@ -718,6 +766,7 @@ namespace hpx { namespace traits
 
         typedef vector_iterator<T> iterator;
         typedef typename iterator::segment_iterator segment_iterator;
+        typedef typename iterator::local_segment_iterator local_segment_iterator;
         typedef typename iterator::local_iterator local_iterator;
 
         //  Conceptually this function is supposed to denote which segment
@@ -767,7 +816,29 @@ namespace hpx { namespace traits
                 return local_iterator();
 
             return local_iterator(seg_iter.base()->partition_,
-                seg_iter.base()->size_);
+                seg_iter.base()->size_, seg_iter.base()->local_data_);
+        }
+
+        //  This function should specify the local iterator which is at the
+        //  beginning of the partition data.
+        static typename std::vector<T>::iterator
+        begin(local_segment_iterator const& seg_iter)
+        {
+            if (seg_iter.is_at_end())       // avoid dereferencing end iterator
+                return typename std::vector<T>::iterator();
+
+            return seg_iter->begin();
+        }
+
+        //  This function should specify the local iterator which is at the
+        //  end of the partition data.
+        static typename std::vector<T>::iterator
+        end(local_segment_iterator const& seg_iter)
+        {
+            if (seg_iter.is_at_end())       // avoid dereferencing end iterator
+                return typename std::vector<T>::iterator();
+
+            return seg_iter->end();
         }
     };
 
@@ -778,6 +849,7 @@ namespace hpx { namespace traits
 
         typedef const_vector_iterator<T> iterator;
         typedef typename iterator::segment_iterator segment_iterator;
+        typedef typename iterator::local_segment_iterator local_segment_iterator;
         typedef typename iterator::local_iterator local_iterator;
 
         //  Conceptually this function is supposed to denote which segment
@@ -827,7 +899,52 @@ namespace hpx { namespace traits
                 return local_iterator();
 
             return local_iterator(seg_iter.base()->partition_,
-                seg_iter.base()->size_);
+                seg_iter.base()->size_, seg_iter.base()->local_data_);
+        }
+
+        //  This function should specify the local iterator which is at the
+        //  beginning of the partition data.
+        static typename std::vector<T>::const_iterator
+        begin(local_segment_iterator const& seg_iter)
+        {
+            if (seg_iter.is_at_end())       // avoid dereferencing end iterator
+                return typename std::vector<T>::const_iterator();
+
+            return seg_iter->cbegin();
+        }
+
+        //  This function should specify the local iterator which is at the
+        //  end of the partition data.
+        static typename std::vector<T>::const_iterator
+        end(local_segment_iterator const& seg_iter)
+        {
+            if (seg_iter.is_at_end())       // avoid dereferencing end iterator
+                return typename std::vector<T>::const_iterator();
+
+            return seg_iter->cend();
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Some 'remote' iterators need to be mapped before being applied to the
+    // local algorithms.
+    template <typename T>
+    struct map_to_local_iterator<local_vector_iterator<T> >
+    {
+        static typename std::vector<T>::iterator
+        call(local_vector_iterator<T> it)
+        {
+            return it.base_iterator();
+        }
+    };
+
+    template <typename T>
+    struct map_to_local_iterator<const_local_vector_iterator<T> >
+    {
+        static typename std::vector<T>::const_iterator
+        call(const_local_vector_iterator<T> const& it)
+        {
+            return it.base_iterator();
         }
     };
 }}

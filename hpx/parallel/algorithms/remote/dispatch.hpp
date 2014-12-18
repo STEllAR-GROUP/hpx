@@ -9,6 +9,7 @@
 #define HPX_PARALLEL_ALGORITHM_REMOTE_DISPATCH_OCT_15_2014_0938PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/traits/map_to_local_iterator.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/util/decay.hpp>
@@ -22,10 +23,15 @@
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 
+///////////////////////////////////////////////////////////////////////////////
 #define HPX_DISPATCH_DECAY_ARG(Z, N, D)                                       \
     typename hpx::util::decay<BOOST_PP_CAT(D, N)>::type                       \
     /**/
 #define HPX_DISPATCH_ARG(Z, N, D) BOOST_PP_CAT(D, N) const&                   \
+    /**/
+#define HPX_MAP_TO_LOCAL_ITERATOR(Z, N, D)                                    \
+    ::hpx::traits::map_to_local_iterator<                                     \
+        BOOST_PP_CAT(Arg, N)>::call(BOOST_PP_CAT(arg, N))                     \
     /**/
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
@@ -34,6 +40,7 @@
 
 #include BOOST_PP_ITERATE()
 
+#undef HPX_MAP_TO_LOCAL_ITERATOR
 #undef HPX_DISPATCH_ARG
 #undef HPX_DISPATCH_DECAY_ARG
 
@@ -59,7 +66,8 @@ namespace hpx { namespace parallel { namespace util { namespace remote
         sequential(Algo const& algo, ExPolicy const& policy,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
-            return algo.call(policy, BOOST_PP_ENUM_PARAMS(N, arg),
+            return algo.call(policy,
+                BOOST_PP_ENUM(N, HPX_MAP_TO_LOCAL_ITERATOR, _),
                 boost::mpl::true_());
         }
 
@@ -69,7 +77,8 @@ namespace hpx { namespace parallel { namespace util { namespace remote
         parallel(Algo const& algo, ExPolicy const& policy,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
-            return algo.call(policy, BOOST_PP_ENUM_PARAMS(N, arg),
+            return algo.call(policy,
+                BOOST_PP_ENUM(N, HPX_MAP_TO_LOCAL_ITERATOR, _),
                 boost::mpl::false_());
         }
     };

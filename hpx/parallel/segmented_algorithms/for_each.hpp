@@ -22,12 +22,13 @@
 #include <algorithm>
 #include <iterator>
 
+#include <boost/mpl/bool.hpp>
 #include <boost/type_traits/is_same.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
     ///////////////////////////////////////////////////////////////////////////
-    // for_each_n_segmented
+    // segmented_for_each
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
