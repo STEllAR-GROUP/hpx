@@ -768,6 +768,7 @@ namespace hpx { namespace traits
         typedef typename iterator::segment_iterator segment_iterator;
         typedef typename iterator::local_segment_iterator local_segment_iterator;
         typedef typename iterator::local_iterator local_iterator;
+        typedef typename std::vector<T>::iterator local_raw_iterator;
 
         //  Conceptually this function is supposed to denote which segment
         //  the iterator is currently pointing to (i.e. just global iterator).
@@ -821,8 +822,7 @@ namespace hpx { namespace traits
 
         //  This function should specify the local iterator which is at the
         //  beginning of the partition data.
-        static typename std::vector<T>::iterator
-        begin(local_segment_iterator const& seg_iter)
+        static local_raw_iterator begin(local_segment_iterator const& seg_iter)
         {
             if (seg_iter.is_at_end())       // avoid dereferencing end iterator
                 return typename std::vector<T>::iterator();
@@ -832,13 +832,25 @@ namespace hpx { namespace traits
 
         //  This function should specify the local iterator which is at the
         //  end of the partition data.
-        static typename std::vector<T>::iterator
-        end(local_segment_iterator const& seg_iter)
+        static local_raw_iterator end(local_segment_iterator const& seg_iter)
         {
             if (seg_iter.is_at_end())       // avoid dereferencing end iterator
                 return typename std::vector<T>::iterator();
 
             return seg_iter->end();
+        }
+
+        // Extract base iterator from local_iterator
+        static local_raw_iterator base(local_iterator const& it)
+        {
+            return it.base_iterator();
+        }
+
+        // Extract the base id for the segment referenced by the given segment
+        // iterator.
+        static id_type get_id(segment_iterator const& iter)
+        {
+            return iter->get_id();
         }
     };
 
@@ -851,6 +863,7 @@ namespace hpx { namespace traits
         typedef typename iterator::segment_iterator segment_iterator;
         typedef typename iterator::local_segment_iterator local_segment_iterator;
         typedef typename iterator::local_iterator local_iterator;
+        typedef typename std::vector<T>::const_iterator local_raw_iterator;
 
         //  Conceptually this function is supposed to denote which segment
         //  the iterator is currently pointing to (i.e. just global iterator).
@@ -904,8 +917,7 @@ namespace hpx { namespace traits
 
         //  This function should specify the local iterator which is at the
         //  beginning of the partition data.
-        static typename std::vector<T>::const_iterator
-        begin(local_segment_iterator const& seg_iter)
+        static local_raw_iterator begin(local_segment_iterator const& seg_iter)
         {
             if (seg_iter.is_at_end())       // avoid dereferencing end iterator
                 return typename std::vector<T>::const_iterator();
@@ -915,13 +927,25 @@ namespace hpx { namespace traits
 
         //  This function should specify the local iterator which is at the
         //  end of the partition data.
-        static typename std::vector<T>::const_iterator
-        end(local_segment_iterator const& seg_iter)
+        static local_raw_iterator end(local_segment_iterator const& seg_iter)
         {
             if (seg_iter.is_at_end())       // avoid dereferencing end iterator
                 return typename std::vector<T>::const_iterator();
 
             return seg_iter->cend();
+        }
+
+        // Extract base iterator from local_iterator
+        static local_raw_iterator base(local_iterator const& it)
+        {
+            return it.base_iterator();
+        }
+
+        // Extract the base id for the segment referenced by the given segment
+        // iterator.
+        static id_type get_id(segment_iterator const& iter)
+        {
+            return iter->get_id();
         }
     };
 

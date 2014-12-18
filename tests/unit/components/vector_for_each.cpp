@@ -99,6 +99,7 @@ void for_each_tests()
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
+    for_each_tests<int>();
     for_each_tests<double>();
 
     return 0;

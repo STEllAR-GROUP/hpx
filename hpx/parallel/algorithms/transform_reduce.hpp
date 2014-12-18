@@ -93,6 +93,38 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     }));
             }
         };
+
+        template <typename ExPolicy, typename InIter, typename T, typename Reduce,
+            typename Convert>
+        inline typename detail::algorithm_result<ExPolicy, T>::type
+        transform_reduce_(ExPolicy&& policy, InIter first, InIter last, T init,
+            Reduce && red_op, Convert && conv_op, boost::mpl::false_)
+        {
+            typedef typename std::iterator_traits<InIter>::iterator_category
+                iterator_category;
+
+            BOOST_STATIC_ASSERT_MSG(
+                (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
+                "Requires at least input iterator.");
+
+            typedef typename boost::mpl::or_<
+                is_sequential_execution_policy<ExPolicy>,
+                boost::is_same<std::input_iterator_tag, iterator_category>
+            >::type is_seq;
+
+            return detail::transform_reduce<T>().call(
+                std::forward<ExPolicy>(policy), first, last, std::move(init),
+                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
+                is_seq());
+        }
+
+        // forward declare the segmented version of this algorithm
+        template <typename ExPolicy, typename InIter, typename T, typename Reduce,
+            typename Convert>
+        typename detail::algorithm_result<ExPolicy, T>::type
+        transform_reduce_(ExPolicy&& policy, InIter first, InIter last, T init,
+            Reduce && red_op, Convert && conv_op, boost::mpl::true_);
+
         /// \endcond
     }
 
@@ -198,15 +230,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
             "Requires at least input iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>
-        >::type is_seq;
+        typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;
+        typedef typename iterator_traits::is_segmented_iterator is_segmented;
 
-        return detail::transform_reduce<T>().call(
+        return detail::transform_reduce_(
             std::forward<ExPolicy>(policy), first, last, std::move(init),
             std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
-            is_seq());
+            is_segmented());
     }
 }}}
 
