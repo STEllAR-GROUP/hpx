@@ -30,7 +30,5 @@
 // bring in nullary actions and all other arities
 #include <hpx/runtime/actions/component_const_action.hpp>
 #include <hpx/runtime/actions/component_non_const_action.hpp>
-#include <hpx/runtime/actions/component_const_action_implementations.hpp>
-#include <hpx/runtime/actions/component_non_const_action_implementations.hpp>
 
 #endif

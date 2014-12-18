@@ -859,7 +859,7 @@ namespace hpx { namespace actions
         typedef typename detail::remote_action_result<R>::type remote_result_type;
 
         static const std::size_t arity = sizeof...(Args);
-        typedef util::tuple<Args...> arguments_type;
+        typedef util::tuple<typename util::decay<Args>::type...> arguments_type;
 
         typedef void action_tag;
 
@@ -870,26 +870,26 @@ namespace hpx { namespace actions
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Func, typename Arguments_>
+        template <typename Func, typename Args_>
         static threads::thread_function_type
         construct_continuation_thread_function_void(
-            continuation_type cont, Func && func, Arguments_ && args)
+            continuation_type cont, Func&& func, Args_&& args)
         {
-            typedef typename boost::remove_reference<Arguments_>::type arguments_type;
+            typedef typename boost::remove_reference<Args_>::type Args_type;
             return detail::construct_continuation_thread_function_voidN<
-                    derived_type, util::tuple_size<arguments_type>::value
-                >::call(cont, std::forward<Func>(func), std::forward<Arguments_>(args));
+                    derived_type, util::tuple_size<Args_type>::value
+                >::call(cont, std::forward<Func>(func), std::forward<Args_>(args));
         }
 
-        template <typename Func, typename Arguments_>
+        template <typename Func, typename Args_>
         static threads::thread_function_type
         construct_continuation_thread_function(
-            continuation_type cont, Func && func, Arguments_ && args)
+            continuation_type cont, Func&& func, Args_&& args)
         {
-            typedef typename boost::remove_reference<Arguments_>::type arguments_type;
+            typedef typename boost::remove_reference<Args_>::type Args_type;
             return detail::construct_continuation_thread_functionN<
-                    derived_type, util::tuple_size<arguments_type>::value
-                >::call(cont, std::forward<Func>(func), std::forward<Arguments_>(args));
+                    derived_type, util::tuple_size<Args_type>::value
+                >::call(cont, std::forward<Func>(func), std::forward<Args_>(args));
         }
 
         // bring in all overloads for
@@ -939,16 +939,47 @@ namespace hpx { namespace actions
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename TF, TF F, typename Derived>
+    template <typename Signature, typename TF, TF F, typename Derived>
     class basic_action_impl;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename TF, TF F, typename Derived = detail::this_type>
-    struct action;
+    struct action
+      : basic_action_impl<TF, TF, F,
+            typename detail::action_type<
+                action<TF, F, Derived>,
+                Derived
+            >::type>
+    {
+        typedef typename detail::action_type<
+            action, Derived
+        >::type derived_type;
+
+        typedef boost::mpl::false_ direct_execution;
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename TF, TF F, typename Derived = detail::this_type>
-    struct direct_action;
+    struct direct_action
+      : basic_action_impl<TF, TF, F,
+            typename detail::action_type<
+                direct_action<TF, F, Derived>,
+                Derived
+            >::type>
+    {
+        typedef typename detail::action_type<
+            direct_action, Derived
+        >::type derived_type;
+
+        typedef boost::mpl::true_ direct_execution;
+
+        /// The function \a get_action_type returns whether this action needs
+        /// to be executed in a new thread or directly.
+        static base_action::action_type get_action_type()
+        {
+            return base_action::direct_action;
+        }
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     // Base template allowing to generate a concrete action type from a function
@@ -1031,6 +1062,19 @@ namespace hpx { namespace actions
 }}
 
 /// \cond NOINTERNAL
+
+// Disabling the guid initialization stuff for actions
+namespace hpx { namespace traits
+{
+    /// \cond NOINTERNAL
+    template <typename Action>
+    struct needs_guid_initialization<
+            hpx::actions::transfer_action<Action>,
+            util::always_void<typename Action::needs_guid_serialization> >
+      : Action::needs_guid_serialization
+    {};
+    /// \endcond
+}}
 
 #include <hpx/config/warnings_suffix.hpp>
 
