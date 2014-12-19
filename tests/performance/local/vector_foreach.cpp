@@ -31,6 +31,18 @@ int chunk_size = 0;
 int num_overlapping_loops = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename Vector>
+struct wait_op
+{
+    typedef typename Vector::value_type value_type;
+
+    void operator()(value_type) const
+    {
+        worker_timed(delay);
+    }
+};
+
+///////////////////////////////////////////////////////////////////////////////
 template <typename Policy, typename Vector>
 boost::uint64_t foreach_vector(Policy const& policy, Vector const& v)
 {
@@ -38,15 +50,11 @@ boost::uint64_t foreach_vector(Policy const& policy, Vector const& v)
 
     boost::uint64_t start = hpx::util::high_resolution_clock::now();
 
-    for (std::size_t i = 0; i != test_count; ++i)
+    for (int i = 0; i != test_count; ++i)
     {
         hpx::parallel::for_each(
-            policy,
-            boost::begin(v), boost::end(v),
-            [](value_type)
-            {
-                worker_timed(delay);
-            });
+            policy, boost::begin(v), boost::end(v), wait_op<Vector>()
+        );
     }
 
     return (hpx::util::high_resolution_clock::now() - start) / test_count;
@@ -56,7 +64,7 @@ boost::uint64_t foreach_vector(Policy const& policy, Vector const& v)
 int hpx_main(boost::program_options::variables_map& vm)
 {
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();
-    bool csvoutput = vm.count("csv_output") != 0;
+//     bool csvoutput = vm.count("csv_output") != 0;
     delay = vm["work_delay"].as<int>();
     test_count = vm["test_count"].as<int>();
     chunk_size = vm["chunk_size"].as<int>();
