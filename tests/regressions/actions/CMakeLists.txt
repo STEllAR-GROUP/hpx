@@ -13,6 +13,9 @@ set(tests
     remote_object_move_semantics
    )
 
+set(plain_action_1330_FLAGS
+    DEPENDENCIES iostreams_component)
+
 set(plain_action_move_semantics_FLAGS
     DEPENDENCIES action_move_semantics_component)
 set(plain_action_move_semantics_PARAMETERS
