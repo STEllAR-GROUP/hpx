@@ -35,10 +35,6 @@
 #include <io.h>
 #endif
 
-#if defined(HPX_PARCELPORT_MPI)
-#include <hpx/util/mpi_environment.hpp>
-#endif
-
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -122,7 +118,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
-            util::runtime_configuration const& rtcfg,
+            util::runtime_configuration & rtcfg,
             runtime_mode locality_mode, std::size_t num_threads,
             init_scheduler_type const& init,
             threads::policies::init_affinity_data const& init_affinity)
@@ -145,7 +141,7 @@ namespace hpx {
         thread_manager_(new hpx::threads::threadmanager_impl<
             SchedulingPolicy, NotificationPolicy>(
                 timer_pool_, scheduler_, notifier_, num_threads)),
-        parcel_handler_(agas_client_, thread_manager_.get(),
+        parcel_handler_(rtcfg, agas_client_, thread_manager_.get(),
             new parcelset::policies::global_parcelhandler_queue,
             boost::bind(&runtime_impl::init_tss, This(), "parcel-thread", ::_1, ::_2, true),
             boost::bind(&runtime_impl::deinit_tss, This())),
@@ -218,11 +214,7 @@ namespace hpx {
         io_pool_.stop();
 
         // unload libraries
-        //runtime_support_->tidy();
-
-#if defined(HPX_PARCELPORT_MPI)
-        util::mpi_environment::finalize();
-#endif
+        runtime_support_->tidy();
 
         LRT_(debug) << "~runtime_impl(finished)";
     }

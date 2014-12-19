@@ -1117,17 +1117,25 @@ namespace hpx { namespace lcos
         typename traits::future_traits<shared_future>::result_type
         get(error_code& ec) const
         {
+            typedef
+                typename traits::future_traits<shared_future>::result_type
+                result_type;
             if (!this->shared_state_)
             {
                 HPX_THROWS_IF(ec, no_state,
                     "shared_future<R>::get",
                     "this future has no valid shared state");
-                return detail::future_value<R>::get_default();
+                static result_type tmp(detail::future_value<R>::get_default());
+                return tmp;
             }
 
             typedef typename shared_state_type::data_type data_type;
             data_type& data = this->shared_state_->get_result(ec);
-            if (ec) return detail::future_value<R>::get_default();
+            if (ec)
+            {
+                static result_type tmp(detail::future_value<R>::get_default());
+                return tmp;
+            }
 
             // no error has been reported, return the result
             return detail::future_value<R>::get(data.get_value());

@@ -728,7 +728,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 {
     hpx::id_type                    here = hpx::find_here();
     uint64_t                        rank = hpx::naming::get_locality_id_from_id(here);
-    std::string                     name = hpx::get_locality_name();
+    std::string                     name = hpx::get_runtime().here();
     uint64_t                      nranks = hpx::get_num_localities().get();
     std::size_t                  current = hpx::get_worker_thread_num();
     std::vector<hpx::id_type>    remotes = hpx::find_remote_localities();

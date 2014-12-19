@@ -83,15 +83,6 @@ response locality_namespace::service(
                 counter_data_.increment_resolve_locality_count();
                 return resolve_locality(req, ec);
             }
-        case locality_ns_resolve_locality_gid:
-            {
-                update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.resolve_locality_.time_
-                );
-                counter_data_.increment_resolve_locality_count();
-                return resolve_locality_gid(req, ec);
-            }
         case locality_ns_resolved_localities:
             {
                 update_time_on_exit update(
@@ -295,192 +286,99 @@ response locality_namespace::allocate(
 
     mutex_type::scoped_lock l(mutex_);
 
-    partition_table_type::iterator it = partitions_.find(endpoints)
-                                 , end = partitions_.end();
-
-    // If the endpoint is in the table, then this is a resize.
-    if (it != end)
+#if defined(HPX_DEBUG)
+    BOOST_FOREACH(partition_table_type::value_type const & partition, partitions_)
     {
-        // Just return the prefix
-        // REVIEW: Should this be an error?
-        if (0 == count)
-        {
-            LAGAS_(info) << (boost::format(
-                "locality_namespace::allocate, ep(%1%), count(%2%), "
-                "prefix(%3%), response(repeated_request)")
-                % endpoints
-                % count
-                % at_c<0>(it->second));
+        HPX_ASSERT(at_c<0>(partition.second) != endpoints);
+    }
+#endif
+    // Check for address space exhaustion.
+    if (HPX_UNLIKELY(0xFFFFFFFE < partitions_.size()))
+    {
+        l.unlock();
 
-            if (&ec != &throws)
-                ec = make_success_code();
-
-            return response(locality_ns_allocate
-                          , at_c<0>(it->second)
-                          , repeated_request);
-        }
-
-
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return response(locality_ns_allocate
-                      , at_c<0>(it->second)
-                      , repeated_request);
+        HPX_THROWS_IF(ec, internal_server_error
+          , "locality_namespace::allocate"
+          , "primary namespace has been exhausted");
+        return response();
     }
 
-    // If the endpoint isn't in the table, then we're registering it.
-    else
+    // Compute the locality's prefix.
+    boost::uint32_t prefix = naming::invalid_locality_id;
+
+    // check if the suggested prefix can be used instead of the next
+    // free one
+    boost::uint32_t suggested_locality_id =
+        naming::get_locality_id_from_gid(suggested_prefix);
+
+    partition_table_type::iterator it = partitions_.end();
+    if (suggested_locality_id != naming::invalid_locality_id)
     {
-        // Check for address space exhaustion.
-        if (HPX_UNLIKELY(0xFFFFFFFE < partitions_.size()))
+        it = partitions_.find(suggested_locality_id);
+
+        if(it == partitions_.end())
         {
-            l.unlock();
-
-            HPX_THROWS_IF(ec, internal_server_error
-              , "locality_namespace::allocate"
-              , "primary namespace has been exhausted");
-            return response();
-        }
-
-        // Compute the locality's prefix.
-        boost::uint32_t prefix = naming::invalid_locality_id;
-
-        // check if the suggested prefix can be used instead of the next
-        // free one
-        boost::uint32_t suggested_locality_id =
-            naming::get_locality_id_from_gid(suggested_prefix);
-
-        if (suggested_locality_id != naming::invalid_locality_id)
-        {
-            reverse_partition_table_type::const_iterator it =
-                prefixes_.find(suggested_locality_id);
-
-            if (it == prefixes_.end())
-            {
-                prefix = suggested_locality_id;
-            }
-            else
-            {
-                do {
-                    prefix = prefix_counter_++;
-                    it = prefixes_.find(prefix);
-                } while (it != prefixes_.end());
-            }
+            prefix = suggested_locality_id;
         }
         else
         {
-            reverse_partition_table_type::const_iterator it;
             do {
                 prefix = prefix_counter_++;
-                it = prefixes_.find(prefix);
-            } while (it != prefixes_.end());
+                it = partitions_.find(prefix);
+            } while (it != partitions_.end());
         }
-
-        // We need to create an entry in the partition table for this
-        // locality.
-        partition_table_type::iterator pit;
-
-        if (HPX_UNLIKELY(!util::insert_checked(partitions_.insert(
-                std::make_pair(endpoints, partition_type(prefix, num_threads))), pit)))
-        {
-            // If this branch is taken, then the partition table was updated
-            // at some point after we first checked it, which would indicate
-            // memory corruption or a locking failure.
-            l.unlock();
-
-            HPX_THROWS_IF(ec, lock_error
-              , "locality_namespace::allocate"
-              , boost::str(boost::format(
-                    "partition table insertion failed due to a locking "
-                    "error or memory corruption, endpoint(%1%), "
-                    "prefix(%2%)") % endpoints % prefix));
-            return response();
-        }
-
-        // insert into reverse partition table
-        reverse_partition_table_type::iterator rpit;
-
-        if (HPX_UNLIKELY(!util::insert_checked(prefixes_.insert(prefix))))
-        {
-            partitions_.erase(pit);
-            l.unlock();
-
-            HPX_THROWS_IF(ec, internal_server_error
-              , "locality_namespace::allocate"
-              , boost::str(boost::format(
-                    "reverse partition table insertion failed, prefix(%1%), "
-                    "endpoint(%2%)") % prefix % endpoints));
-            return response();
-        }
-
-        // Now that we've inserted the locality into the partition table
-        // successfully, we need to put the locality's GID into the GVA
-        // table so that parcels can be sent to the memory of a locality.
-        if (primary_)
-        {
-            naming::gid_type id(naming::get_gid_from_locality_id(prefix));
-            const gva g(id, components::component_runtime_support, count);
-
-            request req(primary_ns_bind_gid, id, g, prefix);
-            response resp = primary_->service(req, ec);
-            if (ec) return resp;
-        }
-
-        LAGAS_(info) << (boost::format(
-            "locality_namespace::allocate, ep(%1%), count(%2%), "
-            "prefix(%3%)")
-            % endpoints % count % prefix);
-
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return response(locality_ns_allocate
-                      , prefix);
     }
-} // }}}
-
-response locality_namespace::resolve_locality(
-    request const& req
-  , error_code& ec
-    )
-{ // {{{ resolve_locality implementation
-    using boost::fusion::at_c;
-
-    // parameters
-    parcelset::endpoints_type endpoints = req.get_endpoints();
-
-    mutex_type::scoped_lock l(mutex_);
-
-    partition_table_type::iterator pit = partitions_.find(endpoints)
-                                 , pend = partitions_.end();
-
-    if (pit != pend)
+    else
     {
-        boost::uint32_t const prefix = at_c<0>(pit->second);
+        do {
+            prefix = prefix_counter_++;
+            it = partitions_.find(prefix);
+        } while (it != partitions_.end());
+    }
 
-        LAGAS_(info) << (boost::format(
-            "locality_namespace::resolve_locality, endpoints(%1%), prefix(%2%)")
-            % endpoints % prefix);
+    // We need to create an entry in the partition table for this
+    // locality.
+    if(HPX_UNLIKELY(!util::insert_checked(partitions_.insert(
+        std::make_pair(prefix, partition_type(endpoints, num_threads))), it)))
+    {
+        l.unlock();
 
-        if (&ec != &throws)
-            ec = make_success_code();
+        HPX_THROWS_IF(ec, lock_error
+          , "locality_namespace::allocate"
+          , boost::str(boost::format(
+                "partition table insertion failed due to a locking "
+                "error or memory corruption, endpoint(%1%), "
+                "prefix(%2%)") % endpoints % prefix));
+        return response();
+    }
 
-        return response(locality_ns_resolve_locality, prefix);
+
+    // Now that we've inserted the locality into the partition table
+    // successfully, we need to put the locality's GID into the GVA
+    // table so that parcels can be sent to the memory of a locality.
+    if (primary_)
+    {
+        naming::gid_type id(naming::get_gid_from_locality_id(prefix));
+        const gva g(id, components::component_runtime_support, count);
+
+        request req(primary_ns_bind_gid, id, g, prefix);
+        response resp = primary_->service(req, ec);
+        if (ec) return resp;
     }
 
     LAGAS_(info) << (boost::format(
-        "locality_namespace::resolve_locality, endpoints(%1%), response(no_success)")
-        % endpoints);
+        "locality_namespace::allocate, ep(%1%), count(%2%), "
+        "prefix(%3%)")
+        % endpoints % count % prefix);
 
     if (&ec != &throws)
         ec = make_success_code();
 
-    return response(locality_ns_resolve_locality, naming::invalid_locality_id,
-        no_success);
+    return response(locality_ns_allocate
+                  , prefix);
 } // }}}
 
-response locality_namespace::resolve_locality_gid(
+response locality_namespace::resolve_locality(
     request const& req
   , error_code& ec
     )
@@ -489,16 +387,15 @@ response locality_namespace::resolve_locality_gid(
     using boost::fusion::at_c;
     boost::uint32_t prefix = naming::get_locality_id_from_gid(req.get_gid());
 
-    // FIXME: implement better way than O(N) lookup
-    BOOST_FOREACH(partition_table_type::value_type & ep, partitions_)
+    mutex_type::scoped_lock l(mutex_);
+    partition_table_type::iterator it = partitions_.find(prefix);
+
+    if(it != partitions_.end())
     {
-        if(prefix == at_c<0>(ep.second))
-        {
-            return response(locality_ns_resolve_locality_gid, ep.first);
-        }
+        return response(locality_ns_resolve_locality, at_c<0>(it->second));
     }
 
-    return response(locality_ns_resolve_locality_gid, parcelset::endpoints_type(),
+    return response(locality_ns_resolve_locality, parcelset::endpoints_type(),
         no_success);
 } // }}}
 
@@ -510,21 +407,24 @@ response locality_namespace::free(
     using boost::fusion::at_c;
 
     // parameters
-    parcelset::endpoints_type endpoints = req.get_endpoints();
+    naming::gid_type locality = req.get_gid();
+    boost::uint32_t prefix = naming::get_locality_id_from_gid(locality);
 
     mutex_type::scoped_lock l(mutex_);
 
-    partition_table_type::iterator pit = partitions_.find(endpoints)
+    partition_table_type::iterator pit = partitions_.find(prefix)
                                  , pend = partitions_.end();
 
     if (pit != pend)
     {
+        /*
         // Wipe the locality from the tables.
         naming::gid_type locality =
             naming::get_gid_from_locality_id(at_c<0>(pit->second));
 
         // first remove entry from reverse partition table
         prefixes_.erase(at_c<0>(pit->second));
+        */
 
         // now remove it from the main partition table
         partitions_.erase(pit);
@@ -577,7 +477,7 @@ response locality_namespace::localities(
                                        , end = partitions_.end();
 
     for (/**/; it != end; ++it)
-        p.push_back(at_c<0>(it->second));
+        p.push_back(it->first);
 
     LAGAS_(info) << (boost::format(
         "locality_namespace::localities, localities(%1%)")
@@ -607,8 +507,8 @@ response locality_namespace::resolved_localities(
     {
         localities.insert(
             std::make_pair(
-                naming::get_gid_from_locality_id(at_c<0>(it->second))
-              , it->first
+                naming::get_gid_from_locality_id(it->first)
+              , at_c<0>(it->second)
             )
         );
     }

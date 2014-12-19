@@ -248,9 +248,10 @@ namespace hpx { namespace components
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
-    runtime_support::runtime_support()
+    runtime_support::runtime_support(hpx::util::runtime_configuration & cfg)
       : stopped_(false), terminated_(false), dijkstra_color_(false),
-        shutdown_all_invoked_(false)
+        shutdown_all_invoked_(false),
+        modules_(cfg.modules())
     {}
 
     ///////////////////////////////////////////////////////////////////////////
@@ -969,7 +970,7 @@ namespace hpx { namespace components { namespace server
         }
 
         plugins_.clear();       // unload all plugins
-        modules_.clear();       // unload all modules
+        //modules_.clear();       // unload all modules
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1093,7 +1094,8 @@ namespace hpx { namespace components { namespace server
             }
 
             // Drop the locality from the partition table.
-            agas_client.unregister_locality(get_runtime().endpoints(), ec);
+            naming::gid_type here = agas_client.get_local_locality();
+            agas_client.unregister_locality(here, ec);
 
             // unregister fixed components
             agas_client.unbind_local(appl.get_runtime_support_raw_gid(), ec);
@@ -1148,8 +1150,6 @@ namespace hpx { namespace components { namespace server
         components::initial_static_loading = false;
 
         // then dynamic ones
-        ini.load_components(modules_);
-
         naming::resolver_client& client = get_runtime().get_agas_client();
         bool result = load_components(ini, client.get_local_locality(), client);
 
@@ -1757,7 +1757,8 @@ namespace hpx { namespace components { namespace server
         std::set<std::string>& startup_handled)
     {
         modules_map_type::iterator it = modules_.find(HPX_MANGLE_STRING(component));
-        if (it != modules_.end()) {
+        if (it != modules_.cend())
+        {
             // use loaded module, instantiate the requested factory
             if (!load_component((*it).second, ini, instance, component, lib,
                     prefix, agas_client, isdefault, isenabled, options,

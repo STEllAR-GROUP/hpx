@@ -38,7 +38,7 @@ namespace hpx { namespace parcelset
             virtual bool equal(impl_base const & rhs) const = 0;
             virtual bool less_than(impl_base const & rhs) const = 0;
             virtual bool valid() const = 0;
-            virtual connection_type get_type() const = 0;
+            virtual const char *type() const = 0;
             virtual std::ostream & print(std::ostream & os) const = 0;
             virtual void save(util::portable_binary_oarchive & ar) const = 0;
             virtual void load(util::portable_binary_iarchive & ar) = 0;
@@ -48,14 +48,14 @@ namespace hpx { namespace parcelset
             template <typename Impl>
             Impl & get()
             {
-                HPX_ASSERT(Impl::get_type() == get_type());
+                HPX_ASSERT(Impl::type() == type());
                 return static_cast<impl<Impl>*>(this)->impl_;
             }
 
             template <typename Impl>
             Impl const & get() const
             {
-                HPX_ASSERT(Impl::get_type() == get_type());
+                HPX_ASSERT(Impl::type() == type());
                 return static_cast<const impl<Impl>*>(this)->impl_;
             }
         };
@@ -121,9 +121,9 @@ namespace hpx { namespace parcelset
             return util::safe_bool<locality>()(impl_ ? impl_->valid(): false);
         }
 
-        connection_type get_type() const
+        const char *type() const
         {
-            return impl_ ? impl_->get_type() : parcelset::connection_unknown;
+            return impl_ ? impl_->type() : "";
         }
 
         template <typename Impl>
@@ -193,14 +193,14 @@ namespace hpx { namespace parcelset
 
             bool equal(impl_base const & rhs) const
             {
-                if(get_type() != rhs.get_type()) return false;
+                if(type() != rhs.type()) return false;
                 return impl_ == rhs.get<Impl>();
             }
 
             bool less_than(impl_base const & rhs) const
             {
-                return get_type() < rhs.get_type() ||
-                    (get_type() == rhs.get_type() && impl_ < rhs.get<Impl>());
+                return type() < rhs.type() ||
+                    (type() == rhs.type() && impl_ < rhs.get<Impl>());
             }
 
             bool valid() const
@@ -208,9 +208,9 @@ namespace hpx { namespace parcelset
                 return !!impl_;
             }
 
-            connection_type get_type() const
+            const char *type() const
             {
-                return Impl::get_type();
+                return Impl::type();
             }
 
             std::ostream & print(std::ostream & os) const

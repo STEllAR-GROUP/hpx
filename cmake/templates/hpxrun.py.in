@@ -96,14 +96,15 @@ def build_cmd(options, args):
     cmd = [args[0]]
     args.pop(0)
 
-    # Selecting the parcelport for hpx via hpx ini confifuration
-    select_parcelport = (lambda pp:
-        ['-Ihpx.parcel.ibverbs.enable=1'] if pp == 'ibverbs'
-        else ['-Ihpx.parcel.ipc.enable=1'] if pp == 'ipc'
-        else ['-Ihpx.parcel.mpi.enable=1', '-Ihpx.parcel.bootstrap=mpi'] if pp == 'mpi'
-        else ['-Ihpx.parcel.tcp.enable=1'] if pp == 'tcp'
-        else [])
-    cmd += select_parcelport(options.parcelport)
+    if options.localities > 1:
+        # Selecting the parcelport for hpx via hpx ini confifuration
+        select_parcelport = (lambda pp:
+            ['-Ihpx.parcel.ibverbs.enable=1'] if pp == 'ibverbs'
+            else ['-Ihpx.parcel.ipc.enable=1'] if pp == 'ipc'
+            else ['-Ihpx.parcel.mpi.enable=1', '-Ihpx.parcel.bootstrap=mpi'] if pp == 'mpi'
+            else ['-Ihpx.parcel.tcp.enable=1'] if pp == 'tcp'
+            else [])
+        cmd += select_parcelport(options.parcelport)
 
     # set number of threads
     cmd += ['--hpx:threads=' + str(options.threads)]

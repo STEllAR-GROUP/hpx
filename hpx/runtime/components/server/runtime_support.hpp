@@ -109,7 +109,7 @@ namespace hpx { namespace components { namespace server
         }
 
         // constructor
-        runtime_support();
+        runtime_support(hpx::util::runtime_configuration & cfg);
 
         ~runtime_support()
         {
@@ -431,7 +431,7 @@ namespace hpx { namespace components { namespace server
 
         component_map_type components_;
         plugin_map_type plugins_;
-        modules_map_type modules_;
+        modules_map_type & modules_;
         static_modules_type static_modules_;
 
         lcos::local::spinlock globals_mtx_;

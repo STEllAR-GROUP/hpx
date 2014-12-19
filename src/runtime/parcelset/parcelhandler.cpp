@@ -12,7 +12,6 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
-#include <hpx/util/mpi_environment.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
@@ -23,6 +22,8 @@
 #include <hpx/lcos/local/counting_semaphore.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
+
+#include <hpx/plugins/parcelport_factory_base.hpp>
 
 #include <string>
 #include <algorithm>
@@ -56,81 +57,6 @@ namespace hpx { namespace detail
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {
-    ///////////////////////////////////////////////////////////////////////////
-    std::string get_connection_type_name(connection_type t)
-    {
-        switch(t) {
-        case connection_tcp:
-            return "tcp";
-
-        case connection_ipc:
-          return "ipc";
-
-        case connection_ibverbs:
-          return "ibverbs";
-
-        case connection_portals4:
-            return "portals4";
-
-        case connection_mpi:
-            return "mpi";
-
-        default:
-            break;
-        }
-        return "<unknown>";
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    bool connection_type_available(connection_type t)
-    {
-        switch(t) {
-#if defined(HPX_PARCELPORT_TCP)
-        case connection_tcp:
-            return true;
-#endif
-#if defined(HPX_PARCELPORT_IPC)
-        case connection_ipc:
-            return true;
-#endif
-#if defined(HPX_PARCELPORT_IBVERBS)
-        case connection_ibverbs:
-            return true;
-#endif
-#if defined(HPX_PARCELPORT_PORTALS4)
-        case connection_portals4:
-            return true;
-#endif
-#if defined(HPX_PARCELPORT_MPI)
-        case connection_mpi:
-            return true;
-#endif
-        default:
-            break;
-        }
-        return false;
-    }
-
-    connection_type get_connection_type_from_name(std::string const& t)
-    {
-        if (!std::strcmp(t.c_str(), "tcp"))
-            return connection_tcp;
-
-        if (!std::strcmp(t.c_str(), "ipc"))
-            return connection_ipc;
-
-        if (!std::strcmp(t.c_str(), "ibverbs"))
-            return connection_ibverbs;
-
-        if (!std::strcmp(t.c_str(), "portals4"))
-            return connection_portals4;
-
-        if (!std::strcmp(t.c_str(), "mpi"))
-            return connection_mpi;
-
-        return connection_unknown;
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     policies::message_handler* get_message_handler(
         parcelhandler* ph, char const* action, char const* type, std::size_t num,
@@ -188,67 +114,94 @@ namespace hpx { namespace parcelset
         parcels_->add_parcel(p);
     }
 
-    parcelhandler::parcelhandler(naming::resolver_client& resolver,
+    parcelhandler::parcelhandler(
+            util::runtime_configuration & cfg,
+            naming::resolver_client& resolver,
             threads::threadmanager_base* tm, parcelhandler_queue_base* policy,
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
             HPX_STD_FUNCTION<void()> const& on_stop_thread)
       : resolver_(resolver),
-        pports_(connection_last),
-        endpoints_(connection_last),
         tm_(tm),
         parcels_(policy),
         use_alternative_parcelports_(false),
         enable_parcel_handling_(true),
         count_routed_(0)
     {
-        util::runtime_configuration const& cfg = hpx::get_config();
+        namespace fs = boost::filesystem;
         // load all parcelports as described in the configuration information
-        if (!cfg.has_section("hpx.plugins.parcelport")) {
+        if (!cfg.has_section("hpx.parcel")) {
             LRT_(info) << "No parcelports found/loaded.";
             return;     // no plugins to load
         }
 
-        /** FIXME:
-#if defined(HPX_PARCELPORT_IPC)
-        std::string enable_ipc =
-            get_config_entry("hpx.parcel.ipc.enable", "0");
-
-        if (hpx::util::safe_lexical_cast<int>(enable_ipc, 0))
+        util::section* sec = cfg.get_section("hpx.parcel");
+        if (NULL == sec)
         {
-            attach_parcelport(parcelport::create(
-                connection_ipc, hpx::get_config(),
-                on_start_thread, on_stop_thread), false);
+            LRT_(error) << "NULL section found";
+            return;     // something bad happened
         }
-#endif
-#if defined(HPX_PARCELPORT_IBVERBS)
-        std::string enable_ibverbs =
-            get_config_entry("hpx.parcel.ibverbs.enable", "0");
 
-        if (hpx::util::safe_lexical_cast<int>(enable_ibverbs, 0))
+        util::section::section_map const& s = (*sec).get_sections();
+        typedef util::section::section_map::const_iterator iterator;
+        iterator end = s.end();
+        for (iterator i = s.begin (); i != end; ++i)
         {
-            attach_parcelport(parcelport::create(
-                connection_ibverbs, hpx::get_config(),
-                on_start_thread, on_stop_thread), false);
-        }
-#endif
-#if defined(HPX_PARCELPORT_MPI)
-        if (util::mpi_environment::enabled()) {
-            attach_parcelport(parcelport::create(
-                connection_mpi, hpx::get_config(),
-                on_start_thread, on_stop_thread), false);
-        }
-#endif
+            // the section name is the instance name of the component
+            util::section const& sect = i->second;
+            std::string instance (sect.get_name());
+            std::string parcelport;
 
-#if defined(HPX_PARCELPORT_TCP)
-        std::string enable_tcp =
-            get_config_entry("hpx.parcel.tcp.enable", "1");
-        if (hpx::util::safe_lexical_cast<int>(enable_tcp, 1)) {
-            attach_parcelport(parcelport::create(
-                connection_tcp, hpx::get_config(),
-                on_start_thread, on_stop_thread), false);
-        }
+            if (i->second.has_entry("name"))
+                parcelport = sect.get_entry("name");
+            else
+                parcelport = instance;
+
+            bool isenabled = true;
+            if (sect.has_entry("enabled")) {
+                std::string tmp = sect.get_entry("enabled");
+                boost::algorithm::to_lower (tmp);
+                if (tmp == "no" || tmp == "false" || tmp == "0") {
+                    LRT_(info) << "parcelport factory disabled: " << instance;
+                    isenabled = false;     // this parcelport has been disabled
+                }
+            }
+            fs::path lib;
+            try {
+                if (sect.has_entry("path"))
+                    lib = hpx::util::create_path(sect.get_entry("path"));
+                else
+                    lib = hpx::util::create_path(HPX_DEFAULT_COMPONENT_PATH);
+
+                if (sect.get_entry("static", "0") == "1") {
+                    // FIXME: implement statically linked plugins
+                }
+                else {
+#if defined(HPX_STATIC_LINKING)
+                    HPX_THROW_EXCEPTION(service_unavailable,
+                        "parcelset::parcelset",
+                        "static linking configuration does not support dynamic "
+                        "loading of parcelport '" + instance + "'");
+#else
+                    // first, try using the path as the full path to the library
+                    if (!load_parcelport(cfg, instance, parcelport, lib, isenabled, on_start_thread, on_stop_thread))
+                    {
+                        // build path to component to load
+                        std::string libname(HPX_MAKE_DLL_STRING(parcelport));
+                        lib /= hpx::util::create_path(libname);
+                        if (!load_parcelport(cfg, instance, parcelport, lib, isenabled, on_start_thread, on_stop_thread))
+                        {
+                            continue;   // next please :-P
+                        }
+                    }
 #endif
-    ***/
+                }
+            }
+            catch (hpx::exception const& e) {
+                LRT_(warning) << "caught exception while loading " << instance
+                              << ", " << e.get_error_code().get_message()
+                              << ": " << e.what();
+            }
+        } // for
     }
 
     std::vector<std::string> parcelhandler::load_runtime_configuration()
@@ -283,74 +236,24 @@ namespace hpx { namespace parcelset
             "async_serialization = ${HPX_PARCEL_ASYNC_SERIALIZATION:1}"
             ;
 
-        for(int i = 0; i < connection_type::connection_last; ++i)
-        {
-            std::pair<std::vector<std::string>, bool> pp_ini_defs =
-                parcelport::runtime_configuration(i);
-            std::string name = get_connection_type_name(connection_type(i));
-            std::string name_uc = boost::to_upper_copy(name);
-            std::string enable = pp_ini_defs.second ? "1" : "0";
-
-            // Load some defaults
-            ini_defs += "[hpx.parcel." + name + "]";
-            if (!connection_type_available(connection_type(i)))
-            {
-                // skip this configuration if the parcelport is not available
-                ini_defs += "enable = 0";
-            }
-            else
-            {
-                ini_defs +=
-                    "enable = ${HPX_PARCELPORT_" + name_uc + ":" + enable + "}",
-                    "parcel_pool_size = ${HPX_PARCEL_" + name_uc + "_PARCEL_POOL_SIZE:"
-                        "$[hpx.threadpools.parcel_pool_size]}",
-                    "max_connections =  ${HPX_PARCEL_" + name_uc + "_MAX_CONNECTIONS:"
-                        "$[hpx.parcel.max_connections]}",
-                    "max_connections_per_locality = "
-                        "${HPX_PARCEL_" + name_uc + "_MAX_CONNECTIONS_PER_LOCALITY:"
-                        "$[hpx.parcel.max_connections_per_locality]}",
-                    "max_message_size =  ${HPX_PARCEL_" + name_uc +
-                        "_MAX_MESSAGE_SIZE:$[hpx.parcel.max_message_size]}",
-                    "max_outbound_message_size =  ${HPX_PARCEL_" + name_uc +
-                        "_MAX_OUTBOUND_MESSAGE_SIZE:$[hpx.parcel.max_outbound_message_size]}",
-                    "array_optimization = ${HPX_PARCEL_" + name_uc +
-                        "_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}",
-                    "zero_copy_optimization = ${HPX_PARCEL_" + name_uc +
-                        "_ZERO_COPY_OPTIMIZATION:"
-                        "$[hpx.parcel.zero_copy_optimization]}",
-                    "enable_security = ${HPX_PARCEL_" + name_uc +
-                        "_ENABLE_SECURITY:"
-                        "$[hpx.parcel.enable_security]}",
-                    "async_serialization = ${HPX_PARCEL_" + name_uc +
-                        "_ASYNC_SERIALIZATION:"
-                        "$[hpx.parcel.async_serialization]}"
-                    ;
-            }
-
-            // add the pp specific configuration parameter
-            ini_defs.insert(ini_defs.end(),
-                pp_ini_defs.first.begin(), pp_ini_defs.first.end());
-        }
 
         return ini_defs;
     }
 
     boost::shared_ptr<parcelport> parcelhandler::get_bootstrap_parcelport() const
     {
-        std::string pptype = get_config_entry("hpx.parcel.bootstrap", "tcp");
-
-        int type = get_connection_type_from_name(pptype);
-        if (type == connection_unknown)
+        if(!pports_.empty())
         {
-#if defined(HPX_PARCELPORT_MPI)
-            if (util::mpi_environment::enabled())
-                type = connection_mpi;
-            else
-#endif
-            type = connection_tcp;
+            std::string cfgkey("hpx.parcel.bootstrap");
+            pports_type::const_iterator it = pports_.find(get_priority(get_config_entry(cfgkey, "tcp")));
+            if(it != pports_.end() && it->first > 0) return it->second;
         }
-
-        return pports_[type];
+        BOOST_FOREACH(pports_type::value_type const & pp, pports_)
+        {
+            if(pp.first > 0 && pp.second->can_bootstrap())
+                return pp.second;
+        }
+        return boost::shared_ptr<parcelport>();
     }
 
 
@@ -359,101 +262,156 @@ namespace hpx { namespace parcelset
         HPX_ASSERT(parcels_);
 
         parcels_->set_parcelhandler(this);
-        for(int i = 0; i < connection_type::connection_last; ++i)
+        BOOST_FOREACH(pports_type::value_type & pp, pports_)
         {
-            if(pports_[i])
+            if(pp.second != get_bootstrap_parcelport())
             {
-                if(pports_[i] != get_bootstrap_parcelport())
-                    pports_[i]->run(false);
-                else
-                {
-                    pports_[i]->register_event_handler(boost::bind(&parcelhandler::parcel_sink, this, _1));
-                }
+                if(pp.first > 0)
+                    pp.second->run(false);
             }
+            else
+                pp.second->register_event_handler(boost::bind(&parcelhandler::parcel_sink, this, _1));
+
         }
     }
 
-    void parcelhandler::list_parcelport(util::osstream& strm, connection_type t,
-        bool available)
+    void parcelhandler::list_parcelport(util::osstream& strm, std::string const& ppname, int priority,
+        bool bootstrap) const
     {
-        std::string ppname = get_connection_type_name(t);
-        strm << "parcel port: " << ppname
-             << " (" << (available ? "" : "not ") << "available)";
+        strm << "parcel port: " << ppname;
 
-        if (available)
-        {
-            std::string cfgkey("hpx.parcel." + ppname + ".enable");
-            std::string enabled = get_config_entry(cfgkey, "0");
-            strm << ", " << (hpx::util::safe_lexical_cast<int>(enabled, 0) ? "" : "not ")
-                 << "enabled";
+        std::string cfgkey("hpx.parcel." + ppname + ".enable");
+        std::string enabled = get_config_entry(cfgkey, "0");
+        strm << ", " << (hpx::util::safe_lexical_cast<int>(enabled, 0) ? "" : "not ")
+             << "enabled";
 
-            std::string bootstrap = get_config_entry("hpx.parcel.bootstrap", "tcp");
-            if (bootstrap == ppname)
-                strm << ", bootstrap";
-        }
+        if (bootstrap)
+            strm << ", bootstrap";
+
+        strm << ", priority " << priority;
 
         strm << '\n';
     }
 
     // list available parcel ports
-    void parcelhandler::list_parcelports(util::osstream& strm)
+    void parcelhandler::list_parcelports(util::osstream& strm) const
     {
-        list_parcelport(strm, connection_tcp);
-
-#if defined(HPX_PARCELPORT_IPC)
-        list_parcelport(strm, connection_ipc);
-#else
-        list_parcelport(strm, connection_ipc, false);
-#endif
-// #if defined(HPX_PARCELPORT_PORTALS4)
-//         list_parcelport(strm, connection_portals4);
-// #else
-//         list_parcelport(strm, connection_portals4, false);
-// #endif
-#if defined(HPX_PARCELPORT_IBVERBS)
-        list_parcelport(strm, connection_ibverbs);
-#else
-        list_parcelport(strm, connection_ibverbs, false);
-#endif
-#if defined(HPX_PARCELPORT_MPI)
-        list_parcelport(strm, connection_mpi);
-#else
-        list_parcelport(strm, connection_mpi, false);
-#endif
-    }
-
-    // find and return the specified parcelport
-    parcelport* parcelhandler::find_parcelport(connection_type type,
-        error_code& ec) const
-    {
-        if (HPX_UNLIKELY(!pports_[type])) { //-V108
-            HPX_THROWS_IF(ec, bad_parameter, "parcelhandler::find_parcelport",
-                "cannot find parcelport for connection type " +
-                    get_connection_type_name(type));
-            return 0;
+        BOOST_FOREACH(pports_type::value_type const & pp, pports_)
+        {
+            list_parcelport(
+                strm
+              , pp.second->type()
+              , pp.second->priority()
+              , pp.second == get_bootstrap_parcelport()
+            );
         }
-
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return pports_[type].get(); //-V108
+        strm << '\n';
     }
 
-    void parcelhandler::attach_parcelport(boost::shared_ptr<parcelport> const& pp,
-        bool run)
+    bool parcelhandler::load_parcelport(util::section& ini,
+        std::string const& instance, std::string const& plugin,
+        boost::filesystem::path const& lib, bool isenabled,
+        HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
+        HPX_STD_FUNCTION<void()> const& on_stop_thread)
     {
+        namespace fs = boost::filesystem;
+        if (fs::extension(lib) != HPX_SHARED_LIB_EXTENSION)
+            return false;
+
+        try {
+            // get the handle of the library
+            error_code ec(lightweight);
+            hpx::util::plugin::dll d(lib.string(), HPX_MANGLE_STRING(plugin));
+
+            d.load_library(ec);
+            if (ec) {
+                LRT_(warning) << "dynamic loading failed: " << lib.string()
+                              << ": " << instance << ": " << get_error_what(ec);
+                return false;
+            }
+
+            // initialize the factory instance using the preferences from the
+            // ini files
+            util::section const* glob_ini = NULL;
+            if (ini.has_section("settings"))
+                glob_ini = ini.get_section("settings");
+
+            util::section const* plugin_ini = NULL;
+            std::string plugin_section("hpx.parcel." + instance);
+            if (ini.has_section(plugin_section))
+                plugin_ini = ini.get_section(plugin_section);
+
+            if (0 != plugin_ini &&
+                "0" != plugin_ini->get_entry("no_factory", "0"))
+            {
+                return false;
+            }
+
+            // get the factory
+            hpx::util::plugin::plugin_factory<plugins::plugin_factory_base>
+                pf (d, "factory");
+
+            // create the component factory object, if not disabled
+            boost::shared_ptr<plugins::plugin_factory_base> factory (
+                pf.create(plugin, ec, glob_ini, plugin_ini, isenabled));
+            if (ec) {
+                LRT_(warning) << "dynamic loading failed: " << lib.string()
+                              << ": " << instance << ": " << get_error_what(ec);
+                return false;
+            }
+
+            attach_parcelport(
+                boost::shared_ptr<parcelport>(
+                    boost::static_pointer_cast<plugins::parcelport_factory_base>(
+                        factory
+                    )->create(
+                        hpx::get_config()
+                      , on_start_thread
+                      , on_stop_thread
+                    )
+                )
+            );
+
+            LRT_(info) << "dynamic loading succeeded: " << lib.string()
+                        << ": " << instance;
+        }
+        catch (hpx::exception const&) {
+            throw;
+        }
+        catch (std::logic_error const& e) {
+            LRT_(warning) << "dynamic loading failed: " << lib.string()
+                          << ": " << instance << ": " << e.what();
+            return false;
+        }
+        catch (std::exception const& e) {
+            LRT_(warning) << "dynamic loading failed: " << lib.string()
+                          << ": " << instance << ": " << e.what();
+            return false;
+        }
+        return true;    // component got loaded
+    }
+
+    void parcelhandler::attach_parcelport(boost::shared_ptr<parcelport> const& pp)
+    {
+        if(!pp) return;
+
         // register our callback function with the parcelport
         pp->register_event_handler(boost::bind(&parcelhandler::parcel_sink, this, _1));
 
-        // start the parcelport's thread pool
-        if (run) pp->run(false);
-
         // add the new parcelport to the list of parcel-ports we care about
-        pports_[pp->get_type()] = pp;
+        int priority = pp->priority();
+        std::string cfgkey(std::string("hpx.parcel.") + pp->type() + ".enable");
+        if(get_config_entry(cfgkey, "0") != "1")
+        {
+            priority = -priority;
+        }
+        pports_[priority] = pp;
+        priority_[pp->type()] = priority;
 
         // add the endpoint of the new parcelport
-        HPX_ASSERT(pp->get_type() == pp->here().get_type());
-        endpoints_[pp->get_type()] = pp->here();
+        HPX_ASSERT(pp->type() == pp->here().type());
+        if(priority > 0)
+            endpoints_[pp->type()] = pp->here();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -461,17 +419,15 @@ namespace hpx { namespace parcelset
     /// connection caches anymore
     void parcelhandler::remove_from_connection_cache(endpoints_type const& endpoints)
     {
-        BOOST_FOREACH(locality const & loc, endpoints)
+        BOOST_FOREACH(endpoints_type::value_type const & loc, endpoints)
         {
-            boost::shared_ptr<parcelport> pp = pports_[loc.get_type()];
-            if (!pp) {
-                HPX_THROW_EXCEPTION(network_error,
-                    "parcelhandler::remove_from_connection_cache",
-                    "cannot find parcelport for connection type " +
-                        get_connection_type_name(loc.get_type()));
-                return;
+            BOOST_FOREACH(pports_type::value_type & pp, pports_)
+            {
+                if(std::string(pp.second->type()) == loc.second.type())
+                {
+                    pp.second->remove_from_connection_cache(loc.second);
+                }
             }
-            pp->remove_from_connection_cache(loc);
         }
     }
 
@@ -495,18 +451,21 @@ namespace hpx { namespace parcelset
         }
 
         // make sure all pending parcels are being handled
-        BOOST_FOREACH(boost::shared_ptr<parcelport> pp, pports_)
+        BOOST_FOREACH(pports_type::value_type & pp, pports_)
         {
-            if (pp) pp->do_background_work();
+            pp.second->do_background_work();
         }
     }
 
     void parcelhandler::stop(bool blocking)
     {
         // now stop all parcel ports
-        BOOST_FOREACH(boost::shared_ptr<parcelport> pp, pports_)
+        BOOST_FOREACH(pports_type::value_type & pp, pports_)
         {
-            if (pp) pp->stop(blocking);
+            if(pp.first > 0)
+            {
+                pp.second->stop(blocking);
+            }
         }
     }
 
@@ -545,157 +504,41 @@ namespace hpx { namespace parcelset
         return !locality_ids.empty();
     }
 
-    locality parcelhandler::find_appropriate_destination(
+    std::pair<boost::shared_ptr<parcelport>, locality> parcelhandler::find_appropriate_destination(
         naming::gid_type const& dest_gid)
     {
-        mutex_type::scoped_lock l(resolved_endpoints_mtx_);
-        resolved_endpoints_type::iterator lit = resolved_endpoints_.find(dest_gid);
+        endpoints_type const & dest_endpoints = resolver_.resolve_locality(dest_gid);
 
-        if(lit == resolved_endpoints_.end())
+        BOOST_FOREACH(pports_type::value_type & pp, pports_)
         {
-            // FIXME: get error here
-            endpoints_type eps;
+            if(pp.first > 0)
             {
-                hpx::util::scoped_unlock<mutex_type::scoped_lock> ull(l);
-                future<endpoints_type> feps = resolver_.resolve_locality_async(dest_gid);
-
-                if(0 == threads::get_self_ptr())
-                {
-                    while(!feps.is_ready()) ;
-                }
-                eps = feps.get();
-            }
-            if(eps.empty())
-            {
-                hpx::util::osstream oss;
-                oss << "The locality gid cannot be resolved to a valid endpoint.\n"
-                    << "Got locality " << dest_gid << " (" << get_locality() << ") . Available endpoints:\n";
-                BOOST_FOREACH(resolved_endpoints_type::value_type const & endpoints, resolved_endpoints_)
-                {
-                    oss << "    " << endpoints.first << ": " << endpoints.second << "\n";
-                }
-                HPX_THROW_EXCEPTION(network_error, "parcelhandler::find_appropriate_destination",
-                    hpx::util::osstream_get_string(oss));
-                return locality();
-            }
-
-            lit = resolved_endpoints_.insert(lit, std::make_pair(dest_gid, std::move(eps)));
-        }
-        endpoints_type const & dest_endpoints = lit->second;
-
-#if defined(HPX_PARCELPORT_IPC)
-        std::string enable_ipc =
-            get_config_entry("hpx.parcel.ipc.enable", "0");
-        if(use_alternative_parcelports_ && hpx::util::safe_lexical_cast<int>(enable_ipc, 0))
-        {
-            // Find ipc parcelport endpoints ...
-            locality here = find_endpoint(endpoints_, connection_ipc);
-            locality dest = find_endpoint(dest_endpoints, connection_ipc);
-            if(here == dest && pports_[connection_ipc])
-            {
-                return dest;
+                locality const & dest = find_endpoint(dest_endpoints, pp.second->type());
+                if(dest && pp.second->can_connect(dest, use_alternative_parcelports_))
+                    return std::make_pair(pp.second, dest);
             }
         }
-#endif
-#if defined(HPX_PARCELPORT_IBVERBS)
-        // FIXME: add check if ibverbs is really available for this destination.
-
-        std::string enable_ibverbs =
-            get_config_entry("hpx.parcel.ibverbs.enable", "0");
-        if (use_alternative_parcelports_ && hpx::util::safe_lexical_cast<int>(enable_ibverbs, 0))
-        {
-            // Find ibverbs parcelport endpoints ...
-            locality dest = find_endpoint(dest_endpoints, connection_ibverbs);
-            if(dest && pports_[connection_ibverbs])
-            {
-                return dest;
-            }
-        }
-#endif
-#if defined(HPX_PARCELPORT_MPI)
-        // FIXME: add check if MPI is really available for this destination.
-
-        if ((use_alternative_parcelports_ ||
-             get_config_entry("hpx.parcel.bootstrap", "tcp") == "mpi") &&
-             util::mpi_environment::enabled())
-        {
-            // Find MPI parcelport endpoints ...
-            locality dest = find_endpoint(dest_endpoints, connection_mpi);
-            if(dest && pports_[connection_mpi])
-            {
-                return dest;
-            }
-        }
-#endif
-#if defined(HPX_PARCELPORT_TCP)
-        // FIXME: add check if tcp is really available for this destination.
-
-        std::string enable_tcp =
-            get_config_entry("hpx.parcel.tcp.enable", "0");
-        if (hpx::util::safe_lexical_cast<int>(enable_tcp, 0))
-        {
-            // Find ibverbs parcelport endpoints ...
-            locality dest = find_endpoint(dest_endpoints, connection_tcp);
-            if(dest && pports_[connection_tcp])
-            {
-                return dest;
-            }
-        }
-#endif
 
         HPX_THROW_EXCEPTION(network_error, "parcelhandler::find_appropriate_destination",
             "The locality gid cannot be resolved to a valid endpoint. No valid parcelport configured.");
+        return std::pair<boost::shared_ptr<parcelport>, locality>();
+    }
+
+    locality parcelhandler::find_endpoint(endpoints_type const & eps, std::string const & name)
+    {
+        endpoints_type::const_iterator it = eps.find(name);
+        if(it != eps.end()) return it->second;
         return locality();
-    }
-
-    locality parcelhandler::find_endpoint(endpoints_type const & eps, connection_type type)
-    {
-        locality res;
-        BOOST_FOREACH(locality const & loc, eps)
-        {
-            if(loc.get_type() == type)
-            {
-                res = loc;
-                break;
-            }
-        }
-        return res;
-    }
-
-    // this function  will be called right after pre_main
-    void parcelhandler::set_resolved_localities(
-        std::map<naming::gid_type, endpoints_type> const& localities)
-    {
-        mutex_type::scoped_lock l(resolved_endpoints_mtx_);
-        if(resolved_endpoints_.empty())
-        {
-            resolved_endpoints_ = localities;
-            return;
-        }
-        BOOST_FOREACH(resolved_endpoints_type::value_type const & resolved, localities)
-        {
-            resolved_endpoints_[resolved.first] = resolved.second;
-        }
-    }
-
-    // this function  will be called right after pre_main
-    void parcelhandler::set_resolved_localities(
-        naming::gid_type gid, endpoints_type const& endpoints)
-    {
-        mutex_type::scoped_lock l(resolved_endpoints_mtx_);
-        resolved_endpoints_[gid] = endpoints;
     }
 
     /// Return the reference to an existing io_service
     util::io_service_pool* parcelhandler::get_thread_pool(char const* name)
     {
         util::io_service_pool* result = 0;
-        BOOST_FOREACH(boost::shared_ptr<parcelport> pp, pports_)
+        BOOST_FOREACH(pports_type::value_type & pp, pports_)
         {
-            if (pp) {
-                result = pp->get_thread_pool(name);
-                if (result) return result;
-            }
+            result = pp.second->get_thread_pool(name);
+            if (result) return result;
         }
         return result;
     }
@@ -783,16 +626,17 @@ namespace hpx { namespace parcelset
 
             // dispatch to the message handler which is associated with the
             // encapsulated action
-            parcelset::locality dest = find_appropriate_destination(addrs[0].locality_);
+            typedef std::pair<boost::shared_ptr<parcelport>, locality> destination_pair;
+            destination_pair dest = find_appropriate_destination(addrs[0].locality_);
             policies::message_handler* mh =
-                p.get_message_handler(this, dest);
+                p.get_message_handler(this, dest.second);
 
             if (mh) {
-                mh->put_parcel(dest, p, wrapped_f);
+                mh->put_parcel(dest.second, p, wrapped_f);
                 return;
             }
 
-            find_parcelport(dest.get_type())->put_parcel(dest, p, wrapped_f);
+            dest.first->put_parcel(dest.second, p, wrapped_f);
             return;
         }
 
@@ -805,9 +649,9 @@ namespace hpx { namespace parcelset
     std::size_t parcelhandler::get_outgoing_queue_length(bool reset) const
     {
         std::size_t parcel_count = 0;
-        BOOST_FOREACH(boost::shared_ptr<parcelport> pp, pports_)
+        BOOST_FOREACH(pports_type::value_type const& pp, pports_)
         {
-            if (pp) parcel_count += pp->get_pending_parcels_count(reset);
+            parcel_count += pp.second->get_pending_parcels_count(reset);
         }
         return parcel_count;
     }
@@ -856,7 +700,7 @@ namespace hpx { namespace parcelset
             {
                 util::scoped_unlock<mutex_type::scoped_lock> ul(l);
                 p.reset(hpx::create_message_handler(message_handler_type,
-                    action, find_parcelport(loc.get_type()), num_messages, interval, ec));
+                    action, find_parcelport(loc.type()), num_messages, interval, ec));
             }
 
             it = handlers_.find(key);
@@ -915,22 +759,13 @@ namespace hpx { namespace parcelset
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::string parcelhandler::get_locality_name() const
-    {
-        BOOST_FOREACH(boost::shared_ptr<parcelport> pp, pports_)
-        {
-            if (pp) return pp->get_locality_name();
-        }
-        return "<unknown>";
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     bool parcelhandler::enable(bool new_state)
     {
         new_state = enable_parcel_handling_.exchange(new_state, boost::memory_order_acquire);
-        BOOST_FOREACH(boost::shared_ptr<parcelport> pp, pports_)
+        BOOST_FOREACH(pports_type::value_type & pp, pports_)
         {
-            if (pp) pp->enable(enable_parcel_handling_);
+            if(pp.first > 0)
+                pp.second->enable(enable_parcel_handling_);
         }
 
         return new_state;
@@ -941,7 +776,7 @@ namespace hpx { namespace parcelset
 
     // number of parcels sent
     std::size_t parcelhandler::get_parcel_send_count(
-        connection_type pp_type, bool reset) const
+        std::string const& pp_type, bool reset) const
     {
         error_code ec(lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
@@ -956,7 +791,7 @@ namespace hpx { namespace parcelset
 
     // number of messages sent
     std::size_t parcelhandler::get_message_send_count(
-        connection_type pp_type, bool reset) const
+        std::string const& pp_type, bool reset) const
     {
         error_code ec(lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
@@ -965,7 +800,7 @@ namespace hpx { namespace parcelset
 
     // number of parcels received
     std::size_t parcelhandler::get_parcel_receive_count(
-        connection_type pp_type, bool reset) const
+        std::string const& pp_type, bool reset) const
     {
         error_code ec(lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
@@ -974,7 +809,7 @@ namespace hpx { namespace parcelset
 
     // number of messages received
     std::size_t parcelhandler::get_message_receive_count(
-        connection_type pp_type, bool reset) const
+        std::string const& pp_type, bool reset) const
     {
         error_code ec(lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
@@ -984,7 +819,7 @@ namespace hpx { namespace parcelset
     // the total time it took for all sends, from async_write to the
     // completion handler (nanoseconds)
     boost::int64_t parcelhandler::get_sending_time(
-        connection_type pp_type, bool reset) const
+        std::string const& pp_type, bool reset) const
     {
         error_code ec(lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
@@ -994,7 +829,7 @@ namespace hpx { namespace parcelset
     // the total time it took for all receives, from async_read to the
     // completion handler (nanoseconds)
     boost::int64_t parcelhandler::get_receiving_time(
-        connection_type pp_type, bool reset) const
+        std::string const& pp_type, bool reset) const
     {
         error_code ec(lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
@@ -1004,7 +839,7 @@ namespace hpx { namespace parcelset
     // the total time it took for all sender-side serialization operations
     // (nanoseconds)
     boost::int64_t parcelhandler::get_sending_serialization_time(
-        connection_type pp_type, bool reset) const
+        std::string const& pp_type, bool reset) const
     {
         error_code ec(lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
@@ -1014,7 +849,7 @@ namespace hpx { namespace parcelset
     // the total time it took for all receiver-side serialization
     // operations (nanoseconds)
     boost::int64_t parcelhandler::get_receiving_serialization_time(
-        connection_type pp_type, bool reset) const
+        std::string const& pp_type, bool reset) const
     {
         error_code ec(lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
@@ -1025,7 +860,7 @@ namespace hpx { namespace parcelset
     // the total time it took for all sender-side security operations
     // (nanoseconds)
     boost::int64_t parcelhandler::get_sending_security_time(
-        connection_type pp_type, bool reset) const
+        std::string const& pp_type, bool reset) const
     {
         error_code ec(lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
@@ -1035,7 +870,7 @@ namespace hpx { namespace parcelset
     // the total time it took for all receiver-side security
     // operations (nanoseconds)
     boost::int64_t parcelhandler::get_receiving_security_time(
-        connection_type pp_type, bool reset) const
+        std::string const& pp_type, bool reset) const
     {
         error_code ec(lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
@@ -1044,7 +879,7 @@ namespace hpx { namespace parcelset
 #endif
 
     // total data sent (bytes)
-    std::size_t parcelhandler::get_data_sent(connection_type pp_type,
+    std::size_t parcelhandler::get_data_sent(std::string const& pp_type,
         bool reset) const
     {
         error_code ec(lightweight);
@@ -1053,7 +888,7 @@ namespace hpx { namespace parcelset
     }
 
     // total data (uncompressed) sent (bytes)
-    std::size_t parcelhandler::get_raw_data_sent(connection_type pp_type,
+    std::size_t parcelhandler::get_raw_data_sent(std::string const& pp_type,
         bool reset) const
     {
         error_code ec(lightweight);
@@ -1062,7 +897,7 @@ namespace hpx { namespace parcelset
     }
 
     // total data received (bytes)
-    std::size_t parcelhandler::get_data_received(connection_type pp_type,
+    std::size_t parcelhandler::get_data_received(std::string const& pp_type,
         bool reset) const
     {
         error_code ec(lightweight);
@@ -1071,7 +906,7 @@ namespace hpx { namespace parcelset
     }
 
     // total data (uncompressed) received (bytes)
-    std::size_t parcelhandler::get_raw_data_received(connection_type pp_type,
+    std::size_t parcelhandler::get_raw_data_received(std::string const& pp_type,
         bool reset) const
     {
         error_code ec(lightweight);
@@ -1080,14 +915,14 @@ namespace hpx { namespace parcelset
     }
 
     boost::int64_t parcelhandler::get_buffer_allocate_time_sent(
-        connection_type pp_type, bool reset) const
+        std::string const& pp_type, bool reset) const
     {
         error_code ec(lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
         return pp ? pp->get_buffer_allocate_time_sent(reset) : 0;
     }
     boost::int64_t parcelhandler::get_buffer_allocate_time_received(
-        connection_type pp_type, bool reset) const
+        std::string const& pp_type, bool reset) const
     {
         error_code ec(lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
@@ -1096,7 +931,7 @@ namespace hpx { namespace parcelset
 
     // connection stack statistics
     boost::int64_t parcelhandler::get_connection_cache_statistics(
-        connection_type pp_type,
+        std::string const& pp_type,
         parcelport::connection_cache_statistics_type stat_type, bool reset) const
     {
         error_code ec(lightweight);
@@ -1108,16 +943,10 @@ namespace hpx { namespace parcelset
     void parcelhandler::register_counter_types()
     {
         // register connection specific counters
-        register_counter_types(connection_tcp);
-#if defined(HPX_PARCELPORT_IPC)
-        register_counter_types(connection_ipc);
-#endif
-#if defined(HPX_PARCELPORT_IBVERBS)
-        register_counter_types(connection_ibverbs);
-#endif
-#if defined(HPX_PARCELPORT_MPI)
-        register_counter_types(connection_mpi);
-#endif
+        BOOST_FOREACH(pports_type::value_type const & pp, pports_)
+        {
+            register_counter_types(pp.second->type());
+        }
 
         // register common counters
         HPX_STD_FUNCTION<boost::int64_t(bool)> incoming_queue_length(
@@ -1162,7 +991,7 @@ namespace hpx { namespace parcelset
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
     }
 
-    void parcelhandler::register_counter_types(connection_type pp_type)
+    void parcelhandler::register_counter_types(std::string const& pp_type)
     {
         HPX_STD_FUNCTION<boost::int64_t(bool)> num_parcel_sends(
             boost::bind(&parcelhandler::get_parcel_send_count, this, pp_type, ::_1));
@@ -1205,43 +1034,42 @@ namespace hpx { namespace parcelset
         HPX_STD_FUNCTION<boost::int64_t(bool)> buffer_allocate_time_received(
             boost::bind(&parcelhandler::get_buffer_allocate_time_received, this, pp_type, ::_1));
 
-        std::string connection_type_name(get_connection_type_name(pp_type));
         performance_counters::generic_counter_type_data const counter_types[] =
         {
-            { boost::str(boost::format("/parcels/count/%s/sent") % connection_type_name),
+            { boost::str(boost::format("/parcels/count/%s/sent") % pp_type),
               performance_counters::counter_raw,
               boost::str(boost::format("returns the number of parcels sent using the %s "
-                  "connection type for the referenced locality") % connection_type_name),
+                  "connection type for the referenced locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, num_parcel_sends, _2),
               &performance_counters::locality_counter_discoverer,
               ""
             },
-            { boost::str(boost::format("/parcels/count/%s/received") % connection_type_name),
+            { boost::str(boost::format("/parcels/count/%s/received") % pp_type),
                performance_counters::counter_raw,
               boost::str(boost::format("returns the number of parcels received using the %s "
-                  "connection type for the referenced locality") % connection_type_name),
+                  "connection type for the referenced locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, num_parcel_receives, _2),
               &performance_counters::locality_counter_discoverer,
               ""
             },
-            { boost::str(boost::format("/messages/count/%s/sent") % connection_type_name),
+            { boost::str(boost::format("/messages/count/%s/sent") % pp_type),
               performance_counters::counter_raw,
               boost::str(boost::format("returns the number of messages sent using the %s "
-                  "connection type for the referenced locality") % connection_type_name),
+                  "connection type for the referenced locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, num_message_sends, _2),
               &performance_counters::locality_counter_discoverer,
               ""
             },
-            { boost::str(boost::format("/messages/count/%s/received") % connection_type_name),
+            { boost::str(boost::format("/messages/count/%s/received") % pp_type),
               performance_counters::counter_raw,
               boost::str(boost::format("returns the number of messages received using the %s "
-                  "connection type for the referenced locality") % connection_type_name),
+                  "connection type for the referenced locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, num_message_receives, _2),
@@ -1249,46 +1077,46 @@ namespace hpx { namespace parcelset
               ""
             },
 
-            { boost::str(boost::format("/data/time/%s/sent") % connection_type_name),
+            { boost::str(boost::format("/data/time/%s/sent") % pp_type),
               performance_counters::counter_raw,
               boost::str(boost::format("returns the total time between the start of "
                   "each asynchronous write and the invocation of the write callback "
                   "using the %s connection type for the referenced locality") %
-                      connection_type_name),
+                      pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, sending_time, _2),
               &performance_counters::locality_counter_discoverer,
               "ns"
             },
-            { boost::str(boost::format("/data/time/%s/received") % connection_type_name),
+            { boost::str(boost::format("/data/time/%s/received") % pp_type),
               performance_counters::counter_raw,
               boost::str(boost::format("returns the total time between the start of "
                   "each asynchronous read and the invocation of the read callback "
                   "using the %s connection type for the referenced locality") %
-                      connection_type_name),
+                      pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, receiving_time, _2),
               &performance_counters::locality_counter_discoverer,
               "ns"
             },
-            { boost::str(boost::format("/serialize/time/%s/sent") % connection_type_name),
+            { boost::str(boost::format("/serialize/time/%s/sent") % pp_type),
               performance_counters::counter_raw,
               boost::str(boost::format("returns the total time required to serialize "
                   "all sent parcels using the %s connection type for the referenced "
-                  "locality") % connection_type_name),
+                  "locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, sending_serialization_time, _2),
               &performance_counters::locality_counter_discoverer,
               "ns"
             },
-            { boost::str(boost::format("/serialize/time/%s/received") % connection_type_name),
+            { boost::str(boost::format("/serialize/time/%s/received") % pp_type),
               performance_counters::counter_raw,
               boost::str(boost::format("returns the total time required to de-serialize "
                   "all received parcels using the %s connection type for the referenced "
-                  "locality") % connection_type_name),
+                  "locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, receiving_serialization_time, _2),
@@ -1297,24 +1125,24 @@ namespace hpx { namespace parcelset
             },
 
 #if defined(HPX_HAVE_SECURITY)
-            { boost::str(boost::format("/security/time/%s/sent") % connection_type_name),
+            { boost::str(boost::format("/security/time/%s/sent") % pp_type),
               performance_counters::counter_raw,
               boost::str(boost::format("returns the total time required to perform "
                   "tasks related to security in the parcel layer for all sent parcels "
                   "using the %s connection type for the referenced locality") %
-                        connection_type_name),
+                        pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, sending_security_time, _2),
               &performance_counters::locality_counter_discoverer,
               "ns"
             },
-            { boost::str(boost::format("/security/time/%s/received") % connection_type_name),
+            { boost::str(boost::format("/security/time/%s/received") % pp_type),
               performance_counters::counter_raw,
               boost::str(boost::format("returns the total time required to perform "
                   "tasks related to security in the parcel layer for all received parcels "
                   "using the %s connection type for the referenced locality") %
-                        connection_type_name),
+                        pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, receiving_security_time, _2),
@@ -1322,62 +1150,62 @@ namespace hpx { namespace parcelset
               "ns"
             },
 #endif
-            { boost::str(boost::format("/data/count/%s/sent") % connection_type_name),
+            { boost::str(boost::format("/data/count/%s/sent") % pp_type),
               performance_counters::counter_raw,
               boost::str(boost::format("returns the amount of (uncompressed) parcel "
                   "argument data sent using the %s connection type by the referenced "
-                  "locality") % connection_type_name),
+                  "locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, data_raw_sent, _2),
               &performance_counters::locality_counter_discoverer,
               "bytes"
             },
-            { boost::str(boost::format("/data/count/%s/received") % connection_type_name),
+            { boost::str(boost::format("/data/count/%s/received") % pp_type),
               performance_counters::counter_raw,
               boost::str(boost::format("returns the amount of (uncompressed) parcel "
                   "argument data received using the %s connection type by the referenced "
-                  "locality") % connection_type_name),
+                  "locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, data_raw_received, _2),
               &performance_counters::locality_counter_discoverer,
               "bytes"
             },
-            { boost::str(boost::format("/serialize/count/%s/sent") % connection_type_name),
+            { boost::str(boost::format("/serialize/count/%s/sent") % pp_type),
               performance_counters::counter_raw,
               boost::str(boost::format("returns the amount of parcel data (including "
                   "headers, possibly compressed) sent using the %s connection type "
-                  "by the referenced locality") % connection_type_name),
+                  "by the referenced locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, data_sent, _2),
               &performance_counters::locality_counter_discoverer,
               "bytes"
             },
-            { boost::str(boost::format("/serialize/count/%s/received") % connection_type_name),
+            { boost::str(boost::format("/serialize/count/%s/received") % pp_type),
               performance_counters::counter_raw,
               boost::str(boost::format("returns the amount of parcel data (including "
                   "headers, possibly compressed) received using the %s connection type "
-                  "by the referenced locality") % connection_type_name),
+                  "by the referenced locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, data_received, _2),
               &performance_counters::locality_counter_discoverer,
               "bytes"
             },
-            { boost::str(boost::format("/parcels/time/%s/buffer_allocate/received") % connection_type_name),
+            { boost::str(boost::format("/parcels/time/%s/buffer_allocate/received") % pp_type),
               performance_counters::counter_raw,
-              boost::str(boost::format("returns the time needed to allocate the buffers for serializing using the %s connection type") % connection_type_name),
+              boost::str(boost::format("returns the time needed to allocate the buffers for serializing using the %s connection type") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, buffer_allocate_time_received, _2),
               &performance_counters::locality_counter_discoverer,
               "ns"
             },
-            { boost::str(boost::format("/parcels/time/%s/buffer_allocate/sent") % connection_type_name),
+            { boost::str(boost::format("/parcels/time/%s/buffer_allocate/sent") % pp_type),
               performance_counters::counter_raw,
-              boost::str(boost::format("returns the time needed to allocate the buffers for serializing using the %s connection type") % connection_type_name),
+              boost::str(boost::format("returns the time needed to allocate the buffers for serializing using the %s connection type") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, buffer_allocate_time_sent, _2),
@@ -1408,55 +1236,55 @@ namespace hpx { namespace parcelset
 
         performance_counters::generic_counter_type_data const connection_cache_types[] =
         {
-            { boost::str(boost::format("/parcelport/count/%s/cache-insertions") % connection_type_name),
+            { boost::str(boost::format("/parcelport/count/%s/cache-insertions") % pp_type),
               performance_counters::counter_raw,
               boost::str(boost::format("returns the number of cache insertions while accessing "
                   "the connection cache for the %s connection type on the referenced "
-                  "locality") % connection_type_name),
+                  "locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, cache_insertions, _2),
               &performance_counters::locality_counter_discoverer,
               ""
             },
-            { boost::str(boost::format("/parcelport/count/%s/cache-evictions") % connection_type_name),
+            { boost::str(boost::format("/parcelport/count/%s/cache-evictions") % pp_type),
               performance_counters::counter_raw,
               boost::str(boost::format("returns the number of cache evictions while accessing "
                   "the connection cache for the %s connection type on the referenced "
-                  "locality") % connection_type_name),
+                  "locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, cache_evictions, _2),
               &performance_counters::locality_counter_discoverer,
               ""
             },
-            { boost::str(boost::format("/parcelport/count/%s/cache-hits") % connection_type_name),
+            { boost::str(boost::format("/parcelport/count/%s/cache-hits") % pp_type),
               performance_counters::counter_raw,
               boost::str(boost::format("returns the number of cache hits while accessing "
                   "the connection cache for the %s connection type on the referenced "
-                  "locality") % connection_type_name),
+                  "locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, cache_hits, _2),
               &performance_counters::locality_counter_discoverer,
               ""
             },
-            { boost::str(boost::format("/parcelport/count/%s/cache-misses") % connection_type_name),
+            { boost::str(boost::format("/parcelport/count/%s/cache-misses") % pp_type),
               performance_counters::counter_raw,
               boost::str(boost::format("returns the number of cache misses while accessing "
                   "the connection cache for the %s connection type on the referenced "
-                  "locality") % connection_type_name),
+                  "locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, cache_misses, _2),
               &performance_counters::locality_counter_discoverer,
               ""
             },
-            { boost::str(boost::format("/parcelport/count/%s/cache-reclaims") % connection_type_name),
+            { boost::str(boost::format("/parcelport/count/%s/cache-reclaims") % pp_type),
               performance_counters::counter_raw,
               boost::str(boost::format("returns the number of cache reclaims while accessing "
                   "the connection cache for the %s connection type on the referenced "
-                  "locality") % connection_type_name),
+                  "locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, cache_reclaims, _2),

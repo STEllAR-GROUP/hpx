@@ -114,20 +114,9 @@ namespace hpx
     /// \namespace parcelset
     namespace parcelset
     {
-        enum connection_type
-        {
-            connection_unknown = -1,
-            connection_tcp = 0,
-            connection_ipc = 1,
-            connection_portals4 = 2,
-            connection_ibverbs = 3,
-            connection_mpi = 4,
-            connection_last
-        };
-
         class HPX_API_EXPORT locality;
 
-        typedef std::vector<locality> endpoints_type;
+        typedef std::map<std::string, locality> endpoints_type;
 
         class HPX_API_EXPORT parcel;
         class HPX_API_EXPORT parcelport;
@@ -147,9 +136,6 @@ namespace hpx
 
             struct message_handler;
         }
-
-        HPX_API_EXPORT std::string get_connection_type_name(connection_type);
-        HPX_API_EXPORT connection_type get_connection_type_from_name(std::string const&);
 
         HPX_API_EXPORT policies::message_handler* get_message_handler(
             parcelhandler* ph, char const* name, char const* type, std::size_t num,
@@ -1451,39 +1437,6 @@ namespace hpx
     ///
     /// \see    \a hpx::get_colocation_id_sync()
     HPX_API_EXPORT lcos::future<naming::id_type> get_colocation_id(
-        naming::id_type const& id);
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// \fn std::string get_locality_name()
-    ///
-    /// \brief Return the name of the locality this function is called on.
-    ///
-    /// This function returns the name for the locality on which this function
-    /// is called.
-    ///
-    /// \returns  This function returns the name for the locality on which the
-    ///           function is called. The name is retrieved from the underlying
-    ///           networking layer and may be different for different parcelports.
-    ///
-    /// \see      \a future<std::string> get_locality_name(naming::id_type const& id)
-    HPX_API_EXPORT std::string get_locality_name();
-
-    /// \fn future<std::string> get_locality_name(naming::id_type const& id)
-    ///
-    /// \brief Return the name of the referenced locality.
-    ///
-    /// This function returns a future referring to the name for the locality
-    /// of the given id.
-    ///
-    /// \param id [in] The global id of the locality for which the name should
-    ///           be retrieved
-    ///
-    /// \returns  This function returns the name for the locality of the given
-    ///           id. The name is retrieved from the underlying networking layer
-    ///           and may be different for different parcel ports.
-    ///
-    /// \see      \a std::string get_locality_name()
-    HPX_API_EXPORT future<std::string> get_locality_name(
         naming::id_type const& id);
 
     ///////////////////////////////////////////////////////////////////////////

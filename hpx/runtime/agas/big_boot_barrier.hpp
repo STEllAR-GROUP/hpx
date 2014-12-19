@@ -97,8 +97,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
         );
 
     void wait_bootstrap();
-    void wait_hosted(std::string const& locality_name,
-        void* primary_ns_ptr, void* symbol_ns_ptr);
+    void wait_hosted(void* primary_ns_ptr, void* symbol_ns_ptr);
 
     // no-op on non-bootstrap localities
     void trigger();

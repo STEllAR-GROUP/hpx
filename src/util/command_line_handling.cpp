@@ -15,7 +15,6 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
-#include <hpx/util/mpi_environment.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/asio.hpp>
@@ -796,7 +795,9 @@ namespace hpx { namespace util
         int argc, char** argv)
     {
         util::manage_config cfgmap(ini_config_);
-        std::size_t node = std::size_t(-1);
+
+        std::vector<boost::shared_ptr<plugins::plugin_registry_base> >
+            plugin_registries = rtcfg_.load_modules();
 
         // Initial analysis of the command line options. This is
         // preliminary as it will not take into account any aliases as
@@ -816,7 +817,7 @@ namespace hpx { namespace util
 
             // handle all --hpx:foo options, determine node
             std::vector<std::string> ini_config;    // will be discarded
-            if (!handle_arguments(cfgmap, prevm, ini_config, node))
+            if (!handle_arguments(cfgmap, prevm, ini_config, node_))
                 return -2;
 
             // re-initialize runtime configuration object
@@ -843,11 +844,14 @@ namespace hpx { namespace util
         // Re-run program option analysis, ini settings (such as aliases)
         // will be considered now.
 
-        util::mpi_environment::init(&argc, &argv, *this, node);
+        BOOST_FOREACH(boost::shared_ptr<plugins::plugin_registry_base> & reg, plugin_registries)
+        {
+            reg->init(&argc, &argv, *this);
+        }
 
         // minimally assume one locality and this is the console
-        if (node == std::size_t(-1))
-            node = 0;
+        if (node_ == std::size_t(-1))
+            node_ = 0;
 
         // Now re-parse the command line using the node number (if given).
         // This will additionally detect any --hpx:N:foo options.
@@ -855,7 +859,7 @@ namespace hpx { namespace util
         std::vector<std::string> unregistered_options;
 
         if (!util::parse_commandline(rtcfg_, desc_cmdline,
-                argc, argv, vm_, node, util::allow_unregistered, mode_,
+                argc, argv, vm_, node_, util::allow_unregistered, mode_,
                 &help, &unregistered_options))
         {
             return -1;
@@ -865,7 +869,7 @@ namespace hpx { namespace util
         handle_attach_debugger();
 
         // handle all --hpx:foo and --hpx:*:foo options
-        if (!handle_arguments(cfgmap, vm_, ini_config_, node))
+        if (!handle_arguments(cfgmap, vm_, ini_config_, node_))
             return -2;
 
         // store unregistered command line and arguments

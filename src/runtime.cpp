@@ -455,7 +455,7 @@ namespace hpx
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime::runtime(util::runtime_configuration const& rtcfg
+    runtime::runtime(util::runtime_configuration & rtcfg
           , threads::policies::init_affinity_data const& affinity_init)
       : ini_(rtcfg),
         instance_number_(++instance_number_counter_),
@@ -464,7 +464,7 @@ namespace hpx
         topology_(threads::create_topology()),
         state_(state_invalid),
         memory_(new components::server::memory),
-        runtime_support_(new components::server::runtime_support)
+        runtime_support_(new components::server::runtime_support(rtcfg))
 #if defined(HPX_HAVE_SECURITY)
       , security_data_(new detail::manage_security_data)
 #endif
@@ -740,16 +740,16 @@ namespace hpx
             sizeof(arithmetic_counter_types)/sizeof(arithmetic_counter_types[0]));
     }
 
-    boost::uint32_t runtime::assign_cores(std::string const& locality_basename,
+    boost::uint32_t runtime::assign_cores(naming::gid_type prefix,
         boost::uint32_t cores_needed)
     {
         boost::mutex::scoped_lock l(mtx_);
 
-        used_cores_map_type::iterator it = used_cores_map_.find(locality_basename);
+        used_cores_map_type::iterator it = used_cores_map_.find(prefix);
         if (it == used_cores_map_.end())
         {
             used_cores_map_.insert(
-                used_cores_map_type::value_type(locality_basename, cores_needed));
+                used_cores_map_type::value_type(prefix, cores_needed));
             return 0;
         }
 
@@ -1101,7 +1101,7 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool is_running()
+    bool HPX_EXPORT is_running()
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt)
@@ -1109,7 +1109,7 @@ namespace hpx
         return false;
     }
 
-    bool is_stopped()
+    bool HPX_EXPORT is_stopped()
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt)
@@ -1117,7 +1117,7 @@ namespace hpx
         return true;        // assume stopped
     }
 
-    bool is_stopped_or_shutting_down()
+    bool HPX_EXPORT is_stopped_or_shutting_down()
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt)
@@ -1128,7 +1128,7 @@ namespace hpx
         return true;        // assume stopped
     }
 
-    bool is_starting()
+    bool HPX_EXPORT is_starting()
     {
         runtime* rt = get_runtime_ptr();
         return NULL != rt ? rt->get_state() <= runtime::state_startup : true;

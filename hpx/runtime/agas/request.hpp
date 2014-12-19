@@ -25,7 +25,7 @@
 #include <boost/serialization/tracking.hpp>
 
 // The number of types that the request's variant can represent.
-#define HPX_AGAS_REQUEST_SUBTYPES 15
+#define HPX_AGAS_REQUEST_SUBTYPES 14
 
 namespace hpx { namespace agas
 {
@@ -80,11 +80,6 @@ struct HPX_EXPORT request
       , boost::uint64_t count_
       , boost::uint32_t num_threads_
       , naming::gid_type prefix_ = naming::gid_type()
-        );
-
-    request(
-        namespace_action_code type_
-      , parcelset::endpoints_type const & endpoints_
         );
 
     request(

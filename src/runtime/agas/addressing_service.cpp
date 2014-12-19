@@ -32,11 +32,6 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/serialization/vector.hpp>
 
-namespace hpx { namespace detail
-{
-    std::string get_locality_base_name();
-}}
-
 namespace hpx { namespace agas
 {
 
@@ -243,14 +238,11 @@ void addressing_service::initialize(
     if (service_type == service_mode_bootstrap)
     {
         get_big_boot_barrier().wait_bootstrap();
-
-        ph.set_resolved_localities(get_resolved_localities());
     }
     else
     {
         launch_hosted();
-        get_big_boot_barrier().wait_hosted(pp ? pp->get_locality_name(): "",
-            &hosted->primary_ns_server_, &hosted->symbol_ns_server_);
+        get_big_boot_barrier().wait_hosted(&hosted->primary_ns_server_, &hosted->symbol_ns_server_);
     }
 
     set_status(running);
@@ -307,18 +299,18 @@ void addressing_service::launch_bootstrap(
 
     runtime& rt = get_runtime();
 
+    naming::gid_type const here =
+        naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX);
+
     // store number of cores used by other processes
     boost::uint32_t cores_needed = rt.assign_cores();
     boost::uint32_t first_used_core = rt.assign_cores(
-        pp ? pp->get_locality_name() : "", cores_needed);
+        here, cores_needed);
 
     util::runtime_configuration& cfg = rt.get_config();
     cfg.set_first_used_core(first_used_core);
     HPX_ASSERT(pp ? pp->here() == pp->agas_locality(cfg) : true);
     rt.assign_cores();
-
-    naming::gid_type const here =
-        naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX);
 
     naming::gid_type const locality_gid = bootstrap_locality_namespace_gid();
     gva locality_gva(here,
@@ -511,6 +503,16 @@ bool addressing_service::register_locality(
 
         prefix = naming::get_gid_from_locality_id(rep.get_locality_id());
 
+        {
+            mutex_type::scoped_lock l(resolved_localities_mtx_);
+            std::pair<resolved_localities_type::iterator, bool> res
+                = resolved_localities_.insert(std::make_pair(
+                    prefix
+                  , make_ready_future(endpoints)
+                ));
+            HPX_ASSERT(res.second);
+        }
+
         return true;
     }
     catch (hpx::exception const& e) {
@@ -519,62 +521,84 @@ bool addressing_service::register_locality(
     }
 } // }}}
 
-naming::gid_type addressing_service::resolve_locality(
-    parcelset::endpoints_type const& endpoints
+void addressing_service::register_console(parcelset::endpoints_type const & eps)
+{
+    mutex_type::scoped_lock l(resolved_localities_mtx_);
+    std::pair<resolved_localities_type::iterator, bool> res
+        = resolved_localities_.insert(std::make_pair(
+            naming::get_gid_from_locality_id(0)
+          , make_ready_future(eps)
+        ));
+    HPX_ASSERT(res.second);
+}
+
+parcelset::endpoints_type const & addressing_service::resolve_locality(
+    naming::gid_type const & gid
   , error_code& ec
     )
 { // {{{
-    try {
-        request req(locality_ns_resolve_locality, endpoints);
-        response rep;
+    hpx::shared_future<parcelset::endpoints_type> endpoints_future;
+    {
+        mutex_type::scoped_lock l(resolved_localities_mtx_);
+        resolved_localities_type::iterator it = resolved_localities_.find(gid);
+        if(it == resolved_localities_.end())
+        {
+            // The locality hasn't been requested to be resolved yet. Do it now.
+            request req(locality_ns_resolve_locality, gid);
 
-        if (is_bootstrap())
-            rep = bootstrap->locality_ns_server_.service(req, ec);
+            if(is_bootstrap())
+            {
+                endpoints_future =
+                    make_ready_future(
+                        bootstrap->locality_ns_server_.service(req, ec).get_endpoints()
+                    );
+                HPX_THROWS_IF(ec, internal_server_error
+                  , "addressing_service::resolve_locality"
+                  , "could not resolve locality to endpoints");
+            }
+            else
+            {
+                endpoints_future =
+                    hosted->locality_ns_.service_async<parcelset::endpoints_type>(
+                        req
+                      , action_priority_
+                    );
+            }
+            if(HPX_UNLIKELY(!util::insert_checked(resolved_localities_.insert(
+                std::make_pair(
+                    gid
+                  , endpoints_future
+                )
+            ), it)))
+            {
+                HPX_THROWS_IF(ec, internal_server_error
+                  , "addressing_service::resolve_locality"
+                  , "resolved locality insertion failed "
+                    "due to a locking error or memory corruption");
+            }
+        }
         else
-            rep = hosted->locality_ns_.service(req, action_priority_, ec);
-
-        if (ec || (success != rep.get_status()))
-            return naming::invalid_gid;
-
-        return naming::get_gid_from_locality_id(rep.get_locality_id());
+        {
+            endpoints_future = it->second;
+        }
     }
-    catch (hpx::exception const& e) {
-        HPX_RETHROWS_IF(ec, e, "addressing_service::resolve_locality");
-        return naming::invalid_gid;
+
+    if(0 == threads::get_self_ptr())
+    {
+        while(!endpoints_future.is_ready()) ;
     }
-} // }}}
-
-future<parcelset::endpoints_type> addressing_service::resolve_locality_async(
-    naming::gid_type const & gid
-    )
-{ // {{{
-    request req(locality_ns_resolve_locality_gid, gid);
-    if (is_bootstrap())
-        return
-            make_ready_future(
-                bootstrap->locality_ns_server_.service(req, throws).get_endpoints()
-            );
-    else
-        return hosted->locality_ns_.service_async<parcelset::endpoints_type>(req, action_priority_);
-} // }}}
-
-parcelset::endpoints_type addressing_service::resolve_locality(
-    naming::gid_type const & gid
-  , error_code& ec
-    )
-{ // {{{
-    return resolve_locality_async(gid).get(ec);
+    return endpoints_future.get(ec);
 } // }}}
 
 // TODO: We need to ensure that the locality isn't unbound while it still holds
 // referenced objects.
 bool addressing_service::unregister_locality(
-    parcelset::endpoints_type const& endpoints
+    naming::gid_type const & gid
   , error_code& ec
     )
 { // {{{
     try {
-        request req(locality_ns_free, endpoints);
+        request req(locality_ns_free, gid);
         response rep;
 
         if (is_bootstrap())
@@ -592,6 +616,13 @@ bool addressing_service::unregister_locality(
 
         if (ec || (success != rep.get_status()))
             return false;
+
+        {
+            mutex_type::scoped_lock l(resolved_localities_mtx_);
+            resolved_localities_type::iterator it = resolved_localities_.find(gid);
+            if(it != resolved_localities_.end())
+                resolved_localities_.erase(it);
+        }
 
         return true;
     }

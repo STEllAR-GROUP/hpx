@@ -14,6 +14,7 @@
 #include <hpx/runtime/components/static_factory_data.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/plugin/dll.hpp>
+#include <hpx/plugins/plugin_registry_base.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -39,7 +40,8 @@ namespace hpx { namespace util
         // any explicit command line options
         void reconfigure(std::vector<std::string> const& ini_defs);
 
-        void load_components(std::map<std::string, hpx::util::plugin::dll>& modules);
+        std::vector<boost::shared_ptr<plugins::plugin_registry_base> >
+        load_modules();
         void load_components_static(std::vector<
             components::static_factory_load_data_type> const& static_modules);
 
@@ -55,9 +57,6 @@ namespace hpx { namespace util
         // sequence number of first usable pu
         boost::uint32_t get_first_used_core() const;
         void set_first_used_core(boost::uint32_t);
-
-        // Get the IP of the ibverbs adapter to use
-        std::string get_ibverbs_address() const;
 
         // Get the size of the ipc parcelport data buffer cache
         std::size_t get_ipc_data_buffer_cache_size() const;
@@ -121,6 +120,11 @@ namespace hpx { namespace util
         boost::uint64_t get_max_inbound_message_size() const;
         boost::uint64_t get_max_outbound_message_size() const;
 
+        std::map<std::string, hpx::util::plugin::dll> & modules()
+        {
+            return modules_;
+        }
+
     private:
         std::ptrdiff_t init_stack_size(char const* entryname,
             char const* defaultvaluestr, std::ptrdiff_t defaultvalue) const;
@@ -150,6 +154,8 @@ namespace hpx { namespace util
 #if defined(__linux) || defined(linux) || defined(__linux__)
         char const* argv0;
 #endif
+
+        std::map<std::string, hpx::util::plugin::dll> modules_;
     };
 }}
 

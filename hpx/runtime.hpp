@@ -95,7 +95,7 @@ namespace hpx
 
         /// construct a new instance of a runtime
         runtime(
-            util::runtime_configuration const& rtcfg
+            util::runtime_configuration & rtcfg
           , threads::policies::init_affinity_data const& affinity_init);
 
         virtual ~runtime();
@@ -185,7 +185,7 @@ namespace hpx
             return topology_;
         }
 
-        boost::uint32_t assign_cores(std::string const& locality_basename,
+        boost::uint32_t assign_cores(naming::gid_type prefix,
             boost::uint32_t num_threads);
 
         boost::uint32_t assign_cores();
@@ -401,7 +401,7 @@ namespace hpx
         threads::topology& topology_;
 
         // locality basename -> used cores
-        typedef std::map<std::string, boost::uint32_t> used_cores_map_type;
+        typedef std::map<naming::gid_type, boost::uint32_t> used_cores_map_type;
         used_cores_map_type used_cores_map_;
 
         boost::atomic<state> state_;

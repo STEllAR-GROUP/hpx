@@ -15,9 +15,9 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/mpi_environment.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/reinitializable_static.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
@@ -106,7 +106,6 @@ struct registration_header
       , boost::uint64_t symbol_ns_ptr_
       , boost::uint32_t cores_needed_
       , boost::uint32_t num_threads_
-      , std::string const& hostname_
       , naming::gid_type prefix_ = naming::gid_type()
     ) :
         endpoints(endpoints_)
@@ -114,7 +113,6 @@ struct registration_header
       , symbol_ns_ptr(symbol_ns_ptr_)
       , cores_needed(cores_needed_)
       , num_threads(num_threads_)
-      , hostname(hostname_)
       , prefix(prefix_)
     {}
 
@@ -123,7 +121,6 @@ struct registration_header
     boost::uint64_t symbol_ns_ptr;
     boost::uint32_t cores_needed;
     boost::uint32_t num_threads;
-    std::string hostname;           // hostname of locality
     naming::gid_type prefix;        // suggested prefix (optional)
 
     template <typename Archive>
@@ -134,7 +131,6 @@ struct registration_header
         ar & symbol_ns_ptr;
         ar & cores_needed;
         ar & num_threads;
-        ar & hostname;
         ar & prefix;
     }
 };
@@ -391,7 +387,7 @@ void register_worker(registration_header const& header)
             agas_client.get_bootstrap_symbol_ns_ptr());
 
     // assign cores to the new locality
-    boost::uint32_t first_core = rt.assign_cores(header.hostname,
+    boost::uint32_t first_core = rt.assign_cores(header.prefix,
         header.cores_needed);
 
     big_boot_barrier & bbb = get_big_boot_barrier();
@@ -427,11 +423,11 @@ void register_worker(registration_header const& header)
 
     parcelset::locality dest;
     parcelset::locality here = bbb.here();
-    BOOST_FOREACH(parcelset::locality const & loc, header.endpoints)
+    BOOST_FOREACH(parcelset::endpoints_type::value_type const & loc, header.endpoints)
     {
-        if(loc.get_type() == here.get_type())
+        if(loc.second.type() == here.type())
         {
-            dest = loc;
+            dest = loc.second;
             break;
         }
     }
@@ -501,6 +497,7 @@ void notify_worker(notification_header const& header)
 
     // set our prefix
     agas_client.set_local_locality(header.prefix);
+    agas_client.register_console(header.agas_endpoints);
     cfg.parse("assigned locality",
         boost::str(boost::format("hpx.locality!=%1%")
                   % naming::get_locality_id_from_gid(header.prefix)));
@@ -582,8 +579,6 @@ void notify_worker(notification_header const& header)
     // store number of used cores by other localities
     cfg.set_first_used_core(header.used_cores);
     rt.assign_cores();
-
-    rt.get_parcel_handler().set_resolved_localities(naming::get_gid_from_locality_id(0), header.agas_endpoints);
 
 #if defined(HPX_HAVE_SECURITY)
     // initialize certificate store
@@ -809,7 +804,7 @@ namespace detail
     }
 }
 
-void big_boot_barrier::wait_hosted(std::string const& locality_name,
+void big_boot_barrier::wait_hosted(
     void* primary_ns_server, void* symbol_ns_server)
 { // {{{
     HPX_ASSERT(service_mode_bootstrap != service_type);
@@ -828,14 +823,12 @@ void big_boot_barrier::wait_hosted(std::string const& locality_name,
 
     naming::gid_type suggested_prefix;
 
-#if defined(HPX_PARCELPORT_MPI)
-    // if MPI parcelport is enabled we use the MPI rank as the suggested locality_id
-    if (util::mpi_environment::rank() != -1)
+    std::string locality_str = rt.get_config().get_entry("hpx.locality", "-1");
+    if(locality_str != "-1")
     {
         suggested_prefix = naming::get_gid_from_locality_id(
-            util::mpi_environment::rank());
+            util::safe_lexical_cast<boost::uint32_t>(locality_str, -1));
     }
-#endif
 
     // contact the bootstrap AGAS node
     registration_header hdr(
@@ -844,7 +837,6 @@ void big_boot_barrier::wait_hosted(std::string const& locality_name,
         , reinterpret_cast<boost::uint64_t>(symbol_ns_server)
         , cores_needed
         , num_threads
-        , locality_name
         , suggested_prefix);
 
     apply(
