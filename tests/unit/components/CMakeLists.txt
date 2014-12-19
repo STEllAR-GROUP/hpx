@@ -61,8 +61,12 @@ set(inheritance_3_classes_2_abstract_FLAGS
 set(inheritance_3_classes_concrete_FLAGS
     DEPENDENCIES iostreams_component)
 
+set(unordered_map_FLAGS DEPENDENCIES unordered_component)
+
 set(vector_FLAGS DEPENDENCIES vector_component)
 set(vector_algorithms_FLAGS DEPENDENCIES vector_component)
+set(vector_copy_FLAGS DEPENDENCIES vector_component)
+set(vector_handle_values_FLAGS DEPENDENCIES vector_component)
 
 foreach(test ${tests})
   set(sources

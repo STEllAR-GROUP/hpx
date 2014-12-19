@@ -33,6 +33,7 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/components/server/abstract_component_base.hpp>
+#include <hpx/runtime/components/server/distributed_metadata_base.hpp>
 
 #include <hpx/runtime/components/server/locking_hook.hpp>
 #include <hpx/runtime/components/server/migration_support.hpp>

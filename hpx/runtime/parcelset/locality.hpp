@@ -18,13 +18,19 @@
 #include <boost/cstdint.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/serialization.hpp>
+#include <boost/mpl/has_xxx.hpp>
 #include <boost/mpl/bool.hpp>
+#include <boost/mpl/or.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {
+    namespace detail {
+        BOOST_MPL_HAS_XXX_TRAIT_DEF(iterator_category);
+    };
+
     class locality
     {
         template <typename Impl>
@@ -67,10 +73,13 @@ namespace hpx { namespace parcelset
         template <typename Impl>
         locality(Impl && i
           , typename boost::disable_if<
-                boost::is_same<locality, typename util::decay<Impl>::type>
+                boost::mpl::or_<
+                    boost::is_same<locality, typename util::decay<Impl>::type>
+                  , detail::has_iterator_category<typename util::decay<Impl>::type>
+                >
             >::type* = 0
         )
-          : impl_(new typename util::decay<impl<Impl> >::type(std::forward<Impl>(i)))
+          : impl_(new impl<typename util::decay<Impl>::type>(std::forward<Impl>(i)))
         {}
 
         locality(locality const & other)
