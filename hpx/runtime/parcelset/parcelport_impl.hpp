@@ -583,14 +583,14 @@ namespace hpx { namespace parcelset
 
                 // If one of the sending threads are in suspended state, we
                 // need to force a new connection to avoid deadlocks.
-                bool force_connection = true;
+                bool force_connection = false;
                 {
                     mutex_type::scoped_lock l(sender_threads_mtx_);
                     BOOST_FOREACH(hpx::threads::thread_id_type const & thread, sender_threads_)
                     {
-                        if(threads::get_thread_state(thread) == threads::suspended)
+                        if(threads::get_thread_state(thread) != threads::suspended)
                         {
-                            force_connection = false;
+                            force_connection = true;
                             break;
                         }
                     }
