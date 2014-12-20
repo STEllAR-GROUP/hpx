@@ -211,6 +211,27 @@ namespace hpx { namespace lcos
             rhs.index = index_error();
         }
 
+        when_any_result& operator=(when_any_result const& rhs)
+        {
+            if (this != &rhs)
+            {
+                index = rhs.index;
+                futures = rhs.futures;
+            }
+            return true;
+        }
+
+        when_any_result& operator=(when_any_result && rhs)
+        {
+            if (this != &rhs)
+            {
+                index = rhs.index;
+                rhs.index = index_error();
+                futures = std::move(rhs.futures);
+            }
+            return true;
+        }
+
         std::size_t index;
         Sequence futures;
     };

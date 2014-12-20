@@ -531,7 +531,7 @@ namespace hpx { namespace components { namespace server
             for (std::size_t i = 0; i != count; ++i)
                 ids.push_back(factory->create());
         }
-        LRT_(info) << "successfully created " << count
+        LRT_(info) << "successfully created " << count //-V128
                    << " component(s) of type: "
                    << components::get_component_type_name(type);
 
