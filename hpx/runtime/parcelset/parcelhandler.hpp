@@ -477,7 +477,7 @@ namespace hpx { namespace parcelset
         /// the parcelport this handler is associated with
         std::vector<boost::shared_ptr<parcelport> > pports_;
 
-        /// the endpoints corresponding to the parcel sports
+        /// the endpoints corresponding to the parcel-ports
         endpoints_type endpoints_;
 
         /// the endpoints to resolved localities
