@@ -59,7 +59,7 @@ namespace hpx { namespace detail
         boost::is_reference<typename util::deferred_call_result_of<F()>::type>
       , detail::create_future<F()>
     >::type
-    call_sync(F&& f, boost::mpl::false_)
+    call_sync(F&& f, boost::mpl::false_) //-V659
     {
         typedef typename util::deferred_call_result_of<F()>::type result_type;
         try

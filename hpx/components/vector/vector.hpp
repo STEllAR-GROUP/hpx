@@ -1761,7 +1761,7 @@ namespace hpx
             return const_segment_iterator(partitions_.cbegin(), this);
         }
 
-        const_segment_iterator segment_cbegin() const
+        const_segment_iterator segment_cbegin() const //-V524
         {
             return const_segment_iterator(partitions_.cbegin(), this);
         }
@@ -1776,7 +1776,7 @@ namespace hpx
             return const_segment_iterator(partitions_.cend());
         }
 
-        const_segment_iterator segment_cend() const
+        const_segment_iterator segment_cend() const //-V524
         {
             return const_segment_iterator(partitions_.cend());
         }

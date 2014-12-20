@@ -194,7 +194,7 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Archive, typename Future>
     typename boost::enable_if<
         boost::is_void<typename traits::future_traits<Future>::type>
-    >::type serialize_future_load(Archive& ar, Future& f)
+    >::type serialize_future_load(Archive& ar, Future& f) //-V659
     {
         typedef lcos::detail::future_data<void> shared_state;
 
@@ -253,7 +253,7 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Archive, typename Future>
     typename boost::enable_if<
         boost::is_void<typename traits::future_traits<Future>::type>
-    >::type serialize_future_save(Archive& ar, Future const& f)
+    >::type serialize_future_save(Archive& ar, Future const& f) //-V659
     {
         if(f.valid())
         {
@@ -1099,7 +1099,7 @@ namespace hpx { namespace lcos
         //         shared state.
         // Postcondition: valid() == false.
         typename traits::future_traits<shared_future>::result_type
-        get() const
+        get() const //-V659
         {
             if (!this->shared_state_)
             {
@@ -1115,7 +1115,7 @@ namespace hpx { namespace lcos
             return detail::future_value<R>::get(data.get_value());
         }
         typename traits::future_traits<shared_future>::result_type
-        get(error_code& ec) const
+        get(error_code& ec) const //-V659
         {
             if (!this->shared_state_)
             {

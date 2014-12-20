@@ -828,7 +828,7 @@ namespace hpx { namespace components { namespace server
         std::vector<naming::id_type> locality_ids = find_all_localities();
         std::size_t count = dijkstra_termination_detection(locality_ids);
 
-        LRT_(info) << "runtime_support::shutdown_all: "
+        LRT_(info) << "runtime_support::shutdown_all: " //-V128
                       "passed first termination detection (count: "
                    << count << ").";
 
@@ -844,7 +844,7 @@ namespace hpx { namespace components { namespace server
         // functions.
         count = dijkstra_termination_detection(locality_ids);
 
-        LRT_(info) << "runtime_support::shutdown_all: "
+        LRT_(info) << "runtime_support::shutdown_all: " //-V128
                       "passed second termination detection (count: "
                    << count << ").";
 

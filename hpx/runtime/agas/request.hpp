@@ -253,7 +253,7 @@ struct HPX_EXPORT request
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
-    namespace_action_code mc;
+    namespace_action_code mc; //-V707
     boost::shared_ptr<request_data> data;
 };
 

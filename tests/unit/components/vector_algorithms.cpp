@@ -78,7 +78,7 @@ void for_each_tests()
     {
         hpx::vector<T> v(length, T(0));
         test_for_each(hpx::parallel::seq, v, T(0));
-        test_for_each(hpx::parallel::par, v, T(4));
+        test_for_each(hpx::parallel::par, v, T(4)); //-V112
         test_for_each(hpx::parallel::seq(hpx::parallel::task), v, T(8));
         test_for_each(hpx::parallel::par(hpx::parallel::task), v, T(12));
     }

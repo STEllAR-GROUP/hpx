@@ -66,7 +66,7 @@ namespace hpx { namespace util
         return accept_begin(loc.address(), loc.port(), io_service);
     }
 
-    inline endpoint_iterator_type accept_end()
+    inline endpoint_iterator_type accept_end() //-V524
     {
         return endpoint_iterator_type();
     }

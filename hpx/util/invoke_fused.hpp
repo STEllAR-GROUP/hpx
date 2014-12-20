@@ -109,7 +109,7 @@ namespace hpx { namespace util
     template <typename F, typename ...Ts>
     BOOST_FORCEINLINE
     typename invoke_result_of<F(Ts...)>::type
-    invoke_fused(F && f, util::tuple<Ts...>&& args)
+    invoke_fused(F && f, util::tuple<Ts...>&& args) //-V659
     {
         typedef typename invoke_result_of<F(Ts...)>::type result_type;
 
