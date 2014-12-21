@@ -222,20 +222,29 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         // segmented implementation
         template <typename ExPolicy, typename InIter, typename T, typename Reduce,
             typename Convert>
-        typename detail::algorithm_result<ExPolicy, T>::type
-        transform_reduce_(ExPolicy&& policy, InIter first, InIter last, T init,
+        typename detail::algorithm_result<
+            ExPolicy, typename hpx::util::decay<T>::type
+        >::type
+        transform_reduce_(ExPolicy&& policy, InIter first, InIter last, T && init,
             Reduce && red_op, Convert && conv_op, boost::mpl::true_)
         {
             typedef typename parallel::is_sequential_execution_policy<
                     ExPolicy
                 >::type is_seq;
 
+            typedef typename hpx::util::decay<T>::type init_type;
+
             if (first == last)
-                return detail::algorithm_result<ExPolicy, T>::get(std::move(init));
+            {
+                return detail::algorithm_result<
+                        ExPolicy, init_type
+                    >::get(std::forward<T>(init));
+            }
 
             return segmented_transform_reduce(
-                transform_reduce<T>(), std::forward<ExPolicy>(policy),
-                first, last, std::move(init),
+                transform_reduce<init_type>(),
+                std::forward<ExPolicy>(policy), first, last,
+                std::forward<T>(init),
                 std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
                 is_seq());
         }
@@ -244,7 +253,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <typename ExPolicy, typename InIter, typename T, typename Reduce,
             typename Convert>
         typename detail::algorithm_result<ExPolicy, T>::type
-        transform_reduce_(ExPolicy&& policy, InIter first, InIter last, T init,
+        transform_reduce_(ExPolicy&& policy, InIter first, InIter last, T && init,
             Reduce && red_op, Convert && conv_op, boost::mpl::false_);
 
         /// \endcond

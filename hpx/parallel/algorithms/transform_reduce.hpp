@@ -68,7 +68,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (first == last)
                 {
                     return detail::algorithm_result<ExPolicy, T>::get(
-                        std::forward<T>(init));
+                        std::forward<T_>(init));
                 }
 
                 typedef typename std::iterator_traits<FwdIter>::reference
@@ -96,8 +96,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         template <typename ExPolicy, typename InIter, typename T, typename Reduce,
             typename Convert>
-        inline typename detail::algorithm_result<ExPolicy, T>::type
-        transform_reduce_(ExPolicy&& policy, InIter first, InIter last, T init,
+        inline typename detail::algorithm_result<
+            ExPolicy, typename hpx::util::decay<T>::type
+        >::type
+        transform_reduce_(ExPolicy&& policy, InIter first, InIter last, T && init,
             Reduce && red_op, Convert && conv_op, boost::mpl::false_)
         {
             typedef typename std::iterator_traits<InIter>::iterator_category
@@ -108,12 +110,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 "Requires at least input iterator.");
 
             typedef typename boost::mpl::or_<
-                is_sequential_execution_policy<ExPolicy>,
+                parallel::is_sequential_execution_policy<ExPolicy>,
                 boost::is_same<std::input_iterator_tag, iterator_category>
             >::type is_seq;
 
-            return detail::transform_reduce<T>().call(
-                std::forward<ExPolicy>(policy), first, last, std::move(init),
+            typedef typename hpx::util::decay<T>::type init_type;
+
+            return transform_reduce<init_type>().call(
+                std::forward<ExPolicy>(policy), first, last,
+                std::forward<T>(init),
                 std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
                 is_seq());
         }
@@ -122,7 +127,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <typename ExPolicy, typename InIter, typename T, typename Reduce,
             typename Convert>
         typename detail::algorithm_result<ExPolicy, T>::type
-        transform_reduce_(ExPolicy&& policy, InIter first, InIter last, T init,
+        transform_reduce_(ExPolicy&& policy, InIter first, InIter last, T && init,
             Reduce && red_op, Convert && conv_op, boost::mpl::true_);
 
         /// \endcond
