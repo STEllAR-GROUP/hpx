@@ -193,7 +193,7 @@ namespace hpx { namespace lcos
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Tuple>
-        struct when_all_frame
+        struct when_all_frame //-V690
           : hpx::lcos::detail::future_data<typename when_all_result<Tuple>::type>
         {
             typedef typename when_all_result<Tuple>::type result_type;

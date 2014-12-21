@@ -1,5 +1,5 @@
 //  Copyright (c)      2014 Thomas Heller
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -87,12 +87,18 @@ namespace hpx { namespace parcelset
         ///                 parcelhandler is connected to. This \a parcelport
         ///                 instance will be used for any parcel related
         ///                 transport operations the parcelhandler carries out.
-        parcelhandler(naming::resolver_client& resolver,
+        parcelhandler(
             threads::threadmanager_base* tm, parcelhandler_queue_base* policy,
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
             HPX_STD_FUNCTION<void()> const& on_stop_thread);
 
         ~parcelhandler() {}
+
+        void set_agas_resolver(naming::resolver_client& resolver)
+        {
+            HPX_ASSERT(resolver_ == 0);     // set only once
+            resolver_ = &resolver;
+        }
 
         /// load runtime configuration settings ...
         static std::vector<std::string> load_runtime_configuration();
@@ -326,7 +332,7 @@ namespace hpx { namespace parcelset
         /// locality endpoint
         locality create_locality(connection_type type) const
         {
-            return pports_[type]->create_locality();
+            return pports_[type]->create_locality(); //-V108
         }
 
         /// Return the name of this locality as retrieved from the
@@ -364,7 +370,7 @@ namespace hpx { namespace parcelset
 
         /// \brief set list of resolved localities
         void set_resolved_localities(std::map<naming::gid_type, endpoints_type> const& l);
-        void set_resolved_localities(naming::gid_type gid, endpoints_type const& l);
+        void set_resolved_localities(naming::gid_type const& gid, endpoints_type const& l);
 
         void enable_alternative_parcelports()
         {
@@ -466,12 +472,12 @@ namespace hpx { namespace parcelset
 
     private:
         /// The AGAS client
-        naming::resolver_client& resolver_;
+        naming::resolver_client* resolver_;
 
         /// the parcelport this handler is associated with
         std::vector<boost::shared_ptr<parcelport> > pports_;
 
-        /// the endpoints corresponding to the parcelports
+        /// the endpoints corresponding to the parcel-ports
         endpoints_type endpoints_;
 
         /// the endpoints to resolved localities

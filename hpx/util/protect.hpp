@@ -69,14 +69,14 @@ namespace hpx { namespace util
             typename util::decay<T>::type
         >(std::forward<T>(f));
     }
-    
+
     // leave everything that is not a bind expression as is
     template <typename T>
     typename boost::disable_if<
         traits::is_bind_expression<typename util::decay<T>::type>
       , T
     >::type
-    protect(T&& v)
+    protect(T && v) //-V659
     {
         return std::forward<T>(v);
     }

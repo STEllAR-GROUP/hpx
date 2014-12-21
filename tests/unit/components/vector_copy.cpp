@@ -129,9 +129,9 @@ void copy_tests()
         hpx::block_cyclic(3, localities));
     copy_tests_with_policy<T>(length, localities.size(),
         hpx::block_cyclic(localities));
-    copy_tests_with_policy<T>(length, 4, hpx::block_cyclic(4, 3));
-    copy_tests_with_policy<T>(length, 4,
-        hpx::block_cyclic(4, localities, 3));
+    copy_tests_with_policy<T>(length, 4, hpx::block_cyclic(4, 3)); //-V112
+    copy_tests_with_policy<T>(length, 4, //-V112
+        hpx::block_cyclic(4, localities, 3)); //-V112
     copy_tests_with_policy<T>(length, localities.size(),
         hpx::block_cyclic(localities, 3));
 }

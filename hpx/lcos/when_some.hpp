@@ -239,6 +239,26 @@ namespace hpx { namespace lcos
           : indices(std::move(rhs.indices)), futures(std::move(rhs.futures))
         {}
 
+        when_some_result& operator=(when_some_result const& rhs)
+        {
+            if (this != &rhs)
+            {
+                indices = rhs.indices;
+                futures = rhs.futures;
+            }
+            return true;
+        }
+
+        when_some_result& operator=(when_some_result && rhs)
+        {
+            if (this != &rhs)
+            {
+                indices = std::move(rhs.indices);
+                futures = std::move(rhs.futures);
+            }
+            return true;
+        }
+
         std::vector<std::size_t> indices;
         Sequence futures;
     };

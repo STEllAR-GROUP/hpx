@@ -333,7 +333,7 @@ response locality_namespace::allocate(
     else
     {
         // Check for address space exhaustion.
-        if (HPX_UNLIKELY(0xFFFFFFFE < partitions_.size()))
+        if (HPX_UNLIKELY(0xFFFFFFFE < partitions_.size())) //-V104
         {
             l.unlock();
 

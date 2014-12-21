@@ -156,7 +156,7 @@ namespace hpx { namespace lcos
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Tuple>
-        struct wait_all_frame
+        struct wait_all_frame //-V690
           : hpx::lcos::detail::future_data<void>
         {
         private:

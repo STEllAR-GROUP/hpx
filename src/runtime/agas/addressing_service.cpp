@@ -218,6 +218,9 @@ addressing_service::addressing_service(
   , state_(starting)
   , locality_()
 { // {{{
+    // finish initialization of parcel handler
+    ph.set_agas_resolver(*this);
+
     parcelset::parcelport & pp = *ph.get_bootstrap_parcelport();
     create_big_boot_barrier(pp, ph.endpoints(), ini_);
 

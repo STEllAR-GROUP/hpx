@@ -8,6 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/spinlock.hpp>
+#include <hpx/util/move.hpp>
 
 #include <vector>
 
@@ -37,6 +38,24 @@ namespace hpx { namespace iostreams { namespace detail
           : data_(rhs.data_)
         {
             rhs.data_.reset();
+        }
+
+        buffer& operator=(buffer const& rhs)
+        {
+            if (this != &rhs)
+            {
+                data_ = rhs.data_;
+            }
+            return *this;
+        }
+
+        buffer& operator=(buffer && rhs)
+        {
+            if (this != &rhs)
+            {
+                data_ = std::move(rhs.data_);
+            }
+            return *this;
         }
 
         bool empty() const

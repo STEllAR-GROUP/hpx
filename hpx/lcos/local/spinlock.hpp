@@ -154,7 +154,7 @@ namespace hpx { namespace lcos { namespace local
         {
             HPX_ITT_SYNC_PREPARE(this);
 
-            bool r = acquire_lock();
+            bool r = acquire_lock(); //-V707
 
             if (r) {
                 HPX_ITT_SYNC_ACQUIRED(this);
