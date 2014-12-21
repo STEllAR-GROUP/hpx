@@ -93,7 +93,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         get(std::move(first));
                 }
 
-                return util::partitioner<ExPolicy, FwdIter, FwdIter, FwdIter>::
+                return util::partitioner<ExPolicy, FwdIter, FwdIter>::
                     call(
                         policy, first, std::distance(first, last),
                         [f](FwdIter it, std::size_t part_count)
@@ -323,7 +323,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         get(std::move(first));
                 }
 
-                return util::partitioner<ExPolicy, FwdIter, FwdIter, FwdIter>::
+                return util::partitioner<ExPolicy, FwdIter, FwdIter>::
                     call(
                         policy, first, std::distance(first, last),
                         [f](FwdIter it, std::size_t part_count)
@@ -568,7 +568,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         get(std::move(result));
                 }
 
-                return util::partitioner<ExPolicy, FwdIter, result_type, result_type>::
+                return util::partitioner<ExPolicy, result_type, result_type>::
                     call(
                         policy, result.first, std::distance(result.first, last),
                         [f](FwdIter it, std::size_t part_count)

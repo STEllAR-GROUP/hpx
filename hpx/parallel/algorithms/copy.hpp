@@ -338,8 +338,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 boost::end(results), &add_pairs);
 
             using hpx::util::make_zip_iterator;
-            return util::partitioner<ExPolicy, FwdIter2, void>::
-                call_with_data(policy,
+            return util::partitioner<ExPolicy, void>::call_with_data(policy,
                     make_zip_iterator(first, flags.get()), count,
                     [dest](Pair const& data, zip_iterator part_begin,
                         std::size_t part_size)
@@ -396,8 +395,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef std::pair<std::size_t, std::size_t> pair_type;
 
                 using hpx::util::make_zip_iterator;
-                return util::partitioner<ExPolicy, OutIter, pair_type>::
-                    call_with_index(
+                return util::partitioner<ExPolicy, pair_type>::call_with_index(
                         policy, make_zip_iterator(first, flags.get()), count,
                         [f](std::size_t base_idx,
                         zip_iterator part_begin, std::size_t part_size)
@@ -422,7 +420,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         hpx::util::unwrapped(
                             [=](std::vector<pair_type> && r)
                             {
-                                return 
+                                return
                                     copy_if_helper(policy,
                                         std::forward<std::vector<pair_type> >(r),
                                         first, count, dest, flags);

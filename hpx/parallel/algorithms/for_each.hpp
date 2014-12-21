@@ -61,7 +61,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 if (count != 0)
                 {
-                    return util::foreach_n_partitioner<ExPolicy, Iter>::call(
+                    return util::foreach_n_partitioner<ExPolicy>::call(
                         policy, first, count,
                         [f](Iter part_begin, std::size_t part_size)
                         {

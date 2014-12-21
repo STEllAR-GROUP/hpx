@@ -74,7 +74,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename std::iterator_traits<FwdIter>::reference
                     reference;
 
-                return util::partitioner<ExPolicy, FwdIter, T>::call(
+                return util::partitioner<ExPolicy, T>::call(
                     policy, first, std::distance(first, last),
                     [r, conv](FwdIter part_begin, std::size_t part_size) -> T
                     {

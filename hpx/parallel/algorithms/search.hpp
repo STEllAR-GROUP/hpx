@@ -79,7 +79,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 util::cancellation_token<difference_type> tok(count);
 
-                return util::partitioner<ExPolicy, FwdIter, FwdIter, void>::
+                return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
                     policy, first, count-(diff-1),
                     [=](std::size_t base_idx, FwdIter it, std::size_t part_size) mutable
@@ -351,7 +351,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 util::cancellation_token<difference_type> tok(count);
 
-                return util::partitioner<ExPolicy, FwdIter, FwdIter, void>::
+                return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
                     policy, first, count-(diff-1),
                     [=](std::size_t base_idx, FwdIter it, std::size_t part_size) mutable

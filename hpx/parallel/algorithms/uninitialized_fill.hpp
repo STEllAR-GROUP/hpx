@@ -67,7 +67,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             util::cancellation_token<util::detail::no_data> tok;
             return util::partitioner_with_cleanup<
-                    ExPolicy, Iter, void, partition_result_type
+                    ExPolicy, void, partition_result_type
                 >::call(
                     policy, first, count,
                     [value, tok](Iter it, std::size_t part_size)

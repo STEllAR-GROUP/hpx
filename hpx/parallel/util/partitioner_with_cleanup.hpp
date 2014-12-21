@@ -366,10 +366,9 @@ namespace hpx { namespace parallel { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy, typename Iter, typename R = void,
-        typename Result = R,
+    template <typename ExPolicy, typename R = void, typename Result = R,
         typename PartTag = typename parallel::traits::extract_partitioner<
-            typename hpx::util::decay<ExPolicy>::type, Iter
+            typename hpx::util::decay<ExPolicy>::type
         >::type>
     struct partitioner_with_cleanup
       : detail::partitioner_with_cleanup<

@@ -66,7 +66,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 difference_type count = std::distance(first, last);
                 util::cancellation_token<difference_type> tok(count);
 
-                return util::partitioner<ExPolicy, FwdIter, FwdIter, void>::
+                return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
                         policy, hpx::util::make_zip_iterator(first, next), count-1,
                         [op, tok](std::size_t base_idx, zip_iterator it,

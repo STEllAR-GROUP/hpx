@@ -54,7 +54,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::size_t count = std::distance(first, last);
                 util::cancellation_token<std::size_t> tok(count);
 
-                return util::partitioner<ExPolicy, InIter, InIter, void>::
+                return util::partitioner<ExPolicy, InIter, void>::
                     call_with_index(
                         policy, first, count,
                         [val, tok](std::size_t base_idx, InIter it,
@@ -181,7 +181,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::size_t count = std::distance(first, last);
                 util::cancellation_token<std::size_t> tok(count);
 
-                return util::partitioner<ExPolicy, FwdIter, FwdIter, void>::
+                return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
                         policy, first, count,
                         [f, tok](std::size_t base_idx, FwdIter it,
@@ -327,7 +327,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::size_t count = std::distance(first, last);
                 util::cancellation_token<std::size_t> tok(count);
 
-                return util::partitioner<ExPolicy, FwdIter, FwdIter, void>::
+                return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
                         policy, first, count,
                         [f, tok](std::size_t base_idx, FwdIter it, std::size_t part_size) mutable
@@ -487,7 +487,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     difference_type, std::greater<difference_type>
                 > tok(-1);
 
-                return util::partitioner<ExPolicy, FwdIter, FwdIter, void>::
+                return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
                         policy, first1, count-(diff-1),
                         [=](std::size_t base_idx, FwdIter it, std::size_t part_size) mutable
@@ -778,7 +778,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 util::cancellation_token<difference_type> tok(count);
 
-                return util::partitioner<ExPolicy, InIter, InIter, void>::
+                return util::partitioner<ExPolicy, InIter, void>::
                     call_with_index(
                         policy, first, count,
                         [s_first, s_last, tok, op](std::size_t base_idx, InIter it,
@@ -857,7 +857,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           returns \a InIter otherwise.
     ///           The \a find_first_of algorithm returns an iterator to the first element
     ///           in the range [first, last) that is equal to an element from the range
-    ///           [s_first, s_last). If the length of the subsequence [s_first, s_last) is 
+    ///           [s_first, s_last). If the length of the subsequence [s_first, s_last) is
     ///           greater than the length of the range [first, last), \a last is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
     ///           is found, \a last is also returned.
@@ -962,7 +962,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           returns \a InIter otherwise.
     ///           The \a find_first_of algorithm returns an iterator to the first element
     ///           in the range [first, last) that is equal to an element from the range
-    ///           [s_first, s_last). If the length of the subsequence [s_first, s_last) is 
+    ///           [s_first, s_last). If the length of the subsequence [s_first, s_last) is
     ///           greater than the length of the range [first, last), \a last is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
     ///           is found, \a last is also returned.
