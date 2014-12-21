@@ -126,7 +126,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         // forward declare the segmented version of this algorithm
         template <typename ExPolicy, typename InIter, typename T, typename Reduce,
             typename Convert>
-        typename detail::algorithm_result<ExPolicy, T>::type
+        typename detail::algorithm_result<
+            ExPolicy, typename hpx::util::decay<T>::type
+        >::type
         transform_reduce_(ExPolicy&& policy, InIter first, InIter last, T && init,
             Reduce && red_op, Convert && conv_op, boost::mpl::true_);
 
