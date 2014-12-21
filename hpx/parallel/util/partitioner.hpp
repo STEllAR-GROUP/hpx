@@ -88,13 +88,13 @@ namespace hpx { namespace parallel { namespace util
                 std::size_t count, F1 && f1, F2 && f2, std::size_t chunk_size,
                 Data && data)
             {
-                typename hpx::util::decay<Data>::type::const_iterator data_it = boost::begin(data);
+                typename hpx::util::decay<Data>::type::const_iterator data_it =
+                    boost::begin(data);
 
                 std::vector<hpx::future<Result> > workitems;
                 std::list<boost::exception_ptr> errors;
 
                 try {
-                    
                     workitems.reserve(count / chunk_size + 1);
 
                     threads::executor exec = policy.get_executor();
@@ -198,7 +198,8 @@ namespace hpx { namespace parallel { namespace util
         struct static_partitioner<parallel_task_execution_policy, R, Result>
         {
             template <typename FwdIter, typename F1, typename F2, typename Data>
-            static R call_with_data(parallel_task_execution_policy const& policy, FwdIter first,
+            static R call_with_data(
+                parallel_task_execution_policy const& policy, FwdIter first,
                 std::size_t count, F1 && f1, F2 && f2, std::size_t chunk_size,
                 Data && data)
             {
@@ -208,7 +209,6 @@ namespace hpx { namespace parallel { namespace util
                 std::list<boost::exception_ptr> errors;
 
                 try {
-                    
                     workitems.reserve(count / chunk_size + 1);
 
                     threads::executor exec = policy.get_executor();
@@ -260,7 +260,8 @@ namespace hpx { namespace parallel { namespace util
             }
 
             template <typename FwdIter, typename F1, typename F2>
-            static hpx::future<R> call(parallel_task_execution_policy const& policy,
+            static hpx::future<R> call(
+                parallel_task_execution_policy const& policy,
                 FwdIter first, std::size_t count, F1 && f1, F2 && f2,
                 std::size_t chunk_size)
             {
@@ -334,7 +335,8 @@ namespace hpx { namespace parallel { namespace util
                 FwdIter first, std::size_t count, F1 && f1, F2 && f2,
                 std::size_t chunk_size, Data && data)
             {
-                typename hpx::util::decay<Data>::type::const_iterator data_it = boost::begin(data);
+                typename hpx::util::decay<Data>::type::const_iterator data_it =
+                    boost::begin(data);
 
                 std::vector<hpx::future<Result> > workitems;
                 std::list<boost::exception_ptr> errors;
@@ -518,7 +520,8 @@ namespace hpx { namespace parallel { namespace util
             parallel::traits::static_partitioner_tag>
         {
             template <typename FwdIter, typename F1, typename F2>
-            static hpx::future<R> call(parallel_task_execution_policy const& policy,
+            static hpx::future<R> call(
+                parallel_task_execution_policy const& policy,
                 FwdIter first, std::size_t count, F1 && f1, F2 && f2)
             {
                 return static_partitioner<
@@ -527,7 +530,7 @@ namespace hpx { namespace parallel { namespace util
                         std::forward<F1>(f1), std::forward<F2>(f2), 0);
             }
 
-            template <typename FwdIter, typename F1, typename F2, 
+            template <typename FwdIter, typename F1, typename F2,
                 typename Data>
             static hpx::future<R> call_with_data(
                 parallel_task_execution_policy const& policy,
