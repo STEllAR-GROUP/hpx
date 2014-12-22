@@ -303,8 +303,6 @@ namespace hpx { namespace actions
     /// \endcond
 }}
 
-/// \endcond
-
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif

@@ -29,7 +29,7 @@
 
     template <typename ...Ts>
     BOOST_FORCEINLINE typename boost::enable_if_c<
-        util::detail::pack<Ts...>::size == arity, 
+        util::detail::pack<Ts...>::size == arity,
         local_result_type
     >::type operator()(BOOST_SCOPED_ENUM(launch) policy,
         naming::id_type const& id, error_code& ec, Ts&&... vs) const
@@ -42,7 +42,7 @@
 
     template <typename ...Ts>
     BOOST_FORCEINLINE typename boost::enable_if_c<
-        util::detail::pack<Ts...>::size == arity, 
+        util::detail::pack<Ts...>::size == arity,
         local_result_type
     >::type operator()(naming::id_type const& id, error_code& ec, Ts&&... vs) const
     {
@@ -51,7 +51,7 @@
 
     template <typename ...Ts>
     BOOST_FORCEINLINE typename boost::enable_if_c<
-        util::detail::pack<Ts...>::size == arity, 
+        util::detail::pack<Ts...>::size == arity,
         local_result_type
     >::type operator()(BOOST_SCOPED_ENUM(launch) policy,
         naming::id_type const& id, Ts&&... vs) const
@@ -61,7 +61,7 @@
 
     template <typename ...Ts>
     BOOST_FORCEINLINE typename boost::enable_if_c<
-        util::detail::pack<Ts...>::size == arity, 
+        util::detail::pack<Ts...>::size == arity,
         local_result_type
     >::type operator()(naming::id_type const& id, Ts&&... vs) const
     {
