@@ -9,6 +9,7 @@
 #include <hpx/traits/is_future.hpp>
 
 #include <boost/mpl/bool.hpp>
+#include <boost/range/iterator_range.hpp>
 
 #include <vector>
 
@@ -22,6 +23,11 @@ namespace hpx { namespace traits
     template <typename T>
     struct is_future_range<std::vector<T> >
       : is_future<T>
+    {};
+
+    template <typename Iterator>
+    struct is_future_range<boost::iterator_range<Iterator> >
+      : is_future<typename std::iterator_traits<Iterator>::value_type>
     {};
 }}
 
