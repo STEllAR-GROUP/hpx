@@ -77,13 +77,11 @@ namespace hpx
             std::forward<Callback>(cb));
     }
 
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, threads::thread_priority Priority,
-        typename Callback>
+    template <typename Component, typename Signature, typename Derived,
+        threads::thread_priority Priority, typename Callback>
     inline bool apply_cb(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > /*act*/, naming::id_type const& gid, Callback && cb)
+        hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
+        naming::id_type const& gid, Callback && cb)
     {
         return apply_p_cb<Derived>(gid, actions::action_priority<Derived>(),
             std::forward<Callback>(cb));
@@ -175,12 +173,11 @@ namespace hpx
             std::forward<Callback>(cb));
     }
 
-    template <typename Component, typename Result, typename Arguments,
-        typename Derived, typename Callback>
+    template <typename Component, typename Signature, typename Derived,
+        typename Callback>
     inline bool apply_cb(actions::continuation* c,
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > /*act*/, naming::id_type const& gid, Callback && cb)
+        hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
+        naming::id_type const& gid, Callback && cb)
     {
         return apply_p_cb<Derived>(c, gid, actions::action_priority<Derived>(),
             std::forward<Callback>(cb));

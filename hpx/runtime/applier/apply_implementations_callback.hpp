@@ -121,14 +121,12 @@ namespace hpx
             std::forward<Callback>(cb), HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename Callback,
+    template <typename Component, typename Signature, typename Derived,
+        typename Callback,
         BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply_cb(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > /*act*/,
+        hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
         naming::id_type const& gid, Callback && cb,
         HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
@@ -240,14 +238,11 @@ namespace hpx
             std::forward<Callback>(cb), HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename Callback,
-        BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    template <typename Component, typename Signature, typename Derived,
+        typename Callback, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply_cb(actions::continuation* c,
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > /*act*/,
+        hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
         naming::id_type const& gid, Callback && cb,
         HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {

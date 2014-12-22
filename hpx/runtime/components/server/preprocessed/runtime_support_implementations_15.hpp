@@ -15,7 +15,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
        >
     struct create_component_action0
-      : ::hpx::actions::result_action0<
+      : ::hpx::actions::action<
             naming::gid_type (runtime_support::*)()
           , &runtime_support::create_component0<
                 Component >
@@ -25,7 +25,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
        >
     struct create_component_direct_action0
-      : ::hpx::actions::direct_result_action0<
+      : ::hpx::actions::direct_action<
             naming::gid_type (runtime_support::*)()
           , &runtime_support::create_component0<
                 Component >
@@ -85,7 +85,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0>
     struct create_component_action1
-      : ::hpx::actions::result_action1<
+      : ::hpx::actions::action<
             naming::gid_type (runtime_support::*)(A0)
           , &runtime_support::create_component1<
                 Component , A0>
@@ -95,7 +95,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0>
     struct create_component_direct_action1
-      : ::hpx::actions::direct_result_action1<
+      : ::hpx::actions::direct_action<
             naming::gid_type (runtime_support::*)(A0)
           , &runtime_support::create_component1<
                 Component , A0>
@@ -106,7 +106,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
        >
     struct bulk_create_component_action1
-      : ::hpx::actions::result_action1<
+      : ::hpx::actions::action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t )
           , &runtime_support::bulk_create_component1<
@@ -117,7 +117,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
        >
     struct bulk_create_component_direct_action1
-      : ::hpx::actions::direct_result_action1<
+      : ::hpx::actions::direct_action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t )
           , &runtime_support::bulk_create_component1<
@@ -178,7 +178,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1>
     struct create_component_action2
-      : ::hpx::actions::result_action2<
+      : ::hpx::actions::action<
             naming::gid_type (runtime_support::*)(A0 , A1)
           , &runtime_support::create_component2<
                 Component , A0 , A1>
@@ -188,7 +188,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1>
     struct create_component_direct_action2
-      : ::hpx::actions::direct_result_action2<
+      : ::hpx::actions::direct_action<
             naming::gid_type (runtime_support::*)(A0 , A1)
           , &runtime_support::create_component2<
                 Component , A0 , A1>
@@ -251,7 +251,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0>
     struct bulk_create_component_action2
-      : ::hpx::actions::result_action2<
+      : ::hpx::actions::action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0)
           , &runtime_support::bulk_create_component2<
@@ -262,7 +262,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0>
     struct bulk_create_component_direct_action2
-      : ::hpx::actions::direct_result_action2<
+      : ::hpx::actions::direct_action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0)
           , &runtime_support::bulk_create_component2<
@@ -323,7 +323,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2>
     struct create_component_action3
-      : ::hpx::actions::result_action3<
+      : ::hpx::actions::action<
             naming::gid_type (runtime_support::*)(A0 , A1 , A2)
           , &runtime_support::create_component3<
                 Component , A0 , A1 , A2>
@@ -333,7 +333,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2>
     struct create_component_direct_action3
-      : ::hpx::actions::direct_result_action3<
+      : ::hpx::actions::direct_action<
             naming::gid_type (runtime_support::*)(A0 , A1 , A2)
           , &runtime_support::create_component3<
                 Component , A0 , A1 , A2>
@@ -396,7 +396,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1>
     struct bulk_create_component_action3
-      : ::hpx::actions::result_action3<
+      : ::hpx::actions::action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0 , A1)
           , &runtime_support::bulk_create_component3<
@@ -407,7 +407,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1>
     struct bulk_create_component_direct_action3
-      : ::hpx::actions::direct_result_action3<
+      : ::hpx::actions::direct_action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0 , A1)
           , &runtime_support::bulk_create_component3<
@@ -468,7 +468,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3>
     struct create_component_action4
-      : ::hpx::actions::result_action4<
+      : ::hpx::actions::action<
             naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3)
           , &runtime_support::create_component4<
                 Component , A0 , A1 , A2 , A3>
@@ -478,7 +478,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3>
     struct create_component_direct_action4
-      : ::hpx::actions::direct_result_action4<
+      : ::hpx::actions::direct_action<
             naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3)
           , &runtime_support::create_component4<
                 Component , A0 , A1 , A2 , A3>
@@ -541,7 +541,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2>
     struct bulk_create_component_action4
-      : ::hpx::actions::result_action4<
+      : ::hpx::actions::action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0 , A1 , A2)
           , &runtime_support::bulk_create_component4<
@@ -552,7 +552,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2>
     struct bulk_create_component_direct_action4
-      : ::hpx::actions::direct_result_action4<
+      : ::hpx::actions::direct_action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0 , A1 , A2)
           , &runtime_support::bulk_create_component4<
@@ -613,7 +613,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
     struct create_component_action5
-      : ::hpx::actions::result_action5<
+      : ::hpx::actions::action<
             naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3 , A4)
           , &runtime_support::create_component5<
                 Component , A0 , A1 , A2 , A3 , A4>
@@ -623,7 +623,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
     struct create_component_direct_action5
-      : ::hpx::actions::direct_result_action5<
+      : ::hpx::actions::direct_action<
             naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3 , A4)
           , &runtime_support::create_component5<
                 Component , A0 , A1 , A2 , A3 , A4>
@@ -686,7 +686,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3>
     struct bulk_create_component_action5
-      : ::hpx::actions::result_action5<
+      : ::hpx::actions::action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0 , A1 , A2 , A3)
           , &runtime_support::bulk_create_component5<
@@ -697,7 +697,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3>
     struct bulk_create_component_direct_action5
-      : ::hpx::actions::direct_result_action5<
+      : ::hpx::actions::direct_action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0 , A1 , A2 , A3)
           , &runtime_support::bulk_create_component5<
@@ -758,7 +758,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
     struct create_component_action6
-      : ::hpx::actions::result_action6<
+      : ::hpx::actions::action<
             naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3 , A4 , A5)
           , &runtime_support::create_component6<
                 Component , A0 , A1 , A2 , A3 , A4 , A5>
@@ -768,7 +768,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
     struct create_component_direct_action6
-      : ::hpx::actions::direct_result_action6<
+      : ::hpx::actions::direct_action<
             naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3 , A4 , A5)
           , &runtime_support::create_component6<
                 Component , A0 , A1 , A2 , A3 , A4 , A5>
@@ -831,7 +831,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
     struct bulk_create_component_action6
-      : ::hpx::actions::result_action6<
+      : ::hpx::actions::action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0 , A1 , A2 , A3 , A4)
           , &runtime_support::bulk_create_component6<
@@ -842,7 +842,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
     struct bulk_create_component_direct_action6
-      : ::hpx::actions::direct_result_action6<
+      : ::hpx::actions::direct_action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0 , A1 , A2 , A3 , A4)
           , &runtime_support::bulk_create_component6<
@@ -903,7 +903,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
     struct create_component_action7
-      : ::hpx::actions::result_action7<
+      : ::hpx::actions::action<
             naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3 , A4 , A5 , A6)
           , &runtime_support::create_component7<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6>
@@ -913,7 +913,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
     struct create_component_direct_action7
-      : ::hpx::actions::direct_result_action7<
+      : ::hpx::actions::direct_action<
             naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3 , A4 , A5 , A6)
           , &runtime_support::create_component7<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6>
@@ -976,7 +976,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
     struct bulk_create_component_action7
-      : ::hpx::actions::result_action7<
+      : ::hpx::actions::action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0 , A1 , A2 , A3 , A4 , A5)
           , &runtime_support::bulk_create_component7<
@@ -987,7 +987,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
     struct bulk_create_component_direct_action7
-      : ::hpx::actions::direct_result_action7<
+      : ::hpx::actions::direct_action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0 , A1 , A2 , A3 , A4 , A5)
           , &runtime_support::bulk_create_component7<
@@ -1048,7 +1048,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
     struct create_component_action8
-      : ::hpx::actions::result_action8<
+      : ::hpx::actions::action<
             naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
           , &runtime_support::create_component8<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7>
@@ -1058,7 +1058,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
     struct create_component_direct_action8
-      : ::hpx::actions::direct_result_action8<
+      : ::hpx::actions::direct_action<
             naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
           , &runtime_support::create_component8<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7>
@@ -1121,7 +1121,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
     struct bulk_create_component_action8
-      : ::hpx::actions::result_action8<
+      : ::hpx::actions::action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0 , A1 , A2 , A3 , A4 , A5 , A6)
           , &runtime_support::bulk_create_component8<
@@ -1132,7 +1132,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
     struct bulk_create_component_direct_action8
-      : ::hpx::actions::direct_result_action8<
+      : ::hpx::actions::direct_action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0 , A1 , A2 , A3 , A4 , A5 , A6)
           , &runtime_support::bulk_create_component8<
@@ -1193,7 +1193,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
     struct create_component_action9
-      : ::hpx::actions::result_action9<
+      : ::hpx::actions::action<
             naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
           , &runtime_support::create_component9<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8>
@@ -1203,7 +1203,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
     struct create_component_direct_action9
-      : ::hpx::actions::direct_result_action9<
+      : ::hpx::actions::direct_action<
             naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
           , &runtime_support::create_component9<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8>
@@ -1266,7 +1266,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
     struct bulk_create_component_action9
-      : ::hpx::actions::result_action9<
+      : ::hpx::actions::action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
           , &runtime_support::bulk_create_component9<
@@ -1277,7 +1277,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
     struct bulk_create_component_direct_action9
-      : ::hpx::actions::direct_result_action9<
+      : ::hpx::actions::direct_action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
           , &runtime_support::bulk_create_component9<
@@ -1338,7 +1338,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
     struct create_component_action10
-      : ::hpx::actions::result_action10<
+      : ::hpx::actions::action<
             naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
           , &runtime_support::create_component10<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9>
@@ -1348,7 +1348,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
     struct create_component_direct_action10
-      : ::hpx::actions::direct_result_action10<
+      : ::hpx::actions::direct_action<
             naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
           , &runtime_support::create_component10<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9>
@@ -1411,7 +1411,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
     struct bulk_create_component_action10
-      : ::hpx::actions::result_action10<
+      : ::hpx::actions::action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
           , &runtime_support::bulk_create_component10<
@@ -1422,7 +1422,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
     struct bulk_create_component_direct_action10
-      : ::hpx::actions::direct_result_action10<
+      : ::hpx::actions::direct_action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
           , &runtime_support::bulk_create_component10<
@@ -1483,7 +1483,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10>
     struct create_component_action11
-      : ::hpx::actions::result_action11<
+      : ::hpx::actions::action<
             naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
           , &runtime_support::create_component11<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10>
@@ -1493,7 +1493,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10>
     struct create_component_direct_action11
-      : ::hpx::actions::direct_result_action11<
+      : ::hpx::actions::direct_action<
             naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
           , &runtime_support::create_component11<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10>
@@ -1556,7 +1556,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
     struct bulk_create_component_action11
-      : ::hpx::actions::result_action11<
+      : ::hpx::actions::action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
           , &runtime_support::bulk_create_component11<
@@ -1567,7 +1567,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
     struct bulk_create_component_direct_action11
-      : ::hpx::actions::direct_result_action11<
+      : ::hpx::actions::direct_action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
           , &runtime_support::bulk_create_component11<
@@ -1628,7 +1628,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11>
     struct create_component_action12
-      : ::hpx::actions::result_action12<
+      : ::hpx::actions::action<
             naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
           , &runtime_support::create_component12<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11>
@@ -1638,7 +1638,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11>
     struct create_component_direct_action12
-      : ::hpx::actions::direct_result_action12<
+      : ::hpx::actions::direct_action<
             naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
           , &runtime_support::create_component12<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11>
@@ -1701,7 +1701,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10>
     struct bulk_create_component_action12
-      : ::hpx::actions::result_action12<
+      : ::hpx::actions::action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
           , &runtime_support::bulk_create_component12<
@@ -1712,7 +1712,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10>
     struct bulk_create_component_direct_action12
-      : ::hpx::actions::direct_result_action12<
+      : ::hpx::actions::direct_action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
           , &runtime_support::bulk_create_component12<
@@ -1773,7 +1773,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12>
     struct create_component_action13
-      : ::hpx::actions::result_action13<
+      : ::hpx::actions::action<
             naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
           , &runtime_support::create_component13<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12>
@@ -1783,7 +1783,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12>
     struct create_component_direct_action13
-      : ::hpx::actions::direct_result_action13<
+      : ::hpx::actions::direct_action<
             naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
           , &runtime_support::create_component13<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12>
@@ -1846,7 +1846,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11>
     struct bulk_create_component_action13
-      : ::hpx::actions::result_action13<
+      : ::hpx::actions::action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
           , &runtime_support::bulk_create_component13<
@@ -1857,7 +1857,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11>
     struct bulk_create_component_direct_action13
-      : ::hpx::actions::direct_result_action13<
+      : ::hpx::actions::direct_action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
           , &runtime_support::bulk_create_component13<
@@ -1918,7 +1918,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13>
     struct create_component_action14
-      : ::hpx::actions::result_action14<
+      : ::hpx::actions::action<
             naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13)
           , &runtime_support::create_component14<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13>
@@ -1928,7 +1928,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13>
     struct create_component_direct_action14
-      : ::hpx::actions::direct_result_action14<
+      : ::hpx::actions::direct_action<
             naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13)
           , &runtime_support::create_component14<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13>
@@ -1991,7 +1991,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12>
     struct bulk_create_component_action14
-      : ::hpx::actions::result_action14<
+      : ::hpx::actions::action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
           , &runtime_support::bulk_create_component14<
@@ -2002,7 +2002,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12>
     struct bulk_create_component_direct_action14
-      : ::hpx::actions::direct_result_action14<
+      : ::hpx::actions::direct_action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
           , &runtime_support::bulk_create_component14<
@@ -2063,7 +2063,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14>
     struct create_component_action15
-      : ::hpx::actions::result_action15<
+      : ::hpx::actions::action<
             naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14)
           , &runtime_support::create_component15<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14>
@@ -2073,7 +2073,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14>
     struct create_component_direct_action15
-      : ::hpx::actions::direct_result_action15<
+      : ::hpx::actions::direct_action<
             naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14)
           , &runtime_support::create_component15<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14>
@@ -2136,7 +2136,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13>
     struct bulk_create_component_action15
-      : ::hpx::actions::result_action15<
+      : ::hpx::actions::action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13)
           , &runtime_support::bulk_create_component15<
@@ -2147,7 +2147,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13>
     struct bulk_create_component_direct_action15
-      : ::hpx::actions::direct_result_action15<
+      : ::hpx::actions::direct_action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13)
           , &runtime_support::bulk_create_component15<

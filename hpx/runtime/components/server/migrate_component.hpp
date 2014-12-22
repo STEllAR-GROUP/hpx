@@ -95,9 +95,8 @@ namespace hpx { namespace components { namespace server
 
     template <typename Component>
     struct migrate_component_action
-      : ::hpx::actions::plain_result_action2<
-            future<naming::id_type>,
-            naming::id_type const&, naming::id_type const&
+      : ::hpx::actions::action<
+            future<naming::id_type> (*)(naming::id_type const&, naming::id_type const&)
           , &migrate_component<Component>
           , migrate_component_action<Component> >
     {};

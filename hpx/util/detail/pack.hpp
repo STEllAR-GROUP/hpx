@@ -26,12 +26,14 @@ namespace hpx { namespace util { namespace detail
     struct pack
     {
         typedef pack type;
+        static const std::size_t size = sizeof...(Ts);
     };
 
     template <typename T, T ...Vs>
     struct pack_c
     {
         typedef pack_c type;
+        static const std::size_t size = sizeof...(Vs);
     };
 
     ///////////////////////////////////////////////////////////////////////////

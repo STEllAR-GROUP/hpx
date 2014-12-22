@@ -61,15 +61,11 @@ namespace hpx
     template <
         typename Action
       , typename Callback
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == N
-      , bool
-    >::type
-    apply_colocated_cb(
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename T)>
+    bool apply_colocated_cb(
         naming::id_type const& gid
       , Callback && cb
-      BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg))
+      BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, T, v))
     {
         // Attach the requested action as a continuation to a resolve_async
         // call on the locality responsible for the target gid.
@@ -88,32 +84,25 @@ namespace hpx
           , util::functional::apply_continuation(
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2, gid)
-                  BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg))
+                  BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, T, v))
                 ));
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename Callback
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == N
-      , bool
-    >::type
-    apply_colocated_cb(
-        hpx::actions::action<Component, Result, Arguments, Derived> /*act*/
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename T)>
+    bool apply_colocated_cb(
+        hpx::actions::basic_action<Component, Signature, Derived> /*act*/
       , naming::id_type const& gid
       , Callback && cb
-      BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg))
+      BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, T, v))
     {
         return apply_colocated_cb<Derived>(
             gid
           , std::forward<Callback>(cb)
-          BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+          BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, T, v));
     }
 }
 

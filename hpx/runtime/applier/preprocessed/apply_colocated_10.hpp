@@ -13,11 +13,7 @@ namespace hpx
     
     template <typename Action
        >
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == 0
-      , bool
-    >::type
-    apply_colocated(
+    bool apply_colocated(
         naming::id_type const& gid
        )
     {
@@ -39,14 +35,10 @@ namespace hpx
     }
     
     template <
-        typename Component, typename Result, typename Arguments, typename Derived
+        typename Component, typename Signature, typename Derived
        >
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == 0
-      , bool
-    >::type
-    apply_colocated(
-        hpx::actions::action<Component, Result, Arguments, Derived> 
+    bool apply_colocated(
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , naming::id_type const& gid
        )
     {
@@ -59,14 +51,10 @@ namespace hpx
 {
     
     template <typename Action
-      , typename Arg0>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == 1
-      , bool
-    >::type
-    apply_colocated(
+      , typename T0>
+    bool apply_colocated(
         naming::id_type const& gid
-      , Arg0 && arg0)
+      , T0 && v0)
     {
         
         
@@ -81,39 +69,31 @@ namespace hpx
           , util::functional::apply_continuation(
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2, gid)
-                  , std::forward<Arg0>( arg0 ))
+                  , std::forward<T0>( v0 ))
                 ));
     }
     
     template <
-        typename Component, typename Result, typename Arguments, typename Derived
-      , typename Arg0>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == 1
-      , bool
-    >::type
-    apply_colocated(
-        hpx::actions::action<Component, Result, Arguments, Derived> 
+        typename Component, typename Signature, typename Derived
+      , typename T0>
+    bool apply_colocated(
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , naming::id_type const& gid
-      , Arg0 && arg0)
+      , T0 && v0)
     {
         return apply_colocated<Derived>(
             gid
-          , std::forward<Arg0>( arg0 ));
+          , std::forward<T0>( v0 ));
     }
 }
 namespace hpx
 {
     
     template <typename Action
-      , typename Arg0 , typename Arg1>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == 2
-      , bool
-    >::type
-    apply_colocated(
+      , typename T0 , typename T1>
+    bool apply_colocated(
         naming::id_type const& gid
-      , Arg0 && arg0 , Arg1 && arg1)
+      , T0 && v0 , T1 && v1)
     {
         
         
@@ -128,39 +108,31 @@ namespace hpx
           , util::functional::apply_continuation(
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2, gid)
-                  , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ))
+                  , std::forward<T0>( v0 ) , std::forward<T1>( v1 ))
                 ));
     }
     
     template <
-        typename Component, typename Result, typename Arguments, typename Derived
-      , typename Arg0 , typename Arg1>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == 2
-      , bool
-    >::type
-    apply_colocated(
-        hpx::actions::action<Component, Result, Arguments, Derived> 
+        typename Component, typename Signature, typename Derived
+      , typename T0 , typename T1>
+    bool apply_colocated(
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , naming::id_type const& gid
-      , Arg0 && arg0 , Arg1 && arg1)
+      , T0 && v0 , T1 && v1)
     {
         return apply_colocated<Derived>(
             gid
-          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
+          , std::forward<T0>( v0 ) , std::forward<T1>( v1 ));
     }
 }
 namespace hpx
 {
     
     template <typename Action
-      , typename Arg0 , typename Arg1 , typename Arg2>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == 3
-      , bool
-    >::type
-    apply_colocated(
+      , typename T0 , typename T1 , typename T2>
+    bool apply_colocated(
         naming::id_type const& gid
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
+      , T0 && v0 , T1 && v1 , T2 && v2)
     {
         
         
@@ -175,39 +147,31 @@ namespace hpx
           , util::functional::apply_continuation(
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2, gid)
-                  , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ))
+                  , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ))
                 ));
     }
     
     template <
-        typename Component, typename Result, typename Arguments, typename Derived
-      , typename Arg0 , typename Arg1 , typename Arg2>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == 3
-      , bool
-    >::type
-    apply_colocated(
-        hpx::actions::action<Component, Result, Arguments, Derived> 
+        typename Component, typename Signature, typename Derived
+      , typename T0 , typename T1 , typename T2>
+    bool apply_colocated(
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , naming::id_type const& gid
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
+      , T0 && v0 , T1 && v1 , T2 && v2)
     {
         return apply_colocated<Derived>(
             gid
-          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
+          , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ));
     }
 }
 namespace hpx
 {
     
     template <typename Action
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == 4
-      , bool
-    >::type
-    apply_colocated(
+      , typename T0 , typename T1 , typename T2 , typename T3>
+    bool apply_colocated(
         naming::id_type const& gid
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
+      , T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3)
     {
         
         
@@ -222,39 +186,31 @@ namespace hpx
           , util::functional::apply_continuation(
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2, gid)
-                  , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ))
+                  , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ))
                 ));
     }
     
     template <
-        typename Component, typename Result, typename Arguments, typename Derived
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == 4
-      , bool
-    >::type
-    apply_colocated(
-        hpx::actions::action<Component, Result, Arguments, Derived> 
+        typename Component, typename Signature, typename Derived
+      , typename T0 , typename T1 , typename T2 , typename T3>
+    bool apply_colocated(
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , naming::id_type const& gid
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
+      , T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3)
     {
         return apply_colocated<Derived>(
             gid
-          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
+          , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ));
     }
 }
 namespace hpx
 {
     
     template <typename Action
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == 5
-      , bool
-    >::type
-    apply_colocated(
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4>
+    bool apply_colocated(
         naming::id_type const& gid
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
+      , T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4)
     {
         
         
@@ -269,39 +225,31 @@ namespace hpx
           , util::functional::apply_continuation(
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2, gid)
-                  , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ))
+                  , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ))
                 ));
     }
     
     template <
-        typename Component, typename Result, typename Arguments, typename Derived
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == 5
-      , bool
-    >::type
-    apply_colocated(
-        hpx::actions::action<Component, Result, Arguments, Derived> 
+        typename Component, typename Signature, typename Derived
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4>
+    bool apply_colocated(
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , naming::id_type const& gid
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
+      , T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4)
     {
         return apply_colocated<Derived>(
             gid
-          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
+          , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ));
     }
 }
 namespace hpx
 {
     
     template <typename Action
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == 6
-      , bool
-    >::type
-    apply_colocated(
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5>
+    bool apply_colocated(
         naming::id_type const& gid
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5)
+      , T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5)
     {
         
         
@@ -316,39 +264,31 @@ namespace hpx
           , util::functional::apply_continuation(
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2, gid)
-                  , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ))
+                  , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ))
                 ));
     }
     
     template <
-        typename Component, typename Result, typename Arguments, typename Derived
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == 6
-      , bool
-    >::type
-    apply_colocated(
-        hpx::actions::action<Component, Result, Arguments, Derived> 
+        typename Component, typename Signature, typename Derived
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5>
+    bool apply_colocated(
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , naming::id_type const& gid
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5)
+      , T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5)
     {
         return apply_colocated<Derived>(
             gid
-          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
+          , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ));
     }
 }
 namespace hpx
 {
     
     template <typename Action
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == 7
-      , bool
-    >::type
-    apply_colocated(
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6>
+    bool apply_colocated(
         naming::id_type const& gid
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6)
+      , T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6)
     {
         
         
@@ -363,39 +303,31 @@ namespace hpx
           , util::functional::apply_continuation(
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2, gid)
-                  , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ))
+                  , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ))
                 ));
     }
     
     template <
-        typename Component, typename Result, typename Arguments, typename Derived
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == 7
-      , bool
-    >::type
-    apply_colocated(
-        hpx::actions::action<Component, Result, Arguments, Derived> 
+        typename Component, typename Signature, typename Derived
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6>
+    bool apply_colocated(
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , naming::id_type const& gid
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6)
+      , T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6)
     {
         return apply_colocated<Derived>(
             gid
-          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
+          , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ));
     }
 }
 namespace hpx
 {
     
     template <typename Action
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == 8
-      , bool
-    >::type
-    apply_colocated(
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7>
+    bool apply_colocated(
         naming::id_type const& gid
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7)
+      , T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6 , T7 && v7)
     {
         
         
@@ -410,39 +342,31 @@ namespace hpx
           , util::functional::apply_continuation(
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2, gid)
-                  , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ))
+                  , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ))
                 ));
     }
     
     template <
-        typename Component, typename Result, typename Arguments, typename Derived
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == 8
-      , bool
-    >::type
-    apply_colocated(
-        hpx::actions::action<Component, Result, Arguments, Derived> 
+        typename Component, typename Signature, typename Derived
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7>
+    bool apply_colocated(
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , naming::id_type const& gid
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7)
+      , T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6 , T7 && v7)
     {
         return apply_colocated<Derived>(
             gid
-          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
+          , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ));
     }
 }
 namespace hpx
 {
     
     template <typename Action
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == 9
-      , bool
-    >::type
-    apply_colocated(
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8>
+    bool apply_colocated(
         naming::id_type const& gid
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8)
+      , T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6 , T7 && v7 , T8 && v8)
     {
         
         
@@ -457,39 +381,31 @@ namespace hpx
           , util::functional::apply_continuation(
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2, gid)
-                  , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ))
+                  , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ))
                 ));
     }
     
     template <
-        typename Component, typename Result, typename Arguments, typename Derived
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == 9
-      , bool
-    >::type
-    apply_colocated(
-        hpx::actions::action<Component, Result, Arguments, Derived> 
+        typename Component, typename Signature, typename Derived
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8>
+    bool apply_colocated(
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , naming::id_type const& gid
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8)
+      , T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6 , T7 && v7 , T8 && v8)
     {
         return apply_colocated<Derived>(
             gid
-          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
+          , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ));
     }
 }
 namespace hpx
 {
     
     template <typename Action
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == 10
-      , bool
-    >::type
-    apply_colocated(
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9>
+    bool apply_colocated(
         naming::id_type const& gid
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9)
+      , T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6 , T7 && v7 , T8 && v8 , T9 && v9)
     {
         
         
@@ -504,24 +420,20 @@ namespace hpx
           , util::functional::apply_continuation(
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2, gid)
-                  , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ))
+                  , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ) , std::forward<T9>( v9 ))
                 ));
     }
     
     template <
-        typename Component, typename Result, typename Arguments, typename Derived
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == 10
-      , bool
-    >::type
-    apply_colocated(
-        hpx::actions::action<Component, Result, Arguments, Derived> 
+        typename Component, typename Signature, typename Derived
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9>
+    bool apply_colocated(
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , naming::id_type const& gid
-      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9)
+      , T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6 , T7 && v7 , T8 && v8 , T9 && v9)
     {
         return apply_colocated<Derived>(
             gid
-          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
+          , std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ) , std::forward<T9>( v9 ));
     }
 }

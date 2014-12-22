@@ -82,18 +82,16 @@ namespace hpx { namespace components { namespace server
 
     template <typename Component>
     struct copy_component_action_here
-      : ::hpx::actions::plain_result_action1<
-            future<naming::id_type>
-          , naming::id_type const&
+      : ::hpx::actions::action<
+            future<naming::id_type> (*)(naming::id_type const&)
           , &copy_component_here<Component>
           , copy_component_action_here<Component> >
     {};
 
     template <typename Component>
     struct copy_component_action
-      : ::hpx::actions::plain_result_action2<
-            future<naming::id_type>
-          , naming::id_type const&, naming::id_type const&
+      : ::hpx::actions::action<
+            future<naming::id_type> (*)(naming::id_type const&, naming::id_type const&)
           , &copy_component<Component>
           , copy_component_action<Component> >
     {};

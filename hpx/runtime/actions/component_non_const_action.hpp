@@ -21,21 +21,17 @@ namespace hpx { namespace actions
     //  number of arguments
     ///////////////////////////////////////////////////////////////////////////
 
-    // zero argument version
+    ///////////////////////////////////////////////////////////////////////////
+    //  N parameter version, with result
     template <
-        typename Component, typename Result,
-        Result (Component::*F)(), typename Derived>
-    class base_result_action0<Result (Component::*)(), F, Derived>
-      : public action<Component, Result, hpx::util::tuple<>, Derived>
+        typename Component, typename R, typename ...Ps,
+        typename TF, TF F, typename Derived>
+    class basic_action_impl<
+            R (Component::*)(Ps...), TF, F, Derived>
+      : public basic_action<Component, R(Ps...), Derived>
     {
     public:
-        typedef Result result_type;
-        typedef typename detail::remote_action_result<Result>::type
-            remote_result_type;
-
-        typedef hpx::util::tuple<> arguments_type;
-        typedef action<Component, result_type, arguments_type, Derived>
-            base_type;
+        typedef basic_action<Component, R(Ps...), Derived> base_type;
 
         // Let the component decide whether the id is valid
         static bool is_target_valid(naming::id_type const& id)
@@ -44,181 +40,139 @@ namespace hpx { namespace actions
         }
 
     protected:
-        /// The \a continuation_thread_function will be registered as the thread
+        /// The \a thread_function will be registered as the thread
         /// function of a thread. It encapsulates the execution of the
-        /// original function (given by \a func), while ignoring the return
-        /// value.
-        template <typename Address>   // dummy template parameter
-        BOOST_FORCEINLINE static threads::thread_state_enum
-        thread_function(Address lva)
+        /// original function (given by \a func).
+        struct thread_function
         {
-            try {
-                LTM_(debug) << "Executing component action("
-                            << detail::get_action_name<Derived>()
-                            << ") lva(" << reinterpret_cast<void const*>
-                                (get_lva<Component>::call(lva)) << ")";
-                (get_lva<Component>::call(lva)->*F)();      // just call the function
-            }
-            catch (hpx::thread_interrupted const&) { //-V565
-                /* swallow this exception */
-            }
-            catch (hpx::exception const& e) {
-                LTM_(error)
-                    << "Unhandled exception while executing component action("
-                    << detail::get_action_name<Derived>()
-                    << ") lva(" << reinterpret_cast<void const*>
-                        (get_lva<Component>::call(lva)) << "): " << e.what();
+            typedef threads::thread_state_enum result_type;
 
-                // report this error to the console in any case
-                hpx::report_error(boost::current_exception());
-            }
-            catch (...) {
-                LTM_(error)
-                    << "Unhandled exception while executing component action("
-                    << detail::get_action_name<Derived>()
-                    << ") lva(" << reinterpret_cast<void const*>
-                        (get_lva<Component>::call(lva)) << ")";
+            template <typename ...Ts>
+            BOOST_FORCEINLINE result_type operator()(
+                naming::address::address_type lva, Ts&&... vs) const
+            {
+                try {
+                    LTM_(debug) << "Executing component action("
+                                << detail::get_action_name<Derived>()
+                                << ") lva(" << reinterpret_cast<void const*>
+                                    (get_lva<Component>::call(lva)) << ")";
 
-                // report this error to the console in any case
-                hpx::report_error(boost::current_exception());
-            }
+                    (get_lva<Component>::call(lva)->*F)(
+                        std::forward<Ts>(vs)...);
+                }
+                catch (hpx::thread_interrupted const&) {
+                    /* swallow this exception */
+                }
+                catch (hpx::exception const& e) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << "): " << e.what();
 
-            // Verify that there are no more registered locks for this
-            // OS-thread. This will throw if there are still any locks
-            // held.
-            util::force_error_on_lock();
-            return threads::terminated;
-        }
+                    // report this error to the console in any case
+                    hpx::report_error(boost::current_exception());
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
+
+                    // report this error to the console in any case
+                    hpx::report_error(boost::current_exception());
+                }
+
+                // Verify that there are no more registered locks for this
+                // OS-thread. This will throw if there are still any locks
+                // held.
+                util::force_error_on_lock();
+                return threads::terminated;
+            }
+        };
 
     public:
-        /// \brief This static \a construct_thread_function allows to construct
-        /// a proper thread function for a \a thread without having to
-        /// instantiate the \a base_result_action0 type. This is used by the \a
-        /// applier in case no continuation has been supplied.
-        template <typename Arguments>
+        typedef boost::mpl::false_ direct_execution;
+
+        // This static construct_thread_function allows to construct
+        // a proper thread function for a thread without having to
+        // instantiate the component_base_actionN type. This is used by the
+        // applier in case no continuation has been supplied.
+        template <std::size_t ...Is, typename Args>
         static threads::thread_function_type
         construct_thread_function(naming::address::address_type lva,
-            Arguments && /*args*/)
+            util::detail::pack_c<std::size_t, Is...>, Args&& args)
         {
-            threads::thread_state_enum (*f)(naming::address::address_type) =
-                &Derived::template thread_function<naming::address::address_type>;
-
-            return traits::action_decorate_function<Derived>::call(
-                lva, util::bind(f, lva));
+            return traits::action_decorate_function<Derived>::call(lva,
+                util::bind(util::one_shot(typename Derived::thread_function()),
+                    lva, util::get<Is>(std::forward<Args>(args))...));
         }
 
-        /// \brief This static \a construct_thread_function allows to construct
-        /// a proper thread function for a \a thread without having to
-        /// instantiate the \a base_result_action0 type. This is used by the \a
-        /// applier in case a continuation has been supplied
-        template <typename Arguments>
+        template <typename Args>
+        static threads::thread_function_type
+        construct_thread_function(naming::address::address_type lva,
+            Args&& args)
+        {
+            return construct_thread_function(lva,
+                typename util::detail::make_index_pack<
+                    util::tuple_size<typename util::decay<Args>::type>::value
+                >::type(), std::forward<Args>(args));
+        }
+
+        // This static construct_thread_function allows to construct
+        // a proper thread function for a thread without having to
+        // instantiate the component_base_actionN type. This is used by the
+        // applier in case a continuation has been supplied
+        template <typename Args>
         static threads::thread_function_type
         construct_thread_function(continuation_type& cont,
-            naming::address::address_type lva, Arguments && args)
+            naming::address::address_type lva, Args&& args)
         {
             return traits::action_decorate_function<Derived>::call(lva,
                 base_type::construct_continuation_thread_object_function(
                     cont, F, get_lva<Component>::call(lva),
-                    std::forward<Arguments>(args)));
+                    std::forward<Args>(args)));
         }
 
         // direct execution
-        template <typename Arguments>
-        BOOST_FORCEINLINE static Result
+        template <std::size_t ...Is, typename Args>
+        BOOST_FORCEINLINE static R
         execute_function(naming::address::address_type lva,
-            Arguments &&)
+            util::detail::pack_c<std::size_t, Is...>, Args&& args)
         {
             LTM_(debug)
-                << "base_result_action0::execute_function: name("
-                << detail::get_action_name<Derived>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component>::call(lva)) << ")";
+                << "basic_action_impl::execute_function name("
+                << detail::get_action_name<Derived>() << ")";
 
-            return (get_lva<Component>::call(lva)->*F)();
+            return (get_lva<Component>::call(lva)->*F)(
+                util::get<Is>(std::forward<Args>(args))...);
         }
-    };
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Component, typename Result,
-        Result (Component::*F)(), typename Derived>
-    struct result_action0<Result (Component::*)(), F, Derived>
-      : base_result_action0<
-            Result (Component::*)(), F,
-            typename detail::action_type<
-                result_action0<Result (Component::*)(), F, Derived>, Derived
-            >::type>
-    {
-        typedef typename detail::action_type<
-            result_action0, Derived
-        >::type derived_type;
-
-        typedef boost::mpl::false_ direct_execution;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Component, typename Result,
-        Result (Component::*F)(), typename Derived>
-    struct make_action<Result (Component::*)(), F, Derived, boost::mpl::false_>
-      : result_action0<Result (Component::*)(), F, Derived>
-    {
-        typedef result_action0<
-            Result (Component::*)(), F, Derived
-        > type;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Component, typename Result,
-        Result (Component::*F)(), typename Derived>
-    struct direct_result_action0<Result (Component::*)(), F, Derived>
-      : public base_result_action0<
-            Result (Component::*)(), F,
-            typename detail::action_type<
-                direct_result_action0<Result (Component::*)(), F, Derived>, Derived
-            >::type>
-    {
-        typedef typename detail::action_type<
-            direct_result_action0, Derived
-        >::type derived_type;
-
-        typedef boost::mpl::true_ direct_execution;
-
-        /// The function \a get_action_type returns whether this action needs
-        /// to be executed in a new thread or directly.
-        static base_action::action_type get_action_type()
+        template <typename Args>
+        BOOST_FORCEINLINE static R
+        execute_function(naming::address::address_type lva,
+            Args&& args)
         {
-            return base_action::direct_action;
+            return execute_function(lva,
+                typename util::detail::make_index_pack<
+                    util::tuple_size<typename util::decay<Args>::type>::value
+                >::type(), std::forward<Args>(args));
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    //  N parameter version, no result type
     template <
-        typename Component, typename Result,
-        Result (Component::*F)(), typename Derived>
-    struct make_action<Result (Component::*)(), F, Derived, boost::mpl::true_>
-      : direct_result_action0<Result (Component::*)(), F, Derived>
-    {
-        typedef direct_result_action0<
-            Result (Component::*)(), F, Derived
-        > type;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    //  zero parameter version, no result value
-    template <typename Component, void (Component::*F)(), typename Derived>
-    class base_action0<void (Component::*)(), F, Derived>
-      : public action<Component, util::unused_type,
-            hpx::util::tuple<>, Derived>
+        typename Component, typename ...Ps,
+        typename TF, TF F, typename Derived>
+    class basic_action_impl<
+            void (Component::*)(Ps...), TF, F, Derived>
+      : public basic_action<Component, util::unused_type(Ps...), Derived>
     {
     public:
-        typedef util::unused_type result_type;
-        typedef util::unused_type remote_result_type;
-
-        typedef hpx::util::tuple<> arguments_type;
-        typedef action<Component, result_type, arguments_type, Derived>
-            base_type;
+        typedef basic_action<
+            Component, util::unused_type(Ps...), Derived> base_type;
 
         // Let the component decide whether the id is valid
         static bool is_target_valid(naming::id_type const& id)
@@ -227,165 +181,125 @@ namespace hpx { namespace actions
         }
 
     protected:
-        /// The \a continuation_thread_function will be registered as the thread
+        /// The \a thread_function will be registered as the thread
         /// function of a thread. It encapsulates the execution of the
-        /// original function (given by \a func), while ignoring the return
-        /// value.
-        template <typename Address>   // dummy template parameter
-        BOOST_FORCEINLINE static threads::thread_state_enum
-        thread_function(Address lva)
+        /// original function (given by \a func).
+        struct thread_function
         {
-            try {
-                LTM_(debug) << "Executing component action("
-                            << detail::get_action_name<Derived>()
-                            << ") lva(" << reinterpret_cast<void const*>
-                                (get_lva<Component>::call(lva)) << ")";
-                (get_lva<Component>::call(lva)->*F)();      // just call the function
-            }
-            catch (hpx::thread_interrupted const&) { //-V565
-                /* swallow this exception */
-            }
-            catch (hpx::exception const& e) {
-                LTM_(error)
-                    << "Unhandled exception while executing component action("
-                    << detail::get_action_name<Derived>()
-                    << ") lva(" << reinterpret_cast<void const*>
-                        (get_lva<Component>::call(lva)) << "): " << e.what();
+            typedef threads::thread_state_enum result_type;
 
-                // report this error to the console in any case
-                hpx::report_error(boost::current_exception());
-            }
-            catch (...) {
-                LTM_(error)
-                    << "Unhandled exception while executing component action("
-                    << detail::get_action_name<Derived>()
-                    << ") lva(" << reinterpret_cast<void const*>
-                        (get_lva<Component>::call(lva)) << ")";
+            template <typename ...Ts>
+            BOOST_FORCEINLINE result_type operator()(
+                naming::address::address_type lva, Ts&&... vs) const
+            {
+                try {
+                    LTM_(debug) << "Executing component action("
+                                << detail::get_action_name<Derived>()
+                                << ") lva(" << reinterpret_cast<void const*>
+                                    (get_lva<Component>::call(lva)) << ")";
 
-                // report this error to the console in any case
-                hpx::report_error(boost::current_exception());
-            }
+                    (get_lva<Component>::call(lva)->*F)(
+                        std::forward<Ts>(vs)...);
+                }
+                catch (hpx::thread_interrupted const&) {
+                    /* swallow this exception */
+                }
+                catch (hpx::exception const& e) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << "): " << e.what();
 
-            // Verify that there are no more registered locks for this
-            // OS-thread. This will throw if there are still any locks
-            // held.
-            util::force_error_on_lock();
-            return threads::terminated;
-        }
+                    // report this error to the console in any case
+                    hpx::report_error(boost::current_exception());
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
+
+                    // report this error to the console in any case
+                    hpx::report_error(boost::current_exception());
+                }
+
+                // Verify that there are no more registered locks for this
+                // OS-thread. This will throw if there are still any locks
+                // held.
+                util::force_error_on_lock();
+                return threads::terminated;
+            }
+        };
 
     public:
-        /// \brief This static \a construct_thread_function allows to construct
-        /// a proper thread function for a \a thread without having to
-        /// instantiate the base_action0 type. This is used by the \a applier in
-        /// case no continuation has been supplied.
-        template <typename Arguments>
+        // This static construct_thread_function allows to construct
+        // a proper thread function for a thread without having to
+        // instantiate the component_base_actionN type. This is used by the applier in
+        // case no continuation has been supplied.
+        template <std::size_t ...Is, typename Args>
         static threads::thread_function_type
         construct_thread_function(naming::address::address_type lva,
-            Arguments && /*args*/)
+            util::detail::pack_c<std::size_t, Is...>, Args&& args)
         {
-            threads::thread_state_enum (*f)(naming::address::address_type) =
-                &Derived::template thread_function<naming::address::address_type>;
-
-            return traits::action_decorate_function<Derived>::call(
-                lva, util::bind(f, lva));
+            return traits::action_decorate_function<Derived>::call(lva,
+                util::bind(util::one_shot(typename Derived::thread_function()),
+                    lva, util::get<Is>(std::forward<Args>(args))...));
         }
 
-        /// \brief This static \a construct_thread_function allows to construct
-        /// a proper thread function for a \a thread without having to
-        /// instantiate the base_action0 type. This is used by the \a applier in
-        /// case a continuation has been supplied
-        template <typename Arguments>
+        template <typename Args>
+        static threads::thread_function_type
+        construct_thread_function(naming::address::address_type lva,
+            Args&& args)
+        {
+            return construct_thread_function(lva,
+                typename util::detail::make_index_pack<
+                    util::tuple_size<typename util::decay<Args>::type>::value
+                >::type(), std::forward<Args>(args));
+        }
+
+        // This static construct_thread_function allows to construct
+        // a proper thread function for a thread without having to
+        // instantiate the component_base_actionN type. This is used by the applier in
+        // case a continuation has been supplied
+        template <typename Args>
         static threads::thread_function_type
         construct_thread_function(continuation_type& cont,
-            naming::address::address_type lva, Arguments && args)
+            naming::address::address_type lva, Args&& args)
         {
             return traits::action_decorate_function<Derived>::call(lva,
                 base_type::construct_continuation_thread_object_function_void(
                     cont, F, get_lva<Component>::call(lva),
-                    std::forward<Arguments>(args)));
+                    std::forward<Args>(args)));
         }
 
-        // direct execution
-        template <typename Arguments>
+        //  direct execution
+        template <std::size_t ...Is, typename Args>
         BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
-            Arguments &&)
+            util::detail::pack_c<std::size_t, Is...>, Args&& args)
         {
             LTM_(debug)
-                << "base_action0::execute_function: name("
-                << detail::get_action_name<Derived>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component>::call(lva)) << ")";
-            (get_lva<Component>::call(lva)->*F)();
+                << "basic_action_impl::execute_function name("
+                << detail::get_action_name<Derived>() << ")";
+
+            (get_lva<Component>::call(lva)->*F)(
+                util::get<Is>(std::forward<Args>(args))...);
             return util::unused;
         }
-    };
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, void (Component::*F)(), typename Derived>
-    struct action0<void (Component::*)(), F, Derived>
-      : base_action0<
-            void (Component::*)(), F,
-            typename detail::action_type<
-                action0<void (Component::*)(), F, Derived>, Derived
-            >::type>
-    {
-        typedef typename detail::action_type<
-            action0, Derived
-        >::type derived_type;
-
-        typedef boost::mpl::false_ direct_execution;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, void (Component::*F)(), typename Derived>
-    struct make_action<void (Component::*)(), F, Derived, boost::mpl::false_>
-      : action0<void (Component::*)(), F, Derived>
-    {
-        typedef action0<
-            void (Component::*)(), F, Derived
-        > type;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, void (Component::*F)(), typename Derived>
-    struct direct_action0<void (Component::*)(), F, Derived>
-      : base_action0<
-            void (Component::*)(), F,
-            typename detail::action_type<
-                direct_action0<void (Component::*)(), F, Derived>, Derived
-            >::type>
-    {
-        typedef typename detail::action_type<
-            direct_action0, Derived
-        >::type derived_type;
-
-        typedef boost::mpl::true_ direct_execution;
-
-        /// The function \a get_action_type returns whether this action needs
-        /// to be executed in a new thread or directly.
-        static base_action::action_type get_action_type()
+        template <typename Args>
+        BOOST_FORCEINLINE static util::unused_type
+        execute_function(naming::address::address_type lva,
+            Args&& args)
         {
-            return base_action::direct_action;
+            return execute_function(lva,
+                typename util::detail::make_index_pack<
+                    util::tuple_size<typename util::decay<Args>::type>::value
+                >::type(), std::forward<Args>(args));
         }
     };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, void (Component::*F)(), typename Derived>
-    struct make_action<void (Component::*)(), F, Derived, boost::mpl::true_>
-      : direct_action0<void (Component::*)(), F, Derived>
-    {
-        typedef direct_action0<
-            void (Component::*)(), F, Derived
-        > type;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    // the specialization for void return type is just a template alias
-    template <typename Component, void (Component::*F)(), typename Derived>
-    struct result_action0<void (Component::*)(), F, Derived>
-      : action0<void (Component::*)(), F, Derived>
-    {};
 
     /// \endcond
 }}
