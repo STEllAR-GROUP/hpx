@@ -7,20 +7,22 @@
 #define HPX_RUNTIME_ACTIONS_FUNCTION_OPERATORS_MAY_09_2012_0420PM
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename LocalResult, typename ...Ts>
+    template <typename LocalResult>
     struct sync_invoke
     {
+        template <typename ...Ts>
         BOOST_FORCEINLINE static LocalResult call(
             boost::mpl::false_, BOOST_SCOPED_ENUM(launch) policy,
-            naming::id_type const& id, Ts&&... vs, error_code& ec = throws)
+            naming::id_type const& id, error_code& ec, Ts&&... vs)
         {
             return hpx::async<basic_action>(policy, id,
                 std::forward<Ts>(vs)...).get(ec);
         }
 
+        template <typename ...Ts>
         BOOST_FORCEINLINE static LocalResult call(
             boost::mpl::true_, BOOST_SCOPED_ENUM(launch) policy,
-            naming::id_type const& id, Ts&&... vs, error_code& = throws)
+            naming::id_type const& id, error_code& /*ec*/, Ts&&... vs)
         {
             return hpx::async<basic_action>(policy, id,
                 std::forward<Ts>(vs)...);
@@ -28,42 +30,33 @@
     };
 
     template <typename ...Ts>
-    BOOST_FORCEINLINE typename boost::enable_if_c<
-        util::detail::pack<Ts...>::size == arity,
-        local_result_type
-    >::type operator()(BOOST_SCOPED_ENUM(launch) policy,
-        naming::id_type const& id, error_code& ec, Ts&&... vs) const
+    BOOST_FORCEINLINE local_result_type operator()(
+        BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& id,
+        error_code& ec, Ts&&... vs) const
     {
         return util::void_guard<local_result_type>(),
-            sync_invoke<local_result_type, Ts...>::call(
-                is_future_pred(), policy, id,
-                std::forward<Ts>(vs)..., ec);
+            sync_invoke<local_result_type>::call(
+                is_future_pred(), policy, id, ec, std::forward<Ts>(vs)...);
     }
 
     template <typename ...Ts>
-    BOOST_FORCEINLINE typename boost::enable_if_c<
-        util::detail::pack<Ts...>::size == arity,
-        local_result_type
-    >::type operator()(naming::id_type const& id, error_code& ec, Ts&&... vs) const
+    BOOST_FORCEINLINE local_result_type operator()(
+        naming::id_type const& id, error_code& ec, Ts&&... vs) const
     {
         return (*this)(launch::all, id, ec, std::forward<Ts>(vs)...);
     }
 
     template <typename ...Ts>
-    BOOST_FORCEINLINE typename boost::enable_if_c<
-        util::detail::pack<Ts...>::size == arity,
-        local_result_type
-    >::type operator()(BOOST_SCOPED_ENUM(launch) policy,
-        naming::id_type const& id, Ts&&... vs) const
+    BOOST_FORCEINLINE local_result_type operator()(
+        BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& id,
+        Ts&&... vs) const
     {
         return (*this)(launch::all, id, throws, std::forward<Ts>(vs)...);
     }
 
     template <typename ...Ts>
-    BOOST_FORCEINLINE typename boost::enable_if_c<
-        util::detail::pack<Ts...>::size == arity,
-        local_result_type
-    >::type operator()(naming::id_type const& id, Ts&&... vs) const
+    BOOST_FORCEINLINE local_result_type operator()(
+        naming::id_type const& id, Ts&&... vs) const
     {
         return (*this)(launch::all, id, throws, std::forward<Ts>(vs)...);
     }
