@@ -84,7 +84,7 @@ namespace hpx { namespace actions
                     // call the function, ignoring the return value
                     F(std::forward<Ts>(vs)...);
                 }
-                catch (hpx::thread_interrupted const&) {
+                catch (hpx::thread_interrupted const&) { //-V565
                     /* swallow this exception */
                 }
                 catch (hpx::exception const& e) {
@@ -219,7 +219,7 @@ namespace hpx { namespace actions
                     // call the function, ignoring the return value
                     F(std::forward<Ts>(vs)...);
                 }
-                catch (hpx::thread_interrupted const&) {
+                catch (hpx::thread_interrupted const&) { //-V565
                     /* swallow this exception */
                 }
                 catch (hpx::exception const& e) {

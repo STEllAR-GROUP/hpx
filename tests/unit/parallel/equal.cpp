@@ -22,7 +22,7 @@ void test_equal1(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> c1(3);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand();
+    std::size_t first_value = std::rand(); //-V101
     std::iota(boost::begin(c1), boost::end(c1), first_value);
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 
@@ -39,7 +39,7 @@ void test_equal1(ExPolicy const& policy, IteratorTag)
     }
 
     {
-        ++c1[std::rand() % c1.size()];
+        ++c1[std::rand() % c1.size()]; //-V104
         bool result = hpx::parallel::equal(policy,
             iterator(boost::begin(c1)), iterator(boost::end(c1)),
             boost::begin(c2));
@@ -61,7 +61,7 @@ void test_equal1_async(ExPolicy const& p, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand();
+    std::size_t first_value = std::rand(); //-V101
     std::iota(boost::begin(c1), boost::end(c1), first_value);
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 
@@ -80,7 +80,7 @@ void test_equal1_async(ExPolicy const& p, IteratorTag)
     }
 
     {
-        ++c1[std::rand() % c1.size()];
+        ++c1[std::rand() % c1.size()]; //-V104
 
         hpx::future<bool> result =
             hpx::parallel::equal(p,
@@ -135,7 +135,7 @@ void test_equal2(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand();
+    std::size_t first_value = std::rand(); //-V101
     std::iota(boost::begin(c1), boost::end(c1), first_value);
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 
@@ -152,7 +152,7 @@ void test_equal2(ExPolicy const& policy, IteratorTag)
     }
 
     {
-        ++c1[std::rand() % c1.size()];
+        ++c1[std::rand() % c1.size()]; //-V104
         bool result = hpx::parallel::equal(policy,
             iterator(boost::begin(c1)), iterator(boost::end(c1)),
             boost::begin(c2), std::equal_to<std::size_t>());
@@ -174,7 +174,7 @@ void test_equal2_async(ExPolicy const& p, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand();
+    std::size_t first_value = std::rand(); //-V101
     std::iota(boost::begin(c1), boost::end(c1), first_value);
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 
@@ -193,7 +193,7 @@ void test_equal2_async(ExPolicy const& p, IteratorTag)
     }
 
     {
-        ++c1[std::rand() % c1.size()];
+        ++c1[std::rand() % c1.size()]; //-V104
 
         hpx::future<bool> result =
             hpx::parallel::equal(p,
@@ -248,7 +248,7 @@ void test_equal_exception(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand();
+    std::size_t first_value = std::rand(); //-V101
     std::iota(boost::begin(c1), boost::end(c1), first_value);
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 
@@ -283,7 +283,7 @@ void test_equal_exception_async(ExPolicy const& p, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand();
+    std::size_t first_value = std::rand(); //-V101
     std::iota(boost::begin(c1), boost::end(c1), first_value);
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 
@@ -354,7 +354,7 @@ void test_equal_bad_alloc(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand();
+    std::size_t first_value = std::rand(); //-V101
     std::iota(boost::begin(c1), boost::end(c1), first_value);
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 
@@ -388,7 +388,7 @@ void test_equal_bad_alloc_async(ExPolicy const& p, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand();
+    std::size_t first_value = std::rand(); //-V101
     std::iota(boost::begin(c1), boost::end(c1), first_value);
     std::iota(boost::begin(c2), boost::end(c2), first_value);
 

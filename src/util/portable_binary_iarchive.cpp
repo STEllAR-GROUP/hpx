@@ -69,7 +69,7 @@ void portable_binary_iarchive::load_impl(boost::int64_t& l, char const maxsize)
     bool negative;
     this->primitive_base_t::load(negative);
 
-    char* cptr = reinterpret_cast<char *>(&l);
+    char* cptr = reinterpret_cast<char *>(&l); //-V206
 #ifdef BOOST_BIG_ENDIAN
     cptr += (sizeof(boost::int64_t) - size);
 #endif
@@ -100,7 +100,7 @@ void portable_binary_iarchive::load_impl(boost::uint64_t& ul, char const maxsize
         BOOST_THROW_EXCEPTION(portable_binary_iarchive_exception());
     }
 
-    char* cptr = reinterpret_cast<char *>(&ul);
+    char* cptr = reinterpret_cast<char *>(&ul); //-V206
 #ifdef BOOST_BIG_ENDIAN
     cptr += (sizeof(boost::uint64_t) - size);
 #endif

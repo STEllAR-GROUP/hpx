@@ -97,7 +97,7 @@ void test_uninitialized_fill_exception(ExPolicy const& policy, IteratorTag)
     std::vector<test::count_instances> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    boost::atomic<std::size_t> throw_after(std::rand() % c.size());
+    boost::atomic<std::size_t> throw_after(std::rand() % c.size()); //-V104
     test::count_instances::instance_count.store(0);
 
     bool caught_exception = false;
@@ -137,7 +137,7 @@ void test_uninitialized_fill_exception_async(ExPolicy const& p, IteratorTag)
     std::vector<test::count_instances> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    boost::atomic<std::size_t> throw_after(std::rand() % c.size());
+    boost::atomic<std::size_t> throw_after(std::rand() % c.size()); //-V104
     test::count_instances::instance_count.store(0);
 
     bool caught_exception = false;
@@ -213,7 +213,7 @@ void test_uninitialized_fill_bad_alloc(ExPolicy const& policy, IteratorTag)
     std::vector<test::count_instances> c(100007);
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    boost::atomic<std::size_t> throw_after(std::rand() % c.size());
+    boost::atomic<std::size_t> throw_after(std::rand() % c.size()); //-V104
     test::count_instances::instance_count.store(0);
 
     bool caught_bad_alloc = false;
@@ -252,7 +252,7 @@ void test_uninitialized_fill_bad_alloc_async(ExPolicy const& p, IteratorTag)
     std::vector<test::count_instances> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    boost::atomic<std::size_t> throw_after(std::rand() % c.size());
+    boost::atomic<std::size_t> throw_after(std::rand() % c.size()); //-V104
     test::count_instances::instance_count.store(0);
 
     bool caught_bad_alloc = false;

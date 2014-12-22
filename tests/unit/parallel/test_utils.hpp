@@ -88,6 +88,11 @@ namespace test
             ++instance_count;
         }
 
+        count_instances& operator=(count_instances const& rhs)
+        {
+            value_ = rhs.value_;
+        }
+
         ~count_instances()
         {
             --instance_count;

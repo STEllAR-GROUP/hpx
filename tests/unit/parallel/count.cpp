@@ -23,7 +23,7 @@ void test_count(ExPolicy const& policy, IteratorTag)
     //assure rand() does not evalulate to zero
     std::iota(boost::begin(c), boost::end(c), std::rand()+1);
 
-    std::size_t find_count = (std::rand() % 30) + 1;
+    std::size_t find_count = (std::rand() % 30) + 1; //-V101
     for (std::size_t i = 0; i != find_count && i != c.size(); ++i)
     {
         c[i] = 0;
@@ -46,7 +46,7 @@ void test_count_async(ExPolicy const& p, IteratorTag)
     //assure rand() does not evaluate to zero
     std::iota(boost::begin(c), boost::end(c), std::rand()+1);
 
-    std::size_t find_count = (std::rand() % 30) + 1;
+    std::size_t find_count = (std::rand() % 30) + 1; //-V101
     for (std::size_t i = 0; i != find_count && i != c.size(); ++i)
     {
         c[i] = 0;
