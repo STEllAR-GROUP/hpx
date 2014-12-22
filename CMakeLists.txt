@@ -14,7 +14,7 @@ cmake_minimum_required(VERSION 2.8.10 FATAL_ERROR)
 
 # explicitly set certain policies
 cmake_policy(VERSION 2.8.10)
-if(NOT(CMAKE_MAJOR VERSION_LESS 3.1))
+if(NOT(CMAKE_VERSION VERSION_LESS 3.1.0))
   cmake_policy(SET CMP0054 OLD)
 endif()
 
