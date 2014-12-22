@@ -17,12 +17,13 @@
 HPX_REGISTER_VECTOR(double);
 HPX_REGISTER_VECTOR(int);
 
-struct pfo
+struct multiply
 {
     template <typename T>
-    void operator()(T& val) const
+    T operator()(hpx::util::tuple<T, T> const& r) const
     {
-        ++val;
+        using hpx::util::get;
+        return get<0>(r) * get<1>(r);
     }
 };
 
@@ -32,20 +33,11 @@ T test_transform_reduce(ExPolicy && policy, hpx::vector<T> const& xvalues,
     hpx::vector<T> const& yvalues)
 {
     using hpx::util::make_zip_iterator;
-    using hpx::util::tuple;
-    using hpx::util::get;
-
     return
-        hpx::parallel::transform_reduce(
-            policy,
+        hpx::parallel::transform_reduce(policy,
             make_zip_iterator(boost::begin(xvalues), boost::begin(yvalues)),
             make_zip_iterator(boost::end(xvalues), boost::end(yvalues)),
-            T(0),
-            std::plus<T>(),
-            [](tuple<T, T> const& r)
-            {
-                return get<0>(r) * get<1>(r);
-            }
+            T(0), std::plus<T>(), multiply()
         );
 }
 
