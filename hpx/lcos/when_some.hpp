@@ -198,7 +198,7 @@ namespace hpx
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/detail/pp_strip_parens.hpp>
+#include <hpx/traits/acquire_future.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/enable_shared_from_this.hpp>
@@ -265,26 +265,6 @@ namespace hpx { namespace lcos
 
     namespace detail
     {
-        template <typename Future>
-        struct when_acquire_future
-        {
-            typedef Future result_type;
-
-            template <typename R>
-            BOOST_FORCEINLINE hpx::future<R>
-            operator()(hpx::future<R>& future) const
-            {
-                return std::move(future);
-            }
-
-            template <typename R>
-            BOOST_FORCEINLINE hpx::shared_future<R>
-            operator()(hpx::shared_future<R>& future) const
-            {
-                return future;
-            }
-        };
-
         ///////////////////////////////////////////////////////////////////////
         template <typename Sequence>
         struct when_some;
@@ -450,7 +430,7 @@ namespace hpx { namespace lcos
         lazy_values_.reserve(lazy_values.size());
         std::transform(lazy_values.begin(), lazy_values.end(),
             std::back_inserter(lazy_values_),
-            detail::when_acquire_future<Future>());
+            traits::acquire_future_disp());
 
         boost::shared_ptr<detail::when_some<result_type> > f =
             boost::make_shared<detail::when_some<result_type> >(
@@ -486,7 +466,7 @@ namespace hpx { namespace lcos
 
         result_type lazy_values_;
         std::transform(begin, end, std::back_inserter(lazy_values_),
-            detail::when_acquire_future<future_type>());
+            traits::acquire_future_disp());
 
         return lcos::when_some(n, lazy_values_, ec);
     }
@@ -506,7 +486,7 @@ namespace hpx { namespace lcos
         result_type lazy_values_;
         lazy_values_.reserve(count);
 
-        detail::when_acquire_future<future_type> func;
+        traits::acquire_future_disp func;
         for (std::size_t i = 0; i != count; ++i)
             lazy_values_.push_back(func(*begin++));
 
@@ -567,10 +547,10 @@ namespace hpx
 #define N BOOST_PP_ITERATION()
 
 #define HPX_WHEN_SOME_DECAY_FUTURE(Z, N, D)                                   \
-    typename util::decay<BOOST_PP_CAT(T, N)>::type                            \
+    typename traits::acquire_future<BOOST_PP_CAT(T, N)>::type                 \
     /**/
 #define HPX_WHEN_SOME_ACQUIRE_FUTURE(Z, N, D)                                 \
-    detail::when_acquire_future<BOOST_PP_CAT(T, N)>()(BOOST_PP_CAT(f, N))     \
+    traits::acquire_future_disp()(BOOST_PP_CAT(f, N))                         \
     /**/
 
 namespace hpx { namespace lcos

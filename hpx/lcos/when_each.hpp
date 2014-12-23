@@ -182,7 +182,7 @@ namespace hpx { namespace lcos
 
         std::transform(lazy_values.begin(), lazy_values.end(),
             std::back_inserter(lazy_values_),
-            detail::when_acquire_future<Future>());
+            traits::acquire_future_disp());
 
         boost::shared_ptr<when_each_type> f =
             boost::make_shared<when_each_type>(std::move(lazy_values_),
@@ -222,7 +222,7 @@ namespace hpx { namespace lcos
 
         std::vector<future_type> lazy_values_;
         std::transform(begin, end, std::back_inserter(lazy_values_),
-            detail::when_acquire_future<future_type>());
+            traits::acquire_future_disp());
 
         return lcos::when_each(lazy_values_, std::forward<F>(f)).then(
             util::bind(&detail::return_iterator<Iterator>,
@@ -239,7 +239,8 @@ namespace hpx { namespace lcos
 
         std::vector<future_type> lazy_values_;
         lazy_values_.reserve(count);
-        detail::when_acquire_future<future_type> func;
+
+        traits::acquire_future_disp func;
         for (std::size_t i = 0; i != count; ++i)
             lazy_values_.push_back(func(*begin++));
 
@@ -289,10 +290,10 @@ namespace hpx
 #define N BOOST_PP_ITERATION()
 
 #define HPX_WHEN_EACH_DECAY_FUTURE(Z, N, D)                                   \
-    typename util::decay<BOOST_PP_CAT(T, N)>::type                            \
+    typename traits::acquire_future<BOOST_PP_CAT(T, N)>::type                 \
     /**/
 #define HPX_WHEN_EACH_ACQUIRE_FUTURE(Z, N, D)                                 \
-    detail::when_acquire_future<BOOST_PP_CAT(T, N)>()(BOOST_PP_CAT(f, N))     \
+    traits::acquire_future_disp()(BOOST_PP_CAT(f, N))                         \
     /**/
 
 namespace hpx { namespace lcos

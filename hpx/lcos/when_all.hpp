@@ -143,6 +143,7 @@ namespace hpx
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/traits/acquire_future.hpp>
 
 #include <boost/mpl/bool.hpp>
 #include <boost/fusion/include/begin.hpp>
@@ -368,7 +369,7 @@ namespace hpx { namespace lcos
 
         std::transform(boost::begin(values), boost::end(values),
             std::back_inserter(values_),
-            detail::when_acquire_future<future_type>());
+            traits::acquire_future_disp());
 
         return lcos::when_all(std::move(values_));
     }
@@ -385,7 +386,7 @@ namespace hpx { namespace lcos
 
         result_type values;
         std::transform(begin, end, std::back_inserter(values),
-            detail::when_acquire_future<future_type>());
+            traits::acquire_future_disp());
 
         return lcos::when_all(std::move(values));
     }
@@ -411,7 +412,7 @@ namespace hpx { namespace lcos
         result_type values;
         values.reserve(count);
 
-        detail::when_acquire_future<future_type> func;
+        traits::acquire_future_disp func;
         for (std::size_t i = 0; i != count; ++i)
             values.push_back(func(*begin++));
 
@@ -428,10 +429,10 @@ namespace hpx { namespace lcos
 #endif
 
 #define HPX_WHEN_ALL_DECAY_FUTURE(Z, N, D)                                    \
-    typename util::decay<BOOST_PP_CAT(T, N)>::type                            \
+    typename traits::acquire_future<BOOST_PP_CAT(T, N)>::type                 \
     /**/
 #define HPX_WHEN_ALL_ACQUIRE_FUTURE(Z, N, D)                                  \
-    detail::when_acquire_future<BOOST_PP_CAT(T, N)>()(BOOST_PP_CAT(f, N))     \
+    traits::acquire_future_disp()(BOOST_PP_CAT(f, N))                         \
     /**/
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
