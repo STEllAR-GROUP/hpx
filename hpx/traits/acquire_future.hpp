@@ -82,6 +82,12 @@ namespace hpx { namespace traits
         {
             return future;
         }
+
+        BOOST_FORCEINLINE hpx::shared_future<R>
+        operator()(hpx::shared_future<R>&& future) const
+        {
+            return future;
+        }
     };
 
     template <typename Range>
