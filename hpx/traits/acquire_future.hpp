@@ -64,6 +64,12 @@ namespace hpx { namespace traits
         {
             return std::move(future);
         }
+
+        BOOST_FORCEINLINE hpx::future<R>
+        operator()(hpx::future<R>&& future) const
+        {
+            return std::move(future);
+        }
     };
 
     template <typename R>
