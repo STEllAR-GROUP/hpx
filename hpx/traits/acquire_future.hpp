@@ -78,13 +78,7 @@ namespace hpx { namespace traits
         typedef hpx::shared_future<R> type;
 
         BOOST_FORCEINLINE hpx::shared_future<R>
-        operator()(hpx::shared_future<R>& future) const
-        {
-            return future;
-        }
-
-        BOOST_FORCEINLINE hpx::shared_future<R>
-        operator()(hpx::shared_future<R>&& future) const
+        operator()(hpx::shared_future<R> future) const
         {
             return future;
         }
