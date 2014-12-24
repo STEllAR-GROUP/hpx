@@ -979,7 +979,7 @@ namespace hpx
         }
 
         vector(vector && rhs)
-          : base_type(std::move(rhs))
+          : base_type(std::move(rhs)),
             size_(rhs.size_),
             block_size_(rhs.block_size_),
             partition_size_(rhs.partition_size_),
