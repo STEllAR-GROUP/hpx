@@ -105,7 +105,7 @@ namespace hpx { namespace traits
 
         template <typename Range_>
         BOOST_FORCEINLINE std::vector<future_type>
-        operator()(Range_& futures) const
+        operator()(Range_&& futures) const
         {
             std::vector<future_type> values;
             std::transform(boost::begin(futures), boost::end(futures),
