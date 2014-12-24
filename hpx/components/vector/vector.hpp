@@ -969,7 +969,8 @@ namespace hpx
         /// Copy construction performs a deep copy of the right hand side
         /// vector.
         vector(vector const& rhs)
-          : size_(0),
+          : base_type(),
+            size_(0),
             block_size_(1),
             policy_(vector_distribution_policy::block)
         {
@@ -978,7 +979,8 @@ namespace hpx
         }
 
         vector(vector && rhs)
-          : size_(rhs.size_),
+          : base_type(std::move(rhs))
+            size_(rhs.size_),
             block_size_(rhs.block_size_),
             partition_size_(rhs.partition_size_),
             partitions_(std::move(rhs.partitions_)),
@@ -1028,6 +1030,8 @@ namespace hpx
         {
             if (this != &rhs)
             {
+                this->base_type::operator=(std::move(rhs));
+
                 size_ = rhs.size_;
                 block_size_ = rhs.block_size_;
                 partition_size_ = rhs.partition_size_;
