@@ -18,6 +18,7 @@ set(tests
     vector_for_each
     vector_copy
     vector_handle_values
+    vector_move
     vector_transform_reduce
     vector
    )
