@@ -132,7 +132,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
             typedef typename traits::local_iterator local_iterator_type;
-            typedef detail::algorithm_result<ExPolicy> result;
+            typedef detail::algorithm_result<ExPolicy, T> result;
 
             typedef typename std::iterator_traits<SegIter>::iterator_category
                 iterator_category;
@@ -143,7 +143,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
 
-            std::vector<future<T> > segments;
+            std::vector<shared_future<T> > segments;
             segments.reserve(std::distance(sit, send));
 
             if (sit == send)
@@ -210,7 +210,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             return result::get(
-                dataflow(
+                lcos::local::dataflow(
                     hpx::util::unwrapped([=](std::vector<T> && r)
                     {
                         return std::accumulate(r.begin(), r.end(), init, red_op);

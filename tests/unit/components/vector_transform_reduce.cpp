@@ -37,7 +37,7 @@ T test_transform_reduce(ExPolicy && policy, hpx::vector<T> const& xvalues,
         hpx::parallel::transform_reduce(policy,
             make_zip_iterator(boost::begin(xvalues), boost::begin(yvalues)),
             make_zip_iterator(boost::end(xvalues), boost::end(yvalues)),
-            T(0), std::plus<T>(), multiply()
+            multiply(), T(0), std::plus<T>()
         );
 }
 
@@ -52,6 +52,9 @@ void transform_reduce_tests()
 
         HPX_TEST_EQ(
             test_transform_reduce(hpx::parallel::seq, xvalues, yvalues),
+            T(num));
+        HPX_TEST_EQ(
+            test_transform_reduce(hpx::parallel::par, xvalues, yvalues),
             T(num));
     }
 }

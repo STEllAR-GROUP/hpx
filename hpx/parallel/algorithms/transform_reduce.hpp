@@ -67,8 +67,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 if (first == last)
                 {
+                    T init_ = init;
                     return detail::algorithm_result<ExPolicy, T>::get(
-                        std::forward<T_>(init));
+                        std::move(init_));
                 }
 
                 typedef typename std::iterator_traits<FwdIter>::reference
@@ -160,21 +161,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
-    /// \param red_op       Specifies the function (or function object) which
-    ///                     will be invoked for each of the values returned
-    ///                     from the invocation of \a conv_op. This is a
-    ///                     binary predicate. The signature of this predicate
-    ///                     should be equivalent to:
-    ///                     \code
-    ///                     Ret fun(const Type1 &a, const Type2 &b);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
-    ///                     the function must not modify the objects passed to
-    ///                     it.
-    ///                     The types \a Type1, \a Type2, and \a Ret must be
-    ///                     such that an object of a type as returned from
-    ///                     \a conv_op can be implicitly converted to any
-    ///                     of those types.
     /// \param conv_op      Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
     ///                     sequence specified by [first, last). This is a
@@ -191,6 +177,21 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     The type \a R must be such that an object of this
     ///                     type can be implicitly converted to \a T.
     /// \param init         The initial value for the generalized sum.
+    /// \param red_op       Specifies the function (or function object) which
+    ///                     will be invoked for each of the values returned
+    ///                     from the invocation of \a conv_op. This is a
+    ///                     binary predicate. The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     Ret fun(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it.
+    ///                     The types \a Type1, \a Type2, and \a Ret must be
+    ///                     such that an object of a type as returned from
+    ///                     \a conv_op can be implicitly converted to any
+    ///                     of those types.
     ///
     /// The reduce operations in the parallel \a transform_reduce algorithm invoked
     /// with an execution policy object of type \a sequential_execution_policy
@@ -227,8 +228,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         is_execution_policy<ExPolicy>,
         typename detail::algorithm_result<ExPolicy, T>::type
     >::type
-    transform_reduce(ExPolicy&& policy, InIter first, InIter last, T init,
-        Reduce && red_op, Convert && conv_op)
+    transform_reduce(ExPolicy&& policy, InIter first, InIter last,
+        Convert && conv_op, T init, Reduce && red_op)
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
             iterator_category;
