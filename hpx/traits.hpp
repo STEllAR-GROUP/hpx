@@ -138,8 +138,8 @@ namespace hpx { namespace traits
     template <typename Iterator, typename Enable = void>
     struct segmented_iterator_traits;
 
-    template <typename T, typename Enable = void>
-    struct map_to_local_iterator;
+    template <typename Iterator, typename Enable = void>
+    struct segmented_local_iterator_traits;
 }}
 
 #endif

@@ -409,7 +409,7 @@ namespace hpx
         std::size_t get_partition(size_type global_index) const
         {
             if (global_index == size_)
-                return std::size_t(-1);
+                return partitions_.size();
 
             switch (policy_)
             {
@@ -451,7 +451,7 @@ namespace hpx
             default:
                 break;
             }
-            return std::size_t(-1);
+            return partitions_.size();
         }
 
         // Return the local index inside the segment corresponding to the
@@ -531,9 +531,12 @@ namespace hpx
         {
             std::size_t part_size = partition_size_;
             if (part_size == 0)
-                return std::size_t(-1);
+                return size_;
 
             std::size_t segment = it.base() - partitions_.cbegin();
+            if (segment == partitions_.size())
+                return size_;
+
             return get_global_index(segment, part_size, local_index, policy);
         }
 
@@ -554,9 +557,15 @@ namespace hpx
         // based on the given global index.
         local_iterator get_local_iterator(size_type global_index) const
         {
+            HPX_ASSERT(global_index != std::size_t(-1));
+
             std::size_t part = get_partition(global_index);
-            if (part == std::size_t(-1))
-                return local_iterator();
+            if (part == partitions_.size())
+            {
+                // return an iterator to the end of the last partition
+                return local_iterator(partitions_.back().partition_,
+                    partitions_.back().size_, partitions_.back().local_data_);
+            }
 
             std::size_t local_index = get_local_index(global_index);
             HPX_ASSERT(local_index != std::size_t(-1));
@@ -567,9 +576,15 @@ namespace hpx
 
         const_local_iterator get_const_local_iterator(size_type global_index) const
         {
+            HPX_ASSERT(global_index != std::size_t(-1));
+
             std::size_t part = get_partition(global_index);
-            if (part == std::size_t(-1))
-                return const_local_iterator();
+            if (part == partitions_.size())
+            {
+                // return an iterator to the end of the last partition
+                return const_local_iterator(partitions_.back().partition_,
+                    partitions_.back().size_, partitions_.back().local_data_);
+            }
 
             std::size_t local_index = get_local_index(global_index);
             HPX_ASSERT(local_index != std::size_t(-1));
@@ -583,7 +598,7 @@ namespace hpx
         segment_iterator get_segment_iterator(size_type global_index)
         {
             std::size_t part = get_partition(global_index);
-            if (part == std::size_t(-1) || part == partitions_.size())
+            if (part == partitions_.size())
                 return segment_iterator(partitions_.end());
 
             return segment_iterator(partitions_.begin() + part, this);
@@ -593,7 +608,7 @@ namespace hpx
             size_type global_index) const
         {
             std::size_t part = get_partition(global_index);
-            if (part == std::size_t(-1))
+            if (part == partitions_.size())
                 return const_segment_iterator(partitions_.cend());
 
             return const_segment_iterator(partitions_.cbegin() + part, this);

@@ -13,7 +13,6 @@
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/serialize_sequence.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/traits/map_to_local_iterator.hpp>
 
 #include <boost/fusion/algorithm/iteration/for_each.hpp>
 #include <boost/iterator/iterator_facade.hpp>
@@ -719,15 +718,6 @@ namespace hpx { namespace traits
                     >::call(seg_iter));
         }
 
-        // Extract base iterator from local_iterator
-        static local_raw_iterator base(local_iterator const& iter)
-        {
-            return local_raw_iterator(
-                functional::lift_zipped_iterators<
-                        functional::get_base_iterator, iterator
-                    >::call(iter));
-        }
-
         // Extract the base id for the segment referenced by the given segment
         // iterator.
         static id_type get_id(segment_iterator const& iter)
@@ -742,23 +732,32 @@ namespace hpx { namespace traits
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    // Some 'remote' iterators need to be mapped before being applied to the
-    // local algorithms.
     template <typename ...Ts>
-    struct map_to_local_iterator<
+    struct segmented_local_iterator_traits<
         util::zip_iterator<Ts...>,
         typename boost::enable_if<
-            typename segmented_iterator_traits<
-                util::zip_iterator<Ts...>
-            >::is_segmented_iterator
+            typename functional::all_of<
+                typename segmented_local_iterator_traits<Ts>::is_segmented_local_iterator...
+            >::type
         >::type>
     {
-        typedef segmented_iterator_traits<util::zip_iterator<Ts...> > traits;
+        typedef boost::mpl::true_ is_segmented_local_iterator;
 
-        static typename traits::local_raw_iterator
-        call(util::zip_iterator<Ts...> const& iter)
+        typedef util::zip_iterator<
+                typename segmented_local_iterator_traits<Ts>::iterator...
+            > iterator;
+        typedef util::zip_iterator<Ts...> local_iterator;
+        typedef util::zip_iterator<
+                typename segmented_local_iterator_traits<Ts>::local_raw_iterator...
+            > local_raw_iterator;
+
+        // Extract base iterator from local_iterator
+        static local_raw_iterator base(local_iterator const& iter)
         {
-            return traits::base(iter);
+            return local_raw_iterator(
+                functional::lift_zipped_iterators<
+                        functional::get_base_iterator, iterator
+                    >::call(iter));
         }
     };
 }}

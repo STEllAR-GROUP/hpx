@@ -17,6 +17,23 @@ namespace hpx { namespace traits
     {
         typedef boost::mpl::false_ is_segmented_iterator;
     };
+
+    // traits allowing to distinguish iterators which have a purely local
+    // representation
+    template <typename Iterator, typename Enable>
+    struct segmented_local_iterator_traits
+    {
+        typedef boost::mpl::false_ is_segmented_local_iterator;
+
+        typedef Iterator iterator;
+        typedef Iterator local_iterator;
+        typedef Iterator local_raw_iterator;
+
+        static local_raw_iterator const& base(local_iterator const& it)
+        {
+            return it;
+        }
+    };
 }}
 
 #endif

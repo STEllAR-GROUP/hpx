@@ -9,7 +9,6 @@
 #define HPX_PARALLEL_ALGORITHM_REMOTE_DISPATCH_OCT_15_2014_0938PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/traits/map_to_local_iterator.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/util/decay.hpp>
@@ -30,8 +29,8 @@
 #define HPX_DISPATCH_ARG(Z, N, D) BOOST_PP_CAT(D, N) const&                   \
     /**/
 #define HPX_MAP_TO_LOCAL_ITERATOR(Z, N, D)                                    \
-    ::hpx::traits::map_to_local_iterator<                                     \
-        BOOST_PP_CAT(Arg, N)>::call(BOOST_PP_CAT(arg, N))                     \
+    ::hpx::traits::segmented_local_iterator_traits<                           \
+        BOOST_PP_CAT(Arg, N)>::base(BOOST_PP_CAT(arg, N))                     \
     /**/
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
