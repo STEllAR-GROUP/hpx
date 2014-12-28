@@ -8,7 +8,10 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <hpx/include/parallel_for_each.hpp>
+#include <hpx/include/parallel_count.hpp>
+
 #include <hpx/parallel/segmented_algorithms/for_each.hpp>
+#include <hpx/parallel/segmented_algorithms/count.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
@@ -24,9 +27,29 @@ struct pfo
     }
 };
 
-///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-void verify_values(hpx::vector<T> const& v, T const& val)
+struct cmp
+{
+    cmp(T const& val = T()) : value_(val) {}
+
+    template <typename T>
+    bool operator()(T const& val) const
+    {
+        return val == value_;
+    }
+
+    T value_;
+
+    template <typename Archive>
+    void serialize(Archive& ar, unsigned version)
+    {
+        ar & value_;
+    }
+};
+
+///////////////////////////////////////////////////////////////////////////////
+template <typename ExPolicy, typename T>
+void verify_values(ExPolicy && policy, hpx::vector<T> const& v, T const& val)
 {
     typedef typename hpx::vector<T>::const_iterator const_iterator;
 
@@ -42,21 +65,54 @@ void verify_values(hpx::vector<T> const& v, T const& val)
 }
 
 template <typename ExPolicy, typename T>
+void verify_values_count(ExPolicy && policy, hpx::vector<T> const& v, T const& val)
+{
+    HPX_TEST_EQ(
+        std::size_t(hpx::parallel::count(
+            policy, v.begin(), v.end(), val)),
+        v.size());
+    HPX_TEST_EQ(
+        std::size_t(hpx::parallel::count_if(
+            policy, v.begin(), v.end(), cmp<T>(val))),
+        v.size());
+}
+
+template <typename ExPolicy, typename T>
 void test_for_each(ExPolicy && policy, hpx::vector<T>& v, T val)
 {
-    hpx::parallel::for_each(hpx::parallel::seq, v.begin(), v.end(), pfo());
-    verify_values(v, ++val);
+    verify_values(policy, v, val);
+    verify_values_count(policy, v, val);
 
-    hpx::parallel::for_each(hpx::parallel::par, v.begin(), v.end(), pfo());
-    verify_values(v, ++val);
+    hpx::parallel::for_each(policy, v.begin(), v.end(), pfo());
 
-    hpx::parallel::for_each(hpx::parallel::seq(hpx::parallel::task),
-        v.begin(), v.end(), pfo()).get();
-    verify_values(v, ++val);
+    verify_values(policy, v, ++val);
+    verify_values_count(policy, v, val);
+}
 
-    hpx::parallel::for_each(hpx::parallel::par(hpx::parallel::task),
-        v.begin(), v.end(), pfo()).get();
-    verify_values(v, ++val);
+template <typename ExPolicy, typename T>
+void verify_values_count_async(ExPolicy && policy, hpx::vector<T> const& v,
+    T const& val)
+{
+    HPX_TEST_EQ(
+        std::size_t(hpx::parallel::count(
+            policy, v.begin(), v.end(), val).get()),
+        v.size());
+    HPX_TEST_EQ(
+        std::size_t(hpx::parallel::count_if(
+            policy, v.begin(), v.end(), cmp<T>(val)).get()),
+        v.size());
+}
+
+template <typename ExPolicy, typename T>
+void test_for_each_async(ExPolicy && policy, hpx::vector<T>& v, T val)
+{
+    verify_values(policy, v, val);
+    verify_values_count_async(policy, v, val);
+
+    hpx::parallel::for_each(policy, v.begin(), v.end(), pfo()).get();
+
+    verify_values(policy, v, ++val);
+    verify_values_count_async(policy, v, val);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -78,22 +134,10 @@ void for_each_tests()
     {
         hpx::vector<T> v(length, T(0));
         test_for_each(hpx::parallel::seq, v, T(0));
-        test_for_each(hpx::parallel::par, v, T(4)); //-V112
-        test_for_each(hpx::parallel::seq(hpx::parallel::task), v, T(8));
-        test_for_each(hpx::parallel::par(hpx::parallel::task), v, T(12));
+        test_for_each(hpx::parallel::par, v, T(1));
+        test_for_each_async(hpx::parallel::seq(hpx::parallel::task), v, T(2));
+        test_for_each_async(hpx::parallel::par(hpx::parallel::task), v, T(3));
     }
-
-//     {
-//         hpx::vector<T> v(length);
-//
-//         HPX_TEST_EQ(
-//             hpx::parallel::count(hpx::parallel::seq, v.begin(), v.end(), T(0)),
-//             length);
-//         hpx::parallel::for_each(hpx::parallel::seq, v.begin(), v.end(), pfo());
-//         HPX_TEST_EQ(
-//             hpx::parallel::count(hpx::parallel::seq, v.begin(), v.end(), T(1)),
-//             length);
-//     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
