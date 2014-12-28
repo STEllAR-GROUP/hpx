@@ -21,7 +21,7 @@ namespace hpx { namespace lcos { namespace local
             BOOST_SCOPED_ENUM(launch)
           , typename hpx::util::decay<Func>::type
           , hpx::util::tuple<
-                typename util::decay<F0>::type
+                typename hpx::traits::acquire_future<F0>::type
             >
         >
     >::type
@@ -36,14 +36,15 @@ namespace hpx { namespace lcos { namespace local
                 BOOST_SCOPED_ENUM(launch)
               , typename hpx::util::decay<Func>::type
               , hpx::util::tuple<
-                    typename util::decay<F0>::type
+                    typename hpx::traits::acquire_future<F0>::type
                 >
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 std::forward<Policy>(policy)
               , std::forward<Func>(func)
-              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ))
+              , hpx::util::forward_as_tuple(
+                    hpx::traits::acquire_future_disp()( std::forward<F0>(f0)))
             ));
         p->await();
         using traits::future_access;
@@ -59,7 +60,7 @@ namespace hpx { namespace lcos { namespace local
             threads::executor
           , typename hpx::util::decay<Func>::type
           , hpx::util::tuple<
-                typename util::decay<F0>::type
+                typename hpx::traits::acquire_future<F0>::type
             >
         >
     >::type
@@ -74,14 +75,15 @@ namespace hpx { namespace lcos { namespace local
                 threads::executor
               , typename hpx::util::decay<Func>::type
               , hpx::util::tuple<
-                    typename util::decay<F0>::type
+                    typename hpx::traits::acquire_future<F0>::type
                 >
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 std::forward<Executor>(sched)
               , std::forward<Func>(func)
-              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ))
+              , hpx::util::forward_as_tuple(
+                    hpx::traits::acquire_future_disp()( std::forward<F0>(f0)))
             ));
         p->await();
         using traits::future_access;
@@ -97,7 +99,7 @@ namespace hpx { namespace lcos { namespace local
             BOOST_SCOPED_ENUM(launch)
           , typename hpx::util::decay<Func>::type
           , hpx::util::tuple<
-                typename util::decay<F0>::type
+                typename hpx::traits::acquire_future<F0>::type
             >
         >
     >::type
@@ -108,14 +110,15 @@ namespace hpx { namespace lcos { namespace local
                 BOOST_SCOPED_ENUM(launch)
               , typename hpx::util::decay<Func>::type
               , hpx::util::tuple<
-                    typename util::decay<F0>::type
+                    typename hpx::traits::acquire_future<F0>::type
                 >
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 launch::all
               , std::forward<Func>(func)
-              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ))
+              , hpx::util::forward_as_tuple(
+                    hpx::traits::acquire_future_disp()( std::forward<F0>(f0)))
             ));
         p->await();
         using traits::future_access;
@@ -135,7 +138,7 @@ namespace hpx { namespace lcos { namespace local
             BOOST_SCOPED_ENUM(launch)
           , typename hpx::util::decay<Func>::type
           , hpx::util::tuple<
-                typename util::decay<F0>::type , typename util::decay<F1>::type
+                typename hpx::traits::acquire_future<F0>::type , typename hpx::traits::acquire_future<F1>::type
             >
         >
     >::type
@@ -150,14 +153,15 @@ namespace hpx { namespace lcos { namespace local
                 BOOST_SCOPED_ENUM(launch)
               , typename hpx::util::decay<Func>::type
               , hpx::util::tuple<
-                    typename util::decay<F0>::type , typename util::decay<F1>::type
+                    typename hpx::traits::acquire_future<F0>::type , typename hpx::traits::acquire_future<F1>::type
                 >
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 std::forward<Policy>(policy)
               , std::forward<Func>(func)
-              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ))
+              , hpx::util::forward_as_tuple(
+                    hpx::traits::acquire_future_disp()( std::forward<F0>(f0)) , hpx::traits::acquire_future_disp()( std::forward<F1>(f1)))
             ));
         p->await();
         using traits::future_access;
@@ -173,7 +177,7 @@ namespace hpx { namespace lcos { namespace local
             threads::executor
           , typename hpx::util::decay<Func>::type
           , hpx::util::tuple<
-                typename util::decay<F0>::type , typename util::decay<F1>::type
+                typename hpx::traits::acquire_future<F0>::type , typename hpx::traits::acquire_future<F1>::type
             >
         >
     >::type
@@ -188,14 +192,15 @@ namespace hpx { namespace lcos { namespace local
                 threads::executor
               , typename hpx::util::decay<Func>::type
               , hpx::util::tuple<
-                    typename util::decay<F0>::type , typename util::decay<F1>::type
+                    typename hpx::traits::acquire_future<F0>::type , typename hpx::traits::acquire_future<F1>::type
                 >
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 std::forward<Executor>(sched)
               , std::forward<Func>(func)
-              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ))
+              , hpx::util::forward_as_tuple(
+                    hpx::traits::acquire_future_disp()( std::forward<F0>(f0)) , hpx::traits::acquire_future_disp()( std::forward<F1>(f1)))
             ));
         p->await();
         using traits::future_access;
@@ -211,7 +216,7 @@ namespace hpx { namespace lcos { namespace local
             BOOST_SCOPED_ENUM(launch)
           , typename hpx::util::decay<Func>::type
           , hpx::util::tuple<
-                typename util::decay<F0>::type , typename util::decay<F1>::type
+                typename hpx::traits::acquire_future<F0>::type , typename hpx::traits::acquire_future<F1>::type
             >
         >
     >::type
@@ -222,14 +227,15 @@ namespace hpx { namespace lcos { namespace local
                 BOOST_SCOPED_ENUM(launch)
               , typename hpx::util::decay<Func>::type
               , hpx::util::tuple<
-                    typename util::decay<F0>::type , typename util::decay<F1>::type
+                    typename hpx::traits::acquire_future<F0>::type , typename hpx::traits::acquire_future<F1>::type
                 >
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 launch::all
               , std::forward<Func>(func)
-              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ))
+              , hpx::util::forward_as_tuple(
+                    hpx::traits::acquire_future_disp()( std::forward<F0>(f0)) , hpx::traits::acquire_future_disp()( std::forward<F1>(f1)))
             ));
         p->await();
         using traits::future_access;
@@ -249,7 +255,7 @@ namespace hpx { namespace lcos { namespace local
             BOOST_SCOPED_ENUM(launch)
           , typename hpx::util::decay<Func>::type
           , hpx::util::tuple<
-                typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type
+                typename hpx::traits::acquire_future<F0>::type , typename hpx::traits::acquire_future<F1>::type , typename hpx::traits::acquire_future<F2>::type
             >
         >
     >::type
@@ -264,14 +270,15 @@ namespace hpx { namespace lcos { namespace local
                 BOOST_SCOPED_ENUM(launch)
               , typename hpx::util::decay<Func>::type
               , hpx::util::tuple<
-                    typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type
+                    typename hpx::traits::acquire_future<F0>::type , typename hpx::traits::acquire_future<F1>::type , typename hpx::traits::acquire_future<F2>::type
                 >
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 std::forward<Policy>(policy)
               , std::forward<Func>(func)
-              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ))
+              , hpx::util::forward_as_tuple(
+                    hpx::traits::acquire_future_disp()( std::forward<F0>(f0)) , hpx::traits::acquire_future_disp()( std::forward<F1>(f1)) , hpx::traits::acquire_future_disp()( std::forward<F2>(f2)))
             ));
         p->await();
         using traits::future_access;
@@ -287,7 +294,7 @@ namespace hpx { namespace lcos { namespace local
             threads::executor
           , typename hpx::util::decay<Func>::type
           , hpx::util::tuple<
-                typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type
+                typename hpx::traits::acquire_future<F0>::type , typename hpx::traits::acquire_future<F1>::type , typename hpx::traits::acquire_future<F2>::type
             >
         >
     >::type
@@ -302,14 +309,15 @@ namespace hpx { namespace lcos { namespace local
                 threads::executor
               , typename hpx::util::decay<Func>::type
               , hpx::util::tuple<
-                    typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type
+                    typename hpx::traits::acquire_future<F0>::type , typename hpx::traits::acquire_future<F1>::type , typename hpx::traits::acquire_future<F2>::type
                 >
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 std::forward<Executor>(sched)
               , std::forward<Func>(func)
-              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ))
+              , hpx::util::forward_as_tuple(
+                    hpx::traits::acquire_future_disp()( std::forward<F0>(f0)) , hpx::traits::acquire_future_disp()( std::forward<F1>(f1)) , hpx::traits::acquire_future_disp()( std::forward<F2>(f2)))
             ));
         p->await();
         using traits::future_access;
@@ -325,7 +333,7 @@ namespace hpx { namespace lcos { namespace local
             BOOST_SCOPED_ENUM(launch)
           , typename hpx::util::decay<Func>::type
           , hpx::util::tuple<
-                typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type
+                typename hpx::traits::acquire_future<F0>::type , typename hpx::traits::acquire_future<F1>::type , typename hpx::traits::acquire_future<F2>::type
             >
         >
     >::type
@@ -336,14 +344,15 @@ namespace hpx { namespace lcos { namespace local
                 BOOST_SCOPED_ENUM(launch)
               , typename hpx::util::decay<Func>::type
               , hpx::util::tuple<
-                    typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type
+                    typename hpx::traits::acquire_future<F0>::type , typename hpx::traits::acquire_future<F1>::type , typename hpx::traits::acquire_future<F2>::type
                 >
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 launch::all
               , std::forward<Func>(func)
-              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ))
+              , hpx::util::forward_as_tuple(
+                    hpx::traits::acquire_future_disp()( std::forward<F0>(f0)) , hpx::traits::acquire_future_disp()( std::forward<F1>(f1)) , hpx::traits::acquire_future_disp()( std::forward<F2>(f2)))
             ));
         p->await();
         using traits::future_access;
@@ -363,7 +372,7 @@ namespace hpx { namespace lcos { namespace local
             BOOST_SCOPED_ENUM(launch)
           , typename hpx::util::decay<Func>::type
           , hpx::util::tuple<
-                typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type
+                typename hpx::traits::acquire_future<F0>::type , typename hpx::traits::acquire_future<F1>::type , typename hpx::traits::acquire_future<F2>::type , typename hpx::traits::acquire_future<F3>::type
             >
         >
     >::type
@@ -378,14 +387,15 @@ namespace hpx { namespace lcos { namespace local
                 BOOST_SCOPED_ENUM(launch)
               , typename hpx::util::decay<Func>::type
               , hpx::util::tuple<
-                    typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type
+                    typename hpx::traits::acquire_future<F0>::type , typename hpx::traits::acquire_future<F1>::type , typename hpx::traits::acquire_future<F2>::type , typename hpx::traits::acquire_future<F3>::type
                 >
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 std::forward<Policy>(policy)
               , std::forward<Func>(func)
-              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ))
+              , hpx::util::forward_as_tuple(
+                    hpx::traits::acquire_future_disp()( std::forward<F0>(f0)) , hpx::traits::acquire_future_disp()( std::forward<F1>(f1)) , hpx::traits::acquire_future_disp()( std::forward<F2>(f2)) , hpx::traits::acquire_future_disp()( std::forward<F3>(f3)))
             ));
         p->await();
         using traits::future_access;
@@ -401,7 +411,7 @@ namespace hpx { namespace lcos { namespace local
             threads::executor
           , typename hpx::util::decay<Func>::type
           , hpx::util::tuple<
-                typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type
+                typename hpx::traits::acquire_future<F0>::type , typename hpx::traits::acquire_future<F1>::type , typename hpx::traits::acquire_future<F2>::type , typename hpx::traits::acquire_future<F3>::type
             >
         >
     >::type
@@ -416,14 +426,15 @@ namespace hpx { namespace lcos { namespace local
                 threads::executor
               , typename hpx::util::decay<Func>::type
               , hpx::util::tuple<
-                    typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type
+                    typename hpx::traits::acquire_future<F0>::type , typename hpx::traits::acquire_future<F1>::type , typename hpx::traits::acquire_future<F2>::type , typename hpx::traits::acquire_future<F3>::type
                 >
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 std::forward<Executor>(sched)
               , std::forward<Func>(func)
-              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ))
+              , hpx::util::forward_as_tuple(
+                    hpx::traits::acquire_future_disp()( std::forward<F0>(f0)) , hpx::traits::acquire_future_disp()( std::forward<F1>(f1)) , hpx::traits::acquire_future_disp()( std::forward<F2>(f2)) , hpx::traits::acquire_future_disp()( std::forward<F3>(f3)))
             ));
         p->await();
         using traits::future_access;
@@ -439,7 +450,7 @@ namespace hpx { namespace lcos { namespace local
             BOOST_SCOPED_ENUM(launch)
           , typename hpx::util::decay<Func>::type
           , hpx::util::tuple<
-                typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type
+                typename hpx::traits::acquire_future<F0>::type , typename hpx::traits::acquire_future<F1>::type , typename hpx::traits::acquire_future<F2>::type , typename hpx::traits::acquire_future<F3>::type
             >
         >
     >::type
@@ -450,14 +461,15 @@ namespace hpx { namespace lcos { namespace local
                 BOOST_SCOPED_ENUM(launch)
               , typename hpx::util::decay<Func>::type
               , hpx::util::tuple<
-                    typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type
+                    typename hpx::traits::acquire_future<F0>::type , typename hpx::traits::acquire_future<F1>::type , typename hpx::traits::acquire_future<F2>::type , typename hpx::traits::acquire_future<F3>::type
                 >
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 launch::all
               , std::forward<Func>(func)
-              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ))
+              , hpx::util::forward_as_tuple(
+                    hpx::traits::acquire_future_disp()( std::forward<F0>(f0)) , hpx::traits::acquire_future_disp()( std::forward<F1>(f1)) , hpx::traits::acquire_future_disp()( std::forward<F2>(f2)) , hpx::traits::acquire_future_disp()( std::forward<F3>(f3)))
             ));
         p->await();
         using traits::future_access;
@@ -477,7 +489,7 @@ namespace hpx { namespace lcos { namespace local
             BOOST_SCOPED_ENUM(launch)
           , typename hpx::util::decay<Func>::type
           , hpx::util::tuple<
-                typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type
+                typename hpx::traits::acquire_future<F0>::type , typename hpx::traits::acquire_future<F1>::type , typename hpx::traits::acquire_future<F2>::type , typename hpx::traits::acquire_future<F3>::type , typename hpx::traits::acquire_future<F4>::type
             >
         >
     >::type
@@ -492,14 +504,15 @@ namespace hpx { namespace lcos { namespace local
                 BOOST_SCOPED_ENUM(launch)
               , typename hpx::util::decay<Func>::type
               , hpx::util::tuple<
-                    typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type
+                    typename hpx::traits::acquire_future<F0>::type , typename hpx::traits::acquire_future<F1>::type , typename hpx::traits::acquire_future<F2>::type , typename hpx::traits::acquire_future<F3>::type , typename hpx::traits::acquire_future<F4>::type
                 >
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 std::forward<Policy>(policy)
               , std::forward<Func>(func)
-              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ))
+              , hpx::util::forward_as_tuple(
+                    hpx::traits::acquire_future_disp()( std::forward<F0>(f0)) , hpx::traits::acquire_future_disp()( std::forward<F1>(f1)) , hpx::traits::acquire_future_disp()( std::forward<F2>(f2)) , hpx::traits::acquire_future_disp()( std::forward<F3>(f3)) , hpx::traits::acquire_future_disp()( std::forward<F4>(f4)))
             ));
         p->await();
         using traits::future_access;
@@ -515,7 +528,7 @@ namespace hpx { namespace lcos { namespace local
             threads::executor
           , typename hpx::util::decay<Func>::type
           , hpx::util::tuple<
-                typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type
+                typename hpx::traits::acquire_future<F0>::type , typename hpx::traits::acquire_future<F1>::type , typename hpx::traits::acquire_future<F2>::type , typename hpx::traits::acquire_future<F3>::type , typename hpx::traits::acquire_future<F4>::type
             >
         >
     >::type
@@ -530,14 +543,15 @@ namespace hpx { namespace lcos { namespace local
                 threads::executor
               , typename hpx::util::decay<Func>::type
               , hpx::util::tuple<
-                    typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type
+                    typename hpx::traits::acquire_future<F0>::type , typename hpx::traits::acquire_future<F1>::type , typename hpx::traits::acquire_future<F2>::type , typename hpx::traits::acquire_future<F3>::type , typename hpx::traits::acquire_future<F4>::type
                 >
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 std::forward<Executor>(sched)
               , std::forward<Func>(func)
-              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ))
+              , hpx::util::forward_as_tuple(
+                    hpx::traits::acquire_future_disp()( std::forward<F0>(f0)) , hpx::traits::acquire_future_disp()( std::forward<F1>(f1)) , hpx::traits::acquire_future_disp()( std::forward<F2>(f2)) , hpx::traits::acquire_future_disp()( std::forward<F3>(f3)) , hpx::traits::acquire_future_disp()( std::forward<F4>(f4)))
             ));
         p->await();
         using traits::future_access;
@@ -553,7 +567,7 @@ namespace hpx { namespace lcos { namespace local
             BOOST_SCOPED_ENUM(launch)
           , typename hpx::util::decay<Func>::type
           , hpx::util::tuple<
-                typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type
+                typename hpx::traits::acquire_future<F0>::type , typename hpx::traits::acquire_future<F1>::type , typename hpx::traits::acquire_future<F2>::type , typename hpx::traits::acquire_future<F3>::type , typename hpx::traits::acquire_future<F4>::type
             >
         >
     >::type
@@ -564,14 +578,15 @@ namespace hpx { namespace lcos { namespace local
                 BOOST_SCOPED_ENUM(launch)
               , typename hpx::util::decay<Func>::type
               , hpx::util::tuple<
-                    typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type
+                    typename hpx::traits::acquire_future<F0>::type , typename hpx::traits::acquire_future<F1>::type , typename hpx::traits::acquire_future<F2>::type , typename hpx::traits::acquire_future<F3>::type , typename hpx::traits::acquire_future<F4>::type
                 >
             >
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 launch::all
               , std::forward<Func>(func)
-              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ))
+              , hpx::util::forward_as_tuple(
+                    hpx::traits::acquire_future_disp()( std::forward<F0>(f0)) , hpx::traits::acquire_future_disp()( std::forward<F1>(f1)) , hpx::traits::acquire_future_disp()( std::forward<F2>(f2)) , hpx::traits::acquire_future_disp()( std::forward<F3>(f3)) , hpx::traits::acquire_future_disp()( std::forward<F4>(f4)))
             ));
         p->await();
         using traits::future_access;

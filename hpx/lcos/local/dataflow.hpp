@@ -20,6 +20,7 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
+#include <hpx/traits/acquire_future.hpp>
 
 #include <boost/fusion/include/begin.hpp>
 #include <boost/fusion/include/deref.hpp>
@@ -38,14 +39,10 @@
 #include <boost/preprocessor/iterate.hpp>
 #include <boost/preprocessor/cat.hpp>
 
+#include <algorithm>
+
 namespace hpx { namespace lcos { namespace local { namespace detail
 {
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    struct is_future_or_future_range
-      : boost::mpl::or_<traits::is_future<T>, traits::is_future_range<T> >
-    {};
-
     ///////////////////////////////////////////////////////////////////////////
     struct reset_dataflow_future
     {
@@ -53,7 +50,9 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
         template <typename Future>
         BOOST_FORCEINLINE
-        typename boost::enable_if<is_future_or_future_range<Future> >::type
+        typename boost::enable_if<
+            hpx::traits::is_future_or_future_range<Future>
+        >::type
         operator()(Future& future) const
         {
             future = Future();
@@ -61,7 +60,9 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
         template <typename Future>
         BOOST_FORCEINLINE
-        typename boost::enable_if<is_future_or_future_range<Future> >::type
+        typename boost::enable_if<
+            traits::is_future_or_future_range<Future>
+        >::type
         operator()(boost::reference_wrapper<Future>& future) const
         {
             future.get() = Future();
@@ -69,7 +70,9 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
         template <typename Future>
         BOOST_FORCEINLINE
-        typename boost::disable_if<is_future_or_future_range<Future> >::type
+        typename boost::disable_if<
+            traits::is_future_or_future_range<Future>
+        >::type
         operator()(Future& future) const
         {
         }
@@ -388,7 +391,11 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 #endif
 
 #define HPX_LCOS_LOCAL_DATAFLOW_DECAY_FUTURE(z, n, d)                           \
-    typename util::decay<BOOST_PP_CAT(F, n)>::type                              \
+    typename hpx::traits::acquire_future<BOOST_PP_CAT(F, n)>::type              \
+/**/
+#define HPX_LCOS_LOCAL_DATAFLOW_ACQUIRE_FUTURE(z, n, d)                         \
+    hpx::traits::acquire_future_disp()(                                         \
+        std::forward<BOOST_PP_CAT(F, n)>(BOOST_PP_CAT(f, n)))                   \
 /**/
 
 #define BOOST_PP_ITERATION_PARAMS_1                                             \
@@ -397,6 +404,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
 #include BOOST_PP_ITERATE()
 
+#undef HPX_LCOS_LOCAL_DATAFLOW_ACQUIRE_FUTURE
 #undef HPX_LCOS_LOCAL_DATAFLOW_DECAY_FUTURE
 
 
@@ -448,7 +456,8 @@ namespace hpx { namespace lcos { namespace local
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 std::forward<Policy>(policy)
               , std::forward<Func>(func)
-              , hpx::util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, F, f))
+              , hpx::util::forward_as_tuple(
+                    BOOST_PP_ENUM(N, HPX_LCOS_LOCAL_DATAFLOW_ACQUIRE_FUTURE, _))
             ));
         p->await();
 
@@ -489,7 +498,8 @@ namespace hpx { namespace lcos { namespace local
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 std::forward<Executor>(sched)
               , std::forward<Func>(func)
-              , hpx::util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, F, f))
+              , hpx::util::forward_as_tuple(
+                    BOOST_PP_ENUM(N, HPX_LCOS_LOCAL_DATAFLOW_ACQUIRE_FUTURE, _))
             ));
         p->await();
 
@@ -526,7 +536,8 @@ namespace hpx { namespace lcos { namespace local
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 launch::all
               , std::forward<Func>(func)
-              , hpx::util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, F, f))
+              , hpx::util::forward_as_tuple(
+                    BOOST_PP_ENUM(N, HPX_LCOS_LOCAL_DATAFLOW_ACQUIRE_FUTURE, _))
             ));
         p->await();
 
