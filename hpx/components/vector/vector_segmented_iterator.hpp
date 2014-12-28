@@ -779,7 +779,7 @@ namespace hpx { namespace traits
                 offset = seg_iter.base()->size_;
             }
 
-            return local_iterator(seg_iter.base()->partition_, 0,
+            return local_iterator(seg_iter.base()->partition_, offset,
                 seg_iter.base()->local_data_);
         }
 
