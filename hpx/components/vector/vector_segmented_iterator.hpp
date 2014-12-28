@@ -739,7 +739,7 @@ namespace hpx { namespace traits
         typedef typename iterator::segment_iterator segment_iterator;
         typedef typename iterator::local_segment_iterator local_segment_iterator;
         typedef typename iterator::local_iterator local_iterator;
-        typedef typename local_raw_vector_iterator<T> local_raw_iterator;
+        typedef local_raw_vector_iterator<T> local_raw_iterator;
 
         //  Conceptually this function is supposed to denote which segment
         //  the iterator is currently pointing to (i.e. just global iterator).
