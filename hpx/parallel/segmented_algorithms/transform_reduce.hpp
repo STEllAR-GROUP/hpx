@@ -18,6 +18,7 @@
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/remote/dispatch.hpp>
 #include <hpx/parallel/algorithms/transform_reduce.hpp>
+#include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -211,11 +212,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             return result::get(
                 lcos::local::dataflow(
-                    hpx::util::unwrapped([=](std::vector<T> && r)
+                    [=](std::vector<shared_future<T> > && r)
                     {
-                        return std::accumulate(r.begin(), r.end(), init, red_op);
-                    }),
-                    segments));
+                        // handle any remote exceptions, will throw on error
+                        std::list<boost::exception_ptr> errors;
+                        parallel::util::detail::handle_remote_exceptions<
+                            ExPolicy
+                        >::call(r, errors);
+
+                        return std::accumulate(
+                            r.begin(), r.end(), init,
+                            [&red_op](T const& val, shared_future<T>& curr)
+                            {
+                                return red_op(val, curr.get());
+                            });
+                    },
+                    std::move(segments)));
         }
 
         ///////////////////////////////////////////////////////////////////////

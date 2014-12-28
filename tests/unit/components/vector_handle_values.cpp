@@ -111,13 +111,13 @@ void handle_values_tests_with_policy(std::size_t size, std::size_t localities,
     DistPolicy const& policy)
 {
     {
-    hpx::vector<T> v(size, policy);
-    handle_values_tests(v);
+        hpx::vector<T> v(size, policy);
+        handle_values_tests(v);
     }
 
     {
-    hpx::vector<T> v(size, policy);
-    handle_values_tests_distributed_access(v);
+        hpx::vector<T> v(size, policy);
+        handle_values_tests_distributed_access(v);
     }
 }
 

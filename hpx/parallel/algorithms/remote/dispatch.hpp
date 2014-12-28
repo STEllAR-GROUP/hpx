@@ -16,6 +16,7 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 
 #include <boost/preprocessor/repeat.hpp>
 #include <boost/preprocessor/iterate.hpp>
@@ -151,8 +152,24 @@ namespace hpx { namespace parallel { namespace util { namespace remote
     dispatch(id_type const& id, Algo && algo, ExPolicy const& policy,
         IsSeq is_seq, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
-        return dispatch_async(id, std::forward<Algo>(algo), policy, is_seq,
-            HPX_ENUM_FORWARD_ARGS(N, Arg, arg)).get();
+        // synchronously invoke remote operation
+        future<typename Algo::result_type> f =
+            dispatch_async(id, std::forward<Algo>(algo), policy, is_seq,
+                HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+        f.wait();
+
+        // handle any remote exceptions
+        if (f.has_exception())
+        {
+            std::list<boost::exception_ptr> errors;
+            parallel::util::detail::handle_remote_exceptions<
+                    ExPolicy
+                >::call(f.get_exception_ptr(), errors);
+
+            HPX_ASSERT(errors.empty());
+            boost::throw_exception(exception_list(std::move(errors)));
+        }
+        return f.get();
     }
 }}}}
 

@@ -60,7 +60,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
         };
 
-
         template <typename Result>
         struct handle_exception<parallel_task_execution_policy, Result>
         {
@@ -84,6 +83,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 }
             }
         };
+
         template <typename Result>
         struct handle_exception<parallel_vector_execution_policy, Result>
         {

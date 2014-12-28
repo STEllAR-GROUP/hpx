@@ -15,7 +15,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
 HPX_REGISTER_VECTOR(double);
-// HPX_REGISTER_VECTOR(int);
+HPX_REGISTER_VECTOR(int);
 
 struct multiply
 {
@@ -100,7 +100,7 @@ void transform_reduce_tests()
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-//     transform_reduce_tests<int>();
+    transform_reduce_tests<int>();
     transform_reduce_tests<double>();
 
     return 0;

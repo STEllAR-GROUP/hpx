@@ -18,6 +18,7 @@
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/remote/dispatch.hpp>
 #include <hpx/parallel/algorithms/count.hpp>
+#include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -401,11 +402,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             return result::get(
                 lcos::local::dataflow(
-                    hpx::util::unwrapped([=](std::vector<value_type> && r)
+                    [=](std::vector<shared_future<value_type> > && r)
                     {
-                        return std::accumulate(r.begin(), r.end(), value_type());
-                    }),
-                    segments));
+                        // handle any remote exceptions, will throw on error
+                        std::list<boost::exception_ptr> errors;
+                        parallel::util::detail::handle_remote_exceptions<
+                            ExPolicy
+                        >::call(r, errors);
+
+                        return std::accumulate(
+                            r.begin(), r.end(), value_type(),
+                            [](value_type const& val, shared_future<value_type>& curr)
+                            {
+                                return val + curr.get();
+                            });
+                    },
+                    std::move(segments)));
         }
 
         template <typename ExPolicy, typename InIter, typename F>
