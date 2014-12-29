@@ -16,6 +16,7 @@
 #include <boost/mpl/bool.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <boost/utility/enable_if.hpp>
+#include <boost/type_traits/is_same.hpp>
 
 #include <vector>
 #include <iterator>
@@ -84,6 +85,38 @@ namespace hpx { namespace traits
         }
     };
 
+    namespace detail
+    {
+        // Reserve sufficient space in the given vector if the underlying
+        // iterator type of the given range allow calculating the size on O(1).
+        template <typename Future, typename Range>
+        void reserve_if_random_access(std::vector<Future>& v, Range const& r,
+            boost::mpl::false_)
+        {
+        }
+
+        template <typename Future, typename Range>
+        void reserve_if_random_access(std::vector<Future>& v, Range const& r,
+            boost::mpl::true_)
+        {
+            v.reserve(boost::size(r));
+        }
+
+        template <typename Future, typename Range>
+        void reserve_if_random_access(std::vector<Future>& v, Range const& r)
+        {
+            typedef typename std::iterator_traits<
+                    typename Range::iterator
+                >::iterator_category iterator_category;
+
+            typedef typename boost::is_same<
+                    iterator_category, std::random_access_iterator_tag
+                >::type is_random_access;
+
+            reserve_if_random_access(v, r, is_random_access());
+        }
+    }
+
     template <typename Range>
     struct acquire_future_impl<Range,
         typename boost::enable_if<traits::is_future_range<Range> >::type>
@@ -108,6 +141,8 @@ namespace hpx { namespace traits
         operator()(Range_&& futures) const
         {
             std::vector<future_type> values;
+            detail::reserve_if_random_access(values, futures);
+
             std::transform(boost::begin(futures), boost::end(futures),
                 std::back_inserter(values), acquire_future_disp());
 
