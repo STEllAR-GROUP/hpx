@@ -39,6 +39,9 @@ namespace hpx
     template <typename T> class local_vector_iterator;
     template <typename T> class const_local_vector_iterator;
 
+    template <typename T, typename BaseIter>
+    class local_raw_vector_iterator;
+
     template <typename T> class vector_iterator;
     template <typename T> class const_vector_iterator;
 
@@ -56,51 +59,21 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // This class wraps plain a vector<>::iterator to avoid problems with
-    // checked iterator libraries, where the comparison of two iterators is
-    // allowed only if both iterators refer to the same container
-    template <typename T>
+    // This class wraps plain a vector<>::iterator or vector<>::const_iterator
+    template <typename T, typename BaseIter>
     class local_raw_vector_iterator
       : public boost::iterator_adaptor<
-            local_raw_vector_iterator<T>,
-            typename std::vector<T>::iterator
+            local_raw_vector_iterator<T, BaseIter>, BaseIter
         >
     {
     private:
         typedef boost::iterator_adaptor<
-                local_raw_vector_iterator<T>,
-                typename std::vector<T>::iterator
+                local_raw_vector_iterator<T, BaseIter>, BaseIter
             > base_type;
-        typedef typename std::vector<T>::iterator base_iterator;
+        typedef BaseIter base_iterator;
 
     public:
-//         local_raw_vector_iterator()
-//         {}
-
         local_raw_vector_iterator(base_iterator const& it)
-          : base_type(it)
-        {}
-    };
-
-    template <typename T>
-    class const_local_raw_vector_iterator
-      : public boost::iterator_adaptor<
-            const_local_raw_vector_iterator<T>,
-            typename std::vector<T>::const_iterator
-        >
-    {
-    private:
-        typedef boost::iterator_adaptor<
-                const_local_raw_vector_iterator<T>,
-                typename std::vector<T>::const_iterator
-            > base_type;
-        typedef typename std::vector<T>::const_iterator base_iterator;
-
-    public:
-//         const_local_raw_vector_iterator()
-//         {}
-
-        const_local_raw_vector_iterator(base_iterator const& it)
           : base_type(it)
         {}
     };
@@ -202,16 +175,20 @@ namespace hpx
             data_(data)
         {}
 
-        typedef local_raw_vector_iterator<T> base_iterator_type;
-        typedef const_local_raw_vector_iterator<T> base_const_iterator_type;
+        typedef local_raw_vector_iterator<
+                T, typename std::vector<T>::iterator
+            > local_raw_iterator;
+        typedef local_raw_vector_iterator<
+                T, typename std::vector<T>::const_iterator
+            > local_raw_const_iterator;
 
         ///////////////////////////////////////////////////////////////////////
-        base_iterator_type base_iterator()
+        local_raw_iterator base_iterator()
         {
             HPX_ASSERT(data_);
             return data_->begin() + local_index_;
         }
-        base_const_iterator_type base_iterator() const
+        local_raw_const_iterator base_iterator() const
         {
             HPX_ASSERT(data_);
             return data_->cbegin() + local_index_;
@@ -329,16 +306,18 @@ namespace hpx
             data_(data)
         {}
 
-        typedef const_local_raw_vector_iterator<T> base_iterator_type;
-        typedef const_local_raw_vector_iterator<T> base_const_iterator_type;
+        typedef local_raw_vector_iterator<
+                T, typename std::vector<T>::const_iterator
+            > local_raw_iterator;
+        typedef local_raw_iterator local_raw_const_iterator;
 
         ///////////////////////////////////////////////////////////////////////
-        base_const_iterator_type base_iterator()
+        local_raw_const_iterator base_iterator()
         {
             HPX_ASSERT(data_);
             return data_->cbegin() + local_index_;
         }
-        base_const_iterator_type base_iterator() const
+        local_raw_const_iterator base_iterator() const
         {
             HPX_ASSERT(data_);
             return data_->cbegin() + local_index_;
@@ -739,7 +718,8 @@ namespace hpx { namespace traits
         typedef typename iterator::segment_iterator segment_iterator;
         typedef typename iterator::local_segment_iterator local_segment_iterator;
         typedef typename iterator::local_iterator local_iterator;
-        typedef local_raw_vector_iterator<T> local_raw_iterator;
+
+        typedef typename local_iterator::local_raw_iterator local_raw_iterator;
 
         //  Conceptually this function is supposed to denote which segment
         //  the iterator is currently pointing to (i.e. just global iterator).
@@ -825,7 +805,8 @@ namespace hpx { namespace traits
         typedef typename iterator::segment_iterator segment_iterator;
         typedef typename iterator::local_segment_iterator local_segment_iterator;
         typedef typename iterator::local_iterator local_iterator;
-        typedef const_local_raw_vector_iterator<T> local_raw_iterator;
+
+        typedef typename local_iterator::local_raw_iterator local_raw_iterator;
 
         //  Conceptually this function is supposed to denote which segment
         //  the iterator is currently pointing to (i.e. just global iterator).
@@ -912,7 +893,7 @@ namespace hpx { namespace traits
 
         typedef vector_iterator<T> iterator;
         typedef local_vector_iterator<T> local_iterator;
-        typedef local_raw_vector_iterator<T> local_raw_iterator;
+        typedef typename local_iterator::local_raw_iterator local_raw_iterator;
 
         // Extract base iterator from local_iterator
         static local_raw_iterator base(local_iterator it)
@@ -928,7 +909,7 @@ namespace hpx { namespace traits
 
         typedef const_vector_iterator<T> iterator;
         typedef const_local_vector_iterator<T> local_iterator;
-        typedef const_local_raw_vector_iterator<T> local_raw_iterator;
+        typedef typename local_iterator::local_raw_iterator local_raw_iterator;
 
         // Extract base iterator from local_iterator
         static local_raw_iterator base(local_iterator it)
