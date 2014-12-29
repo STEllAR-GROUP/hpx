@@ -32,8 +32,8 @@ struct cmp
 {
     cmp(T const& val = T()) : value_(val) {}
 
-    template <typename T>
-    bool operator()(T const& val) const
+    template <typename T_>
+    bool operator()(T_ const& val) const
     {
         return val == value_;
     }
