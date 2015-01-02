@@ -55,30 +55,6 @@ namespace hpx { namespace serialization {
         template <typename T>
         void load_bitwise(T & t, boost::mpl::false_)
         {
-            load_polymorph(t,
-                typename boost::is_abstract<T>::type());
-        }
-
-        template <typename T>
-        void load_polymorph(T & t, boost::mpl::true_)
-        {
-            typedef std::string::size_type size_type;
-            std::string name;
-            size_type size = 0;
-            load(size);
-
-            if(size > 0)
-            {
-                name.resize(size);
-
-                load_binary(&name[0], size);
-            }
-            t = *polymorphic_factory<T>::load(*this, name);
-        }
-
-        template <typename T>
-        void load_polymorph(T & t, boost::mpl::false_)
-        {
             serialize(*this, t, 0);
         }
 
@@ -166,7 +142,6 @@ namespace hpx { namespace serialization {
 
         pointer_tracker pointer_tracker_;
     };
-
 
     void register_pointer(input_archive & ar, std::size_t pos, HPX_STD_UNIQUE_PTR<detail::ptr_helper> helper)
     {

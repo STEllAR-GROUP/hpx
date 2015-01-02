@@ -1,9 +1,11 @@
 //  Copyright (c) 2014 Thomas Heller
+//  Copyright (c) 2014 Anton Bikineev
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/polymorphic_factory_1.hpp>
 
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
@@ -22,6 +24,7 @@ struct A
     {
         ar & a;
     }
+    HPX_SERIALIZATION_POLYMORPHIC(A);
 };
 
 struct B
@@ -35,16 +38,13 @@ struct B
 
     int b;
 
-    /*
     template <typename Archive>
     void serialize(Archive & ar, unsigned)
     {
         ar & b;
     }
-    */
+    HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(B);
 };
-
-HPX_SERIALIZATION_REGISTER_BASE(B);
 
 struct D : B
 {
@@ -62,13 +62,11 @@ struct D : B
         ar & t;
         ar & d;
     }
+    HPX_SERIALIZATION_POLYMORPHIC(D);
 };
-HPX_SERIALIZATION_REGISTER_DERIVED_DECLARATION(D);
-HPX_SERIALIZATION_REGISTER_DERIVED(B, D);
 
 int main()
 {
-    /*
     std::vector<char> buffer;
     hpx::serialization::output_archive oarchive(buffer);
     oarchive << A();
@@ -87,7 +85,6 @@ int main()
     HPX_TEST_EQ(b2.b, d1.b);
     HPX_TEST_EQ(d.b, d1.b);
     HPX_TEST_EQ(d.d, d1.d);
-    */
 
     return hpx::util::report_errors();
 }

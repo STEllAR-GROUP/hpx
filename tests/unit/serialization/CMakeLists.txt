@@ -8,6 +8,7 @@ set(tests
     serialization_builtins
     serialization_polymorphic
     serialization_smart_ptr
+    serialization_smart_ptr_polymorphic
     serialization_vector
 )
 

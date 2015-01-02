@@ -8,9 +8,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/polymorphic_factory_1.hpp>
 
-#include <boost/shared_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
+#include <boost/type_traits/is_polymorphic.hpp>
 
 namespace hpx { namespace serialization {
 
@@ -25,8 +26,64 @@ namespace hpx { namespace serialization {
                 ptr = t_;
             }
 
+            //for polymorphic version
+            intrusive_ptr_helper(boost::intrusive_ptr<T>&& t, boost::intrusive_ptr<T>& ptr)
+              : t_(std::move(t))
+            {
+              ptr = t_;
+            }
+
             boost::intrusive_ptr<T> t_;
         };
+
+        template <typename T> inline
+        void serialize_polymorphic(input_archive& ar, boost::intrusive_ptr<T>& ptr, boost::uint64_t pos, boost::mpl::false_)
+        {
+            T t;
+            ar >> t;
+            register_pointer(
+                ar
+              , pos
+              , HPX_STD_UNIQUE_PTR<detail::ptr_helper>(
+                    new detail::intrusive_ptr_helper<T>(std::move(t), ptr)
+                )
+            );
+        }
+
+        template <typename T> inline
+        void serialize_polymorphic(input_archive& ar, boost::intrusive_ptr<T>& ptr, boost::uint64_t pos, boost::mpl::true_)
+        {
+            typename hpx::serialization::polymorphic_factory::size_type hash;
+
+            ar >> hash;
+            boost::intrusive_ptr<T> t(
+                static_cast<T*>(
+                    hpx::serialization::polymorphic_factory::instance().create(hash)
+                )
+            );
+            ar >> *t;
+            register_pointer(
+                ar
+              , pos
+              , HPX_STD_UNIQUE_PTR<detail::ptr_helper>(
+                    new detail::intrusive_ptr_helper<T>(std::move(t), ptr)
+                )
+            );
+        }
+
+        template <typename T> inline
+        void serialize_polymorphic(output_archive& ar, boost::intrusive_ptr<T>& ptr, boost::mpl::false_)
+        {
+            ar << *ptr;
+        }
+
+        template <typename T> inline
+        void serialize_polymorphic(output_archive& ar, boost::intrusive_ptr<T>& ptr, boost::mpl::true_)
+        {
+            const boost::uint64_t hash = access::get_hash(ptr.get());
+            ar << hash;
+            ar << *ptr;
+        }
     }
 
     // load intrusive_ptr ...
@@ -44,15 +101,7 @@ namespace hpx { namespace serialization {
             {
                 pos = 0;
                 ar >> pos;
-                T t;
-                ar >> t;
-                register_pointer(
-                    ar
-                  , pos
-                  , HPX_STD_UNIQUE_PTR<detail::ptr_helper>(
-                        new detail::intrusive_ptr_helper<T>(std::move(t), ptr)
-                    )
-                );
+                detail::serialize_polymorphic(ar, ptr, pos, boost::is_polymorphic<T>());
             }
             else
             {
@@ -67,7 +116,7 @@ namespace hpx { namespace serialization {
     template <typename T>
     void serialize(output_archive & ar, boost::intrusive_ptr<T> ptr, unsigned)
     {
-        bool valid = ptr;
+        bool valid = static_cast<bool>(ptr);
         ar << valid;
         if(valid)
         {
@@ -77,7 +126,7 @@ namespace hpx { namespace serialization {
             if(pos == boost::uint64_t(-1))
             {
                 ar << cur_pos;
-                ar << *ptr;
+                detail::serialize_polymorphic(ar, ptr, boost::is_polymorphic<T>());
             }
         }
     }

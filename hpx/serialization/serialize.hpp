@@ -29,7 +29,7 @@
     {                                                                           \
         load(ar, t, 0);                                                         \
     }                                                                           \
-    void serialize(hpx::serialization::output_archive & ar, T & t, unsigned)\
+    void serialize(hpx::serialization::output_archive & ar, T & t, unsigned)    \
     {                                                                           \
         save(ar, const_cast<typename boost::add_const<T>::type &>(t)            \
             , 0);                                                               \
