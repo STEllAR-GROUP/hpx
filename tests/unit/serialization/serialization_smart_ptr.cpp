@@ -46,13 +46,6 @@ struct A
     {
         ar & i;
     }
-
-    //template <typename Archive>
-    //void save(Archive & ar, unsigned) const
-    //{
-        //ar & i;
-    //}
-    //HPX_SERIALIZATION_SPLIT_MEMBER()
 };
 
 void intrusive_ptr_add_ref(A* a)

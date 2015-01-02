@@ -92,7 +92,7 @@ public:
 
 void test_shared()
 {
-    boost::shared_ptr<A> ip(new B);
+    boost::shared_ptr<A> ip(new C);
     boost::shared_ptr<A> op1;
     boost::shared_ptr<A> op2;
     {
@@ -105,18 +105,18 @@ void test_shared()
         iarchive >> op2;
     }
 
-    //HPX_TEST_NEQ(op1.get(), ip.get());
-    //HPX_TEST_NEQ(op2.get(), ip.get());
-    //HPX_TEST_EQ(op1.get(), op2.get());
-    //HPX_TEST_EQ(op1->foo(), "C::foo");
-    //HPX_TEST_EQ(op2->foo(), "C::foo");
-    //HPX_TEST_EQ(static_cast<C*>(op1.get())->a, 1);
-    //HPX_TEST_EQ(static_cast<C*>(op1.get())->b, 2);
-    //HPX_TEST_EQ(static_cast<C*>(op1.get())->get_c(), 3);
-    //HPX_TEST_EQ(static_cast<C*>(op2.get())->a, 1);
-    //HPX_TEST_EQ(static_cast<C*>(op2.get())->b, 2);
-    //HPX_TEST_EQ(static_cast<C*>(op2.get())->get_c(), 3);
-    //HPX_TEST_EQ(op1.use_count(), 2);
+    HPX_TEST_NEQ(op1.get(), ip.get());
+    HPX_TEST_NEQ(op2.get(), ip.get());
+    HPX_TEST_EQ(op1.get(), op2.get());
+    HPX_TEST_EQ(op1->foo(), "C::foo");
+    HPX_TEST_EQ(op2->foo(), "C::foo");
+    HPX_TEST_EQ(static_cast<C*>(op1.get())->a, 1);
+    HPX_TEST_EQ(static_cast<C*>(op1.get())->b, 2);
+    HPX_TEST_EQ(static_cast<C*>(op1.get())->get_c(), 3);
+    HPX_TEST_EQ(static_cast<C*>(op2.get())->a, 1);
+    HPX_TEST_EQ(static_cast<C*>(op2.get())->b, 2);
+    HPX_TEST_EQ(static_cast<C*>(op2.get())->get_c(), 3);
+    HPX_TEST_EQ(op1.use_count(), 2);
 }
 
 // =========================intrusive_ptr test==============================
@@ -253,7 +253,7 @@ void test_intrusive()
 int main()
 {
     test_shared();
-    //test_intrusive();
+    test_intrusive();
 
     return hpx::util::report_errors();
 }
