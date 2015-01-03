@@ -15,6 +15,7 @@ set(tests
     countif
     equal
     equal_binary
+    exclusive_scan
     fill
     filln
     find

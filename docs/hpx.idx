@@ -1,4 +1,4 @@
-#   Copyright (c) 2001-2014 Hartmut Kaiser
+#   Copyright (c) 2001-2015 Hartmut Kaiser
 #
 #   Distributed under the Boost Software License, Version 1.0. (See accompanying
 #   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -76,6 +76,9 @@ parallel::count_if                    "count_if" "hpx\.parallel\.v1\.count_if.*"
 
 # hpx/parallel/algorithms/equal.hpp
 parallel::equal                       "equal" "hpx\.parallel\.v1\.equal_id.*"
+
+# hpx/parallel/algorithms/exclusive_scan.hpp
+parallel::exclusive_scan              "exclusive_scan" "hpx\.parallel\.v1\.exclusive_scan.*"
 
 # hpx/parallel/algorithms/fill.hpp
 parallel::fill                        "fill" "hpx\.parallel\.v1\.fill$"

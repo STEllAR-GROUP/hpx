@@ -58,6 +58,7 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/copy.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/count.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/equal.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/exclusive_scan.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/fill.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/find.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/for_each.hpp"
