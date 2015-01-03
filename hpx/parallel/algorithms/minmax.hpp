@@ -518,17 +518,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {
             HPX_ASSERT(count != 0);
 
-            typedef typename std::iterator_traits<PairIter>::value_type
-                value_type;
-            value_type result = *it;
-
             if (count == 1)
-                return result;
+                return *it;
 
+            typename std::iterator_traits<PairIter>::value_type result = *it;
             util::loop_n(++it, count-1, [&f, &result](PairIter const& curr)
             {
                 if (f(*curr->first, *result.first))
                     result.first = curr->first;
+
                 if (!f(*curr->second, *result.second))
                     result.second = curr->second;
             });

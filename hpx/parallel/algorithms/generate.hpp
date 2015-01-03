@@ -54,7 +54,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return hpx::util::void_guard<result_type>(),
                     for_each_n<FwdIter>().call(
                         policy, first, std::distance(first, last),
-                        [f](type& v){
+                        [f](type& v) {
                             v = f();
                         },
                         boost::mpl::false_());

@@ -513,15 +513,14 @@ namespace hpx
 
         // Return the local indices inside the segment corresponding to the
         // given global indices
-        std::vector<size_t>
+        std::vector<size_type>
         get_local_indices(std::vector<size_type> indices) const
         {
-            for (size_type& index : indices){
+            for (size_type& index: indices)
                 index = get_local_index(index);
-            }
-
             return indices;
         }
+
         // Return the global index corresponding to the local index inside the
         // given segment.
         template <typename SegmentIter>
