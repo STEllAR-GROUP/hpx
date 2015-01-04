@@ -152,7 +152,7 @@ namespace hpx { namespace parallel { namespace util
                     threads::executor exec = policy.get_executor();
                     while (count != 0)
                     {
-                        std::size_t chunk = (std::min)(count, chunk_size);
+                        std::size_t chunk = (std::min)(chunk_size, count);
                         if (exec)
                         {
                             workitems.push_back(

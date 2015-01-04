@@ -86,8 +86,8 @@ namespace hpx { namespace parallel { namespace util
 
             template <typename FwdIter, typename F1, typename F2, typename Data>
                 // requires is_container<Data>
-            static R call_with_data(ExPolicy const& policy, FwdIter first,
-                std::size_t count, F1 && f1, F2 && f2,
+            static R call_with_data(ExPolicy const& policy,
+                FwdIter first, std::size_t count, F1 && f1, F2 && f2,
                 std::vector<std::size_t> const& chunk_sizes, Data && data)
             {
                 HPX_ASSERT(boost::size(data) >= chunk_sizes.size());
@@ -101,12 +101,15 @@ namespace hpx { namespace parallel { namespace util
                 std::list<boost::exception_ptr> errors;
 
                 try {
+                    // schedule every chunk on a separate thread
                     workitems.reserve(chunk_sizes.size());
 
                     threads::executor exec = policy.get_executor();
                     while (count > *chunk_size_it)
                     {
                         std::size_t chunk = *chunk_size_it;
+                        HPX_ASSERT(chunk != 0);
+
                         if (exec)
                         {
                             workitems.push_back(hpx::async(exec,
@@ -126,17 +129,20 @@ namespace hpx { namespace parallel { namespace util
                     }
 
                     // execute last chunk directly
-                    if (*chunk_size_it != 0)
+                    if (count != 0)
                     {
+                        std::size_t chunk = *chunk_size_it;
+
+                        HPX_ASSERT(count == chunk);
                         workitems.push_back(hpx::async(hpx::launch::sync,
-                            std::forward<F1>(f1), *data_it,
-                            first, *chunk_size_it));
-                        std::advance(first, *chunk_size_it);
-                    }
+                            std::forward<F1>(f1), *data_it, first, chunk));
+                        std::advance(first, chunk);
 #if defined(HPX_DEBUG)
-                    ++chunk_size_it;
-                    HPX_ASSERT(chunk_size_it == chunk_sizes.end());
+                        ++chunk_size_it;
 #endif
+                    }
+
+                    HPX_ASSERT(chunk_size_it == chunk_sizes.end());
                 }
                 catch (...) {
                     detail::handle_local_exceptions<ExPolicy>::call(
@@ -302,29 +308,30 @@ namespace hpx { namespace parallel { namespace util
                     workitems.reserve(chunk_sizes.size());
 
                     threads::executor exec = policy.get_executor();
-                    while (chunk_size_it != chunk_sizes.end())
+                    while (count != 0)
                     {
                         std::size_t chunk = *chunk_size_it;
-                        if (chunk != 0)
+                        HPX_ASSERT(chunk != 0 && count >= chunk);
+
+                        if (exec)
                         {
-                            if (exec)
-                            {
-                                workitems.push_back(hpx::async(exec,
-                                    f1, *data_it, first, chunk));
-                            }
-                            else
-                            {
-                                workitems.push_back(hpx::async(hpx::launch::fork,
-                                    f1, *data_it, first, chunk));
-                            }
-                            count -= chunk;
-                            std::advance(first, chunk);
+                            workitems.push_back(hpx::async(exec,
+                                f1, *data_it, first, chunk));
                         }
+                        else
+                        {
+                            workitems.push_back(hpx::async(hpx::launch::fork,
+                                f1, *data_it, first, chunk));
+                        }
+
+                        count -= chunk;
+                        std::advance(first, chunk);
+
                         ++data_it;
                         ++chunk_size_it;
                     }
 
-                    HPX_ASSERT(count == 0);
+                    HPX_ASSERT(chunk_size_it == chunk_sizes.end());
                 }
                 catch (std::bad_alloc const&) {
                     return hpx::make_exceptional_future<R>(

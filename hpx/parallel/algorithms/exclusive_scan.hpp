@@ -86,7 +86,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                     op(*get<0>(d.get_iterator_tuple()), v);
                             });
                     },
-                    [=](std::vector<future<void> > && r) mutable -> OutIter
+                    [dest, count, data](
+                        std::vector<future<void> > && r) mutable -> OutIter
                     {
                         std::advance(dest, count);
                         return dest;
