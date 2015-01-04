@@ -143,6 +143,9 @@ parallel::task_canceled_exception     "task_canceled_exception" "hpx\.parallel\.
 # hpx/parallel/algorithms/transform.hpp
 parallel::transform                   "transform" "hpx\.parallel\.v1\.transform.*"
 
+# hpx/parallel/algorithms/transform_exclusive_scan.hpp
+parallel::transform_exclusive_scan    "transform_exclusive_scan" "hpx\.parallel\.v1\.transform_exclusive_scan.*"
+
 # hpx/parallel/algorithms/transform_reduce.hpp
 parallel::transform_reduce            "transform_reduce" "hpx\.parallel\.v1\.transform_reduce.*"
 
