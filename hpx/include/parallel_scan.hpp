@@ -7,6 +7,7 @@
 #define HPX_PARALLEL_SCAN_DEC_30_2014_1257PM
 
 #include <hpx/parallel/algorithms/exclusive_scan.hpp>
+#include <hpx/parallel/algorithms/inclusive_scan.hpp>
 
 #endif
 

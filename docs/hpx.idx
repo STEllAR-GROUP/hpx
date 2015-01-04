@@ -99,6 +99,9 @@ parallel::for_each_n                  "for_each_n" "hpx\.parallel\.v1\.for_each_
 parallel::generate                    "generate" "hpx\.parallel\.v1\.generate$"
 parallel::generate_n                  "generate_n" "hpx\.parallel\.v1\.generate_n.*"
 
+# hpx/parallel/algorithms/inclusive_scan.hpp
+parallel::inclusive_scan              "inclusive_scan" "hpx\.parallel\.v1\.inclusive_scan.*"
+
 # hpx/parallel/algorithms/minmax.hpp
 parallel::max_element                 "max_element" "hpx\.parallel\.v1\.max_element.*"
 parallel::min_element                 "min_element" "hpx\.parallel\.v1\.min_element.*"

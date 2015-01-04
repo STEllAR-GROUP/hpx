@@ -63,6 +63,7 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/find.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/for_each.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/generate.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/inclusive_scan.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/minmax.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/mismatch.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/move.hpp"
