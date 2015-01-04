@@ -74,6 +74,7 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/search.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/swap_ranges.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/transform.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/transform_exclusive_scan.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/transform_reduce.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_copy.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_fill.hpp"

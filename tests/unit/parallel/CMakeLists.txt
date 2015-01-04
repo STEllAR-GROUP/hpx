@@ -51,6 +51,7 @@ set(tests
     task_region
     transform
     transform_binary
+    transform_exclusive_scan
     transform_reduce
     uninitialized_copy
     uninitialized_copyn
