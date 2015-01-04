@@ -15,6 +15,7 @@
 #include <hpx/parallel/algorithms/exclusive_scan.hpp>
 #include <hpx/parallel/algorithms/inclusive_scan.hpp>
 #include <hpx/parallel/algorithms/transform_exclusive_scan.hpp>
+#include <hpx/parallel/algorithms/transform_inclusive_scan.hpp>
 #include <hpx/parallel/algorithms/transform_reduce.hpp>
 
 #endif
