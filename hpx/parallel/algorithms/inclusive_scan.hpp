@@ -240,7 +240,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// \note   GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aN) is defined as:
     ///         * a1 when N is 1
-    ///         * op(GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aK), GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN)
+    ///         * op(GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aK), GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN))
     ///           where 1 < K+1 = M <= N.
     ///
     /// The difference between \a exclusive_scan and \a inclusive_scan is that
@@ -337,11 +337,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           to the element in the destination range, one past the last
     ///           element copied.
     ///
-    /// \note   GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aN) is defined as:
+    /// \note   GENERALIZED_NONCOMMUTATIVE_SUM(+, a1, ..., aN) is defined as:
     ///         * a1 when N is 1
-    ///         * op(GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aK), GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN)
+    ///         * GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aK) + GENERALIZED_NONCOMMUTATIVE_SUM(+, aM, ..., aN)
     ///           where 1 < K+1 = M <= N.
-    ///         * op is std::plus<T>
     ///
     /// The difference between \a exclusive_scan and \a inclusive_scan is that
     /// \a inclusive_scan includes the ith input element in the ith sum.
@@ -431,11 +430,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           to the element in the destination range, one past the last
     ///           element copied.
     ///
-    /// \note   GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aN) is defined as:
+    /// \note   GENERALIZED_NONCOMMUTATIVE_SUM(+, a1, ..., aN) is defined as:
     ///         * a1 when N is 1
-    ///         * op(GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aK), GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN)
+    ///         * GENERALIZED_NONCOMMUTATIVE_SUM(+, a1, ..., aK) + GENERALIZED_NONCOMMUTATIVE_SUM(+, aM, ..., aN)
     ///           where 1 < K+1 = M <= N.
-    ///         * op is std::plus<T>
     ///
     /// The difference between \a exclusive_scan and \a inclusive_scan is that
     /// \a inclusive_scan includes the ith input element in the ith sum.
