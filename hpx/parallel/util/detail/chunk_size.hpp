@@ -24,7 +24,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     }
 
     template <typename F, typename FwdIter>
-    void add_ready_future(std::vector<hpx::future<void> >&,
+    void add_ready_future(std::vector<hpx::future<void> >& workitems,
         F && f, FwdIter first, std::size_t count)
     {
         f(first, count);
@@ -32,7 +32,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     }
 
     template <typename F, typename FwdIter>
-    void add_ready_future(std::vector<hpx::shared_future<void> >&,
+    void add_ready_future(std::vector<hpx::shared_future<void> >& workitems,
         F && f, FwdIter first, std::size_t count)
     {
         f(first, count);
