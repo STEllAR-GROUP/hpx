@@ -207,8 +207,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::uninitialized_copy<FwdIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, dest, is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, dest);
     }
 
     /////////////////////////////////////////////////////////////////////////////
@@ -331,8 +331,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::uninitialized_copy_n<FwdIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, std::size_t(count), dest, is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, std::size_t(count), dest);
     }
 }}}
 

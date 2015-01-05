@@ -50,6 +50,20 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                 boost::throw_exception(exception_list(std::move(errors)));
         }
 
+        template <typename T>
+        static void call(std::vector<hpx::shared_future<T> > const& workitems,
+            std::list<boost::exception_ptr>& errors)
+        {
+            for (hpx::shared_future<T> const& f: workitems)
+            {
+                if (f.has_exception())
+                    call(f.get_exception_ptr(), errors);
+            }
+
+            if (!errors.empty())
+                boost::throw_exception(exception_list(std::move(errors)));
+        }
+
         template <typename T, typename Cleanup>
         static void call(std::vector<hpx::future<T> >& workitems,
             std::list<boost::exception_ptr>& errors, Cleanup && cleanup)
@@ -108,6 +122,17 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             std::list<boost::exception_ptr>&)
         {
             for (hpx::future<T> const& f: workitems)
+            {
+                if (f.has_exception())
+                    hpx::terminate();
+            }
+        }
+
+        template <typename T>
+        static void call(std::vector<hpx::shared_future<T> > const& workitems,
+            std::list<boost::exception_ptr>&)
+        {
+            for (hpx::shared_future<T> const& f: workitems)
             {
                 if (f.has_exception())
                     hpx::terminate();

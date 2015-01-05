@@ -6,7 +6,6 @@
 #if !defined(HPX_NUMERIC_JUN_02_2014_1153AM)
 #define HPX_NUMERIC_JUN_02_2014_1153AM
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/parallel/numeric.hpp>
 
 #endif

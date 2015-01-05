@@ -15,6 +15,7 @@ set(tests
     countif
     equal
     equal_binary
+    exclusive_scan
     fill
     filln
     find
@@ -49,6 +50,7 @@ set(tests
     task_region
     transform
     transform_binary
+    transform_exclusive_scan
     transform_reduce
     uninitialized_copy
     uninitialized_copyn
