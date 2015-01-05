@@ -69,9 +69,6 @@
 #include <boost/mpl/and.hpp>
 #include <boost/mpl/not.hpp>
 #include <boost/mpl/identity.hpp>
-#if defined(BOOST_NO_CXX11_DECLTYPE)
-#  include <boost/typeof/typeof.hpp>
-#endif
 #include <boost/utility/enable_if.hpp>
 #include <boost/preprocessor/cat.hpp>
 
@@ -1008,54 +1005,12 @@ namespace hpx { namespace actions
       : make_action<TF, F, Derived, boost::mpl::true_>
     {};
 
-// older compilers require BOOST_TYPEOF, newer compilers have decltype()
-#if defined(HPX_HAVE_CXX11_DECLTYPE)
-#  define HPX_TYPEOF(x)       decltype(x)
-#  define HPX_TYPEOF_TPL(x)   decltype(x)
-#else
-#  define HPX_TYPEOF(x)       BOOST_TYPEOF(x)
-#  define HPX_TYPEOF_TPL(x)   BOOST_TYPEOF_TPL(x)
-#endif
-
     // Macros usable to refer to an action given the function to expose
     #define HPX_MAKE_ACTION(f)                                                \
-        hpx::actions::make_action<HPX_TYPEOF(&f), &f>        /**/             \
+        hpx::actions::make_action<decltype(&f), &f>        /**/               \
     /**/
     #define HPX_MAKE_DIRECT_ACTION(f)                                         \
-        hpx::actions::make_direct_action<HPX_TYPEOF(&f), &f> /**/             \
-    /**/
-
-    #define HPX_MAKE_ACTION_TPL(f)                                            \
-        hpx::actions::make_action<HPX_TYPEOF_TPL(&f), &f>        /**/         \
-    /**/
-    #define HPX_MAKE_DIRECT_ACTION_TPL(f)                                     \
-        hpx::actions::make_direct_action<HPX_TYPEOF_TPL(&f), &f> /**/         \
-    /**/
-
-    #define HPX_MAKE_COMPONENT_ACTION(component, f)                           \
-        HPX_MAKE_ACTION(component::f)                                         \
-    /**/
-    #define HPX_MAKE_DIRECT_COMPONENT_ACTION(component, f)                    \
-        HPX_MAKE_DIRECT_ACTION(component::f)                                  \
-    /**/
-    #define HPX_MAKE_CONST_COMPONENT_ACTION(component, f)                     \
-        HPX_MAKE_ACTION(component::f)                                         \
-    /**/
-    #define HPX_MAKE_CONST_DIRECT_COMPONENT_ACTION(component, f)              \
-        HPX_MAKE_DIRECT_ACTION(component::f)                                  \
-    /**/
-
-    #define HPX_MAKE_COMPONENT_ACTION_TPL(component, f)                       \
-        HPX_MAKE_ACTION_TPL(component::f)                                     \
-    /**/
-    #define HPX_MAKE_DIRECT_COMPONENT_ACTION_TPL(component, f)                \
-        HPX_MAKE_DIRECT_ACTION_TPL(component::f)                              \
-    /**/
-    #define HPX_MAKE_CONST_COMPONENT_ACTION_TPL(component, f)                 \
-        HPX_MAKE_ACTION_TPL(component::f)                                     \
-    /**/
-    #define HPX_MAKE_CONST_DIRECT_COMPONENT_ACTION_TPL(component, f)          \
-        HPX_MAKE_DIRECT_ACTION_TPL(component::f)                              \
+        hpx::actions::make_direct_action<decltype(&f), &f> /**/               \
     /**/
 
     /// \endcond

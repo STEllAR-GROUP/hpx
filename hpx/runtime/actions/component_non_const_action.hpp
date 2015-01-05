@@ -368,11 +368,11 @@ namespace hpx { namespace actions
     /**/
 
 #define HPX_DEFINE_COMPONENT_ACTION_2(component, func)                        \
-    typedef HPX_MAKE_COMPONENT_ACTION(component, func)::type                  \
+    typedef HPX_MAKE_ACTION(component::func)::type                            \
         BOOST_PP_CAT(func, _action)                                           \
     /**/
 #define HPX_DEFINE_COMPONENT_ACTION_3(component, func, action_type)           \
-    typedef HPX_MAKE_COMPONENT_ACTION(component, func)::type action_type      \
+    typedef HPX_MAKE_ACTION(component::func)::type action_type                \
     /**/
 /// \endcond
 
@@ -388,11 +388,11 @@ namespace hpx { namespace actions
     /**/
 
 #define HPX_DEFINE_COMPONENT_DIRECT_ACTION_2(component, func)                 \
-    typedef HPX_MAKE_DIRECT_COMPONENT_ACTION(component, func)::type           \
+    typedef HPX_MAKE_DIRECT_ACTION(component::func)::type                     \
         BOOST_PP_CAT(func, _action)                                           \
     /**/
 #define HPX_DEFINE_COMPONENT_DIRECT_ACTION_3(component, func, action_type)    \
-    typedef HPX_MAKE_DIRECT_COMPONENT_ACTION(component, func)::type           \
+    typedef HPX_MAKE_DIRECT_ACTION(component::func)::type                     \
         action_type                                                           \
     /**/
 
@@ -409,11 +409,11 @@ namespace hpx { namespace actions
     /**/
 
 #define HPX_DEFINE_COMPONENT_ACTION_TPL_2(component, func)                    \
-    typedef typename HPX_MAKE_COMPONENT_ACTION_TPL(component, func)::type     \
+    typedef typename HPX_MAKE_ACTION(component::func)::type                   \
         BOOST_PP_CAT(func, _action)                                           \
     /**/
 #define HPX_DEFINE_COMPONENT_ACTION_TPL_3(component, func, action_type)       \
-    typedef typename HPX_MAKE_COMPONENT_ACTION_TPL(component, func)::type     \
+    typedef typename HPX_MAKE_ACTION(component::func)::type                   \
         action_type                                                           \
     /**/
 
@@ -429,14 +429,11 @@ namespace hpx { namespace actions
     /**/
 
 #define HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL_2(component, func)             \
-    typedef typename                                                          \
-        HPX_MAKE_DIRECT_COMPONENT_ACTION_TPL(component, func)::type           \
+    typedef typename HPX_MAKE_DIRECT_ACTION(component::func)::type            \
         BOOST_PP_CAT(func, _action)                                           \
     /**/
 #define HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL_3(component, func, action_type)\
-    typedef typename                                                          \
-        HPX_MAKE_DIRECT_COMPONENT_ACTION_TPL(component, func)::type           \
-        action_type                                                           \
+    typedef typename HPX_MAKE_DIRECT_ACTION(component::func)::type action_type\
     /**/
 /// \endcond
 
@@ -504,11 +501,11 @@ namespace hpx { namespace actions
     /**/
 
 #define HPX_DEFINE_COMPONENT_CONST_ACTION_2(component, func)                  \
-    typedef HPX_MAKE_CONST_COMPONENT_ACTION(component, func)::type            \
+    typedef HPX_MAKE_ACTION(component::func)::type                            \
         BOOST_PP_CAT(func, _action)                                           \
     /**/
 #define HPX_DEFINE_COMPONENT_CONST_ACTION_3(component, func, action_type)     \
-    typedef HPX_MAKE_CONST_COMPONENT_ACTION(component, func)::type action_type\
+    typedef HPX_MAKE_ACTION(component::func)::type action_type                \
     /**/
 /// \endcond
 
@@ -525,12 +522,12 @@ namespace hpx { namespace actions
     /**/
 
 #define HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_2(component, func)           \
-    typedef HPX_MAKE_CONST_DIRECT_COMPONENT_ACTION(component, func)::type     \
+    typedef HPX_MAKE_DIRECT_ACTION(component::func)::type                     \
         BOOST_PP_CAT(func, _action)                                           \
     /**/
 #define HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_3(component, func,           \
         action_type)                                                          \
-    typedef HPX_MAKE_CONST_DIRECT_COMPONENT_ACTION(component, func)::type     \
+    typedef HPX_MAKE_DIRECT_ACTION(component::func)::type                     \
         action_type                                                           \
     /**/
 
@@ -547,14 +544,11 @@ namespace hpx { namespace actions
     /**/
 
 #define HPX_DEFINE_COMPONENT_CONST_ACTION_TPL_2(component, func)              \
-    typedef typename                                                          \
-        HPX_MAKE_CONST_COMPONENT_ACTION_TPL(component, func)::type            \
+    typedef typename HPX_MAKE_ACTION(component::func)::type                   \
         BOOST_PP_CAT(func, _action)                                           \
     /**/
 #define HPX_DEFINE_COMPONENT_CONST_ACTION_TPL_3(component, func, action_type) \
-    typedef typename                                                          \
-        HPX_MAKE_CONST_COMPONENT_ACTION_TPL(component, func)::type            \
-        action_type                                                           \
+    typedef typename HPX_MAKE_ACTION(component::func)::type action_type       \
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -570,15 +564,12 @@ namespace hpx { namespace actions
     /**/
 
 #define HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_TPL_2(component, func)       \
-    typedef typename                                                          \
-        HPX_MAKE_CONST_DIRECT_COMPONENT_ACTION_TPL(component, func)::type     \
+    typedef typename HPX_MAKE_DIRECT_ACTION(component::func)::type            \
         BOOST_PP_CAT(func, _action)                                           \
     /**/
 #define HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_TPL_3(component, func,       \
         action_type)                                                          \
-    typedef typename                                                          \
-        HPX_MAKE_CONST_DIRECT_COMPONENT_ACTION_TPL(component, func)::type     \
-        action_type                                                           \
+    typedef typename HPX_MAKE_DIRECT_ACTION(component::func)::type action_type\
     /**/
 /// \endcond
 

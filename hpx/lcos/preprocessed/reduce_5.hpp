@@ -165,7 +165,7 @@ namespace hpx { namespace lcos
                     >
                     reduce_invoker_type;
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };
@@ -418,7 +418,7 @@ namespace hpx { namespace lcos
                     >
                     reduce_invoker_type;
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };
@@ -671,7 +671,7 @@ namespace hpx { namespace lcos
                     >
                     reduce_invoker_type;
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };
@@ -924,7 +924,7 @@ namespace hpx { namespace lcos
                     >
                     reduce_invoker_type;
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };
@@ -1177,7 +1177,7 @@ namespace hpx { namespace lcos
                     >
                     reduce_invoker_type;
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };
@@ -1430,7 +1430,7 @@ namespace hpx { namespace lcos
                     >
                     reduce_invoker_type;
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };

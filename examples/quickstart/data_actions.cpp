@@ -218,8 +218,8 @@ public:
 ///////////////////////////////////////////////////////////////////////////////
 int data = 0;       // this variable is exposed using the actions below
 
-typedef data_get_action<HPX_TYPEOF(&data), &data> get_action;
-typedef data_set_action<HPX_TYPEOF(&data), &data> set_action;
+typedef data_get_action<decltype(&data), &data> get_action;
+typedef data_set_action<decltype(&data), &data> set_action;
 
 HPX_DEFINE_GET_COMPONENT_TYPE(plain_data<get_action>);
 HPX_DEFINE_GET_COMPONENT_TYPE(plain_data<set_action>);
