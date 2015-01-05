@@ -30,7 +30,7 @@ struct test_server
     test_server& operator=(test_server const &) { return *this; }
     test_server& operator=(test_server &&) { return *this; }
 
-    HPX_DEFINE_COMPONENT_CONST_ACTION(test_server, call, call_action);
+    HPX_DEFINE_COMPONENT_ACTION(test_server, call, call_action);
 
     template <typename Archive>
     void serialize(Archive&ar, unsigned version) {}

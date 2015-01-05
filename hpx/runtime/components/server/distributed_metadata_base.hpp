@@ -45,7 +45,7 @@ namespace hpx { namespace components { namespace server
         /// Retrieve the configuration data.
         ConfigData get() const { return data_; }
 
-        HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_TPL(
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL(
             distributed_metadata_base, get);
 
     private:

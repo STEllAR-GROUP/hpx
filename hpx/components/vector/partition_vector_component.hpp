@@ -302,21 +302,21 @@ namespace hpx { namespace server
         }
 
         /// Macros to define HPX component actions for all exported functions.
-        HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_TPL(partition_vector, size);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL(partition_vector, size);
 
-//         HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(partition_vector, max_size);
+//         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_vector, max_size);
 
         HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL(partition_vector, resize);
 
-//         HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(partition_vector, capacity);
-//         HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(partition_vector, empty);
+//         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_vector, capacity);
+//         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_vector, empty);
 //         HPX_DEFINE_COMPONENT_ACTION(partition_vector, reserve);
 
-        HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_TPL(partition_vector, get_value);
-        HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_TPL(partition_vector, get_values);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL(partition_vector, get_value);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL(partition_vector, get_values);
 
-//         HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(partition_vector, front);
-//         HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(partition_vector, back);
+//         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_vector, front);
+//         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_vector, back);
 //         HPX_DEFINE_COMPONENT_ACTION(partition_vector, assign);
 //         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_vector, push_back);
 //         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_vector, pop_back);

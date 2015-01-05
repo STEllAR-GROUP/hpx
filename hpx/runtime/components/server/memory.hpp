@@ -112,11 +112,11 @@ namespace hpx { namespace components { namespace server
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(memory, store64);
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(memory, store128);
 
-        HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(memory, load8);
-        HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(memory, load16);
-        HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(memory, load32);
-        HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(memory, load64);
-        HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(memory, load128);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(memory, load8);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(memory, load16);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(memory, load32);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(memory, load64);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(memory, load128);
 
         // This component type requires valid id for its actions to be invoked
         static bool is_target_valid(naming::id_type const& id) { return true; }

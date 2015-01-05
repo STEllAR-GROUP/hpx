@@ -49,8 +49,8 @@ namespace hpx { namespace components { namespace server
         // Each of the exposed functions needs to be encapsulated into a action
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
-        HPX_DEFINE_COMPONENT_CONST_ACTION(binpacking_factory, create_components);
-        HPX_DEFINE_COMPONENT_CONST_ACTION(binpacking_factory, create_components_counterbased);
+        HPX_DEFINE_COMPONENT_ACTION(binpacking_factory, create_components);
+        HPX_DEFINE_COMPONENT_ACTION(binpacking_factory, create_components_counterbased);
     };
 }}}
 
