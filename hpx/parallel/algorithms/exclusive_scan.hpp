@@ -282,9 +282,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::exclusive_scan<OutIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, dest, std::move(init), std::forward<Op>(op),
-            is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, dest, std::move(init), std::forward<Op>(op));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -378,9 +377,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::exclusive_scan<OutIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, dest, std::move(init), std::plus<T>(),
-            is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, dest, std::move(init), std::plus<T>());
     }
 }}}
 
