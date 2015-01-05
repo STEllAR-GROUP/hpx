@@ -118,10 +118,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename hpx::util::decay<T>::type init_type;
 
             return transform_reduce<init_type>().call(
-                std::forward<ExPolicy>(policy), first, last,
-                std::forward<T>(init),
-                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
-                is_seq());
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, std::forward<T>(init),
+                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op));
         }
 
         // forward declare the segmented version of this algorithm

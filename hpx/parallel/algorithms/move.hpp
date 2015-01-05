@@ -58,13 +58,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 result_type;
 
                 return get_iter<1, result_type>(
-                    for_each_n<zip_iterator>().call(policy,
+                    for_each_n<zip_iterator>().call(
+                        policy, boost::mpl::false_(),
                         hpx::util::make_zip_iterator(first, dest),
                         std::distance(first, last),
                         [](reference t) {
-                            hpx::util::get<1>(t) = std::move(hpx::util::get<0>(t)); //-V573
-                        },
-                        boost::mpl::false_()));
+                            using hpx::util::get;
+                            get<1>(t) = std::move(get<0>(t)); //-V573
+                        }));
             }
         };
         /// \endcond
@@ -150,8 +151,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::move<OutIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, dest, is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, dest);
     }
 }}}
 

@@ -60,15 +60,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     result_type;
 
                 return hpx::util::void_guard<result_type>(),
-                    for_each_n<zip_iterator>().call(policy,
+                    for_each_n<zip_iterator>().call(
+                        policy, boost::mpl::false_(),
                         hpx::util::make_zip_iterator(
                             first, destination_iterator(last)),
                         std::distance(first, last) / 2,
                         [](reference t) {
                             using hpx::util::get;
                             std::swap(get<0>(t), get<1>(t));
-                        },
-                        boost::mpl::false_());
+                        });
             }
         };
         /// \endcond
@@ -129,7 +129,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
 
         return detail::reverse().call(
-            std::forward<ExPolicy>(policy), first, last, is_seq());
+            std::forward<ExPolicy>(policy), is_seq(), first, last);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -161,8 +161,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef std::reverse_iterator<BidirIter> iterator;
 
                 return detail::copy<OutputIter>().call(
-                    policy, iterator(last), iterator(first), dest_first,
-                    boost::mpl::false_());
+                    policy, boost::mpl::false_(),
+                    iterator(last), iterator(first), dest_first);
             }
         };
         /// \endcond
@@ -251,8 +251,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::reverse_copy<OutputIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, dest_first, is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, dest_first);
     }
 }}}
 

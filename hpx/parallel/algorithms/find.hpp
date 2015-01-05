@@ -149,8 +149,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::find<InIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, val, is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, val);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -290,8 +290,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::find_if<InIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, std::forward<F>(f), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, std::forward<F>(f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -436,8 +436,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::find_if_not<InIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, std::forward<F>(f), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, std::forward<F>(f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -615,9 +615,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef is_sequential_execution_policy<ExPolicy> is_seq;
 
         return detail::find_end<FwdIter1>().call(
-            std::forward<ExPolicy>(policy),
-            first1, last1, first2, last2, detail::equal_to(),
-            is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first1, last1, first2, last2, detail::equal_to());
     }
 
     /// Returns the last subsequence of elements [first2, last2) found in the range
@@ -721,8 +720,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef is_sequential_execution_policy<ExPolicy> is_seq;
 
         return detail::find_end<FwdIter1>().call(
-            std::forward<ExPolicy>(policy),
-            first1, last1, first2, last2, std::forward<F>(f), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first1, last1, first2, last2, std::forward<F>(f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -893,9 +892,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::find_first_of<InIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, s_first, s_last,
-            detail::equal_to(), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, s_first, s_last, detail::equal_to());
     }
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
@@ -1000,8 +998,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::find_first_of<InIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, s_first, s_last, std::forward<Pred>(op), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, s_first, s_last, std::forward<Pred>(op));
     }
 }}}
 

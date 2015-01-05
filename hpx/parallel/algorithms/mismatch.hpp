@@ -213,8 +213,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         typedef std::pair<InIter1, InIter2> result_type;
         return detail::mismatch_binary<result_type>().call(
-            std::forward<ExPolicy>(policy),
-            first1, last1, first2, last2, detail::equal_to(), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first1, last1, first2, last2, detail::equal_to());
     }
 
     /// Returns true if the range [first1, last1) is mismatch to the range
@@ -321,8 +321,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         typedef std::pair<InIter1, InIter2> result_type;
         return detail::mismatch_binary<result_type>().call(
-            std::forward<ExPolicy>(policy),
-            first1, last1, first2, last2, std::forward<F>(f), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first1, last1, first2, last2, std::forward<F>(f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -474,8 +474,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         typedef std::pair<InIter1, InIter2> result_type;
         return detail::mismatch<result_type>().call(
-            std::forward<ExPolicy>(policy),
-            first1, last1, first2, detail::equal_to(), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first1, last1, first2, detail::equal_to());
     }
 
     /// Returns std::pair with iterators to the first two non-equivalent
@@ -573,8 +573,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         typedef std::pair<InIter1, InIter2> result_type;
         return detail::mismatch<result_type>().call(
-            std::forward<ExPolicy>(policy),
-            first1, last1, first2, std::forward<F>(f), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first1, last1, first2, std::forward<F>(f));
     }
 }}}
 

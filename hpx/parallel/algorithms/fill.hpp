@@ -62,11 +62,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return hpx::util::void_guard<result_type>(),
                     for_each_n<FwdIter>().call(
-                        policy, first, std::distance(first, last),
+                        policy, boost::mpl::false_(),
+                        first, std::distance(first, last),
                         [val](type& v) {
                             v = val;
-                        },
-                        boost::mpl::false_());
+                        });
             }
         };
         /// \endcond
@@ -128,8 +128,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
 
         return detail::fill().call(
-            std::forward<ExPolicy>(policy),
-            first, last, value, is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, value);
     }
     ///////////////////////////////////////////////////////////////////////////
     // fill_n
@@ -160,11 +160,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return
                     for_each_n<OutIter>().call(
-                        policy, first, count,
+                        policy, boost::mpl::false_(), first, count,
                         [val](type& v) {
                             v = val;
-                        },
-                        boost::mpl::false_());
+                        });
             }
         };
         /// \endcond
@@ -244,8 +243,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::fill_n<OutIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, std::size_t(count), value, is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, std::size_t(count), value);
     }
 }}}
 

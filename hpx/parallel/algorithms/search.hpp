@@ -202,9 +202,8 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::search<FwdIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, s_first, s_last,
-            detail::equal_to(), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, s_first, s_last, detail::equal_to());
     }
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
@@ -294,9 +293,8 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::search<FwdIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, s_first, s_last,
-            op, is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, s_first, s_last, std::forward<Pred>(op));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -467,9 +465,8 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::search_n<FwdIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, count, s_first, s_last,
-            detail::equal_to(), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, count, s_first, s_last, detail::equal_to());
     }
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
@@ -559,9 +556,8 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::search_n<FwdIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, count, s_first, s_last,
-            op, is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, count, s_first, s_last, std::forward<Pred>(op));
     }
 }}}
 
