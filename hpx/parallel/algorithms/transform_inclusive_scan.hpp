@@ -272,9 +272,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::transform_inclusive_scan<OutIter>().call(
-            std::forward<ExPolicy>(policy),
+            std::forward<ExPolicy>(policy), is_seq(),
             first, last, dest, std::forward<Conv>(conv), std::move(init),
-            std::forward<Op>(op), is_seq());
+            std::forward<Op>(op));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -407,9 +407,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename std::iterator_traits<InIter>::value_type value_type;
 
         return detail::transform_inclusive_scan<OutIter>().call(
-            std::forward<ExPolicy>(policy),
+            std::forward<ExPolicy>(policy), is_seq(),
             first, last, dest, std::forward<Conv>(conv), value_type(),
-            std::forward<Op>(op), is_seq());
+            std::forward<Op>(op));
     }
 }}}
 
