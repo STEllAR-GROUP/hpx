@@ -188,8 +188,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
 
         return detail::min_element<FwdIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, std::forward<F>(f), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, std::forward<F>(f));
     }
 
     /// Finds the smallest element in the range [first, last) using the given
@@ -254,8 +254,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
 
         return detail::min_element<FwdIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, std::less<value_type>(), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, std::less<value_type>());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -418,8 +418,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
 
         return detail::max_element<FwdIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, std::forward<F>(f), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, std::forward<F>(f));
     }
 
     /// Finds the greatest element in the range [first, last) using the given
@@ -484,8 +484,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
 
         return detail::max_element<FwdIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, std::less<value_type>(), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, std::less<value_type>());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -666,8 +666,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
 
         return detail::minmax_element<FwdIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, std::forward<F>(f), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, std::forward<F>(f));
     }
 
     /// Finds the greatest element in the range [first, last) using the given
@@ -737,8 +737,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
 
         return detail::minmax_element<FwdIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, std::less<value_type>(), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, std::less<value_type>());
     }
 }}}
 
