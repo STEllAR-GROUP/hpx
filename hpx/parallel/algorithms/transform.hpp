@@ -198,7 +198,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         hpx::util::make_zip_iterator(first1, first2, dest),
                         std::distance(first1, last1),
                         [f](reference t) {
-                            hpx::util::get;
+                            using hpx::util::get;
                             get<2>(t) = f(get<0>(t), get<1>(t)); //-V573
                         }));
             }
