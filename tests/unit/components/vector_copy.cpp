@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,8 +7,8 @@
 #include <hpx/components/vector/vector.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <hpx/include/parallel_for_each.hpp>
-#include <hpx/parallel/segmented_algorithms/for_each.hpp>
+#include <hpx/include/parallel_copy.hpp>
+#include <hpx/parallel/segmented_algorithms/copy.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
@@ -67,6 +67,37 @@ void copy_tests(hpx::vector<T> const& v1)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename T, typename DistPolicy, typename ExPolicy>
+void copy_algo_tests_with_policy(std::size_t size, std::size_t localities,
+    DistPolicy const& policy, ExPolicy const& copy_policy)
+{
+    hpx::vector<T> v1(size, policy);
+    fill_vector(v1, T(43));
+
+    hpx::vector<T> v2(size, policy);
+    typename hpx::vector<T>::iterator it =
+        hpx::parallel::copy(copy_policy, v1.begin(), v1.end(), v2.begin());
+    HPX_TEST(it == v2.end());
+    compare_vectors(v1, v2);
+}
+
+template <typename T, typename DistPolicy, typename ExPolicy>
+void copy_algo_tests_with_policy_async(std::size_t size, std::size_t localities,
+    DistPolicy const& policy, ExPolicy const& copy_policy)
+{
+    hpx::vector<T> v1(size, policy);
+    fill_vector(v1, T(43));
+
+    using hpx::parallel::task;
+
+    hpx::vector<T> v2(size, policy);
+    hpx::future<typename hpx::vector<T>::iterator> f =
+        hpx::parallel::copy(copy_policy(task), v1.begin(), v1.end(), v2.begin());
+
+    HPX_TEST(f.get() == v2.end());
+    compare_vectors(v1, v2);
+}
+
 template <typename T, typename DistPolicy>
 void copy_tests_with_policy(std::size_t size, std::size_t localities,
     DistPolicy const& policy)
@@ -87,6 +118,14 @@ void copy_tests_with_policy(std::size_t size, std::size_t localities,
 
     fill_vector(v3, T(43));
     compare_vectors(v1, v3, false);
+
+    using namespace hpx::parallel;
+
+    copy_algo_tests_with_policy<T>(size, localities, policy, seq);
+    copy_algo_tests_with_policy<T>(size, localities, policy, par);
+
+    copy_algo_tests_with_policy_async<T>(size, localities, policy, seq);
+    copy_algo_tests_with_policy_async<T>(size, localities, policy, par);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

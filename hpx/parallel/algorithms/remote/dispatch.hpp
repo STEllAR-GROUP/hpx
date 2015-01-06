@@ -7,6 +7,7 @@
 #define HPX_PARALLEL_ALGORITHM_REMOTE_DISPATCH_OCT_15_2014_0938PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/util/decay.hpp>
@@ -16,30 +17,98 @@
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 
+#include <boost/utility/enable_if.hpp>
+
 namespace hpx { namespace parallel { namespace util { namespace remote
 {
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        template <typename T, typename Enable = void>
+        struct algorithm_result
+        {
+            template <typename T_>
+            static T_ const& call(T_&& val)
+            {
+                return std::forward<T_>(val);
+            }
+        };
+
+        template <typename Iterator>
+        struct algorithm_result<
+            Iterator,
+            typename boost::enable_if<
+                    typename hpx::traits::segmented_local_iterator_traits<
+                            Iterator
+                        >::is_segmented_local_iterator
+                >::type>
+        {
+            typedef hpx::traits::segmented_local_iterator_traits<Iterator> traits;
+
+            static Iterator call(typename traits::local_raw_iterator&& it)
+            {
+                return traits::remote(std::move(it));
+            }
+        };
+
+        template <typename Iterator>
+        struct algorithm_result<
+            future<Iterator>,
+            typename boost::enable_if<
+                    typename hpx::traits::segmented_local_iterator_traits<
+                            Iterator
+                        >::is_segmented_local_iterator
+                >::type>
+        {
+            typedef hpx::traits::segmented_local_iterator_traits<Iterator> traits;
+
+            static future<Iterator>
+            call(future<typename traits::local_raw_iterator>&& f)
+            {
+                typedef future<typename traits::local_raw_iterator> argtype;
+                return f.then([](argtype&& f) { return traits::remote(f.get()); });
+            }
+        };
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Algo, typename ExPolicy, typename... Args>
     struct dispatcher
     {
-        static typename parallel::v1::detail::algorithm_result<
+        static typename parallel::detail::algorithm_result<
             ExPolicy, typename hpx::util::decay<Algo>::type::result_type
         >::type
         sequential(Algo const& algo, ExPolicy const& policy, Args const&... args)
         {
+            typedef typename parallel::detail::algorithm_result<
+                    ExPolicy, typename hpx::util::decay<Algo>::type::result_type
+                >::type result_type;
+
             using hpx::traits::segmented_local_iterator_traits;
-            return algo.call(policy, boost::mpl::true_(),
-                segmented_local_iterator_traits<Args>::base(args)...);
+            return
+                detail::algorithm_result<result_type>::call(
+                    algo.call(policy, boost::mpl::true_(),
+                        segmented_local_iterator_traits<Args>::local(args)...
+                    )
+                );
         }
 
-        static typename parallel::v1::detail::algorithm_result<
+        static typename parallel::detail::algorithm_result<
             ExPolicy, typename hpx::util::decay<Algo>::type::result_type
         >::type
         parallel(Algo const& algo, ExPolicy const& policy, Args const&... args)
         {
+            typedef typename parallel::detail::algorithm_result<
+                    ExPolicy, typename hpx::util::decay<Algo>::type::result_type
+                >::type result_type;
+
             using hpx::traits::segmented_local_iterator_traits;
-            return algo.call(policy, boost::mpl::false_(),
-                segmented_local_iterator_traits<Args>::base(args)...);
+            return
+                detail::algorithm_result<result_type>::call(
+                    algo.call(policy, boost::mpl::false_(),
+                        segmented_local_iterator_traits<Args>::local(args)...
+                    )
+                );
         }
     };
 
@@ -79,7 +148,7 @@ namespace hpx { namespace parallel { namespace util { namespace remote
         IsSeq, Args&&... args)
     {
         typedef typename hpx::util::decay<Algo>::type algo_type;
-        typedef typename parallel::v1::detail::algorithm_result<
+        typedef typename parallel::detail::algorithm_result<
                 ExPolicy, typename algo_type::result_type
             >::type result_type;
 

@@ -7,15 +7,16 @@
 #define HPX_PARALLEL_DISPATCH_JUN_25_2014_1145PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/move.hpp>
-#include <hpx/parallel/exception_list.hpp>
-#include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/parallel/exception_list.hpp>
+#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 
 #include <boost/mpl/bool.hpp>
 #include <boost/serialization/serialization.hpp>
@@ -24,6 +25,21 @@
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 {
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Result>
+    struct local_algorithm_result
+    {
+        typedef typename hpx::traits::segmented_local_iterator_traits<
+                Result
+            >::local_raw_iterator type;
+    };
+
+    template <>
+    struct local_algorithm_result<void>
+    {
+        typedef void type;
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Derived, typename Result = void>
     struct algorithm
@@ -36,89 +52,93 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 
     public:
         typedef Result result_type;
+        typedef typename local_algorithm_result<result_type>::type
+            local_result_type;
 
         explicit algorithm(char const* const name)
           : name_(name)
         {}
 
         template <typename ExPolicy, typename... Args>
-        typename parallel::v1::detail::algorithm_result<
-            ExPolicy, result_type
+        typename parallel::detail::algorithm_result<
+            ExPolicy, local_result_type
         >::type
         call(ExPolicy const& policy, boost::mpl::true_, Args&&... args) const
         {
             try {
-                return parallel::v1::detail::algorithm_result<
-                        ExPolicy, result_type
+                return parallel::detail::algorithm_result<
+                        ExPolicy, local_result_type
                     >::get(Derived::sequential(policy, std::forward<Args>(args)...));
             }
             catch (...) {
-                parallel::v1::detail::handle_exception<ExPolicy>::call();
+                parallel::detail::handle_exception<
+                        ExPolicy, local_result_type
+                    >::call();
             }
         }
 
         template <typename... Args>
-        typename parallel::v1::detail::algorithm_result<
-            sequential_task_execution_policy, result_type
+        typename parallel::detail::algorithm_result<
+            sequential_task_execution_policy, local_result_type
         >::type
         operator()(sequential_task_execution_policy const& policy,
             Args&&... args) const
         {
             try {
-                return parallel::v1::detail::algorithm_result<
-                        sequential_task_execution_policy, result_type
+                return parallel::detail::algorithm_result<
+                        sequential_task_execution_policy, local_result_type
                     >::get(Derived::sequential(policy, std::forward<Args>(args)...));
             }
             catch (...) {
-                return parallel::v1::detail::handle_exception<
-                        sequential_task_execution_policy, result_type
+                return parallel::detail::handle_exception<
+                        sequential_task_execution_policy, local_result_type
                     >::call();
             }
         }
 
         template <typename... Args>
-        typename parallel::v1::detail::algorithm_result<
-            sequential_task_execution_policy, result_type
+        typename parallel::detail::algorithm_result<
+            sequential_task_execution_policy, local_result_type
         >::type
         call(sequential_task_execution_policy const& policy, boost::mpl::true_,
             Args&&... args) const
         {
             try {
-                hpx::future<result_type> result =
+                hpx::future<local_result_type> result =
                     hpx::async(derived(), policy, std::forward<Args>(args)...);
 
-                return parallel::v1::detail::algorithm_result<
-                        sequential_task_execution_policy, result_type
+                return parallel::detail::algorithm_result<
+                        sequential_task_execution_policy, local_result_type
                     >::get(std::move(result));
             }
             catch (...) {
-                return parallel::v1::detail::handle_exception<
-                        sequential_task_execution_policy, result_type
+                return parallel::detail::handle_exception<
+                        sequential_task_execution_policy, local_result_type
                     >::call();
             }
         }
 
         template <typename... Args>
-        typename parallel::v1::detail::algorithm_result<
-            parallel_task_execution_policy, result_type
+        typename parallel::detail::algorithm_result<
+            parallel_task_execution_policy, local_result_type
         >::type
         call(parallel_task_execution_policy const& policy, boost::mpl::true_,
             Args&&... args) const
         {
             try {
-                return parallel::v1::detail::algorithm_result<
-                        parallel_task_execution_policy, result_type
+                return parallel::detail::algorithm_result<
+                        parallel_task_execution_policy, local_result_type
                     >::get(Derived::sequential(policy, std::forward<Args>(args)...));
             }
             catch (...) {
-                return parallel::v1::detail::handle_exception<
-                        parallel_task_execution_policy, result_type
+                return parallel::detail::handle_exception<
+                        parallel_task_execution_policy, local_result_type
                     >::call();
             }
         }
 
         template <typename ExPolicy, typename... Args>
-        typename parallel::v1::detail::algorithm_result<ExPolicy, result_type>::type
+        typename parallel::detail::algorithm_result<ExPolicy, local_result_type>::type
         call(ExPolicy const& policy, boost::mpl::false_, Args&&... args) const
         {
             return Derived::parallel(policy, std::forward<Args>(args)...);
@@ -126,8 +146,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 
         ///////////////////////////////////////////////////////////////////////////
         template <typename... Args>
-        result_type
-        call(parallel::v1::execution_policy const& policy, boost::mpl::false_,
+        local_result_type
+        call(parallel::execution_policy const& policy, boost::mpl::false_,
             Args&&... args) const
         {
             switch(detail::which(policy))
@@ -158,13 +178,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             default:
                 HPX_THROW_EXCEPTION(hpx::bad_parameter,
                     std::string("hpx::parallel::") + name_,
-                    "Not supported execution policy");
+                    "The given execution policy is not supported");
             }
         }
 
         template <typename... Args>
-        result_type
-        call(parallel::v1::execution_policy const& policy, boost::mpl::true_,
+        local_result_type
+        call(parallel::execution_policy const& policy, boost::mpl::true_,
             Args&&... args) const
         {
             return call(seq, boost::mpl::true_(), std::forward<Args>(args)...);
@@ -176,8 +196,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         friend class boost::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, unsigned int)
+        void serialize(Archive&, unsigned int)
         {
+            // no need to serialize 'name_' as it is always initialized by the
+            // constructor
         }
     };
 }}}}
