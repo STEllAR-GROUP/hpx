@@ -112,12 +112,11 @@ public:
     template <typename Arguments>
     static hpx::threads::thread_function_type
     construct_thread_function(hpx::actions::continuation_type& cont,
-        hpx::naming::address::address_type lva, Arguments && args)
+        hpx::naming::address::address_type lva, Arguments && /*args*/)
     {
         return hpx::traits::action_decorate_function<derived_type>::call(lva,
             base_type::construct_continuation_thread_function(
-                cont, &derived_type::get_value_function,
-                std::forward<Arguments>(args)));
+                cont, hpx::util::deferred_call(&derived_type::set_value_function)));
     }
 
     // direct execution
@@ -200,9 +199,9 @@ public:
         hpx::naming::address::address_type lva, Arguments && args)
     {
         return hpx::traits::action_decorate_function<derived_type>::call(lva,
-            base_type::construct_continuation_thread_function_void(
-                cont, &derived_type::set_value_function,
-                std::forward<Arguments>(args)));
+            base_type::construct_continuation_thread_function(
+                cont, hpx::util::deferred_call(&derived_type::set_value_function,
+                    hpx::util::get<0>(std::forward<Arguments>(args)))));
     }
 
     // direct execution

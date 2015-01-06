@@ -15,6 +15,7 @@
 #include <hpx/config/bind.hpp>
 #include <hpx/config/tuple.hpp>
 #include <hpx/config/function.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/void_guard.hpp>
 #include <hpx/traits/action_priority.hpp>
@@ -834,9 +835,8 @@ namespace hpx { namespace actions
     }
 
     // bring in all overloads for
-    //    construct_continuation_thread_functionN()
-    //    construct_continuation_thread_function_voidN()
-    #include <hpx/runtime/actions/construct_continuation_function_objects.hpp>
+    //    construct_continuation_thread_function()
+    #include <hpx/runtime/actions/construct_continuation_thread_function.hpp>
 
     ///////////////////////////////////////////////////////////////////////////
     /// \tparam Component         component type
@@ -867,34 +867,13 @@ namespace hpx { namespace actions
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Func, typename Args_>
+        template <typename F>
         static threads::thread_function_type
-        construct_continuation_thread_function_void(
-            continuation_type cont, Func&& func, Args_&& args)
+        construct_continuation_thread_function(continuation_type cont, F&& f)
         {
-            typedef typename boost::remove_reference<Args_>::type Args_type;
-            return detail::construct_continuation_thread_function_voidN<
-                    derived_type, util::tuple_size<Args_type>::value
-                >::call(cont, std::forward<Func>(func), std::forward<Args_>(args));
+            return detail::construct_continuation_thread_function<Derived>(
+                std::move(cont), std::forward<F>(f));
         }
-
-        template <typename Func, typename Args_>
-        static threads::thread_function_type
-        construct_continuation_thread_function(
-            continuation_type cont, Func&& func, Args_&& args)
-        {
-            typedef typename boost::remove_reference<Args_>::type Args_type;
-            return detail::construct_continuation_thread_functionN<
-                    derived_type, util::tuple_size<Args_type>::value
-                >::call(cont, std::forward<Func>(func), std::forward<Args_>(args));
-        }
-
-        // bring in all overloads for
-        //    construct_continuation_thread_function_void()
-        //    construct_continuation_thread_object_function_void()
-        //    construct_continuation_thread_function()
-        //    construct_continuation_thread_object_function()
-        #include <hpx/runtime/actions/construct_continuation_functions.hpp>
 
         typedef typename traits::is_future<local_result_type>::type is_future_pred;
 

@@ -122,17 +122,29 @@ namespace hpx { namespace actions
 
         // This static construct_thread_function allows to construct
         // a proper thread function for a thread without having to
-        // instantiate the component_base_actionN type. This is used by the
+        // instantiate the basic_action_impl type. This is used by the
         // applier in case a continuation has been supplied
+        template <std::size_t ...Is, typename Args>
+        static threads::thread_function_type
+        construct_thread_function(continuation_type& cont,
+            naming::address::address_type lva,
+            util::detail::pack_c<std::size_t, Is...>, Args&& args)
+        {
+            return traits::action_decorate_function<Derived>::call(lva,
+                base_type::construct_continuation_thread_function(
+                    cont, util::deferred_call(F, get_lva<Component>::call(lva),
+                        util::get<Is>(std::forward<Args>(args))...)));
+        }
+
         template <typename Args>
         static threads::thread_function_type
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Args&& args)
         {
-            return traits::action_decorate_function<Derived>::call(lva,
-                base_type::construct_continuation_thread_object_function(
-                    cont, F, get_lva<Component>::call(lva),
-                    std::forward<Args>(args)));
+            return construct_thread_function(cont, lva,
+                typename util::detail::make_index_pack<
+                    util::tuple_size<typename util::decay<Args>::type>::value
+                >::type(), std::forward<Args>(args));
         }
 
         // direct execution
@@ -261,17 +273,29 @@ namespace hpx { namespace actions
 
         // This static construct_thread_function allows to construct
         // a proper thread function for a thread without having to
-        // instantiate the component_base_actionN type. This is used by the applier in
+        // instantiate the basic_action_impl type. This is used by the applier in
         // case a continuation has been supplied
+        template <std::size_t ...Is, typename Args>
+        static threads::thread_function_type
+        construct_thread_function(continuation_type& cont,
+            naming::address::address_type lva,
+            util::detail::pack_c<std::size_t, Is...>, Args&& args)
+        {
+            return traits::action_decorate_function<Derived>::call(lva,
+                base_type::construct_continuation_thread_function(
+                    cont, util::deferred_call(F, get_lva<Component>::call(lva),
+                        util::get<Is>(std::forward<Args>(args))...)));
+        }
+
         template <typename Args>
         static threads::thread_function_type
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Args&& args)
         {
-            return traits::action_decorate_function<Derived>::call(lva,
-                base_type::construct_continuation_thread_object_function_void(
-                    cont, F, get_lva<Component>::call(lva),
-                    std::forward<Args>(args)));
+            return construct_thread_function(cont, lva,
+                typename util::detail::make_index_pack<
+                    util::tuple_size<typename util::decay<Args>::type>::value
+                >::type(), std::forward<Args>(args));
         }
 
         //  direct execution
