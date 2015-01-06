@@ -208,8 +208,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::equal_binary().call(
-            std::forward<ExPolicy>(policy),
-            first1, last1, first2, last2, detail::equal_to(), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first1, last1, first2, last2, detail::equal_to());
     }
 
     /// Returns true if the range [first1, last1) is equal to the range
@@ -311,8 +311,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::equal_binary().call(
-            std::forward<ExPolicy>(policy),
-            first1, last1, first2, last2, std::forward<F>(f), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first1, last1, first2, last2, std::forward<F>(f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -457,8 +457,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::equal().call(
-            std::forward<ExPolicy>(policy),
-            first1, last1, first2, detail::equal_to(), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first1, last1, first2, detail::equal_to());
     }
 
     /// Returns true if the range [first1, last1) is equal to the range
@@ -556,8 +556,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::equal().call(
-            std::forward<ExPolicy>(policy),
-            first1, last1, first2, std::forward<F>(f), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first1, last1, first2, std::forward<F>(f));
     }
 }}}
 

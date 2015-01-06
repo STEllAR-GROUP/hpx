@@ -59,13 +59,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 result_type;
 
                 return get_iter<1, result_type>(
-                    for_each_n<zip_iterator>().call(policy,
+                    for_each_n<zip_iterator>().call(
+                        policy, boost::mpl::false_(),
                         hpx::util::make_zip_iterator(first, dest),
                         std::distance(first, last),
                         [f](reference t) {
-                            hpx::util::get<1>(t) = f(hpx::util::get<0>(t)); //-V573
-                        },
-                        boost::mpl::false_()));
+                            using hpx::util::get;
+                            get<1>(t) = f(get<0>(t)); //-V573
+                        }));
             }
         };
         /// \endcond
@@ -152,8 +153,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::transform<OutIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, dest, std::forward<F>(f), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, dest, std::forward<F>(f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -192,14 +193,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 result_type;
 
                 return get_iter<2, result_type>(
-                    for_each_n<zip_iterator>().call(policy,
+                    for_each_n<zip_iterator>().call(
+                        policy, boost::mpl::false_(),
                         hpx::util::make_zip_iterator(first1, first2, dest),
                         std::distance(first1, last1),
                         [f](reference t) {
-                            hpx::util::get<2>(t) = //-V573
-                                f(hpx::util::get<0>(t), hpx::util::get<1>(t));
-                        },
-                        boost::mpl::false_()));
+                            using hpx::util::get;
+                            get<2>(t) = f(get<0>(t), get<1>(t)); //-V573
+                        }));
             }
         };
         /// \endcond
@@ -301,8 +302,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::transform_binary<OutIter>().call(
-            std::forward<ExPolicy>(policy),
-            first1, last1, first2, dest, std::forward<F>(f), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first1, last1, first2, dest, std::forward<F>(f));
     }
 }}}
 

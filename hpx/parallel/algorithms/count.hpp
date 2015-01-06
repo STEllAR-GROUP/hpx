@@ -100,7 +100,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 difference_type;
 
             return detail::count<difference_type>().call(
-                std::forward<ExPolicy>(policy), first, last, value, is_seq());
+                std::forward<ExPolicy>(policy), is_seq(), first, last, value);
         }
 
         // forward declare the segmented version of this algorithm
@@ -252,8 +252,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 difference_type;
 
             return detail::count_if<difference_type>().call(
-                std::forward<ExPolicy>(policy),
-                first, last, std::forward<F>(f), is_seq());
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, std::forward<F>(f));
         }
 
         // forward declare the segmented version of this algorithm

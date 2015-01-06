@@ -58,13 +58,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename std::iterator_traits<FwdIter>::value_type type;
 
                 return hpx::util::void_guard<result_type>(),
-                    for_each_n<FwdIter>().call(policy,
+                    for_each_n<FwdIter>().call(
+                        policy, boost::mpl::false_(),
                         first, std::distance(first, last),
                         [old_value, new_value](type& t) {
                             if (t == old_value)
                                 t = new_value;
-                        },
-                        boost::mpl::false_());
+                        });
             }
         };
         /// \endcond
@@ -129,8 +129,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
 
         return detail::replace().call(
-            std::forward<ExPolicy>(policy),
-            first, last, old_value, new_value, is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, old_value, new_value);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -163,13 +163,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename std::iterator_traits<FwdIter>::value_type type;
 
                 return hpx::util::void_guard<result_type>(),
-                    for_each_n<FwdIter>().call(policy,
+                    for_each_n<FwdIter>().call(
+                        policy, boost::mpl::false_(),
                         first, std::distance(first, last),
                         [f, new_value](type& t) {
                             if (f(t))
                                 t = new_value;
-                        },
-                        boost::mpl::false_());
+                        });
             }
         };
         /// \endcond
@@ -253,8 +253,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
 
         return detail::replace_if().call(
-            std::forward<ExPolicy>(policy),
-            first, last, std::forward<F>(f), new_value, is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, std::forward<F>(f), new_value);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -290,16 +290,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 result_type;
 
                 return get_iter<1, result_type>(
-                    for_each_n<zip_iterator>().call(policy,
+                    for_each_n<zip_iterator>().call(
+                        policy, boost::mpl::false_(),
                         hpx::util::make_zip_iterator(first, dest),
                         std::distance(first, last),
                         [old_value, new_value](reference t) {
-                            if (old_value == hpx::util::get<0>(t))
-                                hpx::util::get<1>(t) = new_value;
+                            using hpx::util::get;
+                            if (old_value == get<0>(t))
+                                get<1>(t) = new_value;
                             else
-                                hpx::util::get<1>(t) = hpx::util::get<0>(t); //-V573
-                        },
-                        boost::mpl::false_()));
+                                get<1>(t) = get<0>(t); //-V573
+                        }));
             }
         };
         /// \endcond
@@ -389,8 +390,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::replace_copy<OutIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, dest, old_value, new_value, is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, dest, old_value, new_value);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -427,16 +428,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 result_type;
 
                 return get_iter<1, result_type>(
-                    for_each_n<zip_iterator>().call(policy,
+                    for_each_n<zip_iterator>().call(
+                        policy, boost::mpl::false_(),
                         hpx::util::make_zip_iterator(first, dest),
                         std::distance(first, last),
                         [f, new_value](reference t) {
-                            if (f(hpx::util::get<0>(t)))
-                                hpx::util::get<1>(t) = new_value;
+                            using hpx::util::get;
+                            if (f(get<0>(t)))
+                                get<1>(t) = new_value;
                             else
-                                hpx::util::get<1>(t) = hpx::util::get<0>(t); //-V573
-                        },
-                        boost::mpl::false_()));
+                                get<1>(t) = get<0>(t); //-V573
+                        }));
             }
         };
         /// \endcond
@@ -545,8 +547,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::replace_copy_if<OutIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, dest, std::forward<F>(f), new_value, is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, dest, std::forward<F>(f), new_value);
     }
 }}}
 

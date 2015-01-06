@@ -75,7 +75,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return lcos::local::dataflow(
                 hpx::util::unwrapped([=]() mutable -> hpx::future<FwdIter>
                 {
-                    hpx::future<void> f = r.call(p, first, last, non_seq());
+                    hpx::future<void> f = r.call(p, non_seq(), first, last);
                     std::advance(first, std::distance(new_first, last));
                     return f.then(
                         [first] (hpx::future<void> &&) -> FwdIter
@@ -83,8 +83,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             return first;
                         });
                 }),
-                r.call(p, first, new_first, non_seq()),
-                r.call(p, new_first, last, non_seq()));
+                r.call(p, non_seq(), first, new_first),
+                r.call(p, non_seq(), new_first, last));
         }
 
         template <typename FwdIter>
@@ -178,7 +178,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::rotate<FwdIter>().call(
-            std::forward<ExPolicy>(policy), first, new_first, last, is_seq());
+            std::forward<ExPolicy>(policy), is_seq(), first, new_first, last);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -196,13 +196,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             parallel_task_execution_policy p =
                 par(task, policy.get_executor(), policy.get_chunk_size());
 
-            hpx::future<OutIter> f = detail::copy<OutIter>().call(p, new_first,
-                last, dest_first, non_seq());
+            hpx::future<OutIter> f =
+                detail::copy<OutIter>().call(p, non_seq(),
+                    new_first, last, dest_first);
 
             return f.then(
-                [=](hpx::future<OutIter> && it) {
-                    return detail::copy<OutIter>().call(p, first,
-                        new_first, it.get(), non_seq());
+                [=](hpx::future<OutIter> && it)
+                {
+                    return detail::copy<OutIter>().call(
+                        p, non_seq(), first, new_first, it.get());
                 });
         }
 
@@ -312,8 +314,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::rotate_copy<OutIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, new_first, last, dest_first, is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, new_first, last, dest_first);
     }
 }}}
 

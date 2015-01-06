@@ -9,7 +9,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 
-/// See N4071: 1.3/3
+/// See N4310: 1.3/3
 #include <algorithm>
 
 #include <hpx/parallel/algorithms/adjacent_find.hpp>

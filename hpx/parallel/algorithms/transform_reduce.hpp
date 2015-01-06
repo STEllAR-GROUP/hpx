@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -95,13 +95,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
         };
 
-        template <typename ExPolicy, typename InIter, typename T, typename Reduce,
-            typename Convert>
+        template <typename ExPolicy, typename InIter, typename T,
+            typename Reduce, typename Convert>
         inline typename detail::algorithm_result<
             ExPolicy, typename hpx::util::decay<T>::type
         >::type
-        transform_reduce_(ExPolicy&& policy, InIter first, InIter last, T && init,
-            Reduce && red_op, Convert && conv_op, boost::mpl::false_)
+        transform_reduce_(ExPolicy&& policy, InIter first, InIter last,
+            T && init, Reduce && red_op, Convert && conv_op, boost::mpl::false_)
         {
             typedef typename std::iterator_traits<InIter>::iterator_category
                 iterator_category;
@@ -118,15 +118,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename hpx::util::decay<T>::type init_type;
 
             return transform_reduce<init_type>().call(
-                std::forward<ExPolicy>(policy), first, last,
-                std::forward<T>(init),
-                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
-                is_seq());
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, std::forward<T>(init),
+                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op));
         }
 
         // forward declare the segmented version of this algorithm
-        template <typename ExPolicy, typename InIter, typename T, typename Reduce,
-            typename Convert>
+        template <typename ExPolicy, typename InIter, typename T,
+            typename Reduce, typename Convert>
         typename detail::algorithm_result<
             ExPolicy, typename hpx::util::decay<T>::type
         >::type
@@ -154,6 +153,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     requirements of \a CopyConstructible.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
+    /// \tparam Reduce      The type of the binary function object used for
+    ///                     the reduction operation.
+    /// \tparam Convert     The type of the unary function object used to
+    ///                     transform the elements of the input sequence before
+    ///                     invoking the reduce function.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
