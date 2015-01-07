@@ -116,14 +116,14 @@ namespace hpx { namespace threads { namespace policies
 
 #ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
         typedef
-            HPX_STD_TUPLE<thread_init_data, thread_state_enum, boost::uint64_t>
+            util::tuple<thread_init_data, thread_state_enum, boost::uint64_t>
         task_description;
 #else
-        typedef HPX_STD_TUPLE<thread_init_data, thread_state_enum> task_description;
+        typedef util::tuple<thread_init_data, thread_state_enum> task_description;
 #endif
 
 #ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
-        typedef HPX_STD_TUPLE<thread_data_base*, boost::uint64_t>
+        typedef util::tuple<thread_data_base*, boost::uint64_t>
             thread_description;
 #else
         typedef thread_data_base thread_description;
@@ -233,7 +233,7 @@ namespace hpx { namespace threads { namespace policies
 #ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
                 if (maintain_queue_wait_times) {
                     addfrom->new_tasks_wait_ +=
-                        util::high_resolution_clock::now() - HPX_STD_GET(2, *task);
+                        util::high_resolution_clock::now() - util::get<2>(*task);
                     ++addfrom->new_tasks_wait_count_;
                 }
 #endif
@@ -243,8 +243,8 @@ namespace hpx { namespace threads { namespace policies
                 util::block_profiler_wrapper<add_new_tag> bp(add_new_logger_);
 
                 // create the new thread
-                threads::thread_init_data& data = HPX_STD_GET(0, *task);
-                thread_state_enum state = HPX_STD_GET(1, *task);
+                threads::thread_init_data& data = util::get<0>(*task);
+                thread_state_enum state = util::get<1>(*task);
                 threads::thread_id_type thrd;
 
                 create_thread_object(thrd, data, state, lk);
@@ -750,9 +750,9 @@ namespace hpx { namespace threads { namespace policies
 #ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
                 if (maintain_queue_wait_times) {
                     boost::uint64_t now = util::high_resolution_clock::now();
-                    src->work_items_wait_ += now - HPX_STD_GET(1, *trd);
+                    src->work_items_wait_ += now - util::get<1>(*trd);
                     ++src->work_items_wait_count_;
-                    HPX_STD_GET(1, *trd) = now;
+                    util::get<1>(*trd) = now;
                 }
 #endif
 
@@ -774,9 +774,9 @@ namespace hpx { namespace threads { namespace policies
 #ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
                 if (maintain_queue_wait_times) {
                     boost::int64_t now = util::high_resolution_clock::now();
-                    src->new_tasks_wait_ += now - HPX_STD_GET(2, *task);
+                    src->new_tasks_wait_ += now - util::get<2>(*task);
                     ++src->new_tasks_wait_count_;
-                    HPX_STD_GET(2, *task) = now;
+                    util::get<2>(*task) = now;
                 }
 #endif
 
@@ -807,11 +807,11 @@ namespace hpx { namespace threads { namespace policies
 
                 if (maintain_queue_wait_times) {
                     work_items_wait_ += util::high_resolution_clock::now() -
-                        HPX_STD_GET(1, *tdesc);
+                        util::get<1>(*tdesc);
                     ++work_items_wait_count_;
                 }
 
-                thrd = HPX_STD_GET(0, *tdesc);
+                thrd = util::get<0>(*tdesc);
                 delete tdesc;
 
                 return true;
