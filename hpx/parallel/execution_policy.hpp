@@ -609,6 +609,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         boost::shared_ptr<void> inner_;
         std::type_info const* type_;
 
+        execution_policy(execution_policy const& rhs)
+          : inner_(rhs.inner_),
+            type_(rhs.type_)
+        {}
+
     public:
         /// Effects: Constructs an execution_policy object with a copy of
         ///          exec's state
