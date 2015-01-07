@@ -309,7 +309,7 @@ namespace hpx { namespace lcos
     >::type
     when_each(HPX_ENUM_FWD_ARGS(N, T, f), F && func)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             BOOST_PP_ENUM(N, HPX_WHEN_EACH_DECAY_FUTURE, _)>
             argument_type;
         typedef void result_type;

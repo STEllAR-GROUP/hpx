@@ -12,10 +12,10 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
-#include <hpx/config/tuple.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/tuple.hpp>
 #include <hpx/util/void_guard.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_stacksize.hpp>

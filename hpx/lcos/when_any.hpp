@@ -418,10 +418,10 @@ namespace hpx { namespace lcos
         return lcos::when_any(lazy_values_, ec);
     }
 
-    inline lcos::future<when_any_result<HPX_STD_TUPLE<> > > //-V524
+    inline lcos::future<when_any_result<util::tuple<> > > //-V524
     when_any(error_code& /*ec*/ = throws)
     {
-        typedef when_any_result<HPX_STD_TUPLE<> > result_type;
+        typedef when_any_result<util::tuple<> > result_type;
 
         return lcos::make_ready_future(result_type());
     }
@@ -494,10 +494,10 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     template <BOOST_PP_ENUM_PARAMS(N, typename T)>
     lcos::future<when_any_result<
-        HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_ANY_DECAY_FUTURE, _)> > >
+        util::tuple<BOOST_PP_ENUM(N, HPX_WHEN_ANY_DECAY_FUTURE, _)> > >
     when_any(HPX_ENUM_FWD_ARGS(N, T, f), error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             BOOST_PP_ENUM(N, HPX_WHEN_ANY_DECAY_FUTURE, _)>
             result_type;
 

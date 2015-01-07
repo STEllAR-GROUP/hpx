@@ -39,7 +39,7 @@ boost::uint64_t add(
 struct when_all_wrapper
 {
     typedef boost::uint64_t result_type;
-    typedef HPX_STD_TUPLE<
+    typedef hpx::util::tuple<
             hpx::future<boost::uint64_t>
           , hpx::future<boost::uint64_t> > data_type;
 
@@ -48,7 +48,7 @@ struct when_all_wrapper
     ) const
     {
         data_type v = data.get();
-        return HPX_STD_GET(0, v).get() + HPX_STD_GET(1, v).get();
+        return hpx::util::get<0>(v).get() + hpx::util::get<1>(v).get();
     }
 };
 

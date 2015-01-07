@@ -21,7 +21,7 @@ namespace hpx { namespace lcos
     >::type
     when_each(T0 && f0, F && func)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename traits::acquire_future<T0>::type>
             argument_type;
         typedef void result_type;
@@ -50,7 +50,7 @@ namespace hpx { namespace lcos
     >::type
     when_each(T0 && f0 , T1 && f1, F && func)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename traits::acquire_future<T0>::type , typename traits::acquire_future<T1>::type>
             argument_type;
         typedef void result_type;
@@ -79,7 +79,7 @@ namespace hpx { namespace lcos
     >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2, F && func)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename traits::acquire_future<T0>::type , typename traits::acquire_future<T1>::type , typename traits::acquire_future<T2>::type>
             argument_type;
         typedef void result_type;
@@ -108,7 +108,7 @@ namespace hpx { namespace lcos
     >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3, F && func)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename traits::acquire_future<T0>::type , typename traits::acquire_future<T1>::type , typename traits::acquire_future<T2>::type , typename traits::acquire_future<T3>::type>
             argument_type;
         typedef void result_type;
@@ -137,7 +137,7 @@ namespace hpx { namespace lcos
     >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4, F && func)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename traits::acquire_future<T0>::type , typename traits::acquire_future<T1>::type , typename traits::acquire_future<T2>::type , typename traits::acquire_future<T3>::type , typename traits::acquire_future<T4>::type>
             argument_type;
         typedef void result_type;
@@ -166,7 +166,7 @@ namespace hpx { namespace lcos
     >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5, F && func)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename traits::acquire_future<T0>::type , typename traits::acquire_future<T1>::type , typename traits::acquire_future<T2>::type , typename traits::acquire_future<T3>::type , typename traits::acquire_future<T4>::type , typename traits::acquire_future<T5>::type>
             argument_type;
         typedef void result_type;
@@ -195,7 +195,7 @@ namespace hpx { namespace lcos
     >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6, F && func)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename traits::acquire_future<T0>::type , typename traits::acquire_future<T1>::type , typename traits::acquire_future<T2>::type , typename traits::acquire_future<T3>::type , typename traits::acquire_future<T4>::type , typename traits::acquire_future<T5>::type , typename traits::acquire_future<T6>::type>
             argument_type;
         typedef void result_type;
@@ -224,7 +224,7 @@ namespace hpx { namespace lcos
     >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7, F && func)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename traits::acquire_future<T0>::type , typename traits::acquire_future<T1>::type , typename traits::acquire_future<T2>::type , typename traits::acquire_future<T3>::type , typename traits::acquire_future<T4>::type , typename traits::acquire_future<T5>::type , typename traits::acquire_future<T6>::type , typename traits::acquire_future<T7>::type>
             argument_type;
         typedef void result_type;
@@ -253,7 +253,7 @@ namespace hpx { namespace lcos
     >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8, F && func)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename traits::acquire_future<T0>::type , typename traits::acquire_future<T1>::type , typename traits::acquire_future<T2>::type , typename traits::acquire_future<T3>::type , typename traits::acquire_future<T4>::type , typename traits::acquire_future<T5>::type , typename traits::acquire_future<T6>::type , typename traits::acquire_future<T7>::type , typename traits::acquire_future<T8>::type>
             argument_type;
         typedef void result_type;
@@ -282,7 +282,7 @@ namespace hpx { namespace lcos
     >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9, F && func)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename traits::acquire_future<T0>::type , typename traits::acquire_future<T1>::type , typename traits::acquire_future<T2>::type , typename traits::acquire_future<T3>::type , typename traits::acquire_future<T4>::type , typename traits::acquire_future<T5>::type , typename traits::acquire_future<T6>::type , typename traits::acquire_future<T7>::type , typename traits::acquire_future<T8>::type , typename traits::acquire_future<T9>::type>
             argument_type;
         typedef void result_type;
@@ -311,7 +311,7 @@ namespace hpx { namespace lcos
     >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10, F && func)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename traits::acquire_future<T0>::type , typename traits::acquire_future<T1>::type , typename traits::acquire_future<T2>::type , typename traits::acquire_future<T3>::type , typename traits::acquire_future<T4>::type , typename traits::acquire_future<T5>::type , typename traits::acquire_future<T6>::type , typename traits::acquire_future<T7>::type , typename traits::acquire_future<T8>::type , typename traits::acquire_future<T9>::type , typename traits::acquire_future<T10>::type>
             argument_type;
         typedef void result_type;
@@ -340,7 +340,7 @@ namespace hpx { namespace lcos
     >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11, F && func)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename traits::acquire_future<T0>::type , typename traits::acquire_future<T1>::type , typename traits::acquire_future<T2>::type , typename traits::acquire_future<T3>::type , typename traits::acquire_future<T4>::type , typename traits::acquire_future<T5>::type , typename traits::acquire_future<T6>::type , typename traits::acquire_future<T7>::type , typename traits::acquire_future<T8>::type , typename traits::acquire_future<T9>::type , typename traits::acquire_future<T10>::type , typename traits::acquire_future<T11>::type>
             argument_type;
         typedef void result_type;
@@ -369,7 +369,7 @@ namespace hpx { namespace lcos
     >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12, F && func)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename traits::acquire_future<T0>::type , typename traits::acquire_future<T1>::type , typename traits::acquire_future<T2>::type , typename traits::acquire_future<T3>::type , typename traits::acquire_future<T4>::type , typename traits::acquire_future<T5>::type , typename traits::acquire_future<T6>::type , typename traits::acquire_future<T7>::type , typename traits::acquire_future<T8>::type , typename traits::acquire_future<T9>::type , typename traits::acquire_future<T10>::type , typename traits::acquire_future<T11>::type , typename traits::acquire_future<T12>::type>
             argument_type;
         typedef void result_type;
@@ -398,7 +398,7 @@ namespace hpx { namespace lcos
     >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12 , T13 && f13, F && func)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename traits::acquire_future<T0>::type , typename traits::acquire_future<T1>::type , typename traits::acquire_future<T2>::type , typename traits::acquire_future<T3>::type , typename traits::acquire_future<T4>::type , typename traits::acquire_future<T5>::type , typename traits::acquire_future<T6>::type , typename traits::acquire_future<T7>::type , typename traits::acquire_future<T8>::type , typename traits::acquire_future<T9>::type , typename traits::acquire_future<T10>::type , typename traits::acquire_future<T11>::type , typename traits::acquire_future<T12>::type , typename traits::acquire_future<T13>::type>
             argument_type;
         typedef void result_type;
@@ -427,7 +427,7 @@ namespace hpx { namespace lcos
     >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12 , T13 && f13 , T14 && f14, F && func)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename traits::acquire_future<T0>::type , typename traits::acquire_future<T1>::type , typename traits::acquire_future<T2>::type , typename traits::acquire_future<T3>::type , typename traits::acquire_future<T4>::type , typename traits::acquire_future<T5>::type , typename traits::acquire_future<T6>::type , typename traits::acquire_future<T7>::type , typename traits::acquire_future<T8>::type , typename traits::acquire_future<T9>::type , typename traits::acquire_future<T10>::type , typename traits::acquire_future<T11>::type , typename traits::acquire_future<T12>::type , typename traits::acquire_future<T13>::type , typename traits::acquire_future<T14>::type>
             argument_type;
         typedef void result_type;
@@ -456,7 +456,7 @@ namespace hpx { namespace lcos
     >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12 , T13 && f13 , T14 && f14 , T15 && f15, F && func)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename traits::acquire_future<T0>::type , typename traits::acquire_future<T1>::type , typename traits::acquire_future<T2>::type , typename traits::acquire_future<T3>::type , typename traits::acquire_future<T4>::type , typename traits::acquire_future<T5>::type , typename traits::acquire_future<T6>::type , typename traits::acquire_future<T7>::type , typename traits::acquire_future<T8>::type , typename traits::acquire_future<T9>::type , typename traits::acquire_future<T10>::type , typename traits::acquire_future<T11>::type , typename traits::acquire_future<T12>::type , typename traits::acquire_future<T13>::type , typename traits::acquire_future<T14>::type , typename traits::acquire_future<T15>::type>
             argument_type;
         typedef void result_type;
@@ -485,7 +485,7 @@ namespace hpx { namespace lcos
     >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12 , T13 && f13 , T14 && f14 , T15 && f15 , T16 && f16, F && func)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename traits::acquire_future<T0>::type , typename traits::acquire_future<T1>::type , typename traits::acquire_future<T2>::type , typename traits::acquire_future<T3>::type , typename traits::acquire_future<T4>::type , typename traits::acquire_future<T5>::type , typename traits::acquire_future<T6>::type , typename traits::acquire_future<T7>::type , typename traits::acquire_future<T8>::type , typename traits::acquire_future<T9>::type , typename traits::acquire_future<T10>::type , typename traits::acquire_future<T11>::type , typename traits::acquire_future<T12>::type , typename traits::acquire_future<T13>::type , typename traits::acquire_future<T14>::type , typename traits::acquire_future<T15>::type , typename traits::acquire_future<T16>::type>
             argument_type;
         typedef void result_type;
@@ -514,7 +514,7 @@ namespace hpx { namespace lcos
     >::type
     when_each(T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12 , T13 && f13 , T14 && f14 , T15 && f15 , T16 && f16 , T17 && f17, F && func)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename traits::acquire_future<T0>::type , typename traits::acquire_future<T1>::type , typename traits::acquire_future<T2>::type , typename traits::acquire_future<T3>::type , typename traits::acquire_future<T4>::type , typename traits::acquire_future<T5>::type , typename traits::acquire_future<T6>::type , typename traits::acquire_future<T7>::type , typename traits::acquire_future<T8>::type , typename traits::acquire_future<T9>::type , typename traits::acquire_future<T10>::type , typename traits::acquire_future<T11>::type , typename traits::acquire_future<T12>::type , typename traits::acquire_future<T13>::type , typename traits::acquire_future<T14>::type , typename traits::acquire_future<T15>::type , typename traits::acquire_future<T16>::type , typename traits::acquire_future<T17>::type>
             argument_type;
         typedef void result_type;
