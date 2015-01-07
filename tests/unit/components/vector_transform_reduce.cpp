@@ -90,8 +90,8 @@ void transform_reduce_tests()
     }
 
     {
-        hpx::vector<T> xvalues(num, T(1), hpx::block(2));
-        hpx::vector<T> yvalues(num, T(1), hpx::block(2));
+        hpx::vector<T> xvalues(num, T(1), hpx::layout(2));
+        hpx::vector<T> yvalues(num, T(1), hpx::layout(2));
 
         transform_reduce_tests(num, xvalues, yvalues);
     }
