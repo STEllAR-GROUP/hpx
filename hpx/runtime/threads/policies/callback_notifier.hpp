@@ -16,9 +16,10 @@ namespace hpx { namespace threads { namespace policies
 {
     class callback_notifier
     {
-        typedef HPX_STD_FUNCTION<void(std::size_t, char const*)> on_startstop_type;
-        typedef HPX_STD_FUNCTION<void(std::size_t, boost::exception_ptr const&)>
-            on_error_type;
+        typedef util::function_nonser<
+            void(std::size_t, char const*)> on_startstop_type;
+        typedef util::function_nonser<
+            void(std::size_t, boost::exception_ptr const&)> on_error_type;
 
     public:
         callback_notifier(on_startstop_type start = on_startstop_type(),

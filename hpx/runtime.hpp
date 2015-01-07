@@ -101,7 +101,7 @@ namespace hpx
         virtual ~runtime();
 
         /// \brief Manage list of functions to call on exit
-        void on_exit(HPX_STD_FUNCTION<void()> const& f)
+        void on_exit(util::function_nonser<void()> const& f)
         {
             boost::mutex::scoped_lock l(mtx_);
             on_exit_functions_.push_back(f);
@@ -118,7 +118,7 @@ namespace hpx
         {
             state_.store(state_stopped);
 
-            typedef HPX_STD_FUNCTION<void()> value_type;
+            typedef util::function_nonser<void()> value_type;
 
             boost::mutex::scoped_lock l(mtx_);
             BOOST_FOREACH(value_type f, on_exit_functions_)
@@ -195,11 +195,11 @@ namespace hpx
         void register_counter_types();
 
         ///////////////////////////////////////////////////////////////////////
-        virtual int run(HPX_STD_FUNCTION<hpx_main_function_type> const& func) = 0;
+        virtual int run(util::function_nonser<hpx_main_function_type> const& func) = 0;
 
         virtual int run() = 0;
 
-        virtual int start(HPX_STD_FUNCTION<hpx_main_function_type> const& func,
+        virtual int start(util::function_nonser<hpx_main_function_type> const& func,
             bool blocking = false) = 0;
 
         virtual int start(bool blocking = false) = 0;
@@ -233,13 +233,13 @@ namespace hpx
 
         virtual util::unique_id_ranges& get_id_pool() = 0;
 
-        virtual void add_pre_startup_function(HPX_STD_FUNCTION<void()> const& f) = 0;
+        virtual void add_pre_startup_function(util::function_nonser<void()> const& f) = 0;
 
-        virtual void add_startup_function(HPX_STD_FUNCTION<void()> const& f) = 0;
+        virtual void add_startup_function(util::function_nonser<void()> const& f) = 0;
 
-        virtual void add_pre_shutdown_function(HPX_STD_FUNCTION<void()> const& f) = 0;
+        virtual void add_pre_shutdown_function(util::function_nonser<void()> const& f) = 0;
 
-        virtual void add_shutdown_function(HPX_STD_FUNCTION<void()> const& f) = 0;
+        virtual void add_shutdown_function(util::function_nonser<void()> const& f) = 0;
 
         /// Keep the factory object alive which is responsible for the given
         /// component type. This a purely internal function allowing to work
@@ -382,7 +382,7 @@ namespace hpx
         util::reinit_helper reinit_;
 
         // list of functions to call on exit
-        typedef std::vector<HPX_STD_FUNCTION<void()> > on_exit_type;
+        typedef std::vector<util::function_nonser<void()> > on_exit_type;
         on_exit_type on_exit_functions_;
         mutable boost::mutex mtx_;
 

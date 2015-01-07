@@ -79,7 +79,7 @@ namespace hpx { namespace components
         /// \return   Returns the GID of the first newly created component
         ///           instance.
         virtual naming::gid_type create_with_args(
-            HPX_STD_FUNCTION<void(void*)> const&) = 0;
+            util::function_nonser<void(void*)> const&) = 0;
 
         /// \brief Create one new component instance and initialize it using
         ///        the using the given constructor function. Assign the give
@@ -93,7 +93,7 @@ namespace hpx { namespace components
         ///           instance (this is the same as assign_gid, if successful).
         virtual naming::gid_type create_with_args(
             naming::gid_type const& assign_gid,
-            HPX_STD_FUNCTION<void(void*)> const& f) = 0;
+            util::function_nonser<void(void*)> const& f) = 0;
 
         /// \brief Destroy one or more component instances
         ///

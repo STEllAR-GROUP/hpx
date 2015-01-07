@@ -555,18 +555,6 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// Use std::function if it's available and movable
-#if defined(HPX_UTIL_FUNCTION)
-#  define HPX_STD_FUNCTION ::hpx::util::function_nonser
-#else
-#if !defined(HPX_HAVE_CXX11_STD_FUNCTION)
-#  define HPX_STD_FUNCTION ::boost::function
-#else
-#  define HPX_STD_FUNCTION ::std::function
-#endif
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 // Use std::tuple if it's available and movable
 #if defined(HPX_UTIL_TUPLE)
 #  define HPX_STD_TUPLE         ::hpx::util::tuple

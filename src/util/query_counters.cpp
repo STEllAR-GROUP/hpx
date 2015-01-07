@@ -74,7 +74,7 @@ namespace hpx { namespace util
             using util::placeholders::_1;
             using util::placeholders::_2;
 
-            HPX_STD_FUNCTION<performance_counters::discover_counter_func> func(
+            performance_counters::discover_counter_func func(
                 util::bind(&query_counters::find_counter, this, _1, _2));
 
             ids_.reserve(names.size());

@@ -254,7 +254,7 @@ namespace hpx { namespace threads
     }
 
     bool add_thread_exit_callback(thread_id_type const& id,
-        HPX_STD_FUNCTION<void()> const& f, error_code& ec)
+        util::function_nonser<void()> const& f, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)

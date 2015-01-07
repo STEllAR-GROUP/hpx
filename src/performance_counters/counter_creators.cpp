@@ -23,7 +23,7 @@ namespace hpx { namespace performance_counters
     /// with the counter types. It will pass the \a counter_info and the
     /// \a error_code to the supplied function.
     bool default_counter_discoverer(counter_info const& info,
-        HPX_STD_FUNCTION<discover_counter_func> const& f,
+        discover_counter_func const& f,
         discover_counters_mode mode, error_code& ec)
     {
         return f(info, ec);
@@ -36,7 +36,7 @@ namespace hpx { namespace performance_counters
     ///   /<objectname>{locality#<locality_id>/total}/<instancename>
     ///
     bool locality_counter_discoverer(counter_info const& info,
-        HPX_STD_FUNCTION<discover_counter_func> const& f,
+        discover_counter_func const& f,
         discover_counters_mode mode, error_code& ec)
     {
         performance_counters::counter_info i = info;
@@ -83,7 +83,7 @@ namespace hpx { namespace performance_counters
     ///   /<objectname>{locality#0/total}/<instancename>
     ///
     bool locality0_counter_discoverer(counter_info const& info,
-        HPX_STD_FUNCTION<discover_counter_func> const& f,
+        discover_counter_func const& f,
         discover_counters_mode mode, error_code& ec)
     {
         performance_counters::counter_info i = info;
@@ -130,7 +130,7 @@ namespace hpx { namespace performance_counters
     ///   /<objectname>{locality#<locality_id>/thread#<threadnum>}/<instancename>
     ///
     bool locality_thread_counter_discoverer(counter_info const& info,
-        HPX_STD_FUNCTION<discover_counter_func> const& f,
+        discover_counter_func const& f,
         discover_counters_mode mode, error_code& ec)
     {
         performance_counters::counter_info i = info;
@@ -185,7 +185,7 @@ namespace hpx { namespace performance_counters
     ///   /<objectname>{locality#<locality_id>/total}/<instancename>
     ///
     naming::gid_type locality_raw_counter_creator(counter_info const& info,
-        HPX_STD_FUNCTION<boost::int64_t(bool)> const& f, error_code& ec)
+        util::function_nonser<boost::int64_t(bool)> const& f, error_code& ec)
     {
         // verify the validity of the counter instance name
         counter_path_elements paths;

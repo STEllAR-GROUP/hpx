@@ -34,7 +34,7 @@ namespace hpx { namespace performance_counters { namespace memory
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool get_startup(HPX_STD_FUNCTION<void()>& startup_func, bool& pre_startup)
+    bool get_startup(util::function_nonser<void()>& startup_func, bool& pre_startup)
     {
         // return our startup-function
         startup_func = register_counter_types;    // function to run during startup

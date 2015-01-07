@@ -21,8 +21,8 @@ namespace hpx { namespace util
         // register_functions function is called from within boost::call_once
         typedef util::spinlock mutex_type;
 
-        typedef HPX_STD_FUNCTION<void()> construct_type;
-        typedef HPX_STD_FUNCTION<void()> destruct_type;
+        typedef util::function_nonser<void()> construct_type;
+        typedef util::function_nonser<void()> destruct_type;
 
         typedef std::pair<construct_type, destruct_type> value_type;
         typedef std::vector<value_type> reinit_functions_type;
@@ -70,8 +70,8 @@ namespace hpx { namespace util
     // the runtime system is about to start and after the runtime system has
     // been terminated. This is used to initialize/reinitialize all
     // singleton instances.
-    void reinit_register(HPX_STD_FUNCTION<void()> const& construct,
-        HPX_STD_FUNCTION<void()> const& destruct)
+    void reinit_register(util::function_nonser<void()> const& construct,
+        util::function_nonser<void()> const& destruct)
     {
         reinit_functions_storage::get().register_functions(construct, destruct);
     }

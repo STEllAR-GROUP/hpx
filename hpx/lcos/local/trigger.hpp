@@ -125,10 +125,11 @@ namespace hpx { namespace lcos { namespace local
                 this_.conditions_.erase(it_);
             }
 
-            future<void> get_future(HPX_STD_FUNCTION<bool()> const& func,
+            template <typename Condition>
+            future<void> get_future(Condition&& func,
                 error_code& ec = hpx::throws)
             {
-                return (*it_)->get_future(func, ec);
+                return (*it_)->get_future(std::forward<Condition>(func), ec);
             }
 
             base_trigger& this_;

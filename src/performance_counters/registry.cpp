@@ -56,8 +56,8 @@ namespace hpx { namespace performance_counters
 
     ///////////////////////////////////////////////////////////////////////////
     counter_status registry::add_counter_type(counter_info const& info,
-        HPX_STD_FUNCTION<create_counter_func> const& create_counter_,
-        HPX_STD_FUNCTION<discover_counters_func> const& discover_counters_,
+        create_counter_func const& create_counter_,
+        discover_counters_func const& discover_counters_,
         error_code& ec)
     {
         // create canonical type name
@@ -177,7 +177,7 @@ namespace hpx { namespace performance_counters
     /// \brief Call the supplied function for the given registered counter type.
     counter_status registry::discover_counter_type(
         std::string const& fullname,
-        HPX_STD_FUNCTION<discover_counter_func> discover_counter,
+        discover_counter_func discover_counter,
         discover_counters_mode mode, error_code& ec)
     {
         // create canonical type name
@@ -276,7 +276,7 @@ namespace hpx { namespace performance_counters
 
     /// \brief Call the supplied function for all registered counter types.
     counter_status registry::discover_counter_types(
-        HPX_STD_FUNCTION<discover_counter_func> discover_counter,
+        discover_counter_func discover_counter,
         discover_counters_mode mode, error_code& ec)
     {
         if (mode == discover_counters_full)
@@ -304,7 +304,7 @@ namespace hpx { namespace performance_counters
 
     ///////////////////////////////////////////////////////////////////////////
     counter_status registry::get_counter_create_function(
-        counter_info const& info, HPX_STD_FUNCTION<create_counter_func>& func,
+        counter_info const& info, create_counter_func& func,
         error_code& ec) const
     {
         // create canonical type name
@@ -334,7 +334,7 @@ namespace hpx { namespace performance_counters
 
     ///////////////////////////////////////////////////////////////////////////
     counter_status registry::get_counter_discovery_function(
-        counter_info const& info, HPX_STD_FUNCTION<discover_counters_func>& func,
+        counter_info const& info, discover_counters_func& func,
         error_code& ec) const
     {
         // create canonical type name
@@ -400,28 +400,28 @@ namespace hpx { namespace performance_counters
     counter_status registry::create_raw_counter_value(counter_info const& info,
         boost::int64_t* countervalue, naming::gid_type& id, error_code& ec)
     {
-        HPX_STD_FUNCTION<boost::int64_t(bool)> func(
+        util::function_nonser<boost::int64_t(bool)> func(
             boost::bind(wrap_counter, countervalue, ::_1));
         return create_raw_counter(info, func, id, ec);
     }
 
     static boost::int64_t
-    wrap_raw_counter(HPX_STD_FUNCTION<boost::int64_t()> const& f, bool)
+    wrap_raw_counter(util::function_nonser<boost::int64_t()> const& f, bool)
     {
         return f();
     }
 
     counter_status registry::create_raw_counter(counter_info const& info,
-        HPX_STD_FUNCTION<boost::int64_t()> const& f, naming::gid_type& id,
+        util::function_nonser<boost::int64_t()> const& f, naming::gid_type& id,
         error_code& ec)
     {
-        HPX_STD_FUNCTION<boost::int64_t(bool)> func(
+        util::function_nonser<boost::int64_t(bool)> func(
             boost::bind(&wrap_raw_counter, f, ::_1));
         return create_raw_counter(info, func, id, ec);
     }
 
     counter_status registry::create_raw_counter(counter_info const& info,
-        HPX_STD_FUNCTION<boost::int64_t(bool)> const& f, naming::gid_type& id,
+        util::function_nonser<boost::int64_t(bool)> const& f, naming::gid_type& id,
         error_code& ec)
     {
         // create canonical type name

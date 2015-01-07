@@ -465,7 +465,7 @@ void register_worker(registration_header const& header)
           , dest, p);
 #else
         // delay the final response until the runtime system is up and running
-        HPX_STD_FUNCTION<void()>* thunk = new HPX_STD_FUNCTION<void()>(
+        util::function_nonser<void()>* thunk = new util::function_nonser<void()>(
             boost::bind(
                 &big_boot_barrier::apply
               , boost::ref(get_big_boot_barrier())
@@ -668,7 +668,7 @@ void register_worker_security(registration_header_security const& header)
     {
         // AGAS is starting up; this locality is participating in startup
         // synchronization.
-        HPX_STD_FUNCTION<void()>* thunk = new HPX_STD_FUNCTION<void()>(
+        util::function_nonser<void()>* thunk = new util::function_nonser<void()>(
             boost::bind(
                 &big_boot_barrier::apply
               , boost::ref(get_big_boot_barrier())
@@ -870,7 +870,7 @@ void big_boot_barrier::trigger()
 {
     if (service_mode_bootstrap == service_type)
     {
-        HPX_STD_FUNCTION<void()>* p;
+        util::function_nonser<void()>* p;
 
         while (thunks.pop(p))
             (*p)();
