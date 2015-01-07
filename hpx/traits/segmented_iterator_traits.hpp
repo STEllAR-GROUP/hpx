@@ -40,6 +40,16 @@ namespace hpx { namespace traits
         {
             return it;
         }
+
+        static local_raw_iterator local(local_iterator&& it)
+        {
+            return std::move(it);
+        }
+
+        static local_iterator remote(local_raw_iterator&& it)
+        {
+            return std::move(it);
+        }
     };
 }}
 

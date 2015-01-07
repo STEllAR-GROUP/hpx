@@ -140,6 +140,27 @@ namespace hpx
             local_vector_iterator<T> const& it_;
         };
 
+        template <typename T>
+        struct const_local_vector_value_proxy
+        {
+            const_local_vector_value_proxy(
+                    const_local_vector_iterator<T> const& it)
+              : it_(it)
+            {}
+
+            operator T() const
+            {
+                if (!it_.get_data())
+                {
+                    return it_.get_partition().get_value_sync(
+                        it_.get_local_index());
+                }
+                return *it_.local();
+            }
+
+            const_local_vector_iterator<T> const& it_;
+        };
+
         ///////////////////////////////////////////////////////////////////////
         template <typename T>
         struct vector_value_proxy
@@ -250,25 +271,21 @@ namespace hpx
 
         void increment()
         {
-            HPX_ASSERT(data_);
             ++local_index_;
         }
 
         void decrement()
         {
-            HPX_ASSERT(data_);
             --local_index_;
         }
 
         void advance(std::ptrdiff_t n)
         {
-            HPX_ASSERT(data_);
             local_index_ += n;
         }
 
         std::ptrdiff_t distance_to(local_vector_iterator const& other) const
         {
-            HPX_ASSERT(data_ && other.data_);
             HPX_ASSERT(partition_ == other.partition_);
             return other.local_index_ - local_index_;
         }
@@ -303,13 +320,15 @@ namespace hpx
     class const_local_vector_iterator
       : public boost::iterator_facade<
             const_local_vector_iterator<T>, T const,
-            std::random_access_iterator_tag, T const
+            std::random_access_iterator_tag,
+            detail::const_local_vector_value_proxy<T>
         >
     {
     private:
         typedef boost::iterator_facade<
                 const_local_vector_iterator<T>, T const,
-                std::random_access_iterator_tag, T const
+                std::random_access_iterator_tag,
+                detail::const_local_vector_value_proxy<T>
             > base_type;
 
     public:
@@ -334,7 +353,7 @@ namespace hpx
         typedef local_raw_iterator local_raw_const_iterator;
 
         ///////////////////////////////////////////////////////////////////////
-        local_raw_const_iterator local()
+        local_raw_iterator local()
         {
             HPX_ASSERT(data_);
             return local_raw_iterator(data_->cbegin() + local_index_, data_);
@@ -342,7 +361,7 @@ namespace hpx
         local_raw_const_iterator local() const
         {
             HPX_ASSERT(data_);
-            return local_raw_iterator(data_->cbegin() + local_index_, data_);
+            return local_raw_const_iterator(data_->cbegin() + local_index_, data_);
         }
 
     private:
@@ -374,31 +393,26 @@ namespace hpx
 
         typename base_type::reference dereference() const
         {
-            HPX_ASSERT(data_);
-            return *base_iterator();
+            return detail::const_local_vector_value_proxy<T>(*this);
         }
 
         void increment()
         {
-            HPX_ASSERT(data_);
             ++local_index_;
         }
 
         void decrement()
         {
-            HPX_ASSERT(data_);
             --local_index_;
         }
 
         void advance(std::ptrdiff_t n)
         {
-            HPX_ASSERT(data_);
             local_index_ += n;
         }
 
         std::ptrdiff_t distance_to(const_local_vector_iterator const& other) const
         {
-            HPX_ASSERT(data_ && other.data_);
             HPX_ASSERT(partition_ == other.partition_);
             return other.local_index_ - local_index_;
         }
@@ -406,6 +420,15 @@ namespace hpx
     public:
         partition_vector<T> const& get_partition() const { return partition_; }
         size_type get_local_index() const { return local_index_; }
+
+        boost::shared_ptr<server::partition_vector<T> >& get_data()
+        {
+            return data_;
+        }
+        boost::shared_ptr<server::partition_vector<T> > const& get_data() const
+        {
+            return data_;
+        }
 
     protected:
         // refer to a partition of the vector
