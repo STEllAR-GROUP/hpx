@@ -12,9 +12,9 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
-#include <hpx/config/bind.hpp>
 #include <hpx/config/tuple.hpp>
 #include <hpx/config/function.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/void_guard.hpp>
 #include <hpx/traits/action_priority.hpp>
