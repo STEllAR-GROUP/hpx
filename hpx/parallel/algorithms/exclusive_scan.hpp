@@ -128,8 +128,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     return result::get(std::move(dest));
 
                 std::size_t count = std::distance(first, last);
-                std::size_t chunk_size = 0;
-
                 boost::shared_array<T> data(new T[count]);
 
                 // The overall scan algorithm is performed by executing 2

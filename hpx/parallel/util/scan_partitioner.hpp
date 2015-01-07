@@ -186,9 +186,14 @@ namespace hpx { namespace parallel { namespace util
                     errors.push_back(boost::current_exception());
                 }
 
+                typedef typename parallel::detail::algorithm_result<
+                        parallel_task_execution_policy, R
+                    >::type result_type;
+
                 // wait for all tasks to finish
                 return lcos::local::dataflow(
                     [=](std::vector<hpx::shared_future<Result> >&& r) mutable
+                      -> result_type
                     {
                         detail::handle_local_exceptions<
                                 parallel_task_execution_policy

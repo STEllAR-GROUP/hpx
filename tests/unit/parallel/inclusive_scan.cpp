@@ -191,7 +191,6 @@ void test_inclusive_scan3(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::fill(boost::begin(c), boost::end(c), std::size_t(1));
 
-    std::size_t const val(0);
     hpx::parallel::inclusive_scan(policy,
         iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d));
 
@@ -214,7 +213,6 @@ void test_inclusive_scan3_async(ExPolicy const& p, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::fill(boost::begin(c), boost::end(c), std::size_t(1));
 
-    std::size_t const val(0);
     hpx::future<void> f =
         hpx::parallel::inclusive_scan(p,
             iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d));

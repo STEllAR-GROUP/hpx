@@ -343,11 +343,11 @@ namespace hpx { namespace parallel { namespace util
 
                 // wait for all tasks to finish
                 return hpx::lcos::local::dataflow(
-                    [f2, errors](std::vector<hpx::future<Result> > && r) mutable
+                    [f2, errors](std::vector<hpx::future<Result> > && r) mutable -> R
                     {
                         detail::handle_local_exceptions<
-                            parallel_task_execution_policy>
-                            ::call(r, errors);
+                                parallel_task_execution_policy
+                            >::call(r, errors);
                         return f2(std::move(r));
                     },
                     std::move(workitems));
