@@ -51,11 +51,11 @@ namespace hpx { namespace parcelset
         friend struct agas::big_boot_barrier;
 
     public:
-        typedef HPX_STD_FUNCTION<
+        typedef util::function_nonser<
             void(boost::system::error_code const&, parcel const&)
         > write_handler_type;
 
-        typedef HPX_STD_FUNCTION<
+        typedef util::function_nonser<
             void(parcelport& pp, boost::shared_ptr<std::vector<char> >,
                  threads::thread_priority)
         > read_handler_type;
@@ -325,8 +325,8 @@ namespace hpx { namespace parcelset
         /// Create a new instance of a parcelport
         static boost::shared_ptr<parcelport> create(int type,
             util::runtime_configuration const& cfg,
-            HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
-            HPX_STD_FUNCTION<void()> const& on_stop_thread);
+            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
+            util::function_nonser<void()> const& on_stop_thread);
 
         /// Return the configured maximal allowed message data size
         boost::uint64_t get_max_inbound_message_size() const

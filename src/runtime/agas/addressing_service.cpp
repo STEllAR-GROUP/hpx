@@ -1705,7 +1705,7 @@ bool addressing_service::resolve_cached(
 ///////////////////////////////////////////////////////////////////////////////
 void addressing_service::route(
     parcelset::parcel const& p
-  , HPX_STD_FUNCTION<void(boost::system::error_code const&,
+  , util::function_nonser<void(boost::system::error_code const&,
         parcelset::parcel const&)> const& f
     )
 {
@@ -2587,31 +2587,31 @@ std::size_t addressing_service::get_cache_erase_entry_time(bool reset)
 void addressing_service::register_counter_types()
 { // {{{
     // install
-    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_hits(
+    util::function_nonser<boost::int64_t(bool)> cache_hits(
         boost::bind(&addressing_service::get_cache_hits, this, ::_1));
-    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_misses(
+    util::function_nonser<boost::int64_t(bool)> cache_misses(
         boost::bind(&addressing_service::get_cache_misses, this, ::_1));
-    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_evictions(
+    util::function_nonser<boost::int64_t(bool)> cache_evictions(
         boost::bind(&addressing_service::get_cache_evictions, this, ::_1));
-    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_insertions(
+    util::function_nonser<boost::int64_t(bool)> cache_insertions(
         boost::bind(&addressing_service::get_cache_insertions, this, ::_1));
 
-    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_get_entry_count(
+    util::function_nonser<boost::int64_t(bool)> cache_get_entry_count(
         boost::bind(&addressing_service::get_cache_get_entry_count, this, ::_1));
-    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_insert_entry_count(
+    util::function_nonser<boost::int64_t(bool)> cache_insert_entry_count(
         boost::bind(&addressing_service::get_cache_insert_entry_count, this, ::_1));
-    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_update_entry_count(
+    util::function_nonser<boost::int64_t(bool)> cache_update_entry_count(
         boost::bind(&addressing_service::get_cache_update_entry_count, this, ::_1));
-    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_erase_entry_count(
+    util::function_nonser<boost::int64_t(bool)> cache_erase_entry_count(
         boost::bind(&addressing_service::get_cache_erase_entry_count, this, ::_1));
 
-    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_get_entry_time(
+    util::function_nonser<boost::int64_t(bool)> cache_get_entry_time(
         boost::bind(&addressing_service::get_cache_get_entry_time, this, ::_1));
-    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_insert_entry_time(
+    util::function_nonser<boost::int64_t(bool)> cache_insert_entry_time(
         boost::bind(&addressing_service::get_cache_insert_entry_time, this, ::_1));
-    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_update_entry_time(
+    util::function_nonser<boost::int64_t(bool)> cache_update_entry_time(
         boost::bind(&addressing_service::get_cache_update_entry_time, this, ::_1));
-    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_erase_entry_time(
+    util::function_nonser<boost::int64_t(bool)> cache_erase_entry_time(
         boost::bind(&addressing_service::get_cache_erase_entry_time, this, ::_1));
 
     performance_counters::generic_counter_type_data const counter_types[] =

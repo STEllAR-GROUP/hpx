@@ -90,8 +90,8 @@ namespace hpx { namespace parcelset
 
     boost::shared_ptr<parcelport> parcelport::create(int type,
         util::runtime_configuration const& cfg,
-        HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
-        HPX_STD_FUNCTION<void()> const& on_stop_thread)
+        util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
+        util::function_nonser<void()> const& on_stop_thread)
     {
         switch(type) {
         case connection_tcp:

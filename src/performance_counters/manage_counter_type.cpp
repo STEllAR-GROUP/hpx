@@ -47,8 +47,8 @@ namespace hpx { namespace performance_counters
     // uninstall it automatically during shutdown.
     counter_status install_counter_type(std::string const& name,
         counter_type type, std::string const& helptext,
-        HPX_STD_FUNCTION<create_counter_func> const& create_counter,
-        HPX_STD_FUNCTION<discover_counters_func> const& discover_counters,
+        create_counter_func const& create_counter,
+        discover_counters_func const& discover_counters,
         boost::uint32_t version, std::string const& uom, error_code& ec)
     {
         counter_info info(type, name, helptext,
@@ -69,7 +69,7 @@ namespace hpx { namespace performance_counters
     // provide the data in a way, which will uninstall it automatically during
     // shutdown.
     counter_status install_counter_type(std::string const& name,
-        HPX_STD_FUNCTION<boost::int64_t(bool)> const& counter_value,
+        util::function_nonser<boost::int64_t(bool)> const& counter_value,
         std::string const& helptext, std::string const& uom, error_code& ec)
     {
         return install_counter_type(name, counter_raw, helptext,

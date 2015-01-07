@@ -89,8 +89,8 @@ namespace hpx { namespace parcelset
         ///                 transport operations the parcelhandler carries out.
         parcelhandler(
             threads::threadmanager_base* tm, parcelhandler_queue_base* policy,
-            HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
-            HPX_STD_FUNCTION<void()> const& on_stop_thread);
+            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
+            util::function_nonser<void()> const& on_stop_thread);
 
         ~parcelhandler() {}
 

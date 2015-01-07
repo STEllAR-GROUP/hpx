@@ -286,25 +286,25 @@ namespace hpx { namespace components { namespace server
 
         bool was_stopped() const { return stopped_; }
 
-        void add_pre_startup_function(HPX_STD_FUNCTION<void()> const& f)
+        void add_pre_startup_function(util::function_nonser<void()> const& f)
         {
             lcos::local::spinlock::scoped_lock l(globals_mtx_);
             pre_startup_functions_.push_back(f);
         }
 
-        void add_startup_function(HPX_STD_FUNCTION<void()> const& f)
+        void add_startup_function(util::function_nonser<void()> const& f)
         {
             lcos::local::spinlock::scoped_lock l(globals_mtx_);
             startup_functions_.push_back(f);
         }
 
-        void add_pre_shutdown_function(HPX_STD_FUNCTION<void()> const& f)
+        void add_pre_shutdown_function(util::function_nonser<void()> const& f)
         {
             lcos::local::spinlock::scoped_lock l(globals_mtx_);
             pre_shutdown_functions_.push_back(f);
         }
 
-        void add_shutdown_function(HPX_STD_FUNCTION<void()> const& f)
+        void add_shutdown_function(util::function_nonser<void()> const& f)
         {
             lcos::local::spinlock::scoped_lock l(globals_mtx_);
             shutdown_functions_.push_back(f);
@@ -437,10 +437,10 @@ namespace hpx { namespace components { namespace server
         static_modules_type static_modules_;
 
         lcos::local::spinlock globals_mtx_;
-        std::list<HPX_STD_FUNCTION<void()> > pre_startup_functions_;
-        std::list<HPX_STD_FUNCTION<void()> > startup_functions_;
-        std::list<HPX_STD_FUNCTION<void()> > pre_shutdown_functions_;
-        std::list<HPX_STD_FUNCTION<void()> > shutdown_functions_;
+        std::list<util::function_nonser<void()> > pre_startup_functions_;
+        std::list<util::function_nonser<void()> > startup_functions_;
+        std::list<util::function_nonser<void()> > pre_shutdown_functions_;
+        std::list<util::function_nonser<void()> > shutdown_functions_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

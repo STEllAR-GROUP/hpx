@@ -1157,14 +1157,14 @@ namespace hpx { namespace components { namespace server
     {
         if (pre_startup) {
             get_runtime().set_state(runtime::state_pre_startup);
-            BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, pre_startup_functions_)
+            BOOST_FOREACH(util::function_nonser<void()> const& f, pre_startup_functions_)
             {
                 f();
             }
         }
         else {
             get_runtime().set_state(runtime::state_startup);
-            BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, startup_functions_)
+            BOOST_FOREACH(util::function_nonser<void()> const& f, startup_functions_)
             {
                 f();
             }
@@ -1176,7 +1176,7 @@ namespace hpx { namespace components { namespace server
         runtime& rt = get_runtime();
         if (pre_shutdown) {
             rt.set_state(runtime::state_pre_shutdown);
-            BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, pre_shutdown_functions_)
+            BOOST_FOREACH(util::function_nonser<void()> const& f, pre_shutdown_functions_)
             {
                 try {
                     f();
@@ -1188,7 +1188,7 @@ namespace hpx { namespace components { namespace server
         }
         else {
             rt.set_state(runtime::state_shutdown);
-            BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, shutdown_functions_)
+            BOOST_FOREACH(util::function_nonser<void()> const& f, shutdown_functions_)
             {
                 try {
                     f();

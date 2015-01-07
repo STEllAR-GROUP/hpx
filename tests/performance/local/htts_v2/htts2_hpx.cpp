@@ -35,7 +35,7 @@ struct hpx_driver : htts2::driver
         char** argv = new char*[argc];
         argv[0] = const_cast<char*>("htts2_hpx");
     
-        HPX_STD_FUNCTION<int(boost::program_options::variables_map& vm)> f;
+        hpx::util::function_nonser<int(boost::program_options::variables_map& vm)> f;
         boost::program_options::options_description desc; 
     
         hpx::init(boost::bind(&hpx_driver::run_impl, boost::ref(*this), _1),

@@ -63,8 +63,8 @@ namespace hpx { namespace parcelset {
             static std::size_t max_memory_chunks(util::runtime_configuration const& ini);
 
             connection_handler(util::runtime_configuration const& ini,
-                HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
-                HPX_STD_FUNCTION<void()> const& on_stop_thread);
+                util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
+                util::function_nonser<void()> const& on_stop_thread);
 
             ~connection_handler();
 

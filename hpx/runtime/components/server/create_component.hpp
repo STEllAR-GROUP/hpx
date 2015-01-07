@@ -49,7 +49,7 @@ namespace hpx { namespace components { namespace server
     }
 
     template <typename Component>
-    naming::gid_type create(HPX_STD_FUNCTION<void(void*)> const& ctor,
+    naming::gid_type create(util::function_nonser<void(void*)> const& ctor,
         error_code& ec = throws)
     {
         Component* c = (Component*)Component::heap_type::alloc(1);
@@ -78,7 +78,7 @@ namespace hpx { namespace components { namespace server
 
     template <typename Component>
     naming::gid_type create(naming::gid_type const& gid,
-        HPX_STD_FUNCTION<void(void*)> const& ctor,
+        util::function_nonser<void(void*)> const& ctor,
         error_code& ec = throws)
     {
         Component* c = (Component*)Component::heap_type::alloc(1);
