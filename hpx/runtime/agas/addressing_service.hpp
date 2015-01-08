@@ -94,6 +94,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     mutex_type refcnt_requests_mtx_;
     std::size_t refcnt_requests_count_;
     bool enable_refcnt_caching_;
+    bool shutdown_started_;
 
     boost::shared_ptr<refcnt_requests_type> refcnt_requests_;
 

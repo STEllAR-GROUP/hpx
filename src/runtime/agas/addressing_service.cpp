@@ -206,6 +206,7 @@ addressing_service::addressing_service(
   , max_refcnt_requests_(ini_.get_agas_max_pending_refcnt_requests())
   , refcnt_requests_count_(0)
   , enable_refcnt_caching_(true)
+  , shutdown_started_(false)
   , refcnt_requests_(new refcnt_requests_type)
   , service_type(ini_.get_agas_service_mode())
   , runtime_type(runtime_type_)
@@ -2352,6 +2353,8 @@ void addressing_service::start_shutdown(error_code& ec)
     mutex_type::scoped_lock l(refcnt_requests_mtx_);
     enable_refcnt_caching_ = false;
     send_refcnt_requests_sync(l, ec);
+
+    shutdown_started_ = true;
 }
 
 namespace detail
@@ -2843,30 +2846,35 @@ void addressing_service::send_refcnt_requests_non_blocking(
                 "addressing_service::send_refcnt_requests_non_blocking");
 #endif
 
-        // collect all requests for each locality
-        typedef std::map<naming::id_type, std::vector<request> > requests_type;
-        requests_type requests;
-
-        BOOST_FOREACH(refcnt_requests_type::const_reference e, *p)
+        // Only send decref requests if we aren't in shutdown mode, if we shut down, the corresponding
+        // component will get destroyed eventually.
+        if(!shutdown_started_)
         {
-            HPX_ASSERT(e.second < 0);
+            // collect all requests for each locality
+            typedef std::map<naming::id_type, std::vector<request> > requests_type;
+            requests_type requests;
 
-            naming::gid_type raw(e.first);
-            request const req(primary_ns_decrement_credit, raw, raw, e.second);
+            BOOST_FOREACH(refcnt_requests_type::const_reference e, *p)
+            {
+                HPX_ASSERT(e.second < 0);
 
-            naming::id_type target(
-                stubs::primary_namespace::get_service_instance(raw)
-              , naming::id_type::unmanaged);
+                naming::gid_type raw(e.first);
+                request const req(primary_ns_decrement_credit, raw, raw, e.second);
 
-            requests[target].push_back(req);
-        }
+                naming::id_type target(
+                    stubs::primary_namespace::get_service_instance(raw)
+                  , naming::id_type::unmanaged);
 
-        // send requests to all locality
-        requests_type::const_iterator end = requests.end();
-        for (requests_type::const_iterator it = requests.begin(); it != end; ++it)
-        {
-            stubs::primary_namespace::bulk_service_non_blocking(
-                (*it).first, (*it).second, action_priority_);
+                requests[target].push_back(req);
+            }
+
+            // send requests to all locality
+            requests_type::const_iterator end = requests.end();
+            for (requests_type::const_iterator it = requests.begin(); it != end; ++it)
+            {
+                stubs::primary_namespace::bulk_service_non_blocking(
+                    (*it).first, (*it).second, action_priority_);
+            }
         }
 
         if (&ec != &throws)
