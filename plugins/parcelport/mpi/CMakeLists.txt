@@ -20,9 +20,6 @@ if(HPX_PARCELPORT_MPI)
   if(MPI_CXX_LINK_FLAGS)
     #    hpx_add_link_flag_if_available(${MPI_CXX_LINK_FLAGS})
   endif()
-  if(MPI_CXX_INCLUDE_PATH)
-    include_directories(${MPI_CXX_INCLUDE_PATH})
-  endif()
 
   # This list is to detect whether we run inside an mpi environment.
   # If one of those environment variables is set, the MPI parcelport
@@ -35,6 +32,9 @@ if(HPX_PARCELPORT_MPI)
   endif()
 
   macro(add_parcelport_mpi_module)
+    if(MPI_CXX_INCLUDE_PATH)
+      include_directories(${MPI_CXX_INCLUDE_PATH})
+    endif()
     hpx_debug("add_parcelport_mpi_module")
     add_hpx_library(parcelport_mpi
         PLUGIN

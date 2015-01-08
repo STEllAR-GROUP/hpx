@@ -399,22 +399,18 @@ namespace hpx { namespace threads { namespace detail
                     break;
                 }
 
-                if (0 == num_thread) {
-                    // do background work in parcel layer and in agas
-                    hpx::parcelset::do_background_work();
-                    hpx::agas::garbage_collect_non_blocking();
-                }
+                // do background work in parcel layer and in agas
+                hpx::parcelset::do_background_work();
+                hpx::agas::garbage_collect_non_blocking();
             }
 
             if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX)
             {
                 busy_loop_count = 0;
 
-                if (0 == num_thread) {
-                    // do background work in parcel layer and in agas
-                    hpx::parcelset::do_background_work();
-                    hpx::agas::garbage_collect_non_blocking();
-                }
+                // do background work in parcel layer and in agas
+                hpx::parcelset::do_background_work();
+                hpx::agas::garbage_collect_non_blocking();
             }
             else if (idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX)
             {

@@ -508,7 +508,7 @@ bool addressing_service::register_locality(
             std::pair<resolved_localities_type::iterator, bool> res
                 = resolved_localities_.insert(std::make_pair(
                     prefix
-                  , make_ready_future(endpoints)
+                  , endpoints
                 ));
             HPX_ASSERT(res.second);
         }
@@ -527,7 +527,7 @@ void addressing_service::register_console(parcelset::endpoints_type const & eps)
     std::pair<resolved_localities_type::iterator, bool> res
         = resolved_localities_.insert(std::make_pair(
             naming::get_gid_from_locality_id(0)
-          , make_ready_future(eps)
+          , eps
         ));
     HPX_ASSERT(res.second);
 }
@@ -537,57 +537,50 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
   , error_code& ec
     )
 { // {{{
-    hpx::shared_future<parcelset::endpoints_type> endpoints_future;
+    mutex_type::scoped_lock l(resolved_localities_mtx_);
+    resolved_localities_type::iterator it = resolved_localities_.find(gid);
+    if(it == resolved_localities_.end())
     {
-        mutex_type::scoped_lock l(resolved_localities_mtx_);
-        resolved_localities_type::iterator it = resolved_localities_.find(gid);
-        if(it == resolved_localities_.end())
-        {
-            // The locality hasn't been requested to be resolved yet. Do it now.
-            request req(locality_ns_resolve_locality, gid);
+        parcelset::endpoints_type endpoints;
+        // The locality hasn't been requested to be resolved yet. Do it now.
+        request req(locality_ns_resolve_locality, gid);
 
-            if(is_bootstrap())
-            {
-                endpoints_future =
-                    make_ready_future(
-                        bootstrap->locality_ns_server_.service(req, ec).get_endpoints()
-                    );
-                HPX_THROWS_IF(ec, internal_server_error
-                  , "addressing_service::resolve_locality"
-                  , "could not resolve locality to endpoints");
-            }
-            else
-            {
-                endpoints_future =
-                    hosted->locality_ns_.service_async<parcelset::endpoints_type>(
-                        req
-                      , action_priority_
-                    );
-            }
-            if(HPX_UNLIKELY(!util::insert_checked(resolved_localities_.insert(
-                std::make_pair(
-                    gid
-                  , endpoints_future
-                )
-            ), it)))
-            {
-                HPX_THROWS_IF(ec, internal_server_error
-                  , "addressing_service::resolve_locality"
-                  , "resolved locality insertion failed "
-                    "due to a locking error or memory corruption");
-            }
+        if(is_bootstrap())
+        {
+            endpoints
+                = bootstrap->locality_ns_server_.service(req, ec).get_endpoints();
+            HPX_THROWS_IF(ec, internal_server_error
+              , "addressing_service::resolve_locality"
+              , "could not resolve locality to endpoints");
         }
         else
         {
-            endpoints_future = it->second;
+            hpx::util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+            future<parcelset::endpoints_type> endpoints_future =
+                hosted->locality_ns_.service_async<parcelset::endpoints_type>(
+                    req
+                  , action_priority_
+                );
+            if(0 == threads::get_self_ptr())
+            {
+                while(!endpoints_future.is_ready()) ;
+            }
+            endpoints = endpoints_future.get(ec);
+        }
+        if(HPX_UNLIKELY(!util::insert_checked(resolved_localities_.insert(
+            std::make_pair(
+                gid
+              , endpoints
+            )
+        ), it)))
+        {
+            HPX_THROWS_IF(ec, internal_server_error
+              , "addressing_service::resolve_locality"
+              , "resolved locality insertion failed "
+                "due to a locking error or memory corruption");
         }
     }
-
-    if(0 == threads::get_self_ptr())
-    {
-        while(!endpoints_future.is_ready()) ;
-    }
-    return endpoints_future.get(ec);
+    return it->second;
 } // }}}
 
 // TODO: We need to ensure that the locality isn't unbound while it still holds

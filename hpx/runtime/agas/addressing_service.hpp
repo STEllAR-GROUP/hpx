@@ -120,7 +120,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     mutable mutex_type resolved_localities_mtx_;
     typedef
-        std::map<naming::gid_type, shared_future<parcelset::endpoints_type> >
+        std::map<naming::gid_type, parcelset::endpoints_type>
         resolved_localities_type;
     resolved_localities_type resolved_localities_;
 

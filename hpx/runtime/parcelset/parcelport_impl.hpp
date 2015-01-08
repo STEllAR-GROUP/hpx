@@ -144,6 +144,7 @@ namespace hpx { namespace parcelset
 
         void stop(bool blocking = true)
         {
+            do_background_work();
             // make sure no more work is pending, wait for service pool to get empty
             io_service_pool_.stop();
             if (blocking) {
@@ -540,10 +541,10 @@ namespace hpx { namespace parcelset
             if(hpx::is_stopped()) return true;
 
             std::vector<locality> destinations;
-            destinations.reserve(parcel_destinations_.size());
 
             {
                 lcos::local::spinlock::scoped_lock l(mtx_);
+                destinations.reserve(parcel_destinations_.size());
                 if (parcel_destinations_.empty())
                     return true;
 
@@ -585,14 +586,21 @@ namespace hpx { namespace parcelset
                 // need to force a new connection to avoid deadlocks.
                 bool force_connection = false;
                 {
-                    mutex_type::scoped_lock l(sender_threads_mtx_);
-                    BOOST_FOREACH(hpx::threads::thread_id_type const & thread, sender_threads_)
+                    mutex_type::scoped_try_lock l(sender_threads_mtx_);
+                    if(l)
                     {
-                        if(threads::get_thread_state(thread) != threads::suspended)
+                        BOOST_FOREACH(hpx::threads::thread_id_type const & thread, sender_threads_)
                         {
-                            force_connection = true;
-                            break;
+                            if(threads::get_thread_state(thread) != threads::suspended)
+                            {
+                                force_connection = true;
+                                break;
+                            }
                         }
+                    }
+                    else
+                    {
+                        force_connection = true;
                     }
                 }
 
@@ -640,7 +648,7 @@ namespace hpx { namespace parcelset
                               , std::move(handlers)
                             )
                           , "parcelport_impl::send_pending_parcels"
-                          , threads::pending, true, threads::thread_priority_boost,
+                          , threads::suspended, true, threads::thread_priority_boost,
                             thread_num, threads::thread_stacksize_default
                         );
                     {
@@ -648,6 +656,7 @@ namespace hpx { namespace parcelset
                         HPX_ASSERT(new_send_thread != threads::invalid_thread_id);
                         sender_threads_.push_back(new_send_thread);
                     }
+                    threads::set_thread_state(new_send_thread, threads::pending);
                 }
                 else
                 {
