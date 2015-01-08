@@ -189,13 +189,15 @@ namespace hpx { namespace actions
 /// the macro \a HPX_PLAIN_ACTION is recommend.
 ///
 #define HPX_DEFINE_PLAIN_ACTION(func, name)                                   \
-    typedef HPX_MAKE_ACTION(func)::type name                                  \
+    struct name : hpx::actions::make_action<                                  \
+        decltype(&func), &func, name>::type {}                                \
     /**/
 
 /// \cond NOINTERNAL
 
 #define HPX_DEFINE_PLAIN_DIRECT_ACTION(func, name)                            \
-    typedef HPX_MAKE_DIRECT_ACTION(func)::type name                           \
+    struct name : hpx::actions::make_direct_action<                           \
+        decltype(&func), &func, name>::type {}                                \
     /**/
 
 /// \endcond

@@ -1226,11 +1226,11 @@ namespace hpx { namespace actions
     {};
 
     // Macros usable to refer to an action given the function to expose
-    #define HPX_MAKE_ACTION(f)                                                \
-        hpx::actions::make_action<decltype(&f), &f>        /**/               \
+    #define HPX_MAKE_ACTION(func)                                             \
+        hpx::actions::make_action<decltype(&func), &func>        /**/         \
     /**/
-    #define HPX_MAKE_DIRECT_ACTION(f)                                         \
-        hpx::actions::make_direct_action<decltype(&f), &f> /**/               \
+    #define HPX_MAKE_DIRECT_ACTION(func)                                      \
+        hpx::actions::make_direct_action<decltype(&func), &func> /**/         \
     /**/
 
     /// \endcond
