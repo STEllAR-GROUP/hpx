@@ -29,8 +29,6 @@ endforeach()
 
 set(action_argument_limit_preprocessing_files
   "hpx/lcos/broadcast.hpp"
-  "hpx/lcos/packaged_action_constructors.hpp"
-  "hpx/lcos/packaged_action_constructors_direct.hpp"
   "hpx/lcos/reduce.hpp"
   "hpx/runtime/actions/construct_continuation_function_objects.hpp"
   "hpx/runtime/actions/construct_continuation_functions.hpp"
