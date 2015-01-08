@@ -28,10 +28,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
     {
     public:
         typedef
-            HPX_STD_FUNCTION<void(boost::system::error_code const &, std::size_t)>
+            util::function_nonser<void(boost::system::error_code const &, std::size_t)>
             handler_function_type;
         typedef
-            HPX_STD_FUNCTION<
+            util::function_nonser<
                 void(
                     boost::system::error_code const &
                   , parcelset::locality const&

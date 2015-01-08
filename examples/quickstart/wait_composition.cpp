@@ -12,7 +12,7 @@
 struct cout_continuation
 {
     typedef void result_type;
-    typedef HPX_STD_TUPLE<
+    typedef hpx::util::tuple<
             hpx::lcos::future<int>
           , hpx::lcos::future<int>
           , hpx::lcos::future<int> > data_type;
@@ -22,9 +22,9 @@ struct cout_continuation
     ) const
     {
         data_type v = data.get();
-        std::cout << HPX_STD_GET(0, v).get() << "\n";
-        std::cout << HPX_STD_GET(1, v).get() << "\n";
-        std::cout << HPX_STD_GET(2, v).get() << "\n";
+        std::cout << hpx::util::get<0>(v).get() << "\n";
+        std::cout << hpx::util::get<1>(v).get() << "\n";
+        std::cout << hpx::util::get<2>(v).get() << "\n";
     }
 };
 ///////////////////////////////////////////////////////////////////////////////

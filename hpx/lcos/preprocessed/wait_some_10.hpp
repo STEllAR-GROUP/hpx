@@ -15,7 +15,7 @@ namespace hpx { namespace lcos
     void wait_some(std::size_t n, T0 && f0,
         error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename lcos::detail::shared_state_ptr_for<T0>::type>
             result_type;
         result_type lazy_values_(
@@ -44,7 +44,7 @@ namespace hpx { namespace lcos
     void wait_some(std::size_t n, T0 && f0 , T1 && f1,
         error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename lcos::detail::shared_state_ptr_for<T0>::type , typename lcos::detail::shared_state_ptr_for<T1>::type>
             result_type;
         result_type lazy_values_(
@@ -73,7 +73,7 @@ namespace hpx { namespace lcos
     void wait_some(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2,
         error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename lcos::detail::shared_state_ptr_for<T0>::type , typename lcos::detail::shared_state_ptr_for<T1>::type , typename lcos::detail::shared_state_ptr_for<T2>::type>
             result_type;
         result_type lazy_values_(
@@ -102,7 +102,7 @@ namespace hpx { namespace lcos
     void wait_some(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3,
         error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename lcos::detail::shared_state_ptr_for<T0>::type , typename lcos::detail::shared_state_ptr_for<T1>::type , typename lcos::detail::shared_state_ptr_for<T2>::type , typename lcos::detail::shared_state_ptr_for<T3>::type>
             result_type;
         result_type lazy_values_(
@@ -131,7 +131,7 @@ namespace hpx { namespace lcos
     void wait_some(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4,
         error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename lcos::detail::shared_state_ptr_for<T0>::type , typename lcos::detail::shared_state_ptr_for<T1>::type , typename lcos::detail::shared_state_ptr_for<T2>::type , typename lcos::detail::shared_state_ptr_for<T3>::type , typename lcos::detail::shared_state_ptr_for<T4>::type>
             result_type;
         result_type lazy_values_(
@@ -160,7 +160,7 @@ namespace hpx { namespace lcos
     void wait_some(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5,
         error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename lcos::detail::shared_state_ptr_for<T0>::type , typename lcos::detail::shared_state_ptr_for<T1>::type , typename lcos::detail::shared_state_ptr_for<T2>::type , typename lcos::detail::shared_state_ptr_for<T3>::type , typename lcos::detail::shared_state_ptr_for<T4>::type , typename lcos::detail::shared_state_ptr_for<T5>::type>
             result_type;
         result_type lazy_values_(
@@ -189,7 +189,7 @@ namespace hpx { namespace lcos
     void wait_some(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6,
         error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename lcos::detail::shared_state_ptr_for<T0>::type , typename lcos::detail::shared_state_ptr_for<T1>::type , typename lcos::detail::shared_state_ptr_for<T2>::type , typename lcos::detail::shared_state_ptr_for<T3>::type , typename lcos::detail::shared_state_ptr_for<T4>::type , typename lcos::detail::shared_state_ptr_for<T5>::type , typename lcos::detail::shared_state_ptr_for<T6>::type>
             result_type;
         result_type lazy_values_(
@@ -218,7 +218,7 @@ namespace hpx { namespace lcos
     void wait_some(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7,
         error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename lcos::detail::shared_state_ptr_for<T0>::type , typename lcos::detail::shared_state_ptr_for<T1>::type , typename lcos::detail::shared_state_ptr_for<T2>::type , typename lcos::detail::shared_state_ptr_for<T3>::type , typename lcos::detail::shared_state_ptr_for<T4>::type , typename lcos::detail::shared_state_ptr_for<T5>::type , typename lcos::detail::shared_state_ptr_for<T6>::type , typename lcos::detail::shared_state_ptr_for<T7>::type>
             result_type;
         result_type lazy_values_(
@@ -247,7 +247,7 @@ namespace hpx { namespace lcos
     void wait_some(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8,
         error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename lcos::detail::shared_state_ptr_for<T0>::type , typename lcos::detail::shared_state_ptr_for<T1>::type , typename lcos::detail::shared_state_ptr_for<T2>::type , typename lcos::detail::shared_state_ptr_for<T3>::type , typename lcos::detail::shared_state_ptr_for<T4>::type , typename lcos::detail::shared_state_ptr_for<T5>::type , typename lcos::detail::shared_state_ptr_for<T6>::type , typename lcos::detail::shared_state_ptr_for<T7>::type , typename lcos::detail::shared_state_ptr_for<T8>::type>
             result_type;
         result_type lazy_values_(
@@ -276,7 +276,7 @@ namespace hpx { namespace lcos
     void wait_some(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9,
         error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename lcos::detail::shared_state_ptr_for<T0>::type , typename lcos::detail::shared_state_ptr_for<T1>::type , typename lcos::detail::shared_state_ptr_for<T2>::type , typename lcos::detail::shared_state_ptr_for<T3>::type , typename lcos::detail::shared_state_ptr_for<T4>::type , typename lcos::detail::shared_state_ptr_for<T5>::type , typename lcos::detail::shared_state_ptr_for<T6>::type , typename lcos::detail::shared_state_ptr_for<T7>::type , typename lcos::detail::shared_state_ptr_for<T8>::type , typename lcos::detail::shared_state_ptr_for<T9>::type>
             result_type;
         result_type lazy_values_(
@@ -305,7 +305,7 @@ namespace hpx { namespace lcos
     void wait_some(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10,
         error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename lcos::detail::shared_state_ptr_for<T0>::type , typename lcos::detail::shared_state_ptr_for<T1>::type , typename lcos::detail::shared_state_ptr_for<T2>::type , typename lcos::detail::shared_state_ptr_for<T3>::type , typename lcos::detail::shared_state_ptr_for<T4>::type , typename lcos::detail::shared_state_ptr_for<T5>::type , typename lcos::detail::shared_state_ptr_for<T6>::type , typename lcos::detail::shared_state_ptr_for<T7>::type , typename lcos::detail::shared_state_ptr_for<T8>::type , typename lcos::detail::shared_state_ptr_for<T9>::type , typename lcos::detail::shared_state_ptr_for<T10>::type>
             result_type;
         result_type lazy_values_(
@@ -334,7 +334,7 @@ namespace hpx { namespace lcos
     void wait_some(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11,
         error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename lcos::detail::shared_state_ptr_for<T0>::type , typename lcos::detail::shared_state_ptr_for<T1>::type , typename lcos::detail::shared_state_ptr_for<T2>::type , typename lcos::detail::shared_state_ptr_for<T3>::type , typename lcos::detail::shared_state_ptr_for<T4>::type , typename lcos::detail::shared_state_ptr_for<T5>::type , typename lcos::detail::shared_state_ptr_for<T6>::type , typename lcos::detail::shared_state_ptr_for<T7>::type , typename lcos::detail::shared_state_ptr_for<T8>::type , typename lcos::detail::shared_state_ptr_for<T9>::type , typename lcos::detail::shared_state_ptr_for<T10>::type , typename lcos::detail::shared_state_ptr_for<T11>::type>
             result_type;
         result_type lazy_values_(
@@ -363,7 +363,7 @@ namespace hpx { namespace lcos
     void wait_some(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12,
         error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             typename lcos::detail::shared_state_ptr_for<T0>::type , typename lcos::detail::shared_state_ptr_for<T1>::type , typename lcos::detail::shared_state_ptr_for<T2>::type , typename lcos::detail::shared_state_ptr_for<T3>::type , typename lcos::detail::shared_state_ptr_for<T4>::type , typename lcos::detail::shared_state_ptr_for<T5>::type , typename lcos::detail::shared_state_ptr_for<T6>::type , typename lcos::detail::shared_state_ptr_for<T7>::type , typename lcos::detail::shared_state_ptr_for<T8>::type , typename lcos::detail::shared_state_ptr_for<T9>::type , typename lcos::detail::shared_state_ptr_for<T10>::type , typename lcos::detail::shared_state_ptr_for<T11>::type , typename lcos::detail::shared_state_ptr_for<T12>::type>
             result_type;
         result_type lazy_values_(

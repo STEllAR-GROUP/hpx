@@ -19,7 +19,7 @@ namespace hpx { namespace util
       : microsecs_(0), id_(0)
     {}
 
-    interval_timer::interval_timer(HPX_STD_FUNCTION<bool()> const& f,
+    interval_timer::interval_timer(util::function_nonser<bool()> const& f,
             boost::int64_t microsecs, std::string const& description,
             bool pre_shutdown)
       : f_(f), on_term_(),
@@ -28,8 +28,8 @@ namespace hpx { namespace util
         is_terminated_(false), is_stopped_(false)
     {}
 
-    interval_timer::interval_timer(HPX_STD_FUNCTION<bool()> const& f,
-            HPX_STD_FUNCTION<void()> const& on_term,
+    interval_timer::interval_timer(util::function_nonser<bool()> const& f,
+            util::function_nonser<void()> const& on_term,
             boost::int64_t microsecs, std::string const& description,
             bool pre_shutdown)
       : f_(f), on_term_(on_term),

@@ -820,7 +820,7 @@ namespace hpx
         hpx::applier::get_applier().get_thread_manager().report_error(num_thread, e);
     }
 
-    bool register_on_exit(HPX_STD_FUNCTION<void()> const& f)
+    bool register_on_exit(util::function_nonser<void()> const& f)
     {
         runtime* rt = get_runtime_ptr();
         if (NULL == rt)

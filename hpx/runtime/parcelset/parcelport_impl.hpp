@@ -86,8 +86,8 @@ namespace hpx { namespace parcelset
         /// Construct the parcelport on the given locality.
         parcelport_impl(util::runtime_configuration const& ini,
             locality const & here,
-            HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
-            HPX_STD_FUNCTION<void()> const& on_stop_thread)
+            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
+            util::function_nonser<void()> const& on_stop_thread)
           : parcelport(ini, here, connection_handler_name())
           , io_service_pool_(thread_pool_size(ini),
                 on_start_thread, on_stop_thread, pool_name(), pool_name_postfix())

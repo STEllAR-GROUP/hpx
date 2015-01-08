@@ -82,7 +82,7 @@ namespace performance_counters { namespace sine
     // function has been registered with.
     bool explicit_sine_counter_discoverer(
         hpx::performance_counters::counter_info const& info,
-        HPX_STD_FUNCTION<hpx::performance_counters::discover_counter_func> const& f,
+        hpx::performance_counters::discover_counter_func const& f,
         hpx::performance_counters::discover_counters_mode mode, hpx::error_code& ec)
     {
         hpx::performance_counters::counter_info i = info;
@@ -238,7 +238,7 @@ namespace performance_counters { namespace sine
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool get_startup(HPX_STD_FUNCTION<void()>& startup_func, bool& pre_startup)
+    bool get_startup(hpx::util::function_nonser<void()>& startup_func, bool& pre_startup)
     {
         // check whether the performance counters need to be enabled
         if (!need_perf_counters()) {

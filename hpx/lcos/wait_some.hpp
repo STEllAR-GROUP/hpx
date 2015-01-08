@@ -516,7 +516,7 @@ namespace hpx { namespace lcos
     void wait_some(std::size_t n, HPX_ENUM_FWD_ARGS(N, T, f),
         error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<
+        typedef util::tuple<
             BOOST_PP_ENUM(N, HPX_WAIT_SOME_SHARED_STATE_FOR_FUTURE, _)>
             result_type;
 
