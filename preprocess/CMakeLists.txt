@@ -10,8 +10,7 @@
 
 # add headers to preprocessing
 set(function_argument_limit_preprocessing_files
-  "hpx/util/unwrapped.hpp"
-  "hpx/lcos/local/detail/invoke_when_ready.hpp")
+  "hpx/util/unwrapped.hpp")
 foreach(file ${function_argument_limit_preprocessing_files})
   hpx_partial_preprocess_header(${file} LIMIT HPX_LIMIT)
 endforeach()
