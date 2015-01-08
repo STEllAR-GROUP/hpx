@@ -832,9 +832,63 @@ namespace hpx { namespace actions
         return args.template get<N>();
     }
 
-    // bring in all overloads for
-    //    construct_continuation_thread_function()
-    #include <hpx/runtime/actions/construct_continuation_thread_function.hpp>
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        struct continuation_thread_function
+        {
+            typedef threads::thread_state_enum result_type;
+
+            template <typename F>
+            BOOST_FORCEINLINE
+            typename boost::disable_if_c<
+                boost::is_void<typename util::result_of<F()>::type>::value,
+                result_type
+            >::type operator()(continuation_type cont, F&& f) const
+            {
+                try {
+                    LTM_(debug) << " with continuation(" << cont->get_gid() << ")";
+
+                    cont->trigger(f());
+                }
+                catch (...) {
+                    // make sure hpx::exceptions are propagated back to the client
+                    cont->trigger_error(boost::current_exception());
+                }
+                return threads::terminated;
+            }
+
+            template <typename F>
+            BOOST_FORCEINLINE
+            typename boost::enable_if_c<
+                boost::is_void<typename util::result_of<F()>::type>::value,
+                result_type
+            >::type operator()(continuation_type cont, F&& f) const
+            {
+                try {
+                    LTM_(debug) << " with continuation(" << cont->get_gid() << ")";
+
+                    f();
+                    cont->trigger();
+                }
+                catch (...) {
+                    // make sure hpx::exceptions are propagated back to the client
+                    cont->trigger_error(boost::current_exception());
+                }
+                return threads::terminated;
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename F>
+        threads::thread_function_type
+        construct_continuation_thread_function(continuation_type cont, F&& f)
+        {
+            return util::bind(
+                util::one_shot(continuation_thread_function()),
+                std::move(cont), std::forward<F>(f));
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     /// \tparam Component         component type
@@ -1013,8 +1067,59 @@ namespace hpx { namespace actions
         ///////////////////////////////////////////////////////////////////////
         typedef typename traits::is_future<local_result_type>::type is_future_pred;
 
-        // bring in the definition for all overloads for operator()
-        #include <hpx/runtime/actions/define_function_operators.hpp>
+        template <typename LocalResult>
+        struct sync_invoke
+        {
+            template <typename ...Ts>
+            BOOST_FORCEINLINE static LocalResult call(
+                boost::mpl::false_, BOOST_SCOPED_ENUM(launch) policy,
+                naming::id_type const& id, error_code& ec, Ts&&... vs)
+            {
+                return hpx::async<basic_action>(policy, id,
+                    std::forward<Ts>(vs)...).get(ec);
+            }
+
+            template <typename ...Ts>
+            BOOST_FORCEINLINE static LocalResult call(
+                boost::mpl::true_, BOOST_SCOPED_ENUM(launch) policy,
+                naming::id_type const& id, error_code& /*ec*/, Ts&&... vs)
+            {
+                return hpx::async<basic_action>(policy, id,
+                    std::forward<Ts>(vs)...);
+            }
+        };
+
+        template <typename ...Ts>
+        BOOST_FORCEINLINE local_result_type operator()(
+            BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& id,
+            error_code& ec, Ts&&... vs) const
+        {
+            return util::void_guard<local_result_type>(),
+                sync_invoke<local_result_type>::call(
+                    is_future_pred(), policy, id, ec, std::forward<Ts>(vs)...);
+        }
+
+        template <typename ...Ts>
+        BOOST_FORCEINLINE local_result_type operator()(
+            naming::id_type const& id, error_code& ec, Ts&&... vs) const
+        {
+            return (*this)(launch::all, id, ec, std::forward<Ts>(vs)...);
+        }
+
+        template <typename ...Ts>
+        BOOST_FORCEINLINE local_result_type operator()(
+            BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& id,
+            Ts&&... vs) const
+        {
+            return (*this)(launch::all, id, throws, std::forward<Ts>(vs)...);
+        }
+
+        template <typename ...Ts>
+        BOOST_FORCEINLINE local_result_type operator()(
+            naming::id_type const& id, Ts&&... vs) const
+        {
+            return (*this)(launch::all, id, throws, std::forward<Ts>(vs)...);
+        }
 
         /// retrieve component type
         static int get_component_type()
