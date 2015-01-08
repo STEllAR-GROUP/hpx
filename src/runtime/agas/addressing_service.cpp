@@ -206,7 +206,6 @@ addressing_service::addressing_service(
   , max_refcnt_requests_(ini_.get_agas_max_pending_refcnt_requests())
   , refcnt_requests_count_(0)
   , enable_refcnt_caching_(true)
-  , shutdown_started_(false)
   , refcnt_requests_(new refcnt_requests_type)
   , service_type(ini_.get_agas_service_mode())
   , runtime_type(runtime_type_)
@@ -2353,8 +2352,6 @@ void addressing_service::start_shutdown(error_code& ec)
     mutex_type::scoped_lock l(refcnt_requests_mtx_);
     enable_refcnt_caching_ = false;
     send_refcnt_requests_sync(l, ec);
-
-    shutdown_started_ = true;
 }
 
 namespace detail
@@ -2848,7 +2845,7 @@ void addressing_service::send_refcnt_requests_non_blocking(
 
         // Only send decref requests if we aren't in shutdown mode, if we shut down, the corresponding
         // component will get destroyed eventually.
-        if(!shutdown_started_)
+        if(!get_runtime().get_state() != runtime::state_shutdown)
         {
             // collect all requests for each locality
             typedef std::map<naming::id_type, std::vector<request> > requests_type;
