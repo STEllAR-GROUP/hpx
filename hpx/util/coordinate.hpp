@@ -51,18 +51,11 @@ namespace hpx { namespace util
             std::fill(vs_ + 0, vs_ + rank, 0);
         }
 
-#if !defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX)
+#if !defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX) && !defined(HPX_INTEL_VERSION)
         //! Requires: il.size() == Rank.
         //! Effects: For all i in the range [0, Rank), initializes the ith
         //! component of *this with *(il.begin() + i).
         index(std::initializer_list<value_type> const& il)
-        {
-            HPX_ASSERT(il.size() == std::size_t(rank) &&
-                "il.size() must be equal to Rank");
-            std::copy(il.begin(), il.end(), vs_ + 0);
-        }
-
-        index(std::initializer_list<value_type const> const& il)
         {
             HPX_ASSERT(il.size() == std::size_t(rank) &&
                 "il.size() must be equal to Rank");
@@ -227,18 +220,11 @@ namespace hpx { namespace util
             std::fill(vs_ + 0, vs_ + rank, 0);
         }
 
-#if !defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX)
+#if !defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX) && !defined(HPX_INTEL_VERSION)
         //! Requires: il.size() == Rank.
         //! Effects: For all i in the range [0, Rank), initializes the ith
         //! component of *this with *(il.begin() + i).
         bounds(std::initializer_list<value_type> const& il)
-        {
-            HPX_ASSERT(il.size() == std::size_t(rank) &&
-                "il.size() must be equal to Rank");
-            std::copy(il.begin(), il.end(), vs_ + 0);
-        }
-
-        bounds(std::initializer_list<value_type const> const& il)
         {
             HPX_ASSERT(il.size() == std::size_t(rank) &&
                 "il.size() must be equal to Rank");
