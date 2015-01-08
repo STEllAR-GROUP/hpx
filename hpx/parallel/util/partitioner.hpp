@@ -90,7 +90,7 @@ namespace hpx { namespace parallel { namespace util
                 FwdIter first, std::size_t count, F1 && f1, F2 && f2,
                 std::vector<std::size_t> const& chunk_sizes, Data && data)
             {
-                HPX_ASSERT(boost::size(data) >= chunk_sizes.size());
+                HPX_ASSERT(boost::size(data) >= boost::size(chunk_sizes));
 
                 typename hpx::util::decay<Data>::type::const_iterator data_it =
                     boost::begin(data);
@@ -293,7 +293,7 @@ namespace hpx { namespace parallel { namespace util
                 FwdIter first, std::size_t count, F1 && f1, F2 && f2,
                 std::vector<std::size_t> const& chunk_sizes, Data && data)
             {
-                HPX_ASSERT(boost::size(data) >= chunk_sizes.size());
+                HPX_ASSERT(boost::size(data) >= boost::size(chunk_sizes));
 
                 typename hpx::util::decay<Data>::type::const_iterator data_it =
                     boost::begin(data);
