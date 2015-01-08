@@ -119,10 +119,19 @@ namespace hpx { namespace parallel { namespace util { namespace remote
     }
 }}}}
 
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40700
+
 HPX_REGISTER_PLAIN_ACTION_TEMPLATE(
     (template <typename Algo, typename ExPolicy, typename IsSeq, typename R,
         typename... Args>),
     (hpx::parallel::util::remote::algorithm_invoker_action<
         Algo, ExPolicy, IsSeq, R(Args const&...)>))
+
+#else
+
+// gcc 4.6 requires special handling :(
+#include <hpx/parallel/algorithms/remote/dispatch_gcc46.hpp>
+
+#endif
 
 #endif
