@@ -134,13 +134,13 @@ namespace hpx
         typedef T reference;
         typedef T const const_reference;
 
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40700
+#if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700) || defined(HPX_NATIVE_MIC)
+        typedef T* pointer;
+        typedef T const* const_pointer;
+#else
         typedef typename std::allocator_traits<allocator_type>::pointer pointer;
         typedef typename std::allocator_traits<allocator_type>::const_pointer
             const_pointer;
-#else
-        typedef T* pointer;
-        typedef T const* const_pointer;
 #endif
 
     private:
