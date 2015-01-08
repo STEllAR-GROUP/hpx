@@ -17,7 +17,7 @@
 #include <hpx/config/function.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/move.hpp>
-#include <hpx/util/void_guard.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_stacksize.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
@@ -67,8 +67,6 @@
 #include <boost/type_traits/is_convertible.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/bool.hpp>
-#include <boost/mpl/and.hpp>
-#include <boost/mpl/not.hpp>
 #include <boost/mpl/identity.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/preprocessor/cat.hpp>
@@ -851,7 +849,9 @@ namespace hpx { namespace actions
         typedef Component component_type;
         typedef Derived derived_type;
 
-        typedef R result_type;
+        typedef typename boost::mpl::if_c<
+            boost::is_void<R>::value, util::unused_type, R
+        >::type result_type;
         typedef typename traits::promise_local_result<R>::type local_result_type;
         typedef typename detail::remote_action_result<R>::type remote_result_type;
 
@@ -866,15 +866,151 @@ namespace hpx { namespace actions
             return true;        // by default we don't do any verification
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        template <typename F>
-        static threads::thread_function_type
-        construct_continuation_thread_function(continuation_type cont, F&& f)
+        template <typename ...Ts>
+        static R invoke(naming::address::address_type /*lva*/, Ts&&... /*vs*/);
+
+    protected:
+        struct invoker
         {
-            return detail::construct_continuation_thread_function<Derived>(
-                std::move(cont), std::forward<F>(f));
+            template <std::size_t ...Is, typename Args_>
+            R operator()(util::detail::pack_c<std::size_t, Is...>,
+                naming::address::address_type lva, Args_&& args) const
+            {
+                return Derived::invoke(lva,
+                    util::get<Is>(std::forward<Args_>(args))...);
+            }
+
+            template <typename Args_>
+            typename boost::disable_if_c<
+                (boost::is_void<R>::value && sizeof(Args_) > 0),
+                result_type
+            >::type operator()(
+                naming::address::address_type lva, Args_&& args) const
+            {
+                return (*this)(typename util::detail::make_index_pack<
+                        util::tuple_size<typename util::decay<Args_>::type>::value
+                    >::type(), lva, std::forward<Args_>(args));
+            }
+
+            template <typename Args_>
+            typename boost::enable_if_c<
+                (boost::is_void<R>::value && sizeof(Args_) > 0),
+                result_type
+            >::type operator()(
+                naming::address::address_type lva, Args_&& args) const
+            {
+                (*this)(typename util::detail::make_index_pack<
+                    util::tuple_size<typename util::decay<Args_>::type>::value
+                >::type(), lva, std::forward<Args_>(args));
+                return util::unused;
+            }
+        };
+
+        /// The \a thread_function will be registered as the thread
+        /// function of a thread. It encapsulates the execution of the
+        /// original function (given by \a func).
+        struct thread_function
+        {
+            typedef threads::thread_state_enum result_type;
+
+            template <typename ...Ts>
+            BOOST_FORCEINLINE result_type operator()(
+                naming::address::address_type lva, Ts&&... vs) const
+            {
+                try {
+                    LTM_(debug) << "Executing action("
+                                << detail::get_action_name<Derived>()
+                                << ").";
+
+                    // call the function, ignoring the return value
+                    Derived::invoke(lva, std::forward<Ts>(vs)...);
+                }
+                catch (hpx::thread_interrupted const&) { //-V565
+                    /* swallow this exception */
+                }
+                catch (hpx::exception const& e) {
+                    LTM_(error)
+                        << "Unhandled exception while executing action("
+                        << detail::get_action_name<Derived>()
+                        << "): " << e.what();
+
+                    // report this error to the console in any case
+                    hpx::report_error(boost::current_exception());
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing action("
+                        << detail::get_action_name<Derived>() << ")";
+
+                    // report this error to the console in any case
+                    hpx::report_error(boost::current_exception());
+                }
+
+                // Verify that there are no more registered locks for this
+                // OS-thread. This will throw if there are still any locks
+                // held.
+                util::force_error_on_lock();
+                return threads::terminated;
+            }
+        };
+
+    public:
+        // This static construct_thread_function allows to construct
+        // a proper thread function for a thread without having to
+        // instantiate the base_action type. This is used by the applier in
+        // case no continuation has been supplied.
+        template <std::size_t ...Is, typename Args_>
+        static threads::thread_function_type
+        construct_thread_function(util::detail::pack_c<std::size_t, Is...>,
+            naming::address::address_type lva, Args_&& args)
+        {
+            return traits::action_decorate_function<Derived>::call(lva,
+                util::bind(util::one_shot(typename Derived::thread_function()),
+                    lva, util::get<Is>(std::forward<Args_>(args))...));
         }
 
+        template <typename Args_>
+        static threads::thread_function_type
+        construct_thread_function(naming::address::address_type lva,
+            Args_&& args)
+        {
+            return construct_thread_function(
+                typename util::detail::make_index_pack<
+                    util::tuple_size<typename util::decay<Args_>::type>::value
+                >::type(), lva, std::forward<Args_>(args));
+        }
+
+        // This static construct_thread_function allows to construct
+        // a proper thread function for a thread without having to
+        // instantiate the base_action type. This is used by the applier in
+        // case a continuation has been supplied
+        template <typename Args_>
+        static threads::thread_function_type
+        construct_thread_function(continuation_type& cont,
+            naming::address::address_type lva, Args_&& args)
+        {
+            typedef typename util::tuple_decay<
+                typename util::decay<Args_>::type>::type decayed_args;
+
+            return traits::action_decorate_function<Derived>::call(lva,
+                detail::construct_continuation_thread_function(
+                    cont, util::deferred_call(invoker(), lva,
+                        decayed_args(std::forward<Args_>(args)))));
+        }
+
+        // direct execution
+        template <typename Args_>
+        static BOOST_FORCEINLINE result_type
+        execute_function(naming::address::address_type lva, Args_&& args)
+        {
+            LTM_(debug)
+                << "basic_action::execute_function name("
+                << detail::get_action_name<Derived>() << ")";
+
+            return invoker()(lva, std::forward<Args_>(args));
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         typedef typename traits::is_future<local_result_type>::type is_future_pred;
 
         // bring in the definition for all overloads for operator()

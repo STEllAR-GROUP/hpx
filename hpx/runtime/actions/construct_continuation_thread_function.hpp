@@ -7,6 +7,7 @@
 #define HPX_RUNTIME_ACTIONS_CONSTRUCT_CONTINUATION_FUNCTION_FEB_22_2012_1143AM
 
 #include <hpx/config/forceinline.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/util/result_of.hpp>
 
 #include <boost/type_traits/is_void.hpp>
@@ -15,7 +16,6 @@
 namespace detail
 {
     ///////////////////////////////////////////////////////////////////////
-    template <typename Action>
     struct continuation_thread_function
     {
         typedef threads::thread_state_enum result_type;
@@ -28,9 +28,7 @@ namespace detail
         >::type operator()(continuation_type cont, F&& f) const
         {
             try {
-                LTM_(debug) << "Executing action("
-                    << detail::get_action_name<Action>()
-                    << ") with continuation(" << cont->get_gid() << ")";
+                LTM_(debug) << " with continuation(" << cont->get_gid() << ")";
 
                 cont->trigger(f());
             }
@@ -49,9 +47,7 @@ namespace detail
         >::type operator()(continuation_type cont, F&& f) const
         {
             try {
-                LTM_(debug) << "Executing action("
-                    << detail::get_action_name<Action>()
-                    << ") with continuation(" << cont->get_gid() << ")";
+                LTM_(debug) << " with continuation(" << cont->get_gid() << ")";
 
                 f();
                 cont->trigger();
@@ -65,12 +61,12 @@ namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename Action, typename F>
+    template <typename F>
     threads::thread_function_type
     construct_continuation_thread_function(continuation_type cont, F&& f)
     {
         return util::bind(
-            util::one_shot(continuation_thread_function<Action>()),
+            util::one_shot(continuation_thread_function()),
             std::move(cont), std::forward<F>(f));
     }
 }
