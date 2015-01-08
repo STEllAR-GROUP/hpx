@@ -1341,44 +1341,6 @@ namespace hpx { namespace actions
             detail::automatic_action_registration<transfer_action<Action> >();
 }}
 
-#if 0 //WIP
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID1_TEMPLATE(            \
-        TEMPLATE, TYPE)                                                       \
-    namespace hpx { namespace actions { namespace detail {                    \
-        HPX_UTIL_STRIP(TEMPLATE) HPX_ALWAYS_EXPORT                            \
-        char const* get_action_name<HPX_UTIL_STRIP(TYPE)>();                  \
-    }}}                                                                       \
-/**/
-#define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID2_TEMPLATE(            \
-        TEMPLATE, TYPE)                                                       \
-    namespace hpx { namespace traits {                                        \
-        HPX_UTIL_STRIP(TEMPLATE)                                              \
-        struct needs_guid_initialization<HPX_UTIL_STRIP(TYPE)>                \
-          : boost::mpl::false_                                                \
-        {};                                                                   \
-    }}                                                                        \
-/**/
-#define HPX_REGISTER_ACTION_DECLARATION_GUID_TEMPLATE(TEMPLATE, TYPE)         \
-    namespace boost { namespace archive { namespace detail {                  \
-        namespace extra_detail {                                              \
-            HPX_UTIL_STRIP(TEMPLATE)                                          \
-            struct init_guid<HPX_UTIL_STRIP(TYPE)>;                           \
-        }                                                                     \
-    }}}                                                                       \
-/**/
-#define HPX_REGISTER_ACTION_DECLARATION_TEMPLATE(TEMPLATE, TYPE)              \
-    HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID1_TEMPLATE(                \
-        TEMPLATE, HPX_UTIL_STRIP(TYPE))                                       \
-    HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID2_TEMPLATE(                \
-        TEMPLATE, hpx::actions::transfer_action<HPX_UTIL_STRIP(TYPE)>)        \
-    HPX_SERIALIZATION_REGISTER_TEMPLATE(                                      \
-        TEMPLATE, hpx::actions::transfer_action<HPX_UTIL_STRIP(TYPE)>)        \
-    HPX_REGISTER_ACTION_DECLARATION_GUID_TEMPLATE(                            \
-        TEMPLATE, hpx::actions::transfer_action<HPX_UTIL_STRIP(TYPE)>)        \
-/**/
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_ACTION_USES_STACK(action, size)                                   \
     namespace hpx { namespace traits                                          \
