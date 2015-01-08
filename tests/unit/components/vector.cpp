@@ -345,29 +345,11 @@ void trivial_tests()
 
     trivial_test_without_policy<T>(length, "test1");
 
-    trivial_test_with_policy<T>(length, 1, hpx::block, "test1");
-    trivial_test_with_policy<T>(length, 3, hpx::block(3), "test2");
-    trivial_test_with_policy<T>(length, 3, hpx::block(3, localities), "test3");
+    trivial_test_with_policy<T>(length, 1, hpx::layout, "test1");
+    trivial_test_with_policy<T>(length, 3, hpx::layout(3), "test2");
+    trivial_test_with_policy<T>(length, 3, hpx::layout(3, localities), "test3");
     trivial_test_with_policy<T>(length, localities.size(),
-        hpx::block(localities), "test4");
-
-    trivial_test_with_policy<T>(length, 1, hpx::cyclic, "test5");
-    trivial_test_with_policy<T>(length, 3, hpx::cyclic(3), "test6");
-    trivial_test_with_policy<T>(length, 3, hpx::cyclic(3, localities), "test7");
-    trivial_test_with_policy<T>(length, localities.size(),
-        hpx::cyclic(localities), "test8");
-
-    trivial_test_with_policy<T>(length, 1, hpx::block_cyclic, "test9");
-    trivial_test_with_policy<T>(length, 3, hpx::block_cyclic(3), "test10");
-    trivial_test_with_policy<T>(length, 3,
-        hpx::block_cyclic(3, localities), "test11");
-    trivial_test_with_policy<T>(length, localities.size(),
-        hpx::block_cyclic(localities), "test12");
-    trivial_test_with_policy<T>(length, 4, hpx::block_cyclic(4, 3), "test13"); //-V112
-    trivial_test_with_policy<T>(length, 4, //-V112
-        hpx::block_cyclic(4, localities, 3), "test14"); //-V112
-    trivial_test_with_policy<T>(length, localities.size(),
-        hpx::block_cyclic(localities, 3), "test15");
+        hpx::layout(localities), "test4");
 }
 
 int main()

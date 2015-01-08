@@ -32,7 +32,6 @@ void compare_vectors(hpx::vector<T> const& v1, hpx::vector<T> const& v2,
     typedef typename hpx::vector<T>::const_iterator const_iterator;
 
     HPX_TEST_EQ(v1.size(), v2.size());
-    HPX_TEST(v1.get_policy() == v2.get_policy());
 
     const_iterator it1 = v1.begin(), it2 = v2.begin();
     const_iterator end1 = v1.end(), end2 = v2.end();
@@ -81,11 +80,9 @@ void move_tests_with_policy(std::size_t size, std::size_t localities,
     hpx::vector<T> v1(size, policy);
 
     hpx::vector<T> v2(v1);
-    HPX_TEST(v2.get_policy() == policy.get_policy_type());
     compare_vectors(v1, v2);
 
     hpx::vector<T> v3(std::move(v2));
-    HPX_TEST(v3.get_policy() == policy.get_policy_type());
     compare_vectors(v1, v3);
 
     fill_vector(v3, T(43));
@@ -93,12 +90,10 @@ void move_tests_with_policy(std::size_t size, std::size_t localities,
 
     hpx::vector<T> v4;
     v4 = v1;
-    HPX_TEST(v4.get_policy() == policy.get_policy_type());
     compare_vectors(v1, v4);
 
     hpx::vector<T> v5;
     v5 = std::move(v4);
-    HPX_TEST(v5.get_policy() == policy.get_policy_type());
     compare_vectors(v1, v5);
 
     fill_vector(v5, T(43));
@@ -127,29 +122,11 @@ void move_tests()
         move_tests(v);
     }
 
-    move_tests_with_policy<T>(length, 1, hpx::block);
-    move_tests_with_policy<T>(length, 3, hpx::block(3));
-    move_tests_with_policy<T>(length, 3, hpx::block(3, localities));
+    move_tests_with_policy<T>(length, 1, hpx::layout);
+    move_tests_with_policy<T>(length, 3, hpx::layout(3));
+    move_tests_with_policy<T>(length, 3, hpx::layout(3, localities));
     move_tests_with_policy<T>(length, localities.size(),
-        hpx::block(localities));
-
-    move_tests_with_policy<T>(length, 1, hpx::cyclic);
-    move_tests_with_policy<T>(length, 3, hpx::cyclic(3));
-    move_tests_with_policy<T>(length, 3, hpx::cyclic(3, localities));
-    move_tests_with_policy<T>(length, localities.size(),
-        hpx::cyclic(localities));
-
-    move_tests_with_policy<T>(length, 1, hpx::block_cyclic);
-    move_tests_with_policy<T>(length, 3, hpx::block_cyclic(3));
-    move_tests_with_policy<T>(length, 3,
-        hpx::block_cyclic(3, localities));
-    move_tests_with_policy<T>(length, localities.size(),
-        hpx::block_cyclic(localities));
-    move_tests_with_policy<T>(length, 4, hpx::block_cyclic(4, 3)); //-V112
-    move_tests_with_policy<T>(length, 4, //-V112
-        hpx::block_cyclic(4, localities, 3)); //-V112
-    move_tests_with_policy<T>(length, localities.size(),
-        hpx::block_cyclic(localities, 3));
+        hpx::layout(localities));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
