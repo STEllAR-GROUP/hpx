@@ -3,8 +3,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !BOOST_PP_IS_ITERATING
-
 #if !defined(HPX_LCOS_LOCAL_PACKAGED_TASK_MAR_01_2012_0121PM)
 #define HPX_LCOS_LOCAL_PACKAGED_TASK_MAR_01_2012_0121PM
 
@@ -20,10 +18,6 @@
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/mpl/bool.hpp>
-#include <boost/preprocessor/iteration/iterate.hpp>
-#include <boost/preprocessor/repetition/enum_params.hpp>
-#include <boost/preprocessor/repetition/enum_binary_params.hpp>
-#include <boost/preprocessor/repetition/repeat_from_to.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/type_traits/is_void.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -361,16 +355,16 @@ namespace hpx { namespace lcos { namespace local
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Func>
+    template <typename Sig>
     class packaged_task;
 
-    template <typename R>
-    class packaged_task<R()>
-      : private detail::packaged_task_base<R, R()>
+    template <typename R, typename ...Ts>
+    class packaged_task<R(Ts...)>
+      : private detail::packaged_task_base<R, R(Ts...)>
     {
         HPX_MOVABLE_BUT_NOT_COPYABLE(packaged_task);
 
-        typedef detail::packaged_task_base<R, R()> base_type;
+        typedef detail::packaged_task_base<R, R(Ts...)> base_type;
 
     public:
         // support for result_of
@@ -385,95 +379,7 @@ namespace hpx { namespace lcos { namespace local
         explicit packaged_task(F && f,
             typename boost::enable_if_c<
                 !boost::is_same<typename util::decay<F>::type, packaged_task>::value
-             && traits::is_callable<typename util::decay<F>::type()>::value
-            >::type* = 0)
-          : base_type(std::forward<F>(f))
-        {}
-
-        packaged_task(packaged_task && other)
-          : base_type(std::move(other))
-        {}
-
-        packaged_task& operator=(packaged_task && rhs)
-        {
-            base_type::operator=(std::move(rhs));
-            return *this;
-        }
-
-        void operator()()
-        {
-            base_type::invoke(util::deferred_call(this->function_), boost::is_void<R>());
-        }
-
-        void swap(packaged_task& other) BOOST_NOEXCEPT
-        {
-            base_type::swap(other);
-        }
-
-        // Result retrieval
-        using base_type::get_future;
-        using base_type::valid;
-        using base_type::reset;
-    };
-}}}
-
-#   if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#       include <hpx/lcos/local/preprocessed/packaged_task.hpp>
-#   else
-#       if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#           pragma wave option(preserve: 1, line: 0, output: "preprocessed/packaged_task_" HPX_LIMIT_STR ".hpp")
-#       endif
-
-        ///////////////////////////////////////////////////////////////////////
-#       define BOOST_PP_ITERATION_PARAMS_1                                    \
-        (                                                                     \
-            3                                                                 \
-          , (                                                                 \
-                1                                                             \
-              , HPX_FUNCTION_ARGUMENT_LIMIT                                   \
-              , <hpx/lcos/local/packaged_task.hpp>                           \
-            )                                                                 \
-        )                                                                     \
-        /**/
-#       include BOOST_PP_ITERATE()
-
-#       if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#           pragma wave option(output: null)
-#       endif
-#   endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-
-#endif
-
-#else // !BOOST_PP_IS_ITERATING
-
-#define N BOOST_PP_ITERATION()
-
-namespace hpx { namespace lcos { namespace local
-{
-    template <typename R, BOOST_PP_ENUM_PARAMS(N, typename T)>
-    class packaged_task<R(BOOST_PP_ENUM_PARAMS(N, T))>
-      : private detail::packaged_task_base<R, R(BOOST_PP_ENUM_PARAMS(N, T))>
-    {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(packaged_task);
-
-        typedef detail::packaged_task_base<R, R(BOOST_PP_ENUM_PARAMS(N, T))> base_type;
-
-    public:
-        // support for result_of
-        typedef R result_type;
-
-        // construction and destruction
-        packaged_task()
-          : base_type()
-        {}
-
-        template <typename F>
-        explicit packaged_task(F && f,
-            typename boost::enable_if_c<
-                !boost::is_same<typename util::decay<F>::type, packaged_task>::value
-             && traits::is_callable<typename util::decay<F>::type(
-                    BOOST_PP_ENUM_PARAMS(N, T)
-                )>::value
+             && traits::is_callable<typename util::decay<F>::type(Ts...)>::value
             >::type* = 0)
           : base_type(std::forward<F>(f))
         {}
@@ -493,20 +399,18 @@ namespace hpx { namespace lcos { namespace local
             base_type::swap(other);
         }
 
-        void operator()(BOOST_PP_ENUM_BINARY_PARAMS(N, T, t))
+        void operator()(Ts... vs)
         {
             base_type::invoke(
-                util::deferred_call(this->function_, HPX_ENUM_FORWARD_ARGS(N, T, t)),
+                util::deferred_call(this->function_, std::forward<Ts>(vs)...),
                 boost::is_void<R>());
         }
 
-        // Result retrieval
+        // result retrieval
         using base_type::get_future;
         using base_type::valid;
         using base_type::reset;
     };
 }}}
-
-#undef N
 
 #endif

@@ -10,8 +10,7 @@
 
 # add headers to preprocessing
 set(function_argument_limit_preprocessing_files
-  "hpx/util/unwrapped.hpp"
-  "hpx/lcos/local/detail/invoke_when_ready.hpp")
+  "hpx/util/unwrapped.hpp")
 foreach(file ${function_argument_limit_preprocessing_files})
   hpx_partial_preprocess_header(${file} LIMIT HPX_LIMIT)
 endforeach()
@@ -30,11 +29,7 @@ endforeach()
 
 set(action_argument_limit_preprocessing_files
   "hpx/lcos/broadcast.hpp"
-  "hpx/lcos/packaged_action_constructors.hpp"
-  "hpx/lcos/packaged_action_constructors_direct.hpp"
   "hpx/lcos/reduce.hpp"
-  "hpx/lcos/local/dataflow.hpp"
-  "hpx/lcos/local/packaged_task.hpp"
   "hpx/runtime/actions/construct_continuation_function_objects.hpp"
   "hpx/runtime/actions/construct_continuation_functions.hpp"
   "hpx/runtime/applier/apply_implementations.hpp"
