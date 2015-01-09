@@ -4,8 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !BOOST_PP_IS_ITERATING
-
 #if !defined(HPX_LCOS_INVOKE_WHEN_READY_APR_28_2014_0405PM)
 #define HPX_LCOS_INVOKE_WHEN_READY_APR_28_2014_0405PM
 
@@ -198,59 +196,15 @@ namespace hpx { namespace lcos { namespace local { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F>
+    template <typename F, typename ...Ts>
     future<typename when_ready<
         typename util::decay<F>::type
-      , util::tuple<>
-    >::result_type>
-    invoke_when_ready(F&& f)
+      , util::tuple<Ts...>
+    >::result_type> invoke_when_ready(F&& f, Ts&&... vs)
     {
         return invoke_fused_when_ready(std::forward<F>(f),
-            util::forward_as_tuple());
+            util::forward_as_tuple(std::forward<Ts>(vs)...));
     }
 }}}}
-
-
-#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/lcos/local/detail/preprocessed/invoke_when_ready.hpp>
-#else
-
-#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/invoke_when_ready_" HPX_LIMIT_STR ".hpp")
-#endif
-
-#define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (1, HPX_FUNCTION_ARGUMENT_LIMIT, <hpx/lcos/local/detail/invoke_when_ready.hpp>))\
-/**/
-#include BOOST_PP_ITERATE()
-
-#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(output: null)
-#endif
-
-#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-#else // BOOST_PP_IS_ITERATING
-
-#define N BOOST_PP_ITERATION()
-
-namespace hpx { namespace lcos { namespace local { namespace detail
-{
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename F, BOOST_PP_ENUM_PARAMS(N, typename T)>
-    future<typename when_ready<
-        typename util::decay<F>::type
-      , util::tuple<BOOST_PP_ENUM_PARAMS(N, T)>
-    >::result_type> invoke_when_ready(F&& f, HPX_ENUM_FWD_ARGS(N, T, v))
-    {
-        return invoke_fused_when_ready(std::forward<F>(f),
-            util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, T, v)));
-    }
-}}}}
-
-#undef N
 
 #endif
