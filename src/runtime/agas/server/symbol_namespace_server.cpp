@@ -357,14 +357,17 @@ response symbol_namespace::bind(
                 return response();
             }
 
-            // split the credit as the receiving end will expect to keep the
-            // object alive
-            naming::gid_type new_gid = naming::detail::split_gid_if_needed(
-                it->second);
+            {
+                util::scoped_unlock<mutex_type::scoped_lock> ul(l);
 
-            // trigger the lco
-            util::scoped_unlock<mutex_type::scoped_lock> ul(l);
-            set_lco_value(id, new_gid);
+                // split the credit as the receiving end will expect to keep the
+                // object alive
+                naming::gid_type new_gid = naming::detail::split_gid_if_needed(
+                    it->second);
+
+                // trigger the lco
+                set_lco_value(id, new_gid);
+            }
         }
     }
 
@@ -509,11 +512,11 @@ response symbol_namespace::on_event(
         {
             // split the credit as the receiving end will expect to keep the
             // object alive
+            l.unlock();
             naming::gid_type new_gid = naming::detail::split_gid_if_needed(
                 it->second);
 
             // trigger the lco
-            l.unlock();
             handled = true;
 
             // trigger LCO as name is already bound to an id
