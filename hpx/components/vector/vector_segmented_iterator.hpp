@@ -73,9 +73,31 @@ namespace hpx
         typedef BaseIter base_iterator;
 
     public:
-        local_raw_vector_iterator(base_iterator const& it)
-          : base_type(it)
+        typedef local_vector_iterator<T> local_iterator;
+        typedef const_local_vector_iterator<T> local_const_iterator;
+
+        local_raw_vector_iterator(base_iterator const& it,
+                boost::shared_ptr<server::partition_vector<T> > const& data)
+          : base_type(it), data_(data)
         {}
+
+        local_iterator remote()
+        {
+            HPX_ASSERT(data_);
+            std::size_t local_index = std::distance(data_->begin(), this->base());
+            return local_iterator(partition_vector<T>(data_->get_gid()),
+                local_index, data_);
+        }
+        local_const_iterator remote() const
+        {
+            HPX_ASSERT(data_);
+            std::size_t local_index = std::distance(data_->begin(), this->base());
+            return local_const_iterator(partition_vector<T>(data_->get_gid()),
+                local_index, data_);
+        }
+
+    private:
+        boost::shared_ptr<server::partition_vector<T> > data_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -116,6 +138,27 @@ namespace hpx
             }
 
             local_vector_iterator<T> const& it_;
+        };
+
+        template <typename T>
+        struct const_local_vector_value_proxy
+        {
+            const_local_vector_value_proxy(
+                    const_local_vector_iterator<T> const& it)
+              : it_(it)
+            {}
+
+            operator T() const
+            {
+                if (!it_.get_data())
+                {
+                    return it_.get_partition().get_value_sync(
+                        it_.get_local_index());
+                }
+                return *it_.local();
+            }
+
+            const_local_vector_iterator<T> const& it_;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -183,15 +226,15 @@ namespace hpx
             > local_raw_const_iterator;
 
         ///////////////////////////////////////////////////////////////////////
-        local_raw_iterator base_iterator()
+        local_raw_iterator local()
         {
             HPX_ASSERT(data_);
-            return data_->begin() + local_index_;
+            return local_raw_iterator(data_->begin() + local_index_, data_);
         }
-        local_raw_const_iterator base_iterator() const
+        local_raw_const_iterator local() const
         {
             HPX_ASSERT(data_);
-            return data_->cbegin() + local_index_;
+            return local_raw_iterator(data_->cbegin() + local_index_, data_);
         }
 
     private:
@@ -228,25 +271,21 @@ namespace hpx
 
         void increment()
         {
-            HPX_ASSERT(data_);
             ++local_index_;
         }
 
         void decrement()
         {
-            HPX_ASSERT(data_);
             --local_index_;
         }
 
         void advance(std::ptrdiff_t n)
         {
-            HPX_ASSERT(data_);
             local_index_ += n;
         }
 
         std::ptrdiff_t distance_to(local_vector_iterator const& other) const
         {
-            HPX_ASSERT(data_ && other.data_);
             HPX_ASSERT(partition_ == other.partition_);
             return other.local_index_ - local_index_;
         }
@@ -281,13 +320,15 @@ namespace hpx
     class const_local_vector_iterator
       : public boost::iterator_facade<
             const_local_vector_iterator<T>, T const,
-            std::random_access_iterator_tag, T const
+            std::random_access_iterator_tag,
+            detail::const_local_vector_value_proxy<T>
         >
     {
     private:
         typedef boost::iterator_facade<
                 const_local_vector_iterator<T>, T const,
-                std::random_access_iterator_tag, T const
+                std::random_access_iterator_tag,
+                detail::const_local_vector_value_proxy<T>
             > base_type;
 
     public:
@@ -312,15 +353,15 @@ namespace hpx
         typedef local_raw_iterator local_raw_const_iterator;
 
         ///////////////////////////////////////////////////////////////////////
-        local_raw_const_iterator base_iterator()
+        local_raw_iterator local()
         {
             HPX_ASSERT(data_);
-            return data_->cbegin() + local_index_;
+            return local_raw_iterator(data_->cbegin() + local_index_, data_);
         }
-        local_raw_const_iterator base_iterator() const
+        local_raw_const_iterator local() const
         {
             HPX_ASSERT(data_);
-            return data_->cbegin() + local_index_;
+            return local_raw_const_iterator(data_->cbegin() + local_index_, data_);
         }
 
     private:
@@ -352,31 +393,26 @@ namespace hpx
 
         typename base_type::reference dereference() const
         {
-            HPX_ASSERT(data_);
-            return *base_iterator();
+            return detail::const_local_vector_value_proxy<T>(*this);
         }
 
         void increment()
         {
-            HPX_ASSERT(data_);
             ++local_index_;
         }
 
         void decrement()
         {
-            HPX_ASSERT(data_);
             --local_index_;
         }
 
         void advance(std::ptrdiff_t n)
         {
-            HPX_ASSERT(data_);
             local_index_ += n;
         }
 
         std::ptrdiff_t distance_to(const_local_vector_iterator const& other) const
         {
-            HPX_ASSERT(data_ && other.data_);
             HPX_ASSERT(partition_ == other.partition_);
             return other.local_index_ - local_index_;
         }
@@ -384,6 +420,15 @@ namespace hpx
     public:
         partition_vector<T> const& get_partition() const { return partition_; }
         size_type get_local_index() const { return local_index_; }
+
+        boost::shared_ptr<server::partition_vector<T> >& get_data()
+        {
+            return data_;
+        }
+        boost::shared_ptr<server::partition_vector<T> > const& get_data() const
+        {
+            return data_;
+        }
 
     protected:
         // refer to a partition of the vector
@@ -740,7 +785,7 @@ namespace hpx { namespace traits
 
         //  Build a full iterator from the segment and local iterators
         static iterator compose(segment_iterator seg_iter,
-            local_iterator& local_iter)
+            local_iterator local_iter)
         {
             vector<T>* data = seg_iter.get_data();
             std::size_t index = local_iter.get_local_index();
@@ -778,14 +823,14 @@ namespace hpx { namespace traits
         //  beginning of the partition data.
         static local_raw_iterator begin(local_segment_iterator const& seg_iter)
         {
-            return seg_iter->begin();
+            return local_raw_iterator(seg_iter->begin(), seg_iter.base()->local_data_);
         }
 
         //  This function should specify the local iterator which is at the
         //  end of the partition data.
         static local_raw_iterator end(local_segment_iterator const& seg_iter)
         {
-            return seg_iter->end();
+            return local_raw_iterator(seg_iter->end(), seg_iter.base()->local_data_);
         }
 
         // Extract the base id for the segment referenced by the given segment
@@ -865,14 +910,16 @@ namespace hpx { namespace traits
         //  beginning of the partition data.
         static local_raw_iterator begin(local_segment_iterator const& seg_iter)
         {
-            return seg_iter->cbegin();
+            return local_raw_iterator(seg_iter->cbegin(),
+                seg_iter.base()->local_data_);
         }
 
         //  This function should specify the local iterator which is at the
         //  end of the partition data.
         static local_raw_iterator end(local_segment_iterator const& seg_iter)
         {
-            return seg_iter->cend();
+            return local_raw_iterator(seg_iter->cend(),
+                seg_iter.base()->local_data_);
         }
 
         // Extract the base id for the segment referenced by the given segment
@@ -896,9 +943,15 @@ namespace hpx { namespace traits
         typedef typename local_iterator::local_raw_iterator local_raw_iterator;
 
         // Extract base iterator from local_iterator
-        static local_raw_iterator base(local_iterator it)
+        static local_raw_iterator local(local_iterator it)
         {
-            return it.base_iterator();
+            return it.local();
+        }
+
+        // Construct remote local_iterator from local_raw_iterator
+        static local_iterator remote(local_raw_iterator it)
+        {
+            return it.remote();
         }
     };
 
@@ -912,9 +965,15 @@ namespace hpx { namespace traits
         typedef typename local_iterator::local_raw_iterator local_raw_iterator;
 
         // Extract base iterator from local_iterator
-        static local_raw_iterator base(local_iterator it)
+        static local_raw_iterator local(local_iterator it)
         {
-            return it.base_iterator();
+            return it.local();
+        }
+
+        // Construct remote local_iterator from local_raw_iterator
+        static local_iterator remote(local_raw_iterator it)
+        {
+            return it.remote();
         }
     };
 }}
