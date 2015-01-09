@@ -33,28 +33,29 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     {
         /// \cond NOINTERNAL
         template <typename OutIter>
-        struct copy : public detail::algorithm<copy<OutIter>, OutIter>
+        struct copy
+          : public detail::algorithm<copy<OutIter>, OutIter>
         {
             copy()
               : copy::algorithm("copy")
             {}
 
-            template <typename ExPolicy, typename InIter>
-            static OutIter
-            sequential(ExPolicy const&, InIter first, InIter last, OutIter dest)
+            template <typename ExPolicy, typename InIter, typename OutIter_>
+            static OutIter_
+            sequential(ExPolicy const&, InIter first, InIter last, OutIter_ dest)
             {
                 return std::copy(first, last, dest);
             }
 
-            template <typename ExPolicy, typename FwdIter>
-            static typename detail::algorithm_result<ExPolicy, OutIter>::type
+            template <typename ExPolicy, typename FwdIter, typename OutIter_>
+            static typename detail::algorithm_result<ExPolicy, OutIter_>::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
-                OutIter dest)
+                OutIter_ dest)
             {
-                typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
+                typedef hpx::util::zip_iterator<FwdIter, OutIter_> zip_iterator;
                 typedef typename zip_iterator::reference reference;
                 typedef
-                    typename detail::algorithm_result<ExPolicy, OutIter>::type
+                    typename detail::algorithm_result<ExPolicy, OutIter_>::type
                 result_type;
 
                 return get_iter<1, result_type>(
@@ -62,11 +63,41 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         policy, boost::mpl::false_(),
                         hpx::util::make_zip_iterator(first, dest),
                         std::distance(first, last),
-                        [](reference t) {
-                            hpx::util::get<1>(t) = hpx::util::get<0>(t); //-V573
+                        [](reference t)
+                        {
+                            using hpx::util::get;
+                            get<1>(t) = get<0>(t); //-V573
                         }));
             }
         };
+
+        template <typename ExPolicy, typename InIter, typename OutIter>
+        typename detail::algorithm_result<ExPolicy, OutIter>::type
+        copy_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
+            boost::mpl::false_)
+        {
+            typedef typename std::iterator_traits<InIter>::iterator_category
+                input_iterator_category;
+            typedef typename std::iterator_traits<OutIter>::iterator_category
+                output_iterator_category;
+
+            typedef typename boost::mpl::or_<
+                parallel::is_sequential_execution_policy<ExPolicy>,
+                boost::is_same<std::input_iterator_tag, input_iterator_category>,
+                boost::is_same<std::output_iterator_tag, output_iterator_category>
+            >::type is_seq;
+
+            return detail::copy<OutIter>().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, dest);
+        }
+
+        // forward declare the segmented version of this algorithm
+        template <typename ExPolicy, typename InIter, typename OutIter>
+        typename detail::algorithm_result<ExPolicy, OutIter>::type
+        copy_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
+            boost::mpl::true_);
+
         /// \endcond
     }
 
@@ -140,15 +171,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             >::value),
             "Requires at least output iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, input_iterator_category>,
-            boost::is_same<std::output_iterator_tag, output_iterator_category>
-        >::type is_seq;
+        typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;
+        typedef typename iterator_traits::is_segmented_iterator is_segmented;
 
-        return detail::copy<OutIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, dest);
+        return detail::copy_(
+            std::forward<ExPolicy>(policy), first, last, dest,
+            is_segmented());
     }
 
     /////////////////////////////////////////////////////////////////////////////

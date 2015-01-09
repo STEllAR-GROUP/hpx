@@ -556,7 +556,7 @@ namespace hpx { namespace traits
         };
 
         ///////////////////////////////////////////////////////////////////////
-        struct get_base_iterator
+        struct get_raw_iterator
         {
             template <typename Iterator>
             struct apply
@@ -573,10 +573,35 @@ namespace hpx { namespace traits
                 };
 
                 template <typename SegIter>
-                typename result<get_base_iterator(SegIter)>::type
+                typename result<get_raw_iterator(SegIter)>::type
                 operator()(SegIter iter) const
                 {
-                    return iter.base_iterator();
+                    return iter.local();
+                };
+            };
+        };
+
+        struct get_remote_iterator
+        {
+            template <typename Iterator>
+            struct apply
+            {
+                template <typename T>
+                struct result;
+
+                template <typename This, typename SegIter>
+                struct result<This(SegIter)>
+                {
+                    typedef typename segmented_iterator_traits<
+                            Iterator
+                        >::local_iterator type;
+                };
+
+                template <typename SegIter>
+                typename result<get_remote_iterator(SegIter)>::type
+                operator()(SegIter iter) const
+                {
+                    return iter.remote();
                 };
             };
         };
@@ -752,11 +777,20 @@ namespace hpx { namespace traits
             > local_raw_iterator;
 
         // Extract base iterator from local_iterator
-        static local_raw_iterator base(local_iterator const& iter)
+        static local_raw_iterator local(local_iterator const& iter)
         {
             return local_raw_iterator(
                 functional::lift_zipped_iterators<
-                        functional::get_base_iterator, iterator
+                        functional::get_raw_iterator, iterator
+                    >::call(iter));
+        }
+
+        // Construct remote local_iterator from local_raw_iterator
+        static local_iterator remote(local_raw_iterator const& iter)
+        {
+            return local_iterator(
+                functional::lift_zipped_iterators<
+                        functional::get_remote_iterator, iterator
                     >::call(iter));
         }
     };
