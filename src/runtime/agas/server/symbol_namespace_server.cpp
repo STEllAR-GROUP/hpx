@@ -411,6 +411,7 @@ response symbol_namespace::resolve(
     if (&ec != &throws)
         ec = make_success_code();
 
+    l.unlock();
     naming::gid_type gid = naming::detail::split_gid_if_needed(it->second);
 
     LAGAS_(info) << (boost::format(
