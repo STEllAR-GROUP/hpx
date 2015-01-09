@@ -2845,7 +2845,7 @@ void addressing_service::send_refcnt_requests_non_blocking(
 
         // Only send decref requests if we aren't in shutdown mode, if we shut down, the corresponding
         // component will get destroyed eventually.
-        if(!get_runtime().get_state() < runtime::state_shutdown)
+        if(get_runtime().get_state() < runtime::state_shutdown)
         {
             // collect all requests for each locality
             typedef std::map<naming::id_type, std::vector<request> > requests_type;
