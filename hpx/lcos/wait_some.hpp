@@ -6,6 +6,9 @@
 
 /// \file lcos/wait_some.hpp
 
+#if !defined(HPX_LCOS_WAIT_SOME_APR_19_2012_0203PM)
+#define HPX_LCOS_WAIT_SOME_APR_19_2012_0203PM
+
 #if defined(DOXYGEN)
 namespace hpx
 {
@@ -142,11 +145,6 @@ namespace hpx
         std::size_t count, error_code& ec = throws);
 }
 #else
-
-#if !BOOST_PP_IS_ITERATING
-
-#if !defined(HPX_LCOS_WAIT_SOME_APR_19_2012_0203PM)
-#define HPX_LCOS_WAIT_SOME_APR_19_2012_0203PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
@@ -468,67 +466,23 @@ namespace hpx { namespace lcos
 
         f.wait();
     }
-}}
 
-#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/lcos/preprocessed/wait_some.hpp>
-#else
-
-#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/wait_some_" HPX_LIMIT_STR ".hpp")
-#endif
-
-#define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (1, HPX_WAIT_ARGUMENT_LIMIT, <hpx/lcos/wait_some.hpp>))               \
-/**/
-#include BOOST_PP_ITERATE()
-
-#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(output: null)
-#endif
-
-#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-
-namespace hpx
-{
-    using lcos::wait_some;
-    using lcos::wait_some_n;
-}
-
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-#else // BOOST_PP_IS_ITERATING
-
-#define N BOOST_PP_ITERATION()
-
-#define HPX_WAIT_SOME_SHARED_STATE_FOR_FUTURE(Z, N, D)                        \
-    typename lcos::detail::shared_state_ptr_for<BOOST_PP_CAT(T, N)>::type     \
-    /**/
-#define HPX_WAIT_SOME_GET_SHARED_STATE(Z, N, D)                               \
-    lcos::detail::get_shared_state(BOOST_PP_CAT(f, N))                        \
-    /**/
-
-namespace hpx { namespace lcos
-{
     ///////////////////////////////////////////////////////////////////////////
-    template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-    void wait_some(std::size_t n, HPX_ENUM_FWD_ARGS(N, T, f),
-        error_code& ec = throws)
+    template <typename... Ts>
+    void wait_some(std::size_t n, error_code& ec, Ts&&...ts)
     {
-        typedef HPX_STD_TUPLE<
-            BOOST_PP_ENUM(N, HPX_WAIT_SOME_SHARED_STATE_FOR_FUTURE, _)>
-            result_type;
+        typedef hpx::util::tuple<
+                typename lcos::detail::shared_state_ptr_for<Ts>::type...
+            > result_type;
 
-        result_type lazy_values_(
-            BOOST_PP_ENUM(N, HPX_WAIT_SOME_GET_SHARED_STATE, _));
+        result_type lazy_values_(lcos::detail::get_shared_state(ts)...);
 
         if (n == 0)
         {
             return;
         }
 
-        if (n > N)
+        if (n > sizeof...(Ts))
         {
             HPX_THROWS_IF(ec, hpx::bad_parameter,
                 "hpx::lcos::wait_some",
@@ -542,12 +496,42 @@ namespace hpx { namespace lcos
 
         return (*f.get())();
     }
+
+    template <typename... Ts>
+    void wait_some(std::size_t n, Ts&&...ts)
+    {
+        typedef hpx::util::tuple<
+                typename lcos::detail::shared_state_ptr_for<Ts>::type...
+            > result_type;
+
+        result_type lazy_values_(lcos::detail::get_shared_state(ts)...);
+
+        if (n == 0)
+        {
+            return;
+        }
+
+        if (n > sizeof...(Ts))
+        {
+            HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                "hpx::lcos::wait_some",
+                "number of results to wait for is out of bounds");
+            return;
+        }
+
+        boost::shared_ptr<detail::wait_some<result_type> > f =
+            boost::make_shared<detail::wait_some<result_type> >(
+                std::move(lazy_values_), n);
+
+        return (*f.get())();
+    }
 }}
 
-#undef HPX_WAIT_SOME_SHARED_STATE_FOR_FUTURE
-#undef HPX_WAIT_SOME_GET_SHARED_STATE
-#undef N
+namespace hpx
+{
+    using lcos::wait_some;
+    using lcos::wait_some_n;
+}
 
-#endif
-
+#endif // DOXYGEN
 #endif

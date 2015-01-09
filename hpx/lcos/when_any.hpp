@@ -1,10 +1,13 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file lcos/when_any.hpp
+
+#if !defined(HPX_LCOS_WHEN_ANY_APR_17_2012_1143AM)
+#define HPX_LCOS_WHEN_ANY_APR_17_2012_1143AM
 
 #if defined(DOXYGEN)
 namespace hpx
@@ -147,12 +150,8 @@ namespace hpx
         vector<future<typename std::iterator_traits<InputIter>::value_type>>>>
     when_any_n(InputIter first, std::size_t count, error_code& ec = throws);
 }
-#else
 
-#if !BOOST_PP_IS_ITERATING
-
-#if !defined(HPX_LCOS_WHEN_ANY_APR_17_2012_1143AM)
-#define HPX_LCOS_WHEN_ANY_APR_17_2012_1143AM
+#else // DOXYGEN
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
@@ -447,61 +446,20 @@ namespace hpx { namespace lcos
 
         return lcos::when_any(lazy_values_, ec);
     }
-}}
 
-#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/lcos/preprocessed/when_any.hpp>
-#else
-
-#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/when_any_" HPX_LIMIT_STR ".hpp")
-#endif
-
-#define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (1, HPX_WAIT_ARGUMENT_LIMIT, <hpx/lcos/when_any.hpp>))                \
-/**/
-#include BOOST_PP_ITERATE()
-
-#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(output: null)
-#endif
-
-#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-
-namespace hpx
-{
-    using lcos::when_any_result;
-    using lcos::when_any;
-    using lcos::when_any_n;
-}
-
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-#else // BOOST_PP_IS_ITERATING
-
-#define N BOOST_PP_ITERATION()
-
-#define HPX_WHEN_ANY_DECAY_FUTURE(Z, N, D)                                    \
-    typename traits::acquire_future<BOOST_PP_CAT(T, N)>::type                 \
-    /**/
-#define HPX_WHEN_ANY_ACQUIRE_FUTURE(Z, N, D)                                  \
-    traits::acquire_future_disp()(BOOST_PP_CAT(f, N))                         \
-    /**/
-
-namespace hpx { namespace lcos
-{
     ///////////////////////////////////////////////////////////////////////////
-    template <BOOST_PP_ENUM_PARAMS(N, typename T)>
+    template <typename... Ts>
     lcos::future<when_any_result<
-        HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_ANY_DECAY_FUTURE, _)> > >
-    when_any(HPX_ENUM_FWD_ARGS(N, T, f), error_code& ec = throws)
+        hpx::util::tuple<typename traits::acquire_future<Ts>::type...>
+    > >
+    when_any(Ts&&... ts)
     {
-        typedef HPX_STD_TUPLE<
-            BOOST_PP_ENUM(N, HPX_WHEN_ANY_DECAY_FUTURE, _)>
-            result_type;
+        typedef hpx::util::tuple<
+                typename traits::acquire_future<Ts>::type...
+            > result_type;
 
-        result_type lazy_values(BOOST_PP_ENUM(N, HPX_WHEN_ANY_ACQUIRE_FUTURE, _));
+        traits::acquire_future_disp func;
+        result_type lazy_values(func(std::forward<Ts>(ts))...);
 
         boost::shared_ptr<detail::when_any<result_type> > f =
             boost::make_shared<detail::when_any<result_type> >(
@@ -515,10 +473,12 @@ namespace hpx { namespace lcos
     }
 }}
 
-#undef HPX_WHEN_ANY_DECAY_FUTURE
-#undef HPX_WHEN_ANY_ACQUIRE_FUTURE
-#undef N
+namespace hpx
+{
+    using lcos::when_any_result;
+    using lcos::when_any;
+    using lcos::when_any_n;
+}
 
-#endif
-
+#endif // DOXYGEN
 #endif

@@ -12,6 +12,7 @@
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/serialize_sequence.hpp>
+#include <hpx/util/functional/boolean_ops.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <boost/fusion/algorithm/iteration/for_each.hpp>
@@ -20,8 +21,6 @@
 
 #include <boost/mpl/assert.hpp>
 #include <boost/mpl/bool.hpp>
-#include <boost/mpl/fold.hpp>
-#include <boost/mpl/and.hpp>
 
 #include <iterator>
 
@@ -607,15 +606,6 @@ namespace hpx { namespace traits
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename ...Ts>
-        struct all_of
-          : boost::mpl::fold<
-                util::tuple<Ts...>, boost::mpl::true_,
-                boost::mpl::and_<boost::mpl::_1, boost::mpl::_2>
-            >::type
-        {};
-
-        ///////////////////////////////////////////////////////////////////////
         template <typename F, typename T>
         struct element_result_of : util::result_of<F(T)> {};
 
@@ -662,7 +652,7 @@ namespace hpx { namespace traits
     struct segmented_iterator_traits<
         util::zip_iterator<Ts...>,
         typename boost::enable_if<
-            typename functional::all_of<
+            typename util::functional::all_of<
                 typename segmented_iterator_traits<Ts>::is_segmented_iterator...
             >::type
         >::type>
@@ -761,7 +751,7 @@ namespace hpx { namespace traits
     struct segmented_local_iterator_traits<
         util::zip_iterator<Ts...>,
         typename boost::enable_if<
-            typename functional::all_of<
+            typename util::functional::all_of<
                 typename segmented_local_iterator_traits<Ts>::is_segmented_local_iterator...
             >::type
         >::type>
