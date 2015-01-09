@@ -578,15 +578,25 @@ namespace hpx { namespace parcelset
                 HPX_ASSERT(!parcels.empty() && !handlers.empty());
                 HPX_ASSERT(parcels.size() == handlers.size());
 
-                // If none of the parcels may require id-splitting we're safe to
-                // force a new connection from the connection cache.
-                bool force_connection = true;
-                BOOST_FOREACH(parcel const& p, parcels)
+                // If one of the sending threads are in suspended state, we
+                // need to force a new connection to avoid deadlocks.
+                bool force_connection = false;
                 {
-                    if (p.may_require_id_splitting())
+                    mutex_type::scoped_try_lock l(sender_threads_mtx_);
+                    if(l)
                     {
-                        force_connection = false;
-                        break;
+                        BOOST_FOREACH(threads::thread_id_type const & thread, sender_threads_)
+                        {
+                            if(threads::get_thread_state(thread) != threads::suspended)
+                            {
+                                force_connection = true;
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        force_connection = true;
                     }
                 }
 
@@ -617,27 +627,41 @@ namespace hpx { namespace parcelset
                     }
                 }
 
+                threads::thread_id_type new_send_thread;
                 // send parcels if they didn't get sent by another connection
                 if (!hpx::is_starting() && threads::get_self_ptr() == 0)
                 {
                     // Re-schedule if this is not executed by an HPX thread
                     std::size_t thread_num = get_worker_thread_num();
-                    hpx::applier::register_thread_nullary(
-                        hpx::util::bind(
-                            hpx::util::one_shot(&parcelport_impl::send_pending_parcels)
-                          , this
-                          , locality_id
-                          , sender_connection
-                          , std::move(parcels)
-                          , std::move(handlers)
-                        )
-                      , "parcelport_impl::send_pending_parcels"
-                      , threads::pending, true, threads::thread_priority_boost,
-                        thread_num, threads::thread_stacksize_default
-                    );
+                    new_send_thread =
+                        hpx::applier::register_thread_nullary(
+                            hpx::util::bind(
+                                hpx::util::one_shot(&parcelport_impl::send_pending_parcels)
+                              , this
+                              , locality_id
+                              , sender_connection
+                              , std::move(parcels)
+                              , std::move(handlers)
+                            )
+                          , "parcelport_impl::send_pending_parcels"
+                          , threads::suspended, true, threads::thread_priority_boost,
+                            thread_num, threads::thread_stacksize_default
+                        );
+                    {
+                        mutex_type::scoped_lock l(sender_threads_mtx_);
+                        HPX_ASSERT(new_send_thread != threads::invalid_thread_id);
+                        sender_threads_.insert(new_send_thread);
+                    }
+                    threads::set_thread_state(new_send_thread, threads::pending);
                 }
                 else
                 {
+                    new_send_thread = threads::get_self_id();
+                    if(new_send_thread != threads::invalid_thread_id)
+                    {
+                        mutex_type::scoped_lock l(sender_threads_mtx_);
+                        sender_threads_.insert(new_send_thread);
+                    }
                     send_pending_parcels(
                         locality_id,
                         sender_connection, std::move(parcels),
@@ -744,6 +768,15 @@ namespace hpx { namespace parcelset
             }
 
             do_background_work_impl<ConnectionHandler>();
+            threads::thread_id_type this_thread = threads::get_self_id();
+            if(this_thread != threads::invalid_thread_id)
+            {
+                mutex_type::scoped_lock l(sender_threads_mtx_);
+                std::set<threads::thread_id_type>::iterator it
+                    = sender_threads_.find(this_thread);
+                HPX_ASSERT(it != sender_threads_.end());
+                sender_threads_.erase(it);
+            }
         }
 
     protected:
@@ -752,6 +785,10 @@ namespace hpx { namespace parcelset
 
         /// The connection cache for sending connections
         util::connection_cache<connection, locality> connection_cache_;
+
+        typedef hpx::lcos::local::spinlock mutex_type;
+        mutex_type sender_threads_mtx_;
+        std::set<threads::thread_id_type> sender_threads_;
 
         int archive_flags_;
     };

@@ -155,6 +155,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         boost::system::error_code error = boost::asio::error::try_again;
         for (std::size_t i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
         {
+            // The acceptor is only NULL when the parcelport has been stopped.
+            // An exit here, avoids hangs when late parcels are in flight (those are
+            // mainly decref requests).
+            if(acceptor_ == NULL)
+                return boost::shared_ptr<sender>();
             try {
                 util::endpoint_iterator_type end = util::connect_end();
                 for (util::endpoint_iterator_type it =
