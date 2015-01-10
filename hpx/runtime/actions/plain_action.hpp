@@ -51,6 +51,13 @@ namespace hpx { namespace actions
     public:
         typedef boost::mpl::false_ needs_guid_initialization;
 
+        static std::string get_action_name(naming::address::address_type /*lva*/)
+        {
+            std::stringstream name;
+            name << "plain action(" << detail::get_action_name<Derived>() << ")";
+            return name.str();
+        }
+
         // Only localities are valid targets for a plain action
         static bool is_target_valid(naming::id_type const& id)
         {
@@ -60,10 +67,6 @@ namespace hpx { namespace actions
         template <typename ...Ts>
         static R invoke(naming::address::address_type /*lva*/, Ts&&... vs)
         {
-            LTM_(debug) << "Executing action("
-                        << detail::get_action_name<Derived>()
-                        << ").";
-
             return F(std::forward<Ts>(vs)...);
         }
     };

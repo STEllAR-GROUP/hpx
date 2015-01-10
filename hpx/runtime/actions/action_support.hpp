@@ -71,6 +71,8 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/preprocessor/cat.hpp>
 
+#include <sstream>
+
 #include <hpx/config/warnings_prefix.hpp>
 
 /// \cond NOINTERNAL
@@ -835,6 +837,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
+        template <typename Action>
         struct continuation_thread_function
         {
             typedef threads::thread_state_enum result_type;
@@ -844,10 +847,15 @@ namespace hpx { namespace actions
             typename boost::disable_if_c<
                 boost::is_void<typename util::result_of<F()>::type>::value,
                 result_type
-            >::type operator()(continuation_type cont, F&& f) const
+            >::type operator()(continuation_type cont,
+                naming::address::address_type lva, F&& f) const
             {
                 try {
-                    LTM_(debug) << " with continuation(" << cont->get_gid() << ")";
+                    if (LHPX_ENABLED(debug))
+                    {
+                        LTM_(debug) << "Executing " << Action::get_action_name(lva)
+                            << " with continuation(" << cont->get_gid() << ")";
+                    }
 
                     cont->trigger(f());
                 }
@@ -863,10 +871,15 @@ namespace hpx { namespace actions
             typename boost::enable_if_c<
                 boost::is_void<typename util::result_of<F()>::type>::value,
                 result_type
-            >::type operator()(continuation_type cont, F&& f) const
+            >::type operator()(continuation_type cont,
+                naming::address::address_type lva, F&& f) const
             {
                 try {
-                    LTM_(debug) << " with continuation(" << cont->get_gid() << ")";
+                    if (LHPX_ENABLED(debug))
+                    {
+                        LTM_(debug) << "Executing " << Action::get_action_name(lva)
+                            << " with continuation(" << cont->get_gid() << ")";
+                    }
 
                     f();
                     cont->trigger();
@@ -880,13 +893,14 @@ namespace hpx { namespace actions
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename F>
+        template <typename Action, typename F>
         threads::thread_function_type
-        construct_continuation_thread_function(continuation_type cont, F&& f)
+        construct_continuation_thread_function(continuation_type cont,
+            naming::address::address_type lva, F&& f)
         {
             return util::bind(
-                util::one_shot(continuation_thread_function()),
-                std::move(cont), std::forward<F>(f));
+                util::one_shot(continuation_thread_function<Action>()),
+                std::move(cont), lva, std::forward<F>(f));
         }
     }
 
@@ -915,6 +929,13 @@ namespace hpx { namespace actions
         typedef void action_tag;
 
         ///////////////////////////////////////////////////////////////////////
+        static std::string get_action_name(naming::address::address_type /*lva*/)
+        {
+            std::stringstream name;
+            name << "action(" << detail::get_action_name<Derived>() << ")";
+            return name.str();
+        }
+
         static bool is_target_valid(naming::id_type const& id)
         {
             return true;        // by default we don't do any verification
@@ -972,9 +993,11 @@ namespace hpx { namespace actions
                 naming::address::address_type lva, Ts&&... vs) const
             {
                 try {
-                    LTM_(debug) << "Executing action("
-                                << detail::get_action_name<Derived>()
-                                << ").";
+                    if (LHPX_ENABLED(debug))
+                    {
+                        LTM_(debug) << "Executing "
+                            << Derived::get_action_name(lva) << ".";
+                    }
 
                     // call the function, ignoring the return value
                     Derived::invoke(lva, std::forward<Ts>(vs)...);
@@ -984,17 +1007,16 @@ namespace hpx { namespace actions
                 }
                 catch (hpx::exception const& e) {
                     LTM_(error)
-                        << "Unhandled exception while executing action("
-                        << detail::get_action_name<Derived>()
-                        << "): " << e.what();
+                        << "Unhandled exception while executing "
+                        << Derived::get_action_name(lva) << ": " << e.what();
 
                     // report this error to the console in any case
                     hpx::report_error(boost::current_exception());
                 }
                 catch (...) {
                     LTM_(error)
-                        << "Unhandled exception while executing action("
-                        << detail::get_action_name<Derived>() << ")";
+                        << "Unhandled exception while executing "
+                        << Derived::get_action_name(lva);
 
                     // report this error to the console in any case
                     hpx::report_error(boost::current_exception());
@@ -1047,8 +1069,8 @@ namespace hpx { namespace actions
                 typename util::decay<Args_>::type>::type decayed_args;
 
             return traits::action_decorate_function<Derived>::call(lva,
-                detail::construct_continuation_thread_function(
-                    cont, util::deferred_call(invoker(), lva,
+                detail::construct_continuation_thread_function<Derived>(
+                    cont, lva, util::deferred_call(invoker(), lva,
                         decayed_args(std::forward<Args_>(args)))));
         }
 
@@ -1057,9 +1079,12 @@ namespace hpx { namespace actions
         static BOOST_FORCEINLINE result_type
         execute_function(naming::address::address_type lva, Args_&& args)
         {
-            LTM_(debug)
-                << "basic_action::execute_function name("
-                << detail::get_action_name<Derived>() << ")";
+            if (LHPX_ENABLED(debug))
+            {
+                LTM_(debug)
+                    << "basic_action::execute_function"
+                    << Derived::get_action_name(lva);
+            }
 
             return invoker()(lva, std::forward<Args_>(args));
         }

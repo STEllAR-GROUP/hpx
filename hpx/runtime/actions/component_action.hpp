@@ -45,6 +45,15 @@ namespace hpx { namespace actions
       : public basic_action<Component, R(Ps...), Derived>
     {
     public:
+        static std::string get_action_name(naming::address::address_type lva)
+        {
+            std::stringstream name;
+            name << "component action(" << detail::get_action_name<Derived>() <<
+                ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component>::call(lva)) << ")";
+            return name.str();
+        }
+
         // Let the component decide whether the id is valid
         static bool is_target_valid(naming::id_type const& id)
         {
@@ -54,11 +63,6 @@ namespace hpx { namespace actions
         template <typename ...Ts>
         static R invoke(naming::address::address_type lva, Ts&&... vs)
         {
-            LTM_(debug) << "Executing action("
-                        << detail::get_action_name<Derived>()
-                        << ") lva(" << reinterpret_cast<void const*>
-                            (get_lva<Component>::call(lva)) << ")";
-
             return (get_lva<Component>::call(lva)->*F)
                 (std::forward<Ts>(vs)...);
         }
@@ -76,6 +80,15 @@ namespace hpx { namespace actions
       : public basic_action<Component const, R(Ps...), Derived>
     {
     public:
+        static std::string get_action_name(naming::address::address_type lva)
+        {
+            std::stringstream name;
+            name << "component action(" << detail::get_action_name<Derived>() <<
+                ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component>::call(lva)) << ")";
+            return name.str();
+        }
+
         // Let the component decide whether the id is valid
         static bool is_target_valid(naming::id_type const& id)
         {
@@ -85,11 +98,6 @@ namespace hpx { namespace actions
         template <typename ...Ts>
         static R invoke(naming::address::address_type lva, Ts&&... vs)
         {
-            LTM_(debug) << "Executing action("
-                        << detail::get_action_name<Derived>()
-                        << ") lva(" << reinterpret_cast<void const*>
-                            (get_lva<Component>::call(lva)) << ")";
-
             return (get_lva<Component const>::call(lva)->*F)
                 (std::forward<Ts>(vs)...);
         }
