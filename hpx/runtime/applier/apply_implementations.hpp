@@ -120,7 +120,7 @@ namespace hpx
                 typename action_type::component_type>::call(addr));
 
             apply_helper<action_type>::call(target, addr.address_, priority,
-                util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, Arg, arg)));
+                HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
             return true;     // no parcel has been sent (dest is local)
         }
 
@@ -136,7 +136,7 @@ namespace hpx
                 typename action_type::component_type>::call(addr));
 
             apply_helper<action_type>::call(target, addr.address_, priority,
-                util::forward_as_tuple(HPX_ENUM_MOVE_ARGS(N, arg)));
+                HPX_ENUM_MOVE_ARGS(N, arg));
             return true;     // no parcel has been sent (dest is local)
         }
 
@@ -305,7 +305,7 @@ namespace hpx
 
             apply_helper<action_type>::call(
                 cont, target, addr.address_, priority,
-                util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, Arg, arg)));
+                HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
             return true;     // no parcel has been sent (dest is local)
         }
 

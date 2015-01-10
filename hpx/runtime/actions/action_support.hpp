@@ -523,11 +523,21 @@ namespace hpx { namespace actions
         /// \note This \a get_thread_function will be invoked to retrieve the
         ///       thread function for an action which has to be invoked without
         ///       continuations.
+        template <std::size_t ...Is>
+        threads::thread_function_type
+        get_thread_function(util::detail::pack_c<std::size_t, Is...>,
+            naming::address::address_type lva)
+        {
+            return derived_type::construct_thread_function(lva,
+                util::get<Is>(std::move(arguments_))...);
+        }
+
         threads::thread_function_type
         get_thread_function(naming::address::address_type lva)
         {
-            return derived_type::construct_thread_function(lva,
-                std::move(arguments_));
+            return get_thread_function(
+                typename util::detail::make_index_pack<Action::arity>::type(),
+                lva);
         }
 
         /// The \a get_thread_function constructs a proper thread function for
@@ -545,12 +555,22 @@ namespace hpx { namespace actions
         /// \note This \a get_thread_function will be invoked to retrieve the
         ///       thread function for an action which has to be invoked with
         ///       continuations.
+        template <std::size_t ...Is>
+        threads::thread_function_type
+        get_thread_function(util::detail::pack_c<std::size_t, Is...>,
+            continuation_type& cont, naming::address::address_type lva)
+        {
+            return derived_type::construct_thread_function(cont, lva,
+                util::get<Is>(std::move(arguments_))...);
+        }
+
         threads::thread_function_type
         get_thread_function(continuation_type& cont,
             naming::address::address_type lva)
         {
-            return derived_type::construct_thread_function(cont, lva,
-                std::move(arguments_));
+            return get_thread_function(
+                typename util::detail::make_index_pack<Action::arity>::type(),
+                cont, lva);
         }
 
 #if !defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
@@ -947,36 +967,24 @@ namespace hpx { namespace actions
     protected:
         struct invoker
         {
-            template <std::size_t ...Is, typename Args_>
-            R operator()(util::detail::pack_c<std::size_t, Is...>,
-                naming::address::address_type lva, Args_&& args) const
-            {
-                return Derived::invoke(lva,
-                    util::get<Is>(std::forward<Args_>(args))...);
-            }
-
-            template <typename Args_>
+            template <typename ...Ts>
             typename boost::disable_if_c<
-                (boost::is_void<R>::value && sizeof(Args_) > 0),
+                (boost::is_void<R>::value && util::detail::pack<Ts...>::size >= 0),
                 result_type
             >::type operator()(
-                naming::address::address_type lva, Args_&& args) const
+                naming::address::address_type lva, Ts&&... vs) const
             {
-                return (*this)(typename util::detail::make_index_pack<
-                        util::tuple_size<typename util::decay<Args_>::type>::value
-                    >::type(), lva, std::forward<Args_>(args));
+                return Derived::invoke(lva, std::forward<Ts>(vs)...);
             }
 
-            template <typename Args_>
+            template <typename ...Ts>
             typename boost::enable_if_c<
-                (boost::is_void<R>::value && sizeof(Args_) > 0),
+                (boost::is_void<R>::value && util::detail::pack<Ts...>::size >= 0),
                 result_type
             >::type operator()(
-                naming::address::address_type lva, Args_&& args) const
+                naming::address::address_type lva, Ts&&... vs) const
             {
-                (*this)(typename util::detail::make_index_pack<
-                    util::tuple_size<typename util::decay<Args_>::type>::value
-                >::type(), lva, std::forward<Args_>(args));
+                Derived::invoke(lva, std::forward<Ts>(vs)...);
                 return util::unused;
             }
         };
@@ -1035,49 +1043,35 @@ namespace hpx { namespace actions
         // a proper thread function for a thread without having to
         // instantiate the base_action type. This is used by the applier in
         // case no continuation has been supplied.
-        template <std::size_t ...Is, typename Args_>
+        template <typename ...Ts>
         static threads::thread_function_type
-        construct_thread_function(util::detail::pack_c<std::size_t, Is...>,
-            naming::address::address_type lva, Args_&& args)
+        construct_thread_function(naming::address::address_type lva,
+            Ts&&... vs)
         {
             return traits::action_decorate_function<Derived>::call(lva,
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    lva, util::get<Is>(std::forward<Args_>(args))...));
-        }
-
-        template <typename Args_>
-        static threads::thread_function_type
-        construct_thread_function(naming::address::address_type lva,
-            Args_&& args)
-        {
-            return construct_thread_function(
-                typename util::detail::make_index_pack<
-                    util::tuple_size<typename util::decay<Args_>::type>::value
-                >::type(), lva, std::forward<Args_>(args));
+                    lva, std::forward<Ts>(vs)...));
         }
 
         // This static construct_thread_function allows to construct
         // a proper thread function for a thread without having to
         // instantiate the base_action type. This is used by the applier in
         // case a continuation has been supplied
-        template <typename Args_>
+        template <typename ...Ts>
         static threads::thread_function_type
         construct_thread_function(continuation_type& cont,
-            naming::address::address_type lva, Args_&& args)
+            naming::address::address_type lva, Ts&&... vs)
         {
-            typedef typename util::tuple_decay<
-                typename util::decay<Args_>::type>::type decayed_args;
-
             return traits::action_decorate_function<Derived>::call(lva,
                 detail::construct_continuation_thread_function<Derived>(
                     cont, lva, util::deferred_call(invoker(), lva,
-                        decayed_args(std::forward<Args_>(args)))));
+                        std::forward<Ts>(vs)...)));
         }
 
         // direct execution
-        template <typename Args_>
+        template <typename ...Ts>
         static BOOST_FORCEINLINE result_type
-        execute_function(naming::address::address_type lva, Args_&& args)
+        execute_function(naming::address::address_type lva, Ts&&... vs)
         {
             if (LHPX_ENABLED(debug))
             {
@@ -1086,7 +1080,7 @@ namespace hpx { namespace actions
                     << Derived::get_action_name(lva);
             }
 
-            return invoker()(lva, std::forward<Args_>(args));
+            return invoker()(lva, std::forward<Ts>(vs)...);
         }
 
         ///////////////////////////////////////////////////////////////////////

@@ -237,8 +237,7 @@ namespace hpx
             HPX_ASSERT(traits::component_type_is_compatible<
                 typename action_type_::component_type>::call(addr));
 
-            util::tuple<> env;
-            apply_helper<action_type_>::call(target, addr.address_, priority, env);
+            apply_helper<action_type_>::call(target, addr.address_, priority);
             return true;     // no parcel has been sent (dest is local)
         }
 
@@ -407,9 +406,8 @@ namespace hpx
                 typename action_type_::component_type>::call(addr));
 
             actions::continuation_type cont(c);
-            util::tuple<> env;
             apply_helper<action_type_>::call(cont, target, addr.address_,
-                priority, env);
+                priority);
             return true;     // no parcel has been sent (dest is local)
         }
 
