@@ -141,7 +141,7 @@ namespace hpx { namespace lcos
     >::type
     wait_each(F&& f, Ts&&... ts)
     {
-//         lcos::when_each(std::forward<F>(f), ts...).wait();
+        lcos::when_each(std::forward<F>(f), std::forward<Ts>(ts)...).wait();
     }
 }}
 
