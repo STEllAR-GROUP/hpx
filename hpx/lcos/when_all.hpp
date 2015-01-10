@@ -105,9 +105,6 @@ namespace hpx
     ///                 which \a wait_all_n should wait.
     /// \param count    [in] The number of elements in the sequence starting at
     ///                 \a first.
-    /// \param ec       [in,out] this represents the error status on exit, if
-    ///                 this is pre-initialized to \a hpx#throws the function
-    ///                 will throw on error instead.
     ///
     /// \return   Returns a future holding the same list of futures as has
     ///           been passed to \a when_all_n.
@@ -130,7 +127,7 @@ namespace hpx
     /// \note     None of the futures in the input sequence are invalidated.
     template <typename InputIter>
     future<vector<future<typename std::iterator_traits<InputIter>::value_type>>>
-    when_all_n(InputIter begin, std::size_t count, error_code& ec = throws);
+    when_all_n(InputIter begin, std::size_t count);
 }
 
 #else // DOXYGEN

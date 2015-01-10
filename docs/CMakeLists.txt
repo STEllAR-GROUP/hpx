@@ -96,6 +96,8 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/lcos/when_any.hpp"
     "${hpx_SOURCE_DIR}/hpx/lcos/wait_some.hpp"
     "${hpx_SOURCE_DIR}/hpx/lcos/when_some.hpp"
+    "${hpx_SOURCE_DIR}/hpx/lcos/wait_each.hpp"
+    "${hpx_SOURCE_DIR}/hpx/lcos/when_each.hpp"
     "${hpx_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp")
 
 

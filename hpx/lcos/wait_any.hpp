@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -85,7 +85,23 @@ namespace hpx
     ///
     /// \note     None of the futures in the input sequence are invalidated.
     template <typename ...T>
-    void wait_any(T &&... futures, error_code& ec = throws);
+    void wait_any(error_code& ec, T&&... futures);
+
+    /// The function \a wait_any is a non-deterministic choice operator. It
+    /// OR-composes all future objects given and returns the same list of
+    /// futures after one future of that list finishes execution.
+    ///
+    /// \param futures  [in] An arbitrary number of \a future or \a shared_future
+    ///                 objects, possibly holding different types for which
+    ///                 \a wait_any should wait.
+    ///
+    /// \note The function \a wait_any returns after at least one future has
+    ///       become ready. All input futures are still valid after \a wait_any
+    ///       returns.
+    ///
+    /// \note     None of the futures in the input sequence are invalidated.
+    template <typename ...T>
+    void wait_any(T&&... futures);
 
     /// The function \a wait_any_n is a non-deterministic choice operator. It
     /// OR-composes all future objects given and returns the same list of
@@ -171,8 +187,7 @@ namespace hpx { namespace lcos
     typename util::always_void<
         typename lcos::detail::future_iterator_traits<Iterator>::type
     >::type
-    wait_any(Iterator begin, Iterator end,
-        error_code& ec = throws)
+    wait_any(Iterator begin, Iterator end, error_code& ec = throws)
     {
         return lcos::wait_some(1, begin, end, ec);
     }
