@@ -863,51 +863,16 @@ namespace hpx { namespace actions
             typedef threads::thread_state_enum result_type;
 
             template <typename F>
-            BOOST_FORCEINLINE
-            typename boost::disable_if_c<
-                boost::is_void<typename util::result_of<F()>::type>::value,
-                result_type
-            >::type operator()(continuation_type cont,
+            BOOST_FORCEINLINE result_type operator()(continuation_type cont,
                 naming::address::address_type lva, F&& f) const
             {
-                try {
-                    if (LHPX_ENABLED(debug))
-                    {
-                        LTM_(debug) << "Executing " << Action::get_action_name(lva)
-                            << " with continuation(" << cont->get_gid() << ")";
-                    }
+                if (LHPX_ENABLED(debug))
+                {
+                    LTM_(debug) << "Executing " << Action::get_action_name(lva)
+                        << " with continuation(" << cont->get_gid() << ")";
+                }
 
-                    cont->trigger(f());
-                }
-                catch (...) {
-                    // make sure hpx::exceptions are propagated back to the client
-                    cont->trigger_error(boost::current_exception());
-                }
-                return threads::terminated;
-            }
-
-            template <typename F>
-            BOOST_FORCEINLINE
-            typename boost::enable_if_c<
-                boost::is_void<typename util::result_of<F()>::type>::value,
-                result_type
-            >::type operator()(continuation_type cont,
-                naming::address::address_type lva, F&& f) const
-            {
-                try {
-                    if (LHPX_ENABLED(debug))
-                    {
-                        LTM_(debug) << "Executing " << Action::get_action_name(lva)
-                            << " with continuation(" << cont->get_gid() << ")";
-                    }
-
-                    f();
-                    cont->trigger();
-                }
-                catch (...) {
-                    // make sure hpx::exceptions are propagated back to the client
-                    cont->trigger_error(boost::current_exception());
-                }
+                actions::trigger(*cont, std::forward<F>(f));
                 return threads::terminated;
             }
         };

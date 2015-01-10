@@ -11,6 +11,7 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/util/invoke.hpp>
 #include <hpx/util/polymorphic_factory.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/serialize_empty_type.hpp>
@@ -215,6 +216,36 @@ namespace hpx { namespace actions
     protected:
         naming::id_type gid_;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename F, typename ...Ts>
+    typename boost::disable_if_c<
+        boost::is_void<typename util::result_of<F(Ts...)>::type>::value
+    >::type trigger(continuation& cont, F&& f, Ts&&... vs)
+    {
+        try {
+            cont.trigger(util::invoke(std::forward<F>(f), std::forward<Ts>(vs)...));
+        }
+        catch (...) {
+            // make sure hpx::exceptions are propagated back to the client
+            cont.trigger_error(boost::current_exception());
+        }
+    }
+
+    template <typename F, typename ...Ts>
+    typename boost::enable_if_c<
+        boost::is_void<typename util::result_of<F(Ts...)>::type>::value
+    >::type trigger(continuation& cont, F&& f, Ts&&... vs)
+    {
+        try {
+            util::invoke(std::forward<F>(f), std::forward<Ts>(vs)...);
+            cont.trigger();
+        }
+        catch (...) {
+            // make sure hpx::exceptions are propagated back to the client
+            cont.trigger_error(boost::current_exception());
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     struct set_lco_value_continuation
