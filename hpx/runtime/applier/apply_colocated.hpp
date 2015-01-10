@@ -35,12 +35,11 @@ namespace hpx
 
         using util::placeholders::_2;
         return apply_continue<action_type>(
-            service_target, req,
             util::functional::apply_continuation(
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2, gid),
-                    std::forward<Ts>(vs)...)
-                ));
+                    std::forward<Ts>(vs)...)),
+            service_target, req);
     }
 
     ///////////////////////////////////////////////////////////////////////////
