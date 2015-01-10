@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/util/always_void.hpp>
 
 namespace hpx { namespace traits
 {
@@ -28,7 +29,8 @@ namespace hpx { namespace traits
     };
 
     template <typename Action>
-    struct action_schedule_thread<Action, typename Action::type>
+    struct action_schedule_thread<Action
+      , typename util::always_void<typename Action::type>::type>
       : action_schedule_thread<typename Action::type>
     {};
 }}
