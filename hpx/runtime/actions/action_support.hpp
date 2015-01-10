@@ -857,35 +857,53 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        template <typename Action>
+        template <typename Action, typename F>
         struct continuation_thread_function
         {
+            HPX_MOVABLE_BUT_NOT_COPYABLE(continuation_thread_function);
+
+        public:
+            template <typename F_>
+            explicit continuation_thread_function(continuation_type cont,
+                naming::address::address_type lva, F_&& f)
+              : cont_(std::move(cont)), lva_(lva), f_(std::forward<F_>(f))
+            {}
+
+            continuation_thread_function(continuation_thread_function && other)
+              : cont_(std::move(other.cont_)), lva_(std::move(other.lva_))
+              , f_(std::move(other.f_))
+            {}
+
             typedef threads::thread_state_enum result_type;
 
-            template <typename F>
-            BOOST_FORCEINLINE result_type operator()(continuation_type cont,
-                naming::address::address_type lva, F&& f) const
+            BOOST_FORCEINLINE result_type operator()(threads::thread_state_ex_enum)
             {
                 if (LHPX_ENABLED(debug))
                 {
-                    LTM_(debug) << "Executing " << Action::get_action_name(lva)
-                        << " with continuation(" << cont->get_gid() << ")";
+                    LTM_(debug) << "Executing " << Action::get_action_name(lva_)
+                        << " with continuation(" << cont_->get_gid() << ")";
                 }
 
-                actions::trigger(*cont, std::forward<F>(f));
+                actions::trigger(*cont_, f_);
                 return threads::terminated;
             }
+
+        private:
+            continuation_type cont_;
+            naming::address::address_type lva_;
+            F f_;
         };
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Action, typename F>
-        threads::thread_function_type
+        continuation_thread_function<Action, typename util::decay<F>::type>
         construct_continuation_thread_function(continuation_type cont,
             naming::address::address_type lva, F&& f)
         {
-            return util::bind(
-                util::one_shot(continuation_thread_function<Action>()),
-                std::move(cont), lva, std::forward<F>(f));
+            typedef continuation_thread_function<Action,
+                typename util::decay<F>::type> result_type;
+
+            return result_type(std::move(cont), lva, std::forward<F>(f));
         }
     }
 
