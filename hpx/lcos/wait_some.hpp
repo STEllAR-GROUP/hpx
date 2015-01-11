@@ -429,13 +429,9 @@ namespace hpx { namespace lcos
             return;
         }
 
-        //if (n > 0)
-        //{
-            HPX_THROWS_IF(ec, hpx::bad_parameter,
-                "hpx::lcos::wait_some",
-                "number of results to wait for is out of bounds");
-            return;
-        //}
+        HPX_THROWS_IF(ec, hpx::bad_parameter,
+            "hpx::lcos::wait_some",
+            "number of results to wait for is out of bounds");
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -475,7 +471,8 @@ namespace hpx { namespace lcos
                 typename lcos::detail::shared_state_ptr_for<Ts>::type...
             > result_type;
 
-        result_type lazy_values_(lcos::detail::get_shared_state(ts)...);
+        result_type lazy_values_ =
+            result_type(lcos::detail::get_shared_state(ts)...);
 
         if (n == 0)
         {
@@ -504,7 +501,8 @@ namespace hpx { namespace lcos
                 typename lcos::detail::shared_state_ptr_for<Ts>::type...
             > result_type;
 
-        result_type lazy_values_(lcos::detail::get_shared_state(ts)...);
+        result_type lazy_values_ =
+            result_type(lcos::detail::get_shared_state(ts)...);
 
         if (n == 0)
         {
