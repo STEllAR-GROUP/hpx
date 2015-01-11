@@ -365,6 +365,8 @@ namespace hpx { namespace actions
 
     template <typename Action>
     struct init_registration;
+
+    /// \endcond
 }}
 
 #endif

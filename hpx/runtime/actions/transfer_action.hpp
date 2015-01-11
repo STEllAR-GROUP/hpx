@@ -41,6 +41,8 @@
 
 namespace hpx { namespace actions
 {
+    /// \cond NOINTERNAL
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
     struct transfer_action : base_action
@@ -482,9 +484,9 @@ namespace hpx { namespace actions
     {
         return args.template get<N>();
     }
-}}
 
-/// \cond NOINTERNAL
+    /// \endcond
+}}
 
 // Disabling the guid initialization stuff for actions
 namespace hpx { namespace traits

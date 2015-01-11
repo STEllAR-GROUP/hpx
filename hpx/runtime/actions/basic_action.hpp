@@ -41,6 +41,8 @@
 
 namespace hpx { namespace actions
 {
+    /// \cond NOINTERNAL
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
@@ -417,6 +419,8 @@ namespace hpx { namespace actions
 }}
 
 #include <hpx/config/warnings_suffix.hpp>
+
+/// \cond NOINTERNAL
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_BASE_HELPER(action, actionname)                          \
