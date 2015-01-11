@@ -303,8 +303,7 @@ wait_any_n                            "" "header\.hpx\.lcos\.wait_any.*"
 # hpx/lcos/when_any.hpp
 when_any                              "" "header\.hpx\.lcos\.when_any.*"
 when_any_n                            "" "header\.hpx\.lcos\.when_any.*"
-when_any_back                         "" "header\.hpx\.lcos\.when_any.*"
-when_any_back_n                       "" "header\.hpx\.lcos\.when_any.*"
+when_any_result                       "" "header\.hpx\.lcos\.when_any_result.*"
 
 # hpx/lcos/wait_some.hpp
 wait_some                             "" "header\.hpx\.lcos\.wait_some.*"
@@ -313,6 +312,14 @@ wait_some_n                           "" "header\.hpx\.lcos\.wait_some.*"
 # hpx/lcos/when_some.hpp
 when_some                             "" "header\.hpx\.lcos\.when_some.*"
 when_some_n                           "" "header\.hpx\.lcos\.when_some.*"
+
+# hpx/lcos/when_each.hpp
+when_each                             "" "header\.hpx\.lcos\.when_each.*"
+when_each_n                           "" "header\.hpx\.lcos\.when_each.*"
+
+# hpx/lcos/wait_each.hpp
+wait_each                             "" "header\.hpx\.lcos\.wait_each.*"
+wait_each_n                           "" "header\.hpx\.lcos\.wait_each.*"
 
 # hpx/hpx_finalize.hpp
 finalize                              "" "hpx\.finalize.*"

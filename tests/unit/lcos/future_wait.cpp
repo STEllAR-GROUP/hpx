@@ -115,7 +115,7 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         // Async wait, single future, void return.
         {
-            wait_each(async<null_action>(here_), cb);
+            wait_each(cb, async<null_action>(here_));
 
             HPX_TEST_EQ(1U, cb.count());
             HPX_TEST_EQ(1U, void_counter.load());
@@ -127,7 +127,7 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         // Async wait, single future, non-void return.
         {
-            wait_each(async<null_result_action>(here_), cb);
+            wait_each(cb, async<null_result_action>(here_));
 
             HPX_TEST_EQ(1U, cb.count());
             HPX_TEST_EQ(1U, result_counter.load());
@@ -145,7 +145,7 @@ int hpx_main(
             for (std::size_t i = 0; i < 64; ++i)
                 futures.push_back(async<null_action>(here_));
 
-            wait_each(futures, cb);
+            wait_each(cb, futures);
 
             HPX_TEST_EQ(64U, cb.count());
             HPX_TEST_EQ(64U, void_counter.load());
@@ -163,7 +163,7 @@ int hpx_main(
             for (std::size_t i = 0; i < 64; ++i)
                 futures.push_back(async<null_result_action>(here_));
 
-            wait_each(futures, cb);
+            wait_each(cb, futures);
 
             HPX_TEST_EQ(64U, cb.count());
             HPX_TEST_EQ(64U, result_counter.load());

@@ -245,8 +245,9 @@ int hpx_main(
                 for (boost::uint64_t i = 0; i < count; ++i)
                     futures.push_back(async<null_action>(here, i));
 
-                wait_each(futures, hpx::util::unwrapped(
-                    [] (double r) { global_scratch += r; }));
+                wait_each(hpx::util::unwrapped(
+                    [] (double r) { global_scratch += r; }),
+                    futures);
 
                 // stop the clock
                 const double duration = walltime.elapsed();

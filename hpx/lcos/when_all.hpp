@@ -1,10 +1,13 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file lcos/when_all.hpp
+
+#if !defined(HPX_LCOS_WHEN_ALL_APR_19_2012_1140AM)
+#define HPX_LCOS_WHEN_ALL_APR_19_2012_1140AM
 
 #if defined(DOXYGEN)
 namespace hpx
@@ -102,9 +105,6 @@ namespace hpx
     ///                 which \a wait_all_n should wait.
     /// \param count    [in] The number of elements in the sequence starting at
     ///                 \a first.
-    /// \param ec       [in,out] this represents the error status on exit, if
-    ///                 this is pre-initialized to \a hpx#throws the function
-    ///                 will throw on error instead.
     ///
     /// \return   Returns a future holding the same list of futures as has
     ///           been passed to \a when_all_n.
@@ -127,14 +127,10 @@ namespace hpx
     /// \note     None of the futures in the input sequence are invalidated.
     template <typename InputIter>
     future<vector<future<typename std::iterator_traits<InputIter>::value_type>>>
-    when_all_n(InputIter begin, std::size_t count, error_code& ec = throws);
+    when_all_n(InputIter begin, std::size_t count);
 }
-#else
 
-#if !BOOST_PP_IS_ITERATING
-
-#if !defined(HPX_LCOS_WHEN_ALL_APR_19_2012_1140AM)
-#define HPX_LCOS_WHEN_ALL_APR_19_2012_1140AM
+#else // DOXYGEN
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
@@ -418,62 +414,21 @@ namespace hpx { namespace lcos
 
         return lcos::when_all(std::move(values));
     }
-}}
 
-#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/lcos/preprocessed/when_all.hpp>
-#else
-
-#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/when_all_" HPX_LIMIT_STR ".hpp")
-#endif
-
-#define HPX_WHEN_ALL_DECAY_FUTURE(Z, N, D)                                    \
-    typename traits::acquire_future<BOOST_PP_CAT(T, N)>::type                 \
-    /**/
-#define HPX_WHEN_ALL_ACQUIRE_FUTURE(Z, N, D)                                  \
-    traits::acquire_future_disp()(BOOST_PP_CAT(f, N))                         \
-    /**/
-
-#define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (1, HPX_WAIT_ARGUMENT_LIMIT, <hpx/lcos/when_all.hpp>))                \
-/**/
-#include BOOST_PP_ITERATE()
-
-#undef HPX_WHEN_ALL_ACQUIRE_FUTURE
-#undef HPX_WHEN_ALL_DECAY_FUTURE
-
-#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(output: null)
-#endif
-
-#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-
-namespace hpx
-{
-    using lcos::when_all;
-    using lcos::when_all_n;
-}
-
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-#else // BOOST_PP_IS_ITERATING
-
-#define N BOOST_PP_ITERATION()
-
-namespace hpx { namespace lcos
-{
     ///////////////////////////////////////////////////////////////////////////
-    template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-    lcos::future<hpx::util::tuple<BOOST_PP_ENUM(N, HPX_WHEN_ALL_DECAY_FUTURE, _)> >
-    when_all(HPX_ENUM_FWD_ARGS(N, T, f))
+    template <typename... Ts>
+    lcos::future<
+        hpx::util::tuple<typename traits::acquire_future<Ts>::type...>
+    >
+    when_all(Ts&&... ts)
     {
-        typedef hpx::util::tuple<BOOST_PP_ENUM(N, HPX_WHEN_ALL_DECAY_FUTURE, _)>
-            result_type;
+        typedef hpx::util::tuple<
+                typename traits::acquire_future<Ts>::type...
+            > result_type;
         typedef detail::when_all_frame<result_type> frame_type;
 
-        result_type values(BOOST_PP_ENUM(N, HPX_WHEN_ALL_ACQUIRE_FUTURE, _));
+        traits::acquire_future_disp func;
+        result_type values(func(std::forward<Ts>(ts))...);
 
         boost::intrusive_ptr<frame_type> p(new frame_type(std::move(values)));
         p->await();
@@ -483,8 +438,11 @@ namespace hpx { namespace lcos
     }
 }}
 
-#undef N
+namespace hpx
+{
+    using lcos::when_all;
+    using lcos::when_all_n;
+}
 
-#endif
-
+#endif // DOXYGEN
 #endif
