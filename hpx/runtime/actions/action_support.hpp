@@ -52,11 +52,6 @@
 #endif
 
 #include <boost/version.hpp>
-#include <boost/fusion/include/at.hpp>
-#include <boost/fusion/include/at_c.hpp>
-#include <boost/fusion/include/for_each.hpp>
-#include <boost/fusion/include/size.hpp>
-#include <boost/fusion/include/transform_view.hpp>
 #include <boost/ref.hpp>
 #include <boost/foreach.hpp>
 #include <boost/serialization/access.hpp>
@@ -751,11 +746,11 @@ namespace hpx { namespace actions
 #endif
     public:
         /// retrieve the N's argument
-        template <int N>
-        typename boost::fusion::result_of::at_c<arguments_type, N>::type
-        get()
+        template <std::size_t N>
+        inline typename util::tuple_element<N, arguments_type>::type const&
+        get() const
         {
-            return boost::fusion::at_c<N>(arguments_);
+            return util::get<N>(arguments_);
         }
 
         // serialization support
@@ -845,11 +840,10 @@ namespace hpx { namespace actions
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <int N, typename Action>
-    inline typename boost::fusion::result_of::at_c<
-        typename transfer_action<Action>::arguments_type, N
-    >::type
-    get(transfer_action<Action> & args)
+    template <std::size_t N, typename Action>
+    inline typename util::tuple_element<
+        N, typename transfer_action<Action>::arguments_type
+    >::type const& get(transfer_action<Action> const& args)
     {
         return args.template get<N>();
     }
