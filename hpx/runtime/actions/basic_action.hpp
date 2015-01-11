@@ -65,11 +65,8 @@ namespace hpx { namespace actions
 
             BOOST_FORCEINLINE result_type operator()(threads::thread_state_ex_enum)
             {
-                if (LHPX_ENABLED(debug))
-                {
-                    LTM_(debug) << "Executing " << Action::get_action_name(lva_)
-                        << " with continuation(" << cont_->get_gid() << ")";
-                }
+                LTM_(debug) << "Executing " << Action::get_action_name(lva_)
+                    << " with continuation(" << cont_->get_gid() << ")";
 
                 actions::trigger(*cont_, f_);
                 return threads::terminated;
@@ -171,11 +168,8 @@ namespace hpx { namespace actions
                 naming::address::address_type lva, Ts&&... vs) const
             {
                 try {
-                    if (LHPX_ENABLED(debug))
-                    {
-                        LTM_(debug) << "Executing "
-                            << Derived::get_action_name(lva) << ".";
-                    }
+                    LTM_(debug) << "Executing "
+                        << Derived::get_action_name(lva) << ".";
 
                     // call the function, ignoring the return value
                     Derived::invoke(lva, std::forward<Ts>(vs)...);
@@ -243,12 +237,9 @@ namespace hpx { namespace actions
         static BOOST_FORCEINLINE result_type
         execute_function(naming::address::address_type lva, Ts&&... vs)
         {
-            if (LHPX_ENABLED(debug))
-            {
-                LTM_(debug)
-                    << "basic_action::execute_function"
-                    << Derived::get_action_name(lva);
-            }
+            LTM_(debug)
+                << "basic_action::execute_function"
+                << Derived::get_action_name(lva);
 
             return invoker()(lva, std::forward<Ts>(vs)...);
         }
