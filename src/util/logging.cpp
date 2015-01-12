@@ -1091,6 +1091,10 @@ namespace hpx { namespace util { namespace detail
 #include <hpx/util/logging.hpp>
 #include <hpx/util/init_logging.hpp>
 
+#include <iostream>
+#include <string>
+#include <vector>
+
 namespace hpx { namespace util { namespace detail
 {
     dummy_log_impl dummy_log = dummy_log_impl();
