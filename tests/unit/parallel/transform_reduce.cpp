@@ -44,7 +44,7 @@ void test_transform_reduce(ExPolicy const& policy, IteratorTag)
     result_type r1 =
         hpx::parallel::transform_reduce(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)),
-            init, reduce_op, convert_op);
+            convert_op, init, reduce_op);
 
     // verify values
     result_type r2 =
@@ -77,7 +77,7 @@ void test_transform_reduce_async(ExPolicy const& p, IteratorTag)
     hpx::future<std::size_t> f =
         hpx::parallel::transform_reduce(p,
             iterator(boost::begin(c)), iterator(boost::end(c)),
-            val, op, [](std::size_t v){return v;});
+            [](std::size_t v){ return v; }, val, op);
     f.wait();
 
     // verify values
@@ -128,11 +128,12 @@ void test_transform_reduce_exception(ExPolicy const& policy, IteratorTag)
     try {
         hpx::parallel::transform_reduce(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)),
+            [](std::size_t v){ return v; },
             std::size_t(42),
-            [](std::size_t v1, std::size_t v2) {
+            [](std::size_t v1, std::size_t v2)
+            {
                 return throw std::runtime_error("test"), v1 + v2;
-            },
-            [](std::size_t v){return v;}
+            }
         );
 
         HPX_TEST(false);
@@ -163,11 +164,12 @@ void test_transform_reduce_exception_async(ExPolicy const& p, IteratorTag)
         hpx::future<void> f =
             hpx::parallel::transform_reduce(p,
                 iterator(boost::begin(c)), iterator(boost::end(c)),
+                [](std::size_t v){ return v; },
                 std::size_t(42),
-                [](std::size_t v1, std::size_t v2) {
+                [](std::size_t v1, std::size_t v2)
+                {
                     return throw std::runtime_error("test"), v1 + v2;
-                },
-                [](std::size_t v){ return v; }
+                }
             );
         returned_from_algorithm = true;
         f.get();
@@ -230,11 +232,12 @@ void test_transform_reduce_bad_alloc(ExPolicy const& policy, IteratorTag)
     try {
         hpx::parallel::transform_reduce(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)),
+            [](std::size_t v){ return v; },
             std::size_t(42),
-            [](std::size_t v1, std::size_t v2) {
+            [](std::size_t v1, std::size_t v2)
+            {
                 return throw std::bad_alloc(), v1 + v2;
-            },
-            [](std::size_t v){return v;}
+            }
         );
 
         HPX_TEST(false);
@@ -264,11 +267,12 @@ void test_transform_reduce_bad_alloc_async(ExPolicy const& p, IteratorTag)
         hpx::future<void> f =
             hpx::parallel::transform_reduce(p,
                 iterator(boost::begin(c)), iterator(boost::end(c)),
+                [](std::size_t v){ return v; },
                 std::size_t(42),
-                [](std::size_t v1, std::size_t v2) {
+                [](std::size_t v1, std::size_t v2)
+                {
                     return throw std::bad_alloc(), v1 + v2;
-                },
-                [](std::size_t v){return v;}
+                }
         );
         returned_from_algorithm = true;
         f.get();

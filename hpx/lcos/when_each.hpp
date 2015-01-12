@@ -1,16 +1,117 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !BOOST_PP_IS_ITERATING
+/// \file lcos/when_each.hpp
 
 #if !defined(HPX_LCOS_WHEN_EACH_JUN_16_2014_0206PM)
 #define HPX_LCOS_WHEN_EACH_JUN_16_2014_0206PM
 
+#if defined(DOXYGEN)
+namespace hpx
+{
+    /// The function \a when_each is a operator allowing to join on the results
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns a new future object representing the event of all those futures
+    /// having finished executing. It also calls the supplied callback
+    /// for each of the futures which becomes ready.
+    ///
+    /// \param f        The function which will be called for each of the
+    ///                 input futures once the future has become ready.
+    /// \param futures  A vector holding an arbitrary amount of \a future or
+    ///                 \a shared_future objects for which \a wait_each should
+    ///                 wait.
+    ///
+    /// \note This function consumes the futures as they are passed on to the
+    ///       supplied function.
+    ///
+    /// \return   Returns a future representing the event of all input futures
+    ///           being ready.
+    ///
+    template <typename F, typename Future>
+    future<void> when_each(F&& f, std::vector<Future>&& lazy_values);
+
+    /// The function \a when_each is a operator allowing to join on the results
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns a new future object representing the event of all those futures
+    /// having finished executing. It also calls the supplied callback
+    /// for each of the futures which becomes ready.
+    ///
+    /// \param f        The function which will be called for each of the
+    ///                 input futures once the future has become ready.
+    /// \param first    The iterator pointing to the first element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a wait_each should wait.
+    /// \param last     The iterator pointing to the last element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a wait_each should wait.
+    ///
+    /// \note This function consumes the futures as they are passed on to the
+    ///       supplied function.
+    ///
+    /// \return   Returns a future representing the event of all input futures
+    ///           being ready.
+    ///
+    template <typename F, typename Iterator>
+    future<Iterator> when_each(F&& f, Iterator begin, Iterator end);
+
+    /// The function \a when_each is a operator allowing to join on the results
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns a new future object representing the event of all those futures
+    /// having finished executing. It also calls the supplied callback
+    /// for each of the futures which becomes ready.
+    ///
+    /// \param f        The function which will be called for each of the
+    ///                 input futures once the future has become ready.
+    /// \param futures  An arbitrary number of \a future or \a shared_future
+    ///                 objects, possibly holding different types for which
+    ///                 \a wait_each should wait.
+    ///
+    /// \note This function consumes the futures as they are passed on to the
+    ///       supplied function.
+    ///
+    /// \return   Returns a future representing the event of all input futures
+    ///           being ready.
+    ///
+    template <typename F, typename... Ts>
+    future<void> when_each(F&& f, Ts&&... ts);
+
+    /// The function \a when_each is a operator allowing to join on the results
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns a new future object representing the event of all those futures
+    /// having finished executing. It also calls the supplied callback
+    /// for each of the futures which becomes ready.
+    ///
+    /// \param f        The function which will be called for each of the
+    ///                 input futures once the future has become ready.
+    /// \param begin    The iterator pointing to the first element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a wait_each_n should wait.
+    /// \param count    The number of elements in the sequence starting at
+    ///                 \a first.
+    ///
+    /// \note This function consumes the futures as they are passed on to the
+    ///       supplied function.
+    ///
+    /// \return   Returns a future holding the iterator pointing to the first
+    ///           element after the last one.
+    ///
+    template <typename F, typename Iterator>
+    future<Iterator> when_each_n(F&& f, Iterator begin, std::size_t count);
+}
+
+#else // DOXYGEN
+
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/when_some.hpp>
+#include <hpx/util/functional/boolean_ops.hpp>
+
+#include <boost/mpl/bool.hpp>
+#include <boost/mpl/not.hpp>
+#include <boost/mpl/and.hpp>
+#include <boost/utility/enable_if.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
@@ -151,23 +252,10 @@ namespace hpx { namespace lcos
         };
     }
 
-    /// The function \a when_each is a operator allowing to join on the result
-    /// of all given futures. It AND-composes all future objects given and
-    /// returns a new future object representing the same list of futures
-    /// after n of them finished executing. It also calls the supplied callback
-    /// for each of the futures which becomes ready.
-    ///
-    /// \note There are four variations of when_each. The first takes a pair
-    ///       of InputIterators. The second takes an std::vector of future<R>.
-    ///       The third takes any arbitrary number of future<R>, where R need
-    ///       not be the same type. The fourth takes an iterator and a count.
-    ///
-    /// \return   Returns a future holding either nothing or the iterator
-    ///           pointing to the first element after the last one.
-    ///
-    template <typename Future, typename F>
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename F, typename Future>
     lcos::future<void>
-    when_each(std::vector<Future>& lazy_values, F && func)
+    when_each(F&& func, std::vector<Future>& lazy_values)
     {
         BOOST_STATIC_ASSERT_MSG(
             traits::is_future<Future>::value, "invalid use of when_each");
@@ -182,7 +270,7 @@ namespace hpx { namespace lcos
 
         std::transform(lazy_values.begin(), lazy_values.end(),
             std::back_inserter(lazy_values_),
-            detail::when_acquire_future<Future>());
+            traits::acquire_future_disp());
 
         boost::shared_ptr<when_each_type> f =
             boost::make_shared<when_each_type>(std::move(lazy_values_),
@@ -195,11 +283,11 @@ namespace hpx { namespace lcos
         return p.get_future();
     }
 
-    template <typename Future, typename F>
+    template <typename F, typename Future>
     lcos::future<void> //-V659
-    when_each(std::vector<Future> && lazy_values, F && f)
+    when_each(F&& f, std::vector<Future>&& lazy_values)
     {
-        return lcos::when_each(lazy_values, std::forward<F>(f));
+        return lcos::when_each(std::forward<F>(f), lazy_values);
     }
 
     namespace detail
@@ -212,9 +300,9 @@ namespace hpx { namespace lcos
         }
     }
 
-    template <typename Iterator, typename F>
+    template <typename F, typename Iterator>
     lcos::future<Iterator>
-    when_each(Iterator begin, Iterator end, F && f)
+    when_each(F&& f, Iterator begin, Iterator end)
     {
         typedef
             typename lcos::detail::future_iterator_traits<Iterator>::type
@@ -222,16 +310,16 @@ namespace hpx { namespace lcos
 
         std::vector<future_type> lazy_values_;
         std::transform(begin, end, std::back_inserter(lazy_values_),
-            detail::when_acquire_future<future_type>());
+            traits::acquire_future_disp());
 
-        return lcos::when_each(lazy_values_, std::forward<F>(f)).then(
+        return lcos::when_each(std::forward<F>(f), lazy_values_).then(
             util::bind(&detail::return_iterator<Iterator>,
                 util::placeholders::_1, end));
     }
 
-    template <typename Iterator, typename F>
+    template <typename F, typename Iterator>
     lcos::future<Iterator>
-    when_each_n(Iterator begin, std::size_t count, F && f)
+    when_each_n(F&& f, Iterator begin, std::size_t count)
     {
         typedef
             typename lcos::detail::future_iterator_traits<Iterator>::type
@@ -239,41 +327,56 @@ namespace hpx { namespace lcos
 
         std::vector<future_type> lazy_values_;
         lazy_values_.reserve(count);
-        detail::when_acquire_future<future_type> func;
+
+        traits::acquire_future_disp func;
         for (std::size_t i = 0; i != count; ++i)
             lazy_values_.push_back(func(*begin++));
 
-        return lcos::when_each(lazy_values_, std::forward<F>(f)).then(
+        return lcos::when_each(std::forward<F>(f), lazy_values_).then(
             util::bind(&detail::return_iterator<Iterator>,
                 util::placeholders::_1, begin));
     }
 
     template <typename F>
     inline lcos::future<void>
-    when_each(F && f)
+    when_each(F&& f)
     {
         return lcos::make_ready_future();
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename F, typename... Ts>
+    typename boost::disable_if<
+        boost::mpl::or_<
+            traits::is_future<typename util::decay<F>::type>,
+            util::functional::any_of<boost::mpl::not_<traits::is_future<Ts> >...>
+        >,
+        lcos::future<void>
+    >::type
+    when_each(F&& f, Ts&&... ts)
+    {
+        typedef hpx::util::tuple<
+                typename traits::acquire_future<Ts>::type...
+            > argument_type;
+
+        typedef void result_type;
+        typedef typename util::decay<F>::type func_type;
+        typedef detail::when_each<argument_type, func_type> when_each_type;
+
+        traits::acquire_future_disp func;
+        argument_type lazy_values(func(std::forward<Ts>(ts))...);
+
+        boost::shared_ptr<when_each_type> fptr =
+            boost::make_shared<when_each_type>(std::move(lazy_values),
+                std::forward<F>(f), sizeof...(Ts));
+
+        lcos::local::futures_factory<result_type()> p(
+            util::bind(&when_each_type::operator(), fptr));
+
+        p.apply();
+        return p.get_future();
+    }
 }}
-
-#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/lcos/preprocessed/when_each.hpp>
-#else
-
-#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/when_each_" HPX_LIMIT_STR ".hpp")
-#endif
-
-#define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (1, HPX_WAIT_ARGUMENT_LIMIT, <hpx/lcos/when_each.hpp>))               \
-/**/
-#include BOOST_PP_ITERATE()
-
-#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(output: null)
-#endif
-
-#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
 namespace hpx
 {
@@ -281,57 +384,6 @@ namespace hpx
     using lcos::when_each_n;
 }
 
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-#else // BOOST_PP_IS_ITERATING
-
-#define N BOOST_PP_ITERATION()
-
-#define HPX_WHEN_EACH_DECAY_FUTURE(Z, N, D)                                   \
-    typename util::decay<BOOST_PP_CAT(T, N)>::type                            \
-    /**/
-#define HPX_WHEN_EACH_ACQUIRE_FUTURE(Z, N, D)                                 \
-    detail::when_acquire_future<BOOST_PP_CAT(T, N)>()(BOOST_PP_CAT(f, N))     \
-    /**/
-
-namespace hpx { namespace lcos
-{
-    ///////////////////////////////////////////////////////////////////////////
-    template <BOOST_PP_ENUM_PARAMS(N, typename T), typename F>
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::mpl::not_<traits::is_future<T0> >,
-            traits::is_future<F>
-        >,
-        lcos::future<void>
-    >::type
-    when_each(HPX_ENUM_FWD_ARGS(N, T, f), F && func)
-    {
-        typedef HPX_STD_TUPLE<
-            BOOST_PP_ENUM(N, HPX_WHEN_EACH_DECAY_FUTURE, _)>
-            argument_type;
-        typedef void result_type;
-        typedef typename util::decay<F>::type func_type;
-        typedef detail::when_each<argument_type, func_type> when_each_type;
-
-        argument_type lazy_values(BOOST_PP_ENUM(N, HPX_WHEN_EACH_ACQUIRE_FUTURE, _));
-
-        boost::shared_ptr<when_each_type> f =
-            boost::make_shared<when_each_type>(std::move(lazy_values),
-                std::forward<F>(func), N);
-
-        lcos::local::futures_factory<result_type()> p(
-            util::bind(&when_each_type::operator(), f));
-
-        p.apply();
-        return p.get_future();
-    }
-}}
-
-#undef HPX_WHEN_EACH_DECAY_FUTURE
-#undef HPX_WHEN_EACH_ACQUIRE_FUTURE
-#undef N
-
+#endif // DOXYGEN
 #endif
 

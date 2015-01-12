@@ -589,7 +589,7 @@ namespace hpx { namespace parcelset
                     mutex_type::scoped_try_lock l(sender_threads_mtx_);
                     if(l)
                     {
-                        BOOST_FOREACH(hpx::threads::thread_id_type const & thread, sender_threads_)
+                        BOOST_FOREACH(threads::thread_id_type const & thread, sender_threads_)
                         {
                             if(threads::get_thread_state(thread) != threads::suspended)
                             {
@@ -654,7 +654,7 @@ namespace hpx { namespace parcelset
                     {
                         mutex_type::scoped_lock l(sender_threads_mtx_);
                         HPX_ASSERT(new_send_thread != threads::invalid_thread_id);
-                        sender_threads_.push_back(new_send_thread);
+                        sender_threads_.insert(new_send_thread);
                     }
                     threads::set_thread_state(new_send_thread, threads::pending);
                 }
@@ -664,8 +664,7 @@ namespace hpx { namespace parcelset
                     if(new_send_thread != threads::invalid_thread_id)
                     {
                         mutex_type::scoped_lock l(sender_threads_mtx_);
-                        HPX_ASSERT(new_send_thread != threads::invalid_thread_id);
-                        sender_threads_.push_back(new_send_thread);
+                        sender_threads_.insert(new_send_thread);
                     }
                     send_pending_parcels(
                         locality_id,
@@ -773,13 +772,12 @@ namespace hpx { namespace parcelset
             }
 
             do_background_work_impl<ConnectionHandler>();
-
             threads::thread_id_type this_thread = threads::get_self_id();
-            if(this_thread != hpx::threads::invalid_thread_id)
+            if(this_thread != threads::invalid_thread_id)
             {
                 mutex_type::scoped_lock l(sender_threads_mtx_);
-                std::list<threads::thread_id_type>::iterator it
-                    = std::find(sender_threads_.begin(), sender_threads_.end(), this_thread);
+                std::set<threads::thread_id_type>::iterator it
+                    = sender_threads_.find(this_thread);
                 HPX_ASSERT(it != sender_threads_.end());
                 sender_threads_.erase(it);
             }
@@ -794,7 +792,7 @@ namespace hpx { namespace parcelset
 
         typedef hpx::lcos::local::spinlock mutex_type;
         mutex_type sender_threads_mtx_;
-        std::list<threads::thread_id_type> sender_threads_;
+        std::set<threads::thread_id_type> sender_threads_;
 
         int archive_flags_;
     };

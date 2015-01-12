@@ -99,13 +99,12 @@ namespace hpx
         return apply_p<Action>(gid, actions::action_priority<Action>(),
             std::forward<Arg0>( arg0 ));
     }
-    template <typename Component, typename Result, typename Arguments,
-        typename Derived, typename Arg0>
+    template <typename Component, typename Signature, typename Derived,
+        typename Arg0>
     inline bool
     apply (
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > , naming::id_type const& gid, Arg0 && arg0)
+        hpx::actions::basic_action<Component, Signature, Derived> ,
+        naming::id_type const& gid, Arg0 && arg0)
     {
         return apply_p<Derived>(gid, actions::action_priority<Derived>(),
             std::forward<Arg0>( arg0 ));
@@ -192,14 +191,11 @@ namespace hpx
         return apply_p<Action>(c, gid, actions::action_priority<Action>(),
             std::forward<Arg0>( arg0 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived,
+    template <typename Component, typename Signature, typename Derived,
         typename Arg0>
     inline bool
     apply (actions::continuation* c,
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
         naming::id_type const& gid,
         Arg0 && arg0)
     {
@@ -261,13 +257,12 @@ namespace hpx
             gid, actions::action_priority<Action>(),
             std::forward<Arg0>( arg0 ));
     }
-    template <typename Component, typename Result, typename Arguments,
-        typename Derived, typename Arg0>
+    template <typename Component, typename Signature, typename Derived,
+        typename Arg0>
     inline bool
     apply_c (
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > , naming::id_type const& contgid, naming::id_type const& gid,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
+        naming::id_type const& contgid, naming::id_type const& gid,
         Arg0 && arg0)
     {
         typedef
@@ -370,13 +365,12 @@ namespace hpx
         return apply_p<Action>(gid, actions::action_priority<Action>(),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
     }
-    template <typename Component, typename Result, typename Arguments,
-        typename Derived, typename Arg0 , typename Arg1>
+    template <typename Component, typename Signature, typename Derived,
+        typename Arg0 , typename Arg1>
     inline bool
     apply (
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > , naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1)
+        hpx::actions::basic_action<Component, Signature, Derived> ,
+        naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1)
     {
         return apply_p<Derived>(gid, actions::action_priority<Derived>(),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
@@ -463,14 +457,11 @@ namespace hpx
         return apply_p<Action>(c, gid, actions::action_priority<Action>(),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived,
+    template <typename Component, typename Signature, typename Derived,
         typename Arg0 , typename Arg1>
     inline bool
     apply (actions::continuation* c,
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
         naming::id_type const& gid,
         Arg0 && arg0 , Arg1 && arg1)
     {
@@ -532,13 +523,12 @@ namespace hpx
             gid, actions::action_priority<Action>(),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
     }
-    template <typename Component, typename Result, typename Arguments,
-        typename Derived, typename Arg0 , typename Arg1>
+    template <typename Component, typename Signature, typename Derived,
+        typename Arg0 , typename Arg1>
     inline bool
     apply_c (
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > , naming::id_type const& contgid, naming::id_type const& gid,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
+        naming::id_type const& contgid, naming::id_type const& gid,
         Arg0 && arg0 , Arg1 && arg1)
     {
         typedef
@@ -641,13 +631,12 @@ namespace hpx
         return apply_p<Action>(gid, actions::action_priority<Action>(),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
     }
-    template <typename Component, typename Result, typename Arguments,
-        typename Derived, typename Arg0 , typename Arg1 , typename Arg2>
+    template <typename Component, typename Signature, typename Derived,
+        typename Arg0 , typename Arg1 , typename Arg2>
     inline bool
     apply (
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > , naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
+        hpx::actions::basic_action<Component, Signature, Derived> ,
+        naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
         return apply_p<Derived>(gid, actions::action_priority<Derived>(),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
@@ -734,14 +723,11 @@ namespace hpx
         return apply_p<Action>(c, gid, actions::action_priority<Action>(),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived,
+    template <typename Component, typename Signature, typename Derived,
         typename Arg0 , typename Arg1 , typename Arg2>
     inline bool
     apply (actions::continuation* c,
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
         naming::id_type const& gid,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
@@ -803,13 +789,12 @@ namespace hpx
             gid, actions::action_priority<Action>(),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
     }
-    template <typename Component, typename Result, typename Arguments,
-        typename Derived, typename Arg0 , typename Arg1 , typename Arg2>
+    template <typename Component, typename Signature, typename Derived,
+        typename Arg0 , typename Arg1 , typename Arg2>
     inline bool
     apply_c (
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > , naming::id_type const& contgid, naming::id_type const& gid,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
+        naming::id_type const& contgid, naming::id_type const& gid,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
         typedef
@@ -912,13 +897,12 @@ namespace hpx
         return apply_p<Action>(gid, actions::action_priority<Action>(),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
     }
-    template <typename Component, typename Result, typename Arguments,
-        typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
+    template <typename Component, typename Signature, typename Derived,
+        typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     inline bool
     apply (
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > , naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
+        hpx::actions::basic_action<Component, Signature, Derived> ,
+        naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
         return apply_p<Derived>(gid, actions::action_priority<Derived>(),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
@@ -1005,14 +989,11 @@ namespace hpx
         return apply_p<Action>(c, gid, actions::action_priority<Action>(),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived,
+    template <typename Component, typename Signature, typename Derived,
         typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     inline bool
     apply (actions::continuation* c,
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
         naming::id_type const& gid,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
@@ -1074,13 +1055,12 @@ namespace hpx
             gid, actions::action_priority<Action>(),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
     }
-    template <typename Component, typename Result, typename Arguments,
-        typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
+    template <typename Component, typename Signature, typename Derived,
+        typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     inline bool
     apply_c (
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > , naming::id_type const& contgid, naming::id_type const& gid,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
+        naming::id_type const& contgid, naming::id_type const& gid,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
         typedef
@@ -1183,13 +1163,12 @@ namespace hpx
         return apply_p<Action>(gid, actions::action_priority<Action>(),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
     }
-    template <typename Component, typename Result, typename Arguments,
-        typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
+    template <typename Component, typename Signature, typename Derived,
+        typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     inline bool
     apply (
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > , naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
+        hpx::actions::basic_action<Component, Signature, Derived> ,
+        naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
         return apply_p<Derived>(gid, actions::action_priority<Derived>(),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
@@ -1276,14 +1255,11 @@ namespace hpx
         return apply_p<Action>(c, gid, actions::action_priority<Action>(),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived,
+    template <typename Component, typename Signature, typename Derived,
         typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     inline bool
     apply (actions::continuation* c,
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
         naming::id_type const& gid,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
@@ -1345,13 +1321,12 @@ namespace hpx
             gid, actions::action_priority<Action>(),
             std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
     }
-    template <typename Component, typename Result, typename Arguments,
-        typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
+    template <typename Component, typename Signature, typename Derived,
+        typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     inline bool
     apply_c (
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > , naming::id_type const& contgid, naming::id_type const& gid,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
+        naming::id_type const& contgid, naming::id_type const& gid,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
         typedef

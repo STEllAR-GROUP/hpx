@@ -1,10 +1,13 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file lcos/when_any.hpp
+
+#if !defined(HPX_LCOS_WHEN_ANY_APR_17_2012_1143AM)
+#define HPX_LCOS_WHEN_ANY_APR_17_2012_1143AM
 
 #if defined(DOXYGEN)
 namespace hpx
@@ -30,9 +33,6 @@ namespace hpx
     /// \param last     [in] The iterator pointing to the last element of a
     ///                 sequence of \a future or \a shared_future objects for
     ///                 which \a when_any should wait.
-    /// \param ec       [in,out] this represents the error status on exit, if
-    ///                 this is pre-initialized to \a hpx#throws the function
-    ///                 will throw on error instead.
     ///
     /// \return   Returns a when_any_result holding the same list of futures
     ///           as has been passed to when_any and an index pointing to a
@@ -42,15 +42,10 @@ namespace hpx
     ///             are all of the same type. The order of the futures in the
     ///             output vector will be the same as given by the input
     ///             iterator.
-    ///
-    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
-    ///           function doesn't throw but returns the result code using the
-    ///           parameter \a ec. Otherwise it throws an instance of
-    ///           \a hpx::exception.
     template <typename InputIter>
     future<when_any_result<
         vector<future<typename std::iterator_traits<InputIter>::value_type>>>>
-    when_any(InputIter first, InputIter last, error_code& ec = throws);
+    when_any(InputIter first, InputIter last);
 
     /// The function \a when_any is a non-deterministic choice operator. It
     /// OR-composes all future objects given and returns a new future object
@@ -60,9 +55,6 @@ namespace hpx
     /// \param futures  [in] A vector holding an arbitrary amount of \a future or
     ///                 \a shared_future objects for which \a when_any should
     ///                 wait.
-    /// \param ec       [in,out] this represents the error status on exit, if
-    ///                 this is pre-initialized to \a hpx#throws the function
-    ///                 will throw on error instead.
     ///
     /// \return   Returns a when_any_result holding the same list of futures
     ///           as has been passed to when_any and an index pointing to a
@@ -72,15 +64,10 @@ namespace hpx
     ///             are all of the same type. The order of the futures in the
     ///             output vector will be the same as given by the input
     ///             iterator.
-    ///
-    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
-    ///           function doesn't throw but returns the result code using the
-    ///           parameter \a ec. Otherwise it throws an instance of
-    ///           \a hpx::exception.
     template <typename R>
     future<when_any_result<
         std::vector<future<R>>>>
-    when_any(std::vector<future<R>>& futures, error_code& ec = throws);
+    when_any(std::vector<future<R>>& futures);
 
     /// The function \a when_any is a non-deterministic choice operator. It
     /// OR-composes all future objects given and returns a new future object
@@ -90,9 +77,6 @@ namespace hpx
     /// \param futures  [in] An arbitrary number of \a future or \a shared_future
     ///                 objects, possibly holding different types for which
     ///                 \a when_any should wait.
-    /// \param ec       [in,out] this represents the error status on exit, if
-    ///                 this is pre-initialized to \a hpx#throws the function
-    ///                 will throw on error instead.
     ///
     /// \return   Returns a when_any_result holding the same list of futures
     ///           as has been passed to when_any and an index pointing to a
@@ -104,14 +88,9 @@ namespace hpx
     ///           - future<when_any_result<tuple<>>> if \a when_any is called
     ///             with zero arguments.
     ///             The returned future will be initially ready.
-    ///
-    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
-    ///           function doesn't throw but returns the result code using the
-    ///           parameter \a ec. Otherwise it throws an instance of
-    ///           \a hpx::exception.
     template <typename ...T>
     future<when_any_result<tuple<future<T>...>>>
-    when_any(T &&... futures, error_code& ec = throws);
+    when_any(T &&... futures);
 
     /// The function \a when_any_n is a non-deterministic choice operator. It
     /// OR-composes all future objects given and returns a new future object
@@ -123,9 +102,6 @@ namespace hpx
     ///                 which \a when_any_n should wait.
     /// \param count    [in] The number of elements in the sequence starting at
     ///                 \a first.
-    /// \param ec       [in,out] this represents the error status on exit, if
-    ///                 this is pre-initialized to \a hpx#throws the function
-    ///                 will throw on error instead.
     ///
     /// \return   Returns a when_any_result holding the same list of futures
     ///           as has been passed to when_any and an index pointing to a
@@ -136,23 +112,14 @@ namespace hpx
     ///             output vector will be the same as given by the input
     ///             iterator.
     ///
-    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
-    ///           function doesn't throw but returns the result code using the
-    ///           parameter \a ec. Otherwise it throws an instance of
-    ///           \a hpx::exception.
-    ///
     /// \note     None of the futures in the input sequence are invalidated.
     template <typename InputIter>
     future<when_any_result<
         vector<future<typename std::iterator_traits<InputIter>::value_type>>>>
-    when_any_n(InputIter first, std::size_t count, error_code& ec = throws);
+    when_any_n(InputIter first, std::size_t count);
 }
-#else
 
-#if !BOOST_PP_IS_ITERATING
-
-#if !defined(HPX_LCOS_WHEN_ANY_APR_17_2012_1143AM)
-#define HPX_LCOS_WHEN_ANY_APR_17_2012_1143AM
+#else // DOXYGEN
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
@@ -165,7 +132,7 @@ namespace hpx
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/detail/pp_strip_parens.hpp>
+#include <hpx/traits/acquire_future.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/enable_shared_from_this.hpp>
@@ -209,6 +176,27 @@ namespace hpx { namespace lcos
           : index(rhs.index), futures(std::move(rhs.futures))
         {
             rhs.index = index_error();
+        }
+
+        when_any_result& operator=(when_any_result const& rhs)
+        {
+            if (this != &rhs)
+            {
+                index = rhs.index;
+                futures = rhs.futures;
+            }
+            return true;
+        }
+
+        when_any_result& operator=(when_any_result && rhs)
+        {
+            if (this != &rhs)
+            {
+                index = rhs.index;
+                rhs.index = index_error();
+                futures = std::move(rhs.futures);
+            }
+            return true;
         }
 
         std::size_t index;
@@ -348,7 +336,7 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
     lcos::future<when_any_result<std::vector<Future> > >
-    when_any(std::vector<Future>& lazy_values, error_code& ec = throws)
+    when_any(std::vector<Future>& lazy_values)
     {
         BOOST_STATIC_ASSERT_MSG(
             traits::is_future<Future>::value, "invalid use of when_any");
@@ -359,7 +347,7 @@ namespace hpx { namespace lcos
         lazy_values_.reserve(lazy_values.size());
         std::transform(lazy_values.begin(), lazy_values.end(),
             std::back_inserter(lazy_values_),
-            detail::when_acquire_future<Future>());
+            traits::acquire_future_disp());
 
         boost::shared_ptr<detail::when_any<result_type> > f =
             boost::make_shared<detail::when_any<result_type> >(
@@ -374,16 +362,16 @@ namespace hpx { namespace lcos
 
     template <typename Future>
     lcos::future<when_any_result<std::vector<Future> > > //-V659
-    when_any(std::vector<Future> && lazy_values, error_code& ec = throws)
+    when_any(std::vector<Future> && lazy_values)
     {
-        return lcos::when_any(lazy_values, ec);
+        return lcos::when_any(lazy_values);
     }
 
     template <typename Iterator>
     lcos::future<when_any_result<std::vector<
         typename lcos::detail::future_iterator_traits<Iterator>::type
     > > >
-    when_any(Iterator begin, Iterator end, error_code& ec = throws)
+    when_any(Iterator begin, Iterator end)
     {
         typedef
             typename lcos::detail::future_iterator_traits<Iterator>::type
@@ -392,15 +380,15 @@ namespace hpx { namespace lcos
 
         result_type lazy_values_;
         std::transform(begin, end, std::back_inserter(lazy_values_),
-            detail::when_acquire_future<future_type>());
+            traits::acquire_future_disp());
 
-        return lcos::when_any(lazy_values_, ec);
+        return lcos::when_any(lazy_values_);
     }
 
-    inline lcos::future<when_any_result<HPX_STD_TUPLE<> > > //-V524
-    when_any(error_code& /*ec*/ = throws)
+    inline lcos::future<when_any_result<hpx::util::tuple<> > > //-V524
+    when_any()
     {
-        typedef when_any_result<HPX_STD_TUPLE<> > result_type;
+        typedef when_any_result<hpx::util::tuple<> > result_type;
 
         return lcos::make_ready_future(result_type());
     }
@@ -410,7 +398,7 @@ namespace hpx { namespace lcos
     lcos::future<when_any_result<std::vector<
         typename lcos::detail::future_iterator_traits<Iterator>::type
     > > >
-    when_any_n(Iterator begin, std::size_t count, error_code& ec = throws)
+    when_any_n(Iterator begin, std::size_t count)
     {
         typedef
             typename lcos::detail::future_iterator_traits<Iterator>::type
@@ -420,67 +408,26 @@ namespace hpx { namespace lcos
         result_type lazy_values_;
         lazy_values_.reserve(count);
 
-        detail::when_acquire_future<future_type> func;
+        traits::acquire_future_disp func;
         for (std::size_t i = 0; i != count; ++i)
             lazy_values_.push_back(func(*begin++));
 
-        return lcos::when_any(lazy_values_, ec);
+        return lcos::when_any(lazy_values_);
     }
-}}
 
-#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/lcos/preprocessed/when_any.hpp>
-#else
-
-#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/when_any_" HPX_LIMIT_STR ".hpp")
-#endif
-
-#define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (1, HPX_WAIT_ARGUMENT_LIMIT, <hpx/lcos/when_any.hpp>))                \
-/**/
-#include BOOST_PP_ITERATE()
-
-#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(output: null)
-#endif
-
-#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-
-namespace hpx
-{
-    using lcos::when_any_result;
-    using lcos::when_any;
-    using lcos::when_any_n;
-}
-
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-#else // BOOST_PP_IS_ITERATING
-
-#define N BOOST_PP_ITERATION()
-
-#define HPX_WHEN_ANY_DECAY_FUTURE(Z, N, D)                                    \
-    typename util::decay<BOOST_PP_CAT(T, N)>::type                            \
-    /**/
-#define HPX_WHEN_ANY_ACQUIRE_FUTURE(Z, N, D)                                 \
-    detail::when_acquire_future<BOOST_PP_CAT(T, N)>()(BOOST_PP_CAT(f, N))     \
-    /**/
-
-namespace hpx { namespace lcos
-{
     ///////////////////////////////////////////////////////////////////////////
-    template <BOOST_PP_ENUM_PARAMS(N, typename T)>
+    template <typename... Ts>
     lcos::future<when_any_result<
-        HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_ANY_DECAY_FUTURE, _)> > >
-    when_any(HPX_ENUM_FWD_ARGS(N, T, f), error_code& ec = throws)
+        hpx::util::tuple<typename traits::acquire_future<Ts>::type...>
+    > >
+    when_any(Ts&&... ts)
     {
-        typedef HPX_STD_TUPLE<
-            BOOST_PP_ENUM(N, HPX_WHEN_ANY_DECAY_FUTURE, _)>
-            result_type;
+        typedef hpx::util::tuple<
+                typename traits::acquire_future<Ts>::type...
+            > result_type;
 
-        result_type lazy_values(BOOST_PP_ENUM(N, HPX_WHEN_ANY_ACQUIRE_FUTURE, _));
+        traits::acquire_future_disp func;
+        result_type lazy_values(func(std::forward<Ts>(ts))...);
 
         boost::shared_ptr<detail::when_any<result_type> > f =
             boost::make_shared<detail::when_any<result_type> >(
@@ -494,10 +441,12 @@ namespace hpx { namespace lcos
     }
 }}
 
-#undef HPX_WHEN_ANY_DECAY_FUTURE
-#undef HPX_WHEN_ANY_ACQUIRE_FUTURE
-#undef N
+namespace hpx
+{
+    using lcos::when_any_result;
+    using lcos::when_any;
+    using lcos::when_any_n;
+}
 
-#endif
-
+#endif // DOXYGEN
 #endif

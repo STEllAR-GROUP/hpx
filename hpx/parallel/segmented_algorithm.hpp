@@ -9,6 +9,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/parallel/algorithm.hpp>
 
-#include <hpx/parallel/segmented/algorithm/for_each.hpp>
+#include <hpx/parallel/segmented_algorithms/count.hpp>
+#include <hpx/parallel/segmented_algorithms/for_each.hpp>
+#include <hpx/parallel/segmented_algorithms/transform_reduce.hpp>
 
 #endif

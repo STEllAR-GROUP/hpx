@@ -54,7 +54,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::size_t count = std::distance(first, last);
                 util::cancellation_token<std::size_t> tok(count);
 
-                return util::partitioner<ExPolicy, InIter, InIter, void>::
+                return util::partitioner<ExPolicy, InIter, void>::
                     call_with_index(
                         policy, first, count,
                         [val, tok](std::size_t base_idx, InIter it,
@@ -149,8 +149,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::find<InIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, val, is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, val);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -181,7 +181,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::size_t count = std::distance(first, last);
                 util::cancellation_token<std::size_t> tok(count);
 
-                return util::partitioner<ExPolicy, FwdIter, FwdIter, void>::
+                return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
                         policy, first, count,
                         [f, tok](std::size_t base_idx, FwdIter it,
@@ -290,8 +290,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::find_if<InIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, std::forward<F>(f), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, std::forward<F>(f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -327,7 +327,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::size_t count = std::distance(first, last);
                 util::cancellation_token<std::size_t> tok(count);
 
-                return util::partitioner<ExPolicy, FwdIter, FwdIter, void>::
+                return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
                         policy, first, count,
                         [f, tok](std::size_t base_idx, FwdIter it, std::size_t part_size) mutable
@@ -436,8 +436,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::find_if_not<InIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, std::forward<F>(f), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, std::forward<F>(f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -487,7 +487,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     difference_type, std::greater<difference_type>
                 > tok(-1);
 
-                return util::partitioner<ExPolicy, FwdIter, FwdIter, void>::
+                return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
                         policy, first1, count-(diff-1),
                         [=](std::size_t base_idx, FwdIter it, std::size_t part_size) mutable
@@ -615,9 +615,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef is_sequential_execution_policy<ExPolicy> is_seq;
 
         return detail::find_end<FwdIter1>().call(
-            std::forward<ExPolicy>(policy),
-            first1, last1, first2, last2, detail::equal_to(),
-            is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first1, last1, first2, last2, detail::equal_to());
     }
 
     /// Returns the last subsequence of elements [first2, last2) found in the range
@@ -721,8 +720,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef is_sequential_execution_policy<ExPolicy> is_seq;
 
         return detail::find_end<FwdIter1>().call(
-            std::forward<ExPolicy>(policy),
-            first1, last1, first2, last2, std::forward<F>(f), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first1, last1, first2, last2, std::forward<F>(f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -778,7 +777,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 util::cancellation_token<difference_type> tok(count);
 
-                return util::partitioner<ExPolicy, InIter, InIter, void>::
+                return util::partitioner<ExPolicy, InIter, void>::
                     call_with_index(
                         policy, first, count,
                         [s_first, s_last, tok, op](std::size_t base_idx, InIter it,
@@ -857,7 +856,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           returns \a InIter otherwise.
     ///           The \a find_first_of algorithm returns an iterator to the first element
     ///           in the range [first, last) that is equal to an element from the range
-    ///           [s_first, s_last). If the length of the subsequence [s_first, s_last) is 
+    ///           [s_first, s_last). If the length of the subsequence [s_first, s_last) is
     ///           greater than the length of the range [first, last), \a last is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
     ///           is found, \a last is also returned.
@@ -893,9 +892,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::find_first_of<InIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, s_first, s_last,
-            detail::equal_to(), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, s_first, s_last, detail::equal_to());
     }
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
@@ -962,7 +960,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           returns \a InIter otherwise.
     ///           The \a find_first_of algorithm returns an iterator to the first element
     ///           in the range [first, last) that is equal to an element from the range
-    ///           [s_first, s_last). If the length of the subsequence [s_first, s_last) is 
+    ///           [s_first, s_last). If the length of the subsequence [s_first, s_last) is
     ///           greater than the length of the range [first, last), \a last is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
     ///           is found, \a last is also returned.
@@ -1000,8 +998,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::find_first_of<InIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, s_first, s_last, std::forward<Pred>(op), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, s_first, s_last, std::forward<Pred>(op));
     }
 }}}
 

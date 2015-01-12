@@ -15,24 +15,35 @@
 namespace hpx { namespace parallel { namespace util { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename R, typename F, typename FwdIter>
-    void add_ready_future(std::vector<hpx::future<R> >& workitems,
+    template <typename F, typename Future, typename FwdIter>
+        // requires traits::is_future<Future>
+    void add_ready_future(std::vector<Future>& workitems,
         F && f, FwdIter first, std::size_t count)
     {
         workitems.push_back(hpx::make_ready_future(f(first, count)));
     }
 
     template <typename F, typename FwdIter>
-    void add_ready_future(std::vector<hpx::future<void> >&,
+    void add_ready_future(std::vector<hpx::future<void> >& workitems,
         F && f, FwdIter first, std::size_t count)
     {
         f(first, count);
+        workitems.push_back(hpx::make_ready_future());
+    }
+
+    template <typename F, typename FwdIter>
+    void add_ready_future(std::vector<hpx::shared_future<void> >& workitems,
+        F && f, FwdIter first, std::size_t count)
+    {
+        f(first, count);
+        workitems.push_back(hpx::make_ready_future());
     }
 
     // estimate a chunk size based on number of cores used
-    template <typename Result, typename F1, typename FwdIter>
+    template <typename Future, typename F1, typename FwdIter>
+        // requires traits::is_future<Future>
     std::size_t auto_chunk_size(
-        std::vector<hpx::future<Result> >& workitems,
+        std::vector<Future>& workitems,
         F1 && f1, FwdIter& first, std::size_t& count)
     {
         std::size_t test_chunk_size = count / 100;
@@ -50,10 +61,11 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         return t == 0 ? 0 : (std::min)(count, (std::size_t)(80000 / t));
     }
 
-    template <typename ExPolicy, typename Result, typename F1,
+    template <typename ExPolicy, typename Future, typename F1,
         typename FwdIter>
+        // requires traits::is_future<Future>
     std::size_t get_static_chunk_size(ExPolicy const& policy,
-        std::vector<hpx::future<Result> >& workitems,
+        std::vector<Future>& workitems,
         F1 && f1, FwdIter& first, std::size_t& count,
         std::size_t chunk_size)
     {
@@ -75,8 +87,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename R, typename F, typename FwdIter>
-    void add_ready_future_idx(std::vector<hpx::future<R> >& workitems,
+    template <typename Future, typename F, typename FwdIter>
+        // requires traits::is_future<Future>
+    void add_ready_future_idx(std::vector<Future>& workitems,
         F && f, std::size_t base_idx, FwdIter first, std::size_t count)
     {
         workitems.push_back(
@@ -84,17 +97,27 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     }
 
     template <typename F, typename FwdIter>
-    void add_ready_future_idx(std::vector<hpx::future<void> >&,
+    void add_ready_future_idx(std::vector<hpx::future<void> >& workitems,
         F && f, std::size_t base_idx, FwdIter first, std::size_t count)
     {
         f(base_idx, first, count);
+        workitems.push_back(hpx::make_ready_future());
+    }
+
+    template <typename F, typename FwdIter>
+    void add_ready_future_idx(std::vector<hpx::shared_future<void> >& workitems,
+        F && f, std::size_t base_idx, FwdIter first, std::size_t count)
+    {
+        f(base_idx, first, count);
+        workitems.push_back(hpx::make_ready_future());
     }
 
     // estimate a chunk size based on number of cores used, take into
     // account base index
-    template <typename Result, typename F1, typename FwdIter>
+    template <typename Future, typename F1, typename FwdIter>
+        // requires traits::is_future<Future>
     std::size_t auto_chunk_size_idx(
-        std::vector<hpx::future<Result> >& workitems, F1 && f1,
+        std::vector<Future>& workitems, F1 && f1,
         std::size_t& base_idx, FwdIter& first, std::size_t& count)
     {
         std::size_t test_chunk_size = count / 100;
@@ -113,10 +136,11 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         return t == 0 ? 0 : (std::min)(count, (std::size_t)(80000 / t));
     }
 
-    template <typename ExPolicy, typename Result, typename F1,
+    template <typename ExPolicy, typename Future, typename F1,
         typename FwdIter>
+        // requires traits::is_future<Future>
     std::size_t get_static_chunk_size_idx(ExPolicy const& policy,
-        std::vector<hpx::future<Result> >& workitems,
+        std::vector<Future>& workitems,
         F1 && f1, std::size_t& base_idx, FwdIter& first,
         std::size_t& count, std::size_t chunk_size)
     {

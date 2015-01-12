@@ -61,7 +61,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 if (count != 0)
                 {
-                    return util::foreach_n_partitioner<ExPolicy, Iter>::call(
+                    return util::foreach_n_partitioner<ExPolicy>::call(
                         policy, first, count,
                         [f](Iter part_begin, std::size_t part_size)
                         {
@@ -177,8 +177,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::for_each_n<InIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, std::size_t(count), std::forward<F>(f), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, std::size_t(count), std::forward<F>(f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -210,8 +210,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return hpx::util::void_guard<result_type>(),
                     detail::for_each_n<FwdIter>().call(
-                        policy, first, std::distance(first, last),
-                        std::forward<F>(f), boost::mpl::false_());
+                        policy, boost::mpl::false_(),
+                        first, std::distance(first, last), std::forward<F>(f));
             }
         };
 
@@ -234,8 +234,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return detail::algorithm_result<ExPolicy>::get();
 
             return for_each().call(
-                std::forward<ExPolicy>(policy),
-                first, last, std::forward<F>(f), is_seq());
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, std::forward<F>(f));
         }
 
         // forward declare the segmented version of this algorithm

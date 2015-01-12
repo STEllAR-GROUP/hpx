@@ -1,4 +1,5 @@
 #include <hpx/config.hpp>
+#include <hpx/hpx_init.hpp>
 #include <boost/detail/workaround.hpp>
 
 #if defined(BOOST_MSVC)

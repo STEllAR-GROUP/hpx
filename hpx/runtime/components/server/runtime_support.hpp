@@ -531,7 +531,7 @@ namespace hpx { namespace components { namespace server
             for (std::size_t i = 0; i != count; ++i)
                 ids.push_back(factory->create());
         }
-        LRT_(info) << "successfully created " << count
+        LRT_(info) << "successfully created " << count //-V128
                    << " component(s) of type: "
                    << components::get_component_type_name(type);
 
@@ -744,7 +744,7 @@ namespace hpx { namespace components { namespace server
 {
     template <typename Component>
     struct copy_create_component_action
-      : ::hpx::actions::result_action2<
+      : ::hpx::actions::action<
             naming::gid_type (runtime_support::*)(
                 boost::shared_ptr<Component> const&, bool)
           , &runtime_support::copy_create_component<Component>
@@ -752,7 +752,7 @@ namespace hpx { namespace components { namespace server
     {};
     template <typename Component>
     struct migrate_component_here_action
-      : ::hpx::actions::result_action2<
+      : ::hpx::actions::action<
             naming::gid_type (runtime_support::*)(
                 boost::shared_ptr<Component> const&, naming::id_type)
           , &runtime_support::migrate_component_to_here<Component>

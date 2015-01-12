@@ -1,4 +1,4 @@
-#   Copyright (c) 2001-2014 Hartmut Kaiser
+#   Copyright (c) 2001-2015 Hartmut Kaiser
 #
 #   Distributed under the Boost Software License, Version 1.0. (See accompanying
 #   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -77,6 +77,9 @@ parallel::count_if                    "count_if" "hpx\.parallel\.v1\.count_if.*"
 # hpx/parallel/algorithms/equal.hpp
 parallel::equal                       "equal" "hpx\.parallel\.v1\.equal_id.*"
 
+# hpx/parallel/algorithms/exclusive_scan.hpp
+parallel::exclusive_scan              "exclusive_scan" "hpx\.parallel\.v1\.exclusive_scan.*"
+
 # hpx/parallel/algorithms/fill.hpp
 parallel::fill                        "fill" "hpx\.parallel\.v1\.fill$"
 parallel::fill_n                      "fill_n" "hpx\.parallel\.v1\.fill_n.*"
@@ -95,6 +98,9 @@ parallel::for_each_n                  "for_each_n" "hpx\.parallel\.v1\.for_each_
 # hpx/parallel/algorithms/generate.hpp
 parallel::generate                    "generate" "hpx\.parallel\.v1\.generate$"
 parallel::generate_n                  "generate_n" "hpx\.parallel\.v1\.generate_n.*"
+
+# hpx/parallel/algorithms/inclusive_scan.hpp
+parallel::inclusive_scan              "inclusive_scan" "hpx\.parallel\.v1\.inclusive_scan.*"
 
 # hpx/parallel/algorithms/minmax.hpp
 parallel::max_element                 "max_element" "hpx\.parallel\.v1\.max_element.*"
@@ -139,6 +145,12 @@ parallel::task_canceled_exception     "task_canceled_exception" "hpx\.parallel\.
 
 # hpx/parallel/algorithms/transform.hpp
 parallel::transform                   "transform" "hpx\.parallel\.v1\.transform.*"
+
+# hpx/parallel/algorithms/transform_exclusive_scan.hpp
+parallel::transform_exclusive_scan    "transform_exclusive_scan" "hpx\.parallel\.v1\.transform_exclusive_scan.*"
+
+# hpx/parallel/algorithms/transform_inclusive_scan.hpp
+parallel::transform_inclusive_scan    "transform_inclusive_scan" "hpx\.parallel\.v1\.transform_inclusive_scan.*"
 
 # hpx/parallel/algorithms/transform_reduce.hpp
 parallel::transform_reduce            "transform_reduce" "hpx\.parallel\.v1\.transform_reduce.*"
@@ -291,8 +303,7 @@ wait_any_n                            "" "header\.hpx\.lcos\.wait_any.*"
 # hpx/lcos/when_any.hpp
 when_any                              "" "header\.hpx\.lcos\.when_any.*"
 when_any_n                            "" "header\.hpx\.lcos\.when_any.*"
-when_any_back                         "" "header\.hpx\.lcos\.when_any.*"
-when_any_back_n                       "" "header\.hpx\.lcos\.when_any.*"
+when_any_result                       "" "header\.hpx\.lcos\.when_any_result.*"
 
 # hpx/lcos/wait_some.hpp
 wait_some                             "" "header\.hpx\.lcos\.wait_some.*"
@@ -301,6 +312,14 @@ wait_some_n                           "" "header\.hpx\.lcos\.wait_some.*"
 # hpx/lcos/when_some.hpp
 when_some                             "" "header\.hpx\.lcos\.when_some.*"
 when_some_n                           "" "header\.hpx\.lcos\.when_some.*"
+
+# hpx/lcos/when_each.hpp
+when_each                             "" "header\.hpx\.lcos\.when_each.*"
+when_each_n                           "" "header\.hpx\.lcos\.when_each.*"
+
+# hpx/lcos/wait_each.hpp
+wait_each                             "" "header\.hpx\.lcos\.wait_each.*"
+wait_each_n                           "" "header\.hpx\.lcos\.wait_each.*"
 
 # hpx/hpx_finalize.hpp
 finalize                              "" "hpx\.finalize.*"

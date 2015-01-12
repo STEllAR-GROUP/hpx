@@ -76,7 +76,7 @@ void portable_binary_oarchive::save_impl(
     else
         ll = l;
 
-    char* cptr = reinterpret_cast<char *>(& ll);
+    char* cptr = reinterpret_cast<char *>(& ll); //-V206
 #ifdef BOOST_BIG_ENDIAN
     cptr += (sizeof(boost::int64_t) - size);
     if(this->flags() & endian_little)
@@ -107,7 +107,7 @@ void portable_binary_oarchive::save_impl(
     this->primitive_base_t::save(size);
 
     ll = ul;
-    char* cptr = reinterpret_cast<char*>(&ll);
+    char* cptr = reinterpret_cast<char*>(&ll); //-V206
 
 #ifdef BOOST_BIG_ENDIAN
     cptr += (sizeof(boost::uint64_t) - size);
@@ -127,7 +127,7 @@ void portable_binary_oarchive::save_impl(
 #   endif
 #   pragma GCC diagnostic ignored "-Wconversion"
 #endif
-void portable_binary_oarchive::init(util::binary_filter* filter, unsigned int flags_)
+void portable_binary_oarchive::init(util::binary_filter* filter, unsigned int flags)
 {
     if ((this->flags() & (endian_big | endian_little)) == (endian_big | endian_little))
     {
@@ -136,7 +136,7 @@ void portable_binary_oarchive::init(util::binary_filter* filter, unsigned int fl
             portable_binary_oarchive_exception());
     }
 
-    if (!(flags_ & boost::archive::no_header)) {
+    if (!(flags & boost::archive::no_header)) {
         // write signature in an archive version independent manner
         const std::string file_signature(
             boost::archive::BOOST_ARCHIVE_SIGNATURE());

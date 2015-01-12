@@ -62,64 +62,59 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     difference_type;
                 typedef typename std::iterator_traits<FwdIter2>::difference_type
                     s_difference_type;
+                typedef detail::algorithm_result<ExPolicy, FwdIter> result;
 
                 s_difference_type diff = std::distance(s_first, s_last);
-                if(diff <= 0)
-                {
-                    return detail::algorithm_result<ExPolicy, FwdIter>::get(
-                        std::move(last));
-                }
+                if (diff <= 0)
+                    return result::get(std::move(last));
 
                 difference_type count = std::distance(first, last);
-                if(diff > count)
-                {
-                    return detail::algorithm_result<ExPolicy, FwdIter>::get(
-                        std::move(last));
-                }
+                if (diff > count)
+                    return result::get(std::move(last));
+
+                typedef util::partitioner<ExPolicy, FwdIter, void> partitioner;
 
                 util::cancellation_token<difference_type> tok(count);
-
-                return util::partitioner<ExPolicy, FwdIter, FwdIter, void>::
-                    call_with_index(
+                return partitioner::call_with_index(
                     policy, first, count-(diff-1),
                     [=](std::size_t base_idx, FwdIter it, std::size_t part_size) mutable
-                {
-                    FwdIter curr = it;
+                    {
+                        FwdIter curr = it;
 
-                    util::loop_idx_n(
-                        base_idx, it, part_size, tok,
-                        [=, &tok, &curr](reference v, std::size_t i)
-                        {
-                            ++curr;
-                            if (op(v, *s_first))
+                        util::loop_idx_n(
+                            base_idx, it, part_size, tok,
+                            [=, &tok, &curr](reference v, std::size_t i)
                             {
-                                difference_type local_count = 1;
-                                FwdIter2 needle = s_first;
-                                FwdIter mid = curr;
-
-                                for(difference_type len = 0;
-                                    local_count != diff && len != count;
-                                    ++local_count, ++len, ++mid)
+                                ++curr;
+                                if (op(v, *s_first))
                                 {
-                                    if(*mid != *++needle)
-                                        break;
+                                    difference_type local_count = 1;
+                                    FwdIter2 needle = s_first;
+                                    FwdIter mid = curr;
+
+                                    for(difference_type len = 0;
+                                        local_count != diff && len != count;
+                                        ++local_count, ++len, ++mid)
+                                    {
+                                        if(*mid != *++needle)
+                                            break;
+                                    }
+
+                                    if(local_count == diff)
+                                        tok.cancel(i);
                                 }
+                            });
+                    },
+                    [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
+                    {
+                        difference_type search_res = tok.get_data();
+                        if (search_res != count)
+                            std::advance(first, search_res);
+                        else
+                            first = last;
 
-                                if(local_count == diff)
-                                    tok.cancel(i);
-                            }
-                        });
-                },
-                [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
-                {
-                    difference_type search_res = tok.get_data();
-                    if( search_res != count)
-                        std::advance(first, search_res);
-                    else
-                        first = last;
-
-                    return std::move(first);
-                });
+                        return std::move(first);
+                    });
             }
         };
         /// \endcond
@@ -207,9 +202,8 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::search<FwdIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, s_first, s_last,
-            detail::equal_to(), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, s_first, s_last, detail::equal_to());
     }
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
@@ -299,9 +293,8 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::search<FwdIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, s_first, s_last,
-            op, is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, s_first, s_last, std::forward<Pred>(op));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -318,8 +311,8 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter2, typename Pred>
             static FwdIter
-            sequential(ExPolicy const&, FwdIter first, std::size_t count, FwdIter2 s_first,
-                FwdIter2 s_last, Pred && op)
+            sequential(ExPolicy const&, FwdIter first, std::size_t count,
+                FwdIter2 s_first, FwdIter2 s_last, Pred && op)
             {
                 return std::search(first, std::next(first, count),
                     s_first, s_last, op);
@@ -335,61 +328,56 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     difference_type;
                 typedef typename std::iterator_traits<FwdIter2>::difference_type
                     s_difference_type;
+                typedef detail::algorithm_result<ExPolicy, FwdIter> result;
 
                 s_difference_type diff = std::distance(s_first, s_last);
-                if(diff <= 0)
-                {
-                    return detail::algorithm_result<ExPolicy, FwdIter>::get(
-                        std::move(first));
-                }
+                if (diff <= 0)
+                    return result::get(std::move(first));
 
-                if(diff > s_difference_type(count))
-                {
-                    return detail::algorithm_result<ExPolicy, FwdIter>::get(
-                        std::move(first));
-                }
+                if (diff > s_difference_type(count))
+                    return result::get(std::move(first));
+
+                typedef util::partitioner<ExPolicy, FwdIter, void> partitioner;
 
                 util::cancellation_token<difference_type> tok(count);
-
-                return util::partitioner<ExPolicy, FwdIter, FwdIter, void>::
-                    call_with_index(
+                return partitioner::call_with_index(
                     policy, first, count-(diff-1),
                     [=](std::size_t base_idx, FwdIter it, std::size_t part_size) mutable
-                {
-                    FwdIter curr = it;
+                    {
+                        FwdIter curr = it;
 
-                    util::loop_idx_n(
-                        base_idx, it, part_size, tok,
-                        [=, &tok, &curr](reference v, std::size_t i)
-                        {
-                            ++curr;
-                            if (op(v, *s_first))
+                        util::loop_idx_n(
+                            base_idx, it, part_size, tok,
+                            [=, &tok, &curr](reference v, std::size_t i)
                             {
-                                difference_type local_count = 1;
-                                FwdIter2 needle = s_first;
-                                FwdIter mid = curr;
-
-                                for(difference_type len = 0;
-                                    local_count != diff && len != difference_type(count);
-                                    ++local_count, ++len, ++mid)
+                                ++curr;
+                                if (op(v, *s_first))
                                 {
-                                    if(*mid != *++needle)
-                                        break;
+                                    difference_type local_count = 1;
+                                    FwdIter2 needle = s_first;
+                                    FwdIter mid = curr;
+
+                                    for(difference_type len = 0;
+                                        local_count != diff && len != difference_type(count);
+                                        ++local_count, ++len, ++mid)
+                                    {
+                                        if(*mid != *++needle)
+                                            break;
+                                    }
+
+                                    if(local_count == diff)
+                                        tok.cancel(i);
                                 }
+                            });
+                    },
+                    [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
+                    {
+                        difference_type search_res = tok.get_data();
+                        if(search_res != s_difference_type(count))
+                            std::advance(first, search_res);
 
-                                if(local_count == diff)
-                                    tok.cancel(i);
-                            }
-                        });
-                },
-                [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
-                {
-                    difference_type search_res = tok.get_data();
-                    if(search_res != s_difference_type(count))
-                        std::advance(first, search_res);
-
-                    return std::move(first);
-                });
+                        return std::move(first);
+                    });
             }
         };
         /// \endcond
@@ -477,9 +465,8 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::search_n<FwdIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, count, s_first, s_last,
-            detail::equal_to(), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, count, s_first, s_last, detail::equal_to());
     }
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
@@ -569,9 +556,8 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::search_n<FwdIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, count, s_first, s_last,
-            op, is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, count, s_first, s_last, std::forward<Pred>(op));
     }
 }}}
 

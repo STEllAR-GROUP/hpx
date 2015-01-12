@@ -21,12 +21,12 @@ void test_rotate_copy(ExPolicy const& policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d1(c.size());
-    std::vector<std::size_t> d2(c.size());
+    std::vector<std::size_t> d2(c.size()); //-V656
 
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     base_iterator mid = boost::begin(c);
-    std::advance(mid, std::rand() % c.size());
+    std::advance(mid, std::rand() % c.size()); //-V104
 
     hpx::parallel::rotate_copy(policy,
         iterator(boost::begin(c)), iterator(mid), iterator(boost::end(c)),
@@ -52,12 +52,12 @@ void test_rotate_copy_async(ExPolicy const& p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d1(c.size());
-    std::vector<std::size_t> d2(c.size());
+    std::vector<std::size_t> d2(c.size()); //-V656
 
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     base_iterator mid = boost::begin(c);
-    std::advance(mid, std::rand() % c.size());
+    std::advance(mid, std::rand() % c.size()); //-V104
 
     auto f =
         hpx::parallel::rotate_copy(p,
@@ -117,7 +117,7 @@ void test_rotate_copy_exception(ExPolicy const& policy, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     base_iterator mid = boost::begin(c);
-    std::advance(mid, std::rand() % c.size());
+    std::advance(mid, std::rand() % c.size()); //-V104
 
     bool caught_exception = false;
     try {
@@ -153,7 +153,7 @@ void test_rotate_copy_exception_async(ExPolicy const& p, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     base_iterator mid = boost::begin(c);
-    std::advance(mid, std::rand() % c.size());
+    std::advance(mid, std::rand() % c.size()); //-V104
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
@@ -225,7 +225,7 @@ void test_rotate_copy_bad_alloc(ExPolicy const& policy, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     base_iterator mid = boost::begin(c);
-    std::advance(mid, std::rand() % c.size());
+    std::advance(mid, std::rand() % c.size()); //-V104
 
     bool caught_bad_alloc = false;
     try {
@@ -260,7 +260,7 @@ void test_rotate_copy_bad_alloc_async(ExPolicy const& p, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     base_iterator mid = boost::begin(c);
-    std::advance(mid, std::rand() % c.size());
+    std::advance(mid, std::rand() % c.size()); //-V104
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;

@@ -215,7 +215,7 @@ struct HPX_EXPORT response
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
-    namespace_action_code mc;
+    namespace_action_code mc; //-V707
     error status;
 
     // FIXME: std::unique_ptr doesn't seem to work with incomplete types

@@ -181,7 +181,7 @@ namespace hpx { namespace components { namespace detail
             alloc_count_ += count;
 #endif
 
-            value_type* p = static_cast<value_type*>(first_free_->address());
+            value_type* p = static_cast<value_type*>(first_free_->address()); //-V707
             HPX_ASSERT(p != NULL);
 
             first_free_ += count;
@@ -344,7 +344,7 @@ namespace hpx { namespace components { namespace detail
             HPX_ASSERT(size_ == 0);
             HPX_ASSERT(first_free_ == NULL);
 
-            std::size_t s = step_ * heap_size; //-V104
+            std::size_t s = step_ * heap_size; //-V104 //-V707
             pool_ = static_cast<storage_type*>(Allocator::alloc(s));
             if (NULL == pool_)
                 return false;

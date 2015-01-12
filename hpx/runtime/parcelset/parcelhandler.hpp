@@ -1,5 +1,5 @@
 //  Copyright (c)      2014 Thomas Heller
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -91,6 +91,12 @@ namespace hpx { namespace parcelset
             HPX_STD_FUNCTION<void()> const& on_stop_thread);
 
         ~parcelhandler() {}
+
+        void set_agas_resolver(naming::resolver_client& resolver)
+        {
+            HPX_ASSERT(resolver_ == 0);     // set only once
+            resolver_ = &resolver;
+        }
 
         /// load runtime configuration settings ...
         static std::vector<std::string> load_runtime_configuration();
@@ -477,7 +483,7 @@ namespace hpx { namespace parcelset
         void attach_parcelport(boost::shared_ptr<parcelport> const& pp);
 
         /// The AGAS client
-        naming::resolver_client& resolver_;
+        naming::resolver_client* resolver_;
 
         /// the parcelport this handler is associated with
         typedef std::map<int, boost::shared_ptr<parcelport>, std::greater<int> > pports_type;
@@ -485,7 +491,7 @@ namespace hpx { namespace parcelset
 
         std::map<std::string, int> priority_;
 
-        /// the endpoints corresponding to the parcelports
+        /// the endpoints corresponding to the parcel-ports
         endpoints_type endpoints_;
 
         /// the thread-manager to use (optional)

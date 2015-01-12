@@ -38,7 +38,7 @@ namespace hpx { namespace traits
 
     // Fixed components are components
     template <typename Component>
-    struct is_component<Component, 
+    struct is_component<Component,
             typename boost::enable_if<
                 boost::is_base_and_derived<
                     components::detail::fixed_component_tag, Component

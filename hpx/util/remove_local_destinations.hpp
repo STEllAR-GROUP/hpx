@@ -34,7 +34,7 @@ namespace hpx { namespace util
         std::vector<naming::address>::iterator addrs_it = addrs.begin();
 
         // gids_it = find_if(gids_it, gids_end, pred)
-        std::size_t i = 0;
+        std::size_t i = 0; //-V707
         for (/**/; gids_it != gids_end; ++gids_it, ++addrs_it)
         {
             if (locals.test(i++))

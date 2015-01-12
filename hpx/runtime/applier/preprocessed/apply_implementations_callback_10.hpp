@@ -77,14 +77,12 @@ namespace hpx
         return apply_p_cb<Action>(gid, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename Callback,
+    template <typename Component, typename Signature, typename Derived,
+        typename Callback,
         typename Arg0>
     inline bool
     apply_cb(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
         naming::id_type const& gid, Callback && cb,
         Arg0 && arg0)
     {
@@ -186,14 +184,11 @@ namespace hpx
         return apply_p_cb<Action>(c, gid, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename Callback,
-        typename Arg0>
+    template <typename Component, typename Signature, typename Derived,
+        typename Callback, typename Arg0>
     inline bool
     apply_cb(actions::continuation* c,
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
         naming::id_type const& gid, Callback && cb,
         Arg0 && arg0)
     {
@@ -364,14 +359,12 @@ namespace hpx
         return apply_p_cb<Action>(gid, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename Callback,
+    template <typename Component, typename Signature, typename Derived,
+        typename Callback,
         typename Arg0 , typename Arg1>
     inline bool
     apply_cb(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
         naming::id_type const& gid, Callback && cb,
         Arg0 && arg0 , Arg1 && arg1)
     {
@@ -473,14 +466,11 @@ namespace hpx
         return apply_p_cb<Action>(c, gid, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename Callback,
-        typename Arg0 , typename Arg1>
+    template <typename Component, typename Signature, typename Derived,
+        typename Callback, typename Arg0 , typename Arg1>
     inline bool
     apply_cb(actions::continuation* c,
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
         naming::id_type const& gid, Callback && cb,
         Arg0 && arg0 , Arg1 && arg1)
     {
@@ -651,14 +641,12 @@ namespace hpx
         return apply_p_cb<Action>(gid, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename Callback,
+    template <typename Component, typename Signature, typename Derived,
+        typename Callback,
         typename Arg0 , typename Arg1 , typename Arg2>
     inline bool
     apply_cb(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
         naming::id_type const& gid, Callback && cb,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
@@ -760,14 +748,11 @@ namespace hpx
         return apply_p_cb<Action>(c, gid, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename Callback,
-        typename Arg0 , typename Arg1 , typename Arg2>
+    template <typename Component, typename Signature, typename Derived,
+        typename Callback, typename Arg0 , typename Arg1 , typename Arg2>
     inline bool
     apply_cb(actions::continuation* c,
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
         naming::id_type const& gid, Callback && cb,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
@@ -938,14 +923,12 @@ namespace hpx
         return apply_p_cb<Action>(gid, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename Callback,
+    template <typename Component, typename Signature, typename Derived,
+        typename Callback,
         typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     inline bool
     apply_cb(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
         naming::id_type const& gid, Callback && cb,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
@@ -1047,14 +1030,11 @@ namespace hpx
         return apply_p_cb<Action>(c, gid, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename Callback,
-        typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
+    template <typename Component, typename Signature, typename Derived,
+        typename Callback, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     inline bool
     apply_cb(actions::continuation* c,
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
         naming::id_type const& gid, Callback && cb,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
@@ -1225,14 +1205,12 @@ namespace hpx
         return apply_p_cb<Action>(gid, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename Callback,
+    template <typename Component, typename Signature, typename Derived,
+        typename Callback,
         typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     inline bool
     apply_cb(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
         naming::id_type const& gid, Callback && cb,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
@@ -1334,14 +1312,11 @@ namespace hpx
         return apply_p_cb<Action>(c, gid, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename Callback,
-        typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
+    template <typename Component, typename Signature, typename Derived,
+        typename Callback, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     inline bool
     apply_cb(actions::continuation* c,
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
         naming::id_type const& gid, Callback && cb,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
@@ -1512,14 +1487,12 @@ namespace hpx
         return apply_p_cb<Action>(gid, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename Callback,
+    template <typename Component, typename Signature, typename Derived,
+        typename Callback,
         typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     inline bool
     apply_cb(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
         naming::id_type const& gid, Callback && cb,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5)
     {
@@ -1621,14 +1594,11 @@ namespace hpx
         return apply_p_cb<Action>(c, gid, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename Callback,
-        typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
+    template <typename Component, typename Signature, typename Derived,
+        typename Callback, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     inline bool
     apply_cb(actions::continuation* c,
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
         naming::id_type const& gid, Callback && cb,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5)
     {
@@ -1799,14 +1769,12 @@ namespace hpx
         return apply_p_cb<Action>(gid, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename Callback,
+    template <typename Component, typename Signature, typename Derived,
+        typename Callback,
         typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     inline bool
     apply_cb(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
         naming::id_type const& gid, Callback && cb,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6)
     {
@@ -1908,14 +1876,11 @@ namespace hpx
         return apply_p_cb<Action>(c, gid, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename Callback,
-        typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
+    template <typename Component, typename Signature, typename Derived,
+        typename Callback, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     inline bool
     apply_cb(actions::continuation* c,
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
         naming::id_type const& gid, Callback && cb,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6)
     {
@@ -2086,14 +2051,12 @@ namespace hpx
         return apply_p_cb<Action>(gid, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename Callback,
+    template <typename Component, typename Signature, typename Derived,
+        typename Callback,
         typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     inline bool
     apply_cb(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
         naming::id_type const& gid, Callback && cb,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7)
     {
@@ -2195,14 +2158,11 @@ namespace hpx
         return apply_p_cb<Action>(c, gid, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename Callback,
-        typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
+    template <typename Component, typename Signature, typename Derived,
+        typename Callback, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     inline bool
     apply_cb(actions::continuation* c,
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
         naming::id_type const& gid, Callback && cb,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7)
     {
@@ -2373,14 +2333,12 @@ namespace hpx
         return apply_p_cb<Action>(gid, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename Callback,
+    template <typename Component, typename Signature, typename Derived,
+        typename Callback,
         typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
     inline bool
     apply_cb(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
         naming::id_type const& gid, Callback && cb,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8)
     {
@@ -2482,14 +2440,11 @@ namespace hpx
         return apply_p_cb<Action>(c, gid, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename Callback,
-        typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
+    template <typename Component, typename Signature, typename Derived,
+        typename Callback, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
     inline bool
     apply_cb(actions::continuation* c,
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
         naming::id_type const& gid, Callback && cb,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8)
     {
@@ -2660,14 +2615,12 @@ namespace hpx
         return apply_p_cb<Action>(gid, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename Callback,
+    template <typename Component, typename Signature, typename Derived,
+        typename Callback,
         typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
     inline bool
     apply_cb(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
         naming::id_type const& gid, Callback && cb,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9)
     {
@@ -2769,14 +2722,11 @@ namespace hpx
         return apply_p_cb<Action>(c, gid, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename Callback,
-        typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
+    template <typename Component, typename Signature, typename Derived,
+        typename Callback, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
     inline bool
     apply_cb(actions::continuation* c,
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
+        hpx::actions::basic_action<Component, Signature, Derived> ,
         naming::id_type const& gid, Callback && cb,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9)
     {

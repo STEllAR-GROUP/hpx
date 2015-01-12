@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -67,14 +67,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 if (first == last)
                 {
+                    T init_ = init;
                     return detail::algorithm_result<ExPolicy, T>::get(
-                        std::forward<T>(init));
+                        std::move(init_));
                 }
 
                 typedef typename std::iterator_traits<FwdIter>::reference
                     reference;
 
-                return util::partitioner<ExPolicy, FwdIter, T>::call(
+                return util::partitioner<ExPolicy, T>::call(
                     policy, first, std::distance(first, last),
                     [r, conv](FwdIter part_begin, std::size_t part_size) -> T
                     {
@@ -93,6 +94,44 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     }));
             }
         };
+
+        template <typename ExPolicy, typename InIter, typename T,
+            typename Reduce, typename Convert>
+        inline typename detail::algorithm_result<
+            ExPolicy, typename hpx::util::decay<T>::type
+        >::type
+        transform_reduce_(ExPolicy&& policy, InIter first, InIter last,
+            T && init, Reduce && red_op, Convert && conv_op, boost::mpl::false_)
+        {
+            typedef typename std::iterator_traits<InIter>::iterator_category
+                iterator_category;
+
+            BOOST_STATIC_ASSERT_MSG(
+                (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
+                "Requires at least input iterator.");
+
+            typedef typename boost::mpl::or_<
+                parallel::is_sequential_execution_policy<ExPolicy>,
+                boost::is_same<std::input_iterator_tag, iterator_category>
+            >::type is_seq;
+
+            typedef typename hpx::util::decay<T>::type init_type;
+
+            return transform_reduce<init_type>().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, std::forward<T>(init),
+                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op));
+        }
+
+        // forward declare the segmented version of this algorithm
+        template <typename ExPolicy, typename InIter, typename T,
+            typename Reduce, typename Convert>
+        typename detail::algorithm_result<
+            ExPolicy, typename hpx::util::decay<T>::type
+        >::type
+        transform_reduce_(ExPolicy&& policy, InIter first, InIter last, T && init,
+            Reduce && red_op, Convert && conv_op, boost::mpl::true_);
+
         /// \endcond
     }
 
@@ -114,6 +153,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     requirements of \a CopyConstructible.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
+    /// \tparam Reduce      The type of the binary function object used for
+    ///                     the reduction operation.
+    /// \tparam Convert     The type of the unary function object used to
+    ///                     transform the elements of the input sequence before
+    ///                     invoking the reduce function.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -121,21 +165,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
-    /// \param red_op       Specifies the function (or function object) which
-    ///                     will be invoked for each of the values returned
-    ///                     from the invocation of \a conv_op. This is a
-    ///                     binary predicate. The signature of this predicate
-    ///                     should be equivalent to:
-    ///                     \code
-    ///                     Ret fun(const Type1 &a, const Type2 &b);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
-    ///                     the function must not modify the objects passed to
-    ///                     it.
-    ///                     The types \a Type1, \a Type2, and \a Ret must be
-    ///                     such that an object of a type as returned from
-    ///                     \a conv_op can be implicitly converted to any
-    ///                     of those types.
     /// \param conv_op      Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
     ///                     sequence specified by [first, last). This is a
@@ -152,6 +181,21 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     The type \a R must be such that an object of this
     ///                     type can be implicitly converted to \a T.
     /// \param init         The initial value for the generalized sum.
+    /// \param red_op       Specifies the function (or function object) which
+    ///                     will be invoked for each of the values returned
+    ///                     from the invocation of \a conv_op. This is a
+    ///                     binary predicate. The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     Ret fun(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it.
+    ///                     The types \a Type1, \a Type2, and \a Ret must be
+    ///                     such that an object of a type as returned from
+    ///                     \a conv_op can be implicitly converted to any
+    ///                     of those types.
     ///
     /// The reduce operations in the parallel \a transform_reduce algorithm invoked
     /// with an execution policy object of type \a sequential_execution_policy
@@ -188,8 +232,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         is_execution_policy<ExPolicy>,
         typename detail::algorithm_result<ExPolicy, T>::type
     >::type
-    transform_reduce(ExPolicy&& policy, InIter first, InIter last, T init,
-        Reduce && red_op, Convert && conv_op)
+    transform_reduce(ExPolicy&& policy, InIter first, InIter last,
+        Convert && conv_op, T init, Reduce && red_op)
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
             iterator_category;
@@ -198,15 +242,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (boost::is_base_of<std::input_iterator_tag, iterator_category>::value),
             "Requires at least input iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, iterator_category>
-        >::type is_seq;
+        typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;
+        typedef typename iterator_traits::is_segmented_iterator is_segmented;
 
-        return detail::transform_reduce<T>().call(
+        return detail::transform_reduce_(
             std::forward<ExPolicy>(policy), first, last, std::move(init),
             std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
-            is_seq());
+            is_segmented());
     }
 }}}
 

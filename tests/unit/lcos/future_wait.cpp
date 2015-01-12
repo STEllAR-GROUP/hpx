@@ -24,8 +24,7 @@ using hpx::finalize;
 
 using hpx::util::report_errors;
 
-using hpx::actions::plain_action0;
-using hpx::actions::plain_result_action0;
+using hpx::actions::action;
 
 using hpx::lcos::wait_each;
 using hpx::async;
@@ -73,7 +72,7 @@ void null_thread()
     ++void_counter;
 }
 
-typedef plain_action0<null_thread> null_action;
+typedef action<void (*)(), null_thread> null_action;
 
 HPX_REGISTER_PLAIN_ACTION(null_action);
 
@@ -86,7 +85,7 @@ bool null_result_thread()
     return true;
 }
 
-typedef plain_result_action0<bool, null_result_thread> null_result_action;
+typedef action<bool (*)(), null_result_thread> null_result_action;
 
 HPX_REGISTER_PLAIN_ACTION(null_result_action);
 
@@ -116,7 +115,7 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         // Async wait, single future, void return.
         {
-            wait_each(async<null_action>(here_), cb);
+            wait_each(cb, async<null_action>(here_));
 
             HPX_TEST_EQ(1U, cb.count());
             HPX_TEST_EQ(1U, void_counter.load());
@@ -128,7 +127,7 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         // Async wait, single future, non-void return.
         {
-            wait_each(async<null_result_action>(here_), cb);
+            wait_each(cb, async<null_result_action>(here_));
 
             HPX_TEST_EQ(1U, cb.count());
             HPX_TEST_EQ(1U, result_counter.load());
@@ -146,7 +145,7 @@ int hpx_main(
             for (std::size_t i = 0; i < 64; ++i)
                 futures.push_back(async<null_action>(here_));
 
-            wait_each(futures, cb);
+            wait_each(cb, futures);
 
             HPX_TEST_EQ(64U, cb.count());
             HPX_TEST_EQ(64U, void_counter.load());
@@ -164,7 +163,7 @@ int hpx_main(
             for (std::size_t i = 0; i < 64; ++i)
                 futures.push_back(async<null_result_action>(here_));
 
-            wait_each(futures, cb);
+            wait_each(cb, futures);
 
             HPX_TEST_EQ(64U, cb.count());
             HPX_TEST_EQ(64U, result_counter.load());

@@ -63,7 +63,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         std::forward<T_>(init));
                 }
 
-                return util::partitioner<ExPolicy, FwdIter, T>::call(
+                return util::partitioner<ExPolicy, T>::call(
                     policy, first, std::distance(first, last),
                     [r](FwdIter part_begin, std::size_t part_size) -> T
                     {
@@ -171,8 +171,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::reduce<T>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, std::move(init), std::forward<F>(f), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, std::move(init), std::forward<F>(f));
     }
 
     /// Returns GENERALIZED_SUM(+, init, *first, ..., *(first + (last - first) - 1)).
@@ -248,8 +248,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::reduce<T>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, std::move(init), std::plus<T>(), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, std::move(init), std::plus<T>());
     }
 
     /// Returns GENERALIZED_SUM(+, T(), *first, ..., *(first + (last - first) - 1)).
@@ -328,8 +328,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::reduce<value_type>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, value_type(), std::plus<value_type>(), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, value_type(), std::plus<value_type>());
     }
 }}}
 

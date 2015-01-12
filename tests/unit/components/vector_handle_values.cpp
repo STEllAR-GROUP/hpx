@@ -111,13 +111,13 @@ void handle_values_tests_with_policy(std::size_t size, std::size_t localities,
     DistPolicy const& policy)
 {
     {
-    hpx::vector<T> v(size, policy);
-    handle_values_tests(v);
+        hpx::vector<T> v(size, policy);
+        handle_values_tests(v);
     }
 
     {
-    hpx::vector<T> v(size, policy);
-    handle_values_tests_distributed_access(v);
+        hpx::vector<T> v(size, policy);
+        handle_values_tests_distributed_access(v);
     }
 }
 
@@ -140,29 +140,11 @@ void handle_values_tests()
         handle_values_tests(v);
     }
 
-    handle_values_tests_with_policy<T>(length, 1, hpx::block);
-    handle_values_tests_with_policy<T>(length, 3, hpx::block(3));
-    handle_values_tests_with_policy<T>(length, 3, hpx::block(3, localities));
+    handle_values_tests_with_policy<T>(length, 1, hpx::layout);
+    handle_values_tests_with_policy<T>(length, 3, hpx::layout(3));
+    handle_values_tests_with_policy<T>(length, 3, hpx::layout(3, localities));
     handle_values_tests_with_policy<T>(length, localities.size(),
-        hpx::block(localities));
-
-    handle_values_tests_with_policy<T>(length, 1, hpx::cyclic);
-    handle_values_tests_with_policy<T>(length, 3, hpx::cyclic(3));
-    handle_values_tests_with_policy<T>(length, 3, hpx::cyclic(3, localities));
-    handle_values_tests_with_policy<T>(length, localities.size(),
-        hpx::cyclic(localities));
-
-    handle_values_tests_with_policy<T>(length, 1, hpx::block_cyclic);
-    handle_values_tests_with_policy<T>(length, 3, hpx::block_cyclic(3));
-    handle_values_tests_with_policy<T>(length, 3,
-        hpx::block_cyclic(3, localities));
-    handle_values_tests_with_policy<T>(length, localities.size(),
-        hpx::block_cyclic(localities));
-    handle_values_tests_with_policy<T>(length, 4, hpx::block_cyclic(4, 3));
-    handle_values_tests_with_policy<T>(length, 4,
-        hpx::block_cyclic(4, localities, 3));
-    handle_values_tests_with_policy<T>(length, localities.size(),
-        hpx::block_cyclic(localities, 3));
+        hpx::layout(localities));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

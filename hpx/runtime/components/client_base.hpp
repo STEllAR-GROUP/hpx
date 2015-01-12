@@ -17,6 +17,7 @@
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/traits/is_future.hpp>
+#include <hpx/traits/acquire_future.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 
 #include <utility>
@@ -76,6 +77,21 @@ namespace hpx { namespace traits
         get_shared_state(Derived const& client)
         {
             return client.share().shared_state_;
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Derived>
+    struct acquire_future_impl<Derived,
+        typename boost::enable_if<is_client<Derived> >::type>
+    {
+        typedef Derived type;
+
+        template <typename T_>
+        BOOST_FORCEINLINE
+        Derived operator()(T_ && value) const
+        {
+            return std::forward<T_>(value);
         }
     };
 }}

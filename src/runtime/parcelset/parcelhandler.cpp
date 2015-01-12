@@ -471,12 +471,14 @@ namespace hpx { namespace parcelset
 
     naming::resolver_client& parcelhandler::get_resolver()
     {
-        return resolver_;
+        HPX_ASSERT(resolver_ != 0);
+        return *resolver_;
     }
 
     naming::gid_type const& parcelhandler::get_locality() const
     {
-        return resolver_.get_local_locality();
+        HPX_ASSERT(resolver_ != 0);
+        return resolver_->get_local_locality();
     }
 
     bool parcelhandler::get_raw_remote_localities(
@@ -485,7 +487,8 @@ namespace hpx { namespace parcelset
     {
         std::vector<naming::gid_type> allprefixes;
 
-        bool result = resolver_.get_localities(allprefixes, type, ec);
+        HPX_ASSERT(resolver_ != 0);
+        bool result = resolver_->get_localities(allprefixes, type, ec);
         if (ec || !result) return false;
 
         std::remove_copy(allprefixes.begin(), allprefixes.end(),
@@ -498,7 +501,8 @@ namespace hpx { namespace parcelset
         std::vector<naming::gid_type>& locality_ids,
         components::component_type type, error_code& ec) const
     {
-        bool result = resolver_.get_localities(locality_ids, type, ec);
+        HPX_ASSERT(resolver_ != 0);
+        bool result = resolver_->get_localities(locality_ids, type, ec);
         if (ec || !result) return false;
 
         return !locality_ids.empty();
@@ -591,7 +595,8 @@ namespace hpx { namespace parcelset
 #if !defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
         if (!addrs[0])
         {
-            resolved_locally = resolver_.resolve_local(ids[0], addrs[0]);
+            HPX_ASSERT(resolver_ != 0);
+            resolved_locally = resolver_->resolve_local(ids[0], addrs[0]);
         }
 #else
         std::size_t size = p.size();
@@ -602,13 +607,14 @@ namespace hpx { namespace parcelset
             return;
         }
 
+        HPX_ASSERT(resolver_ != 0);
         if (1 == size) {
             if (!addrs[0])
-                resolved_locally = resolver_.resolve_local(ids[0], addrs[0]);
+                resolved_locally = resolver_->resolve_local(ids[0], addrs[0]);
         }
         else {
             boost::dynamic_bitset<> locals;
-            resolved_locally = resolver_.resolve_local(ids, addrs, size, locals);
+            resolved_locally = resolver_->resolve_local(ids, addrs, size, locals);
         }
 #endif
 
@@ -643,7 +649,9 @@ namespace hpx { namespace parcelset
         // At least one of the addresses is locally unknown, route the parcel
         // to the AGAS managing the destination.
         ++count_routed_;
-        resolver_.route(p, f);
+
+        HPX_ASSERT(resolver_ != 0);
+        resolver_->route(p, f);
     }
 
     std::size_t parcelhandler::get_outgoing_queue_length(bool reset) const

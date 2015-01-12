@@ -431,6 +431,7 @@ response locality_namespace::free(
 
         if (primary_)
         {
+            l.unlock();
             request req(primary_ns_unbind_gid, locality, 0);
             response resp = primary_->service(req, ec);
             if (ec) return resp;

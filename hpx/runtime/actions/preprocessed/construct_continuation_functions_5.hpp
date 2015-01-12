@@ -93,7 +93,7 @@
              
              >
         HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
-            Result (Object::* func)(),
+            R (Object::* func)(),
             Component* obj
            ) const
         {
@@ -101,7 +101,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(std::forward<Result>(
+                cont->trigger(std::forward<R>(
                     (obj->*func)()
                 ));
             }
@@ -115,7 +115,7 @@
              
              >
         HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
-            Result (Object::* const func)(
+            R (Object::* const func)(
                 ) const,
             Component* obj
            ) const
@@ -124,7 +124,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(std::forward<Result>(
+                cont->trigger(std::forward<R>(
                     (obj->*func)()
                 ));
             }
@@ -140,7 +140,7 @@
     static threads::thread_function_type
     construct_continuation_thread_object_function(
         continuation_type cont,
-        Result (Object::* func)(), Component* obj,
+        R (Object::* func)(), Component* obj,
         Arguments_ && args)
     {
         return util::bind(util::one_shot(
@@ -154,7 +154,7 @@
     static threads::thread_function_type
     construct_continuation_thread_object_function(
         continuation_type cont,
-        Result (Object::* const func)() const,
+        R (Object::* const func)() const,
         Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
@@ -248,7 +248,7 @@
             , typename Arg0
             , typename FArg0>
         HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
-            Result (Object::* func)(FArg0 arg0),
+            R (Object::* func)(FArg0 arg0),
             Component* obj
           , Arg0 && arg0) const
         {
@@ -256,7 +256,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(std::forward<Result>(
+                cont->trigger(std::forward<R>(
                     (obj->*func)(std::forward<Arg0>( arg0 ))
                 ));
             }
@@ -270,7 +270,7 @@
             , typename Arg0
             , typename FArg0>
         HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
-            Result (Object::* const func)(
+            R (Object::* const func)(
                 FArg0 arg0) const,
             Component* obj
           , Arg0 && arg0) const
@@ -279,7 +279,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(std::forward<Result>(
+                cont->trigger(std::forward<R>(
                     (obj->*func)(std::forward<Arg0>( arg0 ))
                 ));
             }
@@ -295,7 +295,7 @@
     static threads::thread_function_type
     construct_continuation_thread_object_function(
         continuation_type cont,
-        Result (Object::* func)(FArg0), Component* obj,
+        R (Object::* func)(FArg0), Component* obj,
         Arguments_ && args)
     {
         return util::bind(util::one_shot(
@@ -309,7 +309,7 @@
     static threads::thread_function_type
     construct_continuation_thread_object_function(
         continuation_type cont,
-        Result (Object::* const func)(FArg0) const,
+        R (Object::* const func)(FArg0) const,
         Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
@@ -403,7 +403,7 @@
             , typename Arg0 , typename Arg1
             , typename FArg0 , typename FArg1>
         HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
-            Result (Object::* func)(FArg0 arg0 , FArg1 arg1),
+            R (Object::* func)(FArg0 arg0 , FArg1 arg1),
             Component* obj
           , Arg0 && arg0 , Arg1 && arg1) const
         {
@@ -411,7 +411,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(std::forward<Result>(
+                cont->trigger(std::forward<R>(
                     (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ))
                 ));
             }
@@ -425,7 +425,7 @@
             , typename Arg0 , typename Arg1
             , typename FArg0 , typename FArg1>
         HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
-            Result (Object::* const func)(
+            R (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1) const,
             Component* obj
           , Arg0 && arg0 , Arg1 && arg1) const
@@ -434,7 +434,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(std::forward<Result>(
+                cont->trigger(std::forward<R>(
                     (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ))
                 ));
             }
@@ -450,7 +450,7 @@
     static threads::thread_function_type
     construct_continuation_thread_object_function(
         continuation_type cont,
-        Result (Object::* func)(FArg0 , FArg1), Component* obj,
+        R (Object::* func)(FArg0 , FArg1), Component* obj,
         Arguments_ && args)
     {
         return util::bind(util::one_shot(
@@ -464,7 +464,7 @@
     static threads::thread_function_type
     construct_continuation_thread_object_function(
         continuation_type cont,
-        Result (Object::* const func)(FArg0 , FArg1) const,
+        R (Object::* const func)(FArg0 , FArg1) const,
         Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
@@ -558,7 +558,7 @@
             , typename Arg0 , typename Arg1 , typename Arg2
             , typename FArg0 , typename FArg1 , typename FArg2>
         HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
-            Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2),
+            R (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2),
             Component* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2) const
         {
@@ -566,7 +566,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(std::forward<Result>(
+                cont->trigger(std::forward<R>(
                     (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ))
                 ));
             }
@@ -580,7 +580,7 @@
             , typename Arg0 , typename Arg1 , typename Arg2
             , typename FArg0 , typename FArg1 , typename FArg2>
         HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
-            Result (Object::* const func)(
+            R (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2) const,
             Component* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2) const
@@ -589,7 +589,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(std::forward<Result>(
+                cont->trigger(std::forward<R>(
                     (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ))
                 ));
             }
@@ -605,7 +605,7 @@
     static threads::thread_function_type
     construct_continuation_thread_object_function(
         continuation_type cont,
-        Result (Object::* func)(FArg0 , FArg1 , FArg2), Component* obj,
+        R (Object::* func)(FArg0 , FArg1 , FArg2), Component* obj,
         Arguments_ && args)
     {
         return util::bind(util::one_shot(
@@ -619,7 +619,7 @@
     static threads::thread_function_type
     construct_continuation_thread_object_function(
         continuation_type cont,
-        Result (Object::* const func)(FArg0 , FArg1 , FArg2) const,
+        R (Object::* const func)(FArg0 , FArg1 , FArg2) const,
         Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
@@ -713,7 +713,7 @@
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3>
         HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
-            Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3),
+            R (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3),
             Component* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3) const
         {
@@ -721,7 +721,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(std::forward<Result>(
+                cont->trigger(std::forward<R>(
                     (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ))
                 ));
             }
@@ -735,7 +735,7 @@
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3>
         HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
-            Result (Object::* const func)(
+            R (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3) const,
             Component* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3) const
@@ -744,7 +744,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(std::forward<Result>(
+                cont->trigger(std::forward<R>(
                     (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ))
                 ));
             }
@@ -760,7 +760,7 @@
     static threads::thread_function_type
     construct_continuation_thread_object_function(
         continuation_type cont,
-        Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3), Component* obj,
+        R (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3), Component* obj,
         Arguments_ && args)
     {
         return util::bind(util::one_shot(
@@ -774,7 +774,7 @@
     static threads::thread_function_type
     construct_continuation_thread_object_function(
         continuation_type cont,
-        Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3) const,
+        R (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3) const,
         Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
@@ -868,7 +868,7 @@
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4>
         HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
-            Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4),
+            R (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4),
             Component* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4) const
         {
@@ -876,7 +876,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(std::forward<Result>(
+                cont->trigger(std::forward<R>(
                     (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ))
                 ));
             }
@@ -890,7 +890,7 @@
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4>
         HPX_MAYBE_FORCEINLINE result_type operator()(continuation_type cont,
-            Result (Object::* const func)(
+            R (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4) const,
             Component* obj
           , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4) const
@@ -899,7 +899,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(std::forward<Result>(
+                cont->trigger(std::forward<R>(
                     (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ))
                 ));
             }
@@ -915,7 +915,7 @@
     static threads::thread_function_type
     construct_continuation_thread_object_function(
         continuation_type cont,
-        Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4), Component* obj,
+        R (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4), Component* obj,
         Arguments_ && args)
     {
         return util::bind(util::one_shot(
@@ -929,7 +929,7 @@
     static threads::thread_function_type
     construct_continuation_thread_object_function(
         continuation_type cont,
-        Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4) const,
+        R (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4) const,
         Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(

@@ -26,14 +26,11 @@ namespace hpx
         template <
             typename Action, typename RemoteResult
           , typename Cont, typename ...Ts>
-        typename boost::enable_if_c<
-            util::tuple_size<typename Action::arguments_type>::value == sizeof...(Ts)
-          , lcos::future<
-                typename traits::promise_local_result<
-                    typename result_of_async_continue<Action, Cont>::type
-                >::type
-            >
-        >::type
+        lcos::future<
+            typename traits::promise_local_result<
+                typename result_of_async_continue<Action, Cont>::type
+            >::type
+        >
         async_continue_r(Cont&& cont, naming::id_type const& gid, Ts&&... vs)
         {
             typedef
@@ -59,14 +56,11 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Cont, typename ...Ts>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == sizeof...(Ts)
-      , lcos::future<
-            typename traits::promise_local_result<
-                typename detail::result_of_async_continue<Action, Cont>::type
-            >::type
-        >
-    >::type
+    lcos::future<
+        typename traits::promise_local_result<
+            typename detail::result_of_async_continue<Action, Cont>::type
+        >::type
+    >
     async_continue(Cont&& cont, naming::id_type const& gid, Ts&&... vs)
     {
         typedef
@@ -81,18 +75,15 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     template <
-        typename Component, typename Result, typename Arguments,
-        typename Derived, typename Cont, typename ...Ts>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == sizeof...(Ts)
-      , lcos::future<
-            typename traits::promise_local_result<
-                typename detail::result_of_async_continue<Derived, Cont>::type
-            >::type
-        >
-    >::type
+        typename Component, typename Signature, typename Derived,
+        typename Cont, typename ...Ts>
+    lcos::future<
+         typename traits::promise_local_result<
+            typename detail::result_of_async_continue<Derived, Cont>::type
+        >::type
+    >
     async_continue(
-        hpx::actions::action<Component, Result, Arguments, Derived> /*act*/
+        hpx::actions::basic_action<Component, Signature, Derived> /*act*/
       , Cont&& cont, naming::id_type const& gid, Ts&&... vs)
     {
         return async_continue<Derived>(

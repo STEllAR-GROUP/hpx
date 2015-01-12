@@ -26,20 +26,20 @@ struct Point
 ///////////////////////////////////////////////////////////////////////////////
 void measure_transform_reduce(std::size_t size)
 {
-    std::vector<Point> data_representation(size, 
+    std::vector<Point> data_representation(size,
         Point{double(std::rand()), double(std::rand())});
 
-    //invode transform_reduce
-    double result = 
+    // invode transform_reduce
+    double result =
         hpx::parallel::transform_reduce(hpx::parallel::par,
         boost::begin(data_representation),
         boost::end(data_representation),
-        0.0,
-        std::plus<double>(),
         [](Point r)
         {
             return r.x * r.y;
-        }
+        },
+        0.0,
+        std::plus<double>()
     );
 }
 
@@ -54,7 +54,7 @@ void measure_transform_reduce_old(std::size_t size)
         boost::begin(data_representation),
         boost::end(data_representation),
         Point{0.0, 0.0},
-        [](Point res, Point curr) 
+        [](Point res, Point curr)
         {
             return Point{
                 res.x * res.y + curr.x * curr.y, 1.0};
@@ -62,7 +62,7 @@ void measure_transform_reduce_old(std::size_t size)
     );
 }
 
-boost::uint64_t average_out_transform_reduce(std::size_t vector_size) 
+boost::uint64_t average_out_transform_reduce(std::size_t vector_size)
 {
     measure_transform_reduce(vector_size);
     return boost::uint64_t(1);
@@ -111,11 +111,11 @@ int main(int argc, char* argv[])
         ("vector_size"
         , boost::program_options::value<std::size_t>()->default_value(1000)
         , "size of vector")
-        
+
         ("csv_output"
         , boost::program_options::value<int>()->default_value(0)
         , "print results in csv format")
-       
+
         ("test_count"
         , boost::program_options::value<int>()->default_value(100)
         , "number of tests to take average from")

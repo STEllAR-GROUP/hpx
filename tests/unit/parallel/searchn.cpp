@@ -193,10 +193,10 @@ void test_search_n3(ExPolicy const& policy, IteratorTag)
         boost::begin(h), boost::end(h));
 
     base_iterator test_index = boost::begin(c);
- 
+
     HPX_TEST(index == iterator(test_index));
 }
- 
+
 template <typename ExPolicy, typename IteratorTag>
 void test_search_n3_async(ExPolicy const& p, IteratorTag)
 {
@@ -260,11 +260,11 @@ void test_search_n4(ExPolicy const& policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    // fill vector with random values above 2 
+    // fill vector with random values above 2
     std::fill(boost::begin(c), boost::end(c), (std::rand() % 100) + 3);
     // create subsequence before the middle of the vector, and only run
     // search_n on half of C
-    int dx = rand() % (c.size()/2 - 2);
+    std::size_t dx = rand() % (c.size()/2 - 2);
     c[dx] = 1;
     c[dx+1] = 2;
 
@@ -278,7 +278,7 @@ void test_search_n4(ExPolicy const& policy, IteratorTag)
 
     HPX_TEST(index == iterator(test_index));
 }
- 
+
 template <typename ExPolicy, typename IteratorTag>
 void test_search_n4_async(ExPolicy const& p, IteratorTag)
 {
@@ -286,11 +286,11 @@ void test_search_n4_async(ExPolicy const& p, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    // fill vector with random values above 2 
+    // fill vector with random values above 2
     std::fill(boost::begin(c), boost::end(c), (std::rand() % 100) + 3);
     // create subsequence before the middle of the vector, and only run
     // search_n on half of C
-    int dx = rand() % (c.size()/2 - 2);
+    std::size_t dx = rand() % (c.size()/2 - 2);
     c[dx] = 1;
     c[dx+1] = 2;
 
@@ -351,7 +351,7 @@ void test_search_n5(ExPolicy const& policy, IteratorTag)
     c[c.size()/2 + 1] = 2;
 
     std::size_t h[] = { 1, 2 };
-    
+
     auto op =
         [](std::size_t a, std::size_t b)
         {
@@ -382,7 +382,7 @@ void test_search_n5_async(ExPolicy const& p, IteratorTag)
 
     std::size_t h[] = { 1, 2 };
 
-    auto op = 
+    auto op =
         [](std::size_t a, std::size_t b)
         {
             return !(a != b);

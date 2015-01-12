@@ -25,7 +25,7 @@ void test_rotate(ExPolicy const& policy, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand());
     std::copy(boost::begin(c), boost::end(c), std::back_inserter(d1));
 
-    std::size_t mid_pos = std::rand() % c.size();
+    std::size_t mid_pos = std::rand() % c.size(); //-V104
     base_iterator mid = boost::begin(c);
     std::advance(mid, mid_pos);
 
@@ -58,7 +58,7 @@ void test_rotate_async(ExPolicy const& p, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand());
     std::copy(boost::begin(c), boost::end(c), std::back_inserter(d1));
 
-    std::size_t mid_pos = std::rand() % c.size();
+    std::size_t mid_pos = std::rand() % c.size(); //-V104
 
     base_iterator mid = boost::begin(c);
     std::advance(mid, mid_pos);
@@ -122,7 +122,7 @@ void test_rotate_exception(ExPolicy const& policy, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     base_iterator mid = boost::begin(c);
-    std::advance(mid, std::rand() % c.size());
+    std::advance(mid, std::rand() % c.size()); //-V104
 
     bool caught_exception = false;
     try {
@@ -156,7 +156,7 @@ void test_rotate_exception_async(ExPolicy const& p, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     base_iterator mid = boost::begin(c);
-    std::advance(mid, std::rand() % c.size());
+    std::advance(mid, std::rand() % c.size()); //-V104
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
@@ -226,7 +226,7 @@ void test_rotate_bad_alloc(ExPolicy const& policy, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     base_iterator mid = boost::begin(c);
-    std::advance(mid, std::rand() % c.size());
+    std::advance(mid, std::rand() % c.size()); //-V104
 
     bool caught_bad_alloc = false;
     try {
@@ -259,7 +259,7 @@ void test_rotate_bad_alloc_async(ExPolicy const& p, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     base_iterator mid = boost::begin(c);
-    std::advance(mid, std::rand() % c.size());
+    std::advance(mid, std::rand() % c.size()); //-V104
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;

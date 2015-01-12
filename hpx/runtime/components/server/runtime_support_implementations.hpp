@@ -97,7 +97,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)>
     struct BOOST_PP_CAT(create_component_action, N)
-      : BOOST_PP_CAT( ::hpx::actions::result_action, N)<
+      : ::hpx::actions::action<
             naming::gid_type (runtime_support::*)(BOOST_PP_ENUM_PARAMS(N, A))
           , &runtime_support::BOOST_PP_CAT(create_component, N)<
                 Component BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)>
@@ -108,7 +108,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)>
     struct BOOST_PP_CAT(create_component_direct_action, N)
-      : BOOST_PP_CAT( ::hpx::actions::direct_result_action, N)<
+      : ::hpx::actions::direct_action<
             naming::gid_type (runtime_support::*)(BOOST_PP_ENUM_PARAMS(N, A))
           , &runtime_support::BOOST_PP_CAT(create_component, N)<
                 Component BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)>
@@ -181,7 +181,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       BOOST_PP_COMMA_IF(M) BOOST_PP_ENUM_PARAMS(M, typename A)>
     struct BOOST_PP_CAT(bulk_create_component_action, N)
-      : BOOST_PP_CAT( ::hpx::actions::result_action, N)<
+      : ::hpx::actions::action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t BOOST_PP_COMMA_IF(M) BOOST_PP_ENUM_PARAMS(M, A))
           , &runtime_support::BOOST_PP_CAT(bulk_create_component, N)<
@@ -193,7 +193,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component
       BOOST_PP_COMMA_IF(M) BOOST_PP_ENUM_PARAMS(M, typename A)>
     struct BOOST_PP_CAT(bulk_create_component_direct_action, N)
-      : BOOST_PP_CAT( ::hpx::actions::direct_result_action, N)<
+      : ::hpx::actions::direct_action<
             std::vector<naming::gid_type> (runtime_support::*)(
                 std::size_t BOOST_PP_COMMA_IF(M) BOOST_PP_ENUM_PARAMS(M, A))
           , &runtime_support::BOOST_PP_CAT(bulk_create_component, N)<

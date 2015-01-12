@@ -1,0 +1,257 @@
+//  Copyright (c) 2007-2015 Hartmut Kaiser
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#if !defined(HPX_PARALLEL_SEGMENTED_ALGORITHM_COPY_JAN_05_2014_0125PM)
+#define HPX_PARALLEL_SEGMENTED_ALGORITHM_COPY_JAN_05_2014_0125PM
+
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/util/void_guard.hpp>
+#include <hpx/util/move.hpp>
+#include <hpx/traits/segmented_iterator_traits.hpp>
+
+#include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
+#include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/is_negative.hpp>
+#include <hpx/parallel/algorithms/remote/dispatch.hpp>
+#include <hpx/parallel/algorithms/copy.hpp>
+#include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
+
+#include <algorithm>
+#include <iterator>
+
+#include <boost/type_traits/is_same.hpp>
+
+namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+{
+    ///////////////////////////////////////////////////////////////////////////
+    // segmented_copy
+    namespace detail
+    {
+        ///////////////////////////////////////////////////////////////////////
+        /// \cond NOINTERNAL
+
+        // sequential remote implementation
+        template <typename Algo, typename ExPolicy, typename SegIter,
+            typename SegOutIter>
+        static typename detail::algorithm_result<ExPolicy, SegOutIter>::type
+        segmented_copy(Algo && algo, ExPolicy const& policy, boost::mpl::true_,
+            SegIter first, SegIter last, SegOutIter dest)
+        {
+            typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
+            typedef typename traits::segment_iterator segment_iterator;
+            typedef typename traits::local_iterator local_iterator_type;
+
+            typedef hpx::traits::segmented_iterator_traits<SegOutIter>
+                output_traits;
+            typedef typename output_traits::segment_iterator
+                segment_output_iterator;
+            typedef typename output_traits::local_iterator
+                local_output_iterator_type;
+
+            segment_iterator sit = traits::segment(first);
+            segment_iterator send = traits::segment(last);
+
+            segment_output_iterator sdest = traits::segment(dest);
+
+            using boost::mpl::true_;
+
+            if (sit == send)
+            {
+                // all elements are on the same partition
+                local_iterator_type beg = traits::local(first);
+                local_iterator_type end = traits::local(last);
+
+                if (beg != end)
+                {
+                    local_output_iterator_type out =
+                        util::remote::dispatch(traits::get_id(sit),
+                            std::forward<Algo>(algo), policy, true_(),
+                            beg, end, traits::local(dest));
+
+                    dest = output_traits::compose(sdest, out);
+                }
+            }
+            else {
+                // handle the remaining part of the first partition
+                local_iterator_type beg = traits::local(first);
+                local_iterator_type end = traits::end(sit);
+                local_output_iterator_type out = traits::local(dest);
+
+                if (beg != end)
+                {
+                     out = util::remote::dispatch(traits::get_id(sit),
+                        std::forward<Algo>(algo), policy, true_(),
+                        beg, end, out);
+                }
+
+                // handle all of the full partitions
+                for ((void) ++sit, ++sdest; sit != send; (void) ++sit, ++sdest)
+                {
+                    beg = traits::begin(sit);
+                    end = traits::end(sit);
+                    out = traits::begin(sdest);
+
+                    if (beg != end)
+                    {
+                        out = util::remote::dispatch(traits::get_id(sit),
+                            std::forward<Algo>(algo), policy, true_(),
+                            beg, end, out);
+                    }
+                }
+
+                // handle the beginning of the last partition
+                beg = traits::begin(sit);
+                end = traits::local(last);
+                if (beg != end)
+                {
+                    out = util::remote::dispatch(traits::get_id(sit),
+                        std::forward<Algo>(algo), policy, true_(),
+                        beg, end, traits::begin(sdest));
+                }
+
+                dest = output_traits::compose(sdest, out);
+            }
+
+            return detail::algorithm_result<ExPolicy, SegOutIter>::get(
+                std::move(dest));
+        }
+
+        // parallel remote implementation
+        template <typename Algo, typename ExPolicy, typename SegIter,
+            typename SegOutIter>
+        static typename detail::algorithm_result<ExPolicy, SegOutIter>::type
+        segmented_copy(Algo && algo, ExPolicy const& policy, boost::mpl::false_,
+            SegIter first, SegIter last, SegOutIter dest)
+        {
+            typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
+            typedef typename traits::segment_iterator segment_iterator;
+            typedef typename traits::local_iterator local_iterator_type;
+
+            typedef hpx::traits::segmented_iterator_traits<SegOutIter>
+                output_traits;
+            typedef typename output_traits::segment_iterator
+                segment_output_iterator;
+            typedef typename output_traits::local_iterator
+                local_output_iterator_type;
+
+            typedef typename std::iterator_traits<SegIter>::iterator_category
+                iterator_category;
+            typedef typename boost::mpl::bool_<boost::is_same<
+                    iterator_category, std::input_iterator_tag
+                >::value> forced_seq;
+
+            segment_iterator sit = traits::segment(first);
+            segment_iterator send = traits::segment(last);
+
+            segment_output_iterator sdest = traits::segment(dest);
+
+            std::vector<shared_future<local_output_iterator_type> > segments;
+            segments.reserve(std::distance(sit, send));
+
+            if (sit == send)
+            {
+                // all elements are on the same partition
+                local_iterator_type beg = traits::local(first);
+                local_iterator_type end = traits::local(last);
+
+                if (beg != end)
+                {
+                    segments.push_back(
+                        util::remote::dispatch_async(traits::get_id(sit),
+                            std::forward<Algo>(algo), policy, forced_seq(),
+                            beg, end, traits::local(dest)));
+                }
+            }
+            else {
+                // handle the remaining part of the first partition
+                local_iterator_type beg = traits::local(first);
+                local_iterator_type end = traits::end(sit);
+                local_output_iterator_type out = traits::local(dest);
+
+                if (beg != end)
+                {
+                    segments.push_back(
+                        util::remote::dispatch_async(traits::get_id(sit),
+                            std::forward<Algo>(algo), policy, forced_seq(),
+                            beg, end, out));
+                }
+
+                // handle all of the full partitions
+                for ((void) ++sit, ++sdest; sit != send; (void) ++sit, ++sdest)
+                {
+                    beg = traits::begin(sit);
+                    end = traits::end(sit);
+                    out = traits::begin(sdest);
+
+                    if (beg != end)
+                    {
+                        segments.push_back(
+                            util::remote::dispatch_async(traits::get_id(sit),
+                                std::forward<Algo>(algo), policy, forced_seq(),
+                                beg, end, out));
+                    }
+                }
+
+                // handle the beginning of the last partition
+                beg = traits::begin(sit);
+                end = traits::local(last);
+
+                if (beg != end)
+                {
+                    segments.push_back(
+                        util::remote::dispatch_async(traits::get_id(sit),
+                            std::forward<Algo>(algo), policy, forced_seq(),
+                            beg, end, traits::begin(sdest)));
+                }
+            }
+            HPX_ASSERT(!segments.empty());
+
+            return detail::algorithm_result<ExPolicy, SegOutIter>::get(
+                lcos::local::dataflow(
+                    [=](std::vector<shared_future<local_output_iterator_type> > && r)
+                    {
+                        return output_traits::compose(sdest, r.back().get());
+                    },
+                    segments));
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // segmented implementation
+        template <typename ExPolicy, typename InIter, typename OutIter>
+        typename detail::algorithm_result<ExPolicy, OutIter>::type
+        copy_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
+            boost::mpl::true_)
+        {
+            if (first == last)
+            {
+                return detail::algorithm_result<ExPolicy, OutIter>::get(
+                    std::move(dest));
+            }
+
+            typedef typename parallel::is_sequential_execution_policy<
+                    ExPolicy
+                >::type is_seq;
+            typedef hpx::traits::segmented_iterator_traits<OutIter>
+                output_iterator_traits;
+
+            return segmented_copy(
+                copy<typename output_iterator_traits::local_iterator>(),
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, dest);
+        }
+
+        // forward declare the non-segmented version of this algorithm
+        template <typename ExPolicy, typename InIter, typename OutIter>
+        typename detail::algorithm_result<ExPolicy, OutIter>::type
+        copy_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
+            boost::mpl::false_);
+
+        /// \endcond
+    }
+}}}
+
+#endif

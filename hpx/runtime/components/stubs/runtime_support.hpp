@@ -146,7 +146,7 @@ namespace hpx { namespace components { namespace stubs
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the future
-            return create_component_async<Component>(gid).get();
+            return create_component_colocated_async<Component>(gid).get();
         }
 
 #define HPX_RUNTIME_SUPPORT_STUB_DECAY(Z, N, D)                               \

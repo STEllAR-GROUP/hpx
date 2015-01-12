@@ -237,17 +237,15 @@ namespace hpx { namespace util
     }
 
     template <
-        typename Component, typename Result, typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ...Ts>
     detail::bound_action<
         Derived
       , util::tuple<typename util::decay<Ts>::type...>
     >
     bind(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > action, Ts&&... vs)
+        hpx::actions::basic_action<Component, Signature, Derived> action,
+        Ts&&... vs)
     {
         typedef detail::bound_action<
             Derived,

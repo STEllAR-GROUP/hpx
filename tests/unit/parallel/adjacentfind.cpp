@@ -23,7 +23,7 @@ void test_adjacent_find(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), (std::rand()%100) + 2);
 
-    std::size_t random_pos = std::rand()%10006;
+    std::size_t random_pos = std::rand()%10006; //-V101
 
     c[random_pos] = 1;
     c[random_pos + 1] = 1;
@@ -46,7 +46,7 @@ void test_adjacent_find_async(ExPolicy const& p, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), (std::rand() % 100) + 2);
 
-    std::size_t random_pos = std::rand() % 10006;
+    std::size_t random_pos = std::rand() % 10006; //-V101
 
     c[random_pos] = 1;
     c[random_pos + 1] = 1;
