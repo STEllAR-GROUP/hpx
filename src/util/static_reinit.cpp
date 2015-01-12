@@ -7,7 +7,7 @@
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/static_reinit.hpp>
 #include <hpx/util/static.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/util/spinlock.hpp>
 
 #include <boost/foreach.hpp>
 
