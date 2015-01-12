@@ -1087,7 +1087,9 @@ namespace hpx { namespace util { namespace detail
 
 #else  // HPX_WITH_LOGGING
 
+#include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/init_logging.hpp>
 
 namespace hpx { namespace util { namespace detail
 {
