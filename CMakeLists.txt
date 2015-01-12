@@ -122,8 +122,8 @@ hpx_option(HPX_WITH_SECURITY BOOL "Enable security support via libsodium." OFF)
 
 # Logging configuration
 hpx_option(HPX_WITH_LOGGING BOOL "Build HPX with logging enabled (default: ON)." ON ADVANCED)
-if(NOT HPX_WITH_LOGGING)
-  hpx_add_config_define(HPX_NO_LOGGING)
+if(HPX_WITH_LOGGING)
+  hpx_add_config_define(HPX_WITH_LOGGING)
 endif()
 
 ## Compiler related build options
