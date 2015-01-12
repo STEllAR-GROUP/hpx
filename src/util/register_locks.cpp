@@ -11,6 +11,7 @@
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
+#include <boost/asio.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -60,6 +61,7 @@ namespace hpx { namespace util
             static hpx::util::thread_specific_ptr<held_locks_map, tls_tag> held_locks_;
 
             static bool lock_detection_enabled_;
+            static std::string lock_detection_report_;
 
             static held_locks_map& get_lock_map()
             {
@@ -77,12 +79,14 @@ namespace hpx { namespace util
             register_locks::held_locks_map, register_locks::tls_tag
         > register_locks::held_locks_;
         bool register_locks::lock_detection_enabled_ = false;
+        std::string register_locks::lock_detection_report_ = "log";
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void enable_lock_detection()
+    void enable_lock_detection(std::string const & report)
     {
         detail::register_locks::lock_detection_enabled_ = true;
+        detail::register_locks::lock_detection_report_ = report;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -165,18 +169,48 @@ namespace hpx { namespace util
             {
                 if (detail::some_locks_are_not_ignored(held_locks))
                 {
-                    std::string back_trace(hpx::detail::backtrace_direct());
-                    if (back_trace.empty()) {
-                        LERR_(debug)
+                    if(register_locks::lock_detection_report_ == "attach_debugger")
+                    {
+#if defined(_POSIX_VERSION)
+                        volatile int i = 0;
+                        std::cerr
                             << "suspending thread while at least one lock is "
                                "being held (stack backtrace was disabled at "
-                               "compile time)";
+                               "compile time)\n"
+                            << "PID: " << getpid() << " on " << boost::asio::ip::host_name()
+                            << " ready for attaching debugger. Once attached set i = 1 and continue"
+                            << std::endl;
+                        while(i == 0)
+                        {
+                            sleep(1);
+                        }
+#elif defined(BOOST_MSVC)
+                        DebugBreak();
+#endif
                     }
-                    else {
-                        LERR_(debug)
-                            << "suspending thread while at least one lock is "
-                            << "being held, stack backtrace: "
-                            << back_trace;
+                    else
+                    {
+                        std::string back_trace(hpx::detail::backtrace_direct());
+                        if(register_locks::lock_detection_report_ == "log")
+                        {
+                            if (back_trace.empty()) {
+                                LERR_(debug)
+                                    << "suspending thread while at least one lock is "
+                                       "being held (stack backtrace was disabled at "
+                                       "compile time)";
+                            }
+                            else {
+                                LERR_(debug)
+                                    << "suspending thread while at least one lock is "
+                                    << "being held, stack backtrace: "
+                                    << back_trace;
+                            }
+                        }
+                        else
+                        {
+                            HPX_THROW_EXCEPTION(invalid_status, "verify_no_locks",
+                                back_trace);
+                        }
                     }
                 }
             }

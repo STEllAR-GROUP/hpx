@@ -118,6 +118,7 @@ namespace hpx { namespace util
             "shutdown_timeout = ${HPX_SHUTDOWN_TIMEOUT:-1.0}",
 #ifdef HPX_HAVE_VERIFY_LOCKS
             "lock_detection = ${HPX_LOCK_DETECTION:0}",
+            "lock_detection_report = log",
 #endif
 #ifdef HPX_HAVE_VERIFY_LOCKS_GLOBALLY
             "global_lock_detection = ${HPX_GLOBAL_LOCK_DETECTION:0}",
@@ -403,7 +404,19 @@ namespace hpx { namespace util
 #endif
 #ifdef HPX_HAVE_VERIFY_LOCKS
         if (enable_lock_detection())
-            util::enable_lock_detection();
+        {
+#ifdef HPX_HAVE_VERIFY_LOCKS
+            std::string report = "log";
+            if (has_section("hpx")) {
+                util::section const* sec = get_section("hpx");
+                if (NULL != sec) {
+                    report = hpx::util::get_entry_as<std::string>(
+                        *sec, "lock_detection_report", "log");
+                }
+            }
+            util::enable_lock_detection(report);
+#endif
+        }
 #endif
 #ifdef HPX_HAVE_VERIFY_LOCKS_GLOBALLY
         if (enable_global_lock_detection())
@@ -457,7 +470,17 @@ namespace hpx { namespace util
 #endif
 #ifdef HPX_HAVE_VERIFY_LOCKS
         if (enable_lock_detection())
-            util::enable_lock_detection();
+        {
+            std::string report = "log";
+            if (has_section("hpx")) {
+                util::section const* sec = get_section("hpx");
+                if (NULL != sec) {
+                    report = hpx::util::get_entry_as<std::string>(
+                        *sec, "lock_detection_report", "log");
+                }
+            }
+            util::enable_lock_detection(report);
+        }
 #endif
 #ifdef HPX_HAVE_VERIFY_LOCKS_GLOBALLY
         if (enable_global_lock_detection())
