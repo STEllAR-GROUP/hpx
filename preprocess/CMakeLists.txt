@@ -30,8 +30,7 @@ endforeach()
 set(action_argument_limit_preprocessing_files
   "hpx/components/dataflow/dataflow.hpp"
   "hpx/lcos/broadcast.hpp"
-  "hpx/lcos/reduce.hpp"
-  "hpx/runtime/components/new.hpp")
+  "hpx/lcos/reduce.hpp")
 foreach(file ${action_argument_limit_preprocessing_files})
   hpx_partial_preprocess_header(${file} LIMIT HPX_LIMIT)
 endforeach()
