@@ -30,8 +30,6 @@ endforeach()
 set(action_argument_limit_preprocessing_files
   "hpx/lcos/broadcast.hpp"
   "hpx/lcos/reduce.hpp"
-  "hpx/runtime/applier/apply_implementations.hpp"
-  "hpx/runtime/applier/apply_implementations_callback.hpp"
   "hpx/runtime/components/new.hpp"
   "hpx/runtime/components/server/runtime_support_implementations.hpp"
   "hpx/runtime/components/server/create_component_with_args.hpp"

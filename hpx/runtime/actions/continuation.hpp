@@ -30,10 +30,10 @@ namespace hpx
     //////////////////////////////////////////////////////////////////////////
     // forward declare the required overload of apply.
     template <typename Component, typename Signature, typename Derived,
-        typename Arg>
+        typename ...Ts>
     inline bool
     apply(hpx::actions::basic_action<Component, Signature, Derived>,
-        naming::id_type const&, Arg &&);
+        naming::id_type const&, Ts&&... vs);
 
     // MSVC complains about ambiguities if it sees this forward declaration
 #ifndef BOOST_MSVC
@@ -56,11 +56,11 @@ namespace hpx
 #endif
 
     template <typename Component, typename Signature, typename Derived,
-        typename T0>
+        typename ...Ts>
     inline bool
     apply_c(hpx::actions::basic_action<Component, Signature, Derived>,
         naming::id_type const& contgid, naming::id_type const& gid,
-        T0 && v0);
+        Ts&&... vs);
 
     //////////////////////////////////////////////////////////////////////////
     // handling special case of triggering an LCO
