@@ -31,8 +31,7 @@ if "HPX_LOCATION" in os.environ:
     pkgconfpath += [
         os.path.join(os.environ["HPX_LOCATION"],"lib","pkgconfig")]
 pkgconfpath += [
-    os.path.join("@HPX_PREFIX@","lib","pkgconfig"),     # install directory
-    os.path.join("@hpx_BINARY_DIR@","lib","pkgconfig"), # build directory
+    os.path.join("@HPX_CONF_PREFIX@","lib","pkgconfig"),     # install directory
     os.path.join(os.path.dirname(sys.argv[0]),"..","lib","pkgconfig"),
     os.path.join("opt","hpx","lib","pkgconfig"),
     os.path.join("usr","bin","hpx","lib","pkgconfig"),
@@ -55,8 +54,9 @@ Usage: hpxcxx -c flags files
 
 The hpxcxx command requires that you build either
 a component, an application, or that you specify
-the -c flag. All other flags are passed through
-to the underlying C++ compiler.
+the -c flag. If you are building against a debug
+build, you need to specify -g. All other flags
+are passed through to the underlying C++ compiler.
 """
     sys.exit(2)
 
@@ -70,6 +70,7 @@ if pkg in os.environ:
 else:
     os.environ[pkg] = pkgconf
 
+pkgconf_suffix = ''
 i = 1
 while i < len(sys.argv):
 
@@ -102,17 +103,20 @@ while i < len(sys.argv):
     elif sys.argv[i] == '-c':
         minusc = True
         pass
+    elif sys.argv[i].startswith('-g'):
+        pkgconf_suffix = '_debug'
+        args += [sys.argv[i]]
     else:
         args += [sys.argv[i]]
 
     i += 1
 
 if application:
-    args += ["$(pkg-config --cflags --libs hpx_application)"]
+    args += ["$(pkg-config --cflags --libs hpx_application" + pkgconf_suffix + ")"]
 elif component:
-    args += ["`pkg-config --cflags --libs hpx_component`"]
+    args += ["`pkg-config --cflags --libs hpx_component" + pkgconf_suffix + "`"]
 else:
-    args += ["`pkg-config --cflags hpx_application`"]
+    args += ["`pkg-config --cflags hpx_application" + pkgconf_suffix + "`"]
 
 if not component and not application and not minusc:
     usage()
