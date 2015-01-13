@@ -88,6 +88,11 @@ configure_file(cmake/templates/hpx_component.pc.in
 configure_file(cmake/templates/hpx_component_debug.pc.in
   "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx_component_debug.pc"
   ESCAPE_QUOTES @ONLY)
+# Configure hpxcxx
+configure_file(cmake/templates/hpxcxx.in
+  "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpxcxx"
+  @ONLY)
+
 
 # ... and the build dir
 set(HPX_CONF_PREFIX "${CMAKE_BINARY_DIR}")
@@ -113,6 +118,10 @@ configure_file(cmake/templates/hpx_component.pc.in
 configure_file(cmake/templates/hpx_component_debug.pc.in
   "${CMAKE_CURRENT_BINARY_DIR}/lib/pkgconfig/hpx_component_debug.pc"
   ESCAPE_QUOTES @ONLY)
+# Configure hpxcxx
+configure_file(cmake/templates/hpxcxx.in
+  "${CMAKE_CURRENT_BINARY_DIR}/bin/hpxcxx"
+  @ONLY)
 
 # Configure macros for the install dir ...
 set(HPX_CMAKE_MODULE_PATH "${CMAKE_INSTALL_PREFIX}/lib/cmake/hpx")
@@ -149,4 +158,11 @@ install(
     "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx_component_debug.pc"
   DESTINATION ${LIB}/pkgconfig
   COMPONENT pkgconfig
+)
+
+install(
+  FILES
+    "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpxcxx"
+  DESTINATION bin
+  COMPONENT compiler_wrapper
 )
