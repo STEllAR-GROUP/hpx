@@ -81,7 +81,7 @@ namespace examples { namespace server
 
         HPX_DEFINE_COMPONENT_ACTION(simple_accumulator, reset);
         HPX_DEFINE_COMPONENT_ACTION(simple_accumulator, add);
-        HPX_DEFINE_COMPONENT_CONST_ACTION(simple_accumulator, query);
+        HPX_DEFINE_COMPONENT_ACTION(simple_accumulator, query);
 
     private:
         argument_type value_;

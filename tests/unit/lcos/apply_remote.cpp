@@ -49,7 +49,7 @@ struct increment_server
         hpx::apply(receive_result_action(), there, accumulator.load());
     }
 
-    HPX_DEFINE_COMPONENT_CONST_ACTION(increment_server, call);
+    HPX_DEFINE_COMPONENT_ACTION(increment_server, call);
 };
 
 typedef hpx::components::managed_component<increment_server> server_type;

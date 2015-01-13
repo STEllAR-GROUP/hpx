@@ -30,11 +30,8 @@ namespace hpx { namespace actions
     template <typename Action>
     struct extract_action<Action
       , typename util::always_void<typename Action::type>::type>
-    {
-        typedef typename Action::type type;
-        typedef typename type::result_type result_type;
-        typedef typename type::remote_result_type remote_result_type;
-    };
+      : extract_action<typename Action::type>
+    {};
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

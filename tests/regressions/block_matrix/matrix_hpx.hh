@@ -40,7 +40,7 @@ struct vector_t_server:
   HPX_DEFINE_COMPONENT_ACTION(vector_t_server, get_data);
   
   double get_elt(std::ptrdiff_t i) const { return (*data)(i); }
-  HPX_DEFINE_COMPONENT_CONST_ACTION(vector_t_server, get_elt);
+  HPX_DEFINE_COMPONENT_ACTION(vector_t_server, get_elt);
   void set_elt(std::ptrdiff_t i, double x) { (*data)(i) = x; }
   HPX_DEFINE_COMPONENT_ACTION(vector_t_server, set_elt);
   
@@ -53,7 +53,7 @@ struct vector_t_server:
             double beta);
   HPX_DEFINE_COMPONENT_ACTION(vector_t_server, gemv);
   double nrm2_process() const;
-  HPX_DEFINE_COMPONENT_CONST_ACTION(vector_t_server, nrm2_process);
+  HPX_DEFINE_COMPONENT_ACTION(vector_t_server, nrm2_process);
   void scal(double alpha);
   HPX_DEFINE_COMPONENT_ACTION(vector_t_server, scal);
 };
@@ -131,7 +131,7 @@ struct matrix_t_server:
   {
     return (*data)(i,j);
   }
-  HPX_DEFINE_COMPONENT_CONST_ACTION(matrix_t_server, get_elt);
+  HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, get_elt);
   void set_elt(std::ptrdiff_t i, std::ptrdiff_t j, double x)
   {
     (*data)(i,j) = x;
@@ -147,9 +147,9 @@ struct matrix_t_server:
   HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, gemm);
   hpx::id_type gemv_process(bool trans, double alpha, const hpx::id_type& x)
     const;
-  HPX_DEFINE_COMPONENT_CONST_ACTION(matrix_t_server, gemv_process);
+  HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, gemv_process);
   double nrm2_process() const;
-  HPX_DEFINE_COMPONENT_CONST_ACTION(matrix_t_server, nrm2_process);
+  HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, nrm2_process);
   void scal(double alpha);
   HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, scal);
 };

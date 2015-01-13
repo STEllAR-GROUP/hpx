@@ -51,7 +51,7 @@ namespace hpx
                 HPX_ASSERT(traits::component_type_is_compatible<
                     typename Action::component_type>::call(addr));
                 return Action::execute_function(addr.address_,
-                    util::forward_as_tuple(std::forward<Ts>(vs)...));
+                    std::forward<Ts>(vs)...);
             }
         };
 

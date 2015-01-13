@@ -43,7 +43,7 @@ namespace hpx
             HPX_ASSERT(traits::component_type_is_compatible<
                 typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
-                util::forward_as_tuple(std::forward<Arg0>( arg0 )));
+                std::forward<Arg0>( arg0 ));
             return true; 
         }
         
@@ -56,7 +56,7 @@ namespace hpx
             HPX_ASSERT(traits::component_type_is_compatible<
                 typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
-                util::forward_as_tuple(std::move(arg0)));
+                std::move(arg0));
             return true; 
         }
         template <typename Action, typename Arg0>
@@ -147,7 +147,7 @@ namespace hpx
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, target, addr.address_, priority,
-                util::forward_as_tuple(std::forward<Arg0>( arg0 )));
+                std::forward<Arg0>( arg0 ));
             return true; 
         }
         template <typename Action, typename Arg0>
@@ -309,7 +309,7 @@ namespace hpx
             HPX_ASSERT(traits::component_type_is_compatible<
                 typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
-                util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 )));
+                std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
             return true; 
         }
         
@@ -322,7 +322,7 @@ namespace hpx
             HPX_ASSERT(traits::component_type_is_compatible<
                 typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
-                util::forward_as_tuple(std::move(arg0) , std::move(arg1)));
+                std::move(arg0) , std::move(arg1));
             return true; 
         }
         template <typename Action, typename Arg0 , typename Arg1>
@@ -413,7 +413,7 @@ namespace hpx
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, target, addr.address_, priority,
-                util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 )));
+                std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
             return true; 
         }
         template <typename Action, typename Arg0 , typename Arg1>
@@ -575,7 +575,7 @@ namespace hpx
             HPX_ASSERT(traits::component_type_is_compatible<
                 typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
-                util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 )));
+                std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
             return true; 
         }
         
@@ -588,7 +588,7 @@ namespace hpx
             HPX_ASSERT(traits::component_type_is_compatible<
                 typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
-                util::forward_as_tuple(std::move(arg0) , std::move(arg1) , std::move(arg2)));
+                std::move(arg0) , std::move(arg1) , std::move(arg2));
             return true; 
         }
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2>
@@ -679,7 +679,7 @@ namespace hpx
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, target, addr.address_, priority,
-                util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 )));
+                std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
             return true; 
         }
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2>
@@ -841,7 +841,7 @@ namespace hpx
             HPX_ASSERT(traits::component_type_is_compatible<
                 typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
-                util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 )));
+                std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
             return true; 
         }
         
@@ -854,7 +854,7 @@ namespace hpx
             HPX_ASSERT(traits::component_type_is_compatible<
                 typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
-                util::forward_as_tuple(std::move(arg0) , std::move(arg1) , std::move(arg2) , std::move(arg3)));
+                std::move(arg0) , std::move(arg1) , std::move(arg2) , std::move(arg3));
             return true; 
         }
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
@@ -945,7 +945,7 @@ namespace hpx
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, target, addr.address_, priority,
-                util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 )));
+                std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
             return true; 
         }
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
@@ -1107,7 +1107,7 @@ namespace hpx
             HPX_ASSERT(traits::component_type_is_compatible<
                 typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
-                util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 )));
+                std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
             return true; 
         }
         
@@ -1120,7 +1120,7 @@ namespace hpx
             HPX_ASSERT(traits::component_type_is_compatible<
                 typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
-                util::forward_as_tuple(std::move(arg0) , std::move(arg1) , std::move(arg2) , std::move(arg3) , std::move(arg4)));
+                std::move(arg0) , std::move(arg1) , std::move(arg2) , std::move(arg3) , std::move(arg4));
             return true; 
         }
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
@@ -1211,7 +1211,7 @@ namespace hpx
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, target, addr.address_, priority,
-                util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 )));
+                std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
             return true; 
         }
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>

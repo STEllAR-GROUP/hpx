@@ -77,9 +77,9 @@ namespace hpx { namespace lcos
                 set_result_locked(which, std::move(t), l);
             }
 
-            HPX_DEFINE_COMPONENT_CONST_ACTION_TPL(
+            HPX_DEFINE_COMPONENT_ACTION(
                 gather_server, get_result, get_result_action);
-            HPX_DEFINE_COMPONENT_ACTION_TPL(
+            HPX_DEFINE_COMPONENT_ACTION(
                 gather_server, set_result, set_result_action);
 
         protected:

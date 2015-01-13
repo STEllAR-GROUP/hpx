@@ -574,7 +574,7 @@ namespace hpx { namespace lcos
                     fold_invoker_type;
 
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(fold_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(fold_invoker_type::call)::type
                     type;
             };
         };

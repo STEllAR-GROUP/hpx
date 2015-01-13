@@ -38,16 +38,16 @@ namespace hpx { namespace components { namespace security { namespace server
 
         bool is_valid() const;
 
-        HPX_DEFINE_COMPONENT_CONST_ACTION(
+        HPX_DEFINE_COMPONENT_ACTION(
             certificate_authority_base
           , sign_certificate_signing_request_nonvirt
           , sign_certificate_signing_request_action);
 
-        HPX_DEFINE_COMPONENT_CONST_ACTION(
+        HPX_DEFINE_COMPONENT_ACTION(
             certificate_authority_base
           , get_certificate);
 
-        HPX_DEFINE_COMPONENT_CONST_ACTION(
+        HPX_DEFINE_COMPONENT_ACTION(
             certificate_authority_base
           , is_valid);
 
