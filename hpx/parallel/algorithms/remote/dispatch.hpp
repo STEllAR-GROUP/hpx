@@ -237,7 +237,7 @@ namespace hpx { namespace parallel { namespace util { namespace remote
     }
 }}}}
 
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40700
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40800
 
 HPX_REGISTER_PLAIN_ACTION_TEMPLATE(
     (template <typename Algo, typename ExPolicy, typename IsSeq, typename R,
