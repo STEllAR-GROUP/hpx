@@ -543,15 +543,17 @@ namespace hpx { namespace parcelset
             std::vector<locality> destinations;
 
             {
-                lcos::local::spinlock::scoped_lock l(mtx_);
-                destinations.reserve(parcel_destinations_.size());
-                if (parcel_destinations_.empty())
-                    return true;
-
-                destinations.reserve(parcel_destinations_.size());
-                BOOST_FOREACH(locality const& loc, parcel_destinations_)
+                lcos::local::spinlock::scoped_try_lock l(mtx_);
+                if(l)
                 {
-                    destinations.push_back(loc);
+                    if (parcel_destinations_.empty())
+                        return true;
+
+                    destinations.reserve(parcel_destinations_.size());
+                    BOOST_FOREACH(locality const& loc, parcel_destinations_)
+                    {
+                        destinations.push_back(loc);
+                    }
                 }
             }
 

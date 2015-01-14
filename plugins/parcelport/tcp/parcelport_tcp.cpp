@@ -37,7 +37,6 @@ namespace hpx { namespace traits
     };
 }}
 
-HPX_REGISTER_PLUGIN_MODULE();
 HPX_REGISTER_PARCELPORT(
     hpx::parcelset::policies::tcp::connection_handler,
     tcp);

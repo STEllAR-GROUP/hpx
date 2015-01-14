@@ -16,6 +16,7 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
+#include <hpx/runtime/parcelset/static_parcelports.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -127,117 +128,18 @@ namespace hpx { namespace parcelset
         enable_parcel_handling_(true),
         count_routed_(0)
     {
-        namespace fs = boost::filesystem;
-        // load all parcelports as described in the configuration information
-        if (!cfg.has_section("hpx.parcel")) {
-            LRT_(info) << "No parcelports found/loaded.";
-            return;     // no plugins to load
-        }
-
-        util::section* sec = cfg.get_section("hpx.parcel");
-        if (NULL == sec)
+        BOOST_FOREACH(plugins::parcelport_factory_base *factory, get_parcelport_factories())
         {
-            LRT_(error) << "NULL section found";
-            return;     // something bad happened
+            boost::shared_ptr<parcelport> pp;
+            pp.reset(
+                factory->create(
+                    cfg
+                  , on_start_thread
+                  , on_stop_thread
+                )
+            );
+            attach_parcelport(pp);
         }
-
-        util::section::section_map const& s = (*sec).get_sections();
-        typedef util::section::section_map::const_iterator iterator;
-        iterator end = s.end();
-        for (iterator i = s.begin (); i != end; ++i)
-        {
-            // the section name is the instance name of the component
-            util::section const& sect = i->second;
-            std::string instance (sect.get_name());
-            std::string parcelport;
-
-            if (i->second.has_entry("name"))
-                parcelport = sect.get_entry("name");
-            else
-                parcelport = instance;
-
-            bool isenabled = true;
-            if (sect.has_entry("enabled")) {
-                std::string tmp = sect.get_entry("enabled");
-                boost::algorithm::to_lower (tmp);
-                if (tmp == "no" || tmp == "false" || tmp == "0") {
-                    LRT_(info) << "parcelport factory disabled: " << instance;
-                    isenabled = false;     // this parcelport has been disabled
-                }
-            }
-            fs::path lib;
-            try {
-                if (sect.has_entry("path"))
-                    lib = hpx::util::create_path(sect.get_entry("path"));
-                else
-                    lib = hpx::util::create_path(HPX_DEFAULT_COMPONENT_PATH);
-
-                if (sect.get_entry("static", "0") == "1") {
-                    // FIXME: implement statically linked plugins
-                }
-                else {
-#if defined(HPX_STATIC_LINKING)
-                    HPX_THROW_EXCEPTION(service_unavailable,
-                        "parcelset::parcelset",
-                        "static linking configuration does not support dynamic "
-                        "loading of parcelport '" + instance + "'");
-#else
-                    // first, try using the path as the full path to the library
-                    if (!load_parcelport(cfg, instance, parcelport, lib, isenabled, on_start_thread, on_stop_thread))
-                    {
-                        // build path to component to load
-                        std::string libname(HPX_MAKE_DLL_STRING(parcelport));
-                        lib /= hpx::util::create_path(libname);
-                        if (!load_parcelport(cfg, instance, parcelport, lib, isenabled, on_start_thread, on_stop_thread))
-                        {
-                            continue;   // next please :-P
-                        }
-                    }
-#endif
-                }
-            }
-            catch (hpx::exception const& e) {
-                LRT_(warning) << "caught exception while loading " << instance
-                              << ", " << e.get_error_code().get_message()
-                              << ": " << e.what();
-            }
-        } // for
-    }
-
-    std::vector<std::string> parcelhandler::load_runtime_configuration()
-    {
-        /// TODO: properly hide this in plugins ...
-        std::vector<std::string> ini_defs;
-
-        using namespace boost::assign;
-        ini_defs +=
-            "[hpx.parcel]",
-            "address = ${HPX_PARCEL_SERVER_ADDRESS:" HPX_INITIAL_IP_ADDRESS "}",
-            "port = ${HPX_PARCEL_SERVER_PORT:"
-                BOOST_PP_STRINGIZE(HPX_INITIAL_IP_PORT) "}",
-            "bootstrap = ${HPX_PARCEL_BOOTSTRAP:" HPX_PARCEL_BOOTSTRAP "}",
-            "max_connections = ${HPX_PARCEL_MAX_CONNECTIONS:"
-                BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_CONNECTIONS) "}",
-            "max_connections_per_locality = ${HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY:"
-                BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY) "}",
-            "max_message_size = ${HPX_PARCEL_MAX_MESSAGE_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_MESSAGE_SIZE) "}",
-            "max_outbound_message_size = ${HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE) "}",
-#ifdef BOOST_BIG_ENDIAN
-            "endian_out = ${HPX_PARCEL_ENDIAN_OUT:big}",
-#else
-            "endian_out = ${HPX_PARCEL_ENDIAN_OUT:little}",
-#endif
-            "array_optimization = ${HPX_PARCEL_ARRAY_OPTIMIZATION:1}",
-            "zero_copy_optimization = ${HPX_PARCEL_ZERO_COPY_OPTIMIZATION:"
-                "$[hpx.parcel.array_optimization]}",
-            "enable_security = ${HPX_PARCEL_ENABLE_SECURITY:0}",
-            "async_serialization = ${HPX_PARCEL_ASYNC_SERIALIZATION:1}"
-            ;
-
-
-        return ini_defs;
     }
 
     boost::shared_ptr<parcelport> parcelhandler::get_bootstrap_parcelport() const
@@ -308,89 +210,6 @@ namespace hpx { namespace parcelset
         strm << '\n';
     }
 
-    bool parcelhandler::load_parcelport(util::section& ini,
-        std::string const& instance, std::string const& plugin,
-        boost::filesystem::path const& lib, bool isenabled,
-        HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
-        HPX_STD_FUNCTION<void()> const& on_stop_thread)
-    {
-        namespace fs = boost::filesystem;
-        if (fs::extension(lib) != HPX_SHARED_LIB_EXTENSION)
-            return false;
-
-        try {
-            // get the handle of the library
-            error_code ec(lightweight);
-            hpx::util::plugin::dll d(lib.string(), HPX_MANGLE_STRING(plugin));
-
-            d.load_library(ec);
-            if (ec) {
-                LRT_(warning) << "dynamic loading failed: " << lib.string()
-                              << ": " << instance << ": " << get_error_what(ec);
-                return false;
-            }
-
-            // initialize the factory instance using the preferences from the
-            // ini files
-            util::section const* glob_ini = NULL;
-            if (ini.has_section("settings"))
-                glob_ini = ini.get_section("settings");
-
-            util::section const* plugin_ini = NULL;
-            std::string plugin_section("hpx.parcel." + instance);
-            if (ini.has_section(plugin_section))
-                plugin_ini = ini.get_section(plugin_section);
-
-            if (0 != plugin_ini &&
-                "0" != plugin_ini->get_entry("no_factory", "0"))
-            {
-                return false;
-            }
-
-            // get the factory
-            hpx::util::plugin::plugin_factory<plugins::plugin_factory_base>
-                pf (d, "factory");
-
-            // create the component factory object, if not disabled
-            boost::shared_ptr<plugins::plugin_factory_base> factory (
-                pf.create(plugin, ec, glob_ini, plugin_ini, isenabled));
-            if (ec) {
-                LRT_(warning) << "dynamic loading failed: " << lib.string()
-                              << ": " << instance << ": " << get_error_what(ec);
-                return false;
-            }
-
-            attach_parcelport(
-                boost::shared_ptr<parcelport>(
-                    boost::static_pointer_cast<plugins::parcelport_factory_base>(
-                        factory
-                    )->create(
-                        hpx::get_config()
-                      , on_start_thread
-                      , on_stop_thread
-                    )
-                )
-            );
-
-            LRT_(info) << "dynamic loading succeeded: " << lib.string()
-                        << ": " << instance;
-        }
-        catch (hpx::exception const&) {
-            throw;
-        }
-        catch (std::logic_error const& e) {
-            LRT_(warning) << "dynamic loading failed: " << lib.string()
-                          << ": " << instance << ": " << e.what();
-            return false;
-        }
-        catch (std::exception const& e) {
-            LRT_(warning) << "dynamic loading failed: " << lib.string()
-                          << ": " << instance << ": " << e.what();
-            return false;
-        }
-        return true;    // component got loaded
-    }
-
     void parcelhandler::attach_parcelport(boost::shared_ptr<parcelport> const& pp)
     {
         if(!pp) return;
@@ -432,20 +251,24 @@ namespace hpx { namespace parcelset
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void parcelhandler::do_background_work(bool stop_buffering)
+    void parcelhandler::do_background_work(std::size_t num_thread, bool stop_buffering)
     {
         // flush all parcel buffers
+        if(0 == num_thread)
         {
-            mutex_type::scoped_lock l(handlers_mtx_);
+            mutex_type::scoped_try_lock l(handlers_mtx_);
 
-            message_handler_map::iterator end = handlers_.end();
-            for (message_handler_map::iterator it = handlers_.begin(); it != end; ++it)
+            if(l)
             {
-                if ((*it).second)
+                message_handler_map::iterator end = handlers_.end();
+                for (message_handler_map::iterator it = handlers_.begin(); it != end; ++it)
                 {
-                    boost::shared_ptr<policies::message_handler> p((*it).second);
-                    util::scoped_unlock<mutex_type::scoped_lock> ul(l);
-                    p->flush(stop_buffering);
+                    if ((*it).second)
+                    {
+                        boost::shared_ptr<policies::message_handler> p((*it).second);
+                        util::scoped_unlock<mutex_type::scoped_try_lock> ul(l);
+                        p->flush(stop_buffering);
+                    }
                 }
             }
         }
@@ -471,14 +294,12 @@ namespace hpx { namespace parcelset
 
     naming::resolver_client& parcelhandler::get_resolver()
     {
-        HPX_ASSERT(resolver_ != 0);
-        return *resolver_;
+        return resolver_;
     }
 
     naming::gid_type const& parcelhandler::get_locality() const
     {
-        HPX_ASSERT(resolver_ != 0);
-        return resolver_->get_local_locality();
+        return resolver_.get_local_locality();
     }
 
     bool parcelhandler::get_raw_remote_localities(
@@ -487,8 +308,7 @@ namespace hpx { namespace parcelset
     {
         std::vector<naming::gid_type> allprefixes;
 
-        HPX_ASSERT(resolver_ != 0);
-        bool result = resolver_->get_localities(allprefixes, type, ec);
+        bool result = resolver_.get_localities(allprefixes, type, ec);
         if (ec || !result) return false;
 
         std::remove_copy(allprefixes.begin(), allprefixes.end(),
@@ -501,8 +321,7 @@ namespace hpx { namespace parcelset
         std::vector<naming::gid_type>& locality_ids,
         components::component_type type, error_code& ec) const
     {
-        HPX_ASSERT(resolver_ != 0);
-        bool result = resolver_->get_localities(locality_ids, type, ec);
+        bool result = resolver_.get_localities(locality_ids, type, ec);
         if (ec || !result) return false;
 
         return !locality_ids.empty();
@@ -595,8 +414,7 @@ namespace hpx { namespace parcelset
 #if !defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
         if (!addrs[0])
         {
-            HPX_ASSERT(resolver_ != 0);
-            resolved_locally = resolver_->resolve_local(ids[0], addrs[0]);
+            resolved_locally = resolver_.resolve_local(ids[0], addrs[0]);
         }
 #else
         std::size_t size = p.size();
@@ -607,14 +425,13 @@ namespace hpx { namespace parcelset
             return;
         }
 
-        HPX_ASSERT(resolver_ != 0);
         if (1 == size) {
             if (!addrs[0])
-                resolved_locally = resolver_->resolve_local(ids[0], addrs[0]);
+                resolved_locally = resolver_.resolve_local(ids[0], addrs[0]);
         }
         else {
             boost::dynamic_bitset<> locals;
-            resolved_locally = resolver_->resolve_local(ids, addrs, size, locals);
+            resolved_locally = resolver_.resolve_local(ids, addrs, size, locals);
         }
 #endif
 
@@ -650,8 +467,7 @@ namespace hpx { namespace parcelset
         // to the AGAS managing the destination.
         ++count_routed_;
 
-        HPX_ASSERT(resolver_ != 0);
-        resolver_->route(p, f);
+        resolver_.route(p, f);
     }
 
     std::size_t parcelhandler::get_outgoing_queue_length(bool reset) const
@@ -1302,6 +1118,71 @@ namespace hpx { namespace parcelset
         };
         performance_counters::install_counter_types(connection_cache_types,
             sizeof(connection_cache_types)/sizeof(connection_cache_types[0]));
+    }
+
+    std::vector<plugins::parcelport_factory_base *> &
+    parcelhandler::get_parcelport_factories()
+    {
+        static std::vector<plugins::parcelport_factory_base *> factories;
+        if(factories.empty())
+        {
+            init_static_parcelport_factories();
+        }
+
+        return factories;
+    }
+
+    void parcelhandler::add_parcelport_factory(plugins::parcelport_factory_base *factory)
+    {
+        get_parcelport_factories().push_back(factory);
+    }
+
+    void parcelhandler::init(int *argc, char ***argv, util::command_line_handling &cfg)
+    {
+        BOOST_FOREACH(plugins::parcelport_factory_base *factory, get_parcelport_factories())
+        {
+            factory->init(argc, argv, cfg);
+        }
+    }
+
+    std::vector<std::string> parcelhandler::load_runtime_configuration()
+    {
+        /// TODO: properly hide this in plugins ...
+        std::vector<std::string> ini_defs;
+
+        using namespace boost::assign;
+        ini_defs +=
+            "[hpx.parcel]",
+            "address = ${HPX_PARCEL_SERVER_ADDRESS:" HPX_INITIAL_IP_ADDRESS "}",
+            "port = ${HPX_PARCEL_SERVER_PORT:"
+                BOOST_PP_STRINGIZE(HPX_INITIAL_IP_PORT) "}",
+            "bootstrap = ${HPX_PARCEL_BOOTSTRAP:" HPX_PARCEL_BOOTSTRAP "}",
+            "max_connections = ${HPX_PARCEL_MAX_CONNECTIONS:"
+                BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_CONNECTIONS) "}",
+            "max_connections_per_locality = ${HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY:"
+                BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY) "}",
+            "max_message_size = ${HPX_PARCEL_MAX_MESSAGE_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_MESSAGE_SIZE) "}",
+            "max_outbound_message_size = ${HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE) "}",
+#ifdef BOOST_BIG_ENDIAN
+            "endian_out = ${HPX_PARCEL_ENDIAN_OUT:big}",
+#else
+            "endian_out = ${HPX_PARCEL_ENDIAN_OUT:little}",
+#endif
+            "array_optimization = ${HPX_PARCEL_ARRAY_OPTIMIZATION:1}",
+            "zero_copy_optimization = ${HPX_PARCEL_ZERO_COPY_OPTIMIZATION:"
+                "$[hpx.parcel.array_optimization]}",
+            "enable_security = ${HPX_PARCEL_ENABLE_SECURITY:0}",
+            "async_serialization = ${HPX_PARCEL_ASYNC_SERIALIZATION:1}"
+            ;
+
+        BOOST_FOREACH(plugins::parcelport_factory_base *factory, get_parcelport_factories())
+        {
+            factory->get_plugin_info(ini_defs);
+        }
+
+        return ini_defs;
     }
 }}
 

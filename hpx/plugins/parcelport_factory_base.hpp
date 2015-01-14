@@ -8,10 +8,6 @@
 #define HPX_PLUGINS_PARCELPORT_FACTORY_BASE_HPP
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/plugins/plugin_factory_base.hpp>
-
-#include <hpx/util/plugin.hpp>
-#include <hpx/util/plugin/export_plugin.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace plugins
@@ -19,9 +15,15 @@ namespace hpx { namespace plugins
     ///////////////////////////////////////////////////////////////////////////
     /// The \a plugin_factory_base has to be used as a base class for all
     /// plugin factories.
-    struct HPX_EXPORT parcelport_factory_base : plugin_factory_base
+    struct HPX_EXPORT parcelport_factory_base
     {
         virtual ~parcelport_factory_base() {}
+
+        void force_init() {}
+
+        virtual void get_plugin_info(std::vector<std::string> & fillini) = 0;
+
+        virtual void init(int *argc, char ***argv, util::command_line_handling &cfg) = 0;
 
         /// Create a new instance of a parcelport
         ///
@@ -34,6 +36,7 @@ namespace hpx { namespace plugins
     };
 }}
 
+/*
 ///////////////////////////////////////////////////////////////////////////////
 /// This macro is used to register the given component factory with
 /// Hpx.Plugin. This macro has to be used for each of the component factories.
@@ -41,6 +44,7 @@ namespace hpx { namespace plugins
     HPX_PLUGIN_EXPORT(HPX_PLUGIN_PLUGIN_PREFIX,                               \
         hpx::plugins::plugin_factory_base, FactoryType,                       \
         pluginname, factory)                                                  \
+*/
 /**/
 
 #endif

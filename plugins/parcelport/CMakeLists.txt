@@ -9,15 +9,85 @@ set(parcelport_plugins
   mpi
   tcp)
 
+set(HPX_STATIC_PARCELPORT_PLUGINS "" CACHE INTERNAL "" FORCE)
+set(HPX_STATIC_PARCELPORT_PLUGINS_SOURCES "" CACHE INTERNAL "" FORCE)
+
+macro(add_parcelport name)
+  set(name_short ${name})
+  set(name "parcelport_${name}")
+  set(options STATIC)
+  set(one_value_args FOLDER)
+  set(multi_value_args SOURCES HEADERS DEPENDENCIES COMPILE_FLAGS LINK_FLAGS)
+  cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+
+  add_hpx_source_group(
+    NAME ${name}
+    CLASS "Source Files"
+    ROOT "."
+    TARGETS ${${name}_SOURCES})
+
+  add_hpx_source_group(
+    NAME ${name}
+    CLASS "Source Files"
+    ROOT "."
+    TARGETS ${${name}_HEADERS})
+
+  set_source_files_properties(
+    ${${name}_SOURCES}
+    PROPERTIES
+    INCLUDE_DIRECTORIES "${${name}_INCLUDE_DIRECTORIES}"
+  )
+
+  if(${${name}_STATIC})
+    set(HPX_STATIC_PARCELPORT_PLUGINS
+      ${HPX_STATIC_PARCELPORT_PLUGINS}
+      ${name}
+      CACHE INTERNAL "" FORCE)
+    set(HPX_STATIC_PARCELPORT_PLUGINS_SOURCES
+      ${HPX_STATIC_PARCELPORT_PLUGINS_SOURCES}
+      ${${name}_SOURCES}
+      CACHE INTERNAL "" FORCE)
+    set(HPX_LIBRARIES ${HPX_LIBRARIES} ${${name}_DEPENDENCIES})
+  else()
+    add_hpx_library(${name}
+        PLUGIN
+        SOURCES ${${name}_SOURCES}
+        HEADERS ${${name}_HEADERS}
+        FOLDER ${${name}_FOLDER}
+        COMPILE_FLAGS ${${name}_COMPILE_FLAGS}
+        LINK_FLAGS ${${name}_LINK_FLAGS}
+        DEPENDENCIES ${${name}_DEPENDENCIES}
+        )
+
+    add_hpx_pseudo_dependencies(plugins.parcelport.${name_short} ${name}_lib)
+    add_hpx_pseudo_dependencies(core plugins.parcelport.${name_short})
+  endif()
+
+endmacro()
+
+macro(add_static_parcelport parcelport)
+set(HPX_STATIC_PARCELPORT_PLUGINS ${HPX_STATIC_PARCELPORT_PLUGINS} "${parcelport}" CACHE INTERNAL "" FORCE)
+endmacro()
+
 foreach(type ${parcelport_plugins})
   add_hpx_pseudo_target(plugins.parcelport.${type})
   add_subdirectory(${type})
   add_hpx_pseudo_dependencies(plugins.parcelport plugins.parcelport.${type})
 endforeach()
 
+macro(add_static_parcelports)
+  add_parcelport_mpi_module()
+  add_parcelport_tcp_module()
+endmacro()
+
 macro(add_parcelport_modules)
   add_parcelport_ibverbs_module()
   add_parcelport_ipc_module()
-  add_parcelport_mpi_module()
-  add_parcelport_tcp_module()
+  foreach(parcelport ${HPX_STATIC_PARCELPORT_PLUGINS})
+    set(_parcelports_export "${parcelport_export}extern hpx::plugins::parcelport_factory_base *parcelport_${parcelport}_factory_base_ptr;\n")
+    set(_parcelports_init "${parcelport_export}        parcelport_${parcelport}_factory_base_ptr->force_init();\n")
+  endforeach()
+  configure_file("${hpx_SOURCE_DIR}/cmake/templates/static_parcelports.hpp.in"
+                 "${CMAKE_BINARY_DIR}/hpx/runtime/parcelset/static_parcelports.hpp"
+                 @ONLY)
 endmacro()

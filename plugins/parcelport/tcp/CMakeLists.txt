@@ -10,8 +10,9 @@ if(HPX_PARCELPORT_TCP)
 
   macro(add_parcelport_tcp_module)
     hpx_debug("add_parcelport_tcp_module")
-    add_hpx_library(parcelport_tcp
-        PLUGIN
+    add_parcelport(
+        tcp
+        STATIC
         SOURCES "${hpx_SOURCE_DIR}/plugins/parcelport/tcp/connection_handler_tcp.cpp"
                 "${hpx_SOURCE_DIR}/plugins/parcelport/tcp/parcelport_tcp.cpp"
         HEADERS
@@ -21,9 +22,6 @@ if(HPX_PARCELPORT_TCP)
               "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/tcp/sender.hpp"
         FOLDER "Core/Plugins/Parcelport/Tcp"
         )
-
-    add_hpx_pseudo_dependencies(plugins.parcelport.tcp parcelport_tcp_lib)
-    add_hpx_pseudo_dependencies(core plugins.parcelport.tcp)
   endmacro()
 else()
   macro(add_parcelport_tcp_module)

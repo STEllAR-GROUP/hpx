@@ -116,8 +116,6 @@ namespace hpx
     {
         class HPX_API_EXPORT locality;
 
-        typedef std::map<std::string, locality> endpoints_type;
-
         class HPX_API_EXPORT parcel;
         class HPX_API_EXPORT parcelport;
         class HPX_API_EXPORT parcelhandler;
@@ -142,7 +140,7 @@ namespace hpx
             std::size_t interval, locality const& l,
             error_code& ec = throws);
 
-        HPX_API_EXPORT void do_background_work();
+        HPX_API_EXPORT void do_background_work(std::size_t num_thread = 0);
     }
 
     namespace util

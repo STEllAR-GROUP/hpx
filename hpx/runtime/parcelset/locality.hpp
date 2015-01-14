@@ -252,6 +252,8 @@ namespace hpx { namespace parcelset
         };
     };
 
+    typedef std::map<std::string, locality> endpoints_type;
+
     std::ostream& operator<< (std::ostream& os, endpoints_type const& endpoints);
 }}
 

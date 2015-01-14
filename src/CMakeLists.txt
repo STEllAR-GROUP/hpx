@@ -224,6 +224,10 @@ if(NOT HPX_STATIC_LINKING)
   set(hpx_targets ${hpx_targets} hpx_serialization)
 endif()
 
+# Add static parcelport sources ...
+add_static_parcelports()
+set(hpx_SOURCES ${hpx_SOURCES} ${HPX_STATIC_PARCELPORT_PLUGINS_SOURCES})
+
 ################################################################################
 # libhpx
 if(HPX_STATIC_LINKING)
@@ -236,6 +240,7 @@ else()
   add_library(hpx ${hpx_library_link_mode_core} EXCLUDE_FROM_ALL
     ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
 endif()
+
 
 #if(HPX_STATIC_LINKING)
 #  add_dependencies(hpx static_component_data_hpp)

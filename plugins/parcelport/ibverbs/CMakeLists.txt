@@ -28,8 +28,7 @@ if(HPX_PARCELPORT_IBVERBS)
 
   macro(add_parcelport_ibverbs_module)
     hpx_debug("add_parcelport_ibverbs_module")
-    add_hpx_library(parcelport_ibverbs
-        PLUGIN
+    add_parcelport(ibverbs
         SOURCES "${hpx_SOURCE_DIR}/plugins/parcelport/ibverbs/connection_handler_ibverbs.cpp"
                 "${hpx_SOURCE_DIR}/plugins/parcelport/ibverbs/parcelport_ibverbs.cpp"
         HEADERS
@@ -51,11 +50,7 @@ if(HPX_PARCELPORT_IBVERBS)
               ${RDMACM_LIBRARIES}
         FOLDER "Core/Plugins/Parcelport/Ibverbs"
         )
-
-    add_hpx_pseudo_dependencies(plugins.parcelport.ibverbs parcelport_ibverbs_lib)
-    add_hpx_pseudo_dependencies(core plugins.parcelport.ibverbs)
   endmacro()
-
 else()
   macro(add_parcelport_ibverbs_module)
   endmacro()

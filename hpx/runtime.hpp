@@ -10,6 +10,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/static_reinit.hpp>
 #include <hpx/util/runtime_configuration.hpp>

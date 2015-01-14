@@ -400,8 +400,11 @@ namespace hpx { namespace threads { namespace detail
                 }
 
                 // do background work in parcel layer and in agas
-                hpx::parcelset::do_background_work();
-                hpx::agas::garbage_collect_non_blocking();
+                hpx::parcelset::do_background_work(num_thread);
+                if (0 == num_thread)
+                {
+                    hpx::agas::garbage_collect_non_blocking();
+                }
             }
 
             if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX)
@@ -409,8 +412,11 @@ namespace hpx { namespace threads { namespace detail
                 busy_loop_count = 0;
 
                 // do background work in parcel layer and in agas
-                hpx::parcelset::do_background_work();
-                hpx::agas::garbage_collect_non_blocking();
+                hpx::parcelset::do_background_work(num_thread);
+                if (0 == num_thread)
+                {
+                    hpx::agas::garbage_collect_non_blocking();
+                }
             }
             else if (idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX)
             {

@@ -62,7 +62,7 @@ macro(add_hpx_library name)
       ROOT ${${name}_HEADER_ROOT}
       TARGETS ${${name}_HEADERS})
   else()
-    add_hpx_library_sources_noglob(${name}_component
+    add_hpx_library_sources_noglob(${name}_lib
         SOURCES "${${name}_SOURCES}")
 
     add_hpx_source_group(
@@ -71,7 +71,7 @@ macro(add_hpx_library name)
       ROOT ${${name}_SOURCE_ROOT}
       TARGETS ${${name}_lib_SOURCES})
 
-    add_hpx_library_headers_noglob(${name}_component
+    add_hpx_library_headers_noglob(${name}_lib
         HEADERS "${${name}_HEADERS}")
 
     add_hpx_source_group(
@@ -149,6 +149,10 @@ macro(add_hpx_library name)
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/${${name}_OUTPUT_SUFFIX}"
         ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/${${name}_OUTPUT_SUFFIX}")
     endif()
+  endif()
+
+  if(${${name}_NOLIBS})
+    set(_target_flags ${_target_flags} NOLIBS)
   endif()
 
   hpx_setup_target(

@@ -555,29 +555,36 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
         }
         else
         {
-            hpx::util::scoped_unlock<mutex_type::scoped_lock> ul(l);
-            future<parcelset::endpoints_type> endpoints_future =
-                hosted->locality_ns_.service_async<parcelset::endpoints_type>(
-                    req
-                  , action_priority_
-                );
-            if(0 == threads::get_self_ptr())
             {
-                while(!endpoints_future.is_ready()) ;
+                hpx::util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+                future<parcelset::endpoints_type> endpoints_future =
+                    hosted->locality_ns_.service_async<parcelset::endpoints_type>(
+                        req
+                      , action_priority_
+                    );
+                if(0 == threads::get_self_ptr())
+                {
+                    while(!endpoints_future.is_ready()) ;
+                }
+                endpoints = endpoints_future.get(ec);
             }
-            endpoints = endpoints_future.get(ec);
+            // Search again ... might have been added by a different thread already
+            it = resolved_localities_.find(gid);
         }
-        if(HPX_UNLIKELY(!util::insert_checked(resolved_localities_.insert(
-            std::make_pair(
-                gid
-              , endpoints
-            )
-        ), it)))
+        if(it == resolved_localities_.end())
         {
-            HPX_THROWS_IF(ec, internal_server_error
-              , "addressing_service::resolve_locality"
-              , "resolved locality insertion failed "
-                "due to a locking error or memory corruption");
+            if(HPX_UNLIKELY(!util::insert_checked(resolved_localities_.insert(
+                std::make_pair(
+                    gid
+                  , endpoints
+                )
+            ), it)))
+            {
+                HPX_THROWS_IF(ec, internal_server_error
+                  , "addressing_service::resolve_locality"
+                  , "resolved locality insertion failed "
+                    "due to a locking error or memory corruption");
+            }
         }
     }
     return it->second;

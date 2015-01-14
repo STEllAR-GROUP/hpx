@@ -13,8 +13,7 @@ if(HPX_PARCELPORT_IPC)
 
   macro(add_parcelport_ipc_module)
     hpx_debug("add_parcelport_ipc_module")
-    add_hpx_library(parcelport_ipc
-        PLUGIN
+    add_parcelport(ipc
         SOURCES "${hpx_SOURCE_DIR}/plugins/parcelport/ipc/connection_handler_ipc.cpp"
                 "${hpx_SOURCE_DIR}/plugins/parcelport/ipc/parcelport_ipc.cpp"
         HEADERS
@@ -30,9 +29,6 @@ if(HPX_PARCELPORT_IPC)
               "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/ipc/sender.hpp"
         FOLDER "Core/Plugins/Parcelport/Tcp"
         )
-
-    add_hpx_pseudo_dependencies(plugins.parcelport.ipc parcelport_ipc_lib)
-    add_hpx_pseudo_dependencies(core plugins.parcelport.ipc)
   endmacro()
 else()
   macro(add_parcelport_ipc_module)

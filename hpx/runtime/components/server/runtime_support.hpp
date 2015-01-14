@@ -31,6 +31,7 @@
 #include <hpx/runtime/components/server/create_component_with_args.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/mutex.hpp>

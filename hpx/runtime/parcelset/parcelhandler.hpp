@@ -24,6 +24,8 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
+#include <hpx/plugins/parcelport_factory_base.hpp>
+
 #include <hpx/config/warnings_prefix.hpp>
 
 #include <map>
@@ -31,6 +33,7 @@
 
 namespace hpx { namespace parcelset
 {
+
     /// The \a parcelhandler is the representation of the parcelset inside a
     /// locality. It is built on top of a single parcelport. Several
     /// parcel-handlers may be connected to a single parcelport.
@@ -64,6 +67,7 @@ namespace hpx { namespace parcelset
         void rethrow_exception();
 
     public:
+
         typedef std::pair<locality, std::string> handler_key_type;
         typedef std::map<
             handler_key_type, boost::shared_ptr<policies::message_handler> >
@@ -92,15 +96,6 @@ namespace hpx { namespace parcelset
 
         ~parcelhandler() {}
 
-        void set_agas_resolver(naming::resolver_client& resolver)
-        {
-            HPX_ASSERT(resolver_ == 0);     // set only once
-            resolver_ = &resolver;
-        }
-
-        /// load runtime configuration settings ...
-        static std::vector<std::string> load_runtime_configuration();
-
         boost::shared_ptr<parcelport> get_bootstrap_parcelport() const;
 
         void initialize();
@@ -109,7 +104,7 @@ namespace hpx { namespace parcelset
         void stop(bool blocking = true);
 
         /// \ brief do background work in the parcel layer
-        void do_background_work(bool stop_buffering = false);
+        void do_background_work(std::size_t num_thread = 0, bool stop_buffering = false);
 
         /// \brief Allow access to AGAS resolver instance.
         ///
@@ -473,17 +468,11 @@ namespace hpx { namespace parcelset
             return pports_.find(priority)->second.get();
         }
 
-        bool load_parcelport(util::section& ini,
-            std::string const& instance, std::string const& plugin,
-            boost::filesystem::path const& lib, bool isenabled,
-            HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
-            HPX_STD_FUNCTION<void()> const& on_stop_thread);
-
         /// \brief Attach the given parcel port to this handler
         void attach_parcelport(boost::shared_ptr<parcelport> const& pp);
 
         /// The AGAS client
-        naming::resolver_client* resolver_;
+        naming::resolver_client& resolver_;
 
         /// the parcelport this handler is associated with
         typedef std::map<int, boost::shared_ptr<parcelport>, std::greater<int> > pports_type;
@@ -516,6 +505,17 @@ namespace hpx { namespace parcelset
 
         /// Count number of (outbound) parcels routed
         boost::atomic<boost::int64_t> count_routed_;
+
+    private:
+        static std::vector<plugins::parcelport_factory_base *> &
+            get_parcelport_factories();
+    public:
+        static void add_parcelport_factory(plugins::parcelport_factory_base *);
+
+        static void init(int *argc, char ***argv, util::command_line_handling &cfg);
+
+        /// load runtime configuration settings ...
+        static std::vector<std::string> load_runtime_configuration();
     };
 }}
 

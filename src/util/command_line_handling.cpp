@@ -844,6 +844,7 @@ namespace hpx { namespace util
         // Re-run program option analysis, ini settings (such as aliases)
         // will be considered now.
 
+        parcelset::parcelhandler::init(&argc, &argv, *this);
         BOOST_FOREACH(boost::shared_ptr<plugins::plugin_registry_base> & reg, plugin_registries)
         {
             reg->init(&argc, &argv, *this);

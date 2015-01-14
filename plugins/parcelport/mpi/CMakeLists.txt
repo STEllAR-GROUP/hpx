@@ -36,29 +36,25 @@ if(HPX_PARCELPORT_MPI)
       include_directories(${MPI_CXX_INCLUDE_PATH})
     endif()
     hpx_debug("add_parcelport_mpi_module")
-    add_hpx_library(parcelport_mpi
-        PLUGIN
-        SOURCES "${hpx_SOURCE_DIR}/plugins/parcelport/mpi/connection_handler_mpi.cpp"
-                "${hpx_SOURCE_DIR}/plugins/parcelport/mpi/mpi_environment.cpp"
-                "${hpx_SOURCE_DIR}/plugins/parcelport/mpi/parcelport_mpi.cpp"
-        HEADERS
-              "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/mpi/acceptor.hpp"
-              "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/mpi/allocator.hpp"
-              "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/mpi/connection_handler.hpp"
-              "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/mpi/header.hpp"
-              "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/mpi/locality.hpp"
-              "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/mpi/mpi_environment.hpp"
-              "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/mpi/sender.hpp"
-              "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/mpi/receiver.hpp"
-        DEPENDENCIES
-              ${MPI_CXX_LIBRARIES}
-              ${MPI_LIBRARY}
-              ${MPI_EXTRA_LIBRARY}
-        FOLDER "Core/Plugins/Parcelport/MPI"
-        )
-
-    add_hpx_pseudo_dependencies(plugins.parcelport.mpi parcelport_mpi_lib)
-    add_hpx_pseudo_dependencies(core plugins.parcelport.mpi)
+    add_parcelport(mpi
+      STATIC
+      SOURCES
+        "${hpx_SOURCE_DIR}/plugins/parcelport/mpi/connection_handler_mpi.cpp"
+        "${hpx_SOURCE_DIR}/plugins/parcelport/mpi/mpi_environment.cpp"
+        "${hpx_SOURCE_DIR}/plugins/parcelport/mpi/parcelport_mpi.cpp"
+      HEADERS
+        "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/mpi/connection_handler.hpp"
+        "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/mpi/header.hpp"
+        "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/mpi/locality.hpp"
+        "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/mpi/mpi_environment.hpp"
+        "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/mpi/sender.hpp"
+        "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/mpi/receiver.hpp"
+      DEPENDENCIES
+        ${MPI_CXX_LIBRARIES}
+        ${MPI_LIBRARY}
+        ${MPI_EXTRA_LIBRARY}
+      FOLDER "Core/Plugins/Parcelport/MPI"
+    )
   endmacro()
 else()
   macro(add_parcelport_mpi_module)

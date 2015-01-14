@@ -18,6 +18,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/traits/serialize_as_future.hpp>
 
 #include <boost/serialization/split_member.hpp>

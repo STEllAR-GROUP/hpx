@@ -3,6 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#define HPX_NO_VERSION_CHECK
+
 #include <hpx/hpx_fwd.hpp>
 
 #include <hpx/plugins/parcelport/mpi/connection_handler.hpp>
@@ -50,7 +52,6 @@ namespace hpx { namespace traits
     };
 }}
 
-HPX_REGISTER_PLUGIN_MODULE();
 HPX_REGISTER_PARCELPORT(
     hpx::parcelset::policies::mpi::connection_handler,
     mpi);
