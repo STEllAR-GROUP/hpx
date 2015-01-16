@@ -210,7 +210,7 @@ if(NOT HPX_STATIC_LINKING)
         debug ${Boost_SYSTEM_LIBRARY_DEBUG}
         optimized ${Boost_SYSTEM_LIBRARY_RELEASE}
         debug ${Boost_SERIALIZATION_LIBRARY_DEBUG}
-        optimized ${Boost_SERIALIZATION_LIBRARY_DEBUG})
+        optimized ${Boost_SERIALIZATION_LIBRARY_RELEASE})
   endif()
 
   target_link_libraries(hpx_serialization
