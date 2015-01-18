@@ -118,6 +118,7 @@ namespace hpx { namespace util
             "shutdown_timeout = ${HPX_SHUTDOWN_TIMEOUT:-1.0}",
 #ifdef HPX_HAVE_VERIFY_LOCKS
             "lock_detection = ${HPX_LOCK_DETECTION:0}",
+            "throw_on_held_lock = ${HPX_THROW_ON_HELD_LOCK:1}",
 #endif
 #ifdef HPX_HAVE_VERIFY_LOCKS_GLOBALLY
             "global_lock_detection = ${HPX_GLOBAL_LOCK_DETECTION:0}",
