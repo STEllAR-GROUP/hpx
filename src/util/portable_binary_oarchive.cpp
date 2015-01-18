@@ -2,7 +2,7 @@
 // portable_binary_oarchive.cpp
 
 // (C) Copyright 2002-7 Robert Ramey - http://www.rrsd.com .
-// Copyright (c) 2007-2013 Hartmut Kaiser
+// Copyright (c) 2007-2015 Hartmut Kaiser
 // Use, modification and distribution is subject to the Boost Software
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -50,6 +50,12 @@ namespace hpx { namespace util
 void portable_binary_oarchive::save_impl(
     boost::int64_t const l, char const maxsize)
 {
+#if defined(HPX_DEBUG_SERIALIZATION)
+    static char const type = 'i';
+    this->primitive_base_t::save(type);
+    this->primitive_base_t::save(maxsize);
+#endif
+
     char size = 0;
     if (l == 0) {
         this->primitive_base_t::save(size);
@@ -67,6 +73,8 @@ void portable_binary_oarchive::save_impl(
         ll >>= CHAR_BIT;
         ++size;
     } while (ll != 0);
+
+    HPX_ASSERT(size <= maxsize);
 
     this->primitive_base_t::save(size);
     this->primitive_base_t::save(negative);
@@ -92,6 +100,12 @@ void portable_binary_oarchive::save_impl(
 void portable_binary_oarchive::save_impl(
     boost::uint64_t const ul, char const maxsize)
 {
+#if defined(HPX_DEBUG_SERIALIZATION)
+    static char const type = 'u';
+    this->primitive_base_t::save(type);
+    this->primitive_base_t::save(maxsize);
+#endif
+
     char size = 0;
     if (ul == 0) {
         this->primitive_base_t::save(size);
@@ -104,6 +118,7 @@ void portable_binary_oarchive::save_impl(
         ++size;
     } while (ll != 0);
 
+    HPX_ASSERT(size <= maxsize);
     this->primitive_base_t::save(size);
 
     ll = ul;

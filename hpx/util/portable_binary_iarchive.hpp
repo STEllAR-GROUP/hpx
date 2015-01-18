@@ -22,7 +22,7 @@
 // portable_binary_iarchive.hpp
 
 // (C) Copyright 2002-7 Robert Ramey - http://www.rrsd.com .
-// Copyright (c) 2007-2013 Hartmut Kaiser
+// Copyright (c) 2007-2015 Hartmut Kaiser
 //
 // Use, modification and distribution is subject to the Boost Software
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -273,7 +273,7 @@ public:
       : primitive_base_t(buffer, inbound_data_size, flags_value),
         archive_base_t(flags_value)
     {
-        init(flags_value);
+        this->primitive_base_t::flags_ = init(flags_value);
     }
 
     template <typename Container>
@@ -283,7 +283,7 @@ public:
       : primitive_base_t(buffer, chunks, inbound_data_size, flags_value),
         archive_base_t(flags_value)
     {
-        init(flags_value);
+        this->primitive_base_t::flags_ = init(flags_value);
     }
 
     // the optimized load_array dispatches to load_binary

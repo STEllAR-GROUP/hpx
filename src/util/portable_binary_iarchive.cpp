@@ -2,7 +2,7 @@
 // portable_binary_iarchive.cpp
 
 // (C) Copyright 2002 Robert Ramey - http://www.rrsd.com .
-// Copyright (c) 2007-2013 Hartmut Kaiser
+// Copyright (c) 2007-2015 Hartmut Kaiser
 // Use, modification and distribution is subject to the Boost Software
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -55,6 +55,15 @@ namespace hpx { namespace util
 
 void portable_binary_iarchive::load_impl(boost::int64_t& l, char const maxsize)
 {
+#if defined(HPX_DEBUG_SERIALIZATION)
+    char type, expected_maxsize;
+    this->primitive_base_t::load(type);
+    this->primitive_base_t::load(expected_maxsize);
+
+    HPX_ASSERT(type == 'i');
+    HPX_ASSERT(expected_maxsize == maxsize);
+#endif
+
     l = 0;
 
     char size;
@@ -62,11 +71,13 @@ void portable_binary_iarchive::load_impl(boost::int64_t& l, char const maxsize)
     if (0 == size)
         return;
 
+    HPX_ASSERT(size > 0);       // sizeof(<any_int>) > 0
+
     if (size > maxsize) {
         BOOST_THROW_EXCEPTION(portable_binary_iarchive_exception());
     }
 
-    bool negative;
+    bool negative = false;
     this->primitive_base_t::load(negative);
 
     char* cptr = reinterpret_cast<char *>(&l); //-V206
@@ -89,12 +100,23 @@ void portable_binary_iarchive::load_impl(boost::int64_t& l, char const maxsize)
 
 void portable_binary_iarchive::load_impl(boost::uint64_t& ul, char const maxsize)
 {
+#if defined(HPX_DEBUG_SERIALIZATION)
+    char type, expected_maxsize;
+    this->primitive_base_t::load(type);
+    this->primitive_base_t::load(expected_maxsize);
+
+    HPX_ASSERT(type == 'u');
+    HPX_ASSERT(expected_maxsize == maxsize);
+#endif
+
     ul = 0;
 
     char size;
     this->primitive_base_t::load(size);
     if (0 == size)
         return;
+
+    HPX_ASSERT(size > 0);       // sizeof(<any_int>) > 0
 
     if (size > maxsize) {
         BOOST_THROW_EXCEPTION(portable_binary_iarchive_exception());
