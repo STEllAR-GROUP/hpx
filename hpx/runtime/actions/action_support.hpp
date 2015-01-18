@@ -35,6 +35,26 @@ namespace hpx { namespace actions { namespace detail
 {
     struct action_serialization_data
     {
+        action_serialization_data()
+          : parent_id_(0)
+          , parent_phase_(0)
+          , parent_locality_(0)
+          , priority_(0)
+          , stacksize_(0)
+        {}
+
+        action_serialization_data(boost::uint64_t parent_id,
+                boost::uint64_t parent_phase,
+                boost::uint32_t parent_locality,
+                boost::uint16_t priority,
+                boost::uint16_t stacksize)
+          : parent_id_(parent_id)
+          , parent_phase_(parent_phase)
+          , parent_locality_(parent_locality)
+          , priority_(priority)
+          , stacksize_(stacksize)
+        {}
+
         boost::uint64_t parent_id_;
         boost::uint64_t parent_phase_;
         boost::uint32_t parent_locality_;
