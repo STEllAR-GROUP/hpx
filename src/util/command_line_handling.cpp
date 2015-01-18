@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -710,23 +710,42 @@ namespace hpx { namespace util
         return false;
     }
 
+    void attach_debugger()
+    {
+#if defined(_POSIX_VERSION)
+        volatile int i = 0;
+        std::cerr
+            << "PID: " << getpid() << " on " << boost::asio::ip::host_name()
+            << " ready for attaching debugger. Once attached set i = 1 and continue"
+            << std::endl;
+        while(i == 0)
+        {
+            sleep(1);
+        }
+#elif defined(BOOST_WINDOWS)
+        DebugBreak();
+#endif
+    }
+
     void command_line_handling::handle_attach_debugger()
     {
-#if defined(_POSIX_VERSION) || defined(BOOST_MSVC)
-        if(vm_.count("hpx:attach-debugger")) {
-#if defined(_POSIX_VERSION)
-            volatile int i = 0;
-            std::cerr
-                << "PID: " << getpid() << " on " << boost::asio::ip::host_name()
-                << " ready for attaching debugger. Once attached set i = 1 and continue"
-                << std::endl;
-            while(i == 0)
-            {
-                sleep(1);
+#if defined(_POSIX_VERSION) || defined(BOOST_WINDOWS)
+        if(vm_.count("hpx:attach-debugger"))
+        {
+            std::string option = vm_["hpx:attach-debugger"].as<std::string>();
+            if (option != "startup" && option != "exception") {
+                std::cerr <<
+                    "hpx::init: command line warning: --hpx:attach-debugger: "
+                    "invalid option: " << option << ". Allowed values are "
+                    "'startup' or 'exception'" << std::endl;
             }
-#elif defined(BOOST_MSVC)
-            DebugBreak();
-#endif
+            else {
+                if (option == "startup")
+                    attach_debugger();
+
+                using namespace boost::assign;
+                ini_config_ += "hpx.attach_debugger!=" + option;
+            }
         }
 #endif
     }
