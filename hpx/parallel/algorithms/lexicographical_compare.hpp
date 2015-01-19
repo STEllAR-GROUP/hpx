@@ -313,7 +313,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         return detail::lexicographical_compare().call(
             std::forward<ExPolicy>(policy), is_seq(),
             first1, last1, first2, last2, 
-            std::forward<Pred>(pred),
+            std::forward<Pred>(pred)
             );
     }
 }}}
