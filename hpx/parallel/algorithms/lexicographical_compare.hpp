@@ -48,13 +48,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return std::lexicographical_compare(first1, last1, first2, last2, pred);
             }
 
-            template <typename ExPolicy, typename InIter1, typename InIter2,
+            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename Pred>
             static typename detail::algorithm_result<ExPolicy, bool>::type
-            parallel(ExPolicy const& policy, InIter1 first1, InIter1 last1, InIter2 first2,
-                InIter2 last2, Pred && pred)
+            parallel(ExPolicy const& policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
+                FwdIter2 last2, Pred && pred)
             {
-                typedef hpx::util::zip_iterator<InIter1, InIter2> zip_iterator;
+                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2> zip_iterator;
                 typedef typename zip_iterator::reference reference;            
  
                 std::size_t count1 = std::distance(first1, last1);
