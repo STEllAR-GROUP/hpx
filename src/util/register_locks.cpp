@@ -169,47 +169,38 @@ namespace hpx { namespace util
             {
                 if (detail::some_locks_are_not_ignored(held_locks))
                 {
-                    if(register_locks::lock_detection_report_ == "attach_debugger")
+                    std::string back_trace(hpx::detail::backtrace_direct());
+
+                    // throw or log, depending on config options
+                    if (get_config_entry("hpx.throw_on_held_lock", "1") == "0")
                     {
-#if defined(_POSIX_VERSION)
-                        volatile int i = 0;
-                        std::cerr
-                            << "suspending thread while at least one lock is "
-                               "being held (stack backtrace was disabled at "
-                               "compile time)\n"
-                            << "PID: " << getpid() << " on " << boost::asio::ip::host_name()
-                            << " ready for attaching debugger. Once attached set i = 1 and continue"
-                            << std::endl;
-                        while(i == 0)
-                        {
-                            sleep(1);
+                        if (back_trace.empty()) {
+                            LERR_(debug)
+                                << "suspending thread while at least one lock is "
+                                   "being held (stack backtrace was disabled at "
+                                   "compile time)";
                         }
-#elif defined(BOOST_MSVC)
-                        DebugBreak();
-#endif
+                        else {
+                            LERR_(debug)
+                                << "suspending thread while at least one lock is "
+                                << "being held, stack backtrace: "
+                                << back_trace;
+                        }
                     }
                     else
                     {
-                        std::string back_trace(hpx::detail::backtrace_direct());
-                        if(register_locks::lock_detection_report_ == "log")
-                        {
-                            if (back_trace.empty()) {
-                                LERR_(debug)
-                                    << "suspending thread while at least one lock is "
-                                       "being held (stack backtrace was disabled at "
-                                       "compile time)";
-                            }
-                            else {
-                                LERR_(debug)
-                                    << "suspending thread while at least one lock is "
-                                    << "being held, stack backtrace: "
-                                    << back_trace;
-                            }
+                        if (back_trace.empty()) {
+                           HPX_THROW_EXCEPTION(
+                                invalid_status, "verify_no_locks",
+                               "suspending thread while at least one lock is "
+                               "being held (stack backtrace was disabled at "
+                               "compile time)");
                         }
-                        else
-                        {
-                            HPX_THROW_EXCEPTION(invalid_status, "verify_no_locks",
-                                back_trace);
+                        else {
+                           HPX_THROW_EXCEPTION(
+                                invalid_status, "verify_no_locks",
+                               "suspending thread while at least one lock is "
+                               "being held, stack backtrace: " + back_trace);
                         }
                     }
                 }

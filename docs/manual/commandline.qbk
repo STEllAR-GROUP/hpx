@@ -110,6 +110,8 @@ described in the table below:
     [[`--hpx:debug-agas-log`]   [enable all messages on the AGAS log channel and send all
                                  AGAS logs to the target destination]]
     [[`--hpx:debug-clp`]        [debug command line processing]]
+    [[`--hpx:attach-debugger arg`] [wait for a debugger to be attached, possible arg values:
+                                    startup or exception (default: startup)]]
 
     [[[*__hpx__ options related to performance counters]]]
     [[`--hpx:print-counter`]    [print the specified performance counter either repeatedly or
