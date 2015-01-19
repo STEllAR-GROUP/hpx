@@ -205,9 +205,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::lexicographical_compare().call(
-            std::forward<ExPolicy>(policy),
-            first1, last1, first2, last2, detail::less_than(),
-            is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first1, last1, first2, last2, detail::less_than()
+            );
     }
 
     /// Checks if the first range [first1, last1) is lexicographically less than
@@ -311,10 +311,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::lexicographical_compare().call(
-            std::forward<ExPolicy>(policy),
+            std::forward<ExPolicy>(policy), is_seq(),
             first1, last1, first2, last2, 
             std::forward<Pred>(pred),
-            is_seq());
+            );
     }
 }}}
 
