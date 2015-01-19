@@ -64,8 +64,7 @@ void test_lexicographical_compare1()
 {
     using namespace hpx::parallel;
     test_lexicographical_compare1(seq, IteratorTag());
-    test_lexicographical_compare1(par, IteratorTag());
-    
+    test_lexicographical_compare1(par, IteratorTag()); 
     test_lexicographical_compare1(par_vec, IteratorTag());
     
     test_lexicographical_compare1_async(seq(task), IteratorTag());
@@ -81,8 +80,8 @@ void test_lexicographical_compare1()
 void lexicographical_compare_test1()
 {
     test_lexicographical_compare1<std::random_access_iterator_tag>();
-    //test_lexicographical_compare1<std::forward_iterator_tag>();
-    //test_lexicographical_compare1<std::input_iterator_tag>();
+    test_lexicographical_compare1<std::forward_iterator_tag>();
+    test_lexicographical_compare1<std::input_iterator_tag>();
 }
 
 ////////////////////////////////////////////////////////////////////////////
