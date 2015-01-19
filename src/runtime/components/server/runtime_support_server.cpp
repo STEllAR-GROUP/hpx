@@ -314,12 +314,9 @@ namespace hpx { namespace components { namespace server
             ids.push_back(factory->create());
 
     // log result if requested
-        if (LHPX_ENABLED(info))
-        {
-            LRT_(info) << "successfully created " << count << " components " //-V128
-                        << " of type: "
-                        << components::get_component_type_name(type);
-        }
+        LRT_(info) << "successfully created " << count << " components " //-V128
+                    << " of type: "
+                    << components::get_component_type_name(type);
         return ids;
     }
 
@@ -1279,11 +1276,8 @@ namespace hpx { namespace components { namespace server
             ec = make_success_code();
 
         // log result if requested
-        if (LHPX_ENABLED(info))
-        {
-            LRT_(info) << "successfully created message handler plugin of type: "
-                       << message_handler_type;
-        }
+        LRT_(info) << "successfully created message handler plugin of type: "
+                    << message_handler_type;
         return mh;
     }
 
@@ -1328,11 +1322,8 @@ namespace hpx { namespace components { namespace server
             ec = make_success_code();
 
         // log result if requested
-        if (LHPX_ENABLED(info))
-        {
-            LRT_(info) << "successfully binary filter handler plugin of type: "
-                       << binary_filter_type;
-        }
+        LRT_(info) << "successfully binary filter handler plugin of type: "
+                    << binary_filter_type;
         return bf;
     }
 

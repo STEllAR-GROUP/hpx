@@ -8,6 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/util/always_void.hpp>
 
 namespace hpx { namespace traits
 {
@@ -27,7 +28,8 @@ namespace hpx { namespace traits
     };
 
     template <typename Action>
-    struct action_decorate_function<Action, typename Action::type>
+    struct action_decorate_function<Action
+      , typename util::always_void<typename Action::type>::type>
       : action_decorate_function<typename Action::type>
     {};
 }}

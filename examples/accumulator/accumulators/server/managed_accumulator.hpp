@@ -89,7 +89,7 @@ namespace examples { namespace server
         //[managed_accumulator_action_types
         HPX_DEFINE_COMPONENT_ACTION(managed_accumulator, reset);
         HPX_DEFINE_COMPONENT_ACTION(managed_accumulator, add);
-        HPX_DEFINE_COMPONENT_CONST_ACTION(managed_accumulator, query);
+        HPX_DEFINE_COMPONENT_ACTION(managed_accumulator, query);
         //]
 
     //[managed_accumulator_server_data_member

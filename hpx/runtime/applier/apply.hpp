@@ -18,6 +18,8 @@
 #include <hpx/runtime/applier/apply_helper.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/traits/action_is_target_valid.hpp>
+#include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/util/remove_local_destinations.hpp>
 
@@ -237,8 +239,7 @@ namespace hpx
             HPX_ASSERT(traits::component_type_is_compatible<
                 typename action_type_::component_type>::call(addr));
 
-            util::tuple<> env;
-            apply_helper<action_type_>::call(target, addr.address_, priority, env);
+            apply_helper<action_type_>::call(target, addr.address_, priority);
             return true;     // no parcel has been sent (dest is local)
         }
 
@@ -407,9 +408,8 @@ namespace hpx
                 typename action_type_::component_type>::call(addr));
 
             actions::continuation_type cont(c);
-            util::tuple<> env;
             apply_helper<action_type_>::call(cont, target, addr.address_,
-                priority, env);
+                priority);
             return true;     // no parcel has been sent (dest is local)
         }
 

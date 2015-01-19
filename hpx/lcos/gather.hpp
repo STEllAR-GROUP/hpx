@@ -5,6 +5,9 @@
 
 /// \file gather.hpp
 
+#if !defined(HPX_LCOS_GATHER_MAY_05_2014_0418PM)
+#define HPX_LCOS_GATHER_MAY_05_2014_0418PM
+
 #if defined(DOXYGEN)
 namespace hpx { namespace lcos
 {
@@ -77,9 +80,9 @@ namespace hpx { namespace lcos
                 set_result_locked(which, std::move(t), l);
             }
 
-            HPX_DEFINE_COMPONENT_CONST_ACTION_TPL(
+            HPX_DEFINE_COMPONENT_ACTION(
                 gather_server, get_result, get_result_action);
-            HPX_DEFINE_COMPONENT_ACTION_TPL(
+            HPX_DEFINE_COMPONENT_ACTION(
                 gather_server, set_result, set_result_action);
 
         protected:
@@ -142,7 +145,7 @@ namespace hpx { namespace lcos
         hpx::future<hpx::id_type> id = hpx::new_<detail::gather_server<T> >(
             hpx::find_here(), num_sites);
 
-        // register it's id using the given basename
+        // register the gatherer's id using the given basename
         using util::placeholders::_1;
         return id.then(
                 util::bind(&detail::register_name, _1, basename, this_site)
@@ -238,3 +241,4 @@ namespace hpx { namespace lcos
     /**/
 
 #endif // DOXYGEN
+#endif

@@ -23,7 +23,7 @@ struct hello_world_server
         hpx::cout << "hello world\n" << hpx::flush;
     }
 
-    HPX_DEFINE_COMPONENT_CONST_ACTION(hello_world_server, print, print_action);
+    HPX_DEFINE_COMPONENT_ACTION(hello_world_server, print, print_action);
 
     ///////////////////////////////////////////////////////////////////////////
     // wrap given function into a nullary function as expected by the executor

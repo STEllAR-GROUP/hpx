@@ -79,7 +79,7 @@ namespace examples { namespace server
         // serialization, etc.
 
         HPX_DEFINE_COMPONENT_ACTION(template_function_accumulator, reset);
-        HPX_DEFINE_COMPONENT_CONST_ACTION(template_function_accumulator, query);
+        HPX_DEFINE_COMPONENT_ACTION(template_function_accumulator, query);
 
         // Actions with template arguments (see add<>() above) require special
         // type definitions. The simplest way to define such an action type is

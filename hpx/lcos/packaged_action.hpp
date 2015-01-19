@@ -249,10 +249,8 @@ namespace hpx { namespace lcos
                 HPX_ASSERT(traits::component_type_is_compatible<
                     typename Action::component_type>::call(addr));
 
-                (*this->impl_)->set_data(
-                    std::move(action_type::execute_function(addr.address_,
-                        util::forward_as_tuple(std::forward<Ts>(vs)...)))
-                );
+                (*this->impl_)->set_data(action_type::execute_function(
+                    addr.address_, std::forward<Ts>(vs)...));
             }
             else {
                 // remote execution
@@ -275,10 +273,8 @@ namespace hpx { namespace lcos
                 HPX_ASSERT(traits::component_type_is_compatible<
                     typename Action::component_type>::call(addr));
 
-                (*this->impl_)->set_data(
-                    std::move(action_type::execute_function(addr.address_,
-                        util::forward_as_tuple(std::forward<Ts>(vs)...)))
-                );
+                (*this->impl_)->set_data(action_type::execute_function(
+                    addr.address_, std::forward<Ts>(vs)...));
             }
             else {
                 // remote execution

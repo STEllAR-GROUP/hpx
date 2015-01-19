@@ -63,15 +63,13 @@ namespace hpx { namespace components { namespace server
         {}
 
     public:
-        template <typename Arguments>
+        template <typename T>
         static util::unused_type
-        execute_function(naming::address::address_type lva,
-            Arguments && args)
+        execute_function(naming::address::address_type lva, T&& v)
         {
             try {
                 // call the function, ignoring the return value
-                console_logging(
-                    std::move(boost::fusion::at_c<0>(args)));
+                console_logging(std::forward<T>(v));
             }
             catch (hpx::exception const& /*e*/) {
                 /**/;      // no logging!

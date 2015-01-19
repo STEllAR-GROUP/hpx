@@ -7,6 +7,7 @@
 #define HPX_TRAITS_ACTION_DECORATE_CONTINUATION_MAR_30_2014_0725PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/always_void.hpp>
 
 namespace hpx { namespace traits
 {
@@ -23,7 +24,8 @@ namespace hpx { namespace traits
     };
 
     template <typename Action>
-    struct action_decorate_continuation<Action, typename Action::type>
+    struct action_decorate_continuation<Action
+      , typename util::always_void<typename Action::type>::type>
       : action_decorate_continuation<typename Action::type>
     {};
 }}

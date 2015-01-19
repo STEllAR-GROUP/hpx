@@ -69,11 +69,7 @@ HPX_PLAIN_ACTION(hpx::detail::list_component_type,
 
 typedef
     hpx::util::detail::bound_action<
-        hpx::actions::action<
-            void (*)(std::string const&, const hpx::naming::gid_type&)
-          , hpx::detail::list_symbolic_name
-          , hpx::actions::detail::this_type
-        >
+        list_symbolic_name_action
       , hpx::util::tuple<
             hpx::naming::id_type
           , hpx::util::detail::placeholder<1>
@@ -94,11 +90,7 @@ HPX_UTIL_REGISTER_FUNCTION(
 
 typedef
     hpx::util::detail::bound_action<
-        hpx::actions::action<
-            void (*)(std::string const&, int)
-          , hpx::detail::list_component_type
-          , hpx::actions::detail::this_type
-        >
+        list_component_type_action
       , hpx::util::tuple<
             hpx::naming::id_type
           , hpx::util::detail::placeholder<1>

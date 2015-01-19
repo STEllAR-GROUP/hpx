@@ -32,7 +32,7 @@ struct message_server : managed_component_base<message_server>
 
     void print() const { cout << msg << flush; }
 
-    HPX_DEFINE_COMPONENT_CONST_ACTION(message_server, print, print_action);
+    HPX_DEFINE_COMPONENT_ACTION(message_server, print, print_action);
 };
 
 typedef managed_component<message_server> server_type;
