@@ -423,7 +423,7 @@ namespace hpx { namespace components { namespace server
         bool dijkstra_color_;   // false: white, true: black
         boost::atomic<bool> shutdown_all_invoked_;
 
-        typedef boost::mutex dijkstra_mtx_type;
+        typedef hpx::lcos::local::spinlock dijkstra_mtx_type;
         dijkstra_mtx_type dijkstra_mtx_;
         lcos::local::condition_variable dijkstra_cond_;
 
