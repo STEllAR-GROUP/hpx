@@ -1,4 +1,5 @@
 # Copyright (c) 2007-2013 Hartmut Kaiser
+# Copyright (c) 2014-2015 Thomas Heller
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,6 +8,7 @@ set(parcelport_plugins
   ibverbs
   ipc
   mpi
+  mpi_new
   tcp)
 
 set(HPX_STATIC_PARCELPORT_PLUGINS "" CACHE INTERNAL "" FORCE)
@@ -65,10 +67,6 @@ macro(add_parcelport name)
 
 endmacro()
 
-macro(add_static_parcelport parcelport)
-set(HPX_STATIC_PARCELPORT_PLUGINS ${HPX_STATIC_PARCELPORT_PLUGINS} "${parcelport}" CACHE INTERNAL "" FORCE)
-endmacro()
-
 foreach(type ${parcelport_plugins})
   add_hpx_pseudo_target(plugins.parcelport.${type})
   add_subdirectory(${type})
@@ -77,6 +75,7 @@ endforeach()
 
 macro(add_static_parcelports)
   add_parcelport_mpi_module()
+  add_parcelport_mpi_new_module()
   add_parcelport_tcp_module()
 endmacro()
 

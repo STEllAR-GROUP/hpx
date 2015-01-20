@@ -7,7 +7,6 @@
 #define HPX_UTIL_MPI_ENV_HPP
 
 #include <hpx/config/defines.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
 
 #include <mpi.h>
 
@@ -20,7 +19,7 @@ namespace hpx { namespace util
 
     struct HPX_EXPORT mpi_environment
     {
-        static void init(int *argc, char ***argv, command_line_handling& cfg, const char *name = "mpi");
+        static void init(int *argc, char ***argv, command_line_handling& cfg);
         static void finalize();
 
         static bool enabled();
@@ -34,21 +33,7 @@ namespace hpx { namespace util
 
         static std::string get_processor_name();
 
-        struct scoped_lock
-        {
-            scoped_lock();
-            ~scoped_lock();
-        };
-
-        typedef hpx::lcos::local::spinlock mutex_type;
-
     private:
-
-        static mutex_type mtx_;
-
-        static void lock();
-        static void unlock();
-
         static bool enabled_;
         static bool has_called_init_;
         static int provided_threading_flag_;

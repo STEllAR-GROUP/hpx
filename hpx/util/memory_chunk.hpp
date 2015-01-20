@@ -11,13 +11,14 @@
 #include <hpx/lcos/local/spinlock.hpp>
 
 namespace hpx { namespace util {
+    template <typename Mutex>
     struct memory_chunk
     {
         typedef char data_type;
         typedef char * iterator;
         typedef std::size_t size_type;
         typedef std::multimap<size_type, iterator> free_list_type;
-        typedef hpx::lcos::local::spinlock mutex_type;
+        typedef Mutex mutex_type;
 
         static void deleter(char * p)
         {
@@ -74,7 +75,7 @@ namespace hpx { namespace util {
 
         bool full() const
         {
-            mutex_type::scoped_lock l(mtx_);
+            typename mutex_type::scoped_lock l(mtx_);
             check_invariants_locked();
             if(allocated_ == chunk_size_)
             {
@@ -85,7 +86,7 @@ namespace hpx { namespace util {
 
         bool contains(char * p) const
         {
-            mutex_type::scoped_lock l(mtx_);
+            typename mutex_type::scoped_lock l(mtx_);
             return contains_locked(p);
         }
 
@@ -102,7 +103,7 @@ namespace hpx { namespace util {
         void check_invariants(char * p = 0, std::size_t size = 0) const
         {
 #ifdef HPX_DEBUG
-            mutex_type::scoped_lock l(mtx_);
+            typename mutex_type::scoped_lock l(mtx_);
             check_invariants_locked(p, size);
 #endif
         }
@@ -139,7 +140,7 @@ namespace hpx { namespace util {
 
         char *allocate(size_type size)
         {
-            mutex_type::scoped_lock l(mtx_);
+            typename mutex_type::scoped_lock l(mtx_);
             check_invariants_locked(0, size);
 
             if(!data_) charge();
@@ -194,7 +195,7 @@ namespace hpx { namespace util {
             if(!contains(p))
                 return false;
 
-            mutex_type::scoped_lock l(mtx_);
+            typename mutex_type::scoped_lock l(mtx_);
             HPX_ASSERT(contains_locked(p));
             HPX_ASSERT(p != current_);
 

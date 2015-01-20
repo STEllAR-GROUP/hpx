@@ -276,7 +276,10 @@ namespace hpx { namespace parcelset
         // make sure all pending parcels are being handled
         BOOST_FOREACH(pports_type::value_type & pp, pports_)
         {
-            pp.second->do_background_work();
+            if(pp.first > 0)
+            {
+                pp.second->do_background_work();
+            }
         }
     }
 
