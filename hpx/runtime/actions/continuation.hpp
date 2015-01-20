@@ -30,10 +30,10 @@ namespace hpx
     //////////////////////////////////////////////////////////////////////////
     // forward declare the required overload of apply.
     template <typename Component, typename Signature, typename Derived,
-        typename Arg>
+        typename ...Ts>
     inline bool
     apply(hpx::actions::basic_action<Component, Signature, Derived>,
-        naming::id_type const&, Arg &&);
+        naming::id_type const&, Ts&&... vs);
 
     // MSVC complains about ambiguities if it sees this forward declaration
 #ifndef BOOST_MSVC
@@ -49,18 +49,18 @@ namespace hpx
 
     template <
         typename Component, typename Signature, typename Derived,
-        typename T0, typename F>
+        typename Cont, typename ...Ts>
     bool apply_continue(
         hpx::actions::basic_action<Component, Signature, Derived>,
-        naming::id_type const& gid, T0 && v0, F && f);
+        Cont&& cont, naming::id_type const& gid, Ts&&... vs);
 #endif
 
     template <typename Component, typename Signature, typename Derived,
-        typename T0>
+        typename ...Ts>
     inline bool
     apply_c(hpx::actions::basic_action<Component, Signature, Derived>,
         naming::id_type const& contgid, naming::id_type const& gid,
-        T0 && v0);
+        Ts&&... vs);
 
     //////////////////////////////////////////////////////////////////////////
     // handling special case of triggering an LCO
@@ -342,8 +342,8 @@ namespace hpx { namespace actions
         T operator()(hpx::id_type const& lco, T && t) const
         {
             using hpx::util::placeholders::_2;
-            hpx::apply_continue(cont_, target_, std::forward<T>(t),
-                hpx::util::bind(f_, lco, _2));
+            hpx::apply_continue(cont_, hpx::util::bind(f_, lco, _2),
+                target_, std::forward<T>(t));
 
             // Yep, 't' is a zombie, however we don't use the returned value
             // anyways. We need it for result type calculation, though.

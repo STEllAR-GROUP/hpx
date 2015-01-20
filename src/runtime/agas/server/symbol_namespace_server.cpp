@@ -327,9 +327,9 @@ response symbol_namespace::bind(
     std::pair<std::string, namespace_action_code> evtkey(key, symbol_ns_bind);
     std::pair<iterator, iterator> p = on_event_data_.equal_range(evtkey);
 
-    std::vector<hpx::id_type> lcos;
     if (p.first != p.second)
     {
+        std::vector<hpx::id_type> lcos;
 
         iterator it = p.first;
         while (it != p.second)
@@ -357,21 +357,19 @@ response symbol_namespace::bind(
                 return response();
             }
 
-            naming::gid_type old_gid = it->second;
             {
                 util::scoped_unlock<mutex_type::scoped_lock> ul(l);
 
                 // split the credit as the receiving end will expect to keep the
                 // object alive
-                naming::gid_type new_gid = naming::detail::split_gid_if_needed(old_gid);
+                naming::gid_type new_gid = naming::detail::split_gid_if_needed(
+                    it->second);
 
                 // trigger the lco
                 set_lco_value(id, new_gid);
             }
         }
     }
-
-    l.unlock();
 
     LAGAS_(info) << (boost::format(
         "symbol_namespace::bind, key(%1%), gid(%2%)")
@@ -413,9 +411,8 @@ response symbol_namespace::resolve(
     if (&ec != &throws)
         ec = make_success_code();
 
-    naming::gid_type old_gid = it->second;
     l.unlock();
-    naming::gid_type gid = naming::detail::split_gid_if_needed(old_gid);
+    naming::gid_type gid = naming::detail::split_gid_if_needed(it->second);
 
     LAGAS_(info) << (boost::format(
         "symbol_namespace::resolve, key(%1%), gid(%2%)")
@@ -514,12 +511,11 @@ response symbol_namespace::on_event(
         gid_table_type::iterator it = gids_.find(name);
         if (it != gids_.end())
         {
-            naming::gid_type old_gid = it->second;
             // split the credit as the receiving end will expect to keep the
             // object alive
             l.unlock();
             naming::gid_type new_gid = naming::detail::split_gid_if_needed(
-                old_gid);
+                it->second);
 
             // trigger the lco
             handled = true;
