@@ -76,9 +76,7 @@ void functions_byrvref_params()
 
     typedef void (*f)(int&&);
     HPX_TEST_MSG((is_callable<f(int)>::value == true), "fun-rvref/value");
-#   if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 40500
     HPX_TEST_MSG((is_callable<f(int&)>::value == false), "fun-rvref/lvref");
-#   endif
     HPX_TEST_MSG((is_callable<f(int const&)>::value == false), "fun-rvref/const-lvref");
     HPX_TEST_MSG((is_callable<f(int &&)>::value == true), "fun-rvref/rvref");
 #if !defined(BOOST_INTEL)
@@ -87,10 +85,8 @@ void functions_byrvref_params()
 
     typedef void (*fc)(int const&&);
     HPX_TEST_MSG((is_callable<fc(int)>::value == true), "fun-const-rvref/value");
-#   if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 40500
     HPX_TEST_MSG((is_callable<fc(int&)>::value == false), "fun-const-rvref/lvref");
     HPX_TEST_MSG((is_callable<fc(int const&)>::value == false), "fun-const-rvref/const-lvref");
-#   endif
     HPX_TEST_MSG((is_callable<fc(int &&)>::value == true), "fun-const-rvref/rvref");
     HPX_TEST_MSG((is_callable<fc(int const &&)>::value == true), "fun-const-rvref/const-rvref");
 }
