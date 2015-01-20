@@ -4,8 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !BOOST_PP_IS_ITERATING
-
 #ifndef HPX_LCOS_DATAFLOW_SERVER_DATAFLOW_HPP
 #define HPX_LCOS_DATAFLOW_SERVER_DATAFLOW_HPP
 
@@ -75,10 +73,21 @@ namespace hpx { namespace lcos { namespace server
         /// init is a variadic function. The first template parameter denotes
         /// the Action that needs to get spawned once all arguments are
         /// computed
-        template <typename Action>
-        void init(naming::id_type const & target)
+        template <typename Action, typename ...Ts>
+        void init(
+            naming::id_type const & target
+          , Ts&&... vs
+        )
         {
-            typedef detail::dataflow_impl<Action> wrapped_type;
+            typedef
+                detail::dataflow_impl<
+                    Action
+                  , typename traits::promise_local_result<
+                        typename Action::result_type>::type(
+                            typename util::decay<Ts>::type...)
+                >
+                wrapped_type;
+
             typedef
                 detail::component_wrapper<wrapped_type>
                 component_type;
@@ -91,7 +100,7 @@ namespace hpx { namespace lcos { namespace server
                 lcos::local::spinlock::scoped_lock l(mtx);
                 component_ptr = w;
             }
-            (*w)->init();
+            (*w)->init(std::forward<Ts>(vs)...);
 
             detail::update_initialized_count();
         }
@@ -107,54 +116,30 @@ namespace hpx { namespace lcos { namespace server
             HPX_ASSERT(false);
         }
 
-        template <typename Action>
+        template <typename Action, typename ...Ts>
         dataflow(
             component_type * back_ptr
           , Action
           , naming::id_type const & target
+          , Ts&&... vs
         )
             : base_type(back_ptr)
             , component_ptr(0)
         {
             /*
             applier::register_thread(
-                util::bind(&dataflow::init<typename Action::type>
+                util::bind(&dataflow::init<
+                        typename Action::type, Ts...
+                    >
                   , this
                   , target
+                  , std::forward<Ts>(vs)...
                 )
               , "hpx::lcos::server::dataflow::init<>"
             );
             */
-            init<typename Action::type>(target);
+            init<typename Action::type>(target, std::forward<Ts>(vs)...);
         }
-
-#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/components/dataflow/server/preprocessed/dataflow.hpp>
-#else
-
-#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/dataflow_" HPX_LIMIT_STR ".hpp")
-#endif
-
-        // Vertical preprocessor repetition to define the remaining
-        // init functions and actions
-#define BOOST_PP_ITERATION_PARAMS_1                                             \
-    (                                                                           \
-        3                                                                       \
-      , (                                                                       \
-            1                                                                   \
-          , HPX_ACTION_ARGUMENT_LIMIT                                           \
-          , <hpx/components/dataflow/server/dataflow.hpp>                       \
-        )                                                                       \
-    )                                                                           \
-/**/
-#include BOOST_PP_ITERATE()
-
-#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(output: null)
-#endif
-
-#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
         /// the connect function is used to connect the current dataflow
         /// to the specified target lco
@@ -185,73 +170,4 @@ namespace hpx { namespace lcos { namespace server
     };
 }}}
 
-#endif
-
-#else // BOOST_PP_IS_ITERATING
-#define N BOOST_PP_ITERATION()
-        // TODO: get rid of the call to impl_ptr->init
-
-#define M0(Z, N, D) BOOST_PP_CAT(A, N &&) BOOST_PP_CAT(a, N)
-#define M1(Z, N, D) std::forward<BOOST_PP_CAT(A, N)>(BOOST_PP_CAT(a, N))
-#define M2(Z, N, D)                                                             \
-    typename util::decay<BOOST_PP_CAT(A, N)>::type                              \
-/**/
-
-        template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename A)>
-        void init(
-            naming::id_type const & target
-          , BOOST_PP_ENUM(N, M0, _) // A0 && a0, A1 && a1, ..., AN && aN
-        )
-        {
-            typedef
-                detail::dataflow_impl<
-                    Action
-                  , BOOST_PP_ENUM(N, M2, _)
-                >
-                wrapped_type;
-
-            typedef
-                detail::component_wrapper<
-                    wrapped_type
-                >
-                component_type;
-            component_type * w = new component_type(target, mtx, targets);
-            {
-                lcos::local::spinlock::scoped_lock l(mtx);
-                component_ptr = w;
-            }
-            (*w)->init(BOOST_PP_ENUM(N, M1, _));
-
-            detail::update_initialized_count();
-        }
-
-        template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename A)>
-        dataflow(
-            component_type * back_ptr
-          , Action
-          , naming::id_type const & target
-          , BOOST_PP_ENUM(N, M0, _) // A0 && a0, A1 && a1, ..., AN && aN
-        )
-            : base_type(back_ptr)
-            , component_ptr(0)
-        {
-            /*
-            applier::register_thread(
-                util::bind(&dataflow::init<
-                        typename Action::type, BOOST_PP_ENUM_PARAMS(N, A)
-                    >
-                  , this
-                  , target
-                  , BOOST_PP_ENUM(N, A)
-                )
-              , "hpx::lcos::server::dataflow::init<>"
-            );
-            */
-            init<typename Action::type>(target, BOOST_PP_ENUM(N, M1, _));
-        }
-
-#undef M2
-#undef M1
-#undef M0
-#undef N
 #endif
