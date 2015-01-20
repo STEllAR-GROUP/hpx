@@ -11,14 +11,12 @@
 #include <hpx/util/logging.hpp>
 
 #include <boost/version.hpp>
-#if BOOST_VERSION >= 103600
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/sum.hpp>
 #include <boost/accumulators/statistics/count.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
 #include <boost/accumulators/statistics/moment.hpp>
-#endif
 
 #define HPX_DONT_USE_BLOCK_PROFILER
 
@@ -29,7 +27,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-#if BOOST_VERSION >= 103600 && defined(HPX_USE_ACCUMULATOR_LIBRARY)
+#if defined(HPX_USE_ACCUMULATOR_LIBRARY)
         class accumulator_stats
         {
         private:

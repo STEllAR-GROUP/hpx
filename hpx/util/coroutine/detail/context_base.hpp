@@ -50,11 +50,7 @@
 #include <boost/version.hpp>
 #include <boost/intrusive_ptr.hpp>
 
-#if BOOST_VERSION < 104200
-#include <boost/exception.hpp>
-#else
 #include <boost/exception/all.hpp>
-#endif
 
 #define HPX_THREAD_MAINTAIN_OPERATIONS_COUNT  0
 
@@ -543,11 +539,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #if defined(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
       HPX_ASSERT(m_thread_data == 0);
 #endif
-#if BOOST_VERSION <= 104200 || BOOST_VERSION >= 104600
       m_type_info = boost::exception_ptr();
-#else
-      m_type_info.reset();
-#endif
     }
 
     // Cause the coroutine to exit if

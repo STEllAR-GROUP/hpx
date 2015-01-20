@@ -452,7 +452,7 @@ namespace hpx { namespace parcelset
             if (e.first.empty())
             {
                 HPX_ASSERT(e.second.empty());
-#if HPX_GCC_VERSION >= 40600 && HPX_GCC_VERSION < 40700
+#if HPX_GCC_VERSION < 40700
                 // GCC4.6 gets incredibly confused
                 std::swap(e.first, static_cast<std::vector<parcel>&>(parcels));
                 std::swap(e.second, static_cast<std::vector<write_handler_type>&>(handlers));

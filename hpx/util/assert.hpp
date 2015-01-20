@@ -25,7 +25,7 @@
 
 #if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
 
-#if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 40500) || defined(HPX_CLANG_VERSION)
+#if defined(HPX_GCC_VERSION) || defined(HPX_CLANG_VERSION)
 # define HPX_ASSERT(expr) ((expr) ? (void)0 : __builtin_unreachable())
 #elif defined(_MSC_VER) && !defined(BOOST_INTEL_WIN)
 # define HPX_ASSERT(expr) __assume(!!(expr))
@@ -61,7 +61,7 @@ namespace hpx
 
 #if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
 
-#if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 40500) || defined(HPX_CLANG_VERSION)
+#if defined(HPX_GCC_VERSION) || defined(HPX_CLANG_VERSION)
 # define HPX_ASSERT_MSG(expr, msg) ((expr) ? (void)0 : __builtin_unreachable())
 #elif defined(_MSC_VER) && !defined(BOOST_INTEL_WIN)
 # define HPX_ASSERT_MSG(expr, msg) __assume(!!(expr))

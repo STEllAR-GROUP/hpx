@@ -11,52 +11,6 @@
 #include <boost/config.hpp>
 #include <boost/version.hpp>
 
-//  -------------------- Macros introduced at 1.44 ---------------------------
-#if BOOST_VERSION < 104400
-
-//  Define BOOST_NO_0X_HDR_TYPEINDEX fallback
-#if !defined(BOOST_NO_0X_HDR_TYPEINDEX)
-#  define BOOST_NO_0X_HDR_TYPEINDEX
-#endif
-
-#endif
-//  ------------------ End of macros introduced at 1.44 ----------------------
-
-//  -------------------- Macros introduced at 1.45 ---------------------------
-#if BOOST_VERSION < 104500
-
-//  Define BOOST_NO_VARIADIC_MACROS fallback
-#if !defined(BOOST_NO_VARIADIC_MACROS)
-#  define BOOST_NO_VARIADIC_MACROS
-#endif
-
-#endif
-//  ------------------ End of macros introduced at 1.45 ----------------------
-
-//  -------------------- Macros introduced at 1.47 ---------------------------
-#if BOOST_VERSION < 104700
-
-//  Define BOOST_NO_NOEXCEPT fallback
-#if !defined(BOOST_NO_NOEXCEPT)
-#  define BOOST_NO_NOEXCEPT
-#endif
-//  Define BOOST_NO_UNIFIED_INITIALIZATION_SYNTAX fallback
-#if !defined(BOOST_NO_UNIFIED_INITIALIZATION_SYNTAX)
-#  define BOOST_NO_UNIFIED_INITIALIZATION_SYNTAX
-#endif
-
-#endif
-//  ------------------ End of macros introduced at 1.47 ----------------------
-
-//  -------------------- Macros introduced at 1.48 ---------------------------
-#if BOOST_VERSION < 104800
-
-//  Define BOOST_NO_DECLTYPE_N3276 fallback
-#if !defined(BOOST_NO_DECLTYPE_N3276)
-#  define BOOST_NO_DECLTYPE_N3276
-#endif
-
-#endif
 //  ------------------ End of macros introduced at 1.48 ----------------------
 
 //  -------------------- Macros introduced at 1.50 ---------------------------
