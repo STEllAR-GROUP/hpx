@@ -408,8 +408,13 @@ namespace hpx { namespace actions
                 ar >> parent_id_;
                 ar >> parent_phase_;
 
-                ar >> priority_;
-                ar >> stacksize_;
+                boost::uint16_t priority = 0;
+                boost::uint16_t stacksize = 0;
+                ar >> priority;
+                ar >> stacksize;
+
+                priority_ = static_cast<threads::thread_priority>(priority);
+                stacksize_ = static_cast<threads::thread_stacksize>(stacksize);
             }
             else {
                 detail::action_serialization_data data;
@@ -442,17 +447,14 @@ namespace hpx { namespace actions
                 ar << parent_id_;
                 ar << parent_phase_;
 
-                ar << priority_;
-                ar << stacksize_;
+                boost::uint16_t priority = priority_;
+                boost::uint16_t stacksize = stacksize_;
+                ar << priority;
+                ar << stacksize;
             }
             else {
-                detail::action_serialization_data data;
-                data.parent_id_ = parent_id_;
-                data.parent_phase_ = parent_phase_;
-                data.parent_locality_ = parent_locality_;
-                data.priority_ = priority_;
-                data.stacksize_ = stacksize_;
-
+                detail::action_serialization_data data(parent_id_,
+                    parent_phase_, parent_locality_, priority_, stacksize_);
                 ar.save(data);
             }
         }

@@ -71,6 +71,8 @@ namespace hpx { namespace util
 #endif
 
     void handle_list_parcelports();
+
+    void attach_debugger();
 }}
 
 #endif

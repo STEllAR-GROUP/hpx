@@ -166,17 +166,38 @@ namespace hpx { namespace util
                 if (detail::some_locks_are_not_ignored(held_locks))
                 {
                     std::string back_trace(hpx::detail::backtrace_direct());
-                    if (back_trace.empty()) {
-                        LERR_(debug)
-                            << "suspending thread while at least one lock is "
-                               "being held (stack backtrace was disabled at "
-                               "compile time)";
+
+                    // throw or log, depending on config options
+                    if (get_config_entry("hpx.throw_on_held_lock", "1") == "0")
+                    {
+                        if (back_trace.empty()) {
+                            LERR_(debug)
+                                << "suspending thread while at least one lock is "
+                                   "being held (stack backtrace was disabled at "
+                                   "compile time)";
+                        }
+                        else {
+                            LERR_(debug)
+                                << "suspending thread while at least one lock is "
+                                << "being held, stack backtrace: "
+                                << back_trace;
+                        }
                     }
-                    else {
-                        LERR_(debug)
-                            << "suspending thread while at least one lock is "
-                            << "being held, stack backtrace: "
-                            << back_trace;
+                    else
+                    {
+                        if (back_trace.empty()) {
+                           HPX_THROW_EXCEPTION(
+                                invalid_status, "verify_no_locks",
+                               "suspending thread while at least one lock is "
+                               "being held (stack backtrace was disabled at "
+                               "compile time)");
+                        }
+                        else {
+                           HPX_THROW_EXCEPTION(
+                                invalid_status, "verify_no_locks",
+                               "suspending thread while at least one lock is "
+                               "being held, stack backtrace: " + back_trace);
+                        }
                     }
                 }
             }

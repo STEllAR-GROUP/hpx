@@ -142,7 +142,7 @@ namespace hpx { namespace parcelset
                 {
                     if (arg_size >= max_outbound_size)
                         break;
-                    arg_size += traits::get_type_size(pv[0]);
+                    arg_size += traits::get_type_size(pv[parcels_sent]);
                 }
 
                 buffer = connection.get_buffer(pv[0], arg_size);

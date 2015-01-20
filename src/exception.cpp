@@ -14,6 +14,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/backtrace.hpp>
+#include <hpx/util/command_line_handling.hpp>
 
 #if defined(BOOST_WINDOWS)
 #  include <process.h>
@@ -26,6 +27,9 @@
 
 #include <stdexcept>
 #include <algorithm>
+#if defined(_POSIX_VERSION)
+#include <iostream>
+#endif
 
 #ifdef __APPLE__
 #include <crt_externs.h>
@@ -257,6 +261,8 @@ namespace hpx { namespace detail
     HPX_EXPORT void throw_exception(Exception const& e, std::string const& func,
         std::string const& file, long line)
     {
+        if (get_config_entry("hpx.attach_debugger", "") == "exception")
+            util::attach_debugger();
         boost::rethrow_exception(get_exception(e, func, file, line));
     }
 
