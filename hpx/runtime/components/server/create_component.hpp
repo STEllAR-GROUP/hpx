@@ -10,7 +10,12 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/applier/applier.hpp>
+#include <hpx/util/bind.hpp>
+#include <hpx/util/decay.hpp>
+#include <hpx/util/move.hpp>
+#include <hpx/util/tuple.hpp>
 #include <hpx/util/stringstream.hpp>
+#include <hpx/util/functional/new.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
@@ -105,6 +110,36 @@ namespace hpx { namespace components { namespace server
     {
         Component* p = Component::heap_type::alloc(1);
         return new (p) typename Component::derived_type(impl);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Create component with arguments
+    namespace detail
+    {
+        template <typename Component, typename ...Ts>
+        util::detail::bound<
+            util::detail::one_shot_wrapper<
+                util::functional::placement_new<typename Component::derived_type>
+            >,
+            util::tuple<
+                util::detail::placeholder<1>,
+                typename util::decay<Ts>::type...
+            >
+        > construct_function(Ts&&... vs)
+        {
+            typedef typename Component::derived_type type;
+
+            return util::bind(
+                util::one_shot(util::functional::placement_new<type>()),
+                util::placeholders::_1, std::forward<Ts>(vs)...);
+        }
+    }
+
+    template <typename Component, typename ...Ts>
+    naming::gid_type construct(Ts&&... vs)
+    {
+        return server::create<Component>(
+            detail::construct_function<Component>(std::forward<Ts>(vs)...));
     }
 }}}
 

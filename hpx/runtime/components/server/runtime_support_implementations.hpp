@@ -79,10 +79,10 @@ namespace hpx { namespace components { namespace server
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
             util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
+
+            typedef typename Component::wrapping_type wrapping_type;
             id = factory->create_with_args(
-                BOOST_PP_CAT(component_constructor_functor, N)<
-                    typename Component::wrapping_type,
-                    BOOST_PP_ENUM_PARAMS(N, A)>(
+                    detail::construct_function<wrapping_type>(
                         HPX_ENUM_FORWARD_ARGS(N, A, a)));
         }
         LRT_(info) << "successfully created component " << id
@@ -160,12 +160,11 @@ namespace hpx { namespace components { namespace server
             util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
             for (std::size_t i = 0; i != count; ++i)
             {
+                typedef typename Component::wrapping_type wrapping_type;
+
                 ids.push_back(factory->create_with_args(
-                    BOOST_PP_CAT(component_constructor_functor, M)<
-                        typename Component::wrapping_type,
-                        BOOST_PP_ENUM_PARAMS(M, A)
-                    >(HPX_ENUM_FORWARD_ARGS(M, A, a)))
-                );
+                    detail::construct_function<wrapping_type>(
+                        HPX_ENUM_FORWARD_ARGS(M, A, a))));
             }
         }
         LRT_(info) << "successfully created " << count

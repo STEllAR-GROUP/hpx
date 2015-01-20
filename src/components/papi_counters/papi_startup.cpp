@@ -71,7 +71,7 @@ namespace hpx { namespace performance_counters { namespace papi
         hpx::naming::gid_type id;
         try
         {
-            id = hpx::components::server::create_with_args<papi_counter_type>(info);
+            id = hpx::components::server::construct<papi_counter_type>(info);
         }
         catch (hpx::exception const& e)
         {

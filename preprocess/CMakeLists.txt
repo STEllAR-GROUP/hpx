@@ -32,7 +32,6 @@ set(action_argument_limit_preprocessing_files
   "hpx/lcos/reduce.hpp"
   "hpx/runtime/components/new.hpp"
   "hpx/runtime/components/server/runtime_support_implementations.hpp"
-  "hpx/runtime/components/server/create_component_with_args.hpp"
   "hpx/runtime/components/server/runtime_support_create_component_decl.hpp")
 if(HPX_HAVE_SECURITY)
 set(action_argument_limit_preprocessing_files ${action_argument_limit_preprocessing_files}

@@ -8,14 +8,26 @@
 #if !defined(HPX_RUNTIME_SUPPORT_JUN_02_2008_1145AM)
 #define HPX_RUNTIME_SUPPORT_JUN_02_2008_1145AM
 
-#include <map>
-#include <list>
-#include <set>
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/agas/gva.hpp>
+#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/components/component_factory_base.hpp>
+#include <hpx/runtime/components/static_factory_data.hpp>
+#include <hpx/runtime/components/server/create_component.hpp>
+#include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/runtime/actions/manage_object_action.hpp>
+#include <hpx/performance_counters/counters.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/lcos/local/mutex.hpp>
+#include <hpx/lcos/local/condition_variable.hpp>
+#include <hpx/plugins/plugin_factory_base.hpp>
+#include <hpx/util/plugin.hpp>
+#include <hpx/util/bind.hpp>
+#include <hpx/util/functional/new.hpp>
 
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/shared_ptr.hpp>
-#include <hpx/util/plugin.hpp>
 #include <boost/program_options/options_description.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/comma_if.hpp>
@@ -23,20 +35,9 @@
 #include <boost/preprocessor/iterate.hpp>
 #include <boost/atomic.hpp>
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/agas/gva.hpp>
-#include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/component_factory_base.hpp>
-#include <hpx/runtime/components/static_factory_data.hpp>
-#include <hpx/runtime/components/server/create_component_with_args.hpp>
-#include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/runtime/actions/manage_object_action.hpp>
-#include <hpx/performance_counters/counters.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/lcos/local/mutex.hpp>
-#include <hpx/lcos/local/condition_variable.hpp>
-
-#include <hpx/plugins/plugin_factory_base.hpp>
+#include <map>
+#include <list>
+#include <set>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -580,14 +581,11 @@ namespace hpx { namespace components { namespace server
             typedef typename Component::wrapping_type wrapping_type;
             if (!local_op) {
                 id = factory->create_with_args(
-                    component_constructor_functor1<wrapping_type, Component>(
-                        std::move(*p))
-                );
+                    detail::construct_function<wrapping_type>(std::move(*p)));
             }
             else {
                 id = factory->create_with_args(
-                    component_constructor_functor1<wrapping_type, Component>(*p)
-                );
+                    detail::construct_function<wrapping_type>(*p));
             }
         }
         LRT_(info) << "successfully created component " << id
@@ -642,9 +640,7 @@ namespace hpx { namespace components { namespace server
 
             typedef typename Component::wrapping_type wrapping_type;
             id = factory->create_with_args(migrated_id,
-                component_constructor_functor1<wrapping_type, Component>(
-                    std::move(*p))
-            );
+                detail::construct_function<wrapping_type>(std::move(*p)));
         }
 
         // sanity checks

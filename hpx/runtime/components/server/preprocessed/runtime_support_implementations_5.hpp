@@ -70,10 +70,9 @@ namespace hpx { namespace components { namespace server
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
             util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
+            typedef typename Component::wrapping_type wrapping_type;
             id = factory->create_with_args(
-                component_constructor_functor1<
-                    typename Component::wrapping_type,
-                    A0>(
+                    detail::construct_function<wrapping_type>(
                         std::forward<A0>( a0 )));
         }
         LRT_(info) << "successfully created component " << id
@@ -163,10 +162,9 @@ namespace hpx { namespace components { namespace server
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
             util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
+            typedef typename Component::wrapping_type wrapping_type;
             id = factory->create_with_args(
-                component_constructor_functor2<
-                    typename Component::wrapping_type,
-                    A0 , A1>(
+                    detail::construct_function<wrapping_type>(
                         std::forward<A0>( a0 ) , std::forward<A1>( a1 )));
         }
         LRT_(info) << "successfully created component " << id
@@ -234,12 +232,10 @@ namespace hpx { namespace components { namespace server
             util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
             for (std::size_t i = 0; i != count; ++i)
             {
+                typedef typename Component::wrapping_type wrapping_type;
                 ids.push_back(factory->create_with_args(
-                    component_constructor_functor1<
-                        typename Component::wrapping_type,
-                        A0
-                    >(std::forward<A0>( a0 )))
-                );
+                    detail::construct_function<wrapping_type>(
+                        std::forward<A0>( a0 ))));
             }
         }
         LRT_(info) << "successfully created " << count
@@ -308,10 +304,9 @@ namespace hpx { namespace components { namespace server
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
             util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
+            typedef typename Component::wrapping_type wrapping_type;
             id = factory->create_with_args(
-                component_constructor_functor3<
-                    typename Component::wrapping_type,
-                    A0 , A1 , A2>(
+                    detail::construct_function<wrapping_type>(
                         std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 )));
         }
         LRT_(info) << "successfully created component " << id
@@ -379,12 +374,10 @@ namespace hpx { namespace components { namespace server
             util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
             for (std::size_t i = 0; i != count; ++i)
             {
+                typedef typename Component::wrapping_type wrapping_type;
                 ids.push_back(factory->create_with_args(
-                    component_constructor_functor2<
-                        typename Component::wrapping_type,
-                        A0 , A1
-                    >(std::forward<A0>( a0 ) , std::forward<A1>( a1 )))
-                );
+                    detail::construct_function<wrapping_type>(
+                        std::forward<A0>( a0 ) , std::forward<A1>( a1 ))));
             }
         }
         LRT_(info) << "successfully created " << count
@@ -453,10 +446,9 @@ namespace hpx { namespace components { namespace server
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
             util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
+            typedef typename Component::wrapping_type wrapping_type;
             id = factory->create_with_args(
-                component_constructor_functor4<
-                    typename Component::wrapping_type,
-                    A0 , A1 , A2 , A3>(
+                    detail::construct_function<wrapping_type>(
                         std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 )));
         }
         LRT_(info) << "successfully created component " << id
@@ -524,12 +516,10 @@ namespace hpx { namespace components { namespace server
             util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
             for (std::size_t i = 0; i != count; ++i)
             {
+                typedef typename Component::wrapping_type wrapping_type;
                 ids.push_back(factory->create_with_args(
-                    component_constructor_functor3<
-                        typename Component::wrapping_type,
-                        A0 , A1 , A2
-                    >(std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 )))
-                );
+                    detail::construct_function<wrapping_type>(
+                        std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ))));
             }
         }
         LRT_(info) << "successfully created " << count
@@ -598,10 +588,9 @@ namespace hpx { namespace components { namespace server
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
             util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
+            typedef typename Component::wrapping_type wrapping_type;
             id = factory->create_with_args(
-                component_constructor_functor5<
-                    typename Component::wrapping_type,
-                    A0 , A1 , A2 , A3 , A4>(
+                    detail::construct_function<wrapping_type>(
                         std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 )));
         }
         LRT_(info) << "successfully created component " << id
@@ -669,12 +658,10 @@ namespace hpx { namespace components { namespace server
             util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
             for (std::size_t i = 0; i != count; ++i)
             {
+                typedef typename Component::wrapping_type wrapping_type;
                 ids.push_back(factory->create_with_args(
-                    component_constructor_functor4<
-                        typename Component::wrapping_type,
-                        A0 , A1 , A2 , A3
-                    >(std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 )))
-                );
+                    detail::construct_function<wrapping_type>(
+                        std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ))));
             }
         }
         LRT_(info) << "successfully created " << count
