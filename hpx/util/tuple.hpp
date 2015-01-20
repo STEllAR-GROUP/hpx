@@ -140,8 +140,7 @@ namespace hpx { namespace util
             {}
         };
 
-#       if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40600)              \
-        || (defined(BOOST_MSVC) && BOOST_MSVC < 1800)
+#       if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40600)
         template <typename T>
         struct tuple_member<T &&,
             typename boost::disable_if_c<
