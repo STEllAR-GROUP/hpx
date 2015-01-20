@@ -246,7 +246,7 @@ namespace hpx { namespace naming
             // Just replenish the credit of the new gid and don't touch the
             // local gid instance. This is less efficient than necessary but
             // avoids deadlocks during serialization.
-            return replenish_new_gid_if_needed_locked(gid);
+            return replenish_new_gid_if_needed(gid);
         }
 
         gid_type split_gid_if_needed_locked(gid_type& gid)
@@ -292,7 +292,7 @@ namespace hpx { namespace naming
             return new_gid;
         }
 
-        gid_type replenish_new_gid_if_needed_locked(gid_type const& gid)
+        gid_type replenish_new_gid_if_needed(gid_type const& gid)
         {
             naming::gid_type new_gid = gid;     // strips lock bit
 
@@ -321,7 +321,7 @@ namespace hpx { namespace naming
             // Just replenish the credit of the new gid and don't touch the
             // local gid instance. This is less efficient than necessary but
             // avoids deadlocks during serialization.
-            return replenish_new_gid_if_needed_locked(gid);
+            return replenish_new_gid_if_needed(gid);
         }
 
         gid_type move_gid_locked(gid_type& gid)

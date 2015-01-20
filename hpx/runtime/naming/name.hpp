@@ -608,7 +608,7 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         HPX_EXPORT gid_type split_gid_if_needed(gid_type& id);
         HPX_EXPORT gid_type split_gid_if_needed_locked(gid_type& id);
-        HPX_EXPORT gid_type replenish_new_gid_if_needed_locked(gid_type const& id);
+        HPX_EXPORT gid_type replenish_new_gid_if_needed(gid_type const& id);
 
         HPX_EXPORT gid_type move_gid(gid_type& id);
         HPX_EXPORT gid_type move_gid_locked(gid_type& gid);
