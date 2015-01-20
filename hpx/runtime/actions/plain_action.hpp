@@ -9,12 +9,8 @@
 #if !defined(HPX_RUNTIME_ACTIONS_PLAIN_ACTION_NOV_14_2008_0706PM)
 #define HPX_RUNTIME_ACTIONS_PLAIN_ACTION_NOV_14_2008_0706PM
 
-#include <cstdlib>
-#include <stdexcept>
-
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
-#include <hpx/config/bind.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
@@ -28,6 +24,9 @@
 #include <hpx/util/detail/pack.hpp>
 
 #include <boost/preprocessor/cat.hpp>
+
+#include <cstdlib>
+#include <stdexcept>
 
 #include <hpx/config/warnings_prefix.hpp>
 
