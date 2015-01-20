@@ -253,6 +253,12 @@ namespace hpx { namespace components
         typedef simple_component<Component> component_type;
         typedef component_type derived_type;
         typedef detail::simple_heap_factory<component_type> heap_type;
+        
+        /// \brief Construct a simple_component instance holding a new wrapped
+        ///        instance
+        simple_component()
+          : Component()
+        {}
 
 #define SIMPLE_COMPONENT_CONSTRUCT(Z, N, _)                                   \
         template <BOOST_PP_ENUM_PARAMS(N, typename T)>                        \

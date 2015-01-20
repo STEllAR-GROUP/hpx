@@ -9,6 +9,7 @@
 #define HPX_RUNTIME_SUPPORT_JUN_02_2008_1145AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
@@ -29,10 +30,6 @@
 #include <boost/thread/condition.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/program_options/options_description.hpp>
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/comma_if.hpp>
-#include <boost/preprocessor/enum_params.hpp>
-#include <boost/preprocessor/iterate.hpp>
 #include <boost/atomic.hpp>
 
 #include <map>
@@ -147,13 +144,17 @@ namespace hpx { namespace components { namespace server
 
         /// \brief Actions to create new objects
         template <typename Component>
-        naming::gid_type create_component0();
+        naming::gid_type create_component();
+
+        template <typename Component, typename T, typename ...Ts>
+        naming::gid_type create_component(T v, Ts... vs);
 
         template <typename Component>
-        std::vector<naming::gid_type> bulk_create_component1(std::size_t count);
+        std::vector<naming::gid_type> bulk_create_component(std::size_t count);
 
-        // bring in all overloads for create_componentN(...)
-        #include <hpx/runtime/components/server/runtime_support_create_component_decl.hpp>
+        template <typename Component, typename T, typename ...Ts>
+        std::vector<naming::gid_type> bulk_create_component(
+            std::size_t count, T v, Ts... vs);
 
         template <typename Component>
         naming::gid_type copy_create_component(
@@ -445,7 +446,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     // Functions wrapped by creat_component actions below
     template <typename Component>
-    naming::gid_type runtime_support::create_component0()
+    naming::gid_type runtime_support::create_component()
     {
         components::component_type const type =
             components::get_component_type<
@@ -489,9 +490,58 @@ namespace hpx { namespace components { namespace server
         return id;
     }
 
+    template <typename Component, typename T, typename ...Ts>
+    naming::gid_type runtime_support::create_component(T v, Ts... vs)
+    {
+        components::component_type const type =
+            components::get_component_type<
+                typename Component::wrapped_type>();
+
+        component_map_mutex_type::scoped_lock l(cm_mtx_);
+        component_map_type::const_iterator it = components_.find(type);
+        if (it == components_.end()) {
+            hpx::util::osstream strm;
+            strm << "attempt to create component instance of "
+                << "invalid/unknown type: "
+                << components::get_component_type_name(type)
+                << " (component type not found in map)";
+            HPX_THROW_EXCEPTION(hpx::bad_component_type,
+                "runtime_support::create_component",
+                hpx::util::osstream_get_string(strm));
+            return naming::invalid_gid;
+        }
+
+        if (!(*it).second.first) {
+            hpx::util::osstream strm;
+            strm << "attempt to create component instance of "
+                << "invalid/unknown type: "
+                << components::get_component_type_name(type)
+                << " (map entry is NULL)";
+            HPX_THROW_EXCEPTION(hpx::bad_component_type,
+                "runtime_support::create_component",
+                hpx::util::osstream_get_string(strm));
+            return naming::invalid_gid;
+        }
+
+        naming::gid_type id;
+        boost::shared_ptr<component_factory_base> factory((*it).second.first);
+        {
+            util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
+
+            typedef typename Component::wrapping_type wrapping_type;
+            id = factory->create_with_args(
+                    detail::construct_function<wrapping_type>(
+                        std::forward<T>(v), std::forward<Ts>(vs)...));
+        }
+        LRT_(info) << "successfully created component " << id
+            << " of type: " << components::get_component_type_name(type);
+
+        return id;
+    }
+
     template <typename Component>
     std::vector<naming::gid_type>
-    runtime_support::bulk_create_component1(std::size_t count)
+    runtime_support::bulk_create_component(std::size_t count)
     {
         components::component_type const type =
             components::get_component_type<
@@ -530,9 +580,67 @@ namespace hpx { namespace components { namespace server
         {
             util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
             for (std::size_t i = 0; i != count; ++i)
+            {
                 ids.push_back(factory->create());
+            }
         }
-        LRT_(info) << "successfully created " << count //-V128
+        LRT_(info) << "successfully created " << count
+                   << " component(s) of type: "
+                   << components::get_component_type_name(type);
+
+        return std::move(ids);
+    }
+
+    template <typename Component, typename T, typename ...Ts>
+    std::vector<naming::gid_type>
+    runtime_support::bulk_create_component(std::size_t count, T v, Ts... vs)
+    {
+        components::component_type const type =
+            components::get_component_type<
+                typename Component::wrapped_type>();
+
+        component_map_mutex_type::scoped_lock l(cm_mtx_);
+        component_map_type::const_iterator it = components_.find(type);
+        if (it == components_.end()) {
+            hpx::util::osstream strm;
+            strm << "attempt to create component(s) instance of "
+                << "invalid/unknown type: "
+                << components::get_component_type_name(type)
+                << " (component type not found in map)";
+            HPX_THROW_EXCEPTION(hpx::bad_component_type,
+                "runtime_support::create_component",
+                hpx::util::osstream_get_string(strm));
+            return std::vector<naming::gid_type>();
+        }
+
+        if (!(*it).second.first) {
+            hpx::util::osstream strm;
+            strm << "attempt to create component instance(s) of "
+                << "invalid/unknown type: "
+                << components::get_component_type_name(type)
+                << " (map entry is NULL)";
+            HPX_THROW_EXCEPTION(hpx::bad_component_type,
+                "runtime_support::create_component",
+                hpx::util::osstream_get_string(strm));
+            return std::vector<naming::gid_type>();
+        }
+
+        std::vector<naming::gid_type> ids;
+        ids.reserve(count);
+
+        boost::shared_ptr<component_factory_base> factory((*it).second.first);
+        {
+            util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
+            for (std::size_t i = 0; i != count; ++i)
+            {
+                typedef typename Component::wrapping_type wrapping_type;
+
+                ids.push_back(factory->create_with_args(
+                    detail::construct_function<wrapping_type>(
+                        std::forward<T>(v), std::forward<Ts>(vs)...)));
+            }
+        }
+        LRT_(info) << "successfully created " << count
                    << " component(s) of type: "
                    << components::get_component_type_name(type);
 
@@ -738,6 +846,72 @@ HPX_REGISTER_ACTION_DECLARATION(
 
 namespace hpx { namespace components { namespace server
 {
+    template <typename Component, typename ...Ts>
+    struct create_component_action
+      : ::hpx::actions::action<
+            naming::gid_type (runtime_support::*)(Ts...)
+          , &runtime_support::create_component<Component, Ts...>
+          , create_component_action<Component, Ts...> >
+    {};
+
+    template <typename Component>
+    struct create_component_action<Component>
+      : ::hpx::actions::action<
+            naming::gid_type (runtime_support::*)()
+          , &runtime_support::create_component<Component>
+          , create_component_action<Component> >
+    {};
+
+    template <typename Component, typename ...Ts>
+    struct create_component_direct_action
+      : ::hpx::actions::direct_action<
+            naming::gid_type (runtime_support::*)(Ts...)
+          , &runtime_support::create_component<Component, Ts...>
+          , create_component_direct_action<Component, Ts...> >
+    {};
+
+    template <typename Component>
+    struct create_component_direct_action<Component>
+      : ::hpx::actions::direct_action<
+            naming::gid_type (runtime_support::*)()
+          , &runtime_support::create_component<Component>
+          , create_component_direct_action<Component> >
+    {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Component, typename ...Ts>
+    struct bulk_create_component_action
+      : ::hpx::actions::action<
+            std::vector<naming::gid_type> (runtime_support::*)(std::size_t, Ts...)
+          , &runtime_support::bulk_create_component<Component, Ts...>
+          , bulk_create_component_action<Component, Ts...> >
+    {};
+
+    template <typename Component>
+    struct bulk_create_component_action<Component>
+      : ::hpx::actions::action<
+            std::vector<naming::gid_type> (runtime_support::*)(std::size_t)
+          , &runtime_support::bulk_create_component<Component>
+          , bulk_create_component_action<Component> >
+    {};
+
+    template <typename Component, typename ...Ts>
+    struct bulk_create_component_direct_action
+      : ::hpx::actions::direct_action<
+            std::vector<naming::gid_type> (runtime_support::*)(std::size_t, Ts...)
+          , &runtime_support::bulk_create_component<Component, Ts...>
+          , bulk_create_component_direct_action<Component, Ts...> >
+    {};
+
+    template <typename Component>
+    struct bulk_create_component_direct_action<Component>
+      : ::hpx::actions::direct_action<
+            std::vector<naming::gid_type> (runtime_support::*)(std::size_t)
+          , &runtime_support::bulk_create_component<Component>
+          , bulk_create_component_direct_action<Component> >
+    {};
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
     struct copy_create_component_action
       : ::hpx::actions::action<
@@ -756,10 +930,10 @@ namespace hpx { namespace components { namespace server
     {};
 }}}
 
-///////////////////////////////////////////////////////////////////////////////
-// Termination detection does not make this locality black
 namespace hpx { namespace traits
 {
+    ///////////////////////////////////////////////////////////////////////////
+    // Termination detection does not make this locality black
     template <>
     struct action_does_termination_detection<
         hpx::components::server::runtime_support::dijkstra_termination_action>
@@ -769,13 +943,45 @@ namespace hpx { namespace traits
             return true;
         }
     };
-}}
-
-#include <hpx/runtime/components/server/runtime_support_implementations.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
-#  include <hpx/runtime/components/server/runtime_support_create_component_capabilities.hpp>
+    ///////////////////////////////////////////////////////////////////////////
+    // Actions used to create components with constructors of various arities.
+    template <typename Component, typename ...Ts>
+    struct action_capability_provider<
+        components::server::create_component_action<Component, Ts...> >
+    {
+        // return the required capabilities to invoke the given action
+        static components::security::capability call(
+            naming::address::address_type lva)
+        {
+            components::server::runtime_support* rts =
+                get_lva<components::server::runtime_support>::call(lva);
+
+            components::component_type const type =
+                components::get_component_type<
+                    typename Component::wrapped_type>();
+            return rts->get_factory_capabilities(type);
+        }
+    };
+
+    template <typename Component, typename ...Ts>
+    struct action_capability_provider<
+        components::server::create_component_direct_action<Component, Ts...> >
+    {
+        static components::security::capability call(
+            naming::address::address_type lva)
+        {
+            components::server::runtime_support* rts =
+                get_lva<components::server::runtime_support>::call(lva);
+
+            components::component_type const type =
+                components::get_component_type<
+                    typename Component::wrapped_type>();
+            return rts->get_factory_capabilities(type);
+        }
+    };
 #endif
+}}
 
 #endif  // HPX_RUNTIME_SUPPORT_JUN_02_2008_1145AM
-

@@ -31,6 +31,6 @@ HPX_REGISTER_ACTION(
     distributing_factory_create_partitioned_action)
 
 HPX_REGISTER_ACTION(
-    hpx::components::server::create_component_action0<hpx::components::server::distributing_factory>
+    hpx::components::server::create_component_action<hpx::components::server::distributing_factory>
   , distributing_factory_create_component_action
 )

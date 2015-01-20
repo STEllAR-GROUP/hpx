@@ -15,7 +15,7 @@
           , boost::mpl::false_
         )
         {
-            typedef components::server::create_component_action3<
+            typedef components::server::create_component_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -36,8 +36,7 @@
           , boost::mpl::true_
         )
         {
-            typedef
-                components::server::create_component_direct_action3<
+            typedef components::server::create_component_direct_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &

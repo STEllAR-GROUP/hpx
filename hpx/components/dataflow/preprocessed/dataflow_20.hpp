@@ -15,7 +15,7 @@
           , boost::mpl::false_
         )
         {
-            typedef components::server::create_component_action3<
+            typedef components::server::create_component_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -36,8 +36,7 @@
           , boost::mpl::true_
         )
         {
-            typedef
-                components::server::create_component_direct_action3<
+            typedef components::server::create_component_direct_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -71,7 +70,7 @@
           , boost::mpl::false_
         )
         {
-            typedef components::server::create_component_action4<
+            typedef components::server::create_component_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -92,8 +91,7 @@
           , boost::mpl::true_
         )
         {
-            typedef
-                components::server::create_component_direct_action4<
+            typedef components::server::create_component_direct_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -127,7 +125,7 @@
           , boost::mpl::false_
         )
         {
-            typedef components::server::create_component_action5<
+            typedef components::server::create_component_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -148,8 +146,7 @@
           , boost::mpl::true_
         )
         {
-            typedef
-                components::server::create_component_direct_action5<
+            typedef components::server::create_component_direct_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -183,7 +180,7 @@
           , boost::mpl::false_
         )
         {
-            typedef components::server::create_component_action6<
+            typedef components::server::create_component_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -204,8 +201,7 @@
           , boost::mpl::true_
         )
         {
-            typedef
-                components::server::create_component_direct_action6<
+            typedef components::server::create_component_direct_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -239,7 +235,7 @@
           , boost::mpl::false_
         )
         {
-            typedef components::server::create_component_action7<
+            typedef components::server::create_component_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -260,8 +256,7 @@
           , boost::mpl::true_
         )
         {
-            typedef
-                components::server::create_component_direct_action7<
+            typedef components::server::create_component_direct_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -295,7 +290,7 @@
           , boost::mpl::false_
         )
         {
-            typedef components::server::create_component_action8<
+            typedef components::server::create_component_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -316,8 +311,7 @@
           , boost::mpl::true_
         )
         {
-            typedef
-                components::server::create_component_direct_action8<
+            typedef components::server::create_component_direct_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -351,7 +345,7 @@
           , boost::mpl::false_
         )
         {
-            typedef components::server::create_component_action9<
+            typedef components::server::create_component_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -372,8 +366,7 @@
           , boost::mpl::true_
         )
         {
-            typedef
-                components::server::create_component_direct_action9<
+            typedef components::server::create_component_direct_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -407,7 +400,7 @@
           , boost::mpl::false_
         )
         {
-            typedef components::server::create_component_action10<
+            typedef components::server::create_component_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -428,8 +421,7 @@
           , boost::mpl::true_
         )
         {
-            typedef
-                components::server::create_component_direct_action10<
+            typedef components::server::create_component_direct_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -463,7 +455,7 @@
           , boost::mpl::false_
         )
         {
-            typedef components::server::create_component_action11<
+            typedef components::server::create_component_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -484,8 +476,7 @@
           , boost::mpl::true_
         )
         {
-            typedef
-                components::server::create_component_direct_action11<
+            typedef components::server::create_component_direct_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -519,7 +510,7 @@
           , boost::mpl::false_
         )
         {
-            typedef components::server::create_component_action12<
+            typedef components::server::create_component_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -540,8 +531,7 @@
           , boost::mpl::true_
         )
         {
-            typedef
-                components::server::create_component_direct_action12<
+            typedef components::server::create_component_direct_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -575,7 +565,7 @@
           , boost::mpl::false_
         )
         {
-            typedef components::server::create_component_action13<
+            typedef components::server::create_component_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -596,8 +586,7 @@
           , boost::mpl::true_
         )
         {
-            typedef
-                components::server::create_component_direct_action13<
+            typedef components::server::create_component_direct_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -631,7 +620,7 @@
           , boost::mpl::false_
         )
         {
-            typedef components::server::create_component_action14<
+            typedef components::server::create_component_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -652,8 +641,7 @@
           , boost::mpl::true_
         )
         {
-            typedef
-                components::server::create_component_direct_action14<
+            typedef components::server::create_component_direct_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -687,7 +675,7 @@
           , boost::mpl::false_
         )
         {
-            typedef components::server::create_component_action15<
+            typedef components::server::create_component_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -708,8 +696,7 @@
           , boost::mpl::true_
         )
         {
-            typedef
-                components::server::create_component_direct_action15<
+            typedef components::server::create_component_direct_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -743,7 +730,7 @@
           , boost::mpl::false_
         )
         {
-            typedef components::server::create_component_action16<
+            typedef components::server::create_component_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -764,8 +751,7 @@
           , boost::mpl::true_
         )
         {
-            typedef
-                components::server::create_component_direct_action16<
+            typedef components::server::create_component_direct_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -799,7 +785,7 @@
           , boost::mpl::false_
         )
         {
-            typedef components::server::create_component_action17<
+            typedef components::server::create_component_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -820,8 +806,7 @@
           , boost::mpl::true_
         )
         {
-            typedef
-                components::server::create_component_direct_action17<
+            typedef components::server::create_component_direct_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -855,7 +840,7 @@
           , boost::mpl::false_
         )
         {
-            typedef components::server::create_component_action18<
+            typedef components::server::create_component_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -876,8 +861,7 @@
           , boost::mpl::true_
         )
         {
-            typedef
-                components::server::create_component_direct_action18<
+            typedef components::server::create_component_direct_action<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &

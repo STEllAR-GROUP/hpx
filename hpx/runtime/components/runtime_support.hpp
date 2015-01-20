@@ -43,45 +43,22 @@ namespace hpx { namespace components
         lcos::future<int> get_factory_properties_async(components::component_type);
 
         /// Create a new component type using the runtime_support
-        template <typename Component>
-        naming::id_type create_component()
+        template <typename Component, typename ...Ts>
+        naming::id_type create_component(Ts&&... vs)
         {
-            return this->base_type::template create_component<Component>(gid_);
+            return this->base_type::template create_component<Component>
+                (gid_, std::forward<Ts>(vs)...);
         }
 
         /// Asynchronously create a new component using the runtime_support
-        template <typename Component>
-        lcos::future<naming::id_type> create_component_async()
+        template <typename Component, typename ...Ts>
+        lcos::future<naming::id_type>
+        create_component_async(Ts&&... vs)
         {
             return this->base_type::template create_component_async<Component>
-                (gid_);
+                (gid_, std::forward<Ts>(vs)...);
         }
 
-#define HPX_RUNTIME_SUPPORT_CLIENT_CREATE(Z, N, D)                           \
-        template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>   \
-        lcos::future<naming::id_type>                                 \
-        create_component_async(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))         \
-        {                                                                    \
-            return this->base_type::template create_component_async<Component>\
-                (gid_, HPX_ENUM_FORWARD_ARGS(N, A, a));                      \
-        }                                                                    \
-                                                                             \
-        template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>   \
-        naming::id_type create_component(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))\
-        {                                                                    \
-            return this->base_type::template create_component<Component>     \
-                (gid_, HPX_ENUM_FORWARD_ARGS(N, A, a));                      \
-        }                                                                    \
-    /**/
-
-        BOOST_PP_REPEAT_FROM_TO(
-            1
-          , HPX_ACTION_ARGUMENT_LIMIT
-          , HPX_RUNTIME_SUPPORT_CLIENT_CREATE
-          , _
-        )
-
-#undef HPX_RUNTIME_SUPPORT_CLIENT_CREATE
 
         /// Asynchronously create N new default constructed components using
         /// the runtime_support
