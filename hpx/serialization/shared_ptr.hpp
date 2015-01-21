@@ -1,4 +1,5 @@
 //  Copyright (c) 2014 Thomas Heller
+//  Copyright (c) 2014-2015 Anton Bikineev
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,10 +9,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/polymorphic_factory_1.hpp>
+#include <hpx/serialization/polymorphic_intrusive_factory.hpp>
+#include <hpx/serialization/polymorphic_nonintrusive_factory.hpp>
+#include <hpx/traits/polymorphic_traits.hpp>
 
 #include <boost/shared_ptr.hpp>
-#include <boost/type_traits/is_polymorphic.hpp>
+#include <boost/mpl/eval_if.hpp>
 
 namespace hpx { namespace serialization {
 
@@ -30,60 +33,113 @@ namespace hpx { namespace serialization {
             shared_ptr_helper(boost::shared_ptr<T>&& t, boost::shared_ptr<T>& ptr)
               : t_(std::move(t))
             {
-              ptr = t_;
+                ptr = t_;
             }
 
             boost::shared_ptr<T> t_;
         };
 
-        template <typename T> inline
-        void serialize_polymorphic(input_archive& ar, boost::shared_ptr<T>& ptr, boost::uint64_t pos, boost::mpl::false_)
+        template <class T>
+        class shared_ptr_input_dispatcher
         {
-            T t;
-            ar >> t;
-            register_pointer(
-                ar
-              , pos
-              , HPX_STD_UNIQUE_PTR<detail::ptr_helper>(
-                    new detail::shared_ptr_helper<T>(std::move(t), ptr)
-                )
-            );
-        }
+          struct intrusive_polymorphic
+          {
+            static void serialize(input_archive& ar,
+                boost::shared_ptr<T>& ptr, boost::uint64_t pos)
+            {
+              typename polymorphic_intrusive_factory::size_type hash;
+              ar >> hash;
 
-        template <typename T> inline
-        void serialize_polymorphic(input_archive& ar, boost::shared_ptr<T>& ptr, boost::uint64_t pos, boost::mpl::true_)
+              boost::shared_ptr<T> t(
+                  polymorphic_intrusive_factory::instance().
+                    create_by_hash<T>(hash)
+              );
+              ar >> *t;
+              register_pointer(
+                  ar
+                , pos
+                , HPX_STD_UNIQUE_PTR<detail::ptr_helper>(
+                      new detail::shared_ptr_helper<T>(std::move(t), ptr)
+                  )
+              );
+            }
+          };
+
+          struct nonintrusive_polymorphic
+          {
+            static void serialize(input_archive& ar,
+                boost::shared_ptr<T>& ptr, boost::uint64_t pos)
+            {
+              boost::shared_ptr<T> t (
+                polymorphic_nonintrusive_factory::instance().load<T>(ar)
+              );
+              register_pointer(
+                  ar
+                , pos
+                , HPX_STD_UNIQUE_PTR<detail::ptr_helper>(
+                      new detail::shared_ptr_helper<T>(std::move(t), ptr)
+                  )
+              );
+            }
+          };
+
+          struct usual
+          {
+            static void serialize(input_archive& ar,
+                boost::shared_ptr<T>& ptr, boost::uint64_t pos)
+            {
+              T t;
+              ar >> t;
+              register_pointer(
+                  ar
+                , pos
+                , HPX_STD_UNIQUE_PTR<detail::ptr_helper>(
+                      new detail::shared_ptr_helper<T>(std::move(t), ptr)
+                  )
+              );
+            }
+          };
+
+        public:
+          typedef typename boost::mpl::eval_if<
+            hpx::traits::is_intrusive_polymorphic<T>,
+              boost::mpl::identity<intrusive_polymorphic>,
+              boost::mpl::eval_if<
+                hpx::traits::is_nonintrusive_polymorphic<T>,
+                  boost::mpl::identity<nonintrusive_polymorphic>,
+                  boost::mpl::identity<usual>
+              >
+          >::type type;
+        };
+
+        template <class T>
+        class shared_ptr_output_dispatcher
         {
-            typename hpx::serialization::polymorphic_factory::size_type hash;
+          struct intrusive_polymorphic
+          {
+            static void serialize(output_archive& ar,
+                boost::shared_ptr<T>& ptr) {
+              const boost::uint64_t hash = access::get_hash(ptr.get());
+              ar << hash;
+              ar << *ptr;
+            }
+          };
 
-            ar >> hash;
-            boost::shared_ptr<T> t(
-                static_cast<T*>(
-                    hpx::serialization::polymorphic_factory::instance().create(hash)
-                )
-            );
-            ar >> *t;
-            register_pointer(
-                ar
-              , pos
-              , HPX_STD_UNIQUE_PTR<detail::ptr_helper>(
-                    new detail::shared_ptr_helper<T>(std::move(t), ptr)
-                )
-            );
-        }
+          struct usual
+          {
+            static void serialize(output_archive& ar,
+                boost::shared_ptr<T>& ptr) {
+              ar << *ptr;
+            }
+          };
 
-        template <typename T> inline
-        void serialize_polymorphic(output_archive& ar, boost::shared_ptr<T>& ptr, boost::mpl::false_)
-        {
-            ar << *ptr;
-        }
-
-        template <typename T> inline
-        void serialize_polymorphic(output_archive& ar, boost::shared_ptr<T>& ptr, boost::mpl::true_)
-        {
-            const boost::uint32_t hash = access::get_hash(ptr.get());
-            ar << hash;
-            ar << *ptr;
-        }
+        public:
+          typedef typename boost::mpl::if_<
+            hpx::traits::is_intrusive_polymorphic<T>,
+              intrusive_polymorphic,
+              usual
+            >::type type;
+        };
     }
 
     // load shared_ptr ...
@@ -101,7 +157,7 @@ namespace hpx { namespace serialization {
             {
                 pos = 0;
                 ar >> pos;
-                detail::serialize_polymorphic(ar, ptr, pos, boost::is_polymorphic<T>());
+                detail::shared_ptr_input_dispatcher<T>::type::serialize(ar, ptr, pos);
             }
             else
             {
@@ -126,7 +182,7 @@ namespace hpx { namespace serialization {
             if(pos == boost::uint64_t(-1))
             {
                 ar << cur_pos;
-                detail::serialize_polymorphic(ar, ptr, boost::is_polymorphic<T>());
+                detail::shared_ptr_output_dispatcher<T>::type::serialize(ar, ptr);
             }
         }
     }

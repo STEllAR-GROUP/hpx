@@ -1,11 +1,11 @@
 //  Copyright (c) 2014 Thomas Heller
-//  Copyright (c) 2014 Anton Bikineev
+//  Copyright (c) 2015 Anton Bikineev
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/polymorphic_factory_1.hpp>
+#include <hpx/serialization/polymorphic_nonintrusive_factory.hpp>
 
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
@@ -18,14 +18,15 @@ struct A
     virtual ~A() {}
 
     int a;
-
-    template <typename Archive>
-    void serialize(Archive & ar, unsigned)
-    {
-        ar & a;
-    }
-    HPX_SERIALIZATION_POLYMORPHIC(A);
 };
+
+template <typename Archive>
+void serialize(Archive& ar, A& a, unsigned)
+{
+  ar & a.a;
+}
+
+HPX_SERIALIZATION_REGISTER_CLASS(A);
 
 struct B
 {
@@ -38,13 +39,15 @@ struct B
 
     int b;
 
-    template <typename Archive>
-    void serialize(Archive & ar, unsigned)
-    {
-        ar & b;
-    }
-    HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(B);
 };
+
+template <class Archive>
+void serialize(Archive& ar, B& b, unsigned)
+{
+  ar & b.b;
+}
+
+HPX_SERIALIZATION_REGISTER_CLASS(B);
 
 struct D : B
 {
@@ -53,17 +56,18 @@ struct D : B
     void f() {}
 
     int d;
-
-    template <typename Archive>
-    void serialize(Archive & ar, unsigned)
-    {
-        b = 4711;
-        auto t = hpx::serialization::base_object<B>(*this);
-        ar & t;
-        ar & d;
-    }
-    HPX_SERIALIZATION_POLYMORPHIC(D);
 };
+
+template <class Archive>
+void serialize(Archive& ar, D& d, unsigned)
+{
+  d.b = 4711;
+  auto t = hpx::serialization::base_object<B>(d);
+  ar & t;
+  ar & d.d;
+}
+
+HPX_SERIALIZATION_REGISTER_CLASS(D);
 
 int main()
 {

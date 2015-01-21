@@ -1,4 +1,5 @@
 //  Copyright (c) 2014 Thomas Heller
+//  Copyright (c) 2015 Anton Bikineev
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,6 +11,7 @@
 
 #include <hpx/serialization/archive.hpp>
 #include <hpx/serialization/output_container.hpp>
+#include <hpx/serialization/polymorphic_nonintrusive_factory.hpp>
 
 #include <boost/utility/enable_if.hpp>
 
@@ -50,7 +52,8 @@ namespace hpx { namespace serialization {
         template <typename T>
         void save_bitwise(T const & t, boost::mpl::false_)
         {
-            serialize(*this, const_cast<T &>(t), 0);
+            save_nonintrusively_polymorphic(t,
+                hpx::traits::is_nonintrusive_polymorphic<T>());
         }
 
         template <typename T>
@@ -66,6 +69,18 @@ namespace hpx { namespace serialization {
             {
                 save_binary(&t, sizeof(t));
             }
+        }
+
+        template <typename T>
+        void save_nonintrusively_polymorphic(T const & t, boost::mpl::false_)
+        {
+            serialize(*this, const_cast<T &>(t), 0);
+        }
+
+        template <typename T>
+        void save_nonintrusively_polymorphic(T const & t, boost::mpl::true_)
+        {
+            polymorphic_nonintrusive_factory::instance().save(*this, t);
         }
 
         template <typename T>
@@ -129,10 +144,7 @@ namespace hpx { namespace serialization {
         pointer_tracker pointer_tracker_;
     };
 
-    std::size_t track_pointer(output_archive & ar, void * pos)
-    {
-        return ar.track_pointer(pos);
-    }
+    std::size_t track_pointer(output_archive & ar, void * pos);
 }}
 
 #endif

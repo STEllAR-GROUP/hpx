@@ -6,7 +6,6 @@
 #include <iostream>
 
 #include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/polymorphic_factory_1.hpp>
 #include <hpx/serialization/shared_ptr.hpp>
 #include <hpx/serialization/intrusive_ptr.hpp>
 

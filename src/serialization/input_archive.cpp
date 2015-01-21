@@ -7,6 +7,11 @@
 
 namespace hpx { namespace serialization {
 
+    void register_pointer(input_archive & ar, std::size_t pos, HPX_STD_UNIQUE_PTR<detail::ptr_helper> helper)
+    {
+        ar.register_pointer(pos, std::move(helper));
+    }
+
     void input_archive::load_impl(boost::int64_t & l)
     {
         const std::size_t size = sizeof(boost::int64_t);

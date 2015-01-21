@@ -4,8 +4,8 @@
 //  See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_SERIALIZATION_POLYMORPHIC_FACTORY_1_HPP
-#define HPX_SERIALIZATION_POLYMORPHIC_FACTORY_1_HPP
+#ifndef HPX_SERIALIZATION_POLYMORPHIC_INTRUSIVE_FACTORY_HPP
+#define HPX_SERIALIZATION_POLYMORPHIC_INTRUSIVE_FACTORY_HPP
 
 #include <hpx/config.hpp>
 #include <hpx/util/jenkins_hash.hpp>
@@ -17,37 +17,38 @@
 
 namespace hpx { namespace serialization {
 
-  class HPX_EXPORT polymorphic_factory: boost::noncopyable
+  class HPX_EXPORT polymorphic_intrusive_factory: boost::noncopyable
   {
   public:
     typedef hpx::util::jenkins_hash::size_type size_type;
     typedef void* (*ctor_type) ();
-    typedef boost::unordered_map<size_type, ctor_type> ctor_map;
+    typedef boost::unordered_map<size_type, ctor_type> ctor_map_type;
 
-    static polymorphic_factory& instance()
+    static polymorphic_intrusive_factory& instance()
     {
-      hpx::util::static_<polymorphic_factory> factory;
+      hpx::util::static_<polymorphic_intrusive_factory> factory;
       return factory.get();
     }
 
-    void register_class(boost::uint64_t hash, ctor_type fun)
+    void register_class_with_hash(boost::uint64_t hash, ctor_type fun)
     {
-      map[hash] = fun;
+      map_[hash] = fun;
     }
 
-    void* create(size_type hash)
+    template <class T>
+    T* create_by_hash(size_type hash)
     {
-      return map.at(hash)();
+      return static_cast<T*>(map_.at(hash)());
     }
 
   private:
-    polymorphic_factory()
+    polymorphic_intrusive_factory()
     {
     }
 
-    friend hpx::util::static_<polymorphic_factory>;
+    friend hpx::util::static_<polymorphic_intrusive_factory>;
 
-    ctor_map map;
+    ctor_map_type map_;
   };
 
 }}
@@ -78,8 +79,8 @@ namespace hpx { namespace serialization {
   virtual void save(hpx::serialization::output_archive& ar, unsigned n) const \
   {                                                                           \
     static bool register_class = (                                            \
-      hpx::serialization::polymorphic_factory::instance().                    \
-        register_class(                                                       \
+      hpx::serialization::polymorphic_intrusive_factory::instance().          \
+        register_class_with_hash(                                             \
           Class::hpx_serialization_get_hash(),                                \
           &Class::factory_function                                            \
         ),                                                                    \
@@ -100,8 +101,8 @@ namespace hpx { namespace serialization {
   virtual void save(hpx::serialization::output_archive& ar, unsigned n) const \
   {                                                                           \
     static bool register_class = (                                            \
-      hpx::serialization::polymorphic_factory::instance().                    \
-        register_class(                                                       \
+      hpx::serialization::polymorphic_intrusive_factory::instance().          \
+        register_class_with_hash(                                             \
           Class::hpx_serialization_get_hash(),                                \
           &Class::factory_function                                            \
         ),                                                                    \

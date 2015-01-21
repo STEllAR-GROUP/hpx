@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/serialization/container.hpp>
-#include <hpx/serialization/polymorphic_factory_1.hpp>
 
 #include <hpx/traits/is_bitwise_serializable.hpp>
 

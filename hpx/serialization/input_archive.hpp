@@ -1,4 +1,5 @@
 //  Copyright (c) 2014 Thomas Heller
+//  Copyright (c) 2015 Anton Bikineev
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,6 +11,7 @@
 
 #include <hpx/serialization/archive.hpp>
 #include <hpx/serialization/input_container.hpp>
+#include <hpx/serialization/polymorphic_nonintrusive_factory.hpp>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -55,7 +57,8 @@ namespace hpx { namespace serialization {
         template <typename T>
         void load_bitwise(T & t, boost::mpl::false_)
         {
-            serialize(*this, t, 0);
+            load_nonintrusively_polymorphic(t,
+                hpx::traits::is_nonintrusive_polymorphic<T>());
         }
 
         template <typename T>
@@ -71,6 +74,18 @@ namespace hpx { namespace serialization {
             {
                 load_binary(&t, sizeof(t));
             }
+        }
+
+        template <class T>
+        void load_nonintrusively_polymorphic(T& t, boost::mpl::false_)
+        {
+            serialize(*this, t, 0);
+        }
+
+        template <class T>
+        void load_nonintrusively_polymorphic(T& t, boost::mpl::true_)
+        {
+            polymorphic_nonintrusive_factory::instance().load(*this, t);
         }
 
         template <typename T>
@@ -143,10 +158,7 @@ namespace hpx { namespace serialization {
         pointer_tracker pointer_tracker_;
     };
 
-    void register_pointer(input_archive & ar, std::size_t pos, HPX_STD_UNIQUE_PTR<detail::ptr_helper> helper)
-    {
-        ar.register_pointer(pos, std::move(helper));
-    }
+    void register_pointer(input_archive & ar, std::size_t pos, HPX_STD_UNIQUE_PTR<detail::ptr_helper> helper);
 
     template <typename Helper>
     Helper & tracked_pointer(input_archive & ar, std::size_t pos)

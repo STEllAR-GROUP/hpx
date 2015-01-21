@@ -9,6 +9,11 @@
 
 namespace hpx { namespace serialization {
 
+    std::size_t track_pointer(output_archive & ar, void * pos)
+    {
+        return ar.track_pointer(pos);
+    }
+
     void output_archive::save_impl(boost::int64_t l)
     {
         const std::size_t size = sizeof(boost::int64_t);

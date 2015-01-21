@@ -74,5 +74,6 @@ namespace hpx { namespace serialization {
 }}
 
 #include <hpx/serialization/base_object.hpp>
+#include <hpx/serialization/polymorphic_nonintrusive_factory.ipp>
 
 #endif
