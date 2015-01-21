@@ -15,8 +15,10 @@
 With this release we put a lot of effort into changing the code base to be more
 compatible to C++11 (all of the API uses variadic templates now). However, this
 change required to modify the argument sequence for some of the exiting API
-functions (`hpx::async_continue`, `hpx::apply_continue`, `hpx::when_each`,
-`hpx::wait_each`).
+functions ([funcref hpx::async_continue `hpx::async_continue`],
+[funcref hpx::apply_continue `hpx::apply_continue`],
+[funcref hpx::when_each `hpx::when_each`],
+[funcref hpx::wait_each `hpx::wait_each`]).
 
 
 [heading Bug Fixes (Closed Tickets)]
