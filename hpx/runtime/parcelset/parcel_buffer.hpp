@@ -31,29 +31,18 @@ namespace hpx { namespace parcelset
           : data_(allocator)
           , num_chunks_(count_chunks_type(0, 0))
           , size_(0), data_size_(0)
-          , parcels_decoded_(false)
-        {}
-
-        template <typename ChunkAllocator>
-        explicit parcel_buffer(allocator_type allocator = allocator_type(), typename boost::disable_if<boost::is_same<ChunkType, util::serialization_chunk>, ChunkAllocator>::type const & chunk_allocator= ChunkAllocator())
-          : data_(allocator)
-          , num_chunks_(count_chunks_type(0, 0))
-          , size_(0), data_size_(0)
-          , parcels_decoded_(false)
         {}
 
         explicit parcel_buffer(BufferType const & data, allocator_type allocator = allocator_type())
           : data_(data, allocator)
           , num_chunks_(count_chunks_type(0, 0))
           , size_(0), data_size_(0)
-          , parcels_decoded_(false)
         {}
 
         explicit parcel_buffer(BufferType && data, allocator_type allocator = allocator_type())
           : data_(std::move(data), allocator)
           , num_chunks_(count_chunks_type(0, 0))
           , size_(0), data_size_(0)
-          , parcels_decoded_(false)
         {}
 
         parcel_buffer(parcel_buffer && other)
@@ -63,12 +52,8 @@ namespace hpx { namespace parcelset
           , num_chunks_(other.num_chunks_)
           , size_(other.size_)
           , data_size_(other.data_size_)
-          , parcels_decoded_(false)
           , data_point_(other.data_point_)
         {
-            bool tmp = other.parcels_decoded_;
-            parcels_decoded_ = tmp;
-            other.parcels_decoded_ = true;
         }
 
         parcel_buffer &operator=(parcel_buffer && other)
@@ -80,9 +65,8 @@ namespace hpx { namespace parcelset
             size_ = other.size_;
             data_size_ = other.data_size_;
             data_point_ = other.data_point_;
-            bool tmp = other.parcels_decoded_;
-            parcels_decoded_ = tmp;
-            other.parcels_decoded_ = true;
+
+            return *this;
         }
 
         void clear()
@@ -93,7 +77,6 @@ namespace hpx { namespace parcelset
             num_chunks_ = count_chunks_type(0, 0);
             size_ = 0;
             data_size_ = 0;
-            parcels_decoded_ = false;
         }
 
         BufferType data_;
@@ -108,8 +91,6 @@ namespace hpx { namespace parcelset
 
         boost::integer::ulittle64_t size_;
         boost::integer::ulittle64_t data_size_;
-
-        boost::atomic<bool> parcels_decoded_;
 
         /// Counters and their data containers.
         performance_counters::parcels::data_point data_point_;

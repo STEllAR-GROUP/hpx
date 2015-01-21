@@ -91,38 +91,38 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         template <typename Handler, typename ParcelPostprocess>
         void async_write(Handler handler, ParcelPostprocess parcel_postprocess)
         {
-            HPX_ASSERT(buffer_);
+            HPX_ASSERT(!buffer_.data_.empty());
 
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
             state_ = state_async_write;
 #endif
             /// Increment sends and begin timer.
-            buffer_->data_point_.time_ = timer_.elapsed_nanoseconds();
+            buffer_.data_point_.time_ = timer_.elapsed_nanoseconds();
 
             // Write the serialized data to the socket. We use "gather-write"
             // to send both the header and the data in a single write operation.
             std::vector<boost::asio::const_buffer> buffers;
-            buffers.push_back(boost::asio::buffer(&buffer_->size_,
-                sizeof(buffer_->size_)));
-            buffers.push_back(boost::asio::buffer(&buffer_->data_size_,
-                sizeof(buffer_->data_size_)));
+            buffers.push_back(boost::asio::buffer(&buffer_.size_,
+                sizeof(buffer_.size_)));
+            buffers.push_back(boost::asio::buffer(&buffer_.data_size_,
+                sizeof(buffer_.data_size_)));
 
             // add chunk description
-            buffers.push_back(boost::asio::buffer(&buffer_->num_chunks_,
-                sizeof(buffer_->num_chunks_)));
+            buffers.push_back(boost::asio::buffer(&buffer_.num_chunks_,
+                sizeof(buffer_.num_chunks_)));
 
             std::vector<parcel_buffer_type::transmission_chunk_type>& chunks =
-                buffer_->transmission_chunks_;
+                buffer_.transmission_chunks_;
             if (!chunks.empty()) {
                 buffers.push_back(
                     boost::asio::buffer(chunks.data(), chunks.size() *
                         sizeof(parcel_buffer_type::transmission_chunk_type)));
 
                 // add main buffer holding data which was serialized normally
-                buffers.push_back(boost::asio::buffer(buffer_->data_));
+                buffers.push_back(boost::asio::buffer(buffer_.data_));
 
                 // now add chunks themselves, those hold zero-copy serialized chunks
-                BOOST_FOREACH(util::serialization_chunk& c, buffer_->chunks_)
+                BOOST_FOREACH(util::serialization_chunk& c, buffer_.chunks_)
                 {
                     if (c.type_ == util::chunk_type_pointer)
                         buffers.push_back(boost::asio::buffer(c.data_.cpos_, c.size_));
@@ -130,7 +130,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             }
             else {
                 // add main buffer holding data which was serialized normally
-                buffers.push_back(boost::asio::buffer(buffer_->data_));
+                buffers.push_back(boost::asio::buffer(buffer_.data_));
             }
 
             // this additional wrapping of the handler into a bind object is
@@ -165,9 +165,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             }
 
             // complete data point and push back onto gatherer
-            buffer_->data_point_.time_ =
-                timer_.elapsed_nanoseconds() - buffer_->data_point_.time_;
-            parcels_sent_.add_data(buffer_->data_point_);
+            buffer_.data_point_.time_ =
+                timer_.elapsed_nanoseconds() - buffer_.data_point_.time_;
+            parcels_sent_.add_data(buffer_.data_point_);
 
             // now handle the acknowledgment byte which is sent by the receiver
 #if defined(__linux) || defined(linux) || defined(__linux__)
@@ -196,6 +196,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             // parcels. Pass along the connection so it can be reused if more
             // parcels have to be sent.
             boost::get<1>(handler)(e, there_, shared_from_this());
+            buffer_.clear();
         }
 
         /// Socket for the parcelport_connection.

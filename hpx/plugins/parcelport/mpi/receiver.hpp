@@ -80,7 +80,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             new_header();
         }
 
-        void receive()
+        void receive(bool recurse = true)
         {
             typedef header_list::iterator iterator;
             int source;
@@ -102,7 +102,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                         headers_.erase(it);
                         {
                             hpx::util::scoped_unlock<mutex_type::scoped_lock> ul(l);
-                            receive_message(source, h);
+                            receive_message(source, h, recurse);
                             h.reset();
                         }
                         it = headers_.begin();
@@ -116,8 +116,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             }
         }
 
-        void receive_message(int source, header h)
+        void receive_message(int source, header h, bool recurse)
         {
+            util::high_resolution_timer timer;
             MPI_Request request;
             MPI_Request *wait_request = NULL;
             // Now do receives ...
@@ -127,6 +128,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
             allocator_type alloc(chunk_pool_);
             buffer_type buffer(alloc);
+
+            performance_counters::parcels::data_point& data = buffer.data_point_;
+            data.time_ = timer.elapsed_nanoseconds();
+            data.bytes_ = static_cast<std::size_t>(buffer.size_);
 
             buffer.data_.resize(static_cast<std::size_t>(h.size()));
             buffer.num_chunks_ = h.num_chunks();
@@ -170,7 +175,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             }
             else
             {
-                wait_done(wait_request);
+                wait_done(wait_request, recurse);
                 {
                     util::mpi_environment::scoped_lock l;
                     MPI_Irecv(
@@ -189,7 +194,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             std::size_t chunk_idx = 0;
             BOOST_FOREACH(data_type & c, buffer.chunks_)
             {
-                wait_done(wait_request);
+                wait_done(wait_request, recurse);
                 std::size_t chunk_size = buffer.transmission_chunks_[chunk_idx++].second;
 
                 c.resize(chunk_size);
@@ -208,9 +213,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 }
             }
 
-            wait_done(wait_request);
+            wait_done(wait_request, recurse);
 
-            //std::cout << "done receive\n";
+            data.time_ = timer.elapsed_nanoseconds() - data.time_;
 
             decode_parcel(pp_, std::move(buffer));
         }
@@ -259,7 +264,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         boost::atomic<bool> & stopped_;
 
-        void wait_done(MPI_Request *& request)
+        void wait_done(MPI_Request *& request, bool recurse)
         {
             if(request == NULL) return;
 
@@ -284,7 +289,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 }
                 else
                 {
-                    receive();
+                    if(recurse)
+                        receive();
+                    else if(threads::get_self_ptr())
+                        hpx::this_thread::suspend(hpx::threads::pending,
+                            "mpi::sender::wait_done");
                 }
                 ++k;
 

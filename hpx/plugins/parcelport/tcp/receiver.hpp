@@ -68,11 +68,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         template <typename Handler>
         void async_read(Handler handler)
         {
-            buffer_ = get_buffer();
-            buffer_->clear();
+            buffer_ = parcel_buffer_type();
 
             // Store the time of the begin of the read operation
-            performance_counters::parcels::data_point& data = buffer_->data_point_;
+            performance_counters::parcels::data_point& data = buffer_.data_point_;
             data.time_ = timer_.elapsed_nanoseconds();
             data.serialization_time_ = 0;
             data.bytes_ = 0;
@@ -81,13 +80,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             // Issue a read operation to read the message size.
             using boost::asio::buffer;
             std::vector<boost::asio::mutable_buffer> buffers;
-            buffers.push_back(buffer(&buffer_->size_,
-                sizeof(buffer_->size_)));
-            buffers.push_back(buffer(&buffer_->data_size_,
-                sizeof(buffer_->data_size_)));
+            buffers.push_back(buffer(&buffer_.size_,
+                sizeof(buffer_.size_)));
+            buffers.push_back(buffer(&buffer_.data_size_,
+                sizeof(buffer_.data_size_)));
 
-            buffers.push_back(buffer(&buffer_->num_chunks_,
-                sizeof(buffer_->num_chunks_)));
+            buffers.push_back(buffer(&buffer_.num_chunks_,
+                sizeof(buffer_.num_chunks_)));
 
 #if defined(__linux) || defined(linux) || defined(__linux__)
             boost::asio::detail::socket_option::boolean<
@@ -124,7 +123,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             }
             else {
                 // Determine the length of the serialized data.
-                boost::uint64_t inbound_size = buffer_->size_;
+                boost::uint64_t inbound_size = buffer_.size_;
 
                 if (inbound_size > max_inbound_size_)
                 {
@@ -134,7 +133,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                     return;
                 }
 
-                buffer_->data_point_.bytes_ = static_cast<std::size_t>(inbound_size);
+                buffer_.data_point_.bytes_ = static_cast<std::size_t>(inbound_size);
 
                 // receive buffers
                 std::vector<boost::asio::mutable_buffer> buffers;
@@ -142,10 +141,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 // determine the size of the chunk buffer
                 std::size_t num_zero_copy_chunks =
                     static_cast<std::size_t>(
-                        static_cast<boost::uint32_t>(buffer_->num_chunks_.first));
+                        static_cast<boost::uint32_t>(buffer_.num_chunks_.first));
                 std::size_t num_non_zero_copy_chunks =
                     static_cast<std::size_t>(
-                        static_cast<boost::uint32_t>(buffer_->num_chunks_.second));
+                        static_cast<boost::uint32_t>(buffer_.num_chunks_.second));
 
                 void (receiver::*f)(boost::system::error_code const&,
                         boost::tuple<Handler>) = 0;
@@ -155,7 +154,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                         transmission_chunk_type;
 
                     std::vector<transmission_chunk_type>& chunks =
-                        buffer_->transmission_chunks_;
+                        buffer_.transmission_chunks_;
 
                     chunks.resize(static_cast<std::size_t>(
                         num_zero_copy_chunks + num_non_zero_copy_chunks));
@@ -165,16 +164,16 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                             sizeof(transmission_chunk_type)));
 
                     // add main buffer holding data which was serialized normally
-                    buffer_->data_.resize(static_cast<std::size_t>(inbound_size));
-                    buffers.push_back(boost::asio::buffer(buffer_->data_));
+                    buffer_.data_.resize(static_cast<std::size_t>(inbound_size));
+                    buffers.push_back(boost::asio::buffer(buffer_.data_));
 
                     // Start an asynchronous call to receive the data.
                     f = &receiver::handle_read_chunk_data<Handler>;
                 }
                 else {
                     // add main buffer holding data which was serialized normally
-                    buffer_->data_.resize(static_cast<std::size_t>(inbound_size));
-                    buffers.push_back(boost::asio::buffer(buffer_->data_));
+                    buffer_.data_.resize(static_cast<std::size_t>(inbound_size));
+                    buffers.push_back(boost::asio::buffer(buffer_.data_));
 
                     // Start an asynchronous call to receive the data.
                     f = &receiver::handle_read_data<Handler>;
@@ -209,15 +208,15 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 // add appropriately sized chunk buffers for the zero-copy data
                 std::size_t num_zero_copy_chunks =
                     static_cast<std::size_t>(
-                        static_cast<boost::uint32_t>(buffer_->num_chunks_.first));
+                        static_cast<boost::uint32_t>(buffer_.num_chunks_.first));
 
-                buffer_->chunks_.resize(num_zero_copy_chunks);
+                buffer_.chunks_.resize(num_zero_copy_chunks);
                 for (std::size_t i = 0; i != num_zero_copy_chunks; ++i)
                 {
-                    std::size_t chunk_size = buffer_->transmission_chunks_[i].second;
-                    buffer_->chunks_[i].resize(chunk_size);
+                    std::size_t chunk_size = buffer_.transmission_chunks_[i].second;
+                    buffer_.chunks_[i].resize(chunk_size);
                     buffers.push_back(
-                        boost::asio::buffer(buffer_->chunks_[i].data(), chunk_size));
+                        boost::asio::buffer(buffer_.chunks_[i].data(), chunk_size));
                 }
 
                 // Start an asynchronous call to receive the data.
@@ -249,8 +248,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             }
             else {
                 // complete data point and pass it along
-                buffer_->data_point_.time_ = timer_.elapsed_nanoseconds() -
-                    buffer_->data_point_.time_;
+                buffer_.data_point_.time_ = timer_.elapsed_nanoseconds() -
+                    buffer_.data_point_.time_;
 
                 // now send acknowledgment byte
                 void (receiver::*f)(boost::system::error_code const&,
@@ -258,7 +257,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                     = &receiver::handle_write_ack<Handler>;
 
                 // decode the received parcels.
-                decode_parcels(parcelport_, *this, buffer_);
+                decode_parcels(parcelport_, *this, std::move(buffer_));
 
                 ack_ = true;
                 boost::asio::async_write(socket_,

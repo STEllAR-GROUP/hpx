@@ -128,19 +128,20 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             );
         }
 
-        void remove_from_connection_cache(parcelset::locality const& loc)
-        {}
-
         util::io_service_pool* get_thread_pool(char const* name)
         {
             return 0;
         }
 
+        // This parcelport doesn't maintain a connection cache
         boost::int64_t get_connection_cache_statistics(
             connection_cache_statistics_type, bool reset)
         {
             return 0;
         }
+
+        void remove_from_connection_cache(parcelset::locality const& loc)
+        {}
 
         bool run(bool blocking = true)
         {
@@ -166,18 +167,29 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
             //std::cout << "put parcel ...\n";
             if(stopped_) return;
+            util::high_resolution_timer timer;
 
             allocator_type alloc(chunk_pool_);
             snd_buffer_type buffer(alloc);
             encode_parcel(p, buffer, archive_flags_, this->get_max_outbound_message_size());
 
+            buffer.data_point_.time_ = timer.elapsed_nanoseconds();
+
             int dest_rank = dest.get<locality>().rank();
             HPX_ASSERT(dest_rank != util::mpi_environment::rank());
 
-            sender_.send(dest_rank, buffer, hpx::util::bind(&receiver::receive, boost::ref(receiver_)));
+            sender_.send(
+                dest_rank
+              , buffer
+              , hpx::util::bind(&receiver::receive, boost::ref(receiver_), false)
+            );
 
             error_code ec;
             f(ec, p);
+            buffer.data_point_.time_ =
+                timer.elapsed_nanoseconds() - buffer.data_point_.time_;
+            parcels_sent_.add_data(buffer.data_point_);
+
             //do_background_work();
         }
 
@@ -278,8 +290,6 @@ namespace hpx { namespace traits
                 "env = ${HPX_PARCELPORT_MPI_ENV:PMI_RANK,OMPI_COMM_WORLD_SIZE}\n"
 #endif
                 "multithreaded = ${HPX_PARCELPORT_MPI_MULTITHREADED:0}\n"
-                "io_pool_size = 1\n"
-                "use_io_pool = 1\n"
                 ;
         }
     };
