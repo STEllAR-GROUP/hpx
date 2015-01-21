@@ -1,12 +1,10 @@
 #include <hpx/hpx_init.hpp>
 
-#if defined( BOOST_MSVC )
-
+#if defined(BOOST_MSVC)
 #pragma warning(disable: 4786)  // identifier truncated in debug info
 #pragma warning(disable: 4710)  // function not inlined
 #pragma warning(disable: 4711)  // function selected for automatic inline expansion
 #pragma warning(disable: 4514)  // unreferenced inline removed
-
 #endif
 
 //  Taken from the Boost.Bind library
@@ -25,15 +23,7 @@
 
 namespace placeholders = hpx::util::placeholders;
 
-#if defined(BOOST_MSVC) && (BOOST_MSVC < 1300)
-#pragma warning(push, 3)
-#endif
-
 #include <iostream>
-
-#if defined(BOOST_MSVC) && (BOOST_MSVC < 1300)
-#pragma warning(pop)
-#endif
 
 #include <hpx/util/lightweight_test.hpp>
 

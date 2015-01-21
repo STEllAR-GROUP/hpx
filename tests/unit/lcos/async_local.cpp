@@ -143,21 +143,15 @@ int hpx_main()
         hpx::future<boost::int32_t> f1 = hpx::async(increment, 42);
         HPX_TEST_EQ(f1.get(), 43);
 
-        // VS2010 bails out with the following code
-#if !defined(BOOST_MSVC) || BOOST_MSVC >= 1700
         hpx::future<boost::int32_t> f2 =
             hpx::async(hpx::launch::all, increment, 42);
         HPX_TEST_EQ(f2.get(), 43);
-#endif
 
         hpx::future<void> f3 = hpx::async(do_nothing, 42);
         f3.get();
 
-        // VS2010 bails out with the following code
-#if !defined(BOOST_MSVC) || BOOST_MSVC >= 1700
         hpx::future<void> f4 = hpx::async(hpx::launch::sync, do_nothing, 42);
         f4.get();
-#endif
     }
 
     {

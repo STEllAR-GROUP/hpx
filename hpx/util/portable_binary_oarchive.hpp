@@ -37,10 +37,8 @@
 #include <boost/archive/archive_exception.hpp>
 #include <boost/archive/detail/common_oarchive.hpp>
 #include <boost/archive/detail/register_archive.hpp>
-#if BOOST_VERSION >= 104400
 #include <boost/serialization/item_version_type.hpp>
 #include <boost/serialization/collection_size_type.hpp>
-#endif
 
 #include <hpx/config.hpp>
 #include <hpx/util/portable_binary_archive.hpp>
@@ -149,7 +147,6 @@ protected:
         this->primitive_base_t::save(t);
     }
 
-#if BOOST_VERSION >= 104400
     void save(const boost::archive::class_id_reference_type& t) {
         boost::int64_t l = t;
         save_impl(l, sizeof(boost::int16_t));
@@ -190,7 +187,6 @@ protected:
         boost::int64_t l = t;
         save_impl(l, sizeof(boost::int64_t));
     }
-#endif
 #ifndef BOOST_NO_STD_WSTRING
     void save(std::wstring const& t) {
         this->primitive_base_t::save(t);

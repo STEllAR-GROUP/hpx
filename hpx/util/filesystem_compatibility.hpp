@@ -121,7 +121,7 @@ namespace hpx { namespace util
 
     inline std::string leaf(boost::filesystem::path const& p)
     {
-#if BOOST_VERSION >= 104600 && BOOST_FILESYSTEM_VERSION >= 3
+#if BOOST_FILESYSTEM_VERSION >= 3
         return p.filename().string();
 #else
         return p.filename();
@@ -140,17 +140,13 @@ namespace hpx { namespace util
 
     inline std::string native_file_string(boost::filesystem::path const& p)
     {
-#if BOOST_VERSION >= 104600
         return p.string();
-#else
-        return p.file_string();
-#endif
     }
 
     inline boost::filesystem::path complete_path(
         boost::filesystem::path const& p)
     {
-#if BOOST_VERSION >= 104600 && BOOST_FILESYSTEM_VERSION >= 3
+#if BOOST_FILESYSTEM_VERSION >= 3
         return boost::filesystem::absolute(p, initial_path());
 #else
         return boost::filesystem::complete(p, initial_path());
@@ -160,7 +156,7 @@ namespace hpx { namespace util
     inline boost::filesystem::path complete_path(
         boost::filesystem::path const& p, boost::filesystem::path const& base)
     {
-#if BOOST_VERSION >= 104600 && BOOST_FILESYSTEM_VERSION >= 3
+#if BOOST_FILESYSTEM_VERSION >= 3
         return boost::filesystem::absolute(p, base);
 #else
         return boost::filesystem::complete(p, base);

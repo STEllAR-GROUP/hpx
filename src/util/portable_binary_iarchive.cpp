@@ -13,8 +13,6 @@
 #include <boost/version.hpp>
 #include <boost/config.hpp>
 
-#if BOOST_VERSION >= 103700
-
 // export the defined functions
 #define BOOST_ARCHIVE_SOURCE
 
@@ -219,18 +217,6 @@ boost::uint32_t portable_binary_iarchive::init(boost::uint32_t flags)
 }}
 
 // explicitly instantiate for this type
-#if BOOST_VERSION < 104000
-#include <boost/archive/impl/archive_pointer_iserializer.ipp>
-
-namespace boost {
-namespace archive {
-
-    template class HPX_ALWAYS_EXPORT
-        detail::archive_pointer_iserializer<hpx::util::portable_binary_iarchive>;
-
-} // namespace archive
-} // namespace boost
-#else
 #include <boost/archive/detail/archive_serializer_map.hpp>
 #include <boost/archive/impl/archive_serializer_map.ipp>
 
@@ -243,8 +229,6 @@ namespace archive {
 } // namespace archive
 } // namespace boost
 
-#endif
-
 // explicitly instantiate for this type of stream
 #include <hpx/util/basic_binary_iprimitive_impl.hpp>
 
@@ -254,5 +238,3 @@ namespace hpx { namespace util
         hpx::util::portable_binary_iarchive
     >;
 }}
-
-#endif // BOOST_VERSION >= 103700

@@ -62,11 +62,9 @@ namespace hpx { namespace util
             std::copy(il.begin(), il.end(), vs_ + 0);
         }
 #else
-        template <std::size_t N>
-        index(value_type const il[N])
+        index(value_type const (&il)[Rank])
         {
-            HPX_ASSERT(N == std::size_t(rank) && "size must be equal to Rank");
-            std::copy(il, il + N, vs_ + 0);
+            std::copy(il, il + Rank, vs_ + 0);
         }
 
         index(value_type const* il, std::size_t size)
@@ -231,11 +229,9 @@ namespace hpx { namespace util
             std::copy(il.begin(), il.end(), vs_ + 0);
         }
 #else
-        template <std::size_t N>
-        bounds(value_type const il[N])
+        bounds(value_type const (&il)[Rank])
         {
-            HPX_ASSERT(N == std::size_t(rank) && "size must be equal to Rank");
-            std::copy(il, il + N, vs_ + 0);
+            std::copy(il, il + Rank, vs_ + 0);
         }
 
         bounds(value_type const* il, std::size_t size)

@@ -70,7 +70,7 @@ namespace hpx { namespace util
 
     template <std::size_t I, typename T>
     struct tuple_element; // undefined
-    
+
     template <std::size_t I, typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename detail::qualify_as<
@@ -140,51 +140,6 @@ namespace hpx { namespace util
             {}
         };
 
-#       if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40600)              \
-        || (defined(BOOST_MSVC) && BOOST_MSVC < 1800)
-        template <typename T>
-        struct tuple_member<T &&,
-            typename boost::disable_if_c<
-                boost::is_fundamental<T>::value || boost::is_pointer<T>::value
-            >::type
-        >
-        {
-        public: // exposition-only
-            T && _value;
-
-        public:
-            // 20.4.2.1, tuple construction
-            BOOST_CONSTEXPR explicit tuple_member(T && value)
-              : _value(std::forward<T>(value))
-            {}
-
-            BOOST_CONSTEXPR tuple_member(tuple_member const& other)
-              : _value(std::forward<T>(other._value))
-            {}
-        };
-
-        template <typename T>
-        struct tuple_member<
-            T &&
-          , typename boost::enable_if_c<
-                boost::is_fundamental<T>::value || boost::is_pointer<T>::value
-            >::type
-        >
-        {
-        public: // exposition-only
-            T _value;
-
-        public:
-            // 20.4.2.1, tuple construction
-            BOOST_CONSTEXPR explicit tuple_member(T && value)
-              : _value(std::forward<T>(value))
-            {}
-
-            BOOST_CONSTEXPR tuple_member(tuple_member const& other)
-              : _value(other._value)
-            {}
-        };
-#       else
         template <typename T>
         struct tuple_member<T &&>
         {
@@ -201,7 +156,6 @@ namespace hpx { namespace util
               : _value(std::forward<T>(other._value))
             {}
         };
-#       endif
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Indices, typename TTuple, typename UTuple>
