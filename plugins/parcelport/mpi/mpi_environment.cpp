@@ -1,4 +1,4 @@
-//  Copyright (c) 2013 Thomas Heller
+//  Copyright (c) 2013-2015 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -71,21 +71,18 @@ namespace hpx { namespace util
     int mpi_environment::provided_threading_flag_ = MPI_THREAD_SINGLE;
     MPI_Comm mpi_environment::communicator_;
 
-    void mpi_environment::init(int *argc, char ***argv, command_line_handling& cfg, const char * name)
+    void mpi_environment::init(int *argc, char ***argv, command_line_handling& cfg)
     {
         using namespace boost::assign;
 
         int this_rank = -1;
-        //has_called_init_ = false;
-        std::string base_key = "hpx.parcel.";
-        base_key += name;
+        has_called_init_ = false;
 
         // We assume to use the MPI parcelport if it is not explicitly disabled
-        bool enabled = detail::get_cfg_entry(cfg, base_key + ".enable", 1) != 0;
-        if (!enabled)
+        enabled_ = detail::get_cfg_entry(cfg, "hpx.parcel.mpi.enable", 1) != 0;
+        if (!enabled_)
         {
-            cfg.ini_config_.push_back(base_key + ".enable = 0");
-            if(!enabled_) enabled_ = false;
+            cfg.ini_config_.push_back("hpx.parcel.mpi.enable = 0");
             return;
         }
 
@@ -98,25 +95,17 @@ namespace hpx { namespace util
         if (!detail::detect_mpi_environment(cfg.rtcfg_, HPX_PARCELPORT_MPI_ENV) &&
             detail::get_cfg_entry(cfg, "hpx.parcel.tcp.enable", 1))
         {
-            cfg.ini_config_.push_back(base_key + ".enable = 0");
+            cfg.ini_config_.push_back("hpx.parcel.mpi.enable = 0");
             // explicitly disable mpi if not run by mpirun
 
-            if(!enabled_) enabled_ = false;
+            enabled_ = false;
             return;
         }
-        enabled_ = true;
 
-        std::string bootstrap = "hpx.parcel.bootstrap!=";
-        cfg.ini_config_ += bootstrap + name;
-
-        if(has_called_init_)
-        {
-            std::cout << "is already initalized ...\n";
-            return;
-        }
+        cfg.ini_config_ += "hpx.parcel.bootstrap!=mpi";
 
         int flag = (detail::get_cfg_entry(
-            cfg, base_key + ".multithreaded", 0) != 0) ?
+            cfg, "hpx.parcel.mpi.multithreaded", 0) != 0) ?
                 MPI_THREAD_MULTIPLE : MPI_THREAD_SINGLE;
 
         int retval = MPI_Init_thread(argc, argv, flag, &provided_threading_flag_);
@@ -125,7 +114,7 @@ namespace hpx { namespace util
             if (MPI_ERR_OTHER != retval)
             {
                 // explicitly disable mpi if not run by mpirun
-                cfg.ini_config_.push_back(base_key + ".enable = 0");
+                cfg.ini_config_.push_back("hpx.parcel.mpi.enable = 0");
 
                 enabled_ = false;
 
@@ -152,7 +141,7 @@ namespace hpx { namespace util
         if (flag != provided_threading_flag_)
         {
             // explicitly disable mpi if not run by mpirun
-            cfg.ini_config_.push_back(base_key + ".enable = 0");
+            cfg.ini_config_.push_back("hpx.parcel.mpi.enable = 0");
 
             enabled_ = false;
             has_called_init_ = false;
@@ -194,7 +183,6 @@ namespace hpx { namespace util
         if(enabled() && has_called_init())
         {
             MPI_Finalize();
-            enabled_ = false;
         }
     }
 

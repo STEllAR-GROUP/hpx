@@ -1,5 +1,5 @@
 //  Copyright (c) 2013-2014 Hartmut Kaiser
-//  Copyright (c) 2013-2014 Thomas Heller
+//  Copyright (c) 2013-2015 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -21,138 +21,118 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
     struct header
     {
         typedef int value_type;
-
-        static int const data_size_ = 5;
-
-        template <typename BufferType, typename ChunkType>
-        header(int rank, value_type tag_,
-            parcel_buffer<BufferType, ChunkType> const & buffer)
-          : rank_(rank)
+        enum data_pos
         {
-            boost::int64_t size = static_cast<boost::uint64_t>(buffer.size_);
-            boost::int64_t numbytes = static_cast<boost::uint64_t>(buffer.data_size_);
+            pos_tag              = 0 * sizeof(value_type),
+            pos_size             = 1 * sizeof(value_type),
+            pos_numbytes         = 2 * sizeof(value_type),
+            pos_numchunks_first  = 3 * sizeof(value_type),
+            pos_numchunks_second = 4 * sizeof(value_type),
+            pos_piggy_back_flag  = 5 * sizeof(value_type),
+            pos_piggy_back_data  = 5 * sizeof(value_type) + 1
+        };
 
-            HPX_ASSERT(rank_ != util::mpi_environment::rank());
+        static int const data_size_ = 24;
+
+        template <typename Buffer>
+        header(Buffer const & buffer, int tag)
+        {
+            boost::int64_t size = static_cast<boost::int64_t>(buffer.size_);
+            boost::int64_t numbytes = static_cast<boost::int64_t>(buffer.data_size_);
+
             HPX_ASSERT(size <= (std::numeric_limits<value_type>::max)());
             HPX_ASSERT(numbytes <= (std::numeric_limits<value_type>::max)());
 
-            data_[0] = tag_;
-            data_[2] = static_cast<value_type>(size);
-            data_[1] = static_cast<value_type>(numbytes);
-            data_[3] = buffer.num_chunks_.first;
-            data_[4] = buffer.num_chunks_.second;
-        }
+            set<pos_tag>(tag);
+            set<pos_size>(static_cast<value_type>(size));
+            set<pos_numbytes>(static_cast<value_type>(numbytes));
+            set<pos_numchunks_first>(static_cast<value_type>(buffer.num_chunks_.first));
+            set<pos_numchunks_second>(static_cast<value_type>(buffer.num_chunks_.second));
 
+            if(buffer.data_.size() <= (data_size_ - pos_piggy_back_data))
+            {
+                data_[pos_piggy_back_flag] = 1;
+                std::memcpy(&data_[pos_piggy_back_data], &buffer.data_[0], buffer.data_.size());
+            }
+            else
+            {
+                data_[pos_piggy_back_flag] = 0;
+            }
+        }
 
         header()
-          : rank_(-1)
         {
-            data_[0] = -1;
-            data_[1] = -1;
-            data_[2] = -1;
-            data_[3] = -1;
-            data_[4] = -1;
+            reset();
         }
 
-        static header close(int tag, int rank)
+        void reset()
         {
-            header h;
-            h.rank() = rank;
-            h.tag() = tag;
-            h.size() = -1;
-            h.numbytes() = -1;
-            return h;
+            std::memset(&data_[0], -1, data_size_);
+            data_[pos_piggy_back_flag] = 1;
         }
 
-        bool close_request() const
+        bool valid() const
         {
-            return (size() == -1) && (numbytes() == -1);
+            return data_[0] != -1;
         }
 
         void assert_valid() const
         {
-            HPX_ASSERT(rank_ != util::mpi_environment::rank());
-            HPX_ASSERT(rank() != -1);
             HPX_ASSERT(tag() != -1);
             HPX_ASSERT(size() != -1);
             HPX_ASSERT(numbytes() != -1);
-            HPX_ASSERT(num_chunks_first() != -1);
-            HPX_ASSERT(num_chunks_second() != -1);
+            HPX_ASSERT(num_chunks().first != -1);
+            HPX_ASSERT(num_chunks().second != -1);
         }
 
-        value_type *data()
+        char *data()
         {
             return &data_[0];
         }
 
-        value_type const & rank() const
+        value_type tag() const
         {
-            return rank_;
+            return get<pos_tag>();
         }
 
-        value_type const & tag() const
+        value_type size() const
         {
-            return data_[0];
+            return get<pos_size>();
         }
 
-        value_type const & size() const
+        value_type numbytes() const
         {
-            return data_[1];
+            return get<pos_numbytes>();
         }
 
-        value_type const & numbytes() const
+        std::pair<value_type, value_type> num_chunks() const
         {
-            return data_[2];
+            return std::make_pair(get<pos_numchunks_first>(), get<pos_numchunks_second>());
         }
 
-        value_type const & num_chunks_first() const
+        char * piggy_back()
         {
-            return data_[3];
-        }
-
-        value_type const & num_chunks_second() const
-        {
-            return data_[4];
-        }
-
-        value_type & rank()
-        {
-            return rank_;
-        }
-
-        value_type & tag()
-        {
-            return data_[0];
-        }
-
-        value_type & size()
-        {
-            return data_[1];
-        }
-
-        value_type & numbytes()
-        {
-            return data_[2];
-        }
-
-        value_type & num_chunks_first()
-        {
-            return data_[3];
-        }
-
-        value_type & num_chunks_second()
-        {
-            return data_[4];
-        }
-
-        MPI_Datatype type()
-        {
-            return MPI_INT;
+            if(data_[pos_piggy_back_flag])
+                return &data_[pos_piggy_back_data];
+            return 0;
         }
 
     private:
-        int rank_;
-        boost::array<value_type, data_size_> data_;
+        boost::array<char, data_size_> data_;
+
+        template <std::size_t Pos, typename T>
+        void set(T const & t)
+        {
+            std::memcpy(&data_[Pos], &t, sizeof(t));
+        }
+
+        template <std::size_t Pos>
+        value_type get() const
+        {
+            value_type res;
+            std::memcpy(&res, &data_[Pos], sizeof(res));
+            return res;
+        }
     };
 }}}}
 

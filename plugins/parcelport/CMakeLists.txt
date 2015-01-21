@@ -8,7 +8,6 @@ set(parcelport_plugins
   ibverbs
   ipc
   mpi
-  mpi_new
   tcp)
 
 set(HPX_STATIC_PARCELPORT_PLUGINS "" CACHE INTERNAL "" FORCE)
@@ -75,7 +74,6 @@ endforeach()
 
 macro(add_static_parcelports)
   add_parcelport_mpi_module()
-  add_parcelport_mpi_new_module()
   add_parcelport_tcp_module()
 endmacro()
 

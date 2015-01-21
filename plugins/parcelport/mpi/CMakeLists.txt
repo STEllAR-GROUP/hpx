@@ -40,11 +40,9 @@ if(HPX_PARCELPORT_MPI)
     add_parcelport(mpi
       STATIC
       SOURCES
-        "${hpx_SOURCE_DIR}/plugins/parcelport/mpi/connection_handler_mpi.cpp"
         "${hpx_SOURCE_DIR}/plugins/parcelport/mpi/mpi_environment.cpp"
         "${hpx_SOURCE_DIR}/plugins/parcelport/mpi/parcelport_mpi.cpp"
       HEADERS
-        "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/mpi/connection_handler.hpp"
         "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/mpi/header.hpp"
         "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/mpi/locality.hpp"
         "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/mpi/mpi_environment.hpp"
