@@ -4,9 +4,11 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+# We explicitly disable ibverbs and ipc for now as they don't work currently
+
 set(parcelport_plugins
-  ibverbs
-  ipc
+  #ibverbs
+  #ipc
   mpi
   tcp)
 
@@ -78,8 +80,8 @@ macro(add_static_parcelports)
 endmacro()
 
 macro(add_parcelport_modules)
-  add_parcelport_ibverbs_module()
-  add_parcelport_ipc_module()
+  #add_parcelport_ibverbs_module()
+  #add_parcelport_ipc_module()
   foreach(parcelport ${HPX_STATIC_PARCELPORT_PLUGINS})
     set(_parcelports_export "${parcelport_export}extern hpx::plugins::parcelport_factory_base *parcelport_${parcelport}_factory_base_ptr;\n")
     set(_parcelports_init "${parcelport_export}        parcelport_${parcelport}_factory_base_ptr->force_init();\n")
