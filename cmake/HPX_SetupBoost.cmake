@@ -8,6 +8,12 @@
 if(HPX_STATIC_LINKING)
   set(Boost_USE_STATIC_LIBS ON)
 endif()
+
+# Add additional version to recognize
+set(Boost_ADDITIONAL_VERSIONS
+    "1.58.0" "1.58"
+    "1.57.0" "1.57")
+
 find_package(Boost
   1.49
   REQUIRED
