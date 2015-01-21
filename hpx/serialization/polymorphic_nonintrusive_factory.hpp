@@ -10,7 +10,6 @@
 #include <hpx/config.hpp>
 #include <hpx/util/jenkins_hash.hpp>
 #include <hpx/util/static.hpp>
-#include <hpx/util/tuple.hpp>
 #include <hpx/util/demangle_helper.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
 
@@ -18,6 +17,8 @@
 #include <boost/unordered_map.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/type_traits/is_abstract.hpp>
+#include <boost/fusion/container/vector.hpp>
+#include <boost/fusion/container/generation/make_vector.hpp>
 
 namespace hpx { namespace serialization {
 
@@ -31,7 +32,7 @@ namespace hpx { namespace serialization {
     typedef void (*save_function_type) (output_archive& , const void* base);
     typedef void (*load_function_type) (input_archive& , void* base);
     typedef void* (*create_function_type) ();
-    typedef hpx::util::tuple<save_function_type,
+    typedef boost::fusion::vector<save_function_type,
               load_function_type, create_function_type> function_bunch_type;
 
     typedef boost::unordered_map<size_type,
@@ -99,7 +100,7 @@ namespace hpx { namespace serialization {
     register_class()
     {
       polymorphic_nonintrusive_factory::function_bunch_type bunch =
-        hpx::util::make_tuple(&register_class<Derived>::save,
+        boost::fusion::make_vector(&register_class<Derived>::save,
             &register_class<Derived>::load, &register_class<Derived>::create);
 
       polymorphic_nonintrusive_factory::instance().
@@ -129,7 +130,7 @@ namespace hpx { namespace serialization {
     register_class()
     {
       polymorphic_nonintrusive_factory::function_bunch_type bunch =
-        hpx::util::make_tuple(&register_class<Derived>::save,
+        boost::fusion::make_vector(&register_class<Derived>::save,
             &register_class<Derived>::load, static_cast<void* (*)()>(0));
 
       polymorphic_nonintrusive_factory::instance().

@@ -13,8 +13,6 @@
 #include <hpx/traits/polymorphic_traits.hpp>
 
 #include <boost/type_traits/is_polymorphic.hpp>
-#include <boost/type_traits/remove_const.hpp>
-#include <boost/type_traits/remove_reference.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/eval_if.hpp>
 
@@ -27,7 +25,8 @@ namespace hpx { namespace serialization {
     {
       serialize(ar, t, 0);
     }
-  }
+
+  } // namespace detail
 
   struct access
   {
@@ -56,7 +55,7 @@ namespace hpx { namespace serialization {
         // force ADL on the second phase of template lookup.
         // call of serialize function directly from base_object
         // finds only serialize-member function and doesn't
-        // perfrom ADL
+        // perform ADL
         template <class Archive>
         static void call(Archive& ar, T& t, unsigned)
         {
@@ -74,7 +73,6 @@ namespace hpx { namespace serialization {
       };
 
     public:
-
       typedef typename boost::mpl::eval_if<
         hpx::traits::is_intrusive_polymorphic<T>,
           boost::mpl::identity<intrusive_polymorphic>,
@@ -93,35 +91,19 @@ namespace hpx { namespace serialization {
     }
 
     template <typename Archive, typename T> BOOST_FORCEINLINE
-    static typename boost::disable_if<boost::is_polymorphic<T> >::type
-    save_base_object(Archive & ar, const T & t, unsigned)
+    static void save_base_object(Archive & ar, const T & t, unsigned)
     {
-        t.serialize(ar, 0);
+      // explicitly specify virtual function
+      // of base class to avoid infinite recursion
+      t.T::save(ar, 0);
     }
 
     template <typename Archive, typename T> BOOST_FORCEINLINE
-    static typename boost::enable_if<boost::is_polymorphic<T> >::type
-    save_base_object(Archive & ar, const T & t, unsigned)
+    static void load_base_object(Archive & ar, T & t, unsigned)
     {
-        // explicitly specify virtual function
-        // to avoid infinite recursion
-        t.T::save(ar, 0);
-    }
-
-    template <typename Archive, typename T> BOOST_FORCEINLINE
-    static typename boost::disable_if<boost::is_polymorphic<T> >::type
-    load_base_object(Archive & ar, T & t, unsigned)
-    {
-        t.serialize(ar, 0);
-    }
-
-    template <typename Archive, typename T> BOOST_FORCEINLINE
-    static typename boost::enable_if<boost::is_polymorphic<T> >::type
-    load_base_object(Archive & ar, T & t, unsigned)
-    {
-        // explicitly specify virtual function
-        // to avoid infinite recursion
-        t.T::load(ar, 0);
+      // explicitly specify virtual function
+      // of base class to avoid infinite recursion
+      t.T::load(ar, 0);
     }
 
     template <typename T> BOOST_FORCEINLINE

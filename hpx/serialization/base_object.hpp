@@ -27,6 +27,23 @@ namespace hpx { namespace serialization {
         Derived & d_;
 
         template <class Archive>
+        void serialize(Archive & ar, unsigned)
+        {
+          access::serialize(ar, static_cast<Base&>(
+            const_cast<typename hpx::util::decay<Derived>::type&>(d_)), 0);
+        }
+    };
+
+    // we need another specialization to explicitly
+    // specify non-virtual calls of virtual functions in
+    // intrusively serialized base classes.
+    template <typename Derived, typename Base>
+    struct base_object_type<Derived, Base, boost::mpl::true_>
+    {
+        base_object_type(Derived & d) : d_(d) {}
+        Derived & d_;
+
+        template <class Archive>
         void save(Archive & ar, unsigned) const
         {
             access::save_base_object(ar, static_cast<const Base&>(d_), 0);
@@ -38,20 +55,6 @@ namespace hpx { namespace serialization {
             access::load_base_object(ar, static_cast<Base&>(d_), 0);
         }
         HPX_SERIALIZATION_SPLIT_MEMBER();
-    };
-
-    template <typename Derived, typename Base>
-    struct base_object_type<Derived, Base, boost::mpl::false_>
-    {
-        base_object_type(Derived & d) : d_(d) {}
-        Derived & d_;
-
-        template <class Archive>
-        void serialize(Archive & ar, unsigned)
-        {
-          access::serialize(ar, static_cast<Base&>(
-            const_cast<typename hpx::util::decay<Derived>::type&>(d_)), 0);
-        }
     };
 
     template <typename Base, typename Derived>

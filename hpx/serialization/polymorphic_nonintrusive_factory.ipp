@@ -9,9 +9,10 @@
 
 #include <hpx/serialization/polymorphic_nonintrusive_factory.hpp>
 
-#include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
+
+#include <boost/fusion/include/at_c.hpp>
 
 namespace hpx { namespace serialization {
 
@@ -21,7 +22,7 @@ namespace hpx { namespace serialization {
     boost::uint64_t hash =
       hpx::util::jenkins_hash()(typeid(t).name());
     ar << hash;
-    hpx::util::get<0>(map_.at(hash))(ar, &t);
+    boost::fusion::at_c<0>(map_.at(hash))(ar, &t);
   }
 
   template <class T>
@@ -32,7 +33,7 @@ namespace hpx { namespace serialization {
 
     HPX_ASSERT(hash);
 
-    hpx::util::get<1>(map_.at(hash))(ar, &t);
+    boost::fusion::at_c<1>(map_.at(hash))(ar, &t);
   }
 
   template <class T>
@@ -44,9 +45,9 @@ namespace hpx { namespace serialization {
     HPX_ASSERT(hash);
 
     const function_bunch_type& bunch = map_.at(hash);
-    T* t = static_cast<T*>(hpx::util::get<2>(bunch)());
+    T* t = static_cast<T*>(boost::fusion::at_c<2>(bunch)());
 
-    hpx::util::get<1>(bunch)(ar, t);
+    boost::fusion::at_c<1>(bunch)(ar, t);
     return t;
   }
 
