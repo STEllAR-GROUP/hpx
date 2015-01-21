@@ -40,6 +40,13 @@ namespace hpx { namespace util
             ~scoped_lock();
         };
 
+        struct scoped_try_lock
+        {
+            scoped_try_lock();
+            ~scoped_try_lock();
+            bool locked;
+        };
+
         typedef hpx::lcos::local::spinlock mutex_type;
 
     private:
@@ -47,6 +54,7 @@ namespace hpx { namespace util
         static mutex_type mtx_;
 
         static void lock();
+        static bool try_lock();
         static void unlock();
 
         static bool enabled_;

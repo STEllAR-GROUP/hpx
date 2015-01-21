@@ -105,7 +105,7 @@ namespace hpx { namespace util
         cfg.ini_config_ += "hpx.parcel.bootstrap!=mpi";
 
         int flag = (detail::get_cfg_entry(
-            cfg, "hpx.parcel.mpi.multithreaded", 0) != 0) ?
+            cfg, "hpx.parcel.mpi.multithreaded", 1) != 0) ?
                 MPI_THREAD_MULTIPLE : MPI_THREAD_SINGLE;
 
         int retval = MPI_Init_thread(argc, argv, flag, &provided_threading_flag_);
@@ -138,15 +138,18 @@ namespace hpx { namespace util
 
         MPI_Comm_dup(MPI_COMM_WORLD, &communicator_);
 
-        if (flag != provided_threading_flag_)
+        if (provided_threading_flag_ < MPI_THREAD_SERIALIZED)
         {
             // explicitly disable mpi if not run by mpirun
-            cfg.ini_config_.push_back("hpx.parcel.mpi.enable = 0");
+            cfg.ini_config_.push_back("hpx.parcel.mpi.multithreaded = 0");
+        }
 
+        if(provided_threading_flag_ == MPI_THREAD_FUNNELED)
+        {
             enabled_ = false;
             has_called_init_ = false;
             throw std::runtime_error("mpi_environment::init: MPI_Init_thread: "
-                "provided multi_threading mode is different from requested mode");
+                "The underlying MPI implementation only supports MPI_THREAD_FUNNELED. This mode is not supported by HPX. Please pass -Ihpx.parcel.mpi.multithreaded=0 to explicitly disable MPI multithreading.");
         }
 
         this_rank = rank();
@@ -193,7 +196,7 @@ namespace hpx { namespace util
 
     bool mpi_environment::multi_threaded()
     {
-        return provided_threading_flag_ == MPI_THREAD_MULTIPLE;
+        return provided_threading_flag_ >= MPI_THREAD_SERIALIZED;
     }
 
     bool mpi_environment::has_called_init()
@@ -234,9 +237,33 @@ namespace hpx { namespace util
             unlock();
     }
 
+    mpi_environment::scoped_try_lock::scoped_try_lock()
+      : locked(false)
+    {
+        if(!multi_threaded())
+        {
+            locked = try_lock();
+        }
+        else
+        {
+            locked = true;
+        }
+    }
+
+    mpi_environment::scoped_try_lock::~scoped_try_lock()
+    {
+        if(!multi_threaded() && locked)
+            unlock();
+    }
+
     void mpi_environment::lock()
     {
         mtx_.lock();
+    }
+
+    bool mpi_environment::try_lock()
+    {
+        return mtx_.try_lock();
     }
 
     void mpi_environment::unlock()

@@ -80,7 +80,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             new_header();
         }
 
-        void receive(bool recurse = true)
+        void receive(bool background = true)
         {
             typedef header_list::iterator iterator;
             int source;
@@ -90,7 +90,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             while(has_work)
             {
                 mutex_type::scoped_lock l(headers_mtx_);
-                accept();
+                accept_locked();
                 iterator it = headers_.begin();
                 while(it != headers_.end())
                 {
@@ -102,10 +102,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                         headers_.erase(it);
                         {
                             hpx::util::scoped_unlock<mutex_type::scoped_lock> ul(l);
-                            receive_message(source, h, recurse);
+                            receive_message(source, h);
                             h.reset();
                         }
-                        it = headers_.begin();
+                        if(background)
+                            it = headers_.begin();
+                        else
+                            it = headers_.end();
                     }
                     else
                     {
@@ -116,7 +119,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             }
         }
 
-        void receive_message(int source, header h, bool recurse)
+        void receive_message(int source, header h)
         {
             util::high_resolution_timer timer;
             MPI_Request request;
@@ -175,7 +178,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             }
             else
             {
-                wait_done(wait_request, recurse);
+                wait_done(wait_request);
                 {
                     util::mpi_environment::scoped_lock l;
                     MPI_Irecv(
@@ -194,7 +197,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             std::size_t chunk_idx = 0;
             BOOST_FOREACH(data_type & c, buffer.chunks_)
             {
-                wait_done(wait_request, recurse);
+                wait_done(wait_request);
                 std::size_t chunk_size = buffer.transmission_chunks_[chunk_idx++].second;
 
                 c.resize(chunk_size);
@@ -213,7 +216,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 }
             }
 
-            wait_done(wait_request, recurse);
+            wait_done(wait_request);
 
             data.time_ = timer.elapsed_nanoseconds() - data.time_;
 
@@ -222,8 +225,17 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         void accept()
         {
+            mutex_type::scoped_try_lock l(headers_mtx_);
+            if(l)
+                accept_locked();
+        }
+
+        void accept_locked()
+        {
+            util::mpi_environment::scoped_try_lock l;
+
+            if(l.locked)
             {
-                util::mpi_environment::scoped_lock l;
                 MPI_Status status;
                 if(request_done_locked(hdr_request_, &status))
                 {
@@ -264,7 +276,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         boost::atomic<bool> & stopped_;
 
-        void wait_done(MPI_Request *& request, bool recurse)
+        void wait_done(MPI_Request *& request)
         {
             if(request == NULL) return;
 
@@ -289,11 +301,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 }
                 else
                 {
-                    if(recurse)
-                        receive();
-                    else if(threads::get_self_ptr())
-                        hpx::this_thread::suspend(hpx::threads::pending,
-                            "mpi::sender::wait_done");
+                    accept();
                 }
                 ++k;
 

@@ -32,7 +32,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             pos_piggy_back_data  = 5 * sizeof(value_type) + 1
         };
 
-        static int const data_size_ = 24;
+        static int const data_size_ = 512;
 
         template <typename Buffer>
         header(Buffer const & buffer, int tag)
