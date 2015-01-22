@@ -83,8 +83,8 @@ namespace hpx
               , cb_(cb)
             {}
 
-            template <typename Args>
-            result_type send_parcel(Args&& args)
+            template <typename ...Ts>
+            result_type operator()(Ts&&... vs)
             {
                 typedef
                     typename hpx::actions::extract_action<Action>::type
@@ -92,7 +92,7 @@ namespace hpx
 
                 actions::base_action* action =
                     new hpx::actions::transfer_action<action_type>(priority_,
-                        std::forward<Args>(args));
+                        std::forward<Ts>(vs)...);
                 parcelset::parcelhandler& ph =
                     hpx::applier::get_applier().get_parcel_handler();
 
@@ -117,13 +117,6 @@ namespace hpx
                     else
                         ph.put_parcel(p, cb_);
                 }
-            }
-
-            template <typename ...Ts>
-            result_type operator()(Ts&&... vs)
-            {
-                return send_parcel(
-                    util::forward_as_tuple(std::forward<Ts>(vs)...));
             }
 
             naming::id_type id_;
@@ -200,7 +193,7 @@ namespace hpx
                 hpx::applier::get_applier().get_parcel_handler();
             actions::action_type act(
                 new hpx::actions::transfer_action<action_type>(priority,
-                    util::forward_as_tuple(std::forward<Ts>(vs)...)));
+                    std::forward<Ts>(vs)...));
 
             std::for_each(dests.begin(), dests.end(), send_parcel(ph, act));
 
@@ -412,8 +405,7 @@ namespace hpx
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
             parcelset::parcel p(id, complement_addr<action_type_>(addr),
-                new hpx::actions::transfer_action<action_type_>(priority,
-                    util::forward_as_tuple()));
+                new hpx::actions::transfer_action<action_type_>(priority));
 
             // Send the parcel through the parcel handler
             hpx::applier::get_applier().get_parcel_handler().sync_put_parcel(p);
