@@ -47,13 +47,12 @@ namespace hpx { namespace serialization {
             static void serialize(input_archive& ar,
                 boost::intrusive_ptr<T>& ptr, boost::uint64_t pos)
             {
-              unique_data_type data;
-              ar >> data.hash;
-              ar >> data.name;
+              std::string name;
+              ar >> name;
 
               boost::intrusive_ptr<T> t(
                   polymorphic_intrusive_factory::instance().
-                    create<T>(data)
+                    create<T>(name)
               );
               ar >> *t;
               register_pointer(
@@ -120,9 +119,8 @@ namespace hpx { namespace serialization {
           {
             static void serialize(output_archive& ar,
                 boost::intrusive_ptr<T>& ptr) {
-              const unique_data_type data = access::get_unique_data(ptr.get());
-              ar << data.hash;
-              ar << data.name;
+              const std::string name = access::get_name(ptr.get());
+              ar << name;
               ar << *ptr;
             }
           };

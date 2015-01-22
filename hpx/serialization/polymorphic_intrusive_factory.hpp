@@ -18,19 +18,13 @@
 
 namespace hpx { namespace serialization {
 
-  struct unique_data_type
-  {
-    boost::uint64_t hash;
-    std::string name;
-  };
-
   class HPX_EXPORT polymorphic_intrusive_factory: boost::noncopyable
   {
   public:
     typedef hpx::util::jenkins_hash::size_type key_type;
     typedef void* (*ctor_type) ();
-    typedef boost::unordered_map<key_type,
-            std::pair<std::string, ctor_type> > ctor_map_type;
+    typedef boost::unordered_map<std::string,
+              ctor_type, hpx::util::jenkins_hash> ctor_map_type;
 
     static polymorphic_intrusive_factory& instance()
     {
@@ -38,47 +32,20 @@ namespace hpx { namespace serialization {
       return factory.get();
     }
 
-    void register_class(const unique_data_type& data, ctor_type fun)
+    void register_class(const std::string& name, ctor_type fun)
     {
-      map_[data.hash] = std::make_pair(data.name, fun);
+      map_[name] = fun;
     }
 
     template <class T>
-    T* create(const unique_data_type& data) const
+    T* create(const std::string& name) const
     {
-      return static_cast<T*>(locate(data)->second.second());
+      return static_cast<T*>(map_.at(name)());
     }
 
   private:
     polymorphic_intrusive_factory()
     {
-    }
-
-    typename ctor_map_type::const_iterator locate( // TODO
-        const unique_data_type& unique_data) const
-    {
-      typedef std::pair<
-        typename ctor_map_type::const_iterator,
-        typename ctor_map_type::const_iterator> equal_range_type;
-
-      equal_range_type range = map_.equal_range(unique_data.hash);
-      if (range.first != range.second)
-      {
-        typename ctor_map_type::const_iterator it = range.first;
-        if (++it == range.second)
-        {
-          // there is only one math in the map
-          return range.first;
-        }
-
-        //there is more than one entry with the same hash in the map
-        for (it = range.first; it != range.second; ++it)
-        {
-          if ((*it).second.first == unique_data.name)
-            return it;
-        }
-      }
-      return map_.end();
     }
 
     friend struct hpx::util::static_<polymorphic_intrusive_factory>;
@@ -89,13 +56,9 @@ namespace hpx { namespace serialization {
 }}
 
 #define HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS_WITH_NAME(Class, Name)        \
-  virtual ::hpx::serialization::unique_data_type                              \
-  hpx_serialization_get_unique_data() const                                   \
+  virtual const char* hpx_serialization_get_name() const                      \
   {                                                                           \
-    static boost::uint64_t const hash =                                       \
-      hpx::util::jenkins_hash()(Name);                                        \
-                                                                              \
-    return ::hpx::serialization::unique_data_type{ hash, Name };              \
+    return Name;                                                              \
   }                                                                           \
   static void* factory_function()                                             \
   {                                                                           \
@@ -113,7 +76,7 @@ namespace hpx { namespace serialization {
     static bool register_class = (                                            \
       hpx::serialization::polymorphic_intrusive_factory::instance().          \
         register_class(                                                       \
-          Class::hpx_serialization_get_unique_data(),                         \
+          Class::hpx_serialization_get_name(),                                \
           &Class::factory_function                                            \
         ),                                                                    \
       true                                                                    \
@@ -135,7 +98,7 @@ namespace hpx { namespace serialization {
     static bool register_class = (                                            \
       hpx::serialization::polymorphic_intrusive_factory::instance().          \
         register_class(                                                       \
-          Class::hpx_serialization_get_unique_data(),                         \
+          Class::hpx_serialization_get_name(),                                \
           &Class::factory_function                                            \
         ),                                                                    \
       true                                                                    \
@@ -156,8 +119,8 @@ namespace hpx { namespace serialization {
       serialize<hpx::serialization::output_archive>(ar, n);                   \
   }                                                                           \
   HPX_SERIALIZATION_SPLIT_MEMBER()                                            \
-  virtual ::hpx::serialization::unique_data_type                              \
-    hpx_serialization_get_unique_data() const = 0;                            \
+  virtual const char*                                                         \
+    hpx_serialization_get_name() const = 0;                                   \
 /**/
 
 #define HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT_SPLITTED(Class)                \
@@ -169,8 +132,8 @@ namespace hpx { namespace serialization {
   {                                                                           \
     save<hpx::serialization::output_archive>(ar, n);                          \
   }                                                                           \
-  virtual ::hpx::serialization::unique_data_type                              \
-    hpx_serialization_get_unique_data() const = 0;                            \
+  virtual const char*                                                         \
+    hpx_serialization_get_name() const = 0;                                   \
 /**/
 
 #define HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS(Class)                        \

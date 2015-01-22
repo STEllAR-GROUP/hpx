@@ -108,9 +108,9 @@ namespace hpx { namespace serialization {
     }
 
     template <typename T> BOOST_FORCEINLINE
-    static unique_data_type get_unique_data(const T* t)
+    static const char* get_name(const T* t)
     {
-      return t->hpx_serialization_get_unique_data();
+      return t->hpx_serialization_get_name();
     }
   };
 }}
