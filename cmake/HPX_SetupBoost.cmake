@@ -11,6 +11,8 @@ endif()
 
 # Add additional version to recognize
 set(Boost_ADDITIONAL_VERSIONS
+    ${Boost_ADDITIONAL_VERSIONS}
+    "1.59.0" "1.59"
     "1.58.0" "1.58"
     "1.57.0" "1.57")
 
