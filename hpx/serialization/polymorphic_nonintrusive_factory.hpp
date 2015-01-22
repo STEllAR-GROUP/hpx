@@ -17,24 +17,27 @@
 #include <boost/unordered_map.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/type_traits/is_abstract.hpp>
-#include <boost/fusion/container/vector.hpp>
-#include <boost/fusion/container/generation/make_vector.hpp>
 
 namespace hpx { namespace serialization {
 
   struct input_archive;
   struct output_archive;
 
+  struct function_bunch_type
+  {
+    typedef void (*save_function_type) (output_archive& , const void* base);
+    typedef void (*load_function_type) (input_archive& , void* base);
+    typedef void* (*create_function_type) ();
+
+    save_function_type save_function;
+    load_function_type load_function;
+    create_function_type create_function;
+  };
+
   class HPX_EXPORT polymorphic_nonintrusive_factory: boost::noncopyable
   {
   public:
     typedef hpx::util::jenkins_hash::size_type size_type;
-    typedef void (*save_function_type) (output_archive& , const void* base);
-    typedef void (*load_function_type) (input_archive& , void* base);
-    typedef void* (*create_function_type) ();
-    typedef boost::fusion::vector<save_function_type,
-              load_function_type, create_function_type> function_bunch_type;
-
     typedef boost::unordered_map<size_type,
               function_bunch_type> serializer_map_type;
 
@@ -99,9 +102,11 @@ namespace hpx { namespace serialization {
 
     register_class()
     {
-      polymorphic_nonintrusive_factory::function_bunch_type bunch =
-        boost::fusion::make_vector(&register_class<Derived>::save,
-            &register_class<Derived>::load, &register_class<Derived>::create);
+      function_bunch_type bunch = {
+        &register_class<Derived>::save,
+        &register_class<Derived>::load,
+        &register_class<Derived>::create
+      };
 
       polymorphic_nonintrusive_factory::instance().
         register_class(
@@ -129,9 +134,11 @@ namespace hpx { namespace serialization {
 
     register_class()
     {
-      polymorphic_nonintrusive_factory::function_bunch_type bunch =
-        boost::fusion::make_vector(&register_class<Derived>::save,
-            &register_class<Derived>::load, static_cast<void* (*)()>(0));
+      function_bunch_type bunch = {
+        &register_class<Derived>::save,
+        &register_class<Derived>::load,
+        static_cast<void* (*)()>(0)
+      };
 
       polymorphic_nonintrusive_factory::instance().
         register_class(

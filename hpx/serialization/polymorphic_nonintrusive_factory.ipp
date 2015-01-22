@@ -12,8 +12,6 @@
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
 
-#include <boost/fusion/include/at_c.hpp>
-
 namespace hpx { namespace serialization {
 
   template <class T>
@@ -22,7 +20,8 @@ namespace hpx { namespace serialization {
     boost::uint64_t hash =
       hpx::util::jenkins_hash()(typeid(t).name());
     ar << hash;
-    boost::fusion::at_c<0>(map_.at(hash))(ar, &t);
+
+    map_.at(hash).save_function(ar, &t);
   }
 
   template <class T>
@@ -30,10 +29,9 @@ namespace hpx { namespace serialization {
   {
     boost::uint64_t hash = 0u;
     ar >> hash;
-
     HPX_ASSERT(hash);
 
-    boost::fusion::at_c<1>(map_.at(hash))(ar, &t);
+    map_.at(hash).load_function(ar, &t);
   }
 
   template <class T>
@@ -41,13 +39,12 @@ namespace hpx { namespace serialization {
   {
     boost::uint64_t hash = 0u;
     ar >> hash;
-
     HPX_ASSERT(hash);
 
     const function_bunch_type& bunch = map_.at(hash);
-    T* t = static_cast<T*>(boost::fusion::at_c<2>(bunch)());
+    T* t = static_cast<T*>(bunch.create_function());
 
-    boost::fusion::at_c<1>(bunch)(ar, t);
+    bunch.load_function(ar, t);
     return t;
   }
 
