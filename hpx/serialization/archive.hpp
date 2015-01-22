@@ -52,10 +52,8 @@ namespace hpx { namespace serialization {
     struct output_archive;
     struct input_archive;
 
-    void register_pointer(input_archive & ar, std::size_t pos, HPX_STD_UNIQUE_PTR<detail::ptr_helper> helper);
     template <typename Helper>
     Helper & tracked_pointer(input_archive & ar, std::size_t pos);
-    std::size_t track_pointer(output_archive & ar, void * pos);
 
     template <typename Archive>
     struct archive
