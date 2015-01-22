@@ -34,7 +34,7 @@ namespace hpx { namespace util
     HPX_API_EXPORT bool unregister_lock(void const* lock);
     HPX_API_EXPORT void verify_no_locks();
     HPX_API_EXPORT void force_error_on_lock();
-    HPX_API_EXPORT void enable_lock_detection(std::string const & report);
+    HPX_API_EXPORT void enable_lock_detection();
     HPX_API_EXPORT void ignore_lock(void const* lock);
     HPX_API_EXPORT void reset_ignored(void const* lock);
 

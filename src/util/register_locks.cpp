@@ -61,7 +61,6 @@ namespace hpx { namespace util
             static hpx::util::thread_specific_ptr<held_locks_map, tls_tag> held_locks_;
 
             static bool lock_detection_enabled_;
-            static std::string lock_detection_report_;
 
             static held_locks_map& get_lock_map()
             {
@@ -79,14 +78,12 @@ namespace hpx { namespace util
             register_locks::held_locks_map, register_locks::tls_tag
         > register_locks::held_locks_;
         bool register_locks::lock_detection_enabled_ = false;
-        std::string register_locks::lock_detection_report_ = "log";
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void enable_lock_detection(std::string const & report)
+    void enable_lock_detection()
     {
         detail::register_locks::lock_detection_enabled_ = true;
-        detail::register_locks::lock_detection_report_ = report;
     }
 
     ///////////////////////////////////////////////////////////////////////////
