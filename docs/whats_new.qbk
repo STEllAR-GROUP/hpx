@@ -1,5 +1,5 @@
 [/==============================================================================
-    Copyright (C) 2007-2014 Hartmut Kaiser
+    Copyright (C) 2007-2015 Hartmut Kaiser
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,9 +12,79 @@
 
 [heading General Changes]
 
+With this release we put a lot of effort into changing the code base to be more
+compatible to C++11 (all of the API uses variadic templates now). However, this
+change required to modify the argument sequence for some of the exiting API
+functions ([funcref hpx::async_continue `hpx::async_continue`],
+[funcref hpx::apply_continue `hpx::apply_continue`],
+[funcref hpx::when_each `hpx::when_each`],
+[funcref hpx::wait_each `hpx::wait_each`]).
+
+
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the important tickets we closed for this release.
+
+* [issue 1359] - Removed obsolete checks
+* [issue 1358] - Fixing 1352
+* [issue 1356] - fixed coordinate test for intel13
+* [issue 1355] - fixed coordinate.hpp
+* [issue 1353] - HPX should set `Boost_ADDITIONAL_VERSIONS` flags
+* [issue 1352] - Error: Cannot find action '' in type registry: HPX(bad_action_code)
+* [issue 1351] - Variadic templates support for appliers
+* [issue 1350] - Actions simplification
+* [issue 1349] - Variadic when and wait functions
+* [issue 1348] - Added hpx_init header to test files
+* [issue 1347] - Another batch of variadic templates support
+* [issue 1346] - Segmented copy
+* [issue 1345] - Attempting to fix hangs during shutdown
+* [issue 1344] - Std config removal
+* [issue 1343] - Removing various distribution policies for hpx::vector
+* [issue 1342] - Inclusive scan
+* [issue 1341] - Exclusive scan
+* [issue 1340] - Adding `parallel::count` for distributed data structures,
+                 adding tests
+* [issue 1339] - Update argument order for transform_reduce
+* [issue 1337] - Fix dataflow to handle properly ranges of futures
+* [issue 1336] - dataflow needs to hold onto futures passed to it
+* [issue 1334] - Examples build problem
+* [issue 1333] - Distributed transform reduce
+* [issue 1332] - Variadic templates support for actions
+* [issue 1331] - Some ambiguous calls of map::erase have been prevented by
+                 adding additional check in locality constructor.
+* [issue 1330] - Defining Plain Actions does not work as described in the
+                 documentation
+* [issue 1329] - Distributed vector cleanup
+* [issue 1328] - Sync docs and comments with code in hello_world example
+* [issue 1327] - Typos in docs
+* [issue 1323] - mmap() failed to allocate thread stack due to insufficient
+                 resources
+* [issue 1324] - fixed bandwidth calculation
+* [issue 1322] - HPX fails to build aa182cf
+* [issue 1321] - Limiting size of outgoing messages while coalescing parcels
+* [issue 1320] - passing a future with launch::deferred in remote function call
+                 causes hang
+* [issue 1319] - An exception when tries to specify number high priority
+                 threads with abp-priority
+* [issue 1318] - Unable to run program with abp-priority and numa-sensitivity
+                 enabled
+* [issue 1317] - N4071 Search/Search_n finished, minor changes
+* [issue 1316] - Add config option to make -Ihpx.run_hpx_main!=1 the default
+* [issue 1314] - Variadic support for async and apply
+* [issue 1313] - Adjust when_any/some to the latest proposed interfaces
+* [issue 1312] - Fixing #857: hpx::naming::locality leaks parcelport specific
+                 information into the public interface
+* [issue 1311] - Distributed get'er/set'er_values for distributed vector
+* [issue 1308] - Unable to execute an application with --hpx:threads
+* [issue 1307] - merge_graph linking issue
+* [issue 1306] - First batch of variadic templates support
+* [issue 1305] - Create a compiler wrapper
+* [issue 1303] - Drop support for GCC44
+* [issue 1302] - Fixing #1297
+* [issue 1301] - Compilation error when tried to use boost range iterators with
+                 wait_all
+* [issue 1298] - Distributed vector
+* [issue 1297] - Unable to invoke component actions recursively
 
 [endsect]
 
