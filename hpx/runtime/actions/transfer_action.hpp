@@ -490,6 +490,20 @@ namespace hpx { namespace actions
     /// \endcond
 }}
 
+namespace hpx { namespace actions
+{
+    template <typename Action>
+    struct init_registration<transfer_action<Action> >
+    {
+        static detail::automatic_action_registration<transfer_action<Action> > g;
+    };
+
+    template <typename Action>
+    detail::automatic_action_registration<transfer_action<Action> >
+        init_registration<transfer_action<Action> >::g =
+            detail::automatic_action_registration<transfer_action<Action> >();
+}}
+
 // Disabling the guid initialization stuff for actions
 namespace hpx { namespace traits
 {
