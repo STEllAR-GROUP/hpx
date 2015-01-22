@@ -46,16 +46,18 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        template <typename Action, typename F>
+        template <typename Action, typename F, typename ...Ts>
         struct continuation_thread_function
         {
             HPX_MOVABLE_BUT_NOT_COPYABLE(continuation_thread_function);
 
         public:
-            template <typename F_>
+            template <typename F_, typename ...Ts_>
             explicit continuation_thread_function(continuation_type cont,
-                naming::address::address_type lva, F_&& f)
-              : cont_(std::move(cont)), lva_(lva), f_(std::forward<F_>(f))
+                naming::address::address_type lva, F_&& f, Ts_&&... vs)
+              : cont_(std::move(cont)), lva_(lva)
+              , f_(util::deferred_call(
+                    std::forward<F_>(f), std::forward<Ts_>(vs)...))
             {}
 
             continuation_thread_function(continuation_thread_function && other)
@@ -77,19 +79,21 @@ namespace hpx { namespace actions
         private:
             continuation_type cont_;
             naming::address::address_type lva_;
-            F f_;
+            util::detail::deferred_call_impl<
+                typename util::decay<F>::type
+              , util::tuple<typename util::decay_unwrap<Ts>::type...>
+            > f_;
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Action, typename F>
-        continuation_thread_function<Action, typename util::decay<F>::type>
+        template <typename Action, typename F, typename ...Ts>
+        continuation_thread_function<Action, F, Ts...>
         construct_continuation_thread_function(continuation_type cont,
-            naming::address::address_type lva, F&& f)
+            naming::address::address_type lva, F&& f, Ts&&... vs)
         {
-            typedef continuation_thread_function<Action,
-                typename util::decay<F>::type> result_type;
-
-            return result_type(std::move(cont), lva, std::forward<F>(f));
+            return continuation_thread_function<Action, F, Ts...>(
+                std::move(cont), lva, std::forward<F>(f),
+                std::forward<Ts>(vs)...);
         }
     }
 
@@ -230,8 +234,7 @@ namespace hpx { namespace actions
         {
             return traits::action_decorate_function<Derived>::call(lva,
                 detail::construct_continuation_thread_function<Derived>(
-                    cont, lva, util::deferred_call(invoker(), lva,
-                        std::forward<Ts>(vs)...)));
+                    cont, lva, invoker(), lva, std::forward<Ts>(vs)...));
         }
 
         // direct execution
@@ -495,20 +498,6 @@ namespace hpx { namespace actions
     HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID2(                         \
         hpx::actions::transfer_action<action>)                                \
 /**/
-
-namespace hpx { namespace actions
-{
-    template <typename Action>
-    struct init_registration<transfer_action<Action> >
-    {
-        static detail::automatic_action_registration<transfer_action<Action> > g;
-    };
-
-    template <typename Action>
-    detail::automatic_action_registration<transfer_action<Action> >
-        init_registration<transfer_action<Action> >::g =
-            detail::automatic_action_registration<transfer_action<Action> >();
-}}
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_ACTION_USES_STACK(action, size)                                   \
