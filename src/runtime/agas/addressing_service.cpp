@@ -1772,7 +1772,7 @@ void addressing_service::route(
 
             parcelset::parcel route_p(route_target, primary_ns_addr_
               , new hpx::actions::transfer_action<action_type>(action_priority_,
-                    util::forward_as_tuple(req)));
+                    req));
 
             // send to the main AGAS instance for routing
             hpx::applier::get_applier().get_parcel_handler().put_parcel(route_p, f);

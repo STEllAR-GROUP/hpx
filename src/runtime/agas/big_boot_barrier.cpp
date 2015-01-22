@@ -433,8 +433,7 @@ void register_worker(registration_header const& header)
     }
 
     actions::base_action* p =
-        new actions::transfer_action<notify_worker_action>(
-            util::forward_as_tuple(hdr));
+        new actions::transfer_action<notify_worker_action>(hdr);
 
 
     // TODO: Handle cases where localities try to connect to AGAS while it's
@@ -594,8 +593,7 @@ void notify_worker(notification_header const& header)
         naming::get_locality_id_from_gid(header.prefix)
       , 0
       , header.agas_locality
-      , new actions::transfer_action<register_worker_security_action>(
-            util::forward_as_tuple(hdr)));
+      , new actions::transfer_action<register_worker_security_action>(hdr));
 #endif
 }
 // }}}
@@ -632,8 +630,7 @@ void register_worker_security(registration_header_security const& header)
       , rt.sign_certificate_signing_request(header.csr));
 
     actions::base_action* p =
-        new actions::transfer_action<notify_worker_security_action>(
-            util::forward_as_tuple(hdr));
+        new actions::transfer_action<notify_worker_security_action>(hdr);
 
 
     parcelset::locality dest;
@@ -843,8 +840,7 @@ void big_boot_barrier::wait_hosted(
         naming::invalid_locality_id
         , 0
         , bootstrap_agas
-        , new actions::transfer_action<register_worker_action>(
-            util::forward_as_tuple(hdr)));
+        , new actions::transfer_action<register_worker_action>(hdr));
 
     // wait for registration to be complete
     spin();
