@@ -253,6 +253,7 @@ if __name__ == '__main__':
     returncode = 0
 
     def wait_on_proc(proc, which):
+        global returncode
         proc.wait()
         ret = proc.returncode
         procs_lock.acquire()
