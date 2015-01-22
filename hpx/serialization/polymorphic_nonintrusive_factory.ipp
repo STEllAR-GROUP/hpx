@@ -17,31 +17,28 @@ namespace hpx { namespace serialization {
   template <class T>
   void polymorphic_nonintrusive_factory::save(output_archive& ar, const T& t)
   {
-    boost::uint64_t hash =
-      hpx::util::jenkins_hash()(typeid(t).name());
-    ar << hash;
+    const std::string class_name = typeid(t).name();
+    ar << class_name;
 
-    map_.at(hash).save_function(ar, &t);
+    map_.at(class_name).save_function(ar, &t);
   }
 
   template <class T>
   void polymorphic_nonintrusive_factory::load(input_archive& ar, T& t)
   {
-    boost::uint64_t hash = 0u;
-    ar >> hash;
-    HPX_ASSERT(hash);
+    std::string class_name;
+    ar >> class_name;
 
-    map_.at(hash).load_function(ar, &t);
+    map_.at(class_name).load_function(ar, &t);
   }
 
   template <class T>
   T* polymorphic_nonintrusive_factory::load(input_archive& ar)
   {
-    boost::uint64_t hash = 0u;
-    ar >> hash;
-    HPX_ASSERT(hash);
+    std::string class_name;
+    ar >> class_name;
 
-    const function_bunch_type& bunch = map_.at(hash);
+    const function_bunch_type& bunch = map_.at(class_name);
     T* t = static_cast<T*>(bunch.create_function());
 
     bunch.load_function(ar, t);

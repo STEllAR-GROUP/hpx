@@ -21,7 +21,6 @@ namespace hpx { namespace serialization {
   class HPX_EXPORT polymorphic_intrusive_factory: boost::noncopyable
   {
   public:
-    typedef hpx::util::jenkins_hash::size_type key_type;
     typedef void* (*ctor_type) ();
     typedef boost::unordered_map<std::string,
               ctor_type, hpx::util::jenkins_hash> ctor_map_type;

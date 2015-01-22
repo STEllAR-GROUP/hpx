@@ -38,9 +38,8 @@ namespace hpx { namespace serialization {
   class HPX_EXPORT polymorphic_nonintrusive_factory: boost::noncopyable
   {
   public:
-    typedef hpx::util::jenkins_hash::size_type size_type;
-    typedef boost::unordered_map<size_type,
-              function_bunch_type> serializer_map_type;
+    typedef boost::unordered_map<std::string,
+              function_bunch_type, hpx::util::jenkins_hash> serializer_map_type;
 
     static polymorphic_nonintrusive_factory& instance()
     {
@@ -51,8 +50,7 @@ namespace hpx { namespace serialization {
     void register_class(const std::string& class_name,
         const function_bunch_type& bunch)
     {
-      boost::uint64_t hash = hpx::util::jenkins_hash()(class_name);
-      map_[hash] = bunch;
+      map_[class_name] = bunch;
     }
 
     // the following templates are defined in *.ipp file
