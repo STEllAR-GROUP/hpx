@@ -1,3 +1,4 @@
+//  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2015 Anton Bikineev
 //
 //  Distributed under the Boost Software License, Version 1.0.

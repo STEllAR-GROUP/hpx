@@ -1,4 +1,5 @@
 //  Copyright (c) 2014 Anton Bikineev
+//  Copyright (c) 2014 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0.
 //  See accompanying file LICENSE_1_0.txt or copy at
@@ -17,12 +18,19 @@
 
 namespace hpx { namespace serialization {
 
+  struct unique_data_type
+  {
+    boost::uint64_t hash;
+    std::string name;
+  };
+
   class HPX_EXPORT polymorphic_intrusive_factory: boost::noncopyable
   {
   public:
-    typedef hpx::util::jenkins_hash::size_type size_type;
+    typedef hpx::util::jenkins_hash::size_type key_type;
     typedef void* (*ctor_type) ();
-    typedef boost::unordered_map<size_type, ctor_type> ctor_map_type;
+    typedef boost::unordered_map<key_type,
+            std::pair<std::string, ctor_type> > ctor_map_type;
 
     static polymorphic_intrusive_factory& instance()
     {
@@ -30,15 +38,15 @@ namespace hpx { namespace serialization {
       return factory.get();
     }
 
-    void register_class_with_hash(boost::uint64_t hash, ctor_type fun)
+    void register_class(const unique_data_type& data, ctor_type fun)
     {
-      map_[hash] = fun;
+      map_[data.hash] = std::make_pair(data.name, fun);
     }
 
     template <class T>
-    T* create_by_hash(size_type hash)
+    T* create(const unique_data_type& data) const
     {
-      return static_cast<T*>(map_.at(hash)());
+      return static_cast<T*>(locate(data)->second.second());
     }
 
   private:
@@ -46,24 +54,48 @@ namespace hpx { namespace serialization {
     {
     }
 
-    friend hpx::util::static_<polymorphic_intrusive_factory>;
+    typename ctor_map_type::const_iterator locate( // TODO
+        const unique_data_type& unique_data) const
+    {
+      typedef std::pair<
+        typename ctor_map_type::const_iterator,
+        typename ctor_map_type::const_iterator> equal_range_type;
+
+      equal_range_type range = map_.equal_range(unique_data.hash);
+      if (range.first != range.second)
+      {
+        typename ctor_map_type::const_iterator it = range.first;
+        if (++it == range.second)
+        {
+          // there is only one math in the map
+          return range.first;
+        }
+
+        //there is more than one entry with the same hash in the map
+        for (it = range.first; it != range.second; ++it)
+        {
+          if ((*it).second.first == unique_data.name)
+            return it;
+        }
+      }
+      return map_.end();
+    }
+
+    friend struct hpx::util::static_<polymorphic_intrusive_factory>;
 
     ctor_map_type map_;
   };
 
 }}
 
-#define HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS(Class)                        \
-  virtual boost::uint64_t hpx_serialization_get_hash() const                  \
+#define HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS_WITH_NAME(Class, Name)        \
+  virtual ::hpx::serialization::unique_data_type                              \
+  hpx_serialization_get_unique_data() const                                   \
   {                                                                           \
-    /* assumes the class name is the unique name in the file  */              \
-    /* addition of __LINE__ can also be considered            */              \
     static boost::uint64_t const hash =                                       \
-      hpx::util::jenkins_hash()(                                              \
-        BOOST_PP_STRINGIZE(Class)                                             \
-        __FILE__                                                              \
-      );                                                                      \
-    return hash;                                                              \
+      hpx::util::jenkins_hash()(Name);                                        \
+                                                                              \
+    return ::hpx::serialization::unique_data_type{ hash, Name };              \
   }                                                                           \
   static void* factory_function()                                             \
   {                                                                           \
@@ -71,7 +103,7 @@ namespace hpx { namespace serialization {
   }                                                                           \
 /**/
 
-#define HPX_SERIALIZATION_POLYMORPHIC(Class)                                  \
+#define HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(Class, Name)                  \
   virtual void load(hpx::serialization::input_archive& ar, unsigned n)        \
   {                                                                           \
     serialize<hpx::serialization::input_archive>(ar, n);                      \
@@ -80,8 +112,8 @@ namespace hpx { namespace serialization {
   {                                                                           \
     static bool register_class = (                                            \
       hpx::serialization::polymorphic_intrusive_factory::instance().          \
-        register_class_with_hash(                                             \
-          Class::hpx_serialization_get_hash(),                                \
+        register_class(                                                       \
+          Class::hpx_serialization_get_unique_data(),                         \
           &Class::factory_function                                            \
         ),                                                                    \
       true                                                                    \
@@ -90,10 +122,10 @@ namespace hpx { namespace serialization {
       serialize<hpx::serialization::output_archive>(ar, n);                   \
   }                                                                           \
   HPX_SERIALIZATION_SPLIT_MEMBER();                                           \
-  HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS(Class);                             \
+  HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS_WITH_NAME(Class, Name);             \
 /**/
 
-#define HPX_SERIALIZATION_POLYMORPHIC_SPLITTED(Class)                         \
+#define HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_SPLITTED(Class, Name)         \
   virtual void load(hpx::serialization::input_archive& ar, unsigned n)        \
   {                                                                           \
     load<hpx::serialization::input_archive>(ar, n);                           \
@@ -102,15 +134,15 @@ namespace hpx { namespace serialization {
   {                                                                           \
     static bool register_class = (                                            \
       hpx::serialization::polymorphic_intrusive_factory::instance().          \
-        register_class_with_hash(                                             \
-          Class::hpx_serialization_get_hash(),                                \
+        register_class(                                                       \
+          Class::hpx_serialization_get_unique_data(),                         \
           &Class::factory_function                                            \
         ),                                                                    \
       true                                                                    \
     );                                                                        \
     save<hpx::serialization::output_archive>(ar, n);                          \
   }                                                                           \
-  HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS(Class);                             \
+  HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS_WITH_NAME(Class, Name);             \
 /**/
 
 #define HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(Class)                         \
@@ -124,7 +156,8 @@ namespace hpx { namespace serialization {
       serialize<hpx::serialization::output_archive>(ar, n);                   \
   }                                                                           \
   HPX_SERIALIZATION_SPLIT_MEMBER()                                            \
-  virtual boost::uint64_t hpx_serialization_get_hash() const = 0;             \
+  virtual ::hpx::serialization::unique_data_type                              \
+    hpx_serialization_get_unique_data() const = 0;                            \
 /**/
 
 #define HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT_SPLITTED(Class)                \
@@ -136,8 +169,21 @@ namespace hpx { namespace serialization {
   {                                                                           \
     save<hpx::serialization::output_archive>(ar, n);                          \
   }                                                                           \
-  virtual boost::uint64_t hpx_serialization_get_hash() const = 0;             \
+  virtual ::hpx::serialization::unique_data_type                              \
+    hpx_serialization_get_unique_data() const = 0;                            \
 /**/
 
+#define HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS(Class)                        \
+  HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS_WITH_NAME(                          \
+      Class, BOOST_STRINGIZE(Class))                                          \
+/**/
+
+#define HPX_SERIALIZATION_POLYMORPHIC(Class)                                  \
+  HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(Class, BOOST_STRINGIZE(Class))      \
+
+#define HPX_SERIALIZATION_POLYMORPHIC_SPLITTED(Class)                         \
+  HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_SPLITTED(                           \
+      Class, BOOST_STRINGIZE(Class))                                          \
+/**/
 
 #endif

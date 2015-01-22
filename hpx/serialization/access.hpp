@@ -11,6 +11,7 @@
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
+#include <hpx/serialization/polymorphic_intrusive_factory.hpp>
 
 #include <boost/type_traits/is_polymorphic.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -107,9 +108,9 @@ namespace hpx { namespace serialization {
     }
 
     template <typename T> BOOST_FORCEINLINE
-    static boost::uint64_t get_hash(const T* t)
+    static unique_data_type get_unique_data(const T* t)
     {
-      return t->hpx_serialization_get_hash();
+      return t->hpx_serialization_get_unique_data();
     }
   };
 }}

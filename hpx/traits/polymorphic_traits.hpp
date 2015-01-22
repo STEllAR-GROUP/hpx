@@ -19,7 +19,7 @@ namespace hpx { namespace traits {
 
     struct intrusive_helper
     {
-      boost::uint64_t hpx_serialization_get_hash() const;
+      boost::uint64_t hpx_serialization_get_unique_data() const;
     };
 
     template <class T>
@@ -29,12 +29,14 @@ namespace hpx { namespace traits {
     struct member_function_holder {};
 
     template <class T, class Ambiguous =
-      detail::member_function_holder<&detail::intrusive_helper::hpx_serialization_get_hash> >
+      detail::member_function_holder<
+        &detail::intrusive_helper::hpx_serialization_get_unique_data> >
     struct is_intrusive_polymorphic_imp: boost::mpl::true_ {};
 
     template <class T>
     struct is_intrusive_polymorphic_imp<T, 
-      detail::member_function_holder<&detail::intrusive_helper_composed<T>::hpx_serialization_get_hash> >
+      detail::member_function_holder<
+        &detail::intrusive_helper_composed<T>::hpx_serialization_get_unique_data> >
     : boost::mpl::false_ {};
 
   } // namespace detail
