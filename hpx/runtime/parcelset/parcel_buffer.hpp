@@ -77,6 +77,7 @@ namespace hpx { namespace parcelset
             num_chunks_ = count_chunks_type(0, 0);
             size_ = 0;
             data_size_ = 0;
+            data_point_ = performance_counters::parcels::data_point();
         }
 
         BufferType data_;
@@ -94,6 +95,7 @@ namespace hpx { namespace parcelset
 
         /// Counters and their data containers.
         performance_counters::parcels::data_point data_point_;
+        HPX_MOVABLE_BUT_NOT_COPYABLE(parcel_buffer)
     };
 }}
 

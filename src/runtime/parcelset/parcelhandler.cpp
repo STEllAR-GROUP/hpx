@@ -278,7 +278,7 @@ namespace hpx { namespace parcelset
         {
             if(pp.first > 0)
             {
-                pp.second->do_background_work();
+                pp.second->do_background_work(num_thread);
             }
         }
     }

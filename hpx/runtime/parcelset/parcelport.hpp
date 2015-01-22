@@ -160,7 +160,7 @@ namespace hpx { namespace parcelset
         };
 
         // invoke pending background work
-        virtual void do_background_work() = 0;
+        virtual void do_background_work(std::size_t num_thread) = 0;
 
         // retrieve performance counter value for given statistics type
         virtual boost::int64_t get_connection_cache_statistics(

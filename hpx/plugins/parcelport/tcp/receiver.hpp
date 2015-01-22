@@ -68,7 +68,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         template <typename Handler>
         void async_read(Handler handler)
         {
-            buffer_ = parcel_buffer_type();
 
             // Store the time of the begin of the read operation
             performance_counters::parcels::data_point& data = buffer_.data_point_;
@@ -258,6 +257,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
                 // decode the received parcels.
                 decode_parcels(parcelport_, *this, std::move(buffer_));
+                buffer_ = parcel_buffer_type();
 
                 ack_ = true;
                 boost::asio::async_write(socket_,

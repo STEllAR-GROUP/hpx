@@ -149,15 +149,6 @@ namespace hpx { namespace util {
 
             HPX_ASSERT(size <= chunk_size_);
 
-            if(size + allocated_ <= chunk_size_)
-            {
-                result = current_;
-                current_ += size;
-                allocated_ += size;
-                check_invariants_locked(result, size);
-                return result;
-            }
-
             typedef free_list_type::iterator free_iterator;
             free_iterator it = free_list_.lower_bound(size);
             if(it != free_list_.end())
@@ -182,6 +173,15 @@ namespace hpx { namespace util {
                 {
                     free_list_.insert(std::make_pair(new_size, new_free_block));
                 }
+                check_invariants_locked(result, size);
+                return result;
+            }
+
+            if(size + allocated_ <= chunk_size_)
+            {
+                result = current_;
+                current_ += size;
+                allocated_ += size;
                 check_invariants_locked(result, size);
                 return result;
             }

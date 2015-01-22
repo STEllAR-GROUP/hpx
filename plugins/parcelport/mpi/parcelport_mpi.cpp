@@ -193,7 +193,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             //do_background_work();
         }
 
-        void do_background_work()
+        void do_background_work(std::size_t num_thread)
         {
             if(stopped_) return;
             receiver_.receive();
@@ -227,7 +227,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             {
                 while(rt->get_state() <= runtime::state_startup)
                 {
-                    do_background_work();
+                    do_background_work(0);
                 }
             }
             catch(...)
