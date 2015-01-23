@@ -67,9 +67,6 @@ namespace hpx { namespace actions
 
         typedef typename Action::direct_execution direct_execution;
 
-        // default constructor is needed for serialization
-        transfer_action() {}
-
         // construct an action from its arguments
         template <typename ...Ts>
         explicit transfer_action(Ts&&... vs)
