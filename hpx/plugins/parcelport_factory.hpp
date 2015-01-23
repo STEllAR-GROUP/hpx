@@ -133,12 +133,15 @@ namespace hpx { namespace plugins
         BOOST_PP_CAT(pluginname, _plugin_factory_type);                       \
     static BOOST_PP_CAT(pluginname, _plugin_factory_type)                     \
         BOOST_PP_CAT(pluginname, _factory);                                   \
-    HPX_EXPORT hpx::plugins::parcelport_factory_base * BOOST_PP_CAT(pluginname, _factory_base_ptr) = &BOOST_PP_CAT(pluginname, _factory); \
+    HPX_EXPORT hpx::plugins::parcelport_factory_base *                        \
+        BOOST_PP_CAT(pluginname, _factory_base_ptr) =                         \
+            &BOOST_PP_CAT(pluginname, _factory);                              \
     HPX_DEF_UNIQUE_PLUGIN_NAME(                                               \
         BOOST_PP_CAT(pluginname, _plugin_factory_type), pp)                   \
 
 #define HPX_REGISTER_PARCELPORT(Parcelport, pluginname)                       \
-        HPX_REGISTER_PARCELPORT_(Parcelport, BOOST_PP_CAT(parcelport_, pluginname), pluginname)\
+        HPX_REGISTER_PARCELPORT_(Parcelport,                                  \
+            BOOST_PP_CAT(parcelport_, pluginname), pluginname)                \
 
 #endif
 

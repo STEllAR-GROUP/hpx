@@ -36,15 +36,4 @@ namespace hpx { namespace plugins
     };
 }}
 
-/*
-///////////////////////////////////////////////////////////////////////////////
-/// This macro is used to register the given component factory with
-/// Hpx.Plugin. This macro has to be used for each of the component factories.
-#define HPX_REGISTER_PARCELPORT_BASE(FactoryType, pluginname)                 \
-    HPX_PLUGIN_EXPORT(HPX_PLUGIN_PLUGIN_PREFIX,                               \
-        hpx::plugins::plugin_factory_base, FactoryType,                       \
-        pluginname, factory)                                                  \
-*/
-/**/
-
 #endif
