@@ -320,10 +320,10 @@ namespace hpx { namespace components { namespace detail
 
             // unbind in AGAS service
             if (base_gid_) {
-                util::scoped_unlock<scoped_lock> ull(lk);
                 naming::gid_type base_gid = base_gid_;
                 base_gid_ = naming::invalid_gid;
 
+                util::scoped_unlock<scoped_lock> ull(lk);
                 applier::unbind_range_local(base_gid, step_);
             }
 
