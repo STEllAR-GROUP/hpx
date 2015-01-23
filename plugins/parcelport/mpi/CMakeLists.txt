@@ -37,6 +37,10 @@ if(HPX_PARCELPORT_MPI)
       include_directories(${MPI_CXX_INCLUDE_PATH})
     endif()
     hpx_debug("add_parcelport_mpi_module")
+    set(_mpi_extra_library)
+    if(MPI_EXTRA_LIBRARY)
+      set(_mpi_extra_library ${MPI_EXTRA_LIBRARY})
+    endif()
     add_parcelport(mpi
       STATIC
       SOURCES
@@ -51,7 +55,7 @@ if(HPX_PARCELPORT_MPI)
       DEPENDENCIES
         ${MPI_CXX_LIBRARIES}
         ${MPI_LIBRARY}
-        ${MPI_EXTRA_LIBRARY}
+        ${_mpi_extra_library}
       FOLDER "Core/Plugins/Parcelport/MPI"
     )
   endmacro()

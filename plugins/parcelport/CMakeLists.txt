@@ -23,18 +23,6 @@ macro(add_parcelport name)
   set(multi_value_args SOURCES HEADERS DEPENDENCIES COMPILE_FLAGS LINK_FLAGS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
-  add_hpx_source_group(
-    NAME ${name}
-    CLASS "Source Files"
-    ROOT "."
-    TARGETS ${${name}_SOURCES})
-
-  add_hpx_source_group(
-    NAME ${name}
-    CLASS "Source Files"
-    ROOT "."
-    TARGETS ${${name}_HEADERS})
-
   set_source_files_properties(
     ${${name}_SOURCES}
     PROPERTIES
@@ -42,6 +30,19 @@ macro(add_parcelport name)
   )
 
   if(${${name}_STATIC})
+    hpx_debug("adding static parcelport: ${name}")
+
+    add_hpx_source_group(
+      NAME hpx
+      CLASS "Header Files"
+      ROOT "${hpx_SOURCE_DIR}/hpx"
+      TARGETS ${${name}_HEADERS})
+    add_hpx_source_group(
+      NAME hpx
+      CLASS "Source Files"
+      ROOT "${hpx_SOURCE_DIR}"
+      TARGETS ${${name}_SOURCES})
+
     set(HPX_STATIC_PARCELPORT_PLUGINS
       ${HPX_STATIC_PARCELPORT_PLUGINS}
       ${name}
@@ -52,6 +53,7 @@ macro(add_parcelport name)
       CACHE INTERNAL "" FORCE)
     set(HPX_LIBRARIES ${HPX_LIBRARIES} ${${name}_DEPENDENCIES})
   else()
+    hpx_debug("adding parcelport plugin: ${name}")
     add_hpx_library(${name}
         PLUGIN
         SOURCES ${${name}_SOURCES}
@@ -59,8 +61,7 @@ macro(add_parcelport name)
         FOLDER ${${name}_FOLDER}
         COMPILE_FLAGS ${${name}_COMPILE_FLAGS}
         LINK_FLAGS ${${name}_LINK_FLAGS}
-        DEPENDENCIES ${${name}_DEPENDENCIES}
-        )
+        DEPENDENCIES ${${name}_DEPENDENCIES})
 
     add_hpx_pseudo_dependencies(plugins.parcelport.${name_short} ${name}_lib)
     add_hpx_pseudo_dependencies(core plugins.parcelport.${name_short})

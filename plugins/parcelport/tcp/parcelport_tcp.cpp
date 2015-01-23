@@ -6,6 +6,7 @@
 #include <hpx/hpx_fwd.hpp>
 
 #include <hpx/plugins/parcelport/tcp/connection_handler.hpp>
+#include <hpx/plugins/parcelport/tcp/sender.hpp>
 
 #include <hpx/plugins/parcelport_factory.hpp>
 
