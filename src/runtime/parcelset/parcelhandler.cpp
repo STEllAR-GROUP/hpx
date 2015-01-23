@@ -586,6 +586,21 @@ namespace hpx { namespace parcelset
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    std::string parcelhandler::get_locality_name() const
+    {
+        BOOST_FOREACH(pports_type::value_type const & pp, pports_)
+        {
+            if(pp.first > 0)
+            {
+                std::string name = pp.second->get_locality_name();
+                if(!name.empty())
+                    return name;
+            }
+        }
+        return "<unknown>";
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     bool parcelhandler::enable(bool new_state)
     {
         new_state = enable_parcel_handling_.exchange(new_state, boost::memory_order_acquire);

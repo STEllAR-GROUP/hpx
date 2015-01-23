@@ -8,7 +8,7 @@
 #if !defined(HPX_UNUSED_FEB_01_2009_1217PM)
 #define HPX_UNUSED_FEB_01_2009_1217PM
 
-#include <boost/config.hpp>
+#include <hpx/config.hpp>
 #if defined(BOOST_MSVC)
 # pragma warning(push)
 # pragma warning(disable: 4522) // multiple assignment operators specified warning

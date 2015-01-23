@@ -18,6 +18,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/current_function.hpp>

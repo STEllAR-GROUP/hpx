@@ -166,6 +166,9 @@ namespace hpx { namespace parcelset
         virtual boost::int64_t get_connection_cache_statistics(
             connection_cache_statistics_type, bool reset) = 0;
 
+        /// Return the name of this locality
+        virtual std::string get_locality_name() const = 0;
+
         /// Register an event handler to be called whenever a parcel has been
         /// received.
         ///

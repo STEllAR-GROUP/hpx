@@ -1654,6 +1654,9 @@ namespace hpx
 #endif
 }
 
+// Including declarations of get_locality_name
+#include <hpx/runtime/get_locality_name.hpp>
+
 #include <hpx/lcos/async_fwd.hpp>
 
 #endif

@@ -325,6 +325,10 @@ namespace hpx { namespace parcelset
             return find_parcelport(name)->create_locality();
         }
 
+        /// Return the name of this locality as retrieved from the active
+        /// parcelport
+        std::string get_locality_name() const;
+
         /// Temporarily enable/disable all parcel handling activities in the
         /// parcel subsystem
         ///

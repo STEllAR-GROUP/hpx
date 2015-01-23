@@ -90,6 +90,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             return true;
         }
 
+        /// Return the name of this locality
+        std::string get_locality_name() const
+        {
+            return util::mpi_environment::get_processor_name();
+        }
+
         parcelset::locality agas_locality(util::runtime_configuration const & ini) const
         {
             return

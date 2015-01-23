@@ -7,7 +7,7 @@
 #if !defined(HPX_LCOS_FUTURE_MAR_06_2012_1059AM)
 #define HPX_LCOS_FUTURE_MAR_06_2012_1059AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/config/forceinline.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/future_traits.hpp>

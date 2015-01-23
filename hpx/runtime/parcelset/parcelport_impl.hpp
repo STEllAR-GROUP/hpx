@@ -265,6 +265,12 @@ namespace hpx { namespace parcelset
                 trigger_pending_work();
         }
 
+        /// Return the name of this locality
+        std::string get_locality_name() const
+        {
+            return connection_handler().get_locality_name();
+        }
+
         /////////////////////////////////////////////////////////////////////////
         // Return the given connection cache statistic
         boost::int64_t get_connection_cache_statistics(

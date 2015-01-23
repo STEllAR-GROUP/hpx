@@ -7,11 +7,15 @@
 #if !defined(HPX_UTIL_REGISTER_LOCKS_JUN_26_2012_1029AM)
 #define HPX_UTIL_REGISTER_LOCKS_JUN_26_2012_1029AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#if !defined(BOOST_NO_CXX11_DECLTYPE_N3276) && !defined(BOOST_NO_SFINAE_EXPR)
 #include <hpx/util/always_void.hpp>
 
-#include <boost/thread/locks.hpp>
 #include <boost/utility/declval.hpp>
+
+#else
+#include <boost/thread/locks.hpp>
+#endif
 
 namespace hpx { namespace util
 {

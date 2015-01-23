@@ -81,6 +81,12 @@ namespace hpx { namespace parcelset
             /// Stop the handling of connectons.
             void do_stop();
 
+            /// Return the name of this locality
+            std::string get_locality_name() const
+            {
+                return boost::asio::ip::host_name();
+            }
+
             boost::shared_ptr<sender> create_connection(
                 parcelset::locality const& l, error_code& ec);
 
