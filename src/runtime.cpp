@@ -48,8 +48,6 @@ namespace hpx
 {
     void handle_termination(char const* reason)
     {
-        if (get_config_entry("hpx.attach_debugger", "") == "exception")
-            util::attach_debugger();
         std::cerr
 #if defined(HPX_HAVE_STACKTRACES)
             << "{stack-trace}: " << hpx::util::trace() << "\n"
@@ -100,7 +98,7 @@ namespace hpx
 {
     HPX_EXPORT void termination_handler(int signum)
     {
-        if (get_config_entry("hpx.attach_debugger", "") == "exception")
+        if (get_config_entry("hpx.attach_debugger", "") == "exception" && signum != SIGINT)
             util::attach_debugger();
         char* reason = strsignal(signum);
         std::cerr
