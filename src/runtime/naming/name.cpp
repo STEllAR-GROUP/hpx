@@ -239,8 +239,13 @@ namespace hpx { namespace naming
             gid_type::mutex_type::scoped_try_lock l(gid.get_mutex());
             if (l)
             {
-                // split credit normally
-                return split_gid_if_needed_locked(gid);
+                gid_type new_gid;
+                {
+                    util::ignore_while_checking<gid_type::mutex_type::scoped_try_lock> il(&l);
+                    // split credit normally
+                    new_gid = split_gid_if_needed_locked(gid);
+                }
+                return new_gid;
             }
 
             // Just replenish the credit of the new gid and don't touch the
@@ -348,6 +353,7 @@ namespace hpx { namespace naming
             naming::detail::set_credit_split_mask_for_gid(gid);
 
             gid_type unlocked_gid = gid;        // strips lock-bit
+            l.unlock();
             return agas::incref(unlocked_gid, added_credit);
         }
 

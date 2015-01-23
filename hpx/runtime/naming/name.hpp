@@ -26,6 +26,7 @@
 #include <hpx/util/serialize_intrusive_ptr.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/register_locks_globally.hpp>
+#include <hpx/util/register_locks.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/lcos/local/spinlock_pool.hpp>
@@ -279,6 +280,8 @@ namespace hpx { namespace naming
                 lcos::local::spinlock::yield(k);
             }
 
+            util::register_lock(this);
+
             HPX_ITT_SYNC_ACQUIRED(this);
         }
 
@@ -289,6 +292,7 @@ namespace hpx { namespace naming
             if (acquire_lock())
             {
                 HPX_ITT_SYNC_ACQUIRED(this);
+                util::register_lock(this);
                 return true;
             }
 
@@ -301,6 +305,7 @@ namespace hpx { namespace naming
             HPX_ITT_SYNC_RELEASING(this);
 
             reliquish_lock();
+            util::unregister_lock(this);
 
             HPX_ITT_SYNC_RELEASED(this);
         }
@@ -339,9 +344,11 @@ namespace hpx { namespace naming
 
         void reliquish_lock()
         {
+            util::ignore_lock(this);
             internal_mutex_type::scoped_lock l(this);
             id_msb_ &= ~is_locked_mask;
             util::unregister_lock_globally(this);
+            util::reset_ignored(this);
         }
 
         bool is_locked() const
