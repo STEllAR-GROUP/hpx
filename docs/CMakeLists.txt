@@ -50,6 +50,7 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/error.hpp"
     "${hpx_SOURCE_DIR}/hpx/exception.hpp"
     "${hpx_SOURCE_DIR}/hpx/exception_list.hpp"
+    "${hpx_SOURCE_DIR}/hpx/get_locality_name.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/execution_policy.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithm.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/task_region.hpp"
