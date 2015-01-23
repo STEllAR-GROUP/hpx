@@ -131,6 +131,9 @@ namespace hpx { namespace util
     inline void force_error_on_lock()
     {
     }
+    inline void enable_lock_detection()
+    {
+    }
     inline void ignore_lock(void const* /*lock*/)
     {
     }
