@@ -101,9 +101,9 @@ namespace hpx { namespace lcos { namespace local
                 if (!try_recursive_lock(id))
                 {
                     mtx.lock();
-                    util::ignore_lock(&mtx);
-                    //util::register_lock(this);
                     locking_thread_id.exchange(id);
+                    util::ignore_lock(&mtx);
+                    util::register_lock(this);
                     recursion_count = 1;
                 }
             }
@@ -155,11 +155,11 @@ namespace hpx { namespace lcos { namespace local
             ///         outside of a HPX-thread.
             void unlock()
             {
+                util::unregister_lock(this);
                 if (0 == --recursion_count)
                 {
                     locking_thread_id.exchange(thread_id_from_mutex<Mutex>::invalid_id());
-                    //util::reset_ignored(&mtx);
-                    //util::unregister_lock(this);
+                    util::reset_ignored(&mtx);
                     mtx.unlock();
                 }
             }
@@ -170,6 +170,7 @@ namespace hpx { namespace lcos { namespace local
                 if (locking_thread_id.load(boost::memory_order_acquire) ==
                     current_thread_id)
                 {
+                    util::register_lock(this);
                     ++recursion_count;
                     return true;
                 }
@@ -180,9 +181,9 @@ namespace hpx { namespace lcos { namespace local
             {
                 if (mtx.try_lock())
                 {
-                    util::ignore_lock(&mtx);
-                    //util::register_lock(this);
                     locking_thread_id.exchange(current_thread_id);
+                    util::ignore_lock(&mtx);
+                    util::register_lock(this);
                     recursion_count = 1;
                     return true;
                 }
