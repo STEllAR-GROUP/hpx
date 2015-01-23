@@ -1125,16 +1125,16 @@ namespace hpx { namespace lcos
                 HPX_THROWS_IF(ec, no_state,
                     "shared_future<R>::get",
                     "this future has no valid shared state");
-                static result_type tmp(detail::future_value<R>::get_default());
-                return tmp;
+                static result_type res(detail::future_value<R>::get_default());
+                return res;
             }
 
             typedef typename shared_state_type::data_type data_type;
             data_type& data = this->shared_state_->get_result(ec);
             if (ec)
             {
-                static result_type tmp(detail::future_value<R>::get_default());
-                return tmp;
+                static result_type res(detail::future_value<R>::get_default());
+                return res;
             }
 
             // no error has been reported, return the result
