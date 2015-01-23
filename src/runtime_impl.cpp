@@ -141,7 +141,7 @@ namespace hpx {
         thread_manager_(new hpx::threads::threadmanager_impl<
             SchedulingPolicy, NotificationPolicy>(
                 timer_pool_, scheduler_, notifier_, num_threads)),
-        parcel_handler_(rtcfg, agas_client_, thread_manager_.get(),
+        parcel_handler_(rtcfg, thread_manager_.get(),
             new parcelset::policies::global_parcelhandler_queue,
             boost::bind(&runtime_impl::init_tss, This(), "parcel-thread", ::_1, ::_2, true),
             boost::bind(&runtime_impl::deinit_tss, This())),
@@ -164,7 +164,7 @@ namespace hpx {
         // now, launch AGAS and register all nodes, launch all other components
         agas_client_.initialize(
             parcel_handler_, boost::uint64_t(runtime_support_.get()), boost::uint64_t(memory_.get()));
-        parcel_handler_.initialize();
+        parcel_handler_.initialize(agas_client_);
 
         applier_.initialize(boost::uint64_t(runtime_support_.get()), boost::uint64_t(memory_.get()));
 
@@ -465,7 +465,7 @@ namespace hpx {
         naming::gid_type console_id;
         if (agas_client_.get_console_locality(console_id))
         {
-            if (parcel_handler_.get_locality() != console_id) {
+            if (agas_client_.get_local_locality() != console_id) {
                 components::console_error_sink(
                     naming::id_type(console_id, naming::id_type::unmanaged), e);
             }

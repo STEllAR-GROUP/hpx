@@ -469,7 +469,7 @@ namespace hpx
         topology_(threads::create_topology()),
         state_(state_invalid),
         memory_(new components::server::memory),
-        runtime_support_(new components::server::runtime_support(rtcfg))
+        runtime_support_(new components::server::runtime_support(ini_))
 #if defined(HPX_HAVE_SECURITY)
       , security_data_(new detail::manage_security_data)
 #endif
@@ -797,7 +797,7 @@ namespace hpx
 
     naming::gid_type const & get_locality()
     {
-        return get_runtime().get_parcel_handler().get_locality();
+        return get_runtime().get_agas_client().get_local_locality();
     }
 
     void report_error(std::size_t num_thread, boost::exception_ptr const& e)

@@ -89,7 +89,6 @@ namespace hpx { namespace parcelset
         ///                 transport operations the parcelhandler carries out.
         parcelhandler(
             util::runtime_configuration & cfg,
-            naming::resolver_client& resolver,
             threads::threadmanager_base* tm, parcelhandler_queue_base* policy,
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
             HPX_STD_FUNCTION<void()> const& on_stop_thread);
@@ -98,7 +97,7 @@ namespace hpx { namespace parcelset
 
         boost::shared_ptr<parcelport> get_bootstrap_parcelport() const;
 
-        void initialize();
+        void initialize(naming::resolver_client &resolver);
 
         /// \brief Stop all parcelports associated with this parcelhandler
         void stop(bool blocking = true);
@@ -113,18 +112,6 @@ namespace hpx { namespace parcelset
         /// parcelhandler constructors). This is the same resolver instance
         /// this parcelhandler has been initialized with.
         naming::resolver_client& get_resolver();
-
-        /// Return the locality_id of this locality
-        ///
-        /// This accessor allows to retrieve the locality_id value being assigned to
-        /// the locality this parcelhandler is associated with. This returns the
-        /// same value as would be returned by:
-        ///
-        /// \code
-        ///     naming::id_type locality_id;
-        ///     get_resolver().get_locality_id(here, locality_id);
-        /// \endcode
-        naming::gid_type const& get_locality() const;
 
         /// Return the list of all remote localities supporting the given
         /// component type
@@ -476,7 +463,7 @@ namespace hpx { namespace parcelset
         void attach_parcelport(boost::shared_ptr<parcelport> const& pp);
 
         /// The AGAS client
-        naming::resolver_client& resolver_;
+        naming::resolver_client *resolver_;
 
         /// the parcelport this handler is associated with
         typedef std::map<int, boost::shared_ptr<parcelport>, std::greater<int> > pports_type;
