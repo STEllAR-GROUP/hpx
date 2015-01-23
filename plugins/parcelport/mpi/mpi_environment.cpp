@@ -149,7 +149,10 @@ namespace hpx { namespace util
             enabled_ = false;
             has_called_init_ = false;
             throw std::runtime_error("mpi_environment::init: MPI_Init_thread: "
-                "The underlying MPI implementation only supports MPI_THREAD_FUNNELED. This mode is not supported by HPX. Please pass -Ihpx.parcel.mpi.multithreaded=0 to explicitly disable MPI multithreading.");
+                "The underlying MPI implementation only supports "
+                "MPI_THREAD_FUNNELED. This mode is not supported by HPX. Please "
+                "pass -Ihpx.parcel.mpi.multithreaded=0 to explicitly disable MPI"
+                " multithreading.");
         }
 
         this_rank = rank();
@@ -228,13 +231,13 @@ namespace hpx { namespace util
     mpi_environment::scoped_lock::scoped_lock()
     {
         if(!multi_threaded())
-            lock();
+            mtx_.lock();
     }
 
     mpi_environment::scoped_lock::~scoped_lock()
     {
         if(!multi_threaded())
-            unlock();
+            mtx_.unlock();
     }
 
     mpi_environment::scoped_try_lock::scoped_try_lock()
@@ -242,7 +245,7 @@ namespace hpx { namespace util
     {
         if(!multi_threaded())
         {
-            locked = try_lock();
+            locked = mtx_.try_lock();
         }
         else
         {
@@ -253,22 +256,7 @@ namespace hpx { namespace util
     mpi_environment::scoped_try_lock::~scoped_try_lock()
     {
         if(!multi_threaded() && locked)
-            unlock();
-    }
-
-    void mpi_environment::lock()
-    {
-        mtx_.lock();
-    }
-
-    bool mpi_environment::try_lock()
-    {
-        return mtx_.try_lock();
-    }
-
-    void mpi_environment::unlock()
-    {
-        mtx_.unlock();
+            mtx_.unlock();
     }
 }}
 

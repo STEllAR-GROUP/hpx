@@ -38,6 +38,7 @@ namespace hpx { namespace util
         {
             scoped_lock();
             ~scoped_lock();
+            HPX_MOVABLE_BUT_NOT_COPYABLE(scoped_lock);
         };
 
         struct scoped_try_lock
@@ -45,6 +46,7 @@ namespace hpx { namespace util
             scoped_try_lock();
             ~scoped_try_lock();
             bool locked;
+            HPX_MOVABLE_BUT_NOT_COPYABLE(scoped_try_lock);
         };
 
         typedef hpx::lcos::local::spinlock mutex_type;
@@ -52,10 +54,6 @@ namespace hpx { namespace util
     private:
 
         static mutex_type mtx_;
-
-        static void lock();
-        static bool try_lock();
-        static void unlock();
 
         static bool enabled_;
         static bool has_called_init_;
