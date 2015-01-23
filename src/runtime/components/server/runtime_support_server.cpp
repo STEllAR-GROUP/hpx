@@ -967,7 +967,7 @@ namespace hpx { namespace components { namespace server
         }
 
         plugins_.clear();       // unload all plugins
-        //modules_.clear();       // unload all modules
+        modules_.clear();       // unload all modules
     }
 
     ///////////////////////////////////////////////////////////////////////////
