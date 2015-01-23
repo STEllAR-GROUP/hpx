@@ -1059,7 +1059,7 @@ if(HPX_WITH_COMPRESSION_ZLIB)
 endif()
 
 # Parcel coalescing is used by the main HPX library, enable it always
-#hpx_add_config_define(HPX_HAVE_PARCEL_COALESCING)
+hpx_add_config_define(HPX_HAVE_PARCEL_COALESCING)
 
 ################################################################################
 # Documentation toolchain (DocBook, BoostBook, QuickBook, xsltproc)
