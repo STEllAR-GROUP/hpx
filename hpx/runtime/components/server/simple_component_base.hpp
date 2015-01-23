@@ -253,18 +253,13 @@ namespace hpx { namespace components
         typedef simple_component<Component> component_type;
         typedef component_type derived_type;
         typedef detail::simple_heap_factory<component_type> heap_type;
-
-#define SIMPLE_COMPONENT_CONSTRUCT(Z, N, _)                                   \
-        template <BOOST_PP_ENUM_PARAMS(N, typename T)>                        \
-        simple_component(HPX_ENUM_FWD_ARGS(N, T, t))                          \
-          : Component(HPX_ENUM_FORWARD_ARGS(N, T, t))                         \
-        {}                                                                    \
-    /**/
-
-        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARGUMENT_LIMIT,
-            SIMPLE_COMPONENT_CONSTRUCT, _)
-
-#undef SIMPLE_COMPONENT_CONSTRUCT
+        
+        /// \brief Construct a simple_component instance holding a new wrapped
+        ///        instance
+        template <typename ...Ts>
+        simple_component(Ts&&... vs)
+          : Component(std::forward<Ts>(vs)...)
+        {}
 
         /// \brief  The function \a create is used for allocation and
         ///         initialization of instances of the derived components.

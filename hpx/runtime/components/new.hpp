@@ -5,8 +5,6 @@
 
 /// \file new.hpp
 
-#ifndef BOOST_PP_IS_ITERATING
-
 #if !defined(HPX_RUNTIME_COMPONENTS_NEW_OCT_10_2012_1256PM)
 #define HPX_RUNTIME_COMPONENTS_NEW_OCT_10_2012_1256PM
 
@@ -67,47 +65,26 @@ namespace hpx { namespace components
     hpx::future<hpx::id_type>
     new_colocated(hpx::id_type const& id, Arg0 argN, ...);
 #else
-    template <typename Component>
+    template <typename Component, typename ...Ts>
     inline typename boost::enable_if<
         traits::is_component<Component>, lcos::future<naming::id_type>
     >::type
-    new_(id_type const& locality)
+    new_(id_type const& locality, Ts&&... vs)
     {
-        return components::stub_base<Component>::create_async(locality);
+        return components::stub_base<Component>::create_async(locality,
+            std::forward<Ts>(vs)...);
     }
 
-    template <typename Component>
+    template <typename Component, typename ...Ts>
     inline typename boost::enable_if<
         traits::is_component<Component>, lcos::future<naming::id_type>
     >::type
-    new_colocated(id_type const& id)
+    new_colocated(id_type const& id, Ts&&... vs)
     {
-        return components::stub_base<Component>::create_colocated_async(id);
+        return components::stub_base<Component>::create_colocated_async(id,
+            std::forward<Ts>(vs)...);
     }
-
-#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/runtime/components/preprocessed/new.hpp>
-#else
-
-#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/new_" HPX_LIMIT_STR ".hpp")
-#endif
-
-#define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (1, HPX_ACTION_ARGUMENT_LIMIT,                                        \
-     "hpx/runtime/components/new.hpp"))                                       \
-/**/
-
-#include BOOST_PP_ITERATE()
-
-#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(output: null)
-#endif
-
 #endif // !defined(DOXYGEN)
-
-#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-
 }}
 
 namespace hpx
@@ -117,31 +94,3 @@ namespace hpx
 }
 
 #endif // HPX_NEW_OCT_10_2012_1256PM
-
-#else  // BOOST_PP_IS_ITERATING
-
-#define N BOOST_PP_ITERATION()
-
-    template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    inline typename boost::enable_if<
-        traits::is_component<Component>, lcos::future<naming::id_type>
-    >::type
-    new_(id_type const& locality, HPX_ENUM_FWD_ARGS(N, Arg, arg))
-    {
-        return components::stub_base<Component>::create_async(locality,
-            HPX_ENUM_FORWARD_ARGS(N , Arg, arg));
-    }
-
-    template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    inline typename boost::enable_if<
-        traits::is_component<Component>, lcos::future<naming::id_type>
-    >::type
-    new_colocated(id_type const& id, HPX_ENUM_FWD_ARGS(N, Arg, arg))
-    {
-        return components::stub_base<Component>::create_colocated_async(id,
-            HPX_ENUM_FORWARD_ARGS(N , Arg, arg));
-    }
-
-#undef N
-
-#endif

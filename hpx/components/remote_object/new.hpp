@@ -2,9 +2,6 @@
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-
-#if !BOOST_PP_IS_ITERATING
-
 #ifndef HPX_COMPONENTS_REMOTE_OBJECT_NEW_HPP
 #define HPX_COMPONENTS_REMOTE_OBJECT_NEW_HPP
 
@@ -13,10 +10,14 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/components/remote_object/stubs/remote_object.hpp>
-#include <hpx/components/remote_object/ctor_fun.hpp>
 #include <hpx/components/remote_object/object.hpp>
 #include <hpx/components/remote_object/new_impl.hpp>
 #include <hpx/traits/is_component.hpp>
+#include <hpx/util/move.hpp>
+#include <hpx/util/decay.hpp>
+#include <hpx/util/invoke_fused.hpp>
+#include <hpx/util/tuple.hpp>
+#include <hpx/util/functional/new.hpp>
 
 #include <boost/utility/enable_if.hpp>
 
@@ -24,6 +25,43 @@ namespace hpx { namespace components
 {
     namespace remote_object
     {
+        template <typename T, typename ...Ts>
+        struct ctor_fun
+        {
+            typedef void result_type;
+
+            // default constructor is needed for serialization
+            ctor_fun() {}
+
+            template <typename ...Args>
+            ctor_fun(util::tuple<Args...>&& args)
+                : args_(std::move(args))
+            {}
+
+            ctor_fun(ctor_fun const& other)
+              : args_(other.args_)
+            {}
+
+            ctor_fun(ctor_fun&& other)
+              : args_(std::move(other.args_))
+            {}
+
+            void operator()(void ** p) const
+            {
+                *p = util::invoke_fused(
+                    util::functional::new_<T>(), std::move(args_));
+            }
+
+            template <typename Archive>
+            void serialize(Archive & ar, unsigned)
+            {
+                ar & args_;
+            }
+
+        private:
+            util::tuple<typename util::decay<Ts>::type...> args_;
+        };
+
         template <typename T>
         struct dtor_fun
         {
@@ -39,12 +77,13 @@ namespace hpx { namespace components
             {}
         };
     }
+
     // asynchronously creates an instance of type T on locality target_id
-    template <typename T>
+    template <typename T, typename ...Ts>
     inline typename boost::disable_if<
         traits::is_component<T>, lcos::future<object<T> >
     >::type
-    new_(naming::id_type const & target_id)
+    new_(naming::id_type const & target_id, Ts&&... vs)
     {
         lcos::packaged_action<
             remote_object::new_impl_action
@@ -55,72 +94,12 @@ namespace hpx { namespace components
             launch::async
           , target_id
           , target_id
-          , remote_object::ctor_fun<T>()
+          , remote_object::ctor_fun<T, Ts...>(
+                util::forward_as_tuple(std::forward<Ts>(vs)...))
           , remote_object::dtor_fun<T>()
         );
         return p.get_future();
     }
-
-#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/components/remote_object/preprocessed/new.hpp>
-#else
-
-#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/new_" HPX_LIMIT_STR ".hpp")
-#endif
-
-    // vertical repetition code to enable constructor parameters up to
-    // HPX_FUNCTION limit
-#define BOOST_PP_ITERATION_PARAMS_1                                             \
-    (                                                                           \
-        3                                                                       \
-      , (                                                                       \
-            1                                                                   \
-          , HPX_FUNCTION_ARGUMENT_LIMIT                                         \
-          , <hpx/components/remote_object/new.hpp>                              \
-        )                                                                       \
-    )                                                                           \
-/**/
-#include BOOST_PP_ITERATE()
-
-#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(output: null)
-#endif
-
-#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-
 }}
-#endif
 
-#else
-
-#define N BOOST_PP_ITERATION()
-
-    template <typename T, BOOST_PP_ENUM_PARAMS(N, typename A)>
-    inline typename boost::disable_if<
-        traits::is_component<T>, lcos::future<object<T> >
-    >::type
-    new_(naming::id_type const & target_id, HPX_ENUM_FWD_ARGS(N, A, a))
-    {
-        lcos::packaged_action<
-            remote_object::new_impl_action
-          , object<T>
-        > p;
-
-        p.apply(
-            launch::async
-          , target_id
-          , target_id
-          , remote_object::ctor_fun<
-                T
-              , BOOST_PP_ENUM_PARAMS(N, A)
-            >(
-                HPX_ENUM_FORWARD_ARGS(N, A, a)
-            )
-          , remote_object::dtor_fun<T>()
-        );
-        return p.get_future();
-    }
-
-#undef N
 #endif

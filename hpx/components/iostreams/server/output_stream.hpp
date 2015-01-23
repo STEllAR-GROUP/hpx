@@ -51,8 +51,8 @@ namespace hpx { namespace iostreams { namespace server
         {}
 
         // std::ostream
-        output_stream(boost::reference_wrapper<std::ostream> os)
-          : write_f(make_std_ostream_write_function(os.get()))
+        output_stream(std::ostream& os)
+          : write_f(make_std_ostream_write_function(os))
         {}
 
         void write_async(boost::uint32_t locality_id,

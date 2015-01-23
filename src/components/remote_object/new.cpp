@@ -8,8 +8,8 @@
 #include <hpx/components/remote_object/new_impl.hpp>
 #include <hpx/components/remote_object/stubs/remote_object.hpp>
 
-HPX_REGISTER_ACTION(hpx::components::server::create_component_action0<hpx::components::server::remote_object>,
-    hpx_components_server_create_component_action0_hpx_components_server_remote_object
+HPX_REGISTER_ACTION(hpx::components::server::create_component_action<hpx::components::server::remote_object>,
+    hpx_components_server_create_component_action_hpx_components_server_remote_object
 )
 
 HPX_REGISTER_ACTION(hpx::components::server::remote_object_apply_action1<hpx::util::function<void(void**)> >,

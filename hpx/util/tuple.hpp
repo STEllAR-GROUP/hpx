@@ -749,6 +749,23 @@ namespace boost { namespace serialization
     {
         ::hpx::util::serialize_sequence(ar, t);
     }
+
+    // These are needed to avoid conflicts with serialize_empty_type
+    BOOST_FORCEINLINE
+    void serialize(
+        hpx::util::portable_binary_oarchive&
+      , ::hpx::util::tuple<>&
+      , unsigned int const
+    )
+    {}
+
+    BOOST_FORCEINLINE
+    void serialize(
+        hpx::util::portable_binary_iarchive&
+      , ::hpx::util::tuple<>&
+      , unsigned int const
+    )
+    {}
 }}
 
 #   if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
