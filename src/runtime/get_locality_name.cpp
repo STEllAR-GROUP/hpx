@@ -7,7 +7,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
-// #include <hpx/runtime/get_locality_name.hpp>
+#include <hpx/runtime/get_locality_name.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/lcos/async.hpp>
 
