@@ -306,7 +306,10 @@ namespace hpx { namespace util
     load_plugin_factory(hpx::util::plugin::dll& d, util::section& ini,
         std::string const& curr, std::string const& name, error_code& ec)
     {
-        std::vector<boost::shared_ptr<plugins::plugin_registry_base> > plugin_registries;
+        typedef std::vector<boost::shared_ptr<plugins::plugin_registry_base> >
+            plugin_list_type;
+
+        plugin_list_type plugin_registries;
         hpx::util::plugin::plugin_factory<plugins::plugin_registry_base>
             pf(d, "plugin");
 
@@ -364,7 +367,10 @@ namespace hpx { namespace util
         typedef std::vector<std::pair<fs::path, std::string> >::iterator
             iterator_type;
 
-        std::vector<boost::shared_ptr<plugins::plugin_registry_base> > plugin_registries;
+        typedef std::vector<boost::shared_ptr<plugins::plugin_registry_base> >
+            plugin_list_type;
+
+        plugin_list_type plugin_registries;
 
         // list of modules to load
         std::vector<std::pair<fs::path, std::string> > libdata;
@@ -443,7 +449,8 @@ namespace hpx { namespace util
             hpx::util::plugin::dll d(p.first.string(), p.second);
             d.load_library(ec);
             if (ec) {
-                LRT_(info) << "skipping (load_library failed): " << p.first.string()
+                LRT_(info)
+                    << "skipping (load_library failed): " << p.first.string()
                     << ": " << get_error_what(ec);
                 continue;
             }
@@ -452,17 +459,23 @@ namespace hpx { namespace util
             std::string curr_fullname(p.first.parent_path().string());
             load_component_factory(d, ini, curr_fullname, p.second, ec);
             if (ec) {
-                LRT_(info) << "skipping (load_component_factory failed): " << p.first.string()
+                LRT_(info)
+                    << "skipping (load_component_factory failed): "
+                    << p.first.string()
                     << ": " << get_error_what(ec);
                 ec = error_code(lightweight);   // reinit ec
             }
 
             // get the plugin factory
-            std::vector<boost::shared_ptr<plugins::plugin_registry_base> > tmp_regs =
+            plugin_list_type tmp_regs =
                 load_plugin_factory(d, ini, curr_fullname, p.second, ec);
-            std::copy(tmp_regs.begin(), tmp_regs.end(), std::back_inserter(plugin_registries));
+
+            std::copy(tmp_regs.begin(), tmp_regs.end(),
+                std::back_inserter(plugin_registries));
             if (ec) {
-                LRT_(info) << "skipping (load_plugin_factory failed): " << p.first.string()
+                LRT_(info)
+                    << "skipping (load_plugin_factory failed): "
+                    << p.first.string()
                     << ": " << get_error_what(ec);
             }
 

@@ -126,7 +126,8 @@ namespace hpx { namespace parcelset
         enable_parcel_handling_(true),
         count_routed_(0)
     {
-        BOOST_FOREACH(plugins::parcelport_factory_base *factory, get_parcelport_factories())
+        BOOST_FOREACH(plugins::parcelport_factory_base *factory,
+            get_parcelport_factories())
         {
             boost::shared_ptr<parcelport> pp;
             pp.reset(
@@ -145,7 +146,8 @@ namespace hpx { namespace parcelset
         if(!pports_.empty())
         {
             std::string cfgkey("hpx.parcel.bootstrap");
-            pports_type::const_iterator it = pports_.find(get_priority(get_config_entry(cfgkey, "tcp")));
+            pports_type::const_iterator it =
+                pports_.find(get_priority(get_config_entry(cfgkey, "tcp")));
             if(it != pports_.end() && it->first > 0) return it->second;
         }
         BOOST_FOREACH(pports_type::value_type const & pp, pports_)
@@ -171,19 +173,22 @@ namespace hpx { namespace parcelset
                     pp.second->run(false);
             }
             else
-                pp.second->register_event_handler(boost::bind(&parcelhandler::parcel_sink, this, _1));
-
+            {
+                pp.second->register_event_handler(
+                    boost::bind(&parcelhandler::parcel_sink, this, _1));
+            }
         }
     }
 
-    void parcelhandler::list_parcelport(util::osstream& strm, std::string const& ppname, int priority,
-        bool bootstrap) const
+    void parcelhandler::list_parcelport(util::osstream& strm,
+        std::string const& ppname, int priority, bool bootstrap) const
     {
         strm << "parcel port: " << ppname;
 
         std::string cfgkey("hpx.parcel." + ppname + ".enable");
         std::string enabled = get_config_entry(cfgkey, "0");
-        strm << ", " << (hpx::util::safe_lexical_cast<int>(enabled, 0) ? "" : "not ")
+        strm << ", "
+             << (hpx::util::safe_lexical_cast<int>(enabled, 0) ? "" : "not ")
              << "enabled";
 
         if (bootstrap)
@@ -235,7 +240,8 @@ namespace hpx { namespace parcelset
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Make sure the specified locality is not held by any
     /// connection caches anymore
-    void parcelhandler::remove_from_connection_cache(endpoints_type const& endpoints)
+    void parcelhandler::remove_from_connection_cache(
+        endpoints_type const& endpoints)
     {
         BOOST_FOREACH(endpoints_type::value_type const & loc, endpoints)
         {
@@ -250,7 +256,8 @@ namespace hpx { namespace parcelset
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void parcelhandler::do_background_work(std::size_t num_thread, bool stop_buffering)
+    void parcelhandler::do_background_work(std::size_t num_thread,
+        bool stop_buffering)
     {
         // flush all parcel buffers
         if(0 == num_thread)
@@ -260,7 +267,8 @@ namespace hpx { namespace parcelset
             if(l)
             {
                 message_handler_map::iterator end = handlers_.end();
-                for (message_handler_map::iterator it = handlers_.begin(); it != end; ++it)
+                for (message_handler_map::iterator it = handlers_.begin();
+                     it != end; ++it)
                 {
                     if ((*it).second)
                     {
@@ -326,7 +334,8 @@ namespace hpx { namespace parcelset
         return !locality_ids.empty();
     }
 
-    std::pair<boost::shared_ptr<parcelport>, locality> parcelhandler::find_appropriate_destination(
+    std::pair<boost::shared_ptr<parcelport>, locality>
+    parcelhandler::find_appropriate_destination(
         naming::gid_type const& dest_gid)
     {
         HPX_ASSERT(resolver_);
@@ -336,18 +345,21 @@ namespace hpx { namespace parcelset
         {
             if(pp.first > 0)
             {
-                locality const & dest = find_endpoint(dest_endpoints, pp.second->type());
+                locality const& dest = find_endpoint(dest_endpoints, pp.second->type());
                 if(dest && pp.second->can_connect(dest, use_alternative_parcelports_))
                     return std::make_pair(pp.second, dest);
             }
         }
 
-        HPX_THROW_EXCEPTION(network_error, "parcelhandler::find_appropriate_destination",
-            "The locality gid cannot be resolved to a valid endpoint. No valid parcelport configured.");
+        HPX_THROW_EXCEPTION(network_error,
+            "parcelhandler::find_appropriate_destination",
+            "The locality gid cannot be resolved to a valid endpoint. "
+            "No valid parcelport configured.");
         return std::pair<boost::shared_ptr<parcelport>, locality>();
     }
 
-    locality parcelhandler::find_endpoint(endpoints_type const & eps, std::string const & name)
+    locality parcelhandler::find_endpoint(endpoints_type const & eps,
+        std::string const & name)
     {
         endpoints_type::const_iterator it = eps.find(name);
         if(it != eps.end()) return it->second;
@@ -601,7 +613,9 @@ namespace hpx { namespace parcelset
     ///////////////////////////////////////////////////////////////////////////
     bool parcelhandler::enable(bool new_state)
     {
-        new_state = enable_parcel_handling_.exchange(new_state, boost::memory_order_acquire);
+        new_state = enable_parcel_handling_.exchange(
+            new_state, boost::memory_order_acquire);
+
         BOOST_FOREACH(pports_type::value_type & pp, pports_)
         {
             if(pp.first > 0)
@@ -1036,7 +1050,8 @@ namespace hpx { namespace parcelset
             },
             { boost::str(boost::format("/parcels/time/%s/buffer_allocate/received") % pp_type),
               performance_counters::counter_raw,
-              boost::str(boost::format("returns the time needed to allocate the buffers for serializing using the %s connection type") % pp_type),
+              boost::str(boost::format("returns the time needed to allocate the "
+                "buffers for serializing using the %s connection type") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, buffer_allocate_time_received, _2),
@@ -1045,7 +1060,8 @@ namespace hpx { namespace parcelset
             },
             { boost::str(boost::format("/parcels/time/%s/buffer_allocate/sent") % pp_type),
               performance_counters::counter_raw,
-              boost::str(boost::format("returns the time needed to allocate the buffers for serializing using the %s connection type") % pp_type),
+              boost::str(boost::format("returns the time needed to allocate the "
+                "buffers for serializing using the %s connection type") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, buffer_allocate_time_sent, _2),
