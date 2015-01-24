@@ -95,7 +95,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             return util::mpi_environment::get_processor_name();
         }
 
-        parcelset::locality agas_locality(util::runtime_configuration const & ini) const
+        parcelset::locality
+        agas_locality(util::runtime_configuration const & ini) const
         {
             return
                 parcelset::locality(
@@ -110,7 +111,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             return parcelset::locality(locality());
         }
 
-        void put_parcels(std::vector<parcelset::locality> dests, std::vector<parcel> parcels,
+        void put_parcels(std::vector<parcelset::locality> dests,
+            std::vector<parcel> parcels,
             std::vector<write_handler_type> handlers)
         {
             HPX_ASSERT(dests.size() == parcels.size());
@@ -151,7 +153,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         bool run(bool blocking = true)
         {
             receiver_.run();
-            receive_early_parcels_thread_ = boost::thread(&parcelport::receive_early_parcels, this, hpx::get_runtime_ptr());
+            receive_early_parcels_thread_ =
+                boost::thread(&parcelport::receive_early_parcels, this,
+                    hpx::get_runtime_ptr());
             return true;
         }
 
@@ -168,7 +172,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
         }
 
-        void put_parcel(parcelset::locality const & dest, parcel p, write_handler_type f)
+        void put_parcel(parcelset::locality const & dest, parcel p,
+            write_handler_type f)
         {
             //std::cout << "put parcel ...\n";
             if(stopped_) return;
@@ -206,7 +211,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
     private:
         typedef util::memory_chunk_pool<> memory_pool_type;
-        typedef memory_pool_type::allocator allocator_type;
+        typedef util::detail::memory_chunk_pool_allocator<char> allocator_type;
         typedef
             std::vector<char, allocator_type>
             data_type;

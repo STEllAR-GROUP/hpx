@@ -33,7 +33,8 @@ namespace hpx { namespace parcelset
           , size_(0), data_size_(0)
         {}
 
-        explicit parcel_buffer(BufferType const & data, allocator_type allocator = allocator_type())
+        explicit parcel_buffer(BufferType const & data,
+                allocator_type allocator = allocator_type())
           : data_(data, allocator)
           , num_chunks_(count_chunks_type(0, 0))
           , size_(0), data_size_(0)

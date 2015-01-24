@@ -10,7 +10,8 @@
 
 #include <hpx/lcos/local/spinlock.hpp>
 
-namespace hpx { namespace util {
+namespace hpx { namespace util
+{
     template <typename Mutex>
     struct memory_chunk
     {
@@ -40,14 +41,15 @@ namespace hpx { namespace util {
             HPX_ASSERT(allocated_ == 0);
             HPX_ASSERT(free_list_.empty());
             HPX_ASSERT(!data_);
-            char * ptr;
 #ifdef POSIX_VERSION_
-            int ret;
-            ret = posix_memalign(reinterpret_cast<void **>(&ptr), EXEC_PAGESIZE, chunk_size_);
+            char * ptr = 0;
+            int ret = posix_memalign(
+                reinterpret_cast<void **>(&ptr), EXEC_PAGESIZE,
+                chunk_size_);
             if(ret != 0)
                 throw std::bad_alloc();
 #else
-            ptr = new char[chunk_size_];
+            char * ptr = new char[chunk_size_];
 #endif
             data_.reset(ptr, deleter);
             current_ = ptr;
@@ -210,10 +212,12 @@ namespace hpx { namespace util {
             }
 
             iterator p_end = p + size;
-            for(free_list_type::iterator jt = free_list_.begin(); jt != free_list_.end(); ++jt)
+            for(free_list_type::iterator jt = free_list_.begin();
+                jt != free_list_.end(); ++jt)
             {
+                // check if the chunk to be deleted is left to the chunk in
+                // the free list
                 iterator chunk_begin = jt->second;
-                // check if the chunk to be deleted is left to the chunk in the free list
                 if(p_end == chunk_begin)
                 {
                     size_type new_size = size + jt->first;
@@ -229,8 +233,10 @@ namespace hpx { namespace util {
                     check_invariants_locked(0, size);
                     return true;
                 }
+
+                // check if the chunk to be deleted is right to the chunk in
+                // the free list
                 iterator chunk_end = chunk_begin + jt->first;
-                // check if the chunk to be deleted is right to the chunk in the free list
                 if(p == chunk_end)
                 {
                     size_type new_size = size + jt->first;
@@ -247,7 +253,8 @@ namespace hpx { namespace util {
                     check_invariants_locked(0, size);
                     return true;
                 }
-                // Since we can't have overlapping regions, we don't need more checks ...
+                // Since we can't have overlapping regions, we don't need more
+                // checks ...
             }
             free_list_.insert(std::make_pair(size, p));
             check_invariants_locked(0, size);
@@ -256,7 +263,7 @@ namespace hpx { namespace util {
 
         mutable mutex_type mtx_;
         boost::shared_ptr<data_type> data_;
-        const size_type chunk_size_;
+        size_type const chunk_size_;
         size_type allocated_;
         iterator current_;
         free_list_type free_list_;

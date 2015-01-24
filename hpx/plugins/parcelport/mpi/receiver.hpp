@@ -22,7 +22,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         typedef std::list<std::pair<int, header> > header_list;
         typedef std::set<std::pair<int, int> > handles_header_type;
         typedef util::memory_chunk_pool<> memory_pool_type;
-        typedef memory_pool_type::allocator allocator_type;
+        typedef util::detail::memory_chunk_pool_allocator<char> allocator_type;
         typedef
             std::vector<char, allocator_type>
             data_type;
@@ -69,7 +69,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             handles_header_type::iterator header_handle_;
         };
 
-        receiver(parcelport & pp, memory_pool_type & chunk_pool, boost::atomic<bool> & stopped)
+        receiver(parcelport & pp, memory_pool_type & chunk_pool,
+                boost::atomic<bool> & stopped)
           : pp_(pp)
           , chunk_pool_(chunk_pool)
           , stopped_(stopped)

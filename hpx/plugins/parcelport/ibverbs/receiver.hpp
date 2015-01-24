@@ -194,7 +194,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         /// The handler used to process the incoming request.
         connection_handler& parcelport_;
 
-        util::memory_chunk_pool & memory_pool_;
+        util::memory_chunk_pool<> & memory_pool_;
         ibverbs_mr mr_;
         ibv_mr adapted_mr_;
 
