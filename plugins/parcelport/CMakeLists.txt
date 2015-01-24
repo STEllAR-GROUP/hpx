@@ -44,14 +44,19 @@ macro(add_parcelport name)
       TARGETS ${${name}_SOURCES})
 
     set(HPX_STATIC_PARCELPORT_PLUGINS
-      ${HPX_STATIC_PARCELPORT_PLUGINS}
-      ${name}
+      ${HPX_STATIC_PARCELPORT_PLUGINS} ${name}
+      CACHE INTERNAL "" FORCE)
+
+    set(HPX_STATIC_PARCELPORT_PLUGINS_HEADERS
+      ${HPX_STATIC_PARCELPORT_PLUGINS_HEADERS}
+      ${${name}_HEADERS}
       CACHE INTERNAL "" FORCE)
     set(HPX_STATIC_PARCELPORT_PLUGINS_SOURCES
       ${HPX_STATIC_PARCELPORT_PLUGINS_SOURCES}
       ${${name}_SOURCES}
       CACHE INTERNAL "" FORCE)
     set(HPX_LIBRARIES ${HPX_LIBRARIES} ${${name}_DEPENDENCIES})
+
   else()
     hpx_debug("adding parcelport plugin: ${name}")
     add_hpx_library(${name}
@@ -76,17 +81,25 @@ foreach(type ${parcelport_plugins})
 endforeach()
 
 macro(add_static_parcelports)
-  add_parcelport_mpi_module()
   add_parcelport_tcp_module()
+  add_parcelport_mpi_module()
 endmacro()
 
 macro(add_parcelport_modules)
   #add_parcelport_ibverbs_module()
   #add_parcelport_ipc_module()
+
+  hpx_debug("creating static_parcelports.hpp: " ${HPX_STATIC_PARCELPORT_PLUGINS})
+
+  set(_parcelport_export)
+  set(_parcelport_init)
   foreach(parcelport ${HPX_STATIC_PARCELPORT_PLUGINS})
-    set(_parcelports_export "${parcelport_export}extern hpx::plugins::parcelport_factory_base *parcelport_${parcelport}_factory_base_ptr;\n")
-    set(_parcelports_init "${parcelport_export}        parcelport_${parcelport}_factory_base_ptr->force_init();\n")
+    set(_parcelport_export
+        "${_parcelport_export}extern hpx::plugins::parcelport_factory_base *parcelport_${parcelport}_factory_base_ptr;\n")
+    set(_parcelport_init
+        "${_parcelport_init}        HPX_ASSERT(parcelport_${parcelport}_factory_base_ptr);\n        parcelport_${parcelport}_factory_base_ptr->force_init();\n")
   endforeach()
+
   configure_file("${hpx_SOURCE_DIR}/cmake/templates/static_parcelports.hpp.in"
                  "${CMAKE_BINARY_DIR}/hpx/runtime/parcelset/static_parcelports.hpp"
                  @ONLY)

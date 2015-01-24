@@ -1037,13 +1037,12 @@ endif()
 include(HPX_GitCommit)
 hpx_add_config_define(HPX_GIT_COMMIT "\"${HPX_GIT_COMMIT}\"")
 
-
 hpx_include(SetOutputPaths)
 ##############################################################################
 
 ################################################################################
-# # Configure compression and other plugins
-# ###############################################################################
+# Configure compression and other plugins
+################################################################################
 set(HPX_STATIC_PARCELPORT_PLUGINS "" CACHE INTERNAL "" FORCE)
 add_hpx_pseudo_target(plugins)
 add_subdirectory(plugins)
@@ -1081,8 +1080,6 @@ set(HPX_DEBUG_POSTFIX "d")
 # Recurse into some subdirectories. This does not actually cause another cmake
 # executable to run. The same process will walk through the project's entire
 # directory structure.
-
-
 if(HPX_BUILD_TOOLS)
   add_hpx_pseudo_target(tools)
   add_subdirectory(tools)
@@ -1126,7 +1123,6 @@ if(HPX_BUILD_TESTS)
   include_directories(tests)
   add_subdirectory(tests)
 endif()
-
 
 if(HPX_BUILD_RUNTIME)
   add_hpx_pseudo_target(runtime)

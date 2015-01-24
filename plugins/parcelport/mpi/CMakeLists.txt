@@ -15,6 +15,11 @@ if(HPX_PARCELPORT_MPI)
     hpx_error("MPI could not be found and HPX_PARCELPORT_MPI=On, please specify MPI_CXX_COMPILER to point to a working MPI C++ compiler for your platform")
   endif()
   hpx_add_config_define(HPX_PARCELPORT_MPI)
+  if(MSVC)
+    # FIXME: add OpenMPI specific flag here for now as the hpx_add_compile_flag()
+    # below does not add the extra options to the top level directory
+    hpx_add_config_define(OMPI_IMPORTS)
+  endif()
   if(MPI_CXX_COMPILE_FLAGS)
     hpx_add_compile_flag(${MPI_CXX_COMPILE_FLAGS})
   endif()
@@ -33,10 +38,11 @@ if(HPX_PARCELPORT_MPI)
   endif()
 
   macro(add_parcelport_mpi_module)
+    hpx_debug("add_parcelport_mpi_module")
     if(MPI_CXX_INCLUDE_PATH)
       include_directories(${MPI_CXX_INCLUDE_PATH})
     endif()
-    hpx_debug("add_parcelport_mpi_module")
+
     set(_mpi_extra_library)
     if(MPI_EXTRA_LIBRARY)
       set(_mpi_extra_library ${MPI_EXTRA_LIBRARY})
@@ -56,8 +62,7 @@ if(HPX_PARCELPORT_MPI)
         ${MPI_CXX_LIBRARIES}
         ${MPI_LIBRARY}
         ${_mpi_extra_library}
-      FOLDER "Core/Plugins/Parcelport/MPI"
-    )
+      FOLDER "Core/Plugins/Parcelport/MPI")
   endmacro()
 else()
   macro(add_parcelport_mpi_module)
