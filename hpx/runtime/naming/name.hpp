@@ -346,9 +346,10 @@ namespace hpx { namespace naming
         {
             util::ignore_lock(this);
             internal_mutex_type::scoped_lock l(this);
+            util::reset_ignored(this);
+
             id_msb_ &= ~is_locked_mask;
             util::unregister_lock_globally(this);
-            util::reset_ignored(this);
         }
 
         bool is_locked() const
