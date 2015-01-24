@@ -117,11 +117,19 @@ namespace hpx { namespace util
             "finalize_wait_time = ${HPX_FINALIZE_WAIT_TIME:-1.0}",
             "shutdown_timeout = ${HPX_SHUTDOWN_TIMEOUT:-1.0}",
 #ifdef HPX_HAVE_VERIFY_LOCKS
+#if defined(HPX_DEBUG)
+            "lock_detection = ${HPX_LOCK_DETECTION:1}",
+#else
             "lock_detection = ${HPX_LOCK_DETECTION:0}",
+#endif
             "throw_on_held_lock = ${HPX_THROW_ON_HELD_LOCK:1}",
 #endif
 #ifdef HPX_HAVE_VERIFY_LOCKS_GLOBALLY
+#if defined(HPX_DEBUG)
+            "global_lock_detection = ${HPX_GLOBAL_LOCK_DETECTION:1}",
+#else
             "global_lock_detection = ${HPX_GLOBAL_LOCK_DETECTION:0}",
+#endif
 #endif
 #ifdef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
 #ifdef HPX_DEBUG
@@ -295,6 +303,9 @@ namespace hpx { namespace util
     std::vector<boost::shared_ptr<plugins::plugin_registry_base> >
     runtime_configuration::load_modules()
     {
+        typedef std::vector<boost::shared_ptr<plugins::plugin_registry_base> >
+            plugin_list_type;
+
         namespace fs = boost::filesystem;
 
         // try to build default ini structure from shared libraries in default
@@ -320,11 +331,13 @@ namespace hpx { namespace util
         tokenizer_type tok_suffixes(component_path_suffixes, sep);
         tokenizer_type::iterator end_path = tok_path.end();
         tokenizer_type::iterator end_suffixes = tok_suffixes.end();
-        std::vector<boost::shared_ptr<plugins::plugin_registry_base> > plugin_registries;
+        plugin_list_type plugin_registries;
+
         for (tokenizer_type::iterator it = tok_path.begin(); it != end_path; ++it)
         {
             std::string p = *it;
-            for(tokenizer_type::iterator jt = tok_suffixes.begin(); jt != end_suffixes; ++jt)
+            for(tokenizer_type::iterator jt = tok_suffixes.begin();
+                jt != end_suffixes; ++jt)
             {
                 std::string path(p);
                 path += *jt;
@@ -339,15 +352,17 @@ namespace hpx { namespace util
                     std::pair<std::set<std::string>::iterator, bool> p =
                         component_paths.insert(
                             util::native_file_string(canonical_p));
+
                     if (p.second) {
                         // have all path elements, now find ini files in there...
                         fs::path this_path (hpx::util::create_path(*p.first));
                         if (fs::exists(this_path)) {
-                            std::vector<boost::shared_ptr<plugins::plugin_registry_base> > tmp_regs =
-                            util::init_ini_data_default(
-                                this_path.string(), *this, basenames, modules_);
+                            plugin_list_type tmp_regs =
+                                util::init_ini_data_default(
+                                    this_path.string(), *this, basenames, modules_);
 
-                            std::copy(tmp_regs.begin(), tmp_regs.end(), std::back_inserter(plugin_registries));
+                            std::copy(tmp_regs.begin(), tmp_regs.end(),
+                                std::back_inserter(plugin_registries));
                         }
                     }
                 }
