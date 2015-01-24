@@ -238,8 +238,11 @@ namespace hpx { namespace util
                 register_locks::held_locks_map::iterator it = held_locks.find(lock);
                 if (it == held_locks.end())
                 {
-                    HPX_THROW_EXCEPTION(invalid_status, "set_ignore_status",
-                        "The given lock has not been registered.");
+                    // this can happen if the lock was registered to be ignore
+                    // on a different OS thread
+//                     HPX_THROW_EXCEPTION(
+//                         invalid_status, "set_ignore_status",
+//                         "The given lock has not been registered.");
                     return;
                 }
 
