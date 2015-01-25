@@ -354,6 +354,7 @@ namespace hpx { namespace naming
 
         bool is_locked() const
         {
+            internal_mutex_type::scoped_lock l(this);
             return (id_msb_ & is_locked_mask) ? true : false;
         }
 
