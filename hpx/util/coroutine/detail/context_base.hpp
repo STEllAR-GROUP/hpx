@@ -175,6 +175,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #if defined(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
       delete_tss_storage(m_thread_data);
 #endif
+      m_thread_id = threads::invalid_thread_id_repr;
     }
 
 #if defined(HPX_THREAD_MAINTAIN_OPERATIONS_COUNT)

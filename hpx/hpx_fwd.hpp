@@ -1373,15 +1373,48 @@ namespace hpx
     HPX_API_EXPORT boost::uint32_t get_locality_id(error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \brief Test whether the runtime system is currently being started.
+    ///
+    /// This function returns whether the runtime system is currently being
+    /// started or not, e.g. whether the current state of the runtime system is
+    /// \a hpx::runtime::state_startup
+    ///
+    /// \note   This function needs to be executed on a HPX-thread. It will
+    ///         return false otherwise.
+    HPX_API_EXPORT bool is_starting();
+
+    ///////////////////////////////////////////////////////////////////////////
     /// \brief Test whether the runtime system is currently running.
     ///
     /// This function returns whether the runtime system is currently running
     /// or not, e.g.  whether the current state of the runtime system is
-    /// \a hpx::runtime::running
+    /// \a hpx::runtime::state_running
     ///
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         return false otherwise.
     HPX_API_EXPORT bool is_running();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Test whether the runtime system is currently stopped.
+    ///
+    /// This function returns whether the runtime system is currently stopped
+    /// or not, e.g.  whether the current state of the runtime system is
+    /// \a hpx::runtime::state_stopped
+    ///
+    /// \note   This function needs to be executed on a HPX-thread. It will
+    ///         return false otherwise.
+    HPX_API_EXPORT bool is_stopped();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Test whether the runtime system is currently being shut down.
+    ///
+    /// This function returns whether the runtime system is currently being
+    /// shut down or not, e.g.  whether the current state of the runtime system
+    /// is \a hpx::runtime::state_stopped or \a hpx::runtime::state_shutdown
+    ///
+    /// \note   This function needs to be executed on a HPX-thread. It will
+    ///         return false otherwise.
+    HPX_API_EXPORT bool is_stopped_or_shutting_down();
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the name of the calling thread.

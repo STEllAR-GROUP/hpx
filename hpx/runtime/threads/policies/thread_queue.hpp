@@ -445,7 +445,6 @@ namespace hpx { namespace threads { namespace policies
                         HPX_ASSERT(thread_map_count_ >= 0);
                     }
                 }
-                return true;
             }
             else {
                 // delete only this many threads
@@ -472,8 +471,8 @@ namespace hpx { namespace threads { namespace policies
 
                     --delete_count;
                 }
-                return terminated_items_count_ == 0;
             }
+            return terminated_items_count_ == 0;
         }
 
         bool cleanup_terminated_locked(bool delete_all = false)

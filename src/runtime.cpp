@@ -1110,7 +1110,7 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool HPX_EXPORT is_running()
+    bool is_running()
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt)
@@ -1118,7 +1118,7 @@ namespace hpx
         return false;
     }
 
-    bool HPX_EXPORT is_stopped()
+    bool is_stopped()
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt)
@@ -1126,7 +1126,7 @@ namespace hpx
         return true;        // assume stopped
     }
 
-    bool HPX_EXPORT is_stopped_or_shutting_down()
+    bool is_stopped_or_shutting_down()
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt)
