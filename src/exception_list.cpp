@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -58,8 +58,42 @@ namespace hpx
       , exceptions_(std::move(l))
     {}
 
+    exception_list::exception_list(exception_list const& l)
+      : hpx::exception(l.size() ? hpx::get_error(l.exceptions_.front()) : success)
+      , exceptions_(l.exceptions_)
+    {}
+
+    exception_list::exception_list(exception_list && l)
+      : hpx::exception(std::move(static_cast<hpx::exception&>(l)))
+      , exceptions_(std::move(l.exceptions_))
+    {}
+
+    exception_list& exception_list::operator=(exception_list const& l)
+    {
+        if (this != &l)
+        {
+            *static_cast<hpx::exception*>(this) = hpx::exception(
+                l.size() ? hpx::get_error(l.exceptions_.front()) : success);
+            exceptions_ = l.exceptions_;
+        }
+        return *this;
+    }
+
+    exception_list& exception_list::operator=(exception_list && l)
+    {
+        if (this != &l)
+        {
+            static_cast<hpx::exception&>(*this) =
+                std::move(static_cast<hpx::exception&>(l));
+            exceptions_ = std::move(l.exceptions_);
+        }
+        return *this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     boost::system::error_code exception_list::get_error() const
     {
+        mutex_type::scoped_lock l(mtx_);
         if (exceptions_.empty())
             return hpx::no_success;
         return hpx::get_error(exceptions_.front());
@@ -67,6 +101,7 @@ namespace hpx
 
     std::string exception_list::get_message() const
     {
+        mutex_type::scoped_lock l(mtx_);
         if (exceptions_.empty())
             return "";
 
@@ -84,5 +119,22 @@ namespace hpx
                 result += "\n";
         }
         return result;
+    }
+
+    void exception_list::add(boost::exception_ptr const& e)
+    {
+        mutex_type::scoped_lock l(mtx_);
+        if (exceptions_.empty())
+        {
+            hpx::exception ex;
+            {
+                util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+                ex = hpx::exception(hpx::get_error(e));
+            }
+
+            // set the error code for our base class
+            static_cast<hpx::exception&>(*this) = ex;
+        }
+        exceptions_.push_back(e);
     }
 }

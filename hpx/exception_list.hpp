@@ -10,7 +10,11 @@
 
 #include <list>
 #include <string>
+
 #include <hpx/exception.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/util/move.hpp>
+#include <hpx/util/scoped_unlock.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -27,8 +31,11 @@ namespace hpx
     class HPX_EXCEPTION_EXPORT exception_list : public hpx::exception
     {
     private:
+        typedef hpx::lcos::local::spinlock mutex_type;
+
         typedef std::list<boost::exception_ptr> exception_list_type;
         exception_list_type exceptions_;
+        mutable mutex_type mtx_;
 
     public:
         /// bidirectional iterator
@@ -42,17 +49,14 @@ namespace hpx
         explicit exception_list(boost::exception_ptr const& e);
         explicit exception_list(exception_list_type && l);
 
+        exception_list(exception_list const& l);
+        exception_list(exception_list && l);
+
+        exception_list& operator=(exception_list const& l);
+        exception_list& operator=(exception_list && l);
+
         ///
-        void add(boost::exception_ptr const& e)
-        {
-            if (exceptions_.empty())
-            {
-                // set the error code for our base class
-                static_cast<hpx::exception&>(*this) =
-                    hpx::exception(hpx::get_error(e));
-            }
-            exceptions_.push_back(e);
-        }
+        void add(boost::exception_ptr const& e);
         /// \endcond
 
         /// The number of exception_ptr objects contained within the
@@ -61,6 +65,7 @@ namespace hpx
         /// \note Complexity: Constant time.
         std::size_t size() const BOOST_NOEXCEPT
         {
+            mutex_type::scoped_lock l(mtx_);
             return exceptions_.size();
         }
 
@@ -68,12 +73,14 @@ namespace hpx
         /// within the exception_list.
         exception_list_type::const_iterator begin() const BOOST_NOEXCEPT
         {
+            mutex_type::scoped_lock l(mtx_);
             return exceptions_.begin();
         }
 
         /// An iterator which is the past-the-end value for the exception_list.
         exception_list_type::const_iterator end() const BOOST_NOEXCEPT
         {
+            mutex_type::scoped_lock l(mtx_);
             return exceptions_.end();
         }
 

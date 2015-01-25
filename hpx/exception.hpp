@@ -423,7 +423,7 @@ namespace hpx
         ///
         /// \param e    The parameter \p e holds the hpx::error code the new
         ///             exception should encapsulate.
-        explicit exception(error e)
+        explicit exception(error e = success)
           : boost::system::system_error(make_error_code(e, plain))
         {
             HPX_ASSERT(e >= success && e < last_error);
@@ -471,6 +471,23 @@ namespace hpx
         {
             HPX_ASSERT(e >= success && e < last_error);
             LERR_(error) << "created exception: " << this->what();
+        }
+
+        /// Move construction
+        exception(exception && rhs)
+          : boost::system::system_error(rhs.code(), rhs.what())
+        {
+        }
+
+        /// Move assignment
+        exception& operator=(exception && rhs)
+        {
+            if (this != &rhs)
+            {
+                *static_cast<boost::system::system_error*>(this) =
+                    boost::system::system_error(rhs.code(), rhs.what());
+            }
+            return *this;
         }
 
         /// Destruct a hpx::exception
