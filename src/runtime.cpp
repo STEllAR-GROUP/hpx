@@ -235,7 +235,7 @@ namespace hpx
     // this is called on all nodes during runtime construction
     void runtime::init_security()
     {
-        // this is the AGAS booststrap node (node zero)
+        // this is the AGAS bootstrap node (node zero)
         if (ini_.get_agas_service_mode() == agas::service_mode_bootstrap)
         {
             components::security::signed_certificate cert;
@@ -747,16 +747,16 @@ namespace hpx
             sizeof(arithmetic_counter_types)/sizeof(arithmetic_counter_types[0]));
     }
 
-    boost::uint32_t runtime::assign_cores(naming::gid_type prefix,
+    boost::uint32_t runtime::assign_cores(std::string const& locality_basename,
         boost::uint32_t cores_needed)
     {
         boost::mutex::scoped_lock l(mtx_);
 
-        used_cores_map_type::iterator it = used_cores_map_.find(prefix);
+        used_cores_map_type::iterator it = used_cores_map_.find(locality_basename);
         if (it == used_cores_map_.end())
         {
             used_cores_map_.insert(
-                used_cores_map_type::value_type(prefix, cores_needed));
+                used_cores_map_type::value_type(locality_basename, cores_needed));
             return 0;
         }
 

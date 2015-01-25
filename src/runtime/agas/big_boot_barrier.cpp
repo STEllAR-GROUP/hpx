@@ -105,6 +105,7 @@ struct registration_header
       , boost::uint64_t symbol_ns_ptr_
       , boost::uint32_t cores_needed_
       , boost::uint32_t num_threads_
+      , std::string const& hostname_
       , naming::gid_type prefix_ = naming::gid_type()
     ) :
         endpoints(endpoints_)
@@ -112,6 +113,7 @@ struct registration_header
       , symbol_ns_ptr(symbol_ns_ptr_)
       , cores_needed(cores_needed_)
       , num_threads(num_threads_)
+      , hostname(hostname_)
       , prefix(prefix_)
     {}
 
@@ -120,6 +122,7 @@ struct registration_header
     boost::uint64_t symbol_ns_ptr;
     boost::uint32_t cores_needed;
     boost::uint32_t num_threads;
+    std::string hostname;           // hostname of locality
     naming::gid_type prefix;        // suggested prefix (optional)
 
     template <typename Archive>
@@ -130,6 +133,7 @@ struct registration_header
         ar & symbol_ns_ptr;
         ar & cores_needed;
         ar & num_threads;
+        ar & hostname;
         ar & prefix;
     }
 };
@@ -386,7 +390,7 @@ void register_worker(registration_header const& header)
             agas_client.get_bootstrap_symbol_ns_ptr());
 
     // assign cores to the new locality
-    boost::uint32_t first_core = rt.assign_cores(header.prefix,
+    boost::uint32_t first_core = rt.assign_cores(header.hostname,
         header.cores_needed);
 
     big_boot_barrier & bbb = get_big_boot_barrier();
@@ -801,6 +805,7 @@ namespace detail
 }
 
 void big_boot_barrier::wait_hosted(
+    std::string const& locality_name,
     void* primary_ns_server, void* symbol_ns_server)
 { // {{{
     HPX_ASSERT(service_mode_bootstrap != service_type);
@@ -833,6 +838,7 @@ void big_boot_barrier::wait_hosted(
         , reinterpret_cast<boost::uint64_t>(symbol_ns_server)
         , cores_needed
         , num_threads
+        , locality_name
         , suggested_prefix);
 
     apply(

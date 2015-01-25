@@ -224,15 +224,16 @@ addressing_service::addressing_service(
     {
         launch_bootstrap(pp, ph.endpoints(), ini_);
     }
-}
+} // }}}
 
-void addressing_service::initialize(
-    parcelset::parcelhandler& ph, boost::uint64_t rts_lva, boost::uint64_t mem_lva)
-{
+void addressing_service::initialize(parcelset::parcelhandler& ph,
+    boost::uint64_t rts_lva, boost::uint64_t mem_lva)
+{ // {{{
     rts_lva_ = rts_lva;
     mem_lva_ = mem_lva;
-    boost::shared_ptr<parcelset::parcelport> pp = ph.get_bootstrap_parcelport();
+
     // now, boot the parcel port
+    boost::shared_ptr<parcelset::parcelport> pp = ph.get_bootstrap_parcelport();
     if(pp)
         pp->run(false);
 
@@ -243,7 +244,9 @@ void addressing_service::initialize(
     else
     {
         launch_hosted();
-        get_big_boot_barrier().wait_hosted(&hosted->primary_ns_server_, &hosted->symbol_ns_server_);
+        get_big_boot_barrier().wait_hosted(
+            pp->get_locality_name(),
+            &hosted->primary_ns_server_, &hosted->symbol_ns_server_);
     }
 
     set_status(running);
@@ -306,7 +309,7 @@ void addressing_service::launch_bootstrap(
     // store number of cores used by other processes
     boost::uint32_t cores_needed = rt.assign_cores();
     boost::uint32_t first_used_core = rt.assign_cores(
-        here, cores_needed);
+        pp ? pp->get_locality_name() : "", cores_needed);
 
     util::runtime_configuration& cfg = rt.get_config();
     cfg.set_first_used_core(first_used_core);
@@ -386,18 +389,12 @@ void addressing_service::launch_bootstrap(
     naming::gid_type lower, upper;
     get_id_range(HPX_INITIAL_GID_RANGE, lower, upper);
     rt.get_id_pool().set_range(lower, upper);
-
-//    get_big_boot_barrier().wait();
-//    set_status(running);
 } // }}}
 
 void addressing_service::launch_hosted()
-{ // {{{
+{
     hosted = boost::make_shared<hosted_data_type>();
-
-//    get_big_boot_barrier().wait(&hosted->primary_ns_server_);
-//    set_status(running);
-} // }}}
+}
 
 void addressing_service::adjust_local_cache_size()
 { // {{{
