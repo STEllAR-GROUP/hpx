@@ -48,6 +48,8 @@ namespace hpx
 {
     void handle_termination(char const* reason)
     {
+        if (get_config_entry("hpx.attach_debugger", "") == "exception")
+            util::attach_debugger();
         std::cerr
 #if defined(HPX_HAVE_STACKTRACES)
             << "{stack-trace}: " << hpx::util::trace() << "\n"
