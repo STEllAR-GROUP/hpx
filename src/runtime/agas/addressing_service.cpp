@@ -1932,7 +1932,10 @@ void addressing_service::decref(
 
         threads::register_thread_nullary(
             util::bind(decref_ptr, this, gid, credit, boost::ref(throws)),
-            "addressing_service::decref");
+            "addressing_service::decref", threads::pending, true,
+            threads::thread_priority_normal, std::size_t(-1),
+            threads::thread_stacksize_default, ec);
+
         return;
     }
 
