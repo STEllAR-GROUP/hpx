@@ -348,6 +348,12 @@ namespace hpx { namespace detail
     void assertion_failed_msg(char const* msg, char const* expr,
         char const* function, char const* file, long line)
     {
+        if (!expect_exception_flag.load(boost::memory_order_relaxed) &&
+            get_config_entry("hpx.attach_debugger", "") == "exception")
+        {
+            util::attach_debugger();
+        }
+
         bool threw = false;
 
         std::string str("assertion '" + std::string(msg) + "' failed");
