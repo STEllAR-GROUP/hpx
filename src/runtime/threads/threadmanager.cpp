@@ -1414,6 +1414,7 @@ namespace hpx { namespace threads
               HPX_PERFORMANCE_COUNTER_V1, counts_creator,
               &performance_counters::locality_thread_counter_discoverer,
               "ns"
+            },
 #endif
 #endif
             { "/threads/count/instantaneous/all", performance_counters::counter_raw,
@@ -1824,7 +1825,6 @@ namespace hpx { namespace threads
             exec_times.end(), 0.);
         double tfunc_total = std::accumulate(tfunc_times.begin(),
             tfunc_times.end(), 0.);
-
         double num_phases = std::accumulate(executed_thread_phases_.begin(),
             executed_thread_phases_.end(), 0.);
 
@@ -1857,6 +1857,8 @@ namespace hpx { namespace threads
 
         double exec_total = std::accumulate(exec_times.begin(),
             exec_times.end(), 0.);
+        double tfunc_total = std::accumulate(tfunc_times.begin(),
+            tfunc_times.end(), 0.);
         double num_threads = std::accumulate(executed_threads_.begin(),
             executed_threads_.end(), 0.);
 
