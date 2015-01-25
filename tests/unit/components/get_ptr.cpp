@@ -80,11 +80,16 @@ int main()
     HPX_TEST(test_get_ptr1(hpx::find_here()));
     HPX_TEST(test_get_ptr2(hpx::find_here()));
 
+
     std::vector<hpx::id_type> localities = hpx::find_remote_localities();
     BOOST_FOREACH(hpx::id_type const& id, localities)
     {
+        HPX_TEST(!hpx::expect_exception());
+
         HPX_TEST(!test_get_ptr1(id));
         HPX_TEST(!test_get_ptr2(id));
+
+        HPX_TEST(hpx::expect_exception(false));
     }
 
     return hpx::util::report_errors();

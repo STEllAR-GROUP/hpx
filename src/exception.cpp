@@ -24,6 +24,7 @@
 
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
+#include <boost/atomic/atomic.hpp>
 
 #include <stdexcept>
 #include <algorithm>
@@ -41,6 +42,16 @@ extern char **environ;
 namespace hpx
 {
     char const* get_runtime_state_name(runtime::state state);
+
+    ///////////////////////////////////////////////////////////////////////////
+    // For testing purposes we sometime expect to see exceptions, allow those
+    // to go through without attaching a debugger.
+    boost::atomic<bool> expect_exception_flag(false);
+
+    bool expect_exception(bool flag)
+    {
+        return expect_exception_flag.exchange(flag);
+    }
 }
 
 namespace hpx { namespace detail
@@ -261,8 +272,11 @@ namespace hpx { namespace detail
     HPX_EXPORT void throw_exception(Exception const& e, std::string const& func,
         std::string const& file, long line)
     {
-        if (get_config_entry("hpx.attach_debugger", "") == "exception")
+        if (!expect_exception_flag.load(boost::memory_order_relaxed) &&
+            get_config_entry("hpx.attach_debugger", "") == "exception")
+        {
             util::attach_debugger();
+        }
         boost::rethrow_exception(get_exception(e, func, file, line));
     }
 
@@ -375,12 +389,24 @@ namespace hpx { namespace detail
     // report an early or late exception and abort
     void report_exception_and_terminate(boost::exception_ptr const& e)
     {
+        if (!expect_exception_flag.load(boost::memory_order_relaxed) &&
+            get_config_entry("hpx.attach_debugger", "") == "exception")
+        {
+            util::attach_debugger();
+        }
+
         std::cerr << hpx::diagnostic_information(e) << std::endl;
         std::abort();
     }
 
     void report_exception_and_terminate(hpx::exception const& e)
     {
+        if (!expect_exception_flag.load(boost::memory_order_relaxed) &&
+            get_config_entry("hpx.attach_debugger", "") == "exception")
+        {
+            util::attach_debugger();
+        }
+
         std::cerr << hpx::diagnostic_information(e) << std::endl;
         std::abort();
     }
