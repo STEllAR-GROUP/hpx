@@ -283,13 +283,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
             sender_connection->context().close(ec);
             sender_connection.reset();
 
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << error.message() << " (while trying to connect to: "
                   << l << ")";
 
             HPX_THROWS_IF(ec, network_error,
                 "ibverbs::parcelport::create_connection",
-                hpx::util::osstream_get_string(strm));
+                strm.str());
             return sender_connection;
         }
 

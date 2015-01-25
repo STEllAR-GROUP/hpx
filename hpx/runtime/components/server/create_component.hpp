@@ -14,8 +14,9 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/util/functional/new.hpp>
+
+#include <sstream>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
@@ -38,12 +39,12 @@ namespace hpx { namespace components { namespace server
 
         Component::destroy(c, count);
 
-        hpx::util::osstream strm;
+        std::ostringstream strm;
         strm << "global id " << gid << " is already bound to a different "
                 "component instance";
         HPX_THROWS_IF(ec, hpx::duplicate_component_address,
             "create<Component>",
-            hpx::util::osstream_get_string(strm));
+            strm.str());
 
         return naming::invalid_gid;
     }
@@ -66,12 +67,12 @@ namespace hpx { namespace components { namespace server
 
         Component::heap_type::free(c, 1);
 
-        hpx::util::osstream strm;
+        std::ostringstream strm;
         strm << "global id " << gid << " is already bound to a different "
                 "component instance";
         HPX_THROWS_IF(ec, hpx::duplicate_component_address,
             "create<Component>(ctor)",
-            hpx::util::osstream_get_string(strm));
+            strm.str());
 
         return naming::invalid_gid;
     }
@@ -95,12 +96,12 @@ namespace hpx { namespace components { namespace server
 
         Component::heap_type::free(c, 1);
 
-        hpx::util::osstream strm;
+        std::ostringstream strm;
         strm << "global id " << assigned_gid <<
             " is already bound to a different component instance";
         HPX_THROWS_IF(ec, hpx::duplicate_component_address,
             "create<Component>(naming::gid_type, ctor)",
-            hpx::util::osstream_get_string(strm));
+            strm.str());
 
         return naming::invalid_gid;
     }

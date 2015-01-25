@@ -453,8 +453,8 @@ namespace hpx { namespace parcelset
         boost::int64_t get_connection_cache_statistics(connection_type pp_type,
             parcelport::connection_cache_statistics_type stat_type, bool) const;
 
-        static void list_parcelports(util::osstream& strm);
-        static void list_parcelport(util::osstream& strm, connection_type t,
+        static void list_parcelports(std::ostringstream& strm);
+        static void list_parcelport(std::ostringstream& strm, connection_type t,
             bool available = true);
 
     protected:

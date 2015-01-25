@@ -490,13 +490,13 @@ namespace hpx { namespace applier
             if (HPX_UNLIKELY(!components::types_are_compatible(
                 addr.type_, comptype)))
             {
-                hpx::util::osstream strm;
+                std::ostringstream strm;
                 strm << " types are not compatible: destination_type("
                       << addr.type_ << ") action_type(" << comptype
                       << ") parcel ("  << p << ")";
                 HPX_THROW_EXCEPTION(bad_component_type,
                     "action_manager::fetch_parcel",
-                    hpx::util::osstream_get_string(strm));
+                    strm.str());
             }
 
             // dispatch action, register work item either with or without

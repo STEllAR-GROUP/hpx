@@ -16,13 +16,14 @@
 #include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/util/reinitializable_static.hpp>
-#include <hpx/util/stringstream.hpp>
 
 #include <boost/noncopyable.hpp>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/array.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
+
+#include <sstream>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -189,26 +190,26 @@ namespace hpx { namespace components
         boost::uint8_t* get_ptr()
         {
             if (!data_) {
-                hpx::util::osstream strm;
+                std::ostringstream strm;
                 strm << "memory_block_data data is NULL ("
                      << components::get_component_type_name(component_memory_block)
                      << ")";
                 HPX_THROW_EXCEPTION(invalid_status,
                     "memory_block_data::get_ptr",
-                    hpx::util::osstream_get_string(strm));
+                    strm.str());
             }
             return data_->get_ptr();
         }
         boost::uint8_t const* get_ptr() const
         {
             if (!data_) {
-                hpx::util::osstream strm;
+                std::ostringstream strm;
                 strm << "memory_block_data data is NULL ("
                      << components::get_component_type_name(component_memory_block)
                      << ")";
                 HPX_THROW_EXCEPTION(invalid_status,
                     "memory_block_data::get_ptr const",
-                    hpx::util::osstream_get_string(strm));
+                    strm.str());
             }
             return data_->get_ptr();
         }
@@ -216,13 +217,13 @@ namespace hpx { namespace components
         std::size_t get_size() const
         {
             if (!data_) {
-                hpx::util::osstream strm;
+                std::ostringstream strm;
                 strm << "memory_block_data data is NULL ("
                      << components::get_component_type_name(component_memory_block)
                      << ")";
                 HPX_THROW_EXCEPTION(invalid_status,
                     "memory_block_data::get_size",
-                    hpx::util::osstream_get_string(strm));
+                    strm.str());
             }
             return data_->get_size();
         }
@@ -243,23 +244,23 @@ namespace hpx { namespace components
         void set (T const& val)
         {
             if (!data_) {
-                hpx::util::osstream strm;
+                std::ostringstream strm;
                 strm << "memory_block_data data is NULL ("
                      << components::get_component_type_name(component_memory_block)
                      << ")";
                 HPX_THROW_EXCEPTION(invalid_status,
                     "memory_block_data::set",
-                    hpx::util::osstream_get_string(strm));
+                    strm.str());
             }
             if (!data_->is_master())
             {
-                hpx::util::osstream strm;
+                std::ostringstream strm;
                 strm << "memory_block_data data is not checked out ("
                      << components::get_component_type_name(component_memory_block)
                      << ")";
                 HPX_THROW_EXCEPTION(invalid_status,
                     "memory_block_data::set",
-                    hpx::util::osstream_get_string(strm));
+                    strm.str());
             }
             *reinterpret_cast<T*>(data_->get_ptr()) = val;
         }
@@ -513,26 +514,26 @@ namespace hpx { namespace components { namespace server
         detail::memory_block* get()
         {
             if (!component_) {
-                hpx::util::osstream strm;
+                std::ostringstream strm;
                 strm << "component is NULL ("
                      << components::get_component_type_name(component_memory_block)
                      << ")";
                 HPX_THROW_EXCEPTION(invalid_status,
                     "memory_block::get",
-                    hpx::util::osstream_get_string(strm));
+                    strm.str());
             }
             return static_cast<detail::memory_block*>(component_.get());
         }
         detail::memory_block const* get() const
         {
             if (!component_) {
-                hpx::util::osstream strm;
+                std::ostringstream strm;
                 strm << "component is NULL ("
                      << components::get_component_type_name(component_memory_block)
                      << ")";
                 HPX_THROW_EXCEPTION(invalid_status,
                     "memory_block::get const",
-                    hpx::util::osstream_get_string(strm));
+                    strm.str());
             }
             return static_cast<detail::memory_block const*>(component_.get());
         }

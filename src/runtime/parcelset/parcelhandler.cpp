@@ -13,7 +13,6 @@
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/mpi_environment.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
@@ -22,9 +21,6 @@
 #include <hpx/lcos/local/counting_semaphore.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
-
-#include <string>
-#include <algorithm>
 
 #include <boost/version.hpp>
 #include <boost/assign/std/vector.hpp>
@@ -40,6 +36,10 @@
 #include <boost/thread/condition.hpp>
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
+
+#include <algorithm>
+#include <sstream>
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -363,7 +363,7 @@ namespace hpx { namespace parcelset
         }
     }
 
-    void parcelhandler::list_parcelport(util::osstream& strm, connection_type t,
+    void parcelhandler::list_parcelport(std::ostringstream& strm, connection_type t,
         bool available)
     {
         std::string ppname = get_connection_type_name(t);
@@ -386,7 +386,7 @@ namespace hpx { namespace parcelset
     }
 
     // list available parcel ports
-    void parcelhandler::list_parcelports(util::osstream& strm)
+    void parcelhandler::list_parcelports(std::ostringstream& strm)
     {
         list_parcelport(strm, connection_tcp);
 
@@ -563,7 +563,7 @@ namespace hpx { namespace parcelset
             }
             if(eps.empty())
             {
-                hpx::util::osstream oss;
+                std::ostringstream oss;
                 oss << "The locality gid cannot be resolved to a valid endpoint.\n"
                     << "Got locality " << dest_gid << " (" << get_locality() << ") . Available endpoints:\n";
                 BOOST_FOREACH(resolved_endpoints_type::value_type const & endpoints, resolved_endpoints_)
@@ -571,7 +571,7 @@ namespace hpx { namespace parcelset
                     oss << "    " << endpoints.first << ": " << endpoints.second << "\n";
                 }
                 HPX_THROW_EXCEPTION(network_error, "parcelhandler::find_appropriate_destination",
-                    hpx::util::osstream_get_string(oss));
+                    oss.str());
                 return locality();
             }
 

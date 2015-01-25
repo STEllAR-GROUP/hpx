@@ -6,25 +6,8 @@
 #if !defined(HPX_PLUGIN_CONFIG_HPP_HK_2005_11_07)
 #define HPX_PLUGIN_CONFIG_HPP_HK_2005_11_07
 
-#include <boost/config.hpp>
 #include <hpx/config.hpp>
-
-///////////////////////////////////////////////////////////////////////////////
-#ifdef BOOST_NO_STRINGSTREAM
-#include <strstream>
-inline std::string HPX_PLUGIN_OSSTREAM_GETSTRING(std::ostrstream& ss)
-{
-    ss << std::ends;
-    std::string rval = ss.str();
-    ss.freeze(false);
-    return rval;
-}
-#define HPX_PLUGIN_OSSTREAM std::ostrstream
-#else
-#include <sstream>
-#define HPX_PLUGIN_OSSTREAM_GETSTRING(ss) ss.str()
-#define HPX_PLUGIN_OSSTREAM std::ostringstream
-#endif
+#include <boost/config.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_PLUGIN_NO_EXPORT_API)

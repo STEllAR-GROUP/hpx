@@ -695,7 +695,7 @@ namespace hpx { namespace util
             else if (0 == std::string("full").find(help_option)) {
                 // defer printing help until after dynamic part has been
                 // acquired
-                hpx::util::osstream strm;
+                std::ostringstream strm;
                 strm << help << std::endl;
                 ini_config_ += "hpx.cmd_line_help!=" +
                     detail::encode_string(strm.str());
@@ -758,7 +758,7 @@ namespace hpx { namespace util
         threads::topology& top = threads::create_topology();
         runtime & rt = get_runtime();
         {
-            util::osstream strm;    // make sure all output is kept together
+            std::ostringstream strm;    // make sure all output is kept together
 
             strm << std::string(79, '*') << '\n';
             strm << "locality: " << hpx::get_locality_id() << '\n';
@@ -790,7 +790,7 @@ namespace hpx { namespace util
                 }
             }
 
-            std::cout << util::osstream_get_string(strm);
+            std::cout << strm.str();
         }
     }
 #endif
@@ -799,13 +799,13 @@ namespace hpx { namespace util
     {
         runtime & rt = get_runtime();
         {
-            util::osstream strm;    // make sure all output is kept together
+            std::ostringstream strm;    // make sure all output is kept together
             strm << std::string(79, '*') << '\n';
             strm << "locality: " << hpx::get_locality_id() << '\n';
 
             rt.get_parcel_handler().list_parcelports(strm);
 
-            std::cout << util::osstream_get_string(strm);
+            std::cout << strm.str();
         }
     }
 

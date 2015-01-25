@@ -7,20 +7,20 @@
 #if !defined(HPX_UTIL_FULLEMPTYSTORE_JUN_16_2008_0128APM)
 #define HPX_UTIL_FULLEMPTYSTORE_JUN_16_2008_0128APM
 
-#include <memory>
-
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/scoped_unlock.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
 #include <boost/aligned_storage.hpp>
 #include <boost/type_traits/alignment_of.hpp>
 #include <boost/type_traits/add_pointer.hpp>
 #include <boost/intrusive/slist.hpp>
+
+#include <memory>
+#include <sstream>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail

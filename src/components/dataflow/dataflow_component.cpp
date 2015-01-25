@@ -8,7 +8,6 @@
 #include <hpx/exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/scoped_unlock.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components/derived_component_factory.hpp>
@@ -24,6 +23,8 @@
 #include <hpx/util/get_and_reset_value.hpp>
 
 #include <boost/serialization/version.hpp>
+
+#include <sstream>
 
 HPX_REGISTER_COMPONENT_MODULE()
 

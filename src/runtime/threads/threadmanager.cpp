@@ -25,7 +25,6 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/itt_notify.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/util/hardware/timestamp.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
@@ -35,6 +34,7 @@
 #include <boost/format.hpp>
 
 #include <numeric>
+#include <sstream>
 
 #ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
 ///////////////////////////////////////////////////////////////////////////////

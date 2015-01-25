@@ -455,26 +455,26 @@ namespace hpx { namespace components { namespace server
         component_map_mutex_type::scoped_lock l(cm_mtx_);
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end()) {
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "attempt to create component instance of "
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (component type not found in map)";
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
-                hpx::util::osstream_get_string(strm));
+                strm.str());
             return naming::invalid_gid;
         }
 
         if (!(*it).second.first) {
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "attempt to create component instance of "
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (map entry is NULL)";
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
-                hpx::util::osstream_get_string(strm));
+                strm.str());
             return naming::invalid_gid;
         }
 
@@ -500,26 +500,26 @@ namespace hpx { namespace components { namespace server
         component_map_mutex_type::scoped_lock l(cm_mtx_);
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end()) {
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "attempt to create component instance of "
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (component type not found in map)";
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
-                hpx::util::osstream_get_string(strm));
+                strm.str());
             return naming::invalid_gid;
         }
 
         if (!(*it).second.first) {
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "attempt to create component instance of "
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (map entry is NULL)";
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
-                hpx::util::osstream_get_string(strm));
+                strm.str());
             return naming::invalid_gid;
         }
 
@@ -550,26 +550,26 @@ namespace hpx { namespace components { namespace server
         component_map_mutex_type::scoped_lock l(cm_mtx_);
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end()) {
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "attempt to create component(s) instance of "
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (component type not found in map)";
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
-                hpx::util::osstream_get_string(strm));
+                strm.str());
             return std::vector<naming::gid_type>();
         }
 
         if (!(*it).second.first) {
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "attempt to create component instance(s) of "
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (map entry is NULL)";
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
-                hpx::util::osstream_get_string(strm));
+                strm.str());
             return std::vector<naming::gid_type>();
         }
 
@@ -602,26 +602,26 @@ namespace hpx { namespace components { namespace server
         component_map_mutex_type::scoped_lock l(cm_mtx_);
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end()) {
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "attempt to create component(s) instance of "
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (component type not found in map)";
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
-                hpx::util::osstream_get_string(strm));
+                strm.str());
             return std::vector<naming::gid_type>();
         }
 
         if (!(*it).second.first) {
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "attempt to create component instance(s) of "
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (map entry is NULL)";
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
-                hpx::util::osstream_get_string(strm));
+                strm.str());
             return std::vector<naming::gid_type>();
         }
 
@@ -658,26 +658,26 @@ namespace hpx { namespace components { namespace server
         component_map_mutex_type::scoped_lock l(cm_mtx_);
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end()) {
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "attempt to create component instance of "
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (component type not found in map)";
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::copy_create_component",
-                hpx::util::osstream_get_string(strm));
+                strm.str());
             return naming::invalid_gid;
         }
 
         if (!(*it).second.first) {
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "attempt to create component instance of "
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (map entry is NULL)";
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::copy_create_component",
-                hpx::util::osstream_get_string(strm));
+                strm.str());
             return naming::invalid_gid;
         }
 
@@ -714,26 +714,26 @@ namespace hpx { namespace components { namespace server
         component_map_mutex_type::scoped_lock l(cm_mtx_);
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end()) {
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "attempt to migrate component instance of "
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (component type not found in map)";
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::migrate_component_to_here",
-                hpx::util::osstream_get_string(strm));
+                strm.str());
             return naming::invalid_gid;
         }
 
         if (!(*it).second.first) {
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "attempt to migrate component instance of "
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (map entry is NULL)";
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::migrate_component_to_here",
-                hpx::util::osstream_get_string(strm));
+                strm.str());
             return naming::invalid_gid;
         }
 

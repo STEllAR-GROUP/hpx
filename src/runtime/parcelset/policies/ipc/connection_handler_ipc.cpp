@@ -222,12 +222,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
             sender_connection->window().close();
             sender_connection.reset();
 
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << error.message() << " (while trying to connect to: "
                   << l << ")";
             HPX_THROWS_IF(ec, network_error,
                 "ipc::parcelport::get_connection",
-                hpx::util::osstream_get_string(strm));
+                strm.str());
             return sender_connection;
         }
 

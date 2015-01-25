@@ -14,8 +14,8 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/bind_naming_wrappers.hpp>
-#include <hpx/util/stringstream.hpp>
 
+#include <sstream>
 #include <utility>
 
 namespace hpx { namespace detail
@@ -96,14 +96,14 @@ namespace hpx { namespace components
                     gid_ = hpx::detail::get_next_id();
                     if (!applier::bind_gid_local(gid_, addr))
                     {
-                        hpx::util::osstream strm;
+                        std::ostringstream strm;
                         strm << gid_;
 
                         gid_ = naming::invalid_gid;   // invalidate GID
 
                         HPX_THROW_EXCEPTION(duplicate_component_address,
                             "simple_component_base<Component>::get_base_gid",
-                            hpx::util::osstream_get_string(strm));
+                            strm.str());
                     }
                 }
                 else
@@ -114,14 +114,14 @@ namespace hpx { namespace components
 
                     if (!agas::bind_sync(gid_, addr, appl.get_locality_id()))
                     {
-                        hpx::util::osstream strm;
+                        std::ostringstream strm;
                         strm << gid_;
 
                         gid_ = naming::invalid_gid;   // invalidate GID
 
                         HPX_THROW_EXCEPTION(duplicate_component_address,
                             "simple_component_base<Component>::get_base_gid",
-                            hpx::util::osstream_get_string(strm));
+                            strm.str());
                     }
                 }
             }

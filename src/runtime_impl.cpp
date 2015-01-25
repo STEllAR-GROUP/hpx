@@ -5,10 +5,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
-
-#include <iostream>
-#include <vector>
-
 #include <boost/config.hpp>
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
@@ -19,7 +15,6 @@
 #include <hpx/include/runtime.hpp>
 #include <hpx/runtime_impl.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/util/set_thread_name.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/util/apex.hpp>
@@ -30,6 +25,11 @@
 #include <hpx/runtime/threads/threadmanager_impl.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
+
+#include <iostream>
+#include <sstream>
+#include <vector>
+
 
 #if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
 #include <io.h>

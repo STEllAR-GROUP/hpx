@@ -257,9 +257,9 @@ namespace hpx {
         /// \brief Returns a string of the locality endpoints (usable in debug output)
         std::string here() const
         {
-            util::osstream strm;
+            std::ostringstream strm;
             strm << get_runtime().endpoints();
-            return util::osstream_get_string(strm);
+            return strm.str();
         }
 
         /// \brief Return the number of executed HPX threads

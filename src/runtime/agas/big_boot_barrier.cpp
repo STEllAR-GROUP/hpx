@@ -16,7 +16,6 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/mpi_environment.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
@@ -43,6 +42,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/serialization/vector.hpp>
+
+#include <sstream>
 
 namespace hpx { namespace detail
 {
@@ -489,11 +490,11 @@ void notify_worker(notification_header const& header)
 
     if (HPX_UNLIKELY(agas_client.get_status() != starting))
     {
-        hpx::util::osstream strm;
+        std::ostringstream strm;
         strm << "locality " << rt.here() << " has launched early";
         HPX_THROW_EXCEPTION(internal_server_error,
             "agas::notify_worker",
-            hpx::util::osstream_get_string(strm));
+            strm.str());
     }
 
     util::runtime_configuration& cfg = rt.get_config();
@@ -689,11 +690,11 @@ void notify_worker_security(notification_header_security const& header)
 
     if (HPX_UNLIKELY(agas_client.get_status() != starting))
     {
-        hpx::util::osstream strm;
+        std::ostringstream strm;
         strm << "locality " << rt.here() << " has launched early";
         HPX_THROW_EXCEPTION(internal_server_error,
             "agas::notify_worker",
-            hpx::util::osstream_get_string(strm));
+            strm.str());
     }
 
     // finish initializing the certificate store

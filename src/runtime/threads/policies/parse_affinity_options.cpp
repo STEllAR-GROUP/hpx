@@ -29,7 +29,8 @@
 
 #include <hpx/runtime/threads/detail/partlit.hpp>
 #include <hpx/runtime.hpp>
-#include <hpx/util/stringstream.hpp>
+
+#include <sstream>
 
 ///////////////////////////////////////////////////////////////////////////////
 BOOST_FUSION_ADAPT_STRUCT(

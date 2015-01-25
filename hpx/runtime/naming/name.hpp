@@ -8,9 +8,14 @@
 #if !defined(HPX_NAMING_NAME_MAR_24_2008_0942AM)
 #define HPX_NAMING_NAME_MAR_24_2008_0942AM
 
-#include <ios>
-#include <iomanip>
-#include <iostream>
+#include <hpx/config.hpp>
+#include <hpx/exception.hpp>
+#include <hpx/util/safe_bool.hpp>
+#include <hpx/util/serialize_intrusive_ptr.hpp>
+#include <hpx/util/register_locks_globally.hpp>
+#include <hpx/traits/promise_remote_result.hpp>
+#include <hpx/traits/promise_local_result.hpp>
+#include <hpx/lcos/local/spinlock_pool.hpp>
 
 #include <boost/foreach.hpp>
 #include <boost/io/ios_state.hpp>
@@ -20,15 +25,10 @@
 #include <boost/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
 
-#include <hpx/config.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/util/safe_bool.hpp>
-#include <hpx/util/serialize_intrusive_ptr.hpp>
-#include <hpx/util/stringstream.hpp>
-#include <hpx/util/register_locks_globally.hpp>
-#include <hpx/traits/promise_remote_result.hpp>
-#include <hpx/traits/promise_local_result.hpp>
-#include <hpx/lcos/local/spinlock_pool.hpp>
+#include <ios>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -257,11 +257,11 @@ namespace hpx { namespace naming
 
         std::string to_string() const
         {
-            hpx::util::osstream out;
+            std::ostringstream out;
             out << std::hex
                 << std::right << std::setfill('0') << std::setw(16) << id_msb_
                 << std::right << std::setfill('0') << std::setw(16) << id_lsb_;
-            return hpx::util::osstream_get_string(out);
+            return out.str();
         }
 
         // this type is at the same time its own mutex type

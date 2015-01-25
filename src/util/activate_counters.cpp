@@ -10,7 +10,6 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/activate_counters.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/util/apex.hpp>
 #include <hpx/util/unwrapped.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
@@ -22,6 +21,7 @@
 #include <boost/format.hpp>
 
 #include <iostream>
+#include <sstream>
 #include <fstream>
 
 namespace hpx { namespace util
