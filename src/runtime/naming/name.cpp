@@ -236,13 +236,14 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         gid_type split_gid_if_needed(gid_type& gid)
         {
-            gid_type::mutex_type::scoped_try_lock l(gid.get_mutex());
+            typedef gid_type::mutex_type::scoped_try_lock scoped_try_lock;
+            scoped_try_lock l(gid.get_mutex());
             if (l)
             {
                 gid_type new_gid;
                 {
-                    util::ignore_while_checking<gid_type::mutex_type::scoped_try_lock> il(&l);
                     // split credit normally
+                    util::ignore_while_checking<scoped_try_lock> il(&l);
                     new_gid = split_gid_if_needed_locked(gid);
                 }
                 return new_gid;
@@ -346,14 +347,16 @@ namespace hpx { namespace naming
         {
             boost::int64_t added_credit = 0;
 
-            gid_type::mutex_type::scoped_lock l(gid);
+            typedef gid_type::mutex_type::scoped_lock scoped_lock;
+            scoped_lock l(gid);
 
             HPX_ASSERT(0 == get_credit_from_gid(gid));
             added_credit = naming::detail::fill_credit_for_gid(gid);
             naming::detail::set_credit_split_mask_for_gid(gid);
 
             gid_type unlocked_gid = gid;        // strips lock-bit
-            l.unlock();
+
+            util::ignore_while_checking<scoped_lock> il(&l);
             return agas::incref(unlocked_gid, added_credit);
         }
 

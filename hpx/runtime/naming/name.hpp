@@ -56,6 +56,8 @@ namespace hpx { namespace naming
 
         inline boost::uint64_t strip_internal_bits_and_locality_from_gid(
                 boost::uint64_t msb) HPX_SUPER_PURE;
+
+        inline bool is_locked(gid_type const& gid);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -352,11 +354,13 @@ namespace hpx { namespace naming
             util::unregister_lock_globally(this);
         }
 
+        // this is used for assertions only, no need to acquire the lock
         bool is_locked() const
         {
-            internal_mutex_type::scoped_lock l(this);
             return (id_msb_ & is_locked_mask) ? true : false;
         }
+
+        friend bool detail::is_locked(gid_type const& gid);
 
         // actual gid
         boost::uint64_t id_msb_;
@@ -528,7 +532,7 @@ namespace hpx { namespace naming
 
         inline bool is_locked(gid_type const& gid)
         {
-            return (gid.get_msb() & gid_type::is_locked_mask) ? true : false;
+            return gid.is_locked();
         }
 
         ///////////////////////////////////////////////////////////////////////
