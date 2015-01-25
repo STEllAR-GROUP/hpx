@@ -274,7 +274,10 @@ namespace hpx { namespace lcos { namespace detail
             // special precautions for it to go out of scope
             if (1 == counter && naming::detail::has_credits(this->gid_))
             {
-                this->get_gid_locked();          // this will trigger normal destruction
+                // this will trigger normal destruction
+                naming::id_type id = this->get_gid_locked();
+
+                l.unlock();
                 return false;
             }
             else if (0 == counter)
@@ -384,7 +387,10 @@ namespace hpx { namespace lcos { namespace detail
             // special precautions for it to go out of scope
             if (1 == counter && naming::detail::has_credits(this->gid_))
             {
-                this->get_gid_locked();          // this will trigger normal destruction
+                // this will trigger normal destruction
+                naming::id_type id = this->get_gid_locked();
+
+                l.unlock();
                 return false;
             }
             else if (0 == counter)
