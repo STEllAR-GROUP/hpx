@@ -494,6 +494,10 @@ namespace hpx { namespace threads
             std::size_t num = std::size_t(-1), bool reset = false);
         boost::int64_t get_thread_duration(
             std::size_t num = std::size_t(-1), bool reset = false);
+        boost::int64_t get_thread_phase_overhead(
+            std::size_t num = std::size_t(-1), bool reset = false);
+        boost::int64_t get_thread_overhead(
+            std::size_t num = std::size_t(-1), bool reset = false);
 #endif
 #endif
 

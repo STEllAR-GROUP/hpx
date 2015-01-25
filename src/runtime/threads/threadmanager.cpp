@@ -1,3 +1,4 @@
+//  Copyright (c) 2015 Patricia Grubel
 //  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach, Katelyn Kufahl
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
@@ -1141,6 +1142,22 @@ namespace hpx { namespace threads
                   static_cast<std::size_t>(paths.instanceindex_), _1),
               "worker-thread", shepherd_count
             },
+            // /threads{locality#%d/total}/time/average-overhead
+            // /threads{locality#%d/worker-thread%d}/time/average-overhead
+            { "time/average-overhead",
+              util::bind(&ti::get_thread_overhead, this, -1, _1),
+              util::bind(&ti::get_thread_overhead, this,
+                  static_cast<std::size_t>(paths.instanceindex_), _1),
+              "worker-thread", shepherd_count
+            },
+            // /threads{locality#%d/total}/time/average-phase-overhead
+            // /threads{locality#%d/worker-thread%d}/time/average-phase-overhead
+            { "time/average-phase-overhead",
+              util::bind(&ti::get_thread_phase_overhead, this, -1, _1),
+              util::bind(&ti::get_thread_phase_overhead, this,
+                  static_cast<std::size_t>(paths.instanceindex_), _1),
+              "worker-thread", shepherd_count
+            },
 #endif
 #endif
             // /threads{locality#%d/total}/count/instantaneous/all
@@ -1386,6 +1403,17 @@ namespace hpx { namespace threads
               &performance_counters::locality_thread_counter_discoverer,
               "ns"
             },
+            { "/threads/time/average-overhead", performance_counters::counter_raw,
+              "returns average overhead time executing one HPX-thread",
+              HPX_PERFORMANCE_COUNTER_V1, counts_creator,
+              &performance_counters::locality_thread_counter_discoverer,
+              "ns"
+            },
+            { "/threads/time/average-phase-overhead", performance_counters::counter_raw,
+              "returns average overhead time executing one HPX-thread phase",
+              HPX_PERFORMANCE_COUNTER_V1, counts_creator,
+              &performance_counters::locality_thread_counter_discoverer,
+              "ns"
 #endif
 #endif
             { "/threads/count/instantaneous/all", performance_counters::counter_raw,
@@ -1774,6 +1802,73 @@ namespace hpx { namespace threads
         }
         return boost::uint64_t((exec_total * timestamp_scale_) / num_threads);
     }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    boost::int64_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        get_thread_phase_overhead(std::size_t num, bool reset)
+    {
+        if (num != std::size_t(-1)) {
+            double exec_total = static_cast<double>(exec_times[num]);
+            double tfunc_total = static_cast<double>(tfunc_times[num]);
+            double num_phases = static_cast<double>(executed_thread_phases_[num]);
+
+            if (reset) {
+                executed_thread_phases_[num] = 0;
+                tfunc_times[num] = boost::uint64_t(-1);
+            }
+            return boost::uint64_t(((tfunc_total - exec_total) * timestamp_scale_)/
+                    num_phases);
+        }
+
+        double exec_total = std::accumulate(exec_times.begin(),
+            exec_times.end(), 0.);
+        double tfunc_total = std::accumulate(tfunc_times.begin(),
+            tfunc_times.end(), 0.);
+
+        double num_phases = std::accumulate(executed_thread_phases_.begin(),
+            executed_thread_phases_.end(), 0.);
+
+        if (reset) {
+            std::fill(executed_thread_phases_.begin(),
+                executed_thread_phases_.end(), 0LL);
+            std::fill(tfunc_times.begin(), tfunc_times.end(),
+                boost::uint64_t(-1));
+        }
+        return boost::uint64_t(((tfunc_total - exec_total) * timestamp_scale_)/
+                num_phases);
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    boost::int64_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        get_thread_overhead(std::size_t num, bool reset)
+    {
+        if (num != std::size_t(-1)) {
+            double exec_total = static_cast<double>(exec_times[num]);
+            double tfunc_total = static_cast<double>(tfunc_times[num]);
+            double num_threads = static_cast<double>(executed_threads_[num]);
+
+            if (reset) {
+                executed_threads_[num] = 0;
+                tfunc_times[num] = boost::uint64_t(-1);
+            }
+            return boost::uint64_t(((tfunc_total - exec_total) *
+                        timestamp_scale_) / num_threads);
+        }
+
+        double exec_total = std::accumulate(exec_times.begin(),
+            exec_times.end(), 0.);
+        double num_threads = std::accumulate(executed_threads_.begin(),
+            executed_threads_.end(), 0.);
+
+        if (reset) {
+            std::fill(executed_threads_.begin(), executed_threads_.end(), 0LL);
+            std::fill(tfunc_times.begin(), tfunc_times.end(),
+                boost::uint64_t(-1));
+        }
+        return boost::uint64_t(((tfunc_total - exec_total) *
+                        timestamp_scale_) / num_threads);
+    }
+
 #endif
 #endif
 
