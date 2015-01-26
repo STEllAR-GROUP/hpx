@@ -312,7 +312,7 @@ namespace hpx { namespace components { namespace detail
         }
 
     protected:
-        bool test_release(scoped_lock& /*lk*/)
+        bool test_release(scoped_lock& lk)
         {
             if (pool_ == NULL || free_size_ < size_ || first_free_ < pool_+size_)
                 return false;
@@ -323,6 +323,7 @@ namespace hpx { namespace components { namespace detail
                 naming::gid_type base_gid = base_gid_;
                 base_gid_ = naming::invalid_gid;
 
+                util::scoped_unlock<scoped_lock> ull(lk);
                 applier::unbind_range_local(base_gid, step_);
             }
 
