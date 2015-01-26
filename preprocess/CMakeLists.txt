@@ -9,12 +9,6 @@
 ################################################################################
 
 # add headers to preprocessing
-set(function_argument_limit_preprocessing_files
-  "hpx/util/unwrapped.hpp")
-foreach(file ${function_argument_limit_preprocessing_files})
-  hpx_partial_preprocess_header(${file} LIMIT HPX_LIMIT)
-endforeach()
-
 set(tuple_argument_limit_preprocessing_files
   "hpx/util/tuple.hpp")
 foreach(file ${tuple_argument_limit_preprocessing_files})
