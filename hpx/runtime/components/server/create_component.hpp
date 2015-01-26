@@ -10,7 +10,13 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/util/stringstream.hpp>
+#include <hpx/util/bind.hpp>
+#include <hpx/util/decay.hpp>
+#include <hpx/util/move.hpp>
+#include <hpx/util/tuple.hpp>
+#include <hpx/util/functional/new.hpp>
+
+#include <sstream>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
@@ -33,18 +39,18 @@ namespace hpx { namespace components { namespace server
 
         Component::destroy(c, count);
 
-        hpx::util::osstream strm;
+        std::ostringstream strm;
         strm << "global id " << gid << " is already bound to a different "
                 "component instance";
         HPX_THROWS_IF(ec, hpx::duplicate_component_address,
             "create<Component>",
-            hpx::util::osstream_get_string(strm));
+            strm.str());
 
         return naming::invalid_gid;
     }
 
     template <typename Component>
-    naming::gid_type create(HPX_STD_FUNCTION<void(void*)> const& ctor,
+    naming::gid_type create(util::function_nonser<void(void*)> const& ctor,
         error_code& ec = throws)
     {
         Component* c = (Component*)Component::heap_type::alloc(1);
@@ -61,19 +67,19 @@ namespace hpx { namespace components { namespace server
 
         Component::heap_type::free(c, 1);
 
-        hpx::util::osstream strm;
+        std::ostringstream strm;
         strm << "global id " << gid << " is already bound to a different "
                 "component instance";
         HPX_THROWS_IF(ec, hpx::duplicate_component_address,
             "create<Component>(ctor)",
-            hpx::util::osstream_get_string(strm));
+            strm.str());
 
         return naming::invalid_gid;
     }
 
     template <typename Component>
     naming::gid_type create(naming::gid_type const& gid,
-        HPX_STD_FUNCTION<void(void*)> const& ctor,
+        util::function_nonser<void(void*)> const& ctor,
         error_code& ec = throws)
     {
         Component* c = (Component*)Component::heap_type::alloc(1);
@@ -90,12 +96,12 @@ namespace hpx { namespace components { namespace server
 
         Component::heap_type::free(c, 1);
 
-        hpx::util::osstream strm;
+        std::ostringstream strm;
         strm << "global id " << assigned_gid <<
             " is already bound to a different component instance";
         HPX_THROWS_IF(ec, hpx::duplicate_component_address,
             "create<Component>(naming::gid_type, ctor)",
-            hpx::util::osstream_get_string(strm));
+            strm.str());
 
         return naming::invalid_gid;
     }
@@ -105,6 +111,36 @@ namespace hpx { namespace components { namespace server
     {
         Component* p = Component::heap_type::alloc(1);
         return new (p) typename Component::derived_type(impl);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Create component with arguments
+    namespace detail
+    {
+        template <typename Component, typename ...Ts>
+        util::detail::bound<
+            util::detail::one_shot_wrapper<
+                util::functional::placement_new<typename Component::derived_type>
+            >,
+            util::tuple<
+                util::detail::placeholder<1>,
+                typename util::decay<Ts>::type...
+            >
+        > construct_function(Ts&&... vs)
+        {
+            typedef typename Component::derived_type type;
+
+            return util::bind(
+                util::one_shot(util::functional::placement_new<type>()),
+                util::placeholders::_1, std::forward<Ts>(vs)...);
+        }
+    }
+
+    template <typename Component, typename ...Ts>
+    naming::gid_type construct(Ts&&... vs)
+    {
+        return server::create<Component>(
+            detail::construct_function<Component>(std::forward<Ts>(vs)...));
     }
 }}}
 

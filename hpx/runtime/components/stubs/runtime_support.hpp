@@ -19,12 +19,6 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/async.hpp>
 
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/repeat.hpp>
-#include <boost/preprocessor/enum_params.hpp>
-#include <boost/preprocessor/inc.hpp>
-#include <boost/type_traits/remove_reference.hpp>
-
 #include <boost/serialization/vector.hpp>
 
 namespace hpx { namespace components { namespace stubs
@@ -51,9 +45,9 @@ namespace hpx { namespace components { namespace stubs
         /// given \a targetgid. This is a non-blocking call. The caller needs
         /// to call \a future#get on the result of this function
         /// to obtain the global id of the newly created object.
-        template <typename Component>
+        template <typename Component, typename ...Ts>
         static lcos::future<naming::id_type>
-        create_component_async(naming::id_type const& gid)
+        create_component_async(naming::id_type const& gid, Ts&&... vs)
         {
             if (!naming::is_locality(gid))
             {
@@ -64,28 +58,28 @@ namespace hpx { namespace components { namespace stubs
                 return lcos::make_ready_future(naming::invalid_id);
             }
 
-            // Create a future, execute the required action,
-            // we simply return the initialized future, the caller needs
-            // to call get() on the return value to obtain the result
-            typedef typename server::create_component_action0<Component>
-                action_type;
-            return hpx::async<action_type>(gid);
+            typedef server::create_component_action<
+                Component, typename hpx::util::decay<Ts>::type...
+            > action_type;
+            return hpx::async<action_type>(gid, std::forward<Ts>(vs)...);
         }
 
         /// Create a new component \a type using the runtime_support with the
         /// given \a targetgid. Block for the creation to finish.
-        template <typename Component>
-        static naming::id_type create_component(naming::id_type const& gid)
+        template <typename Component, typename ...Ts>
+        static naming::id_type create_component(naming::id_type const& gid,
+            Ts&&... vs)
         {
-            // The following get yields control while the action above
-            // is executed and the result is returned to the future
-            return create_component_async<Component>(gid).get();
+            return create_component_async<Component>(gid,
+                std::forward<Ts>(vs)...).get();
         }
 
-        template <typename Component>
+        /// Create a new component \a type using the runtime_support with the
+        /// given \a targetgid. This is a non-blocking call.
+        template <typename Component, typename ...Ts>
         static lcos::future<std::vector<naming::id_type> >
         bulk_create_component_async(naming::id_type const& gid,
-            std::size_t count)
+            std::size_t count, Ts&&... vs)
         {
             if (!naming::is_locality(gid))
             {
@@ -96,171 +90,48 @@ namespace hpx { namespace components { namespace stubs
                 return lcos::make_ready_future(std::vector<naming::id_type>());
             }
 
-            // Create a future, execute the required action,
-            // we simply return the initialized future, the caller needs
-            // to call get() on the return value to obtain the result
-            typedef typename server::bulk_create_component_action1<Component>
-                action_type;
-            return hpx::async<action_type>(gid, count);
+            typedef server::bulk_create_component_action<
+                Component, typename hpx::util::decay<Ts>::type...
+            > action_type;
+            return hpx::async<action_type>(gid, count,
+                std::forward<Ts>(vs)...);
         }
 
         /// Create a new component \a type using the runtime_support with the
         /// given \a targetgid. Block for the creation to finish.
-        template <typename Component>
-        static std::vector<naming::id_type>
-        bulk_create_component(naming::id_type const& gid, std::size_t count)
+        template <typename Component, typename ...Ts>
+        static std::vector<naming::id_type> bulk_create_component(
+            naming::id_type const& gid, std::size_t count, Ts&&... vs)
         {
-            // The following get yields control while the action above
-            // is executed and the result is returned to the future
-            return bulk_create_component_async<Component>(gid, count).get();
+            return bulk_create_component_async<Component>(gid, count,
+                std::forward<Ts>(vs)...).get();
         }
 
         /// Create a new component \a type using the runtime_support with the
         /// given \a targetgid. This is a non-blocking call. The caller needs
         /// to call \a future#get on the result of this function
         /// to obtain the global id of the newly created object.
-        template <typename Component>
+        template <typename Component, typename ...Ts>
         static lcos::future<naming::id_type>
-        create_component_colocated_async(naming::id_type const& gid)
+        create_component_colocated_async(naming::id_type const& gid,
+            Ts&&... vs)
         {
-            if (!naming::is_locality(gid))
-            {
-                HPX_THROW_EXCEPTION(bad_parameter,
-                    "stubs::runtime_support::create_component_async",
-                    "The id passed as the first argument is not representing"
-                        " a locality");
-                return lcos::make_ready_future(naming::invalid_id);
-            }
-
-            // Create a future, execute the required action,
-            // we simply return the initialized future, the caller needs
-            // to call get() on the return value to obtain the result
-            typedef typename server::create_component_action0<Component>
-                action_type;
-            return hpx::async_colocated<action_type>(gid);
+            typedef server::create_component_action<
+                Component, typename hpx::util::decay<Ts>::type...
+            > action_type;
+            return hpx::async_colocated<action_type>(gid,
+                std::forward<Ts>(vs)...);
         }
 
-        template <typename Component>
+        /// Create a new component \a type using the runtime_support with the
+        /// given \a targetgid. Block for the creation to finish.
+        template <typename Component, typename ...Ts>
         static naming::id_type create_component_colocated(
-            naming::id_type const& gid)
+            naming::id_type const& gid, Ts&&... vs)
         {
-            // The following get yields control while the action above
-            // is executed and the result is returned to the future
-            return create_component_colocated_async<Component>(gid).get();
+            return create_component_colocated_async<Component>(gid,
+                std::forward<Ts>(vs)...).get();
         }
-
-#define HPX_RUNTIME_SUPPORT_STUB_DECAY(Z, N, D)                               \
-        typename hpx::util::decay<BOOST_PP_CAT(D, N)>::type                   \
-/**/
-#define HPX_RUNTIME_SUPPORT_STUB_CREATE(Z, N, D)                              \
-        template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename Arg)>  \
-        static lcos::future<naming::id_type>                                  \
-        create_component_async(naming::id_type const& gid,                    \
-            HPX_ENUM_FWD_ARGS(N, Arg, arg))                                   \
-        {                                                                     \
-            if (!naming::is_locality(gid))                                    \
-            {                                                                 \
-                HPX_THROW_EXCEPTION(bad_parameter,                            \
-                    "stubs::runtime_support::create_component_async",         \
-                    "The id passed as the first argument is not representing" \
-                        " a locality");                                       \
-                return lcos::make_ready_future(naming::invalid_id);           \
-            }                                                                 \
-                                                                              \
-            typedef typename                                                  \
-                server::BOOST_PP_CAT(create_component_action, N)<             \
-                    Component, BOOST_PP_ENUM(N,                               \
-                        HPX_RUNTIME_SUPPORT_STUB_DECAY, Arg)>                 \
-                action_type;                                                  \
-            return hpx::async<action_type>(gid,                               \
-                HPX_ENUM_FORWARD_ARGS(N , Arg, arg));                         \
-        }                                                                     \
-                                                                              \
-        template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename Arg)>  \
-        static naming::id_type create_component(                              \
-            naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))       \
-        {                                                                     \
-            return create_component_async<Component>(                         \
-                gid, HPX_ENUM_FORWARD_ARGS(N , Arg, arg)).get();              \
-        }                                                                     \
-                                                                              \
-        template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename Arg)>  \
-        static lcos::future<naming::id_type>                                  \
-        create_component_colocated_async(naming::id_type const& gid,          \
-            HPX_ENUM_FWD_ARGS(N, Arg, arg))                                   \
-        {                                                                     \
-            typedef typename                                                  \
-                server::BOOST_PP_CAT(create_component_action, N)<             \
-                    Component, BOOST_PP_ENUM(N,                               \
-                        HPX_RUNTIME_SUPPORT_STUB_DECAY, Arg)>                 \
-                action_type;                                                  \
-            return hpx::async_colocated<action_type>(gid,                     \
-                HPX_ENUM_FORWARD_ARGS(N , Arg, arg));                         \
-        }                                                                     \
-                                                                              \
-        template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename Arg)>  \
-        static naming::id_type create_component_colocated(                    \
-            naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))       \
-        {                                                                     \
-            return create_component_colocated_async<Component>(               \
-                gid, HPX_ENUM_FORWARD_ARGS(N , Arg, arg)).get();              \
-        }                                                                     \
-    /**/
-
-        BOOST_PP_REPEAT_FROM_TO(
-            1
-          , HPX_ACTION_ARGUMENT_LIMIT
-          , HPX_RUNTIME_SUPPORT_STUB_CREATE
-          , _
-        )
-
-#undef HPX_RUNTIME_SUPPORT_STUB_CREATE
-
-#define HPX_RUNTIME_SUPPORT_STUB_BULK_CREATE(Z, N, D)                         \
-        template <typename Component,                                         \
-            BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(N), typename Arg)>              \
-        static lcos::future<std::vector<naming::id_type> >                    \
-        bulk_create_component_async(naming::id_type const& gid,               \
-            std::size_t count, HPX_ENUM_FWD_ARGS(BOOST_PP_DEC(N), Arg, arg))  \
-        {                                                                     \
-            if (!naming::is_locality(gid))                                    \
-            {                                                                 \
-                HPX_THROW_EXCEPTION(bad_parameter,                            \
-                    "stubs::runtime_support::bulk_create_component_async",    \
-                    "The id passed as the first argument is not representing" \
-                        " a locality");                                       \
-                return lcos::make_ready_future(std::vector<naming::id_type>());\
-            }                                                                 \
-                                                                              \
-            typedef typename                                                  \
-                server::BOOST_PP_CAT(bulk_create_component_action, N)<        \
-                    Component, BOOST_PP_ENUM(BOOST_PP_DEC(N),                 \
-                        HPX_RUNTIME_SUPPORT_STUB_DECAY, Arg)>                 \
-                action_type;                                                  \
-            return hpx::async<action_type>(gid, count,                        \
-                HPX_ENUM_FORWARD_ARGS(BOOST_PP_DEC(N), Arg, arg));            \
-        }                                                                     \
-                                                                              \
-        template <typename Component,                                         \
-            BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(N), typename Arg)>              \
-        static std::vector<naming::id_type> bulk_create_component(            \
-            naming::id_type const& gid, std::size_t count,                    \
-                HPX_ENUM_FWD_ARGS(BOOST_PP_DEC(N), Arg, arg))                 \
-        {                                                                     \
-            return bulk_create_component_async<Component>(gid, count,         \
-                HPX_ENUM_FORWARD_ARGS(BOOST_PP_DEC(N), Arg, arg)).get();      \
-        }                                                                     \
-    /**/
-
-        BOOST_PP_REPEAT_FROM_TO(
-            2
-          , HPX_ACTION_ARGUMENT_LIMIT
-          , HPX_RUNTIME_SUPPORT_STUB_BULK_CREATE
-          , _
-        )
-
-#undef HPX_RUNTIME_SUPPORT_STUB_BULK_CREATE
-#undef HPX_RUNTIME_SUPPORT_STUB_DECAY
 
         ///////////////////////////////////////////////////////////////////////
         // copy construct a component

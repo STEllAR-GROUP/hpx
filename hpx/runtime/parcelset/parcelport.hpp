@@ -51,11 +51,11 @@ namespace hpx { namespace parcelset
         friend struct agas::big_boot_barrier;
 
     public:
-        typedef HPX_STD_FUNCTION<
+        typedef util::function_nonser<
             void(boost::system::error_code const&, parcel const&)
         > write_handler_type;
 
-        typedef HPX_STD_FUNCTION<
+        typedef util::function_nonser<
             void(parcelport& pp, boost::shared_ptr<std::vector<char> >,
                  threads::thread_priority)
         > read_handler_type;

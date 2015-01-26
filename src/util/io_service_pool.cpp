@@ -23,8 +23,8 @@
 namespace hpx { namespace util
 {
     io_service_pool::io_service_pool(std::size_t pool_size,
-            HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
-            HPX_STD_FUNCTION<void()> const& on_stop_thread,
+            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
+            util::function_nonser<void()> const& on_stop_thread,
             char const* pool_name, char const* name_postfix)
       : next_io_service_(0), stopped_(false),
         pool_size_(pool_size),
@@ -51,8 +51,8 @@ namespace hpx { namespace util
     }
 
     io_service_pool::io_service_pool(
-            HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
-            HPX_STD_FUNCTION<void()> const& on_stop_thread,
+            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
+            util::function_nonser<void()> const& on_stop_thread,
             char const* pool_name, char const* name_postfix)
       : next_io_service_(0), stopped_(false),
         pool_size_(2),

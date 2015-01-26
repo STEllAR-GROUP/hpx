@@ -3,8 +3,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !BOOST_PP_IS_ITERATING
-
 #ifndef HPX_LCOS_DATAFLOW_SERVER_DETAIL_DATAFLOW_IMPL_HPP
 #define HPX_LCOS_DATAFLOW_SERVER_DETAIL_DATAFLOW_IMPL_HPP
 
@@ -19,8 +17,6 @@
 #include <boost/mpl/at.hpp>
 #include <boost/mpl/int.hpp>
 #include <boost/mpl/insert.hpp>
-#include <boost/preprocessor/arithmetic/sub.hpp>
-#include <boost/preprocessor/facilities/intercept.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <hpx/components/dataflow/is_dataflow.hpp>
 #include <hpx/components/dataflow/server/detail/dataflow_slot.hpp>
@@ -30,6 +26,7 @@
 
 #include <hpx/util/decay.hpp>
 #include <hpx/util/demangle_helper.hpp>
+#include <hpx/util/tuple.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/detail/full_empty_memory.hpp>
 
@@ -51,7 +48,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
     };
 
     /// counter function declarations
-    
+
     HPX_COMPONENT_EXPORT boost::int64_t get_initialized_count(bool);
     HPX_COMPONENT_EXPORT boost::int64_t get_constructed_count(bool);
     HPX_COMPONENT_EXPORT boost::int64_t get_fired_count(bool);
@@ -67,107 +64,17 @@ namespace hpx { namespace lcos { namespace server { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Action
-      , BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT(HPX_ACTION_ARGUMENT_LIMIT, typename A, void)
-      , typename Result = typename traits::promise_local_result<
-                typename Action::result_type>::type
-      , typename Enable = void
+      , typename R, typename ...Ts
     >
     struct dataflow_impl;
 
-#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/components/dataflow/server/detail/preprocessed/dataflow_impl.hpp>
-#else
-
-#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/dataflow_impl_" HPX_LIMIT_STR ".hpp")
-#endif
-
-#define BOOST_PP_ITERATION_PARAMS_1                                             \
-    (                                                                           \
-        3                                                                       \
-      , (                                                                       \
-            0                                                                   \
-          , HPX_ACTION_ARGUMENT_LIMIT                                           \
-          , <hpx/components/dataflow/server/detail/dataflow_impl.hpp>           \
-        )                                                                       \
-    )                                                                           \
-/**/
-#include BOOST_PP_ITERATE()
-
-#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(output: null)
-#endif
-
-#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-
-}}}}
-
-namespace hpx { namespace traits
-{
     template <
         typename Action
-      , BOOST_PP_ENUM_PARAMS(HPX_ACTION_ARGUMENT_LIMIT, typename A)
-      , typename Result
-    >
-    struct component_type_database<
-        lcos::server::detail::dataflow_impl<
-            Action
-          , BOOST_PP_ENUM_PARAMS(HPX_ACTION_ARGUMENT_LIMIT, A), Result
-        >
-    >
-    {
-        typedef
-            typename boost::mpl::if_<
-                boost::is_void<Result>
-              , hpx::util::unused_type
-              , Result
-            >::type
-            result_type;
-
-        static components::component_type get()
-        {
-            return component_type_database<
-                lcos::base_lco_with_value<
-                    typename Action::result_type
-                  , typename Action::remote_result_type
-                >
-            >::get();
-        }
-
-        static void set(components::component_type t)
-        {
-            component_type_database<
-                lcos::base_lco_with_value<
-                    typename Action::result_type
-                  , typename Action::remote_result_type
-                >
-            >::set(t);
-        }
-    };
-}}
-
-
-#endif
-
-#else
-
-#define N BOOST_PP_ITERATION()
-#define REMAINDER BOOST_PP_SUB(HPX_ACTION_ARGUMENT_LIMIT, N)
-
-    template <
-        typename Action
-        BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
-      , typename Result
+      , typename R
     >
     struct dataflow_impl<
         Action
-        BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)
-        BOOST_PP_COMMA_IF(REMAINDER)
-        BOOST_PP_ENUM_PARAMS(
-            REMAINDER
-          , void BOOST_PP_INTERCEPT
-        )
-      , Result
+      , R()
     >
         : ::hpx::lcos::base_lco_with_value<
               typename Action::result_type
@@ -175,7 +82,7 @@ namespace hpx { namespace traits
           >
     {
         typedef
-            typename traits::promise_remote_result<Result>::type
+            typename traits::promise_remote_result<R>::type
             result_type;
 
         typedef util::detail::value_or_error<result_type> data_type;
@@ -189,22 +96,18 @@ namespace hpx { namespace traits
         typedef
             dataflow_impl<
                 Action
-                BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)
+              , typename traits::promise_local_result<
+                    typename Action::result_type>::type()
             >
             wrapped_type;
 
         typedef
-            components::managed_component<
-                dataflow_impl<
-                    Action
-                    BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)
-                >
-            >
+            components::managed_component<wrapped_type>
             wrapping_type;
 
         typedef
             passed_args_transforms<
-                BOOST_PP_CAT(boost::mpl::vector, N)<BOOST_PP_ENUM_PARAMS(N, A)>
+                util::tuple<>
             >
             passed_args;
 
@@ -212,33 +115,19 @@ namespace hpx { namespace traits
 
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
 
-#if N > 0
-        // generate the bitset for checking if all slots have fired
-#define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
-            (1<<N) |                                                            \
-    /**/
-        static const boost::uint32_t
-            slots_completed = (BOOST_PP_REPEAT(N, HPX_LCOS_DATAFLOW_M0, _) 0);
-#undef HPX_LCOS_DATAFLOW_M0
-#endif
-
         dataflow_impl(
             naming::id_type const & id
           , lcos::local::spinlock & mtx
           , std::vector<naming::id_type> & t
         )
             : back_ptr_(0)
-#if N > 0
-            , slots_set(0)
-#endif
             , targets(t)
             , action_id(id)
             , mtx(mtx)
         {
         }
 
-
-        void init(BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
+        void init()
         {
             LLCO_(info)
                 << "hpx::lcos::server::detail::dataflow_impl<"
@@ -246,20 +135,7 @@ namespace hpx { namespace traits
                 << ">::init(): "
                 << get_gid()
                 ;
-#if N == 0
             hpx::apply_c<Action>(get_gid(), action_id);
-#endif
-#if N > 0
-            future_slots.reserve(N);
-
-#define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
-            set_slot<N>(                                                        \
-                BOOST_PP_CAT(a, N)                                              \
-              , typename hpx::traits::is_dataflow<BOOST_PP_CAT(A, N)>::type()); \
-    /**/
-            BOOST_PP_REPEAT(N, HPX_LCOS_DATAFLOW_M0, _)
-#undef HPX_LCOS_DATAFLOW_M0
-#endif
         }
 
         void finalize()
@@ -293,9 +169,6 @@ namespace hpx { namespace traits
         {
             HPX_ASSERT(!result.is_empty());
             HPX_ASSERT(targets.empty());
-#if N > 0
-            HPX_ASSERT(slots_set == slots_completed);
-#endif
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -307,17 +180,10 @@ namespace hpx { namespace traits
         typedef typename Action::remote_result_type remote_result;
 
         // This is called by our action after it executed. The argument is what
-        // has been calculated by the action. The result has to be sent to all 
+        // has been calculated by the action. The result has to be sent to all
         // connected dataflow instances.
         void set_value(remote_result && r)
         {
-#if N > 0
-            BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
-            {
-                delete p;
-            }
-            future_slots.clear();
-#endif
             remote_result tmp(r);
             result.set(std::move(r));
             forward_results(tmp);
@@ -380,9 +246,258 @@ namespace hpx { namespace traits
             }
         }
 
-#if N > 0
+        void set_event()
+        {
+            this->set_value_nonvirt(remote_result());
+        }
+
+        result_type get_value(error_code& ec = throws)
+        {
+            HPX_ASSERT(false);
+            static result_type default_;
+            return default_;
+        }
+
+        naming::id_type get_gid() const
+        {
+            return
+                naming::id_type(
+                    naming::detail::get_stripped_gid(get_base_gid())
+                  , naming::id_type::unmanaged
+                );
+        }
+
+        naming::gid_type get_base_gid() const
+        {
+            HPX_ASSERT(back_ptr_);
+            return back_ptr_->get_base_gid();
+        }
+
+    private:
+        template <typename>
+        friend struct components::detail_adl_barrier::init;
+
+        void set_back_ptr(components::managed_component<dataflow_impl>* bp)
+        {
+            HPX_ASSERT(0 == back_ptr_);
+            HPX_ASSERT(bp);
+            back_ptr_ = bp;
+        }
+
+        components::managed_component<dataflow_impl>* back_ptr_;
+
+        hpx::lcos::detail::full_empty<data_type> result;
+        std::vector<naming::id_type> & targets;
+        naming::id_type action_id;
+
+        lcos::local::spinlock & mtx;
+    };
+
+    template <
+        typename Action
+      , typename R
+      , typename ...Ts
+    >
+    struct dataflow_impl<
+        Action
+      , R(Ts...)
+    >
+        : ::hpx::lcos::base_lco_with_value<
+              typename Action::result_type
+            , typename Action::remote_result_type
+          >
+    {
+        typedef
+            typename traits::promise_remote_result<R>::type
+            result_type;
+
+        typedef util::detail::value_or_error<result_type> data_type;
+
+        typedef
+            hpx::lcos::base_lco_with_value<
+                typename Action::result_type
+              , typename Action::remote_result_type
+            >
+            lco_type;
+        typedef
+            dataflow_impl<
+                Action
+              , typename traits::promise_local_result<
+                    typename Action::result_type>::type(Ts...)
+            >
+            wrapped_type;
+
+        typedef
+            components::managed_component<wrapped_type>
+            wrapping_type;
+
+        typedef
+            passed_args_transforms<
+                util::tuple<Ts...>
+            >
+            passed_args;
+
+        typedef typename passed_args::results_type args_type;
+
+        typedef typename passed_args::slot_to_args_map slot_to_args_map;
+
+        // generate the bitset for checking if all slots have fired
+        static const boost::uint32_t slots_completed = (1u << sizeof...(Ts)) - 1;
+
+        dataflow_impl(
+            naming::id_type const & id
+          , lcos::local::spinlock & mtx
+          , std::vector<naming::id_type> & t
+        )
+            : back_ptr_(0)
+            , slots_set(0)
+            , targets(t)
+            , action_id(id)
+            , mtx(mtx)
+        {
+        }
+
+        template <std::size_t ...Is>
+        void init_impl(util::detail::pack_c<std::size_t, Is...>, Ts&&... vs)
+        {
+            LLCO_(info)
+                << "hpx::lcos::server::detail::dataflow_impl<"
+                << hpx::actions::detail::get_action_name<Action>()
+                << ">::init(): "
+                << get_gid()
+                ;
+            future_slots.reserve(sizeof...(Is));
+
+            int const sequencer[] = {
+                (set_slot<Is>(
+                    vs
+                  , typename hpx::traits::is_dataflow<Ts>::type()), 0)...
+            };
+        }
+
+        void init(Ts&&... vs)
+        {
+            init_impl(
+                typename util::detail::make_index_pack<sizeof...(Ts)>::type()
+              , std::forward<Ts>(vs)...);
+        }
+
+        void finalize()
+        {
+            data_type d;
+            result.read(d);
+            std::vector<naming::id_type> t;
+            {
+                lcos::local::spinlock::scoped_lock l(mtx);
+                std::swap(targets, t);
+            }
+            for (std::size_t i = 0; i < t.size(); ++i)
+            {
+                if(d.stores_error())
+                {
+                    typedef typename lco_type::set_exception_action action_type;
+                    hpx::apply<action_type>(t[i], d.get_error());
+                }
+                else
+                {
+                    HPX_ASSERT(d.stores_value()); // This should never be empty
+
+                    typedef typename lco_type::set_value_action action_type;
+                    result_type r = d.get_value();
+                    hpx::apply<action_type>(t[i], std::move(r));
+                }
+            }
+        }
+
+        ~dataflow_impl()
+        {
+            HPX_ASSERT(!result.is_empty());
+            HPX_ASSERT(targets.empty());
+            HPX_ASSERT(slots_set == slots_completed);
+            LLCO_(info)
+                << "~dataflow_impl<"
+                << hpx::actions::detail::get_action_name<Action>()
+                << ">::dataflow_impl(): "
+                << get_gid()
+                ;
+        }
+
+        typedef typename Action::remote_result_type remote_result;
+
+        // This is called by our action after it executed. The argument is what
+        // has been calculated by the action. The result has to be sent to all
+        // connected dataflow instances.
+        void set_value(remote_result && r)
+        {
+            BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
+            {
+                delete p;
+            }
+            future_slots.clear();
+            remote_result tmp(r);
+            result.set(std::move(r));
+            forward_results(tmp);
+        }
+
+        void forward_results(remote_result & r)
+        {
+            std::vector<naming::id_type> t;
+            {
+                lcos::local::spinlock::scoped_lock l(mtx);
+                std::swap(targets, t);
+            }
+
+            // Note: lco::set_value is a direct action, for this reason,
+            //       the following loop will not be parallelized if the
+            //       targets are local (which is ok)
+            for (std::size_t i = 0; i < t.size(); ++i)
+            {
+                typedef typename lco_type::set_value_action action_type;
+                result_type tmp =  r;
+                hpx::apply<action_type>(t[i], std::move(tmp));
+            }
+        }
+
+        // This is called when some dataflow object connects to this one (i.e.
+        // requests to receive the output of this dataflow instance).
+        void connect(naming::id_type const & target)
+        {
+            LLCO_(info)
+                << "dataflow_impl<"
+                << hpx::actions::detail::get_action_name<Action>()
+                << ">::set_target() of "
+                << get_gid()
+                << " ";
+
+            lcos::local::spinlock::scoped_lock l(mtx);
+            if(!result.is_empty())
+            {
+                data_type d;
+                result.read(d);
+                l.unlock();
+
+                if(d.stores_error())
+                {
+                    typedef typename lco_type::set_exception_action action_type;
+                    hpx::apply<action_type>(target, d.get_error());
+                }
+                else
+                {
+                    HPX_ASSERT(d.stores_value()); // This should never be empty
+
+                    typedef typename lco_type::set_value_action action_type;
+                    result_type r =  d.get_value();
+                    hpx::apply<action_type>(target, std::move(r));
+                }
+            }
+            else
+            {
+                targets.push_back(target);
+            }
+        }
+
         // Setting the slot for future values
-        template <int Slot, typename A>
+        template <std::size_t Slot, typename A>
         void set_slot(A && a, boost::mpl::true_)
         {
             typedef
@@ -404,7 +519,7 @@ namespace hpx { namespace traits
 
         // Setting the slot for immediate values
         template <
-            int Slot
+            std::size_t Slot
           , typename A
         >
         typename boost::enable_if<
@@ -422,7 +537,7 @@ namespace hpx { namespace traits
         };
         // Setting the slot for immediate values
         template <
-            int Slot
+            std::size_t Slot
           , typename A
         >
         typename boost::disable_if<
@@ -433,7 +548,7 @@ namespace hpx { namespace traits
             maybe_apply<Slot>();
         };
 
-        template <int Slot>
+        template <std::size_t Slot>
         void maybe_apply()
         {
             bool apply_it = false;
@@ -471,7 +586,6 @@ namespace hpx { namespace traits
                 << "\n"
                 ;
         }
-#endif
 
         void set_event()
         {
@@ -513,11 +627,9 @@ namespace hpx { namespace traits
 
         components::managed_component<dataflow_impl>* back_ptr_;
 
-#if N > 0
         args_type slots;
         boost::uint32_t slots_set;
         std::vector<detail::component_wrapper_base *> future_slots;
-#endif
 
         hpx::lcos::detail::full_empty<data_type> result;
         std::vector<naming::id_type> & targets;
@@ -525,8 +637,50 @@ namespace hpx { namespace traits
 
         lcos::local::spinlock & mtx;
     };
+}}}}
 
-#undef REMAINDER
-#undef N
+namespace hpx { namespace traits
+{
+    template <
+        typename Action
+      , typename R
+      , typename ...Ts
+    >
+    struct component_type_database<
+        lcos::server::detail::dataflow_impl<
+            Action
+          , R(Ts...)
+        >
+    >
+    {
+        typedef
+            typename boost::mpl::if_<
+                boost::is_void<R>
+              , hpx::util::unused_type
+              , R
+            >::type
+            result_type;
+
+        static components::component_type get()
+        {
+            return component_type_database<
+                lcos::base_lco_with_value<
+                    typename Action::result_type
+                  , typename Action::remote_result_type
+                >
+            >::get();
+        }
+
+        static void set(components::component_type t)
+        {
+            component_type_database<
+                lcos::base_lco_with_value<
+                    typename Action::result_type
+                  , typename Action::remote_result_type
+                >
+            >::set(t);
+        }
+    };
+}}
 
 #endif

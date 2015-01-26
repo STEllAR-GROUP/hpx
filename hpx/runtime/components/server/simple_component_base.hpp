@@ -14,8 +14,8 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/bind_naming_wrappers.hpp>
-#include <hpx/util/stringstream.hpp>
 
+#include <sstream>
 #include <utility>
 
 namespace hpx { namespace detail
@@ -96,14 +96,14 @@ namespace hpx { namespace components
                     gid_ = hpx::detail::get_next_id();
                     if (!applier::bind_gid_local(gid_, addr))
                     {
-                        hpx::util::osstream strm;
+                        std::ostringstream strm;
                         strm << gid_;
 
                         gid_ = naming::invalid_gid;   // invalidate GID
 
                         HPX_THROW_EXCEPTION(duplicate_component_address,
                             "simple_component_base<Component>::get_base_gid",
-                            hpx::util::osstream_get_string(strm));
+                            strm.str());
                     }
                 }
                 else
@@ -114,14 +114,14 @@ namespace hpx { namespace components
 
                     if (!agas::bind_sync(gid_, addr, appl.get_locality_id()))
                     {
-                        hpx::util::osstream strm;
+                        std::ostringstream strm;
                         strm << gid_;
 
                         gid_ = naming::invalid_gid;   // invalidate GID
 
                         HPX_THROW_EXCEPTION(duplicate_component_address,
                             "simple_component_base<Component>::get_base_gid",
-                            hpx::util::osstream_get_string(strm));
+                            strm.str());
                     }
                 }
             }
@@ -253,18 +253,13 @@ namespace hpx { namespace components
         typedef simple_component<Component> component_type;
         typedef component_type derived_type;
         typedef detail::simple_heap_factory<component_type> heap_type;
-
-#define SIMPLE_COMPONENT_CONSTRUCT(Z, N, _)                                   \
-        template <BOOST_PP_ENUM_PARAMS(N, typename T)>                        \
-        simple_component(HPX_ENUM_FWD_ARGS(N, T, t))                          \
-          : Component(HPX_ENUM_FORWARD_ARGS(N, T, t))                         \
-        {}                                                                    \
-    /**/
-
-        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARGUMENT_LIMIT,
-            SIMPLE_COMPONENT_CONSTRUCT, _)
-
-#undef SIMPLE_COMPONENT_CONSTRUCT
+        
+        /// \brief Construct a simple_component instance holding a new wrapped
+        ///        instance
+        template <typename ...Ts>
+        simple_component(Ts&&... vs)
+          : Component(std::forward<Ts>(vs)...)
+        {}
 
         /// \brief  The function \a create is used for allocation and
         ///         initialization of instances of the derived components.

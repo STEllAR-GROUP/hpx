@@ -7,7 +7,18 @@
 #if !defined(HPX_PLUGINS_PARCELPORT_FACTORY_BASE_HPP)
 #define HPX_PLUGINS_PARCELPORT_FACTORY_BASE_HPP
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+
+#include <hpx/util/function.hpp>
+#include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/runtime_configuration.hpp>
+
+#include <vector>
+#include <string>
+
+namespace hpx { namespace parcelset {
+    class parcelport;
+}}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace plugins
@@ -31,8 +42,8 @@ namespace hpx { namespace plugins
         ///        supported by this factory
         virtual parcelset::parcelport* create(
             hpx::util::runtime_configuration const & cfg,
-            HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
-            HPX_STD_FUNCTION<void()> const& on_stop_thread) = 0;
+            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
+            util::function_nonser<void()> const& on_stop_thread) = 0;
     };
 }}
 

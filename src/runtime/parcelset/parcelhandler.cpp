@@ -12,7 +12,6 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
@@ -25,9 +24,6 @@
 #include <hpx/performance_counters/counter_creators.hpp>
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
-
-#include <string>
-#include <algorithm>
 
 #include <boost/version.hpp>
 #include <boost/assign/std/vector.hpp>
@@ -43,6 +39,10 @@
 #include <boost/thread/condition.hpp>
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
+
+#include <algorithm>
+#include <sstream>
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -118,8 +118,8 @@ namespace hpx { namespace parcelset
     parcelhandler::parcelhandler(
             util::runtime_configuration & cfg,
             threads::threadmanager_base* tm, parcelhandler_queue_base* policy,
-            HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
-            HPX_STD_FUNCTION<void()> const& on_stop_thread)
+            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
+            util::function_nonser<void()> const& on_stop_thread)
       : tm_(tm),
         parcels_(policy),
         use_alternative_parcelports_(false),
@@ -180,7 +180,7 @@ namespace hpx { namespace parcelset
         }
     }
 
-    void parcelhandler::list_parcelport(util::osstream& strm,
+    void parcelhandler::list_parcelport(std::ostringstream& strm,
         std::string const& ppname, int priority, bool bootstrap) const
     {
         strm << "parcel port: " << ppname;
@@ -200,7 +200,7 @@ namespace hpx { namespace parcelset
     }
 
     // list available parcel ports
-    void parcelhandler::list_parcelports(util::osstream& strm) const
+    void parcelhandler::list_parcelports(std::ostringstream& strm) const
     {
         BOOST_FOREACH(pports_type::value_type const & pp, pports_)
         {
@@ -803,11 +803,11 @@ namespace hpx { namespace parcelset
         }
 
         // register common counters
-        HPX_STD_FUNCTION<boost::int64_t(bool)> incoming_queue_length(
+        util::function_nonser<boost::int64_t(bool)> incoming_queue_length(
             boost::bind(&parcelhandler::get_incoming_queue_length, this, ::_1));
-        HPX_STD_FUNCTION<boost::int64_t(bool)> outgoing_queue_length(
+        util::function_nonser<boost::int64_t(bool)> outgoing_queue_length(
             boost::bind(&parcelhandler::get_outgoing_queue_length, this, ::_1));
-        HPX_STD_FUNCTION<boost::int64_t(bool)> outgoing_routed_count(
+        util::function_nonser<boost::int64_t(bool)> outgoing_routed_count(
             boost::bind(&parcelhandler::get_parcel_routed_count, this, ::_1));
 
         performance_counters::generic_counter_type_data const counter_types[] =
@@ -847,45 +847,45 @@ namespace hpx { namespace parcelset
 
     void parcelhandler::register_counter_types(std::string const& pp_type)
     {
-        HPX_STD_FUNCTION<boost::int64_t(bool)> num_parcel_sends(
+        util::function_nonser<boost::int64_t(bool)> num_parcel_sends(
             boost::bind(&parcelhandler::get_parcel_send_count, this, pp_type, ::_1));
-        HPX_STD_FUNCTION<boost::int64_t(bool)> num_parcel_receives(
+        util::function_nonser<boost::int64_t(bool)> num_parcel_receives(
             boost::bind(&parcelhandler::get_parcel_receive_count, this, pp_type, ::_1));
 
-        HPX_STD_FUNCTION<boost::int64_t(bool)> num_message_sends(
+        util::function_nonser<boost::int64_t(bool)> num_message_sends(
             boost::bind(&parcelhandler::get_message_send_count, this, pp_type, ::_1));
-        HPX_STD_FUNCTION<boost::int64_t(bool)> num_message_receives(
+        util::function_nonser<boost::int64_t(bool)> num_message_receives(
             boost::bind(&parcelhandler::get_message_receive_count, this, pp_type, ::_1));
 
-        HPX_STD_FUNCTION<boost::int64_t(bool)> sending_time(
+        util::function_nonser<boost::int64_t(bool)> sending_time(
             boost::bind(&parcelhandler::get_sending_time, this, pp_type, ::_1));
-        HPX_STD_FUNCTION<boost::int64_t(bool)> receiving_time(
+        util::function_nonser<boost::int64_t(bool)> receiving_time(
             boost::bind(&parcelhandler::get_receiving_time, this, pp_type, ::_1));
 
-        HPX_STD_FUNCTION<boost::int64_t(bool)> sending_serialization_time(
+        util::function_nonser<boost::int64_t(bool)> sending_serialization_time(
             boost::bind(&parcelhandler::get_sending_serialization_time, this, pp_type, ::_1));
-        HPX_STD_FUNCTION<boost::int64_t(bool)> receiving_serialization_time(
+        util::function_nonser<boost::int64_t(bool)> receiving_serialization_time(
             boost::bind(&parcelhandler::get_receiving_serialization_time, this, pp_type, ::_1));
 
 #if defined(HPX_HAVE_SECURITY)
-        HPX_STD_FUNCTION<boost::int64_t(bool)> sending_security_time(
+        util::function_nonser<boost::int64_t(bool)> sending_security_time(
             boost::bind(&parcelhandler::get_sending_security_time, this, pp_type, ::_1));
-        HPX_STD_FUNCTION<boost::int64_t(bool)> receiving_security_time(
+        util::function_nonser<boost::int64_t(bool)> receiving_security_time(
             boost::bind(&parcelhandler::get_receiving_security_time, this, pp_type, ::_1));
 #endif
-        HPX_STD_FUNCTION<boost::int64_t(bool)> data_sent(
+        util::function_nonser<boost::int64_t(bool)> data_sent(
             boost::bind(&parcelhandler::get_data_sent, this, pp_type, ::_1));
-        HPX_STD_FUNCTION<boost::int64_t(bool)> data_received(
+        util::function_nonser<boost::int64_t(bool)> data_received(
             boost::bind(&parcelhandler::get_data_received, this, pp_type, ::_1));
 
-        HPX_STD_FUNCTION<boost::int64_t(bool)> data_raw_sent(
+        util::function_nonser<boost::int64_t(bool)> data_raw_sent(
             boost::bind(&parcelhandler::get_raw_data_sent, this, pp_type, ::_1));
-        HPX_STD_FUNCTION<boost::int64_t(bool)> data_raw_received(
+        util::function_nonser<boost::int64_t(bool)> data_raw_received(
             boost::bind(&parcelhandler::get_raw_data_received, this, pp_type, ::_1));
 
-        HPX_STD_FUNCTION<boost::int64_t(bool)> buffer_allocate_time_sent(
+        util::function_nonser<boost::int64_t(bool)> buffer_allocate_time_sent(
             boost::bind(&parcelhandler::get_buffer_allocate_time_sent, this, pp_type, ::_1));
-        HPX_STD_FUNCTION<boost::int64_t(bool)> buffer_allocate_time_received(
+        util::function_nonser<boost::int64_t(bool)> buffer_allocate_time_received(
             boost::bind(&parcelhandler::get_buffer_allocate_time_received, this, pp_type, ::_1));
 
         performance_counters::generic_counter_type_data const counter_types[] =
@@ -1074,19 +1074,19 @@ namespace hpx { namespace parcelset
 
         // register connection specific performance counters related to connection
         // caches
-        HPX_STD_FUNCTION<boost::int64_t(bool)> cache_insertions(
+        util::function_nonser<boost::int64_t(bool)> cache_insertions(
             boost::bind(&parcelhandler::get_connection_cache_statistics,
                 this, pp_type, parcelport::connection_cache_insertions, ::_1));
-        HPX_STD_FUNCTION<boost::int64_t(bool)> cache_evictions(
+        util::function_nonser<boost::int64_t(bool)> cache_evictions(
             boost::bind(&parcelhandler::get_connection_cache_statistics,
                 this, pp_type, parcelport::connection_cache_evictions, ::_1));
-        HPX_STD_FUNCTION<boost::int64_t(bool)> cache_hits(
+        util::function_nonser<boost::int64_t(bool)> cache_hits(
             boost::bind(&parcelhandler::get_connection_cache_statistics,
                 this, pp_type, parcelport::connection_cache_hits, ::_1));
-        HPX_STD_FUNCTION<boost::int64_t(bool)> cache_misses(
+        util::function_nonser<boost::int64_t(bool)> cache_misses(
             boost::bind(&parcelhandler::get_connection_cache_statistics,
                 this, pp_type, parcelport::connection_cache_misses, ::_1));
-        HPX_STD_FUNCTION<boost::int64_t(bool)> cache_reclaims(
+        util::function_nonser<boost::int64_t(bool)> cache_reclaims(
             boost::bind(&parcelhandler::get_connection_cache_statistics,
                 this, pp_type, parcelport::connection_cache_reclaims, ::_1));
 

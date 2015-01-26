@@ -116,9 +116,9 @@ namespace hpx
         {
             id_ = threads::invalid_thread_id;
         }
-        void start_thread(HPX_STD_FUNCTION<void()> && func);
+        void start_thread(util::function_nonser<void()> && func);
         static threads::thread_state_enum thread_function_nullary(
-            HPX_STD_FUNCTION<void()> const& func);
+            util::function_nonser<void()> const& func);
 
         mutable mutex_type mtx_;
         threads::thread_id_type id_;

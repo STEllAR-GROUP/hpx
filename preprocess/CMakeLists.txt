@@ -29,15 +29,7 @@ endforeach()
 
 set(action_argument_limit_preprocessing_files
   "hpx/lcos/broadcast.hpp"
-  "hpx/lcos/reduce.hpp"
-  "hpx/runtime/components/new.hpp"
-  "hpx/runtime/components/server/runtime_support_implementations.hpp"
-  "hpx/runtime/components/server/create_component_with_args.hpp"
-  "hpx/runtime/components/server/runtime_support_create_component_decl.hpp")
-if(HPX_HAVE_SECURITY)
-set(action_argument_limit_preprocessing_files ${action_argument_limit_preprocessing_files}
-  "hpx/runtime/components/server/runtime_support_create_component_capabilities.hpp")
-endif()
+  "hpx/lcos/reduce.hpp")
 foreach(file ${action_argument_limit_preprocessing_files})
   hpx_partial_preprocess_header(${file} LIMIT HPX_LIMIT)
 endforeach()

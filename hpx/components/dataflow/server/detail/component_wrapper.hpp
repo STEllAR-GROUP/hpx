@@ -14,10 +14,10 @@ namespace hpx { namespace lcos { namespace server { namespace detail
     struct component_wrapper_base
     {
         virtual ~component_wrapper_base() {}
-        virtual base_lco &operator*() = 0;
-        virtual base_lco const &operator*() const = 0;
-        virtual base_lco * operator->() = 0;
-        virtual base_lco const * operator->() const = 0;
+        virtual base_lco& operator*() = 0;
+        virtual base_lco const& operator*() const = 0;
+        virtual base_lco* operator->() = 0;
+        virtual base_lco const* operator->() const = 0;
         virtual void finalize() = 0;
     };
 
@@ -29,22 +29,12 @@ namespace hpx { namespace lcos { namespace server { namespace detail
 
         component_type * component_ptr;
 
-        component_wrapper()
+        template <typename ...Ts>
+        component_wrapper(Ts&&... vs)
         {
-            T * t = new T;
+            T * t = new T(std::forward<Ts>(vs)...);
             component_ptr = new component_type(t);
         }
-
-#define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
-        template <BOOST_PP_ENUM_PARAMS(N, typename A)>                          \
-        component_wrapper(HPX_ENUM_FWD_ARGS(N, A, a))                           \
-        {                                                                       \
-            T * t = new T(HPX_ENUM_FORWARD_ARGS(N, A, a));                      \
-            component_ptr = new component_type(t);                              \
-        }                                                                       \
-    /**/
-        BOOST_PP_REPEAT_FROM_TO(1, 10, HPX_LCOS_DATAFLOW_M0, _)
-#undef HPX_LCOS_DATAFLOW_M0
 
         void finalize()
         {
@@ -56,22 +46,22 @@ namespace hpx { namespace lcos { namespace server { namespace detail
             delete component_ptr;
         }
 
-        T &operator*()
+        T& operator*()
         {
             return *component_ptr->get_checked();
         }
 
-        T const&operator*() const
+        T const& operator*() const
         {
             return *component_ptr->get_checked();
         }
 
-        T *operator->()
+        T* operator->()
         {
             return component_ptr->get_checked();
         }
 
-        T const *operator->() const
+        T const* operator->() const
         {
             return component_ptr->get_checked();
         }

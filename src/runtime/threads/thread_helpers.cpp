@@ -11,11 +11,12 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/util/register_locks.hpp>
 #ifdef HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
 #include <hpx/util/backtrace.hpp>
 #endif
+
+#include <sstream>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
@@ -254,7 +255,7 @@ namespace hpx { namespace threads
     }
 
     bool add_thread_exit_callback(thread_id_type const& id,
-        HPX_STD_FUNCTION<void()> const& f, error_code& ec)
+        util::function_nonser<void()> const& f, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -507,12 +508,12 @@ namespace hpx { namespace this_thread
 
         // handle interrupt and abort
         if (statex == threads::wait_abort) {
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "thread(" << threads::get_self_id() << ", "
                   << threads::get_thread_description(id)
                   << ") aborted (yield returned wait_abort)";
             HPX_THROWS_IF(ec, yield_aborted, description,
-                hpx::util::osstream_get_string(strm));
+                strm.str());
         }
 
         if (&ec != &throws)
@@ -562,12 +563,12 @@ namespace hpx { namespace this_thread
 
         // handle interrupt and abort
         if (statex == threads::wait_abort) {
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "thread(" << threads::get_self_id() << ", "
                   << threads::get_thread_description(id)
                   << ") aborted (yield returned wait_abort)";
             HPX_THROWS_IF(ec, yield_aborted, description,
-                hpx::util::osstream_get_string(strm));
+                strm.str());
         }
 
         if (&ec != &throws)

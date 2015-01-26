@@ -6,7 +6,7 @@
 #if !defined(HPX_UTIL_STATIC_JUN_12_2008_0934AM)
 #define HPX_UTIL_STATIC_JUN_12_2008_0934AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 
 #include <boost/noncopyable.hpp>
 #include <boost/call_traits.hpp>

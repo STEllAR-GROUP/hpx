@@ -71,7 +71,7 @@ namespace hpx { namespace performance_counters { namespace papi
         hpx::naming::gid_type id;
         try
         {
-            id = hpx::components::server::create_with_args<papi_counter_type>(info);
+            id = hpx::components::server::construct<papi_counter_type>(info);
         }
         catch (hpx::exception const& e)
         {
@@ -114,7 +114,7 @@ namespace hpx { namespace performance_counters { namespace papi
         std::set<std::string> const& tdesc,
         hpx::performance_counters::counter_info& info,
         T& gen,
-        HPX_STD_FUNCTION<hpx::performance_counters::discover_counter_func> const& f,
+        hpx::performance_counters::discover_counter_func const& f,
         hpx::error_code& ec)
     {
         typename boost::generator_iterator_generator<T>::type gi =
@@ -143,7 +143,7 @@ namespace hpx { namespace performance_counters { namespace papi
     // discover available PAPI counters
     bool discover_papi_counters_helper(
         hpx::performance_counters::counter_info const& info,
-        HPX_STD_FUNCTION<hpx::performance_counters::discover_counter_func> const& f,
+        hpx::performance_counters::discover_counter_func const& f,
         hpx::performance_counters::discover_counters_mode mode, hpx::error_code& ec)
     {
         hpx::performance_counters::counter_info cnt_info = info;
@@ -221,7 +221,7 @@ namespace hpx { namespace performance_counters { namespace papi
     // wrap the actual discoverer allowing HPX to expand all wildcards it knows about
     bool discover_papi_counters(
         hpx::performance_counters::counter_info const& info,
-        HPX_STD_FUNCTION<hpx::performance_counters::discover_counter_func> const& f,
+        hpx::performance_counters::discover_counter_func const& f,
         hpx::performance_counters::discover_counters_mode mode, hpx::error_code& ec)
     {
         using hpx::util::placeholders::_1;
@@ -285,7 +285,7 @@ namespace hpx { namespace performance_counters { namespace papi
         }
     }
 
-    bool check_startup(HPX_STD_FUNCTION<void()>& startup_func, bool& pre_startup)
+    bool check_startup(util::function_nonser<void()>& startup_func, bool& pre_startup)
     {
         // PAPI initialization
         if (PAPI_is_initialized() == PAPI_NOT_INITED)

@@ -1,3 +1,4 @@
+//  Copyright (c) 2015 Patricia Grubel
 //  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach, Katelyn Kufahl
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
@@ -25,7 +26,6 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/itt_notify.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/util/hardware/timestamp.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
@@ -35,6 +35,7 @@
 #include <boost/format.hpp>
 
 #include <numeric>
+#include <sstream>
 
 #ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
 ///////////////////////////////////////////////////////////////////////////////
@@ -545,7 +546,7 @@ namespace hpx { namespace threads
     template <typename SchedulingPolicy, typename NotificationPolicy>
     bool threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
     add_thread_exit_callback(thread_id_type const& thrd,
-        HPX_STD_FUNCTION<void()> const& f, error_code& ec)
+        util::function_nonser<void()> const& f, error_code& ec)
     {
         if (HPX_UNLIKELY(!thrd)) {
             HPX_THROWS_IF(ec, null_thread_id,
@@ -760,9 +761,9 @@ namespace hpx { namespace threads
         {
             // overall counter
             using performance_counters::detail::create_raw_counter;
-            HPX_STD_FUNCTION<boost::int64_t()> f =
+            util::function_nonser<boost::int64_t()> f =
                 util::bind(&spt::get_queue_length, &scheduler_, -1);
-            return create_raw_counter(info, f, ec);
+            return create_raw_counter(info, std::move(f), ec);
         }
         else if (paths.instancename_ == "worker-thread" &&
             paths.instanceindex_ >= 0 &&
@@ -770,10 +771,10 @@ namespace hpx { namespace threads
         {
             // specific counter
             using performance_counters::detail::create_raw_counter;
-            HPX_STD_FUNCTION<boost::int64_t()> f =
+            util::function_nonser<boost::int64_t()> f =
                 util::bind(&spt::get_queue_length, &scheduler_,
                     static_cast<std::size_t>(paths.instanceindex_));
-            return create_raw_counter(info, f, ec);
+            return create_raw_counter(info, std::move(f), ec);
         }
 
         HPX_THROWS_IF(ec, bad_parameter, "queue_length_counter_creator",
@@ -812,9 +813,9 @@ namespace hpx { namespace threads
 
             // overall counter
             using performance_counters::detail::create_raw_counter;
-            HPX_STD_FUNCTION<boost::int64_t()> f =
+            util::function_nonser<boost::int64_t()> f =
                 util::bind(&spt::get_average_thread_wait_time, &scheduler_, -1);
-            return create_raw_counter(info, f, ec);
+            return create_raw_counter(info, std::move(f), ec);
         }
         else if (paths.instancename_ == "worker-thread" &&
             paths.instanceindex_ >= 0 &&
@@ -824,10 +825,10 @@ namespace hpx { namespace threads
 
             // specific counter
             using performance_counters::detail::create_raw_counter;
-            HPX_STD_FUNCTION<boost::int64_t()> f =
+            util::function_nonser<boost::int64_t()> f =
                 util::bind(&spt::get_average_thread_wait_time, &scheduler_,
                     static_cast<std::size_t>(paths.instanceindex_));
-            return create_raw_counter(info, f, ec);
+            return create_raw_counter(info, std::move(f), ec);
         }
 
         HPX_THROWS_IF(ec, bad_parameter, "thread_wait_time_counter_creator",
@@ -865,9 +866,9 @@ namespace hpx { namespace threads
 
             // overall counter
             using performance_counters::detail::create_raw_counter;
-            HPX_STD_FUNCTION<boost::int64_t()> f =
+            util::function_nonser<boost::int64_t()> f =
                 util::bind(&spt::get_average_task_wait_time, &scheduler_, -1);
-            return create_raw_counter(info, f, ec);
+            return create_raw_counter(info, std::move(f), ec);
         }
         else if (paths.instancename_ == "worker-thread" &&
             paths.instanceindex_ >= 0 &&
@@ -877,10 +878,10 @@ namespace hpx { namespace threads
 
             // specific counter
             using performance_counters::detail::create_raw_counter;
-            HPX_STD_FUNCTION<boost::int64_t()> f =
+            util::function_nonser<boost::int64_t()> f =
                 util::bind(&spt::get_average_task_wait_time, &scheduler_,
                     static_cast<std::size_t>(paths.instanceindex_));
-            return create_raw_counter(info, f, ec);
+            return create_raw_counter(info, std::move(f), ec);
         }
 
         HPX_THROWS_IF(ec, bad_parameter, "task_wait_time_counter_creator",
@@ -891,7 +892,7 @@ namespace hpx { namespace threads
 
     bool locality_allocator_counter_discoverer(
         performance_counters::counter_info const& info,
-        HPX_STD_FUNCTION<performance_counters::discover_counter_func> const& f,
+        performance_counters::discover_counter_func const& f,
         performance_counters::discover_counters_mode mode, error_code& ec)
     {
         performance_counters::counter_info i = info;
@@ -998,9 +999,9 @@ namespace hpx { namespace threads
             boost::int64_t (threadmanager_impl::*avg_idle_rate_ptr)(
                 bool
             ) = &ti::avg_idle_rate;
-            HPX_STD_FUNCTION<boost::int64_t(bool)> f =
+            util::function_nonser<boost::int64_t(bool)> f =
                  util::bind(avg_idle_rate_ptr, this, _1);
-            return create_raw_counter(info, f, ec);
+            return create_raw_counter(info, std::move(f), ec);
         }
         else if (paths.instancename_ == "worker-thread" &&
             paths.instanceindex_ >= 0 &&
@@ -1012,10 +1013,10 @@ namespace hpx { namespace threads
                 std::size_t, bool
             ) = &ti::avg_idle_rate;
             using performance_counters::detail::create_raw_counter;
-            HPX_STD_FUNCTION<boost::int64_t(bool)> f =
+            util::function_nonser<boost::int64_t(bool)> f =
                 util::bind(avg_idle_rate_ptr, this,
                     static_cast<std::size_t>(paths.instanceindex_), _1);
-            return create_raw_counter(info, f, ec);
+            return create_raw_counter(info, std::move(f), ec);
         }
 
         HPX_THROWS_IF(ec, bad_parameter, "idle_rate_counter_creator",
@@ -1028,8 +1029,8 @@ namespace hpx { namespace threads
     naming::gid_type
     counter_creator(performance_counters::counter_info const& info,
         performance_counters::counter_path_elements const& paths,
-        HPX_STD_FUNCTION<boost::int64_t(bool)> const& total_creator,
-        HPX_STD_FUNCTION<boost::int64_t(bool)> const& individual_creator,
+        util::function_nonser<boost::int64_t(bool)> const& total_creator,
+        util::function_nonser<boost::int64_t(bool)> const& individual_creator,
         char const* individual_name, std::size_t individual_count,
         error_code& ec)
     {
@@ -1077,8 +1078,8 @@ namespace hpx { namespace threads
         struct creator_data
         {
             char const* const countername;
-            HPX_STD_FUNCTION<boost::int64_t(bool)> total_func;
-            HPX_STD_FUNCTION<boost::int64_t(bool)> individual_func;
+            util::function_nonser<boost::int64_t(bool)> total_func;
+            util::function_nonser<boost::int64_t(bool)> individual_func;
             char const* const individual_name;
             std::size_t individual_count;
         };
@@ -1096,14 +1097,14 @@ namespace hpx { namespace threads
             // /threads{locality#%d/worker-thread%d}/creation-idle-rate
             { "creation-idle-rate",
               util::bind(&ti::avg_creation_idle_rate, this, _1),
-              HPX_STD_FUNCTION<boost::uint64_t(bool)>(),
+              util::function_nonser<boost::uint64_t(bool)>(),
               "", 0
             },
             // /threads{locality#%d/total}/cleanup-idle-rate
             // /threads{locality#%d/worker-thread%d}/cleanup-idle-rate
             { "cleanup-idle-rate",
               util::bind(&ti::avg_cleanup_idle_rate, this, _1),
-              HPX_STD_FUNCTION<boost::uint64_t(bool)>(),
+              util::function_nonser<boost::uint64_t(bool)>(),
               "", 0
             },
 #endif
@@ -1138,6 +1139,22 @@ namespace hpx { namespace threads
             { "time/average-phase",
               util::bind(&ti::get_thread_phase_duration, this, -1, _1),
               util::bind(&ti::get_thread_phase_duration, this,
+                  static_cast<std::size_t>(paths.instanceindex_), _1),
+              "worker-thread", shepherd_count
+            },
+            // /threads{locality#%d/total}/time/average-overhead
+            // /threads{locality#%d/worker-thread%d}/time/average-overhead
+            { "time/average-overhead",
+              util::bind(&ti::get_thread_overhead, this, -1, _1),
+              util::bind(&ti::get_thread_overhead, this,
+                  static_cast<std::size_t>(paths.instanceindex_), _1),
+              "worker-thread", shepherd_count
+            },
+            // /threads{locality#%d/total}/time/average-phase-overhead
+            // /threads{locality#%d/worker-thread%d}/time/average-phase-overhead
+            { "time/average-phase-overhead",
+              util::bind(&ti::get_thread_phase_overhead, this, -1, _1),
+              util::bind(&ti::get_thread_phase_overhead, this,
                   static_cast<std::size_t>(paths.instanceindex_), _1),
               "worker-thread", shepherd_count
             },
@@ -1206,13 +1223,13 @@ namespace hpx { namespace threads
             // /threads{locality#%d/total}/count/stack-recycles
             { "count/stack-recycles",
               util::bind(&coroutine_type::impl_type::get_stack_recycle_count, _1),
-              HPX_STD_FUNCTION<boost::uint64_t(bool)>(), "", 0
+              util::function_nonser<boost::uint64_t(bool)>(), "", 0
             },
 #if !defined(BOOST_WINDOWS) && !defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
             // /threads{locality#%d/total}/count/stack-unbinds
             { "count/stack-unbinds",
               util::bind(&coroutine_type::impl_type::get_stack_unbind_count, _1),
-              HPX_STD_FUNCTION<boost::uint64_t(bool)>(), "", 0
+              util::function_nonser<boost::uint64_t(bool)>(), "", 0
             },
 #endif
             // /threads{locality#%d/total}/count/objects
@@ -1303,7 +1320,7 @@ namespace hpx { namespace threads
         register_counter_types()
     {
         typedef threadmanager_impl ti;
-        HPX_STD_FUNCTION<performance_counters::create_counter_func> counts_creator(
+        performance_counters::create_counter_func counts_creator(
             boost::bind(&ti::thread_counts_counter_creator, this, _1, _2));
 
         performance_counters::generic_counter_type_data counter_types[] =
@@ -1382,6 +1399,18 @@ namespace hpx { namespace threads
             },
             { "/threads/time/average-phase", performance_counters::counter_raw,
               "returns the average time spent executing one HPX-thread phase",
+              HPX_PERFORMANCE_COUNTER_V1, counts_creator,
+              &performance_counters::locality_thread_counter_discoverer,
+              "ns"
+            },
+            { "/threads/time/average-overhead", performance_counters::counter_raw,
+              "returns average overhead time executing one HPX-thread",
+              HPX_PERFORMANCE_COUNTER_V1, counts_creator,
+              &performance_counters::locality_thread_counter_discoverer,
+              "ns"
+            },
+            { "/threads/time/average-phase-overhead", performance_counters::counter_raw,
+              "returns average overhead time executing one HPX-thread phase",
               HPX_PERFORMANCE_COUNTER_V1, counts_creator,
               &performance_counters::locality_thread_counter_discoverer,
               "ns"
@@ -1774,6 +1803,74 @@ namespace hpx { namespace threads
         }
         return boost::uint64_t((exec_total * timestamp_scale_) / num_threads);
     }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    boost::int64_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        get_thread_phase_overhead(std::size_t num, bool reset)
+    {
+        if (num != std::size_t(-1)) {
+            double exec_total = static_cast<double>(exec_times[num]);
+            double tfunc_total = static_cast<double>(tfunc_times[num]);
+            double num_phases = static_cast<double>(executed_thread_phases_[num]);
+
+            if (reset) {
+                executed_thread_phases_[num] = 0;
+                tfunc_times[num] = boost::uint64_t(-1);
+            }
+            return boost::uint64_t(((tfunc_total - exec_total) * timestamp_scale_)/
+                    num_phases);
+        }
+
+        double exec_total = std::accumulate(exec_times.begin(),
+            exec_times.end(), 0.);
+        double tfunc_total = std::accumulate(tfunc_times.begin(),
+            tfunc_times.end(), 0.);
+        double num_phases = std::accumulate(executed_thread_phases_.begin(),
+            executed_thread_phases_.end(), 0.);
+
+        if (reset) {
+            std::fill(executed_thread_phases_.begin(),
+                executed_thread_phases_.end(), 0LL);
+            std::fill(tfunc_times.begin(), tfunc_times.end(),
+                boost::uint64_t(-1));
+        }
+        return boost::uint64_t(((tfunc_total - exec_total) * timestamp_scale_)/
+                num_phases);
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    boost::int64_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        get_thread_overhead(std::size_t num, bool reset)
+    {
+        if (num != std::size_t(-1)) {
+            double exec_total = static_cast<double>(exec_times[num]);
+            double tfunc_total = static_cast<double>(tfunc_times[num]);
+            double num_threads = static_cast<double>(executed_threads_[num]);
+
+            if (reset) {
+                executed_threads_[num] = 0;
+                tfunc_times[num] = boost::uint64_t(-1);
+            }
+            return boost::uint64_t(((tfunc_total - exec_total) *
+                        timestamp_scale_) / num_threads);
+        }
+
+        double exec_total = std::accumulate(exec_times.begin(),
+            exec_times.end(), 0.);
+        double tfunc_total = std::accumulate(tfunc_times.begin(),
+            tfunc_times.end(), 0.);
+        double num_threads = std::accumulate(executed_threads_.begin(),
+            executed_threads_.end(), 0.);
+
+        if (reset) {
+            std::fill(executed_threads_.begin(), executed_threads_.end(), 0LL);
+            std::fill(tfunc_times.begin(), tfunc_times.end(),
+                boost::uint64_t(-1));
+        }
+        return boost::uint64_t(((tfunc_total - exec_total) *
+                        timestamp_scale_) / num_threads);
+    }
+
 #endif
 #endif
 

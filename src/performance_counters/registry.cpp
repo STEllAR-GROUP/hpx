@@ -6,7 +6,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/components/server/create_component_with_args.hpp>
+#include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/performance_counters/server/raw_counter.hpp>
 #include <hpx/performance_counters/server/elapsed_time_counter.hpp>
@@ -56,8 +56,8 @@ namespace hpx { namespace performance_counters
 
     ///////////////////////////////////////////////////////////////////////////
     counter_status registry::add_counter_type(counter_info const& info,
-        HPX_STD_FUNCTION<create_counter_func> const& create_counter_,
-        HPX_STD_FUNCTION<discover_counters_func> const& discover_counters_,
+        create_counter_func const& create_counter_,
+        discover_counters_func const& discover_counters_,
         error_code& ec)
     {
         // create canonical type name
@@ -177,7 +177,7 @@ namespace hpx { namespace performance_counters
     /// \brief Call the supplied function for the given registered counter type.
     counter_status registry::discover_counter_type(
         std::string const& fullname,
-        HPX_STD_FUNCTION<discover_counter_func> discover_counter,
+        discover_counter_func discover_counter,
         discover_counters_mode mode, error_code& ec)
     {
         // create canonical type name
@@ -276,7 +276,7 @@ namespace hpx { namespace performance_counters
 
     /// \brief Call the supplied function for all registered counter types.
     counter_status registry::discover_counter_types(
-        HPX_STD_FUNCTION<discover_counter_func> discover_counter,
+        discover_counter_func discover_counter,
         discover_counters_mode mode, error_code& ec)
     {
         if (mode == discover_counters_full)
@@ -304,7 +304,7 @@ namespace hpx { namespace performance_counters
 
     ///////////////////////////////////////////////////////////////////////////
     counter_status registry::get_counter_create_function(
-        counter_info const& info, HPX_STD_FUNCTION<create_counter_func>& func,
+        counter_info const& info, create_counter_func& func,
         error_code& ec) const
     {
         // create canonical type name
@@ -334,7 +334,7 @@ namespace hpx { namespace performance_counters
 
     ///////////////////////////////////////////////////////////////////////////
     counter_status registry::get_counter_discovery_function(
-        counter_info const& info, HPX_STD_FUNCTION<discover_counters_func>& func,
+        counter_info const& info, discover_counters_func& func,
         error_code& ec) const
     {
         // create canonical type name
@@ -400,28 +400,28 @@ namespace hpx { namespace performance_counters
     counter_status registry::create_raw_counter_value(counter_info const& info,
         boost::int64_t* countervalue, naming::gid_type& id, error_code& ec)
     {
-        HPX_STD_FUNCTION<boost::int64_t(bool)> func(
+        util::function_nonser<boost::int64_t(bool)> func(
             boost::bind(wrap_counter, countervalue, ::_1));
         return create_raw_counter(info, func, id, ec);
     }
 
     static boost::int64_t
-    wrap_raw_counter(HPX_STD_FUNCTION<boost::int64_t()> const& f, bool)
+    wrap_raw_counter(util::function_nonser<boost::int64_t()> const& f, bool)
     {
         return f();
     }
 
     counter_status registry::create_raw_counter(counter_info const& info,
-        HPX_STD_FUNCTION<boost::int64_t()> const& f, naming::gid_type& id,
+        util::function_nonser<boost::int64_t()> const& f, naming::gid_type& id,
         error_code& ec)
     {
-        HPX_STD_FUNCTION<boost::int64_t(bool)> func(
+        util::function_nonser<boost::int64_t(bool)> func(
             boost::bind(&wrap_raw_counter, f, ::_1));
         return create_raw_counter(info, func, id, ec);
     }
 
     counter_status registry::create_raw_counter(counter_info const& info,
-        HPX_STD_FUNCTION<boost::int64_t(bool)> const& f, naming::gid_type& id,
+        util::function_nonser<boost::int64_t(bool)> const& f, naming::gid_type& id,
         error_code& ec)
     {
         // create canonical type name
@@ -452,7 +452,7 @@ namespace hpx { namespace performance_counters
         // create the counter as requested
         try {
             typedef components::managed_component<server::raw_counter> counter_t;
-            id = components::server::create_with_args<counter_t>(complemented_info, f);
+            id = components::server::construct<counter_t>(complemented_info, f);
 
             std::string name(complemented_info.fullname_);
             ensure_counter_prefix(name);      // pre-pend prefix, if necessary
@@ -503,7 +503,7 @@ namespace hpx { namespace performance_counters
             case counter_elapsed_time:
                 {
                     typedef components::managed_component<server::elapsed_time_counter> counter_t;
-                    id = components::server::create_with_args<counter_t>(complemented_info);
+                    id = components::server::construct<counter_t>(complemented_info);
                 }
                 break;
 
@@ -588,7 +588,7 @@ namespace hpx { namespace performance_counters
                     hpx::performance_counters::server::statistics_counter<
                         boost::accumulators::tag::mean>
                 > counter_t;
-                gid = components::server::create_with_args<counter_t>(
+                gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_name, sample_interval, 0);
             }
             else if (p.countername_ == "stddev") {
@@ -596,7 +596,7 @@ namespace hpx { namespace performance_counters
                     hpx::performance_counters::server::statistics_counter<
                         boost::accumulators::tag::variance>
                 > counter_t;
-                gid = components::server::create_with_args<counter_t>(
+                gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_name, sample_interval, 0);
             }
             else if (p.countername_ == "rolling_average") {
@@ -609,7 +609,7 @@ namespace hpx { namespace performance_counters
                 if (parameters.size() > 1)
                     window_size = parameters[1];
 
-                gid = components::server::create_with_args<counter_t>(
+                gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_name, sample_interval, window_size);
             }
             else if (p.countername_ == "median") {
@@ -617,7 +617,7 @@ namespace hpx { namespace performance_counters
                     hpx::performance_counters::server::statistics_counter<
                         boost::accumulators::tag::median>
                 > counter_t;
-                gid = components::server::create_with_args<counter_t>(
+                gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_name, sample_interval, 0);
             }
             else if (p.countername_ == "max") {
@@ -625,7 +625,7 @@ namespace hpx { namespace performance_counters
                     hpx::performance_counters::server::statistics_counter<
                         boost::accumulators::tag::max>
                 > counter_t;
-                gid = components::server::create_with_args<counter_t>(
+                gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_name, sample_interval, 0);
             }
             else if (p.countername_ == "min") {
@@ -633,7 +633,7 @@ namespace hpx { namespace performance_counters
                     hpx::performance_counters::server::statistics_counter<
                         boost::accumulators::tag::min>
                 > counter_t;
-                gid = components::server::create_with_args<counter_t>(
+                gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_name, sample_interval, 0);
             }
             else {
@@ -708,28 +708,28 @@ namespace hpx { namespace performance_counters
                 typedef hpx::components::managed_component<
                     hpx::performance_counters::server::arithmetics_counter<
                         std::plus<double> > > counter_t;
-                gid = components::server::create_with_args<counter_t>(
+                gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_names);
             }
             else if (p.countername_ == "subtract") {
                 typedef hpx::components::managed_component<
                     hpx::performance_counters::server::arithmetics_counter<
                         std::minus<double> > > counter_t;
-                gid = components::server::create_with_args<counter_t>(
+                gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_names);
             }
             else if (p.countername_ == "multiply") {
                 typedef hpx::components::managed_component<
                     hpx::performance_counters::server::arithmetics_counter<
                         std::multiplies<double> > > counter_t;
-                gid = components::server::create_with_args<counter_t>(
+                gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_names);
             }
             else if (p.countername_ == "divide") {
                 typedef hpx::components::managed_component<
                     hpx::performance_counters::server::arithmetics_counter<
                         std::divides<double> > > counter_t;
-                gid = components::server::create_with_args<counter_t>(
+                gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_names);
             }
             else {

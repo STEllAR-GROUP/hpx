@@ -39,7 +39,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     boost::mutex mtx;
     std::size_t connected;
 
-    boost::lockfree::queue<HPX_STD_FUNCTION<void()>* > thunks;
+    boost::lockfree::queue<util::function_nonser<void()>* > thunks;
 
     void spin();
 
@@ -74,7 +74,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
 
     ~big_boot_barrier()
     {
-        HPX_STD_FUNCTION<void()>* f;
+        util::function_nonser<void()>* f;
         while (thunks.pop(f))
             delete f;
     }
@@ -103,7 +103,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     // no-op on non-bootstrap localities
     void trigger();
 
-    void add_thunk(HPX_STD_FUNCTION<void()>* f)
+    void add_thunk(util::function_nonser<void()>* f)
     {
         thunks.push(f);
     }

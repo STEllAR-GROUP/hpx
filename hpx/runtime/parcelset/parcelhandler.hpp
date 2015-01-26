@@ -90,8 +90,8 @@ namespace hpx { namespace parcelset
         parcelhandler(
             util::runtime_configuration & cfg,
             threads::threadmanager_base* tm, parcelhandler_queue_base* policy,
-            HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
-            HPX_STD_FUNCTION<void()> const& on_stop_thread);
+            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
+            util::function_nonser<void()> const& on_stop_thread);
 
         ~parcelhandler() {}
 
@@ -425,9 +425,9 @@ namespace hpx { namespace parcelset
         boost::int64_t get_connection_cache_statistics(std::string const& pp_type,
             parcelport::connection_cache_statistics_type stat_type, bool) const;
 
-        void list_parcelports(util::osstream& strm) const;
-        void list_parcelport(util::osstream& strm, std::string const& ppname, int priority = -1,
-            bool bootstrap = true) const;
+        void list_parcelports(std::ostringstream& strm) const;
+        void list_parcelport(std::ostringstream& strm,
+            std::string const& ppname, int priority, bool bootstrap) const;
 
     protected:
         std::size_t get_incoming_queue_length(bool /*reset*/) const

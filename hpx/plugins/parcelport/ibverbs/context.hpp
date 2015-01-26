@@ -160,7 +160,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
     {
     public:
 
-        typedef HPX_STD_FUNCTION<void(rdma_cm_id *)> callback_function;
+        typedef util::function_nonser<void(rdma_cm_id *)> callback_function;
 
         explicit context_impl()
           : pd_(0)

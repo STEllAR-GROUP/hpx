@@ -10,7 +10,6 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/activate_counters.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/util/apex.hpp>
 #include <hpx/util/unwrapped.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
@@ -22,6 +21,7 @@
 #include <boost/format.hpp>
 
 #include <iostream>
+#include <sstream>
 #include <fstream>
 
 namespace hpx { namespace util
@@ -68,7 +68,7 @@ namespace hpx { namespace util
             using util::placeholders::_1;
             using util::placeholders::_2;
 
-            HPX_STD_FUNCTION<performance_counters::discover_counter_func> func(
+            performance_counters::discover_counter_func func(
                 util::bind(&activate_counters::find_counter, this, _1, _2));
 
             ids_.reserve(names.size());

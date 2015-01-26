@@ -8,7 +8,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/find_prefix.hpp>
 
@@ -16,6 +15,8 @@
 #include <boost/version.hpp>
 #include <boost/format.hpp>
 #include <boost/preprocessor/stringize.hpp>
+
+#include <sstream>
 
 #if defined(HPX_HAVE_HWLOC)
 #include <hwloc.h>
@@ -70,7 +71,7 @@ namespace hpx
     // Returns the HPX full build information string.
     std::string full_build_string()
     {
-        hpx::util::osstream strm;
+        std::ostringstream strm;
         strm << "{config}:\n" << configuration_string()
              << "{version}: " << build_string() << "\n"
              << "{boost}: " << boost_version() << "\n"
@@ -80,7 +81,7 @@ namespace hpx
              << "{compiler}: " << boost_compiler() << "\n"
              << "{stdlib}: " << boost_stdlib() << "\n";
 
-        return util::osstream_get_string(strm);
+        return strm.str();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -104,7 +105,7 @@ namespace hpx
 
     std::string configuration_string()
     {
-        hpx::util::osstream strm;
+        std::ostringstream strm;
 
 #if defined(HPX_HAVE_NATIVE_TLS)
         strm << "  HPX_HAVE_NATIVE_TLS=ON\n";
@@ -230,7 +231,7 @@ namespace hpx
         strm << "  HPX_PREFIX=" << util::find_prefix() << "\n";
 #endif
 
-        return util::osstream_get_string(strm);
+        return strm.str();
     }
 
     std::string build_string()
@@ -320,7 +321,7 @@ namespace hpx
     std::string runtime_configuration_string(
         util::command_line_handling const& cfg)
     {
-        hpx::util::osstream strm;
+        std::ostringstream strm;
 
         // runtime mode
         strm << "  {mode}: " << get_runtime_mode_name(cfg.mode_) << "\n";
@@ -335,7 +336,7 @@ namespace hpx
         strm << "  {os-threads}: " << cfg.num_threads_ << "\n";
         strm << "  {cores}: " << cfg.num_cores_ << "\n";
 
-        return util::osstream_get_string(strm);
+        return strm.str();
     }
 
     ///////////////////////////////////////////////////////////////////////////

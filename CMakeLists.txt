@@ -196,16 +196,6 @@ endif()
 ################################################################################
 # Utility configuration
 ################################################################################
-hpx_option(HPX_UTIL_FUNCTION BOOL "Use hpx::util::function instead of boost::function or std::function (default: ON)" ON ADVANCED)
-if(HPX_UTIL_FUNCTION)
-  hpx_add_config_define(HPX_UTIL_FUNCTION)
-endif()
-
-hpx_option(HPX_UTIL_TUPLE BOOL "Use hpx::util::tuple instead of boost::tuple or std::tuple (default: ON)" ON ADVANCED)
-if(HPX_UTIL_TUPLE)
-  hpx_add_config_define(HPX_UTIL_TUPLE)
-endif()
-
 set(HPX_HIDDEN_VISIBILITY_DEFAULT ON)
 if(CMAKE_COMPILER_IS_GNUCXX)
   if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.6.99
@@ -947,14 +937,6 @@ hpx_check_for_cxx11_defaulted_deleted_functions(
 hpx_check_for_cxx11_std_unique_ptr(
   DEFINITIONS HPX_HAVE_CXX11_STD_UNIQUE_PTR
               BOOST_LOCKFREE_HAVE_CXX11_STD_UNIQUE_PTR)
-
-if(NOT HPX_UTIL_TUPLE)
-  hpx_check_for_cxx11_std_tuple(DEFINITIONS HPX_HAVE_CXX11_STD_TUPLE)
-endif()
-
-if(NOT HPX_UTIL_FUNCTION)
-  hpx_check_for_cxx11_std_bind(DEFINITIONS HPX_HAVE_CXX11_STD_FUNCTION)
-endif()
 
 hpx_check_for_cxx11_std_initializer_list(
   DEFINITIONS HPX_HAVE_CXX11_STD_INITIALIZER_LIST)

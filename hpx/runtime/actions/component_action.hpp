@@ -10,7 +10,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
-#include <hpx/config/bind.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
