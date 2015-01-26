@@ -140,28 +140,31 @@ namespace hpx { namespace util
             boost::serialization::is_bitwise_serializable<sequence_type>::type
         predicate;
 
+        if (boost::fusion::size(seq) != 0)
+        {
 #if defined(HPX_DEBUG_SERIALIZATION)
-        char type = 'S';
-        std::size_t size = boost::fusion::size(seq);
-        ar & type & size;
-        HPX_ASSERT(type == 'S');
-        HPX_ASSERT(size == boost::fusion::size(seq));
+            char type = 'S';
+            std::size_t size = boost::fusion::size(seq);
+            ar & type & size;
+            HPX_ASSERT(type == 'S');
+            HPX_ASSERT(size == boost::fusion::size(seq));
 #endif
 
-        if(ar.flags() & disable_array_optimization)
-        {
-            detail::serialize_sequence(ar, seq, boost::mpl::false_());
-        }
-        else
-        {
-            detail::serialize_sequence(ar, seq, predicate());
-        }
+            if(ar.flags() & disable_array_optimization)
+            {
+                detail::serialize_sequence(ar, seq, boost::mpl::false_());
+            }
+            else
+            {
+                detail::serialize_sequence(ar, seq, predicate());
+            }
 
 #if defined(HPX_DEBUG_SERIALIZATION)
-        type = 'E';
-        ar & type;
-        HPX_ASSERT(type == 'E');
+            type = 'E';
+            ar & type;
+            HPX_ASSERT(type == 'E');
 #endif
+        }
     }
 }}
 
