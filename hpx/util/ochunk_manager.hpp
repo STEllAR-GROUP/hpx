@@ -135,13 +135,18 @@ namespace hpx { namespace util { namespace detail
                     filter_->save(address, count);
                 }
                 else {
-                    // make sure there is a current serialization_chunk descriptor available
-                    if (chunks_ && (get_chunk_type(current_chunk_) == chunk_type_pointer ||
-                        get_chunk_size(current_chunk_) != 0))
+                    // make sure there is a current serialization_chunk descriptor
+                    // available
+                    if (chunks_)
                     {
-                        // add a new serialization_chunk
-                        chunks_->push_back(create_index_chunk(current_, 0));
-                        ++current_chunk_;
+                        if (get_num_chunks() == 0 ||
+                            get_chunk_type(current_chunk_) == chunk_type_pointer ||
+                            get_chunk_size(current_chunk_) != 0)
+                        {
+                            // add a new serialization_chunk
+                            chunks_->push_back(create_index_chunk(current_, 0));
+                            ++current_chunk_;
+                        }
                     }
 
                     if (cont_.size() < current_ + count)

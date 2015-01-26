@@ -132,7 +132,7 @@ namespace hpx { namespace parcelset
         std::size_t arg_size = 0;
         boost::uint32_t dest_locality_id = pv[0].get_destination_locality_id();
 
-        parcel_buffer_type & buffer = connection.get_buffer(pv[0]);;
+        parcel_buffer_type & buffer = connection.get_buffer(pv[0]);
         std::size_t parcels_sent = 0;
 
         // guard against serialization errors
