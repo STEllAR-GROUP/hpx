@@ -232,7 +232,7 @@ namespace hpx
 #endif
                             // make sure this parcel ended up on the right locality
 #ifdef HPX_DEBUG
-                            if(hpx::get_locality() && hpx::get_runtime_ptr())
+                            if(hpx::get_runtime_ptr() && hpx::get_locality())
                                 HPX_ASSERT(p.get_destination_locality() == hpx::get_locality());
 #endif
 
