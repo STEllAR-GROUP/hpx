@@ -163,11 +163,12 @@ namespace hpx
         void decode_message(
             Parcelport & pp
           , Buffer buffer
-          , std::vector<util::serialization_chunk> chunks
           , std::size_t parcel_count
           , bool first_message
         )
         {
+            std::vector<util::serialization_chunk> chunks(decode_chunks(buffer));
+
             unsigned archive_flags = boost::archive::no_header;
             if (!pp.allow_array_optimizations()) {
                 archive_flags |= util::disable_array_optimization;
@@ -285,20 +286,18 @@ namespace hpx
         template <typename Parcelport, typename Buffer>
         void decode_parcel(Parcelport & parcelport, Buffer buffer)
         {
-            std::vector<util::serialization_chunk> chunks(decode_chunks(buffer));
-
             if(hpx::is_running() && parcelport.async_serialization())
             {
                 hpx::applier::register_thread_nullary(
                     util::bind(
                         util::one_shot(&decode_message<Parcelport, Buffer>),
-                        boost::ref(parcelport), std::move(buffer), std::move(chunks), 1, false),
+                        boost::ref(parcelport), std::move(buffer), 1, false),
                     "decode_parcels",
                     threads::pending, true, threads::thread_priority_boost);
             }
             else
             {
-                decode_message(parcelport, std::move(buffer), std::move(chunks), 1, false);
+                decode_message(parcelport, std::move(buffer), 1, false);
             }
         }
     }

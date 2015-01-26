@@ -21,8 +21,6 @@ namespace hpx { namespace parcelset
     void decode_parcels(Parcelport & parcelport, Connection & connection,
         Buffer buffer)
     {
-        std::vector<util::serialization_chunk> chunks(decode_chunks(buffer));
-
         bool first_message = false;
 #if defined(HPX_HAVE_SECURITY)
         if(connection.first_message_)
@@ -36,13 +34,13 @@ namespace hpx { namespace parcelset
             hpx::applier::register_thread_nullary(
                 util::bind(
                     util::one_shot(&decode_message<Parcelport, Buffer>),
-                    boost::ref(parcelport), std::move(buffer), std::move(chunks), 0, first_message),
+                    boost::ref(parcelport), std::move(buffer), 0, first_message),
                 "decode_parcels",
                 threads::pending, true, threads::thread_priority_boost);
         }
         else
         {
-            decode_message(parcelport, std::move(buffer), std::move(chunks), 0, first_message);
+            decode_message(parcelport, std::move(buffer), 0, first_message);
         }
     }
 

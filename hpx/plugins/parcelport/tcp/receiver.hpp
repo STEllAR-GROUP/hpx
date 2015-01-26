@@ -68,7 +68,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         template <typename Handler>
         void async_read(Handler handler)
         {
-
+            HPX_ASSERT(buffer_.data_.empty());
             // Store the time of the begin of the read operation
             performance_counters::parcels::data_point& data = buffer_.data_point_;
             data.time_ = timer_.elapsed_nanoseconds();

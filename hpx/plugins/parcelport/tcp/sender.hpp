@@ -192,11 +192,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
             state_ = state_handle_read_ack;
 #endif
+            buffer_.clear();
             // Call post-processing handler, which will send remaining pending
             // parcels. Pass along the connection so it can be reused if more
             // parcels have to be sent.
             boost::get<1>(handler)(e, there_, shared_from_this());
-            buffer_.clear();
         }
 
         /// Socket for the parcelport_connection.
