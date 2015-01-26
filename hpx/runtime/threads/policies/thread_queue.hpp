@@ -419,7 +419,8 @@ namespace hpx { namespace threads { namespace policies
         ///
         /// This returns 'true' if there are no more terminated threads waiting
         /// to be deleted.
-        bool cleanup_terminated_locked_helper(bool delete_all = false)
+        template <typename Lock>
+        bool cleanup_terminated_locked_helper(Lock & lk, bool delete_all = false)
         {
 #ifdef HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
             util::tick_counter tc(cleanup_terminated_time_);
@@ -433,16 +434,28 @@ namespace hpx { namespace threads { namespace policies
                 thread_data_base* todelete;
                 while (terminated_items_.pop(todelete))
                 {
+                    // Hold on to this reference until after we deleted it from
+                    // the map. This will be the last reference to this thread.
+                    thread_id_type todelete_ref(todelete);
                     --terminated_items_count_;
 
                     // this thread has to be in this map
                     HPX_ASSERT(thread_map_.find(todelete) != thread_map_.end());
 
                     bool deleted = thread_map_.erase(todelete) != 0;
+
                     HPX_ASSERT(deleted);
                     if (deleted) {
                         --thread_map_count_;
                         HPX_ASSERT(thread_map_count_ >= 0);
+                    }
+
+                    // After the thread is deleted from the map, we release the
+                    // last reference and let it go out of scope without the lock
+                    // being held.
+                    {
+                        util::scoped_unlock<Lock> ull(lk);
+                        todelete_ref.reset();
                     }
                 }
             }
@@ -475,9 +488,10 @@ namespace hpx { namespace threads { namespace policies
             return terminated_items_count_ == 0;
         }
 
-        bool cleanup_terminated_locked(bool delete_all = false)
+        template <typename Lock>
+        bool cleanup_terminated_locked(Lock & lk, bool delete_all = false)
         {
-            return cleanup_terminated_locked_helper(delete_all) &&
+            return cleanup_terminated_locked_helper(lk, delete_all) &&
                 thread_map_.empty();
         }
 
@@ -492,7 +506,7 @@ namespace hpx { namespace threads { namespace policies
                 while (true)
                 {
                     typename mutex_type::scoped_lock lk(mtx_);
-                    if (cleanup_terminated_locked_helper(false))
+                    if (cleanup_terminated_locked_helper(lk, false))
                     {
                         thread_map_is_empty = thread_map_.empty();
                         break;
@@ -502,7 +516,7 @@ namespace hpx { namespace threads { namespace policies
             }
 
             typename mutex_type::scoped_lock lk(mtx_);
-            return cleanup_terminated_locked_helper(false) && thread_map_.empty();
+            return cleanup_terminated_locked_helper(lk, false) && thread_map_.empty();
         }
 
         // The maximum number of active threads this thread manager should
@@ -936,7 +950,7 @@ namespace hpx { namespace threads { namespace policies
                     // Before exiting each of the OS threads deletes the
                     // remaining terminated HPX threads
                     // REVIEW: Should we be doing this if we are stealing?
-                    bool canexit = cleanup_terminated_locked(true);
+                    bool canexit = cleanup_terminated_locked(lk, true);
                     if (!running && canexit) {
                         // we don't have any registered work items anymore
                         //do_some_work();       // notify possibly waiting threads
@@ -945,7 +959,7 @@ namespace hpx { namespace threads { namespace policies
                     return false;
                 }
 
-                cleanup_terminated_locked();
+                cleanup_terminated_locked(lk);
             }
             return false;
         }
