@@ -217,8 +217,8 @@ namespace hpx { namespace lcos
                 using boost::mpl::false_;
                 using boost::mpl::true_;
 
-                future_type& f_ = boost::fusion::deref(iter);
-                if (!f_.is_ready())
+                future_type& fut = boost::fusion::deref(iter);
+                if (!fut.is_ready())
                 {
                     // Attach a continuation to this future which will
                     // re-evaluate it and continue to the next argument
@@ -231,7 +231,7 @@ namespace hpx { namespace lcos
 
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
-                    > next_future_data = lcos::detail::get_shared_state(f_);
+                    > next_future_data = lcos::detail::get_shared_state(fut);
 
                     boost::intrusive_ptr<when_each_frame> this_(this);
                     next_future_data->set_on_completed(hpx::util::bind(
@@ -240,7 +240,7 @@ namespace hpx { namespace lcos
                     return;
                 }
 
-                f_(std::move(f_));
+                f_(std::move(fut));
                 ++count_;
                 if(count_ == needed_count_)
                 {
@@ -401,8 +401,7 @@ namespace hpx { namespace lcos
         argument_type lazy_values(func(std::forward<Ts>(ts))...);
 
         boost::intrusive_ptr<frame_type> p(new frame_type(
-            util::forward_as_tuple(std::move(lazy_values),
-            std::forward<F>(func), sizeof...(Ts))));
+            std::move(lazy_values), std::forward<F>(f), sizeof...(Ts)));
 
         p->await();
 
