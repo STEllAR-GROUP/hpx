@@ -2,9 +2,6 @@
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-
-#if !BOOST_PP_IS_ITERATING
-
 #if !defined(HPX_THREADS_THREAD_APR_10_2012_0145PM)
 #define HPX_THREADS_THREAD_APR_10_2012_0145PM
 
@@ -16,9 +13,6 @@
 
 #include <boost/thread/thread.hpp>
 #include <boost/utility/enable_if.hpp>
-#include <boost/preprocessor/enum.hpp>
-#include <boost/preprocessor/enum_params.hpp>
-#include <boost/preprocessor/iterate.hpp>
 
 #include <iosfwd>
 
@@ -46,21 +40,12 @@ namespace hpx
             start_thread(util::deferred_call(std::forward<F>(f)));
         }
 
-// #if !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES)
-//         template <typename F, typename ...Args>
-//         explicit thread(F&& f, Args&&... args)
-//         {
-//             start_thead(util::deferred_call(
-//                std::forward<F>(f), std::forward<Args...>(args)));
-//         }
-// #else
-        // Vertical preprocessor repetition to define the remaining constructors
-#define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (1, HPX_FUNCTION_ARGUMENT_LIMIT, <hpx/runtime/threads/thread.hpp>))   \
-    /**/
-
-#include BOOST_PP_ITERATE()
-// #endif
+        template <typename F, typename ...Ts>
+        explicit thread(F&& f, Ts&&... vs)
+        {
+            start_thread(util::deferred_call(
+                std::forward<F>(f), std::forward<Ts>(vs)...));
+        }
 
         ~thread();
 
@@ -253,21 +238,3 @@ namespace hpx
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif
-
-///////////////////////////////////////////////////////////////////////////////
-#else // BOOST_PP_IS_ITERATING
-
-#define N BOOST_PP_ITERATION()
-
-    template <typename F, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    thread(F && f, HPX_ENUM_FWD_ARGS(N, Arg, arg))
-      : id_(threads::invalid_thread_id)
-    {
-        start_thread(util::deferred_call(std::forward<F>(f),
-            HPX_ENUM_FORWARD_ARGS(N, Arg, arg)));
-    }
-
-#undef N
-
-#endif
-
