@@ -166,6 +166,10 @@ namespace hpx { namespace util
             {
                 if (detail::some_locks_are_not_ignored(held_locks))
                 {
+                    register_locks::held_locks_map tmp_held_locks;
+                    // temporarily cleaning held locks to avoid endless recursions
+                    // when acquiring the backtrace
+                    std::swap(tmp_held_locks, held_locks);
                     std::string back_trace(hpx::detail::backtrace_direct());
 
                     // throw or log, depending on config options
@@ -200,6 +204,8 @@ namespace hpx { namespace util
                                "being held, stack backtrace: " + back_trace);
                         }
                     }
+                    // restoring held locks ...
+                    std::swap(tmp_held_locks, held_locks);
                 }
             }
         }

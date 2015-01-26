@@ -336,7 +336,6 @@ namespace hpx { namespace naming
             bool was_locked = (id_msb_ & is_locked_mask) ? true : false;
             if (!was_locked)
             {
-                util::register_lock_globally(this);
                 id_msb_ |= is_locked_mask;
                 return true;
             }
@@ -350,7 +349,6 @@ namespace hpx { namespace naming
             util::reset_ignored(this);
 
             id_msb_ &= ~is_locked_mask;
-            util::unregister_lock_globally(this);
         }
 
         // this is used for assertions only, no need to acquire the lock
