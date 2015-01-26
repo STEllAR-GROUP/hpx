@@ -199,10 +199,10 @@ namespace hpx { namespace util
                 new (p) T();
             }
 
-            template <typename T>
-            void construct(pointer p, T && val)
+            template <typename U>
+            void construct(pointer p, U && val)
             {
-                new (p) typename util::decay<T>::type(std::forward<T>(val));
+                new (p) typename util::decay<T>::type(std::forward<U>(val));
             }
 
             /** Destroy the object referenced by @c p. */
