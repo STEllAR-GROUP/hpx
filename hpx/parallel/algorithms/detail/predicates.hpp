@@ -39,7 +39,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    struct less_than
+    struct less
     {
         template <typename T1, typename T2>
         bool operator()(T1 const& t1, T2 const& t2) const
