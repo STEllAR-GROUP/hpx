@@ -473,23 +473,6 @@ namespace hpx
             LERR_(error) << "created exception: " << this->what();
         }
 
-        /// Move construction
-        exception(exception && rhs)
-          : boost::system::system_error(rhs.code(), rhs.what())
-        {
-        }
-
-        /// Move assignment
-        exception& operator=(exception && rhs)
-        {
-            if (this != &rhs)
-            {
-                *static_cast<boost::system::system_error*>(this) =
-                    boost::system::system_error(rhs.code(), rhs.what());
-            }
-            return *this;
-        }
-
         /// Destruct a hpx::exception
         ///
         /// \throws nothing
