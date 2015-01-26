@@ -405,6 +405,10 @@ namespace hpx { namespace threads { namespace detail
                 {
                     hpx::agas::garbage_collect_non_blocking();
                 }
+
+                // call back into invoking context
+                if (!cb.empty())
+                    cb();
             }
 
             if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX)
