@@ -15,12 +15,6 @@ foreach(file ${tuple_argument_limit_preprocessing_files})
   hpx_partial_preprocess_header(${file} LIMIT HPX_LIMIT)
 endforeach()
 
-set(wait_argument_limit_preprocessing_files
-  "hpx/runtime/components/memory_block.hpp")
-foreach(file ${wait_argument_limit_preprocessing_files})
-  hpx_partial_preprocess_header(${file} LIMIT HPX_LIMIT)
-endforeach()
-
 # invoke preprocessing routines
 hpx_setup_partial_preprocess_headers()
 
