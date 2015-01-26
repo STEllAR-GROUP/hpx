@@ -30,6 +30,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/lockfree/detail/branch_hints.hpp>
+#include <boost/lockfree/stack.hpp>
 
 #include <stack>
 
@@ -47,44 +48,34 @@ namespace hpx { namespace threads
         template <typename CoroutineImpl>
         struct coroutine_allocator
         {
-            typedef lcos::local::spinlock mutex_type;
-
             coroutine_allocator()
+              : heap_(128)
             {}
 
             CoroutineImpl* get()
             {
-                mutex_type::scoped_lock l(mtx_);
                 return get_locked();
             }
 
             CoroutineImpl* try_get()
             {
-                mutex_type::scoped_lock l(mtx_, boost::try_to_lock);
-                if (!l)
-                    return NULL;
                 return get_locked();
             }
 
             void deallocate(CoroutineImpl* c)
             {
-                mutex_type::scoped_lock l(mtx_);
                 heap_.push(c);
             }
 
         private:
             CoroutineImpl* get_locked()
             {
-                if (heap_.empty())
-                    return NULL;
-
-                CoroutineImpl* next = heap_.top();
-                heap_.pop();
-                return next;
+                CoroutineImpl* result = 0;
+                heap_.pop(result);
+                return result;
             }
 
-            mutex_type mtx_;
-            std::stack<CoroutineImpl*> heap_;
+            boost::lockfree::stack<CoroutineImpl*> heap_;
         };
 
         ///////////////////////////////////////////////////////////////////////
