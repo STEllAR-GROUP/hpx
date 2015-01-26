@@ -15,7 +15,6 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
-#include <hpx/util/locking_helpers.hpp>
 
 //Boost includes
 #include <boost/program_options.hpp>

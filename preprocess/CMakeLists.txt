@@ -15,12 +15,6 @@ foreach(file ${tuple_argument_limit_preprocessing_files})
   hpx_partial_preprocess_header(${file} LIMIT HPX_LIMIT)
 endforeach()
 
-set(lock_argument_limit_preprocessing_files
-  "hpx/util/locking_helpers.hpp")
-foreach(file ${lock_argument_limit_preprocessing_files})
-  hpx_partial_preprocess_header(${file} LIMIT HPX_LIMIT)
-endforeach()
-
 set(action_argument_limit_preprocessing_files
   "hpx/lcos/broadcast.hpp"
   "hpx/lcos/reduce.hpp")
