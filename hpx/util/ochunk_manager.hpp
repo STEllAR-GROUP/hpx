@@ -100,6 +100,7 @@ namespace hpx { namespace util { namespace detail
                 cont_.resize(current_);         // truncate container
             }
             else if (chunks_) {
+                HPX_ASSERT(get_num_chunks() > current_chunk_);
                 HPX_ASSERT(
                     get_chunk_type(current_chunk_) == chunk_type_index ||
                     get_chunk_size(current_chunk_) != 0);
@@ -139,8 +140,8 @@ namespace hpx { namespace util { namespace detail
                     // available
                     if (chunks_)
                     {
-                        if (get_num_chunks() == 0 ||
-                            get_chunk_type(current_chunk_) == chunk_type_pointer ||
+                        HPX_ASSERT(get_num_chunks() > current_chunk_);
+                        if (get_chunk_type(current_chunk_) == chunk_type_pointer ||
                             get_chunk_size(current_chunk_) != 0)
                         {
                             // add a new serialization_chunk
@@ -168,6 +169,7 @@ namespace hpx { namespace util { namespace detail
                 this->ocontainer_type::save_binary(address, count);
             }
             else {
+                HPX_ASSERT(get_num_chunks() > current_chunk_);
                 HPX_ASSERT(
                     get_chunk_type(current_chunk_) == chunk_type_index ||
                     get_chunk_size(current_chunk_) != 0);
