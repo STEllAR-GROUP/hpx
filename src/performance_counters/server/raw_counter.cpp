@@ -9,6 +9,7 @@
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/server/raw_counter.hpp>
+#include <hpx/util/function.hpp>
 
 #include <boost/version.hpp>
 
@@ -27,7 +28,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(
 namespace hpx { namespace performance_counters { namespace server
 {
     raw_counter::raw_counter(counter_info const& info,
-            util::function_nonser<boost::int64_t(bool)> f)
+            hpx::util::function_nonser<boost::int64_t(bool)> f)
       : base_type_holder(info), f_(std::move(f))
     {
         if (info.type_ != counter_raw) {

@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/performance_counters/counters.hpp>
+#include <hpx/util/function.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters
@@ -88,14 +89,14 @@ namespace hpx { namespace performance_counters
         ///        raw_counter based on given function returning the counter
         ///        value
         counter_status create_raw_counter(counter_info const& info,
-            util::function_nonser<boost::int64_t()> const& f,
+            hpx::util::function_nonser<boost::int64_t()> const& f,
             naming::gid_type& id, error_code& ec = throws);
 
         /// \brief Create a new performance counter instance of type
         ///        raw_counter based on given function returning the counter
         ///        value
         counter_status create_raw_counter(counter_info const& info,
-            util::function_nonser<boost::int64_t(bool)> const& f,
+            hpx::util::function_nonser<boost::int64_t(bool)> const& f,
             naming::gid_type& id, error_code& ec = throws);
 
         /// \brief Create a new performance counter instance based on given

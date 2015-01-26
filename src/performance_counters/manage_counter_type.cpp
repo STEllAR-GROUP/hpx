@@ -12,6 +12,7 @@
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/util/function.hpp>
 
 #include <boost/bind.hpp>
 
@@ -69,7 +70,7 @@ namespace hpx { namespace performance_counters
     // provide the data in a way, which will uninstall it automatically during
     // shutdown.
     counter_status install_counter_type(std::string const& name,
-        util::function_nonser<boost::int64_t(bool)> const& counter_value,
+        hpx::util::function_nonser<boost::int64_t(bool)> const& counter_value,
         std::string const& helptext, std::string const& uom, error_code& ec)
     {
         return install_counter_type(name, counter_raw, helptext,

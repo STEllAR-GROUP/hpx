@@ -13,6 +13,7 @@
 #include <hpx/runtime/components/base_lco_factory.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 
+#include <hpx/util/function.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/bind.hpp>
@@ -597,7 +598,7 @@ namespace hpx { namespace performance_counters
         }
 
         naming::gid_type create_raw_counter(counter_info const& info,
-            util::function_nonser<boost::int64_t()> const& f, error_code& ec)
+            hpx::util::function_nonser<boost::int64_t()> const& f, error_code& ec)
         {
             naming::gid_type gid;
             get_runtime().get_counter_registry().create_raw_counter(
@@ -606,7 +607,7 @@ namespace hpx { namespace performance_counters
         }
 
         naming::gid_type create_raw_counter(counter_info const& info,
-            util::function_nonser<boost::int64_t(bool)> const& f, error_code& ec)
+            hpx::util::function_nonser<boost::int64_t(bool)> const& f, error_code& ec)
         {
             naming::gid_type gid;
             get_runtime().get_counter_registry().create_raw_counter(

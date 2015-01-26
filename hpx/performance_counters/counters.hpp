@@ -11,6 +11,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/util/function.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/serialization/serialization.hpp>
@@ -348,7 +349,7 @@ namespace hpx { namespace performance_counters
     /// \brief This declares the type of a function, which will be
     ///        called by HPX whenever a new performance counter instance of a
     ///        particular type needs to be created.
-    typedef util::function_nonser<
+    typedef hpx::util::function_nonser<
         naming::gid_type(counter_info const&, error_code&)>
         create_counter_func;
 
@@ -356,7 +357,7 @@ namespace hpx { namespace performance_counters
     /// \brief This declares a type of a function, which will be passed to
     ///        a \a discover_counters_func in order to be called for each
     ///        discovered performance counter instance.
-    typedef util::function_nonser<
+    typedef hpx::util::function_nonser<
         bool(counter_info const&, error_code&)>
         discover_counter_func;
 
@@ -369,7 +370,7 @@ namespace hpx { namespace performance_counters
     /// \brief This declares the type of a function, which will be called by
     ///        HPX whenever it needs to discover all performance counter
     ///        instances of a particular type.
-    typedef util::function_nonser<
+    typedef hpx::util::function_nonser<
         bool(counter_info const&, discover_counter_func const&, 
             discover_counters_mode, error_code&)>
         discover_counters_func;
@@ -573,12 +574,12 @@ namespace hpx { namespace performance_counters
         // Helper function for creating counters encapsulating a function
         // returning the counter value.
         naming::gid_type create_raw_counter(counter_info const&,
-            util::function_nonser<boost::int64_t()> const&, error_code&);
+            hpx::util::function_nonser<boost::int64_t()> const&, error_code&);
 
         // Helper function for creating counters encapsulating a function
         // returning the counter value.
         naming::gid_type create_raw_counter(counter_info const&,
-            util::function_nonser<boost::int64_t(bool)> const&, error_code&);
+            hpx::util::function_nonser<boost::int64_t(bool)> const&, error_code&);
 
         // Helper function for creating a new performance counter instance
         // based on a given counter value.

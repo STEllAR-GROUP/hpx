@@ -12,6 +12,7 @@
 #include <hpx/performance_counters/server/elapsed_time_counter.hpp>
 #include <hpx/performance_counters/server/statistics_counter.hpp>
 #include <hpx/performance_counters/server/arithmetics_counter.hpp>
+#include <hpx/util/function.hpp>
 #include <hpx/util/logging.hpp>
 
 #include <boost/foreach.hpp>
@@ -400,28 +401,28 @@ namespace hpx { namespace performance_counters
     counter_status registry::create_raw_counter_value(counter_info const& info,
         boost::int64_t* countervalue, naming::gid_type& id, error_code& ec)
     {
-        util::function_nonser<boost::int64_t(bool)> func(
+        hpx::util::function_nonser<boost::int64_t(bool)> func(
             boost::bind(wrap_counter, countervalue, ::_1));
         return create_raw_counter(info, func, id, ec);
     }
 
     static boost::int64_t
-    wrap_raw_counter(util::function_nonser<boost::int64_t()> const& f, bool)
+    wrap_raw_counter(hpx::util::function_nonser<boost::int64_t()> const& f, bool)
     {
         return f();
     }
 
     counter_status registry::create_raw_counter(counter_info const& info,
-        util::function_nonser<boost::int64_t()> const& f, naming::gid_type& id,
+        hpx::util::function_nonser<boost::int64_t()> const& f, naming::gid_type& id,
         error_code& ec)
     {
-        util::function_nonser<boost::int64_t(bool)> func(
+        hpx::util::function_nonser<boost::int64_t(bool)> func(
             boost::bind(&wrap_raw_counter, f, ::_1));
         return create_raw_counter(info, func, id, ec);
     }
 
     counter_status registry::create_raw_counter(counter_info const& info,
-        util::function_nonser<boost::int64_t(bool)> const& f, naming::gid_type& id,
+        hpx::util::function_nonser<boost::int64_t(bool)> const& f, naming::gid_type& id,
         error_code& ec)
     {
         // create canonical type name

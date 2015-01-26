@@ -8,6 +8,7 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
+#include <hpx/util/function.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace detail
@@ -60,7 +61,7 @@ namespace hpx { namespace performance_counters { namespace detail
                     return naming::invalid_gid;
                 }
 
-                util::function_nonser<boost::int64_t()> f = 
+                hpx::util::function_nonser<boost::int64_t()> f = 
                     util::bind(&get_instance_count, type);
                 return create_raw_counter(info, std::move(f), ec);
             }
