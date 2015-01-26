@@ -231,7 +231,10 @@ namespace hpx
                             archive >> p;
 #endif
                             // make sure this parcel ended up on the right locality
-                            HPX_ASSERT(hpx::get_locality() ? p.get_destination_locality() == hpx::get_locality() : true);
+#ifdef HPX_DEBUG
+                            if(hpx::get_locality() && hpx::get_runtime_ptr())
+                                HPX_ASSERT(p.get_destination_locality() == hpx::get_locality() : true);
+#ifdef HPX_DEBUG
 
                             // be sure not to measure add_parcel as serialization time
                             boost::int64_t add_parcel_time = timer.elapsed_nanoseconds();
