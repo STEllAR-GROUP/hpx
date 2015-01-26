@@ -6,10 +6,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/include/iostreams.hpp>
 
 #include <boost/foreach.hpp>
+
+#include <sstream>
 
 #include <tests/unit/agas/components/server/managed_refcnt_checker.hpp>
 
@@ -21,7 +22,7 @@ managed_refcnt_checker::~managed_refcnt_checker()
     const boost::uint32_t prefix_ = get_locality_id();
     const naming::gid_type this_ = get_base_gid();
 
-    util::osstream strm;
+    std::ostringstream strm;
 
     if (!references_.empty())
     {
@@ -51,7 +52,7 @@ managed_refcnt_checker::~managed_refcnt_checker()
         hpx::trigger_lco_event(target_);
     }
 
-    std::string const str = util::osstream_get_string(strm);
+    std::string const str = strm.str();
 
     if (!str.empty())
         cout << str << flush;

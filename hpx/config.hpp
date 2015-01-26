@@ -555,36 +555,6 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// Use std::function if it's available and movable
-#if defined(HPX_UTIL_FUNCTION)
-#  define HPX_STD_FUNCTION ::hpx::util::function_nonser
-#else
-#if !defined(HPX_HAVE_CXX11_STD_FUNCTION)
-#  define HPX_STD_FUNCTION ::boost::function
-#else
-#  define HPX_STD_FUNCTION ::std::function
-#endif
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-// Use std::tuple if it's available and movable
-#if defined(HPX_UTIL_TUPLE)
-#  define HPX_STD_TUPLE         ::hpx::util::tuple
-#  define HPX_STD_MAKE_TUPLE    ::hpx::util::make_tuple
-#  define HPX_STD_GET(N, c)     ::hpx::util::get<N>(c)
-#else
-#if !defined(HPX_HAVE_CXX11_STD_TUPLE)
-#  define HPX_STD_TUPLE         ::boost::tuple
-#  define HPX_STD_MAKE_TUPLE    ::boost::make_tuple
-#  define HPX_STD_GET(N, c)     ::boost::get<N>(c)
-#else
-#  define HPX_STD_TUPLE         ::std::tuple
-#  define HPX_STD_MAKE_TUPLE    ::std::make_tuple
-#  define HPX_STD_GET(N, c)     ::std::get<N>(c)
-#endif
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 // Older Boost versions do not have BOOST_NOEXCEPT defined
 #if !defined(BOOST_NOEXCEPT)
 #  define BOOST_NOEXCEPT

@@ -8,16 +8,16 @@
 #if !defined(HPX_APPLIER_APPLIER_JUN_03_2008_0438PM)
 #define HPX_APPLIER_APPLIER_JUN_03_2008_0438PM
 
-#include <boost/noncopyable.hpp>
-
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 
 #include <boost/foreach.hpp>
+#include <boost/noncopyable.hpp>
+
+#include <sstream>
 
 #include <hpx/config/warnings_prefix.hpp>
 

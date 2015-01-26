@@ -16,7 +16,6 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/mpi_environment.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
@@ -43,6 +42,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/serialization/vector.hpp>
+
+#include <sstream>
 
 namespace hpx { namespace detail
 {
@@ -464,7 +465,7 @@ void register_worker(registration_header const& header)
           , dest, p);
 #else
         // delay the final response until the runtime system is up and running
-        HPX_STD_FUNCTION<void()>* thunk = new HPX_STD_FUNCTION<void()>(
+        util::function_nonser<void()>* thunk = new util::function_nonser<void()>(
             boost::bind(
                 &big_boot_barrier::apply
               , boost::ref(get_big_boot_barrier())
@@ -489,11 +490,11 @@ void notify_worker(notification_header const& header)
 
     if (HPX_UNLIKELY(agas_client.get_status() != starting))
     {
-        hpx::util::osstream strm;
+        std::ostringstream strm;
         strm << "locality " << rt.here() << " has launched early";
         HPX_THROW_EXCEPTION(internal_server_error,
             "agas::notify_worker",
-            hpx::util::osstream_get_string(strm));
+            strm.str());
     }
 
     util::runtime_configuration& cfg = rt.get_config();
@@ -665,7 +666,7 @@ void register_worker_security(registration_header_security const& header)
     {
         // AGAS is starting up; this locality is participating in startup
         // synchronization.
-        HPX_STD_FUNCTION<void()>* thunk = new HPX_STD_FUNCTION<void()>(
+        util::function_nonser<void()>* thunk = new util::function_nonser<void()>(
             boost::bind(
                 &big_boot_barrier::apply
               , boost::ref(get_big_boot_barrier())
@@ -689,11 +690,11 @@ void notify_worker_security(notification_header_security const& header)
 
     if (HPX_UNLIKELY(agas_client.get_status() != starting))
     {
-        hpx::util::osstream strm;
+        std::ostringstream strm;
         strm << "locality " << rt.here() << " has launched early";
         HPX_THROW_EXCEPTION(internal_server_error,
             "agas::notify_worker",
-            hpx::util::osstream_get_string(strm));
+            strm.str());
     }
 
     // finish initializing the certificate store
@@ -866,7 +867,7 @@ void big_boot_barrier::trigger()
 {
     if (service_mode_bootstrap == service_type)
     {
-        HPX_STD_FUNCTION<void()>* p;
+        util::function_nonser<void()>* p;
 
         while (thunks.pop(p))
             (*p)();

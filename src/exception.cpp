@@ -12,7 +12,6 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/command_line_handling.hpp>
 
@@ -30,6 +29,7 @@
 #if defined(_POSIX_VERSION)
 #include <iostream>
 #endif
+#include <sstream>
 
 #ifdef __APPLE__
 #include <crt_externs.h>
@@ -224,9 +224,9 @@ namespace hpx { namespace detail
             if (rts_state >= runtime::state_initialized &&
                 rts_state < runtime::state_stopped)
             {
-                util::osstream strm;
+                std::ostringstream strm;
                 strm << get_runtime().here();
-                hostname = util::osstream_get_string(strm);
+                hostname = strm.str();
             }
         }
 
@@ -409,7 +409,7 @@ namespace hpx
     // return a string holding a formatted message.
     std::string diagnostic_information(boost::exception const& e)
     {
-        util::osstream strm;
+        std::ostringstream strm;
         strm << "\n";
 
         std::string const* back_trace =
@@ -513,7 +513,7 @@ namespace hpx
         if (se)
             strm << "{what}: " << se->what() << "\n";
 
-        return util::osstream_get_string(strm);
+        return strm.str();
     }
 
     std::string diagnostic_information(boost::exception_ptr const& e)

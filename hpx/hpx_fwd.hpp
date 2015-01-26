@@ -38,10 +38,10 @@
 #include <boost/system/error_code.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 
-#include <hpx/config/function.hpp>
 #include <hpx/traits.hpp>
 #include <hpx/lcos/local/once_fwd.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/util/function.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unused.hpp>
@@ -540,7 +540,7 @@ namespace hpx
     HPX_API_EXPORT void report_error(boost::exception_ptr const& e);
 
     /// Register a function to be called during system shutdown
-    HPX_API_EXPORT bool register_on_exit(HPX_STD_FUNCTION<void()> const&);
+    HPX_API_EXPORT bool register_on_exit(util::function_nonser<void()> const&);
 
     enum logging_destination
     {
@@ -1256,7 +1256,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     /// The type of a function which is registered to be executed as a
     /// startup or pre-startup function.
-    typedef HPX_STD_FUNCTION<void()> startup_function_type;
+    typedef util::function_nonser<void()> startup_function_type;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Add a function to be executed by a HPX thread before hpx_main
@@ -1309,7 +1309,7 @@ namespace hpx
 
     /// The type of a function which is registered to be executed as a
     /// shutdown or pre-shutdown function.
-    typedef HPX_STD_FUNCTION<void()> shutdown_function_type;
+    typedef util::function_nonser<void()> shutdown_function_type;
 
     /// \brief Add a function to be executed by a HPX thread during
     /// \a hpx::finalize() but guaranteed before any shutdown function is

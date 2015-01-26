@@ -10,7 +10,6 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/serialize_intrusive_ptr.hpp>
-#include <hpx/util/stringstream.hpp>
 
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/version.hpp>
@@ -18,6 +17,8 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/shared_ptr.hpp>
+
+#include <sstream>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
@@ -336,9 +337,9 @@ namespace hpx { namespace parcelset
 
     std::string dump_parcel(parcel const& p)
     {
-        util::osstream os;
+        std::ostringstream os;
         os << p;
-        return util::osstream_get_string(os);
+        return os.str();
     }
 }}
 

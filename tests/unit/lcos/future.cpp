@@ -562,8 +562,8 @@ void test_wait_for_either_of_two_futures_1()
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
 
-    HPX_TEST(HPX_STD_GET(0, t).is_ready());
-    HPX_TEST_EQ(HPX_STD_GET(0, t).get(), 42);
+    HPX_TEST(hpx::util::get<0>(t).is_ready());
+    HPX_TEST_EQ(hpx::util::get<0>(t).get(), 42);
 }
 
 void test_wait_for_either_of_two_futures_2()
@@ -586,8 +586,8 @@ void test_wait_for_either_of_two_futures_2()
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
 
-    HPX_TEST(HPX_STD_GET(1, t).is_ready());
-    HPX_TEST_EQ(HPX_STD_GET(1, t).get(), 42);
+    HPX_TEST(hpx::util::get<1>(t).is_ready());
+    HPX_TEST_EQ(hpx::util::get<1>(t).get(), 42);
 }
 
 void test_wait_for_either_of_two_futures_list_1()
@@ -669,8 +669,8 @@ void test_wait_for_either_of_three_futures_1()
     HPX_TEST(!f2.valid());
     HPX_TEST(!f3.valid());
 
-    HPX_TEST(HPX_STD_GET(0, t).is_ready());
-    HPX_TEST_EQ(HPX_STD_GET(0, t).get(), 42);
+    HPX_TEST(hpx::util::get<0>(t).is_ready());
+    HPX_TEST_EQ(hpx::util::get<0>(t).get(), 42);
 }
 
 void test_wait_for_either_of_three_futures_2()
@@ -698,8 +698,8 @@ void test_wait_for_either_of_three_futures_2()
     HPX_TEST(!f2.valid());
     HPX_TEST(!f3.valid());
 
-    HPX_TEST(HPX_STD_GET(1, t).is_ready());
-    HPX_TEST_EQ(HPX_STD_GET(1, t).get(), 42);
+    HPX_TEST(hpx::util::get<1>(t).is_ready());
+    HPX_TEST_EQ(hpx::util::get<1>(t).get(), 42);
 }
 
 void test_wait_for_either_of_three_futures_3()
@@ -727,8 +727,8 @@ void test_wait_for_either_of_three_futures_3()
     HPX_TEST(!f2.valid());
     HPX_TEST(!f3.valid());
 
-    HPX_TEST(HPX_STD_GET(2, t).is_ready());
-    HPX_TEST_EQ(HPX_STD_GET(2, t).get(), 42);
+    HPX_TEST(hpx::util::get<2>(t).is_ready());
+    HPX_TEST_EQ(hpx::util::get<2>(t).get(), 42);
 }
 
 void test_wait_for_either_of_four_futures_1()
@@ -761,8 +761,8 @@ void test_wait_for_either_of_four_futures_1()
     HPX_TEST(!f3.valid());
     HPX_TEST(!f4.valid());
 
-    HPX_TEST(HPX_STD_GET(0, t).is_ready());
-    HPX_TEST_EQ(HPX_STD_GET(0, t).get(), 42);
+    HPX_TEST(hpx::util::get<0>(t).is_ready());
+    HPX_TEST_EQ(hpx::util::get<0>(t).get(), 42);
 }
 
 void test_wait_for_either_of_four_futures_2()
@@ -795,8 +795,8 @@ void test_wait_for_either_of_four_futures_2()
     HPX_TEST(!f3.valid());
     HPX_TEST(!f4.valid());
 
-    HPX_TEST(HPX_STD_GET(1, t).is_ready());
-    HPX_TEST_EQ(HPX_STD_GET(1, t).get(), 42);
+    HPX_TEST(hpx::util::get<1>(t).is_ready());
+    HPX_TEST_EQ(hpx::util::get<1>(t).get(), 42);
 }
 
 void test_wait_for_either_of_four_futures_3()
@@ -829,8 +829,8 @@ void test_wait_for_either_of_four_futures_3()
     HPX_TEST(!f3.valid());
     HPX_TEST(!f4.valid());
 
-    HPX_TEST(HPX_STD_GET(2, t).is_ready());
-    HPX_TEST_EQ(HPX_STD_GET(2, t).get(), 42);
+    HPX_TEST(hpx::util::get<2>(t).is_ready());
+    HPX_TEST_EQ(hpx::util::get<2>(t).get(), 42);
 }
 
 void test_wait_for_either_of_four_futures_4()
@@ -863,8 +863,8 @@ void test_wait_for_either_of_four_futures_4()
     HPX_TEST(!f3.valid());
     HPX_TEST(!f4.valid());
 
-    HPX_TEST(HPX_STD_GET(3, t).is_ready());
-    HPX_TEST_EQ(HPX_STD_GET(3, t).get(), 42);
+    HPX_TEST(hpx::util::get<3>(t).is_ready());
+    HPX_TEST_EQ(hpx::util::get<3>(t).get(), 42);
 }
 
 void test_wait_for_either_of_five_futures_1_from_list()
@@ -986,8 +986,8 @@ void test_wait_for_either_of_five_futures_1()
     HPX_TEST(!f4.valid());
     HPX_TEST(!f5.valid());
 
-    HPX_TEST(HPX_STD_GET(0, t).is_ready());
-    HPX_TEST_EQ(HPX_STD_GET(0, t).get(), 42);
+    HPX_TEST(hpx::util::get<0>(t).is_ready());
+    HPX_TEST_EQ(hpx::util::get<0>(t).get(), 42);
 }
 
 void test_wait_for_either_of_five_futures_2()
@@ -1025,8 +1025,8 @@ void test_wait_for_either_of_five_futures_2()
     HPX_TEST(!f4.valid());
     HPX_TEST(!f5.valid());
 
-    HPX_TEST(HPX_STD_GET(1, t).is_ready());
-    HPX_TEST_EQ(HPX_STD_GET(1, t).get(), 42);
+    HPX_TEST(hpx::util::get<1>(t).is_ready());
+    HPX_TEST_EQ(hpx::util::get<1>(t).get(), 42);
 }
 
 void test_wait_for_either_of_five_futures_3()
@@ -1064,8 +1064,8 @@ void test_wait_for_either_of_five_futures_3()
     HPX_TEST(!f4.valid());
     HPX_TEST(!f5.valid());
 
-    HPX_TEST(HPX_STD_GET(2, t).is_ready());
-    HPX_TEST_EQ(HPX_STD_GET(2, t).get(), 42);
+    HPX_TEST(hpx::util::get<2>(t).is_ready());
+    HPX_TEST_EQ(hpx::util::get<2>(t).get(), 42);
 }
 
 void test_wait_for_either_of_five_futures_4()
@@ -1103,8 +1103,8 @@ void test_wait_for_either_of_five_futures_4()
     HPX_TEST(!f4.valid());
     HPX_TEST(!f5.valid());
 
-    HPX_TEST(HPX_STD_GET(3, t).is_ready());
-    HPX_TEST_EQ(HPX_STD_GET(3, t).get(), 42);
+    HPX_TEST(hpx::util::get<3>(t).is_ready());
+    HPX_TEST_EQ(hpx::util::get<3>(t).get(), 42);
 }
 
 void test_wait_for_either_of_five_futures_5()
@@ -1142,8 +1142,8 @@ void test_wait_for_either_of_five_futures_5()
     HPX_TEST(!f4.valid());
     HPX_TEST(!f5.valid());
 
-    HPX_TEST(HPX_STD_GET(4, t).is_ready());
-    HPX_TEST_EQ(HPX_STD_GET(4, t).get(), 42);
+    HPX_TEST(hpx::util::get<4>(t).is_ready());
+    HPX_TEST_EQ(hpx::util::get<4>(t).get(), 42);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1265,8 +1265,8 @@ void test_wait_for_all_two_futures()
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
 
-    HPX_TEST(HPX_STD_GET(0, result).is_ready());
-    HPX_TEST(HPX_STD_GET(1, result).is_ready());
+    HPX_TEST(hpx::util::get<0>(result).is_ready());
+    HPX_TEST(hpx::util::get<1>(result).is_ready());
 }
 
 void test_wait_for_all_three_futures()
@@ -1294,9 +1294,9 @@ void test_wait_for_all_three_futures()
     HPX_TEST(!f2.valid());
     HPX_TEST(!f3.valid());
 
-    HPX_TEST(HPX_STD_GET(0, result).is_ready());
-    HPX_TEST(HPX_STD_GET(1, result).is_ready());
-    HPX_TEST(HPX_STD_GET(2, result).is_ready());
+    HPX_TEST(hpx::util::get<0>(result).is_ready());
+    HPX_TEST(hpx::util::get<1>(result).is_ready());
+    HPX_TEST(hpx::util::get<2>(result).is_ready());
 }
 
 void test_wait_for_all_four_futures()
@@ -1329,10 +1329,10 @@ void test_wait_for_all_four_futures()
     HPX_TEST(!f3.valid());
     HPX_TEST(!f4.valid());
 
-    HPX_TEST(HPX_STD_GET(0, result).is_ready());
-    HPX_TEST(HPX_STD_GET(1, result).is_ready());
-    HPX_TEST(HPX_STD_GET(2, result).is_ready());
-    HPX_TEST(HPX_STD_GET(3, result).is_ready());
+    HPX_TEST(hpx::util::get<0>(result).is_ready());
+    HPX_TEST(hpx::util::get<1>(result).is_ready());
+    HPX_TEST(hpx::util::get<2>(result).is_ready());
+    HPX_TEST(hpx::util::get<3>(result).is_ready());
 }
 
 void test_wait_for_all_five_futures()
@@ -1370,11 +1370,11 @@ void test_wait_for_all_five_futures()
     HPX_TEST(!f4.valid());
     HPX_TEST(!f5.valid());
 
-    HPX_TEST(HPX_STD_GET(0, result).is_ready());
-    HPX_TEST(HPX_STD_GET(1, result).is_ready());
-    HPX_TEST(HPX_STD_GET(2, result).is_ready());
-    HPX_TEST(HPX_STD_GET(3, result).is_ready());
-    HPX_TEST(HPX_STD_GET(4, result).is_ready());
+    HPX_TEST(hpx::util::get<0>(result).is_ready());
+    HPX_TEST(hpx::util::get<1>(result).is_ready());
+    HPX_TEST(hpx::util::get<2>(result).is_ready());
+    HPX_TEST(hpx::util::get<3>(result).is_ready());
+    HPX_TEST(hpx::util::get<4>(result).is_ready());
 }
 
 void test_wait_for_two_out_of_five_futures()
@@ -1411,11 +1411,11 @@ void test_wait_for_two_out_of_five_futures()
     HPX_TEST(!f5.valid());
 
     HPX_TEST_EQ(result.indices.size(), count);
-    HPX_TEST(!HPX_STD_GET(0, result.futures).is_ready());
-    HPX_TEST(HPX_STD_GET(1, result.futures).is_ready());
-    HPX_TEST(!HPX_STD_GET(2, result.futures).is_ready());
-    HPX_TEST(HPX_STD_GET(3, result.futures).is_ready());
-    HPX_TEST(!HPX_STD_GET(4, result.futures).is_ready());
+    HPX_TEST(!hpx::util::get<0>(result.futures).is_ready());
+    HPX_TEST(hpx::util::get<1>(result.futures).is_ready());
+    HPX_TEST(!hpx::util::get<2>(result.futures).is_ready());
+    HPX_TEST(hpx::util::get<3>(result.futures).is_ready());
+    HPX_TEST(!hpx::util::get<4>(result.futures).is_ready());
 }
 
 void test_wait_for_three_out_of_five_futures()
@@ -1453,11 +1453,11 @@ void test_wait_for_three_out_of_five_futures()
     HPX_TEST(!f5.valid());
 
     HPX_TEST_EQ(result.indices.size(), count);
-    HPX_TEST(HPX_STD_GET(0, result.futures).is_ready());
-    HPX_TEST(!HPX_STD_GET(1, result.futures).is_ready());
-    HPX_TEST(HPX_STD_GET(2, result.futures).is_ready());
-    HPX_TEST(!HPX_STD_GET(3, result.futures).is_ready());
-    HPX_TEST(HPX_STD_GET(4, result.futures).is_ready());
+    HPX_TEST(hpx::util::get<0>(result.futures).is_ready());
+    HPX_TEST(!hpx::util::get<1>(result.futures).is_ready());
+    HPX_TEST(hpx::util::get<2>(result.futures).is_ready());
+    HPX_TEST(!hpx::util::get<3>(result.futures).is_ready());
+    HPX_TEST(hpx::util::get<4>(result.futures).is_ready());
 }
 
 ///////////////////////////////////////////////////////////////////////////////

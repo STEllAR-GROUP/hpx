@@ -138,7 +138,7 @@ int main(int argc, char* argv[])
     std::vector<std::string> cfg;
     cfg.push_back("hpx.run_hpx_main!=1");
 
-    HPX_STD_FUNCTION<void()> const empty;
+    hpx::util::function_nonser<void()> const empty;
     return hpx::init(desc_commandline, argc, argv, cfg, empty, empty, hpx::runtime_mode_connect);
 }
 

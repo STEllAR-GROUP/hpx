@@ -94,7 +94,7 @@ namespace hpx
     }
 
     threads::thread_state_enum thread::thread_function_nullary(
-        HPX_STD_FUNCTION<void()> const& func)
+        util::function_nonser<void()> const& func)
     {
         try {
             // Now notify our calling thread that we started execution.
@@ -135,7 +135,7 @@ namespace hpx
         return hpx::threads::hardware_concurrency();
     }
 
-    void thread::start_thread(HPX_STD_FUNCTION<void()> && func)
+    void thread::start_thread(util::function_nonser<void()> && func)
     {
         mutex_type::scoped_lock l(mtx_);
 

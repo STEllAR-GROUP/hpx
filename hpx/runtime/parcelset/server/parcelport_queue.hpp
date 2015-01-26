@@ -33,7 +33,7 @@ namespace hpx { namespace parcelset { namespace server
 
     private:
         typedef void callback_type(parcel const&);
-        HPX_STD_FUNCTION<callback_type> notify_;
+        util::function_nonser<callback_type> notify_;
     };
 }}}
 

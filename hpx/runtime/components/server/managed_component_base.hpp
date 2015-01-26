@@ -446,14 +446,14 @@ namespace hpx { namespace components
         Component* get_checked()
         {
             if (!component_) {
-                hpx::util::osstream strm;
+                std::ostringstream strm;
                 strm << "component is NULL ("
                      << components::get_component_type_name(
                         components::get_component_type<wrapped_type>())
                      << ") gid(" << get_base_gid() << ")";
                 HPX_THROW_EXCEPTION(invalid_status,
                     "managed_component<Component, Derived>::get_checked",
-                    hpx::util::osstream_get_string(strm));
+                    strm.str());
             }
             return get();
         }
@@ -461,14 +461,14 @@ namespace hpx { namespace components
         Component const* get_checked() const
         {
             if (!component_) {
-                hpx::util::osstream strm;
+                std::ostringstream strm;
                 strm << "component is NULL ("
                      << components::get_component_type_name(
                         components::get_component_type<wrapped_type>())
                      << ") gid(" << get_base_gid() << ")";
                 HPX_THROW_EXCEPTION(invalid_status,
                     "managed_component<Component, Derived>::get_checked",
-                    hpx::util::osstream_get_string(strm));
+                    strm.str());
             }
             return get();
         }

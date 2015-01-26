@@ -20,15 +20,15 @@ namespace hpx { namespace performance_counters
         struct counter_data
         {
             counter_data(counter_info const& info,
-                    HPX_STD_FUNCTION<create_counter_func> const& create_counter,
-                    HPX_STD_FUNCTION<discover_counters_func> const& discover_counters)
+                    create_counter_func const& create_counter,
+                    discover_counters_func const& discover_counters)
               : info_(info), create_counter_(create_counter),
                 discover_counters_(discover_counters)
             {}
 
             counter_info info_;
-            HPX_STD_FUNCTION<create_counter_func> create_counter_;
-            HPX_STD_FUNCTION<discover_counters_func> discover_counters_;
+            create_counter_func create_counter_;
+            discover_counters_func discover_counters_;
         };
         typedef std::map<std::string, counter_data> counter_type_map_type;
 
@@ -37,23 +37,23 @@ namespace hpx { namespace performance_counters
 
         /// \brief Add a new performance counter type to the (local) registry
         counter_status add_counter_type(counter_info const& info,
-            HPX_STD_FUNCTION<create_counter_func> const& create_counter,
-            HPX_STD_FUNCTION<discover_counters_func> const& discover_counters,
+            create_counter_func const& create_counter,
+            discover_counters_func const& discover_counters,
             error_code& ec = throws);
 
         /// \brief Call the supplied function for all registered counter types.
         counter_status discover_counter_types(
-            HPX_STD_FUNCTION<discover_counter_func> discover_counter,
+            discover_counter_func discover_counter,
             discover_counters_mode mode, error_code& ec = throws);
 
         /// \brief Call the supplied function for the given registered counter type.
         counter_status discover_counter_type(
             std::string const& fullname,
-            HPX_STD_FUNCTION<discover_counter_func> discover_counter,
+            discover_counter_func discover_counter,
             discover_counters_mode mode, error_code& ec = throws);
 
         counter_status discover_counter_type(
-            counter_info const& info, HPX_STD_FUNCTION<discover_counter_func> const& f,
+            counter_info const& info, discover_counter_func const& f,
             discover_counters_mode mode, error_code& ec = throws)
         {
             return discover_counter_type(info.fullname_, f, mode, ec);
@@ -62,13 +62,13 @@ namespace hpx { namespace performance_counters
         /// \brief Retrieve the counter creation function which is associated
         ///        with a given counter type.
         counter_status get_counter_create_function(counter_info const& info,
-            HPX_STD_FUNCTION<create_counter_func>& create_counter,
+            create_counter_func& create_counter,
             error_code& ec = throws) const;
 
         /// \brief Retrieve the counter discovery function which is associated
         ///        with a given counter type.
         counter_status get_counter_discovery_function(counter_info const& info,
-            HPX_STD_FUNCTION<discover_counters_func>& func,
+            discover_counters_func& func,
             error_code& ec) const;
 
         /// \brief Remove an existing counter type from the (local) registry
@@ -88,14 +88,14 @@ namespace hpx { namespace performance_counters
         ///        raw_counter based on given function returning the counter
         ///        value
         counter_status create_raw_counter(counter_info const& info,
-            HPX_STD_FUNCTION<boost::int64_t()> const& f, naming::gid_type& id,
-            error_code& ec = throws);
+            util::function_nonser<boost::int64_t()> const& f,
+            naming::gid_type& id, error_code& ec = throws);
 
         /// \brief Create a new performance counter instance of type
         ///        raw_counter based on given function returning the counter
         ///        value
         counter_status create_raw_counter(counter_info const& info,
-            HPX_STD_FUNCTION<boost::int64_t(bool)> const& f,
+            util::function_nonser<boost::int64_t(bool)> const& f,
             naming::gid_type& id, error_code& ec = throws);
 
         /// \brief Create a new performance counter instance based on given

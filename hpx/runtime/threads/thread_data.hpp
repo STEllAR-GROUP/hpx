@@ -90,10 +90,10 @@ namespace hpx { namespace threads
         ///////////////////////////////////////////////////////////////////////
         struct thread_exit_callback_node
         {
-            HPX_STD_FUNCTION<void()> f_;
+            util::function_nonser<void()> f_;
             thread_exit_callback_node* next_;
 
-            thread_exit_callback_node(HPX_STD_FUNCTION<void()> const& f,
+            thread_exit_callback_node(util::function_nonser<void()> const& f,
                     thread_exit_callback_node* next)
               : f_(f), next_(next)
             {}
@@ -578,7 +578,7 @@ namespace hpx { namespace threads
 
         bool interruption_point(bool throw_on_interrupt = true);
 
-        bool add_thread_exit_callback(HPX_STD_FUNCTION<void()> const& f);
+        bool add_thread_exit_callback(util::function_nonser<void()> const& f);
         void run_thread_exit_callbacks();
         void free_thread_exit_callbacks();
 
@@ -652,7 +652,7 @@ namespace hpx { namespace threads
 
         // Singly linked list (heap-allocated)
         // FIXME: replace with forward_list eventually.
-        std::deque<HPX_STD_FUNCTION<void()> > exit_funcs_;
+        std::deque<util::function_nonser<void()> > exit_funcs_;
 
         // reference to scheduler which created/manages this thread
         policies::scheduler_base* scheduler_base_;

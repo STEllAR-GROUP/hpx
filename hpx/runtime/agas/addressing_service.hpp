@@ -1095,7 +1095,7 @@ public:
     ///                   destination.
     void route(
         parcelset::parcel const& p
-      , HPX_STD_FUNCTION<void(boost::system::error_code const&,
+      , util::function_nonser<void(boost::system::error_code const&,
             parcelset::parcel const&)> const&
         );
 

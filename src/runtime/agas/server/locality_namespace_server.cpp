@@ -189,7 +189,7 @@ void locality_namespace::register_counter_types(
         "returns the number of invocations of the AGAS service '%s'");
     boost::format help_time(
         "returns the overall execution time of the AGAS service '%s'");
-    HPX_STD_FUNCTION<performance_counters::create_counter_func> creator(
+    performance_counters::create_counter_func creator(
         boost::bind(&performance_counters::agas_raw_counter_creator, _1, _2
       , agas::server::locality_namespace_service_name));
 
@@ -716,7 +716,7 @@ response locality_namespace::statistics_counter(
 
     typedef locality_namespace::counter_data cd;
 
-    HPX_STD_FUNCTION<boost::int64_t(bool)> get_data_func;
+    util::function_nonser<boost::int64_t(bool)> get_data_func;
     if (target == detail::counter_target_count)
     {
         switch (code) {

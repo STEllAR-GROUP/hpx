@@ -89,8 +89,8 @@ namespace hpx { namespace parcelset
         ///                 transport operations the parcelhandler carries out.
         parcelhandler(
             threads::threadmanager_base* tm, parcelhandler_queue_base* policy,
-            HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
-            HPX_STD_FUNCTION<void()> const& on_stop_thread);
+            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
+            util::function_nonser<void()> const& on_stop_thread);
 
         ~parcelhandler() {}
 
@@ -453,8 +453,8 @@ namespace hpx { namespace parcelset
         boost::int64_t get_connection_cache_statistics(connection_type pp_type,
             parcelport::connection_cache_statistics_type stat_type, bool) const;
 
-        static void list_parcelports(util::osstream& strm);
-        static void list_parcelport(util::osstream& strm, connection_type t,
+        static void list_parcelports(std::ostringstream& strm);
+        static void list_parcelport(std::ostringstream& strm, connection_type t,
             bool available = true);
 
     protected:

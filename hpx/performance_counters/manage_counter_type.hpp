@@ -42,8 +42,8 @@ namespace hpx { namespace performance_counters
         }
 
         counter_status install(
-            HPX_STD_FUNCTION<create_counter_func> const& create_counter,
-            HPX_STD_FUNCTION<discover_counters_func> const& discover_counters,
+            create_counter_func const& create_counter,
+            discover_counters_func const& discover_counters,
             error_code& ec = throws)
         {
             if (status_invalid_data != status_) {
@@ -112,7 +112,7 @@ namespace hpx { namespace performance_counters
     ///       have to register each counter type on every locality where a
     ///       corresponding performance counter will be created.
     HPX_EXPORT counter_status install_counter_type(std::string const& name,
-        HPX_STD_FUNCTION<boost::int64_t(bool)> const& counter_value,
+        util::function_nonser<boost::int64_t(bool)> const& counter_value,
         std::string const& helptext = "", std::string const& uom = "",
         error_code& ec = throws);
 
@@ -222,8 +222,8 @@ namespace hpx { namespace performance_counters
     ///       corresponding performance counter will be created.
     HPX_EXPORT counter_status install_counter_type(std::string const& name,
         counter_type type, std::string const& helptext,
-        HPX_STD_FUNCTION<create_counter_func> const& create_counter,
-        HPX_STD_FUNCTION<discover_counters_func> const& discover_counters,
+        create_counter_func const& create_counter,
+        discover_counters_func const& discover_counters,
         boost::uint32_t version = HPX_PERFORMANCE_COUNTER_V1,
         std::string const& uom = "", error_code& ec = throws);
 
@@ -239,9 +239,9 @@ namespace hpx { namespace performance_counters
                                     ///< counter type
         boost::uint32_t version_;   ///< Version of this counter type definition
                                     ///< (default: HPX_PERFORMANCE_COUNTER_V1)
-        HPX_STD_FUNCTION<create_counter_func> create_counter_;
+        create_counter_func create_counter_;
             ///< Function used to create a counter instance of this type.
-        HPX_STD_FUNCTION<discover_counters_func> discover_counters_;
+        discover_counters_func discover_counters_;
             ///< Function used to discover all supported counter instances of
             ///< this type.
         std::string unit_of_measure_;

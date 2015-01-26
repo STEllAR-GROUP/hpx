@@ -9,7 +9,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/util/detail/reset_function.hpp>
 
 #include <utility>
 
@@ -42,10 +41,11 @@ namespace hpx { namespace lcos { namespace local
         }
 
         /// \brief get a future allowing to wait for the trigger to fire
-        future<void> get_future(HPX_STD_FUNCTION<bool()> const& func,
+        template <typename Condition>
+        future<void> get_future(Condition&& func,
             error_code& ec = hpx::throws)
         {
-            cond_ = func;
+            cond_.assign(std::forward<Condition>(func));
 
             future<void> f = promise_.get_future(ec);
 
@@ -56,7 +56,7 @@ namespace hpx { namespace lcos { namespace local
 
         void reset()
         {
-            util::detail::reset_function(cond_);
+            cond_.reset();
         }
 
         /// \brief Trigger this object.
@@ -78,7 +78,7 @@ namespace hpx { namespace lcos { namespace local
 
     private:
         lcos::local::promise<void> promise_;
-        HPX_STD_FUNCTION<bool()> cond_;
+        util::function_nonser<bool()> cond_;
     };
 }}}
 

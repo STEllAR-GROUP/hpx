@@ -35,17 +35,17 @@ namespace hpx { namespace util
         /// \param start_thread
         ///                 [in]
         explicit io_service_pool(std::size_t pool_size = 2,
-            HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread = 
-                HPX_STD_FUNCTION<void(std::size_t, char const*)>(),
-            HPX_STD_FUNCTION<void()> const& on_stop_thread = HPX_STD_FUNCTION<void()>(),
+            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread = 
+                util::function_nonser<void(std::size_t, char const*)>(),
+            util::function_nonser<void()> const& on_stop_thread = util::function_nonser<void()>(),
             char const* pool_name = "", char const* name_postfix = "");
 
         /// \brief Construct the io_service pool.
         /// \param start_thread
         ///                 [in]
         explicit io_service_pool(
-            HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
-            HPX_STD_FUNCTION<void()> const& on_stop_thread = HPX_STD_FUNCTION<void()>(),
+            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
+            util::function_nonser<void()> const& on_stop_thread = util::function_nonser<void()>(),
             char const* pool_name = "", char const* name_postfix = "");
 
         ~io_service_pool();
@@ -76,9 +76,9 @@ namespace hpx { namespace util
         char const* get_name() const { return pool_name_; }
 
         /// \brief return the thread registration functions
-        HPX_STD_FUNCTION<void(std::size_t, char const*)> const& 
+        util::function_nonser<void(std::size_t, char const*)> const& 
             get_on_start_thread() const { return on_start_thread_; }
-        HPX_STD_FUNCTION<void()> const& 
+        util::function_nonser<void()> const& 
             get_on_stop_thread() const { return on_stop_thread_; }
 
     protected:
@@ -109,8 +109,8 @@ namespace hpx { namespace util
         std::size_t const pool_size_;
 
         /// call this for each thread start/stop
-        HPX_STD_FUNCTION<void(std::size_t, char const*)> on_start_thread_;
-        HPX_STD_FUNCTION<void()> on_stop_thread_;
+        util::function_nonser<void(std::size_t, char const*)> on_start_thread_;
+        util::function_nonser<void()> on_stop_thread_;
 
         char const* pool_name_;
         char const* pool_name_postfix_;

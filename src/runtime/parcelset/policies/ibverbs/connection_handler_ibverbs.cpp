@@ -88,8 +88,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
     }
 
     connection_handler::connection_handler(util::runtime_configuration const& ini,
-            HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
-            HPX_STD_FUNCTION<void()> const& on_stop_thread)
+            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
+            util::function_nonser<void()> const& on_stop_thread)
       : base_type(ini, parcelport_address(ini), on_start_thread, on_stop_thread)
       , memory_pool_(memory_chunk_size(ini), max_memory_chunks(ini))
       , mr_cache_size_(max_memory_chunks(ini) * 4) // <-- FIXME: Find better value here
@@ -283,13 +283,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
             sender_connection->context().close(ec);
             sender_connection.reset();
 
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << error.message() << " (while trying to connect to: "
                   << l << ")";
 
             HPX_THROWS_IF(ec, network_error,
                 "ibverbs::parcelport::create_connection",
-                hpx::util::osstream_get_string(strm));
+                strm.str());
             return sender_connection;
         }
 

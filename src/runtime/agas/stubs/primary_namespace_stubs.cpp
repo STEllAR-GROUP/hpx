@@ -58,7 +58,7 @@ template lcos::future<naming::id_type>
 void primary_namespace::service_non_blocking(
     naming::id_type const& gid
   , request const& req
-  , HPX_STD_FUNCTION<void(boost::system::error_code const&,
+  , util::function_nonser<void(boost::system::error_code const&,
         parcelset::parcel const&)> const& f
   , threads::thread_priority priority
     )

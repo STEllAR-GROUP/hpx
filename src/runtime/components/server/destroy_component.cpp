@@ -28,24 +28,24 @@ namespace hpx { namespace components { namespace server
         // make sure this component is located here (lcos don't migrate)
         if (get_locality() != addr.locality_)
         {
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "global id " << gid << " is not bound to any local "
                     "component instance";
             HPX_THROWS_IF(ec, hpx::unknown_component_address,
-                "destroy_base_lco", hpx::util::osstream_get_string(strm));
+                "destroy_base_lco", strm.str());
             return;
         }
 
         // make sure it's the correct component type
         if (!types_are_compatible(type, addr.type_))
         {
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "global id " << gid << " is not bound to a component "
                     "instance of type: " << get_component_type_name(type)
                  << " (it is bound to a " << get_component_type_name(addr.type_)
                  << ")";
             HPX_THROWS_IF(ec, hpx::unknown_component_address,
-                "destroy_base_lco", hpx::util::osstream_get_string(strm));
+                "destroy_base_lco", strm.str());
             return;
         }
 
@@ -70,11 +70,11 @@ namespace hpx { namespace components { namespace server
         naming::address addr;
         if (!appl.get_agas_client().resolve_local(gid, addr))
         {
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "global id " << gid << " is not bound to any "
                     "component instance";
             HPX_THROWS_IF(ec, hpx::unknown_component_address,
-                "destroy_base_lco", hpx::util::osstream_get_string(strm));
+                "destroy_base_lco", strm.str());
             return;
         }
 

@@ -527,10 +527,10 @@ namespace hpx { namespace lcos
         return lcos::when_some(n, lazy_values_, ec);
     }
 
-    inline lcos::future<when_some_result<HPX_STD_TUPLE<> > >
+    inline lcos::future<when_some_result<hpx::util::tuple<> > >
     when_some(std::size_t n, error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<> result_type;
+        typedef hpx::util::tuple<> result_type;
 
         result_type lazy_values;
 
