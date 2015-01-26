@@ -2873,35 +2873,30 @@ void addressing_service::send_refcnt_requests_non_blocking(
                 "addressing_service::send_refcnt_requests_non_blocking");
 #endif
 
-        // Only send decref requests if we aren't in shutdown mode, if we shut down, the corresponding
-        // component will get destroyed eventually.
-        if(get_runtime().get_state() < runtime::state_shutdown)
+        // collect all requests for each locality
+        typedef std::map<naming::id_type, std::vector<request> > requests_type;
+        requests_type requests;
+
+        BOOST_FOREACH(refcnt_requests_type::const_reference e, *p)
         {
-            // collect all requests for each locality
-            typedef std::map<naming::id_type, std::vector<request> > requests_type;
-            requests_type requests;
+            HPX_ASSERT(e.second < 0);
 
-            BOOST_FOREACH(refcnt_requests_type::const_reference e, *p)
-            {
-                HPX_ASSERT(e.second < 0);
+            naming::gid_type raw(e.first);
+            request const req(primary_ns_decrement_credit, raw, raw, e.second);
 
-                naming::gid_type raw(e.first);
-                request const req(primary_ns_decrement_credit, raw, raw, e.second);
+            naming::id_type target(
+                stubs::primary_namespace::get_service_instance(raw)
+              , naming::id_type::unmanaged);
 
-                naming::id_type target(
-                    stubs::primary_namespace::get_service_instance(raw)
-                  , naming::id_type::unmanaged);
+            requests[target].push_back(req);
+        }
 
-                requests[target].push_back(req);
-            }
-
-            // send requests to all locality
-            requests_type::const_iterator end = requests.end();
-            for (requests_type::const_iterator it = requests.begin(); it != end; ++it)
-            {
-                stubs::primary_namespace::bulk_service_non_blocking(
-                    (*it).first, (*it).second, action_priority_);
-            }
+        // send requests to all locality
+        requests_type::const_iterator end = requests.end();
+        for (requests_type::const_iterator it = requests.begin(); it != end; ++it)
+        {
+            stubs::primary_namespace::bulk_service_non_blocking(
+                (*it).first, (*it).second, action_priority_);
         }
 
         if (&ec != &throws)
