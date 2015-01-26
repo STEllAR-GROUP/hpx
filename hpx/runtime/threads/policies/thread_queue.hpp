@@ -429,6 +429,8 @@ namespace hpx { namespace threads { namespace policies
             if (terminated_items_count_ == 0 && thread_map_.empty())
                 return true;
 
+            std::vector<thread_id_type> erased_threads;
+            erased_threads.reserve(terminated_items_count_);
             if (delete_all) {
                 // delete all threads
                 thread_data_base* todelete;
@@ -436,7 +438,7 @@ namespace hpx { namespace threads { namespace policies
                 {
                     // Hold on to this reference until after we deleted it from
                     // the map. This will be the last reference to this thread.
-                    thread_id_type todelete_ref(todelete);
+                    erased_threads.push_back(todelete);
                     --terminated_items_count_;
 
                     // this thread has to be in this map
@@ -450,13 +452,6 @@ namespace hpx { namespace threads { namespace policies
                         HPX_ASSERT(thread_map_count_ >= 0);
                     }
 
-                    // After the thread is deleted from the map, we release the
-                    // last reference and let it go out of scope without the lock
-                    // being held.
-                    {
-                        util::scoped_unlock<Lock> ull(lk);
-                        todelete_ref.reset();
-                    }
                 }
             }
             else {
@@ -485,7 +480,16 @@ namespace hpx { namespace threads { namespace policies
                     --delete_count;
                 }
             }
-            return terminated_items_count_ == 0;
+
+            // After the threads have been deleted from the map, we release the
+            // last reference and let it go out of scope without the lock
+            // being held.
+            bool result = terminated_items_count_ == 0;
+            {
+                util::scoped_unlock<Lock> ull(lk);
+                erased_threads.clear();
+            }
+            return result;
         }
 
         template <typename Lock>
