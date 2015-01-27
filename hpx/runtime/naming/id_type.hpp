@@ -6,7 +6,7 @@
 #if !defined(HPX_NAMING_ID_TYPE_OCT_13_2013_0751PM)
 #define HPX_NAMING_ID_TYPE_OCT_13_2013_0751PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/config/warnings_prefix.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>

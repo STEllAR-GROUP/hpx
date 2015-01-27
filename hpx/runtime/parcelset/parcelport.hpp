@@ -66,6 +66,13 @@ namespace hpx { namespace parcelset
         /// Virtual destructor
         virtual ~parcelport() {}
 
+        virtual bool can_bootstrap() const = 0;
+
+        int priority() const { return priority_; }
+
+        /// Retrieve the type of the locality represented by this parcelport
+        std::string const& type() const { return type_; }
+
         /// Start the parcelport I/O thread pool.
         ///
         /// \param blocking [in] If blocking is set to \a true the routine will
@@ -79,6 +86,15 @@ namespace hpx { namespace parcelset
         ///                 return immediately, otherwise it will wait for all
         ///                 worker threads to exit.
         virtual void stop(bool blocking = true) = 0;
+
+        /// Check if this parcelport can connect to this locality
+        ///
+        /// The default is to return true if it can be used at bootstrap or alternative
+        /// parcelports are enabled.
+        virtual bool can_connect(locality const &, bool use_alternative_parcelport)
+        {
+            return can_bootstrap() || use_alternative_parcelport;
+        }
 
         /// Queues a parcel for transmission to another locality
         ///
@@ -126,9 +142,6 @@ namespace hpx { namespace parcelset
         /// Cache specific functionality
         virtual void remove_from_connection_cache(locality const& loc) = 0;
 
-        /// Retrieve the type of the locality represented by this parcelport
-        virtual connection_type get_type() const = 0;
-
         /// Return the thread pool if the name matches
         virtual util::io_service_pool* get_thread_pool(char const* name) = 0;
 
@@ -147,7 +160,7 @@ namespace hpx { namespace parcelset
         };
 
         // invoke pending background work
-        virtual void do_background_work() = 0;
+        virtual void do_background_work(std::size_t num_thread) = 0;
 
         // retrieve performance counter value for given statistics type
         virtual boost::int64_t get_connection_cache_statistics(
@@ -319,15 +332,6 @@ namespace hpx { namespace parcelset
             parcels_sent_.add_data(data);
         }
 
-        /// load the runtime configuration parameters
-        static std::pair<std::vector<std::string>, bool> runtime_configuration(int type);
-
-        /// Create a new instance of a parcelport
-        static boost::shared_ptr<parcelport> create(int type,
-            util::runtime_configuration const& cfg,
-            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
-            util::function_nonser<void()> const& on_stop_thread);
-
         /// Return the configured maximal allowed message data size
         boost::uint64_t get_max_inbound_message_size() const
         {
@@ -400,6 +404,10 @@ namespace hpx { namespace parcelset
 
         /// enable parcelport
         boost::atomic<bool> enable_parcel_handling_;
+
+        /// priority of the parcelport
+        int priority_;
+        std::string type_;
     };
 }}
 

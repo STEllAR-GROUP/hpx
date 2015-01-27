@@ -66,7 +66,7 @@ namespace hpx {
         ///                       instance should be executed in.
         /// \param num_threads    [in] The initial number of threads to be started
         ///                       by the thread-manager.
-        explicit runtime_impl(util::runtime_configuration const& rtcfg,
+        explicit runtime_impl(util::runtime_configuration & rtcfg,
             runtime_mode locality_mode = runtime_mode_console,
             std::size_t num_threads = 1,
             init_scheduler_type const& init = init_scheduler_type(),

@@ -17,6 +17,7 @@
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/mutex.hpp>
@@ -107,7 +108,7 @@ namespace hpx { namespace components { namespace server
         }
 
         // constructor
-        runtime_support();
+        runtime_support(hpx::util::runtime_configuration & cfg);
 
         ~runtime_support()
         {
@@ -424,7 +425,7 @@ namespace hpx { namespace components { namespace server
         bool dijkstra_color_;   // false: white, true: black
         boost::atomic<bool> shutdown_all_invoked_;
 
-        typedef boost::mutex dijkstra_mtx_type;
+        typedef hpx::lcos::local::spinlock dijkstra_mtx_type;
         dijkstra_mtx_type dijkstra_mtx_;
         lcos::local::condition_variable dijkstra_cond_;
 
@@ -433,7 +434,7 @@ namespace hpx { namespace components { namespace server
 
         component_map_type components_;
         plugin_map_type plugins_;
-        modules_map_type modules_;
+        modules_map_type & modules_;
         static_modules_type static_modules_;
 
         lcos::local::spinlock globals_mtx_;

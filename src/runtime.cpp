@@ -100,8 +100,12 @@ namespace hpx
 {
     HPX_EXPORT void termination_handler(int signum)
     {
-        if (get_config_entry("hpx.attach_debugger", "") == "exception")
+        if (signum != SIGINT &&
+            get_config_entry("hpx.attach_debugger", "") == "exception")
+        {
             util::attach_debugger();
+        }
+
         char* reason = strsignal(signum);
         std::cerr
 #if defined(HPX_HAVE_STACKTRACES)
@@ -233,7 +237,7 @@ namespace hpx
     // this is called on all nodes during runtime construction
     void runtime::init_security()
     {
-        // this is the AGAS booststrap node (node zero)
+        // this is the AGAS bootstrap node (node zero)
         if (ini_.get_agas_service_mode() == agas::service_mode_bootstrap)
         {
             components::security::signed_certificate cert;
@@ -460,7 +464,7 @@ namespace hpx
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime::runtime(util::runtime_configuration const& rtcfg
+    runtime::runtime(util::runtime_configuration & rtcfg
           , threads::policies::init_affinity_data const& affinity_init)
       : ini_(rtcfg),
         instance_number_(++instance_number_counter_),
@@ -469,7 +473,7 @@ namespace hpx
         topology_(threads::create_topology()),
         state_(state_invalid),
         memory_(new components::server::memory),
-        runtime_support_(new components::server::runtime_support)
+        runtime_support_(new components::server::runtime_support(ini_))
 #if defined(HPX_HAVE_SECURITY)
       , security_data_(new detail::manage_security_data)
 #endif
@@ -797,7 +801,7 @@ namespace hpx
 
     naming::gid_type const & get_locality()
     {
-        return get_runtime().get_parcel_handler().get_locality();
+        return get_runtime().get_agas_client().get_local_locality();
     }
 
     void report_error(std::size_t num_thread, boost::exception_ptr const& e)
@@ -1133,7 +1137,7 @@ namespace hpx
         return true;        // assume stopped
     }
 
-    bool is_starting()
+    bool HPX_EXPORT is_starting()
     {
         runtime* rt = get_runtime_ptr();
         return NULL != rt ? rt->get_state() <= runtime::state_startup : true;
@@ -1167,9 +1171,9 @@ namespace hpx { namespace naming
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {
-    void do_background_work()
+    void do_background_work(std::size_t num_thread)
     {
-        get_runtime().get_parcel_handler().do_background_work();
+        get_runtime().get_parcel_handler().do_background_work(num_thread);
     }
 }}
 

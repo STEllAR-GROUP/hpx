@@ -15,6 +15,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
+#include <hpx/util/scoped_unlock.hpp>
 #include <hpx/async.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -127,7 +128,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         BOOST_DELETED_FUNCTION(task_region_handle* operator&() const);
 
         static void on_ready(std::vector<hpx::future<void> > && results,
-            parallel::exception_list errors)
+            parallel::exception_list && errors)
         {
             for (hpx::future<void>& f: results)
             {
@@ -286,7 +287,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             f(trh);
         }
         catch (...) {
-            task_region_handle::mutex_type::scoped_lock l(trh.mtx_);
             detail::handle_task_region_exceptions(trh.errors_);
         }
 
@@ -356,7 +356,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             f(trh);
         }
         catch (...) {
-            task_region_handle::mutex_type::scoped_lock l(trh.mtx_);
             detail::handle_task_region_exceptions(trh.errors_);
         }
         return trh.when(true);

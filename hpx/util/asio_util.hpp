@@ -34,7 +34,7 @@ namespace hpx { namespace util
 
     typedef boost::asio::ip::tcp::resolver::iterator endpoint_iterator_type;
 
-    endpoint_iterator_type connect_begin(std::string const & address, boost::uint16_t port,
+    endpoint_iterator_type HPX_EXPORT connect_begin(std::string const & address, boost::uint16_t port,
         boost::asio::io_service& io_service);
 
     /// \brief Returns an iterator which when dereferenced will give an
@@ -47,12 +47,12 @@ namespace hpx { namespace util
         return connect_begin(loc.address(), loc.port(), io_service);
     }
 
-    inline endpoint_iterator_type connect_end()
+    inline endpoint_iterator_type HPX_EXPORT connect_end()
     {
         return endpoint_iterator_type();
     }
 
-    endpoint_iterator_type accept_begin(std::string const & address, boost::uint16_t port,
+    endpoint_iterator_type HPX_EXPORT accept_begin(std::string const & address, boost::uint16_t port,
         boost::asio::io_service& io_service);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -66,7 +66,7 @@ namespace hpx { namespace util
         return accept_begin(loc.address(), loc.port(), io_service);
     }
 
-    inline endpoint_iterator_type accept_end() //-V524
+    inline endpoint_iterator_type accept_end()
     {
         return endpoint_iterator_type();
     }

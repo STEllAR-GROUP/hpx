@@ -5,7 +5,8 @@
 
 set(plugin_categories
     binary_filter
-    parcel)
+    parcel
+    parcelport)
 
 foreach(category ${plugin_categories})
   add_hpx_pseudo_target(plugins.${category})
@@ -16,4 +17,5 @@ endforeach()
 macro(add_plugin_modules)
   add_binary_filter_modules()
   add_parcel_modules()
+  add_parcelport_modules()
 endmacro()

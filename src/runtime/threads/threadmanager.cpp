@@ -1679,7 +1679,7 @@ namespace hpx { namespace threads
             }
 
             if (blocking) {
-                for (std::size_t i = 0; i < threads_.size(); ++i)
+                for (std::size_t i = 0; i != threads_.size(); ++i)
                 {
                     // make sure no OS thread is waiting
                     LTM_(info) << "stop: notify_all";

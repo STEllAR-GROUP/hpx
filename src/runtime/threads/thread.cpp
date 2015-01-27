@@ -137,8 +137,6 @@ namespace hpx
 
     void thread::start_thread(util::function_nonser<void()> && func)
     {
-        mutex_type::scoped_lock l(mtx_);
-
         threads::thread_init_data data(
             util::bind(util::one_shot(&thread::thread_function_nullary),
                 std::move(func)),
@@ -185,6 +183,7 @@ namespace hpx
                 util::bind(&resume_thread, this_id)))
         {
             // wait for thread to be terminated
+            util::scoped_unlock<mutex_type::scoped_lock> ul(l);
             this_thread::suspend(threads::suspended, "thread::join");
         }
 

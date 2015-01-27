@@ -7,7 +7,7 @@
 #define HPX_UTIL_AGAS_LOGGING_APR_10_2008_1032AM
 
 #include <string>
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 
 #if defined(HPX_WITH_LOGGING)
 

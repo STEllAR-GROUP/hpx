@@ -24,6 +24,8 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
+#include <hpx/plugins/parcelport_factory_base.hpp>
+
 #include <hpx/config/warnings_prefix.hpp>
 
 #include <map>
@@ -31,6 +33,7 @@
 
 namespace hpx { namespace parcelset
 {
+
     /// The \a parcelhandler is the representation of the parcelset inside a
     /// locality. It is built on top of a single parcelport. Several
     /// parcel-handlers may be connected to a single parcelport.
@@ -58,16 +61,13 @@ namespace hpx { namespace parcelset
             p.set_start_time(get_current_time());
         }
 
-        // find and return the specified parcelport
-        parcelport* find_parcelport(connection_type t,
-            error_code& ec = throws) const;
-
         // exception handling
         typedef lcos::local::spinlock mutex_type;
 
         void rethrow_exception();
 
     public:
+
         typedef std::pair<locality, std::string> handler_key_type;
         typedef std::map<
             handler_key_type, boost::shared_ptr<policies::message_handler> >
@@ -88,33 +88,22 @@ namespace hpx { namespace parcelset
         ///                 instance will be used for any parcel related
         ///                 transport operations the parcelhandler carries out.
         parcelhandler(
+            util::runtime_configuration & cfg,
             threads::threadmanager_base* tm, parcelhandler_queue_base* policy,
             util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
             util::function_nonser<void()> const& on_stop_thread);
 
         ~parcelhandler() {}
 
-        void set_agas_resolver(naming::resolver_client& resolver)
-        {
-            HPX_ASSERT(resolver_ == 0);     // set only once
-            resolver_ = &resolver;
-        }
-
-        /// load runtime configuration settings ...
-        static std::vector<std::string> load_runtime_configuration();
-
         boost::shared_ptr<parcelport> get_bootstrap_parcelport() const;
 
-        void initialize();
-
-        /// \brief Attach the given parcel port to this handler
-        void attach_parcelport(boost::shared_ptr<parcelport> const& pp, bool run = true);
+        void initialize(naming::resolver_client &resolver);
 
         /// \brief Stop all parcelports associated with this parcelhandler
         void stop(bool blocking = true);
 
         /// \ brief do background work in the parcel layer
-        void do_background_work(bool stop_buffering = false);
+        void do_background_work(std::size_t num_thread = 0, bool stop_buffering = false);
 
         /// \brief Allow access to AGAS resolver instance.
         ///
@@ -123,18 +112,6 @@ namespace hpx { namespace parcelset
         /// parcelhandler constructors). This is the same resolver instance
         /// this parcelhandler has been initialized with.
         naming::resolver_client& get_resolver();
-
-        /// Return the locality_id of this locality
-        ///
-        /// This accessor allows to retrieve the locality_id value being assigned to
-        /// the locality this parcelhandler is associated with. This returns the
-        /// same value as would be returned by:
-        ///
-        /// \code
-        ///     naming::id_type locality_id;
-        ///     get_resolver().get_locality_id(here, locality_id);
-        /// \endcode
-        naming::gid_type const& get_locality() const;
 
         /// Return the list of all remote localities supporting the given
         /// component type
@@ -330,13 +307,13 @@ namespace hpx { namespace parcelset
 
         /// \brief Factory function used in serialization to create a given
         /// locality endpoint
-        locality create_locality(connection_type type) const
+        locality create_locality(std::string const & name) const
         {
-            return pports_[type]->create_locality(); //-V108
+            return find_parcelport(name)->create_locality();
         }
 
-        /// Return the name of this locality as retrieved from the
-        /// active parcel port.
+        /// Return the name of this locality as retrieved from the active
+        /// parcelport
         std::string get_locality_name() const;
 
         /// Temporarily enable/disable all parcel handling activities in the
@@ -367,11 +344,6 @@ namespace hpx { namespace parcelset
             return endpoints_;
         }
 
-
-        /// \brief set list of resolved localities
-        void set_resolved_localities(std::map<naming::gid_type, endpoints_type> const& l);
-        void set_resolved_localities(naming::gid_type const& gid, endpoints_type const& l);
-
         void enable_alternative_parcelports()
         {
             use_alternative_parcelports_.store(true);
@@ -395,67 +367,67 @@ namespace hpx { namespace parcelset
         // Performance counter data
 
         // number of parcels sent
-        std::size_t get_parcel_send_count(connection_type, bool) const;
+        std::size_t get_parcel_send_count(std::string const&, bool) const;
 
         // number of messages sent
-        std::size_t get_message_send_count(connection_type, bool) const;
+        std::size_t get_message_send_count(std::string const&, bool) const;
 
         // number of parcels routed
         boost::int64_t get_parcel_routed_count(bool);
 
         // number of parcels received
-        std::size_t get_parcel_receive_count(connection_type, bool) const;
+        std::size_t get_parcel_receive_count(std::string const&, bool) const;
 
         // number of messages received
-        std::size_t get_message_receive_count(connection_type, bool) const;
+        std::size_t get_message_receive_count(std::string const&, bool) const;
 
         // the total time it took for all sends, from async_write to the
         // completion handler (nanoseconds)
-        boost::int64_t get_sending_time(connection_type, bool) const;
+        boost::int64_t get_sending_time(std::string const&, bool) const;
 
         // the total time it took for all receives, from async_read to the
         // completion handler (nanoseconds)
-        boost::int64_t get_receiving_time(connection_type, bool) const;
+        boost::int64_t get_receiving_time(std::string const&, bool) const;
 
         // the total time it took for all sender-side serialization operations
         // (nanoseconds)
-        boost::int64_t get_sending_serialization_time(connection_type, bool) const;
+        boost::int64_t get_sending_serialization_time(std::string const&, bool) const;
 
         // the total time it took for all receiver-side serialization
         // operations (nanoseconds)
-        boost::int64_t get_receiving_serialization_time(connection_type, bool) const;
+        boost::int64_t get_receiving_serialization_time(std::string const&, bool) const;
 
 #if defined(HPX_HAVE_SECURITY)
         // the total time it took for all sender-side security operations
         // (nanoseconds)
-        boost::int64_t get_sending_security_time(connection_type, bool) const;
+        boost::int64_t get_sending_security_time(std::string const&, bool) const;
 
         // the total time it took for all receiver-side security
         // operations (nanoseconds)
-        boost::int64_t get_receiving_security_time(connection_type, bool) const;
+        boost::int64_t get_receiving_security_time(std::string const&, bool) const;
 #endif
 
         // total data sent (bytes)
-        std::size_t get_data_sent(connection_type, bool) const;
+        std::size_t get_data_sent(std::string const&, bool) const;
 
         // total data (uncompressed) sent (bytes)
-        std::size_t get_raw_data_sent(connection_type, bool) const;
+        std::size_t get_raw_data_sent(std::string const&, bool) const;
 
         // total data received (bytes)
-        std::size_t get_data_received(connection_type, bool) const;
+        std::size_t get_data_received(std::string const&, bool) const;
 
         // total data (uncompressed) received (bytes)
-        std::size_t get_raw_data_received(connection_type, bool) const;
+        std::size_t get_raw_data_received(std::string const&, bool) const;
 
-        boost::int64_t get_buffer_allocate_time_sent(connection_type, bool) const;
-        boost::int64_t get_buffer_allocate_time_received(connection_type, bool) const;
+        boost::int64_t get_buffer_allocate_time_sent(std::string const&, bool) const;
+        boost::int64_t get_buffer_allocate_time_received(std::string const&, bool) const;
 
-        boost::int64_t get_connection_cache_statistics(connection_type pp_type,
+        boost::int64_t get_connection_cache_statistics(std::string const& pp_type,
             parcelport::connection_cache_statistics_type stat_type, bool) const;
 
-        static void list_parcelports(std::ostringstream& strm);
-        static void list_parcelport(std::ostringstream& strm, connection_type t,
-            bool available = true);
+        void list_parcelports(std::ostringstream& strm) const;
+        void list_parcelport(std::ostringstream& strm,
+            std::string const& ppname, int priority, bool bootstrap) const;
 
     protected:
         std::size_t get_incoming_queue_length(bool /*reset*/) const
@@ -465,25 +437,42 @@ namespace hpx { namespace parcelset
 
         std::size_t get_outgoing_queue_length(bool reset) const;
 
-        locality find_appropriate_destination(naming::gid_type const & dest_gid);
-        locality find_endpoint(endpoints_type const & eps, connection_type type);
+        std::pair<boost::shared_ptr<parcelport>, locality>
+        find_appropriate_destination(naming::gid_type const & dest_gid);
+        locality find_endpoint(endpoints_type const & eps, std::string const & name);
 
-        void register_counter_types(connection_type pp_type);
+        void register_counter_types(std::string const& pp_type);
 
     private:
+        int get_priority(std::string const& name) const
+        {
+            std::map<std::string, int>::const_iterator it = priority_.find(name);
+            if(it == priority_.end()) return 0;
+            return priority_.find(name)->second;
+        }
+
+        parcelport *find_parcelport(std::string const& type, error_code = throws) const
+        {
+            int priority = get_priority(type);
+            if(priority <= 0) return 0;
+            HPX_ASSERT(pports_.find(priority) != pports_.end());
+            return pports_.find(priority)->second.get();
+        }
+
+        /// \brief Attach the given parcel port to this handler
+        void attach_parcelport(boost::shared_ptr<parcelport> const& pp);
+
         /// The AGAS client
-        naming::resolver_client* resolver_;
+        naming::resolver_client *resolver_;
 
         /// the parcelport this handler is associated with
-        std::vector<boost::shared_ptr<parcelport> > pports_;
+        typedef std::map<int, boost::shared_ptr<parcelport>, std::greater<int> > pports_type;
+        pports_type pports_;
+
+        std::map<std::string, int> priority_;
 
         /// the endpoints corresponding to the parcel-ports
         endpoints_type endpoints_;
-
-        /// the endpoints to resolved localities
-        mutex_type resolved_endpoints_mtx_;
-        typedef std::map<naming::gid_type, endpoints_type> resolved_endpoints_type;
-        resolved_endpoints_type resolved_endpoints_;
 
         /// the thread-manager to use (optional)
         threads::threadmanager_base* tm_;
@@ -507,6 +496,17 @@ namespace hpx { namespace parcelset
 
         /// Count number of (outbound) parcels routed
         boost::atomic<boost::int64_t> count_routed_;
+
+    private:
+        static std::vector<plugins::parcelport_factory_base *> &
+            get_parcelport_factories();
+    public:
+        static void add_parcelport_factory(plugins::parcelport_factory_base *);
+
+        static void init(int *argc, char ***argv, util::command_line_handling &cfg);
+
+        /// load runtime configuration settings ...
+        static std::vector<std::string> load_runtime_configuration();
     };
 }}
 

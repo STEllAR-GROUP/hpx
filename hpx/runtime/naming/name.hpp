@@ -55,6 +55,8 @@ namespace hpx { namespace naming
 
         inline boost::uint64_t strip_internal_bits_and_locality_from_gid(
                 boost::uint64_t msb) HPX_SUPER_PURE;
+
+        inline bool is_locked(gid_type const& gid);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -279,6 +281,8 @@ namespace hpx { namespace naming
                 lcos::local::spinlock::yield(k);
             }
 
+            util::register_lock(this);
+
             HPX_ITT_SYNC_ACQUIRED(this);
         }
 
@@ -289,6 +293,7 @@ namespace hpx { namespace naming
             if (acquire_lock())
             {
                 HPX_ITT_SYNC_ACQUIRED(this);
+                util::register_lock(this);
                 return true;
             }
 
@@ -301,6 +306,7 @@ namespace hpx { namespace naming
             HPX_ITT_SYNC_RELEASING(this);
 
             reliquish_lock();
+            util::unregister_lock(this);
 
             HPX_ITT_SYNC_RELEASED(this);
         }
@@ -330,7 +336,6 @@ namespace hpx { namespace naming
             bool was_locked = (id_msb_ & is_locked_mask) ? true : false;
             if (!was_locked)
             {
-                util::register_lock_globally(this);
                 id_msb_ |= is_locked_mask;
                 return true;
             }
@@ -339,15 +344,20 @@ namespace hpx { namespace naming
 
         void reliquish_lock()
         {
+            util::ignore_lock(this);
             internal_mutex_type::scoped_lock l(this);
+            util::reset_ignored(this);
+
             id_msb_ &= ~is_locked_mask;
-            util::unregister_lock_globally(this);
         }
 
+        // this is used for assertions only, no need to acquire the lock
         bool is_locked() const
         {
             return (id_msb_ & is_locked_mask) ? true : false;
         }
+
+        friend bool detail::is_locked(gid_type const& gid);
 
         // actual gid
         boost::uint64_t id_msb_;
@@ -519,7 +529,7 @@ namespace hpx { namespace naming
 
         inline bool is_locked(gid_type const& gid)
         {
-            return (gid.get_msb() & gid_type::is_locked_mask) ? true : false;
+            return gid.is_locked();
         }
 
         ///////////////////////////////////////////////////////////////////////

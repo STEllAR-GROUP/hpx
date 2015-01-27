@@ -12,6 +12,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/plugin/dll.hpp>
 #include <hpx/util/plugin/virtual_constructors.hpp>
+#include <hpx/plugins/plugin_registry_base.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -41,7 +42,8 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // iterate over all shared libraries in the given directory and construct
     // default ini settings assuming all of those are components
-    void init_ini_data_default(std::string const& libs, section& ini,
+    std::vector<boost::shared_ptr<plugins::plugin_registry_base> >
+    init_ini_data_default(std::string const& libs, section& ini,
         std::map<std::string, boost::filesystem::path>& basenames,
         std::map<std::string, hpx::util::plugin::dll>& modules);
 

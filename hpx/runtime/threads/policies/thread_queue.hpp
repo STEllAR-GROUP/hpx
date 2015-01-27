@@ -415,34 +415,36 @@ namespace hpx { namespace threads { namespace policies
 
     public:
         /// This function makes sure all threads which are marked for deletion
-        /// (state is terminated) are properly destroyed
+        /// (state is terminated) are properly destroyed.
+        ///
+        /// This returns 'true' if there are no more terminated threads waiting
+        /// to be deleted.
         bool cleanup_terminated_locked_helper(bool delete_all = false)
         {
 #ifdef HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
             util::tick_counter tc(cleanup_terminated_time_);
 #endif
 
-            if (thread_map_.empty())
-                return false;
-
-            if (terminated_items_count_ == 0)
-                return false;
+            if (terminated_items_count_ == 0 && thread_map_.empty())
+                return true;
 
             if (delete_all) {
                 // delete all threads
                 thread_data_base* todelete;
                 while (terminated_items_.pop(todelete))
                 {
+                    --terminated_items_count_;
+
                     // this thread has to be in this map
                     HPX_ASSERT(thread_map_.find(todelete) != thread_map_.end());
 
-                    --terminated_items_count_;
                     bool deleted = thread_map_.erase(todelete) != 0;
                     HPX_ASSERT(deleted);
-                    if (deleted)
+                    if (deleted) {
                         --thread_map_count_;
+                        HPX_ASSERT(thread_map_count_ >= 0);
+                    }
                 }
-                return false;
             }
             else {
                 // delete only this many threads
@@ -454,6 +456,8 @@ namespace hpx { namespace threads { namespace policies
                 thread_data_base* todelete;
                 while (delete_count && terminated_items_.pop(todelete))
                 {
+                    --terminated_items_count_;
+
                     thread_map_type::iterator it = thread_map_.find(todelete);
 
                     // this thread has to be in this map
@@ -462,18 +466,19 @@ namespace hpx { namespace threads { namespace policies
                     recycle_thread(*it);
 
                     thread_map_.erase(it);
-                    --terminated_items_count_;
                     --thread_map_count_;
+                    HPX_ASSERT(thread_map_count_ >= 0);
+
                     --delete_count;
                 }
-                return terminated_items_count_ != 0;
             }
+            return terminated_items_count_ == 0;
         }
 
         bool cleanup_terminated_locked(bool delete_all = false)
         {
-            cleanup_terminated_locked_helper(delete_all);
-            return thread_map_.empty();
+            return cleanup_terminated_locked_helper(delete_all) &&
+                thread_map_.empty();
         }
 
     public:
@@ -487,7 +492,7 @@ namespace hpx { namespace threads { namespace policies
                 while (true)
                 {
                     typename mutex_type::scoped_lock lk(mtx_);
-                    if (!cleanup_terminated_locked_helper(false))
+                    if (cleanup_terminated_locked_helper(false))
                     {
                         thread_map_is_empty = thread_map_.empty();
                         break;
@@ -497,8 +502,7 @@ namespace hpx { namespace threads { namespace policies
             }
 
             typename mutex_type::scoped_lock lk(mtx_);
-            cleanup_terminated_locked_helper(false);
-            return thread_map_.empty();
+            return cleanup_terminated_locked_helper(false) && thread_map_.empty();
         }
 
         // The maximum number of active threads this thread manager should

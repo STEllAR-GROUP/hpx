@@ -12,13 +12,14 @@
 #if !defined(HPX_B3A83B49_92E0_4150_A551_488F9F5E1113)
 #define HPX_B3A83B49_92E0_4150_A551_488F9F5E1113
 
+#include <hpx/config.hpp>
+
 #include <hpx/util/move.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
 #include <boost/thread/locks.hpp>
-#include <boost/config.hpp>
 
 #if defined(BOOST_WINDOWS)
 #  include <boost/smart_ptr/detail/spinlock_w32.hpp>

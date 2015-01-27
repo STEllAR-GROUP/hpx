@@ -177,13 +177,17 @@ void task_region_exceptions_test3()
         {
             trh.run([&]()
             {
-                // Error: tr is not active
+                HPX_TEST(!hpx::expect_exception());
+
+                // Error: trh is not active
                 trh.run([]()
                 {
                     HPX_TEST(false);    // should not be called
                 });
 
                 HPX_TEST(false);
+
+                HPX_TEST(hpx::expect_exception(false));
             });
         });
 

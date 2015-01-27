@@ -313,9 +313,10 @@ namespace hpx { namespace applier
 
     void applier::initialize(boost::uint64_t rts, boost::uint64_t mem)
     {
-        runtime_support_id_ = naming::id_type(parcel_handler_.get_locality().get_msb(),
+        naming::resolver_client & agas_client = get_agas_client();
+        runtime_support_id_ = naming::id_type(agas_client.get_local_locality().get_msb(),
                 rts, naming::id_type::unmanaged);
-        memory_id_ = naming::id_type(parcel_handler_.get_locality().get_msb(),
+        memory_id_ = naming::id_type(agas_client.get_local_locality().get_msb(),
             mem, naming::id_type::unmanaged);
     }
 

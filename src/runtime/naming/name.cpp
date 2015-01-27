@@ -121,9 +121,14 @@ namespace hpx { namespace naming
             // type.
             naming::address addr;
 
-            if (gid_was_split(*p) ||
-                !naming::get_agas_client().resolve_cached(*p, addr))
+
+            if ((gid_was_split(*p) ||
+                !naming::get_agas_client().resolve_cached(*p, addr)))
             {
+                hpx::runtime *rt = hpx::get_runtime_ptr();
+                if(!rt) return;
+                if(hpx::is_stopped()) return;
+
                 // guard for wait_abort and other shutdown issues
                 try {
                     // decrement global reference count for the given gid,
@@ -236,11 +241,17 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         gid_type split_gid_if_needed(gid_type& gid)
         {
-            gid_type::mutex_type::scoped_try_lock l(gid.get_mutex());
+            typedef gid_type::mutex_type::scoped_try_lock scoped_try_lock;
+            scoped_try_lock l(gid.get_mutex());
             if (l)
             {
-                // split credit normally
-                return split_gid_if_needed_locked(gid);
+                gid_type new_gid;
+                {
+                    // split credit normally
+                    util::ignore_while_checking<scoped_try_lock> il(&l);
+                    new_gid = split_gid_if_needed_locked(gid);
+                }
+                return new_gid;
             }
 
             // Just replenish the credit of the new gid and don't touch the
@@ -341,13 +352,16 @@ namespace hpx { namespace naming
         {
             boost::int64_t added_credit = 0;
 
-            gid_type::mutex_type::scoped_lock l(gid);
+            typedef gid_type::mutex_type::scoped_lock scoped_lock;
+            scoped_lock l(gid);
 
             HPX_ASSERT(0 == get_credit_from_gid(gid));
             added_credit = naming::detail::fill_credit_for_gid(gid);
             naming::detail::set_credit_split_mask_for_gid(gid);
 
             gid_type unlocked_gid = gid;        // strips lock-bit
+
+            util::ignore_while_checking<scoped_lock> il(&l);
             return agas::incref(unlocked_gid, added_credit);
         }
 

@@ -49,14 +49,12 @@ struct HPX_EXPORT locality_namespace
 
     typedef boost::int32_t component_type;
 
-    // stores the locality id, and number of OS-threads running on this locality
+    // stores the locality endpoints, and number of OS-threads running on this locality
     typedef boost::fusion::vector2<
-        boost::uint32_t, boost::uint32_t>
+        parcelset::endpoints_type, boost::uint32_t>
     partition_type;
 
-    typedef std::map<parcelset::endpoints_type, partition_type> partition_table_type;
-
-    typedef std::set<boost::uint32_t> reverse_partition_table_type;
+    typedef std::map<boost::uint32_t, partition_type> partition_table_type;
     // }}}
 
   private:
@@ -66,7 +64,6 @@ struct HPX_EXPORT locality_namespace
     std::string instance_name_;
 
     partition_table_type partitions_;
-    reverse_partition_table_type prefixes_;
     boost::uint32_t prefix_counter_;
     primary_namespace* primary_;
 
@@ -209,11 +206,6 @@ struct HPX_EXPORT locality_namespace
         );
 
     response resolve_locality(
-        request const& req
-      , error_code& ec = throws
-        );
-
-    response resolve_locality_gid(
         request const& req
       , error_code& ec = throws
         );

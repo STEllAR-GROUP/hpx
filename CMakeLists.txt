@@ -510,85 +510,6 @@ if(HPX_WITH_HWLOC)
 endif()
 
 ################################################################################
-# Decide whether to use the ibverbs based parcelport
-################################################################################
-if(HPX_PARCELPORT_IBVERBS)
-  find_package(Ibverbs)
-  if(NOT IBVERBS_FOUND)
-    hpx_error("The ibverbs libraries could not be found and HPX_PARCELPORT_IBVERBS=ON, please specify IBVERBS_ROOT to point to the correct location or set HPX_PARCELPORT_IBVERBS to OFF")
-  endif()
-  hpx_libraries(${IBVERBS_LIBRARIES})
-  include_directories(${IBVERBS_INCLUDE_DIR})
-
-  find_package(Rdmacm)
-  if(NOT RDMACM_FOUND)
-    hpx_error("The ibverbs libraries could not be found and HPX_PARCELPORT_IBVERBS=ON, please specify RDMACM_ROOT to point to the correct location or set HPX_PARCELPORT_IBVERBS to OFF")
-  endif()
-  hpx_libraries(${RDMACM_LIBRARIES})
-  include_directories(${RDMACM_INCLUDE_DIR})
-  hpx_add_config_define(HPX_PARCELPORT_IBVERBS)
-  hpx_add_config_define(HPX_PARCELPORT_IBVERBS_IFNAME "\"${HPX_PARCELPORT_IBVERBS_IFNAME}\"")
-  hpx_add_config_define(HPX_PARCELPORT_IBVERBS_MESSAGE_PAYLOAD "${HPX_PARCELPORT_IBVERBS_MESSAGE_PAYLOAD}")
-  hpx_add_config_define(HPX_PARCELPORT_IBVERBS_MEMORY_CHUNK_SIZE "${HPX_PARCELPORT_IBVERBS_MEMORY_CHUNK_SIZE}")
-  hpx_add_config_define(HPX_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS "${HPX_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS}")
-endif()
-
-################################################################################
-# Decide whether to use shared memory based parcelport (starting with
-# Boost V1.52)
-################################################################################
-if(HPX_PARCELPORT_IPC)
-  if(Boost_VERSION GREATER 105100)
-    hpx_add_config_define(HPX_PARCELPORT_IPC)
-  endif()
-endif()
-
-################################################################################
-# Decide whether to use the MPI based parcelport
-################################################################################
-if(HPX_PARCELPORT_MPI)
-  find_package(MPI)
-  if(NOT MPI_CXX_FOUND)
-    hpx_error("MPI could not be found and HPX_PARCELPORT_MPI=On, please specify MPI_CXX_COMPILER to point to a working MPI C++ compiler for your platform")
-  endif()
-  hpx_add_config_define(HPX_PARCELPORT_MPI)
-  if(MPI_CXX_COMPILE_FLAGS)
-    hpx_add_compile_flag(${MPI_CXX_COMPILE_FLAGS})
-  endif()
-  if(MPI_CXX_LINK_FLAGS)
-    #    hpx_add_link_flag_if_available(${MPI_CXX_LINK_FLAGS})
-  endif()
-  if(MPI_CXX_INCLUDE_PATH)
-    include_directories(${MPI_CXX_INCLUDE_PATH})
-  endif()
-  if(MPI_CXX_LIBRARIES)
-    hpx_libraries(${MPI_CXX_LIBRARIES})
-  endif()
-  if(MPI_LIBRARY)
-    hpx_libraries(${MPI_LIBRARY})
-  endif()
-  if(MPI_EXTRA_LIBRARY)
-    hpx_libraries(${MPI_LIBRARY})
-  endif()
-  # This list is to detect whether we run inside an mpi environment.
-  # If one of those environment variables is set, the MPI parcelport
-  # is enabled by default.
-  # PMI_RANK: Intel MPI and MVAPICH2
-  # OMPI_COMM_WORLD_SIZE: OpenMPI starting at version 1.3
-  if(HPX_PARCELPORT_MPI_ENV)
-    string(REPLACE ";" "," hpx_parcelport_mpi_env_ "${HPX_PARCELPORT_MPI_ENV}")
-    hpx_add_config_define(HPX_PARCELPORT_MPI_ENV "\"${hpx_parcelport_mpi_env_}\"")
-  endif()
-endif()
-
-################################################################################
-# Decide whether to use the TCP/IP based parcelport
-################################################################################
-if(HPX_PARCELPORT_TCP)
-  hpx_add_config_define(HPX_PARCELPORT_TCP)
-endif()
-
-################################################################################
 # Enable integration with Intel Amplifier and Inspector tools
 ################################################################################
 if(WITH_AMPLIFIER)
@@ -852,9 +773,6 @@ if(HPX_COMPILER_WARNINGS)
     hpx_add_compile_flag_if_available(-Wno-attributes LANGUAGES CXX)
     hpx_add_compile_flag_if_available(-Wno-cast-align LANGUAGES CXX)
 
-    # We never want trampolines
-    hpx_add_compile_flag_if_available(-Wt)
-
     # These are usually benign and can't be suppressed because of
     # interface requirements
     hpx_add_compile_flag_if_available(-Wno-unused-parameter)
@@ -1101,13 +1019,13 @@ endif()
 include(HPX_GitCommit)
 hpx_add_config_define(HPX_GIT_COMMIT "\"${HPX_GIT_COMMIT}\"")
 
-
 hpx_include(SetOutputPaths)
 ##############################################################################
 
 ################################################################################
-# # Configure compression and other plugins
-# ###############################################################################
+# Configure compression and other plugins
+################################################################################
+set(HPX_STATIC_PARCELPORT_PLUGINS "" CACHE INTERNAL "" FORCE)
 add_hpx_pseudo_target(plugins)
 add_subdirectory(plugins)
 
@@ -1144,8 +1062,6 @@ set(HPX_DEBUG_POSTFIX "d")
 # Recurse into some subdirectories. This does not actually cause another cmake
 # executable to run. The same process will walk through the project's entire
 # directory structure.
-
-
 if(HPX_BUILD_TOOLS)
   add_hpx_pseudo_target(tools)
   add_subdirectory(tools)
@@ -1189,7 +1105,6 @@ if(HPX_BUILD_TESTS)
   include_directories(tests)
   add_subdirectory(tests)
 endif()
-
 
 if(HPX_BUILD_RUNTIME)
   add_hpx_pseudo_target(runtime)

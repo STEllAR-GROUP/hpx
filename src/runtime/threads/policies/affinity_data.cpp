@@ -8,7 +8,6 @@
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
-#include <hpx/util/mpi_environment.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #include <algorithm>

@@ -11,6 +11,7 @@
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
+#include <boost/asio.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -165,6 +166,10 @@ namespace hpx { namespace util
             {
                 if (detail::some_locks_are_not_ignored(held_locks))
                 {
+                    register_locks::held_locks_map tmp_held_locks;
+                    // temporarily cleaning held locks to avoid endless recursions
+                    // when acquiring the backtrace
+                    std::swap(tmp_held_locks, held_locks);
                     std::string back_trace(hpx::detail::backtrace_direct());
 
                     // throw or log, depending on config options
@@ -199,6 +204,8 @@ namespace hpx { namespace util
                                "being held, stack backtrace: " + back_trace);
                         }
                     }
+                    // restoring held locks ...
+                    std::swap(tmp_held_locks, held_locks);
                 }
             }
         }
@@ -237,8 +244,11 @@ namespace hpx { namespace util
                 register_locks::held_locks_map::iterator it = held_locks.find(lock);
                 if (it == held_locks.end())
                 {
-                    HPX_THROW_EXCEPTION(invalid_status, "set_ignore_status",
-                        "The given lock has not been registered.");
+                    // this can happen if the lock was registered to be ignore
+                    // on a different OS thread
+//                     HPX_THROW_EXCEPTION(
+//                         invalid_status, "set_ignore_status",
+//                         "The given lock has not been registered.");
                     return;
                 }
 

@@ -8,12 +8,11 @@
 #if !defined(HPX_THREAD_HELPERS_NOV_15_2008_0504PM)
 #define HPX_THREAD_HELPERS_NOV_15_2008_0504PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/runtime/threads/thread_executor.hpp>
 
 #include <boost/exception_ptr.hpp>
 

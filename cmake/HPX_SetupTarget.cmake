@@ -96,6 +96,7 @@ function(hpx_setup_target target)
     if(MSVC)
       string(REPLACE ";" ":" _prefix "${_prefix}")
     endif()
+
     set_property(TARGET ${target} APPEND
                  PROPERTY COMPILE_DEFINITIONS
                  "HPX_APPLICATION_NAME=${name}"
@@ -121,6 +122,7 @@ function(hpx_setup_target target)
     if(target_PLUGIN)
       set(plugin_name "HPX_PLUGIN_NAME=${name}")
     endif()
+    set(nohpxinit TRUE)
 
     set_property(TARGET ${target} APPEND
                  PROPERTY COMPILE_DEFINITIONS
@@ -144,6 +146,7 @@ function(hpx_setup_target target)
       # allow creating static and shared libs without conflicts
       CLEAN_DIRECT_OUTPUT 1
       OUTPUT_NAME ${name})
+    set(nohpxinit TRUE)
 
     set_property(TARGET ${target} APPEND
                  PROPERTY COMPILE_DEFINITIONS

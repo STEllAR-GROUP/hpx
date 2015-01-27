@@ -11,6 +11,7 @@
 #define HPX_PARCELSET_ENCODE_PARCELS_HPP
 
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
+#include <hpx/runtime/parcelset/encode_parcel.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
@@ -131,7 +132,8 @@ namespace hpx { namespace parcelset
         std::size_t arg_size = 0;
         boost::uint32_t dest_locality_id = pv[0].get_destination_locality_id();
 
-        boost::shared_ptr<parcel_buffer_type> buffer;
+        parcel_buffer_type & buffer = connection.get_buffer(pv[0]);
+        HPX_ASSERT(buffer.data_.empty());
         std::size_t parcels_sent = 0;
 
         // guard against serialization errors
@@ -145,8 +147,7 @@ namespace hpx { namespace parcelset
                     arg_size += traits::get_type_size(pv[parcels_sent]);
                 }
 
-                buffer = connection.get_buffer(pv[0], arg_size);
-                buffer->clear();
+                buffer.data_.reserve(arg_size);
 
                 // mark start of serialization
                 util::high_resolution_timer timer;
@@ -158,13 +159,13 @@ namespace hpx { namespace parcelset
 
                     int archive_flags = archive_flags_;
                     if (filter.get() != 0) {
-                        filter->set_max_length(buffer->data_.capacity());
+                        filter->set_max_length(buffer.data_.capacity());
                         archive_flags |= util::enable_compression;
                     }
 
                     util::portable_binary_oarchive archive(
-                        buffer->data_
-                      , &buffer->chunks_
+                        buffer.data_
+                      , &buffer.chunks_
                       , dest_locality_id
                       , filter.get()
                       , archive_flags);
@@ -190,10 +191,10 @@ namespace hpx { namespace parcelset
                 // calculate and sign the hash, but only after everything has
                 // been initialized
                 if (enable_security && !connection.first_message_)
-                    create_message_suffix(*buffer, pv[0].get_parcel_id());
+                    create_message_suffix(buffer, pv[0].get_parcel_id());
 #endif
                 // store the time required for serialization
-                buffer->data_point_.serialization_time_ = timer.elapsed_nanoseconds();
+                buffer.data_point_.serialization_time_ = timer.elapsed_nanoseconds();
             }
             catch (hpx::exception const& e) {
                 LPT_(fatal)
@@ -235,50 +236,8 @@ namespace hpx { namespace parcelset
             return 0;
         }
 
-        buffer->size_ = buffer->data_.size();
-        buffer->data_size_ = arg_size;
-
-        performance_counters::parcels::data_point& data = buffer->data_point_;
-        data.num_parcels_ = parcels_sent;
-        data.bytes_ = arg_size;
-        data.raw_bytes_ = buffer->data_.size();
-
-        // prepare chunk data for transmission, the transmission_chunks data
-        // first holds all zero-copy, then all non-zero-copy chunk infos
-        typedef typename parcel_buffer_type::transmission_chunk_type
-            transmission_chunk_type;
-        typedef typename parcel_buffer_type::count_chunks_type
-            count_chunks_type;
-
-        std::vector<transmission_chunk_type>& chunks =
-            buffer->transmission_chunks_;
-
-        chunks.clear();
-        chunks.reserve(buffer->chunks_.size());
-
-        std::size_t index = 0;
-        BOOST_FOREACH(util::serialization_chunk& c, buffer->chunks_)
-        {
-            if (c.type_ == util::chunk_type_pointer)
-                chunks.push_back(transmission_chunk_type(index, c.size_));
-            ++index;
-        }
-
-        buffer->num_chunks_ = count_chunks_type(
-                static_cast<boost::uint32_t>(chunks.size()),
-                static_cast<boost::uint32_t>(buffer->chunks_.size() - chunks.size())
-            );
-
-        if (!chunks.empty()) {
-            // the remaining number of chunks are non-zero-copy
-            BOOST_FOREACH(util::serialization_chunk& c, buffer->chunks_)
-            {
-                if (c.type_ == util::chunk_type_index) {
-                    chunks.push_back(
-                        transmission_chunk_type(c.data_.index_, c.size_));
-                }
-            }
-        }
+        buffer.data_point_.num_parcels_ = parcels_sent;
+        encode_finalize(buffer, arg_size);
 
         return parcels_sent;
     }

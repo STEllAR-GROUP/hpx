@@ -28,6 +28,7 @@ namespace hpx { namespace util
             mode_(mode),
             ini_config_(ini_config),
             hpx_main_f_(f),
+            node_(std::size_t(-1)),
             num_threads_(1),
             num_cores_(1),
             num_localities_(1)
@@ -46,6 +47,7 @@ namespace hpx { namespace util
         std::vector<std::string> ini_config_;
         util::function_nonser<int(boost::program_options::variables_map& vm)> hpx_main_f_;
 
+        std::size_t node_;
         std::size_t num_threads_;
         std::size_t num_cores_;
         std::size_t num_localities_;

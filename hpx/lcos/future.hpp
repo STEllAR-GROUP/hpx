@@ -7,7 +7,7 @@
 #if !defined(HPX_LCOS_FUTURE_MAR_06_2012_1059AM)
 #define HPX_LCOS_FUTURE_MAR_06_2012_1059AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/config/forceinline.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/future_traits.hpp>
@@ -1117,17 +1117,25 @@ namespace hpx { namespace lcos
         typename traits::future_traits<shared_future>::result_type
         get(error_code& ec) const //-V659
         {
+            typedef
+                typename traits::future_traits<shared_future>::result_type
+                result_type;
             if (!this->shared_state_)
             {
                 HPX_THROWS_IF(ec, no_state,
                     "shared_future<R>::get",
                     "this future has no valid shared state");
-                return detail::future_value<R>::get_default();
+                static result_type res(detail::future_value<R>::get_default());
+                return res;
             }
 
             typedef typename shared_state_type::data_type data_type;
             data_type& data = this->shared_state_->get_result(ec);
-            if (ec) return detail::future_value<R>::get_default();
+            if (ec)
+            {
+                static result_type res(detail::future_value<R>::get_default());
+                return res;
+            }
 
             // no error has been reported, return the result
             return detail::future_value<R>::get(data.get_value());
