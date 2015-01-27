@@ -81,15 +81,15 @@ double receive(
         using hpx::parallel::for_each;
         using hpx::parallel::par;
 
-        const boost::uint64_t start = 0;
+        std::size_t const start = 0;
 
         // Fill the original matrix, set transpose to known garbage value.
         auto range = boost::irange(start, window_size);
         for_each(par, boost::begin(range), boost::end(range),
             [&](boost::uint64_t j)
             {
-                recv_buffers[j] = hpx::async(msg, dest, buffer_type(send_buffer, size,
-                    buffer_type::reference));
+                recv_buffers[j] = hpx::async(msg, dest,
+                    buffer_type(send_buffer, size, buffer_type::reference));
             }
         );
 
