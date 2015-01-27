@@ -121,8 +121,9 @@ namespace hpx { namespace naming
             // type.
             naming::address addr;
 
-            if (gid_was_split(*p) ||
+            if ((gid_was_split(*p) ||
                 !naming::get_agas_client().resolve_cached(*p, addr))
+                && !hpx::is_stopped())
             {
                 // guard for wait_abort and other shutdown issues
                 try {
