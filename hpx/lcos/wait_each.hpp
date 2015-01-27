@@ -97,6 +97,7 @@ namespace hpx
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/when_each.hpp>
+#include <hpx/util/detail/pack.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
@@ -136,7 +137,7 @@ namespace hpx { namespace lcos
     typename boost::disable_if<
         boost::mpl::or_<
             traits::is_future<typename util::decay<F>::type>,
-            util::functional::any_of<boost::mpl::not_<traits::is_future<Ts> >...>
+            util::detail::any_of<boost::mpl::not_<traits::is_future<Ts> >...>
         >
     >::type
     wait_each(F&& f, Ts&&... ts)

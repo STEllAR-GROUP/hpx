@@ -733,9 +733,9 @@ namespace boost { namespace serialization
     template <typename ...Ts>
     struct is_bitwise_serializable<
         ::hpx::util::tuple<Ts...>
-    > : ::hpx::util::detail::all_of< ::hpx::util::detail::pack<
+    > : ::hpx::util::detail::all_of<
             boost::serialization::is_bitwise_serializable<Ts>...
-        > >
+        >
     {};
 
     ///////////////////////////////////////////////////////////////////////////

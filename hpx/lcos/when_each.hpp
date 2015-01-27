@@ -107,7 +107,7 @@ namespace hpx
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/when_some.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
-#include <hpx/util/functional/boolean_ops.hpp>
+#include <hpx/util/detail/pack.hpp>
 
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/not.hpp>
@@ -383,7 +383,7 @@ namespace hpx { namespace lcos
     typename boost::disable_if<
         boost::mpl::or_<
             traits::is_future<typename util::decay<F>::type>,
-            util::functional::any_of<boost::mpl::not_<traits::is_future<Ts> >...>
+            util::detail::any_of<boost::mpl::not_<traits::is_future<Ts> >...>
         >,
         lcos::future<void>
     >::type

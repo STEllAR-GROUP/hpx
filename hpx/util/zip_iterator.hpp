@@ -12,7 +12,6 @@
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/serialize_sequence.hpp>
-#include <hpx/util/functional/boolean_ops.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <boost/fusion/algorithm/iteration/for_each.hpp>
@@ -652,7 +651,7 @@ namespace hpx { namespace traits
     struct segmented_iterator_traits<
         util::zip_iterator<Ts...>,
         typename boost::enable_if<
-            typename util::functional::all_of<
+            typename util::detail::all_of<
                 typename segmented_iterator_traits<Ts>::is_segmented_iterator...
             >::type
         >::type>
@@ -751,7 +750,7 @@ namespace hpx { namespace traits
     struct segmented_local_iterator_traits<
         util::zip_iterator<Ts...>,
         typename boost::enable_if<
-            typename util::functional::all_of<
+            typename util::detail::all_of<
                 typename segmented_local_iterator_traits<Ts>::is_segmented_local_iterator...
             >::type
         >::type>
