@@ -7,7 +7,7 @@
 #if !defined(HPX_PLUGINS_PARCELPORT_FACTORY_HPP)
 #define HPX_PLUGINS_PARCELPORT_FACTORY_HPP
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/plugins/unique_plugin_name.hpp>
 #include <hpx/plugins/plugin_factory_base.hpp>
 #include <hpx/plugins/parcelport_factory_base.hpp>
@@ -128,16 +128,16 @@ namespace hpx { namespace plugins
 /// This macro is used create and to register a minimal component factory with
 /// Hpx.Plugin.
 #define HPX_REGISTER_PARCELPORT_(Parcelport, pluginname, pp)                  \
-    template struct hpx::plugins::parcelport_factory<Parcelport>;             \
     typedef hpx::plugins::parcelport_factory<Parcelport>                      \
         BOOST_PP_CAT(pluginname, _plugin_factory_type);                       \
+    HPX_DEF_UNIQUE_PLUGIN_NAME(                                               \
+        BOOST_PP_CAT(pluginname, _plugin_factory_type), pp)                   \
+    template struct hpx::plugins::parcelport_factory<Parcelport>;             \
     static BOOST_PP_CAT(pluginname, _plugin_factory_type)                     \
         BOOST_PP_CAT(pluginname, _factory);                                   \
     HPX_EXPORT hpx::plugins::parcelport_factory_base *                        \
         BOOST_PP_CAT(pluginname, _factory_base_ptr) =                         \
             &BOOST_PP_CAT(pluginname, _factory);                              \
-    HPX_DEF_UNIQUE_PLUGIN_NAME(                                               \
-        BOOST_PP_CAT(pluginname, _plugin_factory_type), pp)                   \
 
 #define HPX_REGISTER_PARCELPORT(Parcelport, pluginname)                       \
         HPX_REGISTER_PARCELPORT_(Parcelport,                                  \
