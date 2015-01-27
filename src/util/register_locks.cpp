@@ -57,8 +57,18 @@ namespace hpx { namespace util
             typedef lcos::local::spinlock mutex_type;
             typedef boost::ptr_map<void const*, lock_data> held_locks_map;
 
+            struct held_locks_data
+            {
+                held_locks_data()
+                  : enabled_(true)
+                {}
+
+                held_locks_map data_;
+                bool enabled_;
+            };
+
             struct tls_tag {};
-            static hpx::util::thread_specific_ptr<held_locks_map, tls_tag> held_locks_;
+            static hpx::util::thread_specific_ptr<held_locks_data, tls_tag> held_locks_;
 
             static bool lock_detection_enabled_;
 
@@ -66,18 +76,45 @@ namespace hpx { namespace util
             {
                 if (NULL == held_locks_.get())
                 {
-                    held_locks_.reset(new held_locks_map());
+                    held_locks_.reset(new held_locks_data());
                 }
 
                 HPX_ASSERT(NULL != held_locks_.get());
-                return *held_locks_.get();
+                return held_locks_.get()->data_;
+            }
+
+            static bool& get_lock_enabled()
+            {
+                if (NULL == held_locks_.get())
+                {
+                    held_locks_.reset(new held_locks_data());
+                }
+
+                HPX_ASSERT(NULL != held_locks_.get());
+                return held_locks_.get()->enabled_;
             }
         };
 
         hpx::util::thread_specific_ptr<
-            register_locks::held_locks_map, register_locks::tls_tag
+            register_locks::held_locks_data, register_locks::tls_tag
         > register_locks::held_locks_;
         bool register_locks::lock_detection_enabled_ = false;
+
+        struct reset_on_exit
+        {
+            reset_on_exit(bool& reset, bool value)
+              : reset_(reset), old_value_(reset)
+            {
+                reset = value;
+            }
+            ~reset_on_exit()
+            {
+                reset_ = old_value_;
+            }
+
+            bool& reset_;
+            bool old_value_;
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -155,7 +192,10 @@ namespace hpx { namespace util
     {
         using detail::register_locks;
 
-        if (register_locks::lock_detection_enabled_ && 0 != threads::get_self_ptr())
+        bool& enabled = register_locks::get_lock_enabled();
+
+        if (enabled && register_locks::lock_detection_enabled_ &&
+            0 != threads::get_self_ptr())
         {
             register_locks::held_locks_map& held_locks =
                 register_locks::get_lock_map();
@@ -167,10 +207,11 @@ namespace hpx { namespace util
                 if (detail::some_locks_are_not_ignored(held_locks))
                 {
                     register_locks::held_locks_map tmp_held_locks;
+
                     // temporarily cleaning held locks to avoid endless recursions
-                    // when acquiring the backtrace
-                    std::swap(tmp_held_locks, held_locks);
-                    std::string back_trace(hpx::detail::backtrace_direct());
+                    // when acquiring the back-trace
+                    detail::reset_on_exit e(enabled, false);
+                    std::string back_trace = hpx::detail::backtrace_direct();
 
                     // throw or log, depending on config options
                     if (get_config_entry("hpx.throw_on_held_lock", "1") == "0")
@@ -204,8 +245,6 @@ namespace hpx { namespace util
                                "being held, stack backtrace: " + back_trace);
                         }
                     }
-                    // restoring held locks ...
-                    std::swap(tmp_held_locks, held_locks);
                 }
             }
         }

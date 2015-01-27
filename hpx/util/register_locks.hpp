@@ -114,6 +114,24 @@ namespace hpx { namespace util
 
         void const* lock_;
     };
+
+    template <typename Mutex>
+    struct ignore_while_checking<boost::detail::try_lock_wrapper<Mutex> >
+    {
+        ignore_while_checking(
+                boost::detail::try_lock_wrapper<Mutex> const* lock)
+          : lock_(lock->mutex())
+        {
+            ignore_lock(lock_);
+        }
+
+        ~ignore_while_checking()
+        {
+            reset_ignored(lock_);
+        }
+
+        void const* lock_;
+    };
 #endif
 
 #else
