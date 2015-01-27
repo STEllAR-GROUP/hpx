@@ -162,6 +162,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         void stop(bool blocking = true)
         {
             stopped_ = true;
+            sender_.stop();
+            receiver_.stop();
             if(blocking)
             {
                 MPI_Barrier(util::mpi_environment::communicator());

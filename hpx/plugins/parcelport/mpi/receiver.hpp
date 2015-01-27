@@ -81,6 +81,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             new_header();
         }
 
+        void stop()
+        {
+        }
+
         void receive(bool background = true)
         {
             typedef header_list::iterator iterator;
@@ -180,6 +184,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             else
             {
                 wait_done(wait_request);
+                if(stopped_) return;
                 {
                     util::mpi_environment::scoped_lock l;
                     MPI_Irecv(
@@ -199,6 +204,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             BOOST_FOREACH(data_type & c, buffer.chunks_)
             {
                 wait_done(wait_request);
+                if(stopped_) return;
                 std::size_t chunk_size = buffer.transmission_chunks_[chunk_idx++].second;
 
                 c.resize(chunk_size);
@@ -218,6 +224,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             }
 
             wait_done(wait_request);
+            if(stopped_) return;
 
             data.time_ = timer.elapsed_nanoseconds() - data.time_;
 
@@ -249,6 +256,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         header new_header()
         {
+            if(stopped_) return header();
+
             header h = rcv_header_;
             rcv_header_.reset();
             MPI_Irecv(
@@ -319,6 +328,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         bool request_done_locked(MPI_Request & r, MPI_Status *status)
         {
+            if(stopped_)
+            {
+                MPI_Cancel(&r);
+                return false;
+            }
             int completed = 0;
             int ret = 0;
             ret = MPI_Test(&r, &completed, status);
@@ -327,7 +341,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             {
                 return true;
             }
-            if(stopped_) return false;
             return false;
         }
     };

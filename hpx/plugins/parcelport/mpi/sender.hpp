@@ -78,6 +78,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
           : stopped_(stopped)
         {}
 
+        void stop()
+        {
+        }
+
         template <typename Buffer, typename Background>
         void send(int dest, Buffer & buffer, Background background)
         {
@@ -107,6 +111,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             if(!chunks.empty())
             {
                 wait_done(wait_request, background);
+                if(stopped_) return;
                 {
                     util::mpi_environment::scoped_lock l;
                     MPI_Isend(
@@ -128,6 +133,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             if(!h.piggy_back())
             {
                 wait_done(wait_request, background);
+                if(stopped_) return;
                 {
                     util::mpi_environment::scoped_lock l;
                     MPI_Isend(
@@ -148,6 +154,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 if(c.type_ == util::chunk_type_pointer)
                 {
                     wait_done(wait_request, background);
+                    if(stopped_) return;
                     {
                         util::mpi_environment::scoped_lock l;
                         MPI_Isend(
@@ -165,6 +172,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             }
 
             wait_done(wait_request, background);
+            if(stopped_) return;
         }
 
     private:
@@ -208,6 +216,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         bool request_done(MPI_Request & r)
         {
             util::mpi_environment::scoped_lock l;
+            if(stopped_)
+            {
+                MPI_Cancel(&r);
+                return false;
+            }
+
             int completed = 0;
             MPI_Status status;
             int ret = 0;
@@ -217,7 +231,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             {
                 return true;
             }
-            if(stopped_) return false;
             return false;
         }
     };
