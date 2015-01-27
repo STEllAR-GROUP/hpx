@@ -12,8 +12,6 @@
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/functional/colocated_helpers.hpp>
 
-#include <boost/preprocessor/repetition/enum_params.hpp>
-
 namespace hpx { namespace detail
 {
     template <typename Tuple>
