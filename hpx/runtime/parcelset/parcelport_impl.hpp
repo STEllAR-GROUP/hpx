@@ -600,9 +600,15 @@ namespace hpx { namespace parcelset
                     mutex_type::scoped_try_lock l(sender_threads_mtx_);
                     if(l)
                     {
-                        BOOST_FOREACH(threads::thread_id_type const & thread, sender_threads_)
+                        std::vector<threads::thread_id_type> threads;
+                        threads.reserve(sender_threads_.size());
+                        std::copy(sender_threads_.begin(), sender_threads_.end(),
+                            std::back_inserter(threads));
+                        l.unlock();
+
+                        BOOST_FOREACH(threads::thread_id_type const& t, threads)
                         {
-                            if(threads::get_thread_state(thread) != threads::suspended)
+                            if(threads::get_thread_state(t) != threads::suspended)
                             {
                                 force_connection = true;
                                 break;
