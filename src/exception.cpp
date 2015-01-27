@@ -23,7 +23,7 @@
 
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
-#include <boost/atomic/atomic.hpp>
+#include <boost/atomic.hpp>
 
 #include <stdexcept>
 #include <algorithm>
