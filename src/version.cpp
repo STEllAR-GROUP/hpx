@@ -69,8 +69,10 @@ namespace hpx
              << OMPI_MINOR_VERSION << "." << OMPI_RELEASE_VERSION;
 #elif defined(MPICH)
         strm << "MPICH V" << MPICH_VERSION;
+#elif defined(MVAPICH2_VERSION)
+        strm << "MVAPICH2 V" << MVAPICH2_VERSION;
 #else
-        strm << "Unknown MPI"
+        strm << "Unknown MPI";
 #endif
         // add general MPI version
         strm << ", MPI V" << MPI_VERSION << "." << MPI_SUBVERSION;
