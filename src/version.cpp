@@ -21,6 +21,9 @@
 #if defined(HPX_HAVE_HWLOC)
 #include <hwloc.h>
 #endif
+#if defined(HPX_PARCELPORT_MPI)
+#include <mpi.h>
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -54,6 +57,26 @@ namespace hpx
     {
         return HPX_VERSION_TAG;
     }
+
+#if defined(HPX_PARCELPORT_MPI)
+    std::string mpi_version()
+    {
+        std::ostringstream strm;
+
+        // add type and library version
+#if defined(OPEN_MPI)
+        strm << "OpenMPI V" << OMPI_MAJOR_VERSION << "."
+             << OMPI_MINOR_VERSION << "." << OMPI_RELEASE_VERSION;
+#elif defined(MPICH)
+        strm << "MPICH V" << MPICH_VERSION;
+#else
+        strm << "Unknown MPI"
+#endif
+        // add general MPI version
+        strm << ", MPI V" << MPI_VERSION << "." << MPI_SUBVERSION;
+        return strm.str();
+    }
+#endif
 
     std::string copyright()
     {
@@ -136,6 +159,16 @@ namespace hpx
         strm << "  HPX_HAVE_PARCEL_COALESCING=ON\n";
 #else
         strm << "  HPX_HAVE_PARCEL_COALESCING=OFF\n";
+#endif
+#if defined(HPX_PARCELPORT_TCP)
+        strm << "  HPX_PARCELPORT_TCP=ON\n";
+#else
+        strm << "  HPX_PARCELPORT_TCP=OFF\n";
+#endif
+#if defined(HPX_PARCELPORT_MPI)
+        strm << "  HPX_PARCELPORT_MPI=ON (" << mpi_version() << ")\n";
+#else
+        strm << "  HPX_PARCELPORT_MPI=OFF\n";
 #endif
 #if defined(HPX_PARCELPORT_IPC)
         strm << "  HPX_PARCELPORT_IPC=ON\n";
@@ -286,6 +319,9 @@ namespace hpx
 #if defined(HPX_HAVE_HWLOC)
             "  Hwloc: %s\n"
 #endif
+#if defined(HPX_PARCELPORT_MPI)
+            "  MPI: %s\n"
+#endif
             "\n"
             "Build:\n"
             "  Type: %s\n"
@@ -299,6 +335,9 @@ namespace hpx
             boost_version() %
 #if defined(HPX_HAVE_HWLOC)
             hwloc_version() %
+#endif
+#if defined(HPX_PARCELPORT_MPI)
+            mpi_version() %
 #endif
             build_type() %
             build_date_time() %

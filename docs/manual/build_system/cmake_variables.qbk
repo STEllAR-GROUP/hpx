@@ -170,7 +170,7 @@ The options are split into these categories:
         [[[#build_system.cmake_variables.HPX_PARCELPORT_IBVERBS_MESSAGE_PAYLOAD] `HPX_PARCELPORT_IBVERBS_MESSAGE_PAYLOAD:STRING`][Size of the message payload not sent with RDMA (default: 512 byte)]]
         [[[#build_system.cmake_variables.HPX_PARCELPORT_IPC] `HPX_PARCELPORT_IPC:BOOL`][Enable the IPC (inter process communication) based parcelport. This is currently an experimental feature]]
         [[[#build_system.cmake_variables.HPX_PARCELPORT_MPI] `HPX_PARCELPORT_MPI:BOOL`][Enable the MPI based parcelport.]]
-        [[[#build_system.cmake_variables.HPX_PARCELPORT_MPI_ENV] `HPX_PARCELPORT_MPI_ENV:STRING`][List of environment variables checked to detect MPI (default: PMI_RANK;OMPI_COMM_WORLD_SIZE).]]
+        [[[#build_system.cmake_variables.HPX_PARCELPORT_MPI_ENV] `HPX_PARCELPORT_MPI_ENV:STRING`][List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE).]]
         [[[#build_system.cmake_variables.HPX_PARCELPORT_TCP] `HPX_PARCELPORT_TCP:BOOL`][Enable the TCP based parcelport.]]
 ] [/ Parcelport Options]
 
