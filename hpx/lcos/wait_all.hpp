@@ -100,10 +100,6 @@ namespace hpx
 #include <boost/type_traits/is_same.hpp>
 #include <boost/ref.hpp>
 
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/enum.hpp>
-#include <boost/preprocessor/iterate.hpp>
-
 #include <algorithm>
 #include <iterator>
 #include <vector>

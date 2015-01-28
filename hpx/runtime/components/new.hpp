@@ -14,10 +14,6 @@
 #include <hpx/util/move.hpp>
 #include <hpx/traits/is_component.hpp>
 
-#include <boost/utility/enable_if.hpp>
-#include <boost/preprocessor/iterate.hpp>
-#include <boost/preprocessor/enum_params.hpp>
-
 namespace hpx { namespace components
 {
 #if defined(DOXYGEN)

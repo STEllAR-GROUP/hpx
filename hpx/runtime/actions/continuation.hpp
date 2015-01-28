@@ -223,8 +223,10 @@ namespace hpx { namespace actions
         boost::is_void<typename util::result_of<F(Ts...)>::type>::value
     >::type trigger(continuation& cont, F&& f, Ts&&... vs)
     {
+        typedef typename util::result_of<F(Ts...)>::type result_type;
         try {
-            cont.trigger(util::invoke(std::forward<F>(f), std::forward<Ts>(vs)...));
+            cont.trigger(util::invoke_r<result_type>(std::forward<F>(f),
+                std::forward<Ts>(vs)...));
         }
         catch (...) {
             // make sure hpx::exceptions are propagated back to the client
@@ -238,7 +240,7 @@ namespace hpx { namespace actions
     >::type trigger(continuation& cont, F&& f, Ts&&... vs)
     {
         try {
-            util::invoke(std::forward<F>(f), std::forward<Ts>(vs)...);
+            util::invoke_r<void>(std::forward<F>(f), std::forward<Ts>(vs)...);
             cont.trigger();
         }
         catch (...) {

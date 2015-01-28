@@ -150,9 +150,6 @@ namespace hpx
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/enum.hpp>
-#include <boost/preprocessor/iterate.hpp>
 #include <boost/utility/swap.hpp>
 
 #include <algorithm>

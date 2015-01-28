@@ -8,13 +8,9 @@
 
 #include <hpx/traits/is_future.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/util/detail/pack.hpp>
 
 #include <boost/mpl/bool.hpp>
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/arithmetic/inc.hpp>
-#include <boost/preprocessor/repetition/enum_params.hpp>
-#include <boost/preprocessor/repetition/repeat.hpp>
-#include <boost/preprocessor/repetition/repeat_from_to.hpp>
 
 namespace hpx { namespace traits
 {
@@ -23,31 +19,10 @@ namespace hpx { namespace traits
       : boost::mpl::false_
     {};
 
-    template <>
-    struct is_future_tuple<util::tuple<> >
-      : boost::mpl::true_
+    template <typename ...Ts>
+    struct is_future_tuple<util::tuple<Ts...> >
+      : util::detail::all_of<is_future<Ts>...>
     {};
-
-#   define HPX_TRAITS_IS_FUTURE_TUPLE_ELEM(Z, N, D)                           \
-     && is_future<BOOST_PP_CAT(T, N)>::value                                  \
-    /**/
-#   define HPX_TRAITS_IS_FUTURE_TUPLE(Z, N, D)                                \
-    template <BOOST_PP_ENUM_PARAMS(N, typename T)>                            \
-    struct is_future_tuple<util::tuple<BOOST_PP_ENUM_PARAMS(N, T)> >          \
-      : boost::mpl::bool_<                                                    \
-            true BOOST_PP_REPEAT(N, HPX_TRAITS_IS_FUTURE_TUPLE_ELEM, _)       \
-        >                                                                     \
-    {};                                                                       \
-    /**/
-
-    BOOST_PP_REPEAT_FROM_TO(
-        1, BOOST_PP_INC(HPX_TUPLE_LIMIT)
-      , HPX_TRAITS_IS_FUTURE_TUPLE, _
-    )
-    
-#   undef HPX_TRAITS_IS_FUTURE_TUPLE_ELEM
-#   undef HPX_TRAITS_IS_FUTURE_TUPLE
 }}
 
 #endif
-

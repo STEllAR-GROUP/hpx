@@ -84,17 +84,6 @@ namespace hpx { namespace actions
               , util::tuple<typename util::decay_unwrap<Ts>::type...>
             > f_;
         };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Action, typename F, typename ...Ts>
-        continuation_thread_function<Action, F, Ts...>
-        construct_continuation_thread_function(continuation_type cont,
-            naming::address::address_type lva, F&& f, Ts&&... vs)
-        {
-            return continuation_thread_function<Action, F, Ts...>(
-                std::move(cont), lva, std::forward<F>(f),
-                std::forward<Ts>(vs)...);
-        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -232,9 +221,13 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Ts&&... vs)
         {
+            typedef detail::continuation_thread_function<
+                Derived, invoker, naming::address::address_type, Ts...
+            > thread_function;
+
             return traits::action_decorate_function<Derived>::call(lva,
-                detail::construct_continuation_thread_function<Derived>(
-                    cont, lva, invoker(), lva, std::forward<Ts>(vs)...));
+                thread_function(std::move(cont), lva, invoker(), 
+                    lva, std::forward<Ts>(vs)...));
         }
 
         // direct execution

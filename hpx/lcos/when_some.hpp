@@ -238,10 +238,6 @@ namespace hpx
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/fusion/include/for_each.hpp>
 #include <boost/fusion/include/is_sequence.hpp>
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/enum.hpp>
-#include <boost/preprocessor/iterate.hpp>
-#include <boost/preprocessor/repeat.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility/enable_if.hpp>
 

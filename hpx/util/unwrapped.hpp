@@ -4,8 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !BOOST_PP_IS_ITERATING
-
 #ifndef HPX_UTIL_UNWRAPPED_HPP
 #define HPX_UTIL_UNWRAPPED_HPP
 
@@ -17,14 +15,10 @@
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/util/detail/pack.hpp>
 
 #include <boost/mpl/eval_if.hpp>
 #include <boost/fusion/include/fold.hpp>
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/iteration/iterate.hpp>
-#include <boost/preprocessor/repetition/enum.hpp>
-#include <boost/preprocessor/repetition/enum_params.hpp>
-#include <boost/preprocessor/repetition/repeat_from_to.hpp>
 #include <boost/utility/enable_if.hpp>
 
 namespace hpx { namespace util
@@ -124,34 +118,28 @@ namespace hpx { namespace util
             }
         };
 
-#       define UNWRAP_TUPLE_PUSH_BACK_GET(Z, N, D)                            \
-        util::get<N>(std::forward<Tuple_>(tuple))                             \
-        /**/
-#       define UNWRAP_TUPLE_PUSH_BACK(Z, N, D)                                \
-        template <BOOST_PP_ENUM_PARAMS(N, typename T), typename U>            \
-        struct unwrap_tuple_push_back<                                        \
-            util::tuple<BOOST_PP_ENUM_PARAMS(N, T)>, U                        \
-        >                                                                     \
-        {                                                                     \
-            typedef util::tuple<BOOST_PP_ENUM_PARAMS(N, T), U> type;          \
-                                                                              \
-            template <typename Tuple_, typename U_>                           \
-            static type call(Tuple_&& tuple, U_&& value)                      \
-            {                                                                 \
-                return type(                                                  \
-                    BOOST_PP_ENUM(N, UNWRAP_TUPLE_PUSH_BACK_GET, _)           \
-                  , std::forward<U_>(value));                                 \
-            }                                                                 \
-        };                                                                    \
-        /**/
+        template <typename ...Ts, typename U>
+        struct unwrap_tuple_push_back<util::tuple<Ts...>, U>
+        {
+            typedef util::tuple<Ts..., U> type;
 
-        BOOST_PP_REPEAT_FROM_TO(
-            1, HPX_TUPLE_LIMIT
-          , UNWRAP_TUPLE_PUSH_BACK, _
-        );
+            template <std::size_t ...Is, typename Tuple_, typename U_>
+            static type call(util::detail::pack_c<std::size_t, Is...>,
+                Tuple_&& tuple, U_&& value)
+            {
+                return type(
+                    util::get<Is>(std::forward<Tuple_>(tuple))...,
+                    std::forward<U_>(value));
+            }
 
-#       undef UNWRAP_TUPLE_PUSH_BACK_GET
-#       undef UNWRAP_TUPLE_PUSH_BACK
+            template <typename Tuple_, typename U_>
+            static type call(Tuple_&& tuple, U_&& value)
+            {
+                return call(
+                    typename util::detail::make_index_pack<sizeof...(Ts)>::type(),
+                    std::forward<Tuple_>(tuple), std::forward<U_>(value));
+            }
+        };
 
         struct unwrap_tuple_impl
         {
@@ -292,9 +280,15 @@ namespace hpx { namespace util
                     util::make_tuple());
             }
 
-            template <typename This, typename T0>
-            struct result<This(T0)>
-              : unwrapped_impl_result<F, T0>
+            template <typename This, typename T, typename ...Ts>
+            struct result<This(T, Ts...)>
+              : boost::mpl::if_c<
+                    (util::detail::pack<Ts...>::size == 0)
+                  , unwrapped_impl_result<F, T>
+                  , unwrapped_impl_result<F, util::tuple<
+                        typename util::decay<T>::type
+                      , typename util::decay<Ts>::type...> >
+                >::type
             {};
 
             // future
@@ -367,43 +361,23 @@ namespace hpx { namespace util
                     unwrap_impl_t::call(t0));
             }
 
-            // futures
-#define     HPX_UTIL_UNWRAPPED_DECAY(Z, N, D)                                 \
-            typename util::decay<BOOST_PP_CAT(T, N)>::type                    \
-            /**/
-#           define HPX_UTIL_UNWRAP_IMPL_OPERATOR(Z, N, D)                     \
-            template <typename This, BOOST_PP_ENUM_PARAMS(N, typename T)>     \
-            struct result<This(BOOST_PP_ENUM_PARAMS(N, T))>                   \
-              : result<This(util::tuple<                                      \
-                    BOOST_PP_ENUM(N, HPX_UTIL_UNWRAPPED_DECAY, _)>)>          \
-            {};                                                               \
-                                                                              \
-            template <BOOST_PP_ENUM_PARAMS(N, typename T)>                    \
-            BOOST_FORCEINLINE                                                 \
-            typename result<unwrapped_impl(BOOST_PP_ENUM_PARAMS(N, T))>::type \
-            operator()(HPX_ENUM_FWD_ARGS(N, T, t))                            \
-            {                                                                 \
-                typedef                                                       \
-                    typename result<unwrapped_impl(BOOST_PP_ENUM_PARAMS(N, T))>::type\
-                    result_type;                                              \
-                typedef                                                       \
-                    unwrap_impl<util::tuple<                                  \
-                        BOOST_PP_ENUM(N, HPX_UTIL_UNWRAPPED_DECAY, _)> >      \
-                    unwrap_impl_t;                                            \
-                                                                              \
-                return util::invoke_fused_r<result_type>(f_,                  \
-                    unwrap_impl_t::call(util::forward_as_tuple(               \
-                        HPX_ENUM_FORWARD_ARGS(N, T, t))));                    \
-            }                                                                 \
-            /**/
+            template <typename ...Ts>
+            BOOST_FORCEINLINE
+            typename result<unwrapped_impl(Ts...)>::type
+            operator()(Ts&&... vs)
+            {
+                typedef
+                    typename result<unwrapped_impl(Ts...)>::type
+                    result_type;
+                typedef
+                    unwrap_impl<util::tuple<
+                        typename util::decay<Ts>::type...> >
+                    unwrap_impl_t;
 
-            BOOST_PP_REPEAT_FROM_TO(
-                2, HPX_FUNCTION_ARGUMENT_LIMIT
-              , HPX_UTIL_UNWRAP_IMPL_OPERATOR, _
-            );
-
-#           undef HPX_UTIL_UNWRAPPED_DECAY
-#           undef HPX_UTIL_UNWRAP_IMPL_OPERATOR
+                return util::invoke_fused_r<result_type>(f_,
+                    unwrap_impl_t::call(util::forward_as_tuple(
+                        std::forward<Ts>(vs)...)));
+            }
 
             F f_;
         };
@@ -437,6 +411,24 @@ namespace hpx { namespace util
             res(std::forward<F>(f));
 
         return std::move(res);
+    }
+
+    template <typename ...Ts>
+    typename boost::lazy_enable_if_c<
+        traits::is_future_tuple<util::tuple<
+            typename util::decay<Ts>::type...
+        > >::value
+      , detail::unwrap_impl<util::tuple<
+            typename util::decay<Ts>::type...
+        > >
+    >::type unwrapped(Ts&&... vs)
+    {
+        typedef detail::unwrap_impl<util::tuple<
+            typename util::decay<Ts>::type...
+        > > unwrap_impl_t;
+
+        return unwrap_impl_t::call(util::forward_as_tuple(
+            std::forward<Ts>(vs)...));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -473,60 +465,5 @@ namespace hpx { namespace util
         return result_type(std::move(res));
     }
 }}
-
-#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/util/preprocessed/unwrapped.hpp>
-#else
-
-#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/unwrapped_" HPX_LIMIT_STR ".hpp")
-#endif
-
-#define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (2, HPX_FUNCTION_ARGUMENT_LIMIT, <hpx/util/unwrapped.hpp>))           \
-/**/
-#include BOOST_PP_ITERATE()
-
-#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(output: null)
-#endif
-
-#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-#else // BOOST_PP_IS_ITERATING
-
-#define N BOOST_PP_ITERATION()
-
-#define HPX_UTIL_UNWRAPPED_DECAY(Z, N, D)                                     \
-    typename util::decay<BOOST_PP_CAT(T, N)>::type                            \
-    /**/
-
-namespace hpx { namespace util
-{
-    ///////////////////////////////////////////////////////////////////////////
-    template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-    typename boost::lazy_enable_if_c<
-        traits::is_future_tuple<util::tuple<
-            BOOST_PP_ENUM(N, HPX_UTIL_UNWRAPPED_DECAY, _)
-        > >::value
-      , detail::unwrap_impl<util::tuple<
-            BOOST_PP_ENUM(N, HPX_UTIL_UNWRAPPED_DECAY, _)
-        > >
-    >::type unwrapped(HPX_ENUM_FWD_ARGS(N, T, f))
-    {
-        typedef detail::unwrap_impl<util::tuple<
-            BOOST_PP_ENUM(N, HPX_UTIL_UNWRAPPED_DECAY, _)
-        > > unwrap_impl_t;
-
-        return unwrap_impl_t::call(util::forward_as_tuple(
-            HPX_ENUM_FORWARD_ARGS(N, T, f)));
-    }
-}}
-
-#undef HPX_UTIL_UNWRAPPED_DECAY
-#undef N
 
 #endif
