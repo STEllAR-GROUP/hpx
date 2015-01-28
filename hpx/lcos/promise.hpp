@@ -77,7 +77,7 @@ namespace hpx { namespace components
 
         private:
             static boost::shared_ptr<util::one_size_heap_list_base> heap_;
-            static lcos::local::once_flag constructed_;
+            static boost::once_flag constructed_;
 
             static void destruct_heap()
             {
@@ -100,7 +100,9 @@ namespace hpx { namespace components
             static util::one_size_heap_list_base& get_heap()
             {
                 // ensure thread-safe initialization
-                lcos::local::call_once(constructed_,
+                // FIXME: The heap may be initialized during startup in a non-HPX thread
+                // Bootstrapping should happen in HPX threads ...
+                boost::call_once(constructed_,
                     &promise_heap_factory::create_heap);
                 return *heap_;
             }
@@ -126,7 +128,7 @@ namespace hpx { namespace components
             promise_heap_factory<Promise>::heap_;
 
         template <typename Promise>
-        lcos::local::once_flag
+        boost::once_flag
             promise_heap_factory<Promise>::constructed_;
 
         ///////////////////////////////////////////////////////////////////////
