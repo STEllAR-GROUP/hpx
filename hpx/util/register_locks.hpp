@@ -132,7 +132,7 @@ namespace hpx { namespace util
 #endif
 
 #else
-    template <typename Lock, typename Enable = void>
+    template <typename Lock, typename Enable>
     struct ignore_while_checking
     {
         ignore_while_checking(void const* lock) {}
