@@ -111,7 +111,7 @@ int hpx_main()
         hpx::apply(hpx::util::bind(obj, 1));
         hpx::apply(hpx::util::bind(obj, _1), 1);
     }
-    
+
 #   if !defined(BOOST_NO_CXX11_LAMBDAS) && !defined(BOOST_NO_CXX11_AUTO_DECLARATIONS)
     {
         using hpx::util::placeholders::_1;
@@ -126,12 +126,12 @@ int hpx_main()
     hpx::lcos::local::no_mutex result_mutex;
     hpx::lcos::local::no_mutex::scoped_lock l(result_mutex);
 #   if !defined(BOOST_NO_CXX11_LAMBDAS) && !defined(BOOST_NO_CXX11_AUTO_DECLARATIONS)
-    result_cv.wait_for(result_mutex, boost::chrono::seconds(1),
+    result_cv.wait_for(l, boost::chrono::seconds(1),
         hpx::util::bind(std::equal_to<boost::int32_t>(), boost::ref(accumulator), 18));
 
     HPX_TEST_EQ(accumulator.load(), 18);
 #   else
-    result_cv.wait_for(result_mutex, boost::chrono::seconds(1),
+    result_cv.wait_for(l, boost::chrono::seconds(1),
         hpx::util::bind(std::equal_to<boost::int32_t>(), boost::ref(accumulator), 15));
 
     HPX_TEST_EQ(accumulator.load(), 15);
