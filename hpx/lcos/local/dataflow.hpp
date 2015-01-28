@@ -211,6 +211,16 @@ namespace hpx { namespace lcos { namespace local
 
             // Current element is a not a future or future range, e.g. a just plain
             // value.
+            template <typename Iter, typename IsFuture, typename IsRange>
+            BOOST_FORCEINLINE
+            void await_next_respawn(Iter iter, IsFuture is_future,
+                IsRange is_range)
+            {
+                await_next(iter, is_future, is_range);
+                if (done_)
+                    finalize(policy_);
+            }
+
             template <typename Iter>
             BOOST_FORCEINLINE
             void await_next(Iter iter, boost::mpl::false_, boost::mpl::false_)
@@ -226,7 +236,12 @@ namespace hpx { namespace lcos { namespace local
                         boost::is_same<next_type, end_type>::value
                     >()
                 );
+            }
 
+            template <typename TupleIter, typename Iter>
+            void await_range_respawn(TupleIter iter, Iter next, Iter end)
+            {
+                await_range(iter, next, end);
                 if (done_)
                     finalize(policy_);
             }
@@ -239,7 +254,7 @@ namespace hpx { namespace lcos { namespace local
                     if (!next->is_ready())
                     {
                         void (dataflow_frame::*f)(TupleIter, Iter, Iter)
-                            = &dataflow_frame::await_range;
+                            = &dataflow_frame::await_range_respawn;
 
                         typedef
                             typename std::iterator_traits<
@@ -283,9 +298,6 @@ namespace hpx { namespace lcos { namespace local
                         boost::is_same<next_type, end_type>::value
                     >()
                 );
-
-                if (done_)
-                    finalize(policy_);
             }
 
             // Current element is a range (vector) of futures
@@ -320,7 +332,7 @@ namespace hpx { namespace lcos { namespace local
                 if(!f_.is_ready())
                 {
                     void (dataflow_frame::*f)(Iter, boost::mpl::true_, boost::mpl::false_)
-                        = &dataflow_frame::await_next;
+                        = &dataflow_frame::await_next_respawn;
 
                     typedef
                         typename traits::future_traits<
@@ -354,9 +366,6 @@ namespace hpx { namespace lcos { namespace local
                         boost::is_same<next_type, end_type>::value
                     >()
                 );
-
-                if (done_)
-                    finalize(policy_);
             }
 
             ///////////////////////////////////////////////////////////////////////
