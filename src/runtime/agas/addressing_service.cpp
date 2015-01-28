@@ -539,17 +539,21 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
     resolved_localities_type::iterator it = resolved_localities_.find(gid);
     if(it == resolved_localities_.end())
     {
-        parcelset::endpoints_type endpoints;
         // The locality hasn't been requested to be resolved yet. Do it now.
+        parcelset::endpoints_type endpoints;
         request req(locality_ns_resolve_locality, gid);
 
         if(is_bootstrap())
         {
             endpoints
                 = bootstrap->locality_ns_server_.service(req, ec).get_endpoints();
-            HPX_THROWS_IF(ec, internal_server_error
-              , "addressing_service::resolve_locality"
-              , "could not resolve locality to endpoints");
+            if(ec)
+            {
+                HPX_THROWS_IF(ec, internal_server_error
+                  , "addressing_service::resolve_locality"
+                  , "could not resolve locality to endpoints");
+                return endpoints;
+            }
         }
         else
         {
@@ -560,28 +564,35 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
                         req
                       , action_priority_
                     );
-                if(0 == threads::get_self_ptr())
+
+                if (0 == threads::get_self_ptr())
                 {
-                    while(!endpoints_future.is_ready()) ;
+                    // this should happen only during bootstrap
+                    HPX_ASSERT(hpx::is_starting());
+
+                    while(!endpoints_future.is_ready())
+                        /**/;
                 }
                 endpoints = endpoints_future.get(ec);
             }
             // Search again ... might have been added by a different thread already
             it = resolved_localities_.find(gid);
         }
+
         if(it == resolved_localities_.end())
         {
             if(HPX_UNLIKELY(!util::insert_checked(resolved_localities_.insert(
-                std::make_pair(
-                    gid
-                  , endpoints
-                )
-            ), it)))
+                    std::make_pair(
+                        gid
+                      , endpoints
+                    )
+                ), it)))
             {
                 HPX_THROWS_IF(ec, internal_server_error
                   , "addressing_service::resolve_locality"
                   , "resolved locality insertion failed "
                     "due to a locking error or memory corruption");
+                return endpoints;
             }
         }
     }
