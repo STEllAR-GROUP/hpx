@@ -248,7 +248,7 @@ namespace hpx { namespace naming
                 gid_type new_gid;
                 {
                     // split credit normally
-                    util::ignore_while_checking<scoped_try_lock> il(&l);
+                    util::ignore_while_checking<gid_type::mutex_type> il(&gid.get_mutex());
                     new_gid = split_gid_if_needed_locked(gid);
                 }
                 return new_gid;
