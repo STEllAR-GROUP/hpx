@@ -202,9 +202,9 @@ namespace hpx { namespace lcos { namespace local
             }
 
             ///////////////////////////////////////////////////////////////////
-            template <typename Policy, typename Iter>
+            template <typename Policy_, typename Iter>
             BOOST_FORCEINLINE
-            void await(Policy &&, Iter &&, boost::mpl::true_)
+            void await(Policy_ &&, Iter &&, boost::mpl::true_)
             {
                  done_ = true;
             }
