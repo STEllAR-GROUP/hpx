@@ -24,6 +24,12 @@ namespace hpx { namespace util
     // Always provide function exports, which guarantees ABI compatibility of
     // Debug and Release builds.
 
+    template <typename Lock, typename Enable = void>
+    struct ignore_while_checking
+    {
+        ignore_while_checking(void const* lock) {}
+    };
+
 #if defined(HPX_HAVE_VERIFY_LOCKS) || defined(HPX_EXPORTS)
 
     ///////////////////////////////////////////////////////////////////////////
@@ -35,23 +41,6 @@ namespace hpx { namespace util
     HPX_API_EXPORT void enable_lock_detection();
     HPX_API_EXPORT void ignore_lock(void const* lock);
     HPX_API_EXPORT void reset_ignored(void const* lock);
-
-    template <typename Lock, typename Enable = void>
-    struct ignore_while_checking
-    {
-        ignore_while_checking(void const* lock)
-          : lock_(lock)
-        {
-            ignore_lock(lock_);
-        }
-
-        ~ignore_while_checking()
-        {
-            reset_ignored(lock_);
-        }
-
-        void const* lock_;
-    };
 
     ///////////////////////////////////////////////////////////////////////////
 #if !defined(BOOST_NO_CXX11_DECLTYPE_N3276) && !defined(BOOST_NO_SFINAE_EXPR)
@@ -146,13 +135,6 @@ namespace hpx { namespace util
 #endif
 
 #else
-
-    template <typename Lock, typename Enable = void>
-    struct ignore_while_checking
-    {
-        ignore_while_checking(void const* lock) {}
-    };
-
     inline bool register_lock(void const*, util::register_lock_data* = 0)
     {
         return true;
