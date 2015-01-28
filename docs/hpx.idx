@@ -102,6 +102,9 @@ parallel::generate_n                  "generate_n" "hpx\.parallel\.v1\.generate_
 # hpx/parallel/algorithms/inclusive_scan.hpp
 parallel::inclusive_scan              "inclusive_scan" "hpx\.parallel\.v1\.inclusive_scan.*"
 
+# hpx/parallel/algorithms/lexicographical_compare.hpp
+parallel::lexicographical_compare     "lexicographical_compare" "hpx\.parallel\.v1\.lexicographical_compare.*"
+
 # hpx/parallel/algorithms/minmax.hpp
 parallel::max_element                 "max_element" "hpx\.parallel\.v1\.max_element.*"
 parallel::min_element                 "min_element" "hpx\.parallel\.v1\.min_element.*"
