@@ -18,7 +18,7 @@ void test_lexicographical_compare1(ExPolicy const& policy, IteratorTag)
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-    
+
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), 0);
 
@@ -30,8 +30,7 @@ void test_lexicographical_compare1(ExPolicy const& policy, IteratorTag)
         iterator(boost::begin(c)), iterator(boost::end(c)),
         boost::begin(d), boost::end(d));
 
-    HPX_TEST(res == false);
-    
+    HPX_TEST(!res);
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -43,11 +42,11 @@ void test_lexicographical_compare1_async(ExPolicy const& p, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), 0);
 
-    //d is lexicographical less than c
+    // d is lexicographical less than c
     std::vector<std::size_t> d(10006);
     std::iota(boost::begin(d), boost::end(d), 0);
 
-    hpx::future<bool> f = 
+    hpx::future<bool> f =
         hpx::parallel::lexicographical_compare(p,
             iterator(boost::begin(c)), iterator(boost::end(c)),
             boost::begin(d), boost::end(d));
@@ -56,7 +55,7 @@ void test_lexicographical_compare1_async(ExPolicy const& p, IteratorTag)
 
     bool res = f.get();
 
-    HPX_TEST(res == false);
+    HPX_TEST(!res);
 }
 
 template <typename IteratorTag>
@@ -64,17 +63,17 @@ void test_lexicographical_compare1()
 {
     using namespace hpx::parallel;
     test_lexicographical_compare1(seq, IteratorTag());
-    test_lexicographical_compare1(par, IteratorTag()); 
+    test_lexicographical_compare1(par, IteratorTag());
     test_lexicographical_compare1(par_vec, IteratorTag());
-    
+
     test_lexicographical_compare1_async(seq(task), IteratorTag());
     test_lexicographical_compare1_async(par(task), IteratorTag());
-    
+
     test_lexicographical_compare1(execution_policy(seq), IteratorTag());
     test_lexicographical_compare1(execution_policy(par), IteratorTag());
     test_lexicographical_compare1(execution_policy(par_vec), IteratorTag());
     test_lexicographical_compare1(execution_policy(seq(task)), IteratorTag());
-    test_lexicographical_compare1(execution_policy(par(task)), IteratorTag()); 
+    test_lexicographical_compare1(execution_policy(par(task)), IteratorTag());
 }
 
 void lexicographical_compare_test1()
@@ -104,7 +103,7 @@ void test_lexicographical_compare2(ExPolicy const& policy, IteratorTag)
         iterator(boost::begin(c)), iterator(boost::end(c)),
         boost::begin(d), boost::end(d));
 
-    HPX_TEST(res == false);
+    HPX_TEST(!res);
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -120,14 +119,14 @@ void test_lexicographical_compare2_async(ExPolicy const& p, IteratorTag)
     std::vector<std::size_t> d(10007);
     std::iota(boost::begin(d), boost::end(d), 0);
 
-    hpx::future<bool> f = 
+    hpx::future<bool> f =
         hpx::parallel::lexicographical_compare(p,
             iterator(boost::begin(c)), iterator(boost::end(c)),
             boost::begin(d), boost::end(d));
 
     f.wait();
 
-    HPX_TEST(f.get() == false);
+    HPX_TEST(!f.get());
 }
 
 template <typename IteratorTag>
@@ -177,7 +176,7 @@ void test_lexicographical_compare3(ExPolicy const& policy, IteratorTag)
         iterator(boost::begin(c)), iterator(boost::end(c)),
         boost::begin(d), boost::end(d));
 
-    HPX_TEST(res == true);
+    HPX_TEST(res);
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -193,14 +192,14 @@ void test_lexicographical_compare3_async(ExPolicy const& p, IteratorTag)
     std::vector<std::size_t> d(10007);
     std::iota(boost::begin(d), boost::end(d), 0);
 
-    hpx::future<bool> f = 
+    hpx::future<bool> f =
         hpx::parallel::lexicographical_compare(p,
             iterator(boost::begin(c)), iterator(boost::end(c)),
             boost::begin(d), boost::end(d));
 
     f.wait();
 
-    HPX_TEST(f.get() == true);
+    HPX_TEST(f.get());
 }
 
 template <typename IteratorTag>
