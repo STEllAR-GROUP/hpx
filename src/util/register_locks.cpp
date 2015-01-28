@@ -211,7 +211,7 @@ namespace hpx { namespace util
                     // temporarily cleaning held locks to avoid endless recursions
                     // when acquiring the back-trace
                     detail::reset_on_exit e(enabled, false);
-                    std::string back_trace = hpx::detail::backtrace_direct();
+                    std::string back_trace = hpx::detail::backtrace_direct(128);
 
                     // throw or log, depending on config options
                     if (get_config_entry("hpx.throw_on_held_lock", "1") == "0")
