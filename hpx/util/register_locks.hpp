@@ -25,10 +25,7 @@ namespace hpx { namespace util
     // Debug and Release builds.
 
     template <typename Lock, typename Enable = void>
-    struct ignore_while_checking
-    {
-        ignore_while_checking(void const* lock) {}
-    };
+    struct ignore_while_checking;
 
 #if defined(HPX_HAVE_VERIFY_LOCKS) || defined(HPX_EXPORTS)
 
@@ -135,6 +132,12 @@ namespace hpx { namespace util
 #endif
 
 #else
+    template <typename Lock, typename Enable = void>
+    struct ignore_while_checking;
+    {
+        ignore_while_checking(void const* lock) {}
+    };
+
     inline bool register_lock(void const*, util::register_lock_data* = 0)
     {
         return true;
