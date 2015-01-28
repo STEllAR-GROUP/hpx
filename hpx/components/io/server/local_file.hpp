@@ -27,11 +27,11 @@ typedef _W64 int   ssize_t;
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace io { namespace server
 {
-
     // local file class
     // uses C style file APIs
-    class local_file : public components::locking_hook<
-                       components::managed_component_base<local_file> >
+    class local_file
+      : public components::locking_hook<
+            components::managed_component_base<local_file> >
     {
       public:
 
@@ -258,7 +258,7 @@ namespace hpx { namespace io { namespace server
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
         HPX_DEFINE_COMPONENT_ACTION(local_file, open);
-        HPX_DEFINE_COMPONENT_CONST_ACTION(local_file, is_open);
+        HPX_DEFINE_COMPONENT_ACTION(local_file, is_open);
         HPX_DEFINE_COMPONENT_ACTION(local_file, close);
         HPX_DEFINE_COMPONENT_ACTION(local_file, remove_file);
         HPX_DEFINE_COMPONENT_ACTION(local_file, read);

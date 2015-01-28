@@ -246,7 +246,7 @@ namespace hpx { namespace io { namespace server
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
         HPX_DEFINE_COMPONENT_ACTION(orangefs_file, open);
-        HPX_DEFINE_COMPONENT_CONST_ACTION(orangefs_file, is_open);
+        HPX_DEFINE_COMPONENT_ACTION(orangefs_file, is_open);
         HPX_DEFINE_COMPONENT_ACTION(orangefs_file, close);
         HPX_DEFINE_COMPONENT_ACTION(orangefs_file, remove_file);
         HPX_DEFINE_COMPONENT_ACTION(orangefs_file, read);

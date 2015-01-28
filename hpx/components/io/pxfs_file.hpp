@@ -35,7 +35,7 @@ extern "C" {
 #include <pxfs.h>
 
 #ifdef __cplusplus
-} //extern "C" {
+} //extern "C"
 #endif
 
 /* -------------------------  end pvfs header stuff --------------- */
