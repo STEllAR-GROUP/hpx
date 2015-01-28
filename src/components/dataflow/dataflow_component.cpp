@@ -8,7 +8,6 @@
 #include <hpx/exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/scoped_unlock.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components/derived_component_factory.hpp>
@@ -24,6 +23,8 @@
 #include <hpx/util/get_and_reset_value.hpp>
 
 #include <boost/serialization/version.hpp>
+
+#include <sstream>
 
 HPX_REGISTER_COMPONENT_MODULE()
 
@@ -147,7 +148,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
 namespace dataflow_module
 {
     ///////////////////////////////////////////////////////////////////////////
-    bool get_startup(HPX_STD_FUNCTION<void()>& startup_func, bool& pre_startup)
+    bool get_startup(hpx::util::function_nonser<void()>& startup_func, bool& pre_startup)
     {
         // return our startup-function if performance counters are required
         startup_func = hpx::lcos::server::detail::register_counter_types;

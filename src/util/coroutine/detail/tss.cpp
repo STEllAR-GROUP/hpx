@@ -82,11 +82,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         void insert(void const* key,
             boost::shared_ptr<tss_cleanup_function> const& func, void* tss_data)
         {
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40500
-            data_[key].set_data(func, tss_data);
-#else
             data_.insert(std::make_pair(key, tss_data_node(func, tss_data)));
-#endif
         }
 
         void insert(void const* key, void* tss_data)

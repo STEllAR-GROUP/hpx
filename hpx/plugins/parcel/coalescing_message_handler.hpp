@@ -40,7 +40,7 @@ namespace hpx { namespace plugins { namespace parcel
             parcelset::parcelport* pp, std::size_t num = std::size_t(-1),
             std::size_t interval = std::size_t(-1));
 
-        void put_parcel(parcelset::parcel& p, write_handler_type const& f);
+        void put_parcel(parcelset::locality const & dest, parcelset::parcel& p, write_handler_type const& f);
 
         void flush(bool stop_buffering = false);
 
@@ -93,11 +93,11 @@ namespace hpx { namespace plugins { namespace parcel
         struct action_message_handler<action_type>                            \
         {                                                                     \
             static parcelset::policies::message_handler* call(                \
-                parcelset::parcelhandler* ph, naming::locality const& loc,    \
-                parcelset::connection_type t, parcelset::parcel const& /*p*/) \
+                parcelset::parcelhandler* ph, parcelset::locality const& loc, \
+                parcelset::parcel const& /*p*/)                               \
             {                                                                 \
                 return parcelset::get_message_handler(ph, action_name,        \
-                    "coalescing_message_handler", num, interval, loc, t);     \
+                    "coalescing_message_handler", num, interval, loc);        \
             }                                                                 \
         };                                                                    \
     }}                                                                        \
@@ -111,12 +111,12 @@ namespace hpx { namespace plugins { namespace parcel
         struct action_message_handler<action_type>                            \
         {                                                                     \
             static parcelset::policies::message_handler* call(                \
-                parcelset::parcelhandler* ph, naming::locality const& loc,    \
-                parcelset::connection_type t, parcelset::parcel const& /*p*/) \
+                parcelset::parcelhandler* ph, parcelset::locality const& loc, \
+                parcelset::parcel const& /*p*/)                               \
             {                                                                 \
                 error_code ec(lightweight);                                   \
                 return parcelset::get_message_handler(ph, action_name,        \
-                    "coalescing_message_handler", num, interval, loc, t, ec); \
+                    "coalescing_message_handler", num, interval, loc, ec);    \
             }                                                                 \
         };                                                                    \
     }}                                                                        \

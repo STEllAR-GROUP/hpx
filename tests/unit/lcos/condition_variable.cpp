@@ -495,15 +495,21 @@ void condition_test_waits(condition_test_data* data)
 
 void test_condition_waits()
 {
+    typedef boost::unique_lock<hpx::lcos::local::spinlock> unique_lock;
+
     condition_test_data data;
 
     hpx::thread thread(&condition_test_waits, &data);
 
     {
-        boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
+        unique_lock lock(data.mutex);
         HPX_TEST(lock ? true : false);
 
-        hpx::this_thread::sleep_for(boost::chrono::milliseconds(1));
+        {
+            hpx::util::scoped_unlock<unique_lock> ul(lock);
+            hpx::this_thread::sleep_for(boost::chrono::milliseconds(1));
+        }
+
         data.notified++;
         data.condition.notify_one();
         while (data.awoken != 1)
@@ -511,7 +517,11 @@ void test_condition_waits()
         HPX_TEST(lock ? true : false);
         HPX_TEST_EQ(data.awoken, 1);
 
-        hpx::this_thread::sleep_for(boost::chrono::milliseconds(1));
+        {
+            hpx::util::scoped_unlock<unique_lock> ul(lock);
+            hpx::this_thread::sleep_for(boost::chrono::milliseconds(1));
+        }
+
         data.notified++;
         data.condition.notify_one();
         while (data.awoken != 2)
@@ -519,7 +529,11 @@ void test_condition_waits()
         HPX_TEST(lock ? true : false);
         HPX_TEST_EQ(data.awoken, 2);
 
-        hpx::this_thread::sleep_for(boost::chrono::milliseconds(1));
+        {
+            hpx::util::scoped_unlock<unique_lock> ul(lock);
+            hpx::this_thread::sleep_for(boost::chrono::milliseconds(1));
+        }
+
         data.notified++;
         data.condition.notify_one();
         while (data.awoken != 3)
@@ -527,7 +541,11 @@ void test_condition_waits()
         HPX_TEST(lock ? true : false);
         HPX_TEST_EQ(data.awoken, 3);
 
-        hpx::this_thread::sleep_for(boost::chrono::milliseconds(1));
+        {
+            hpx::util::scoped_unlock<unique_lock> ul(lock);
+            hpx::this_thread::sleep_for(boost::chrono::milliseconds(1));
+        }
+
         data.notified++;
         data.condition.notify_one();
         while (data.awoken != 4)
@@ -536,7 +554,11 @@ void test_condition_waits()
         HPX_TEST_EQ(data.awoken, 4);
 
 
-        hpx::this_thread::sleep_for(boost::chrono::milliseconds(1));
+        {
+            hpx::util::scoped_unlock<unique_lock> ul(lock);
+            hpx::this_thread::sleep_for(boost::chrono::milliseconds(1));
+        }
+
         data.notified++;
         data.condition.notify_one();
         while (data.awoken != 5)

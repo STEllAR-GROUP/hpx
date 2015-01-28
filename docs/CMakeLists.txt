@@ -58,10 +58,13 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/copy.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/count.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/equal.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/exclusive_scan.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/fill.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/find.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/for_each.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/generate.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/inclusive_scan.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/lexicographical_compare.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/minmax.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/mismatch.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/move.hpp"
@@ -69,15 +72,19 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/replace.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/reverse.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/rotate.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/search.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/swap_ranges.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/transform.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/transform_exclusive_scan.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/transform_inclusive_scan.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/transform_reduce.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_copy.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_fill.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/get_ptr.hpp"
-    "${hpx_SOURCE_DIR}/hpx/runtime/actions/action_support.hpp"
+    "${hpx_SOURCE_DIR}/hpx/runtime/get_locality_name.hpp"
+    "${hpx_SOURCE_DIR}/hpx/runtime/actions/basic_action.hpp"
+    "${hpx_SOURCE_DIR}/hpx/runtime/actions/component_action.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action.hpp"
-    "${hpx_SOURCE_DIR}/hpx/runtime/actions/component_non_const_action.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/components/new.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/components/copy_component.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/components/migrate_component.hpp"
@@ -91,6 +98,8 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/lcos/when_any.hpp"
     "${hpx_SOURCE_DIR}/hpx/lcos/wait_some.hpp"
     "${hpx_SOURCE_DIR}/hpx/lcos/when_some.hpp"
+    "${hpx_SOURCE_DIR}/hpx/lcos/wait_each.hpp"
+    "${hpx_SOURCE_DIR}/hpx/lcos/when_each.hpp"
     "${hpx_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp")
 
 
@@ -318,9 +327,9 @@ add_custom_target(git_docs
   COMMAND "${CMAKE_COMMAND}"
     -DHPX_SOURCE_DIR:PATH=${CMAKE_SOURCE_DIR}
     -DHPX_VERSION:STRING=${HPX_VERSION}
-    -DHPX_DOCUMENTATION_FILES=\"${documentation_dependencies}\"
-    -P "${CMAKE_SOURCE_DIR}/cmake/HPX_UpdateGitDocs.cmake"
-  VERBATIM)
+    -DHPX_DOCUMENTATION_FILES="${documentation_dependencies};${doxygen_dependencies}"
+    -P "${CMAKE_SOURCE_DIR}/cmake/HPX_UpdateGitDocs.cmake")
+#  VERBATIM)
 
 add_dependencies(git_docs docs)
 if(HPX_BUILD_DOCUMENTATION_SINGLEPAGE)

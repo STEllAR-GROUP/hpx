@@ -61,7 +61,7 @@ the next example:
     // The following macro expands to a series of definitions of global objects
     // which are needed for proper serialization and initialization support
     // enabling the remote invocation of the function `some_global_function`.
-    ``[macroref HPX_REGISTER_PLAIN_ACTION `HPX_REGISTER_PLAIN_ACTION`]``(app::some_global_action);
+    ``[macroref HPX_REGISTER_PLAIN_ACTION `HPX_REGISTER_PLAIN_ACTION`]``(app::some_global_action, app_some_global_action);
 
 The shown code defines an action type `some_global_action` inside the namespace
 `app`.
@@ -69,6 +69,11 @@ The shown code defines an action type `some_global_action` inside the namespace
 [important If the action type definition is split between two macros as shown
            above, the name of the action type to create has to be the same for
            both macro invocations (here `some_global_action`).]
+
+[important The second argument passed to [macroref HPX_REGISTER_PLAIN_ACTION `HPX_REGISTER_PLAIN_ACTION`]
+           (`app_some_global_action`) has to comprise a globally unique C++
+           identifier representing the action. This is used for serialization
+           purposes.]
 
 For member functions of objects which have been registered with AGAS (e.g.
 'components') a different registration macro

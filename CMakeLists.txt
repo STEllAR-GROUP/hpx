@@ -1,5 +1,5 @@
 # Copyright (c) 2007-2014 Hartmut Kaiser
-# Copyright (c) 2011-2013 Thomas Heller
+# Copyright (c) 2011-2014 Thomas Heller
 # Copyright (c) 2007-2008 Chirag Dekate
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2011 Vinay C Amatya
@@ -11,6 +11,12 @@
 
 # We require at least CMake V2.8.10
 cmake_minimum_required(VERSION 2.8.10 FATAL_ERROR)
+
+# explicitly set certain policies
+cmake_policy(VERSION 2.8.10)
+if(NOT(CMAKE_VERSION VERSION_LESS 3.1.0))
+  cmake_policy(SET CMP0054 OLD)
+endif()
 
 # Overrides must go before the project() statement, otherwise they are ignored.
 
@@ -116,8 +122,8 @@ hpx_option(HPX_WITH_SECURITY BOOL "Enable security support via libsodium." OFF)
 
 # Logging configuration
 hpx_option(HPX_WITH_LOGGING BOOL "Build HPX with logging enabled (default: ON)." ON ADVANCED)
-if(NOT HPX_WITH_LOGGING)
-  hpx_add_config_define(HPX_NO_LOGGING)
+if(HPX_WITH_LOGGING)
+  hpx_add_config_define(HPX_WITH_LOGGING)
 endif()
 
 ## Compiler related build options
@@ -190,16 +196,6 @@ endif()
 ################################################################################
 # Utility configuration
 ################################################################################
-hpx_option(HPX_UTIL_FUNCTION BOOL "Use hpx::util::function instead of boost::function or std::function (default: ON)" ON ADVANCED)
-if(HPX_UTIL_FUNCTION)
-  hpx_add_config_define(HPX_UTIL_FUNCTION)
-endif()
-
-hpx_option(HPX_UTIL_TUPLE BOOL "Use hpx::util::tuple instead of boost::tuple or std::tuple (default: ON)" ON ADVANCED)
-if(HPX_UTIL_TUPLE)
-  hpx_add_config_define(HPX_UTIL_TUPLE)
-endif()
-
 set(HPX_HIDDEN_VISIBILITY_DEFAULT ON)
 if(CMAKE_COMPILER_IS_GNUCXX)
   if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.6.99
@@ -403,8 +399,8 @@ hpx_option(HPX_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS STRING "Maximum number of ch
 
 ## mpi parcelport settings
 hpx_option(HPX_PARCELPORT_MPI_ENV STRING
-  "List of environment variables checked to detect MPI (default: PMI_RANK;OMPI_COMM_WORLD_SIZE)."
-  "PMI_RANK;OMPI_COMM_WORLD_SIZE" CATEGORY "Parcelport" ADVANCED)
+  "List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE)."
+  "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE" CATEGORY "Parcelport" ADVANCED)
 
 ## Profiling related build options
 hpx_option(HPX_WITH_APEX BOOL "Enable APEX instrumentation support." OFF CATEGORY "Profiling")
@@ -467,6 +463,12 @@ if(HPX_THREAD_DEBUG_INFO)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_DEADLOCK_DETECTION)
 endif()
 
+# run hpx_main on all localities by default
+hpx_option(HPX_RUN_MAIN_EVERYWHERE BOOL "Run hpx_main by default on all localities (default: OFF)." OFF ADVANCED)
+if(HPX_RUN_MAIN_EVERYWHERE)
+  hpx_add_config_define(HPX_RUN_MAIN_EVERYWHERE)
+endif()
+
 # Options for our plugins
 hpx_option(HPX_WITH_COMPRESSION_BZIP2 BOOL "Enable bzip2 compression for parcel data (default: OFF)." OFF ADVANCED)
 hpx_option(HPX_WITH_COMPRESSION_SNAPPY BOOL "Enable snappy compression for parcel data (default: OFF)." OFF ADVANCED)
@@ -505,85 +507,6 @@ if(HPX_WITH_HWLOC)
   hpx_libraries(${HWLOC_LIBRARIES})
   include_directories(${HWLOC_INCLUDE_DIR})
   hpx_add_config_define(HPX_HAVE_HWLOC)
-endif()
-
-################################################################################
-# Decide whether to use the ibverbs based parcelport
-################################################################################
-if(HPX_PARCELPORT_IBVERBS)
-  find_package(Ibverbs)
-  if(NOT IBVERBS_FOUND)
-    hpx_error("The ibverbs libraries could not be found and HPX_PARCELPORT_IBVERBS=ON, please specify IBVERBS_ROOT to point to the correct location or set HPX_PARCELPORT_IBVERBS to OFF")
-  endif()
-  hpx_libraries(${IBVERBS_LIBRARIES})
-  include_directories(${IBVERBS_INCLUDE_DIR})
-
-  find_package(Rdmacm)
-  if(NOT RDMACM_FOUND)
-    hpx_error("The ibverbs libraries could not be found and HPX_PARCELPORT_IBVERBS=ON, please specify RDMACM_ROOT to point to the correct location or set HPX_PARCELPORT_IBVERBS to OFF")
-  endif()
-  hpx_libraries(${RDMACM_LIBRARIES})
-  include_directories(${RDMACM_INCLUDE_DIR})
-  hpx_add_config_define(HPX_PARCELPORT_IBVERBS)
-  hpx_add_config_define(HPX_PARCELPORT_IBVERBS_IFNAME "\"${HPX_PARCELPORT_IBVERBS_IFNAME}\"")
-  hpx_add_config_define(HPX_PARCELPORT_IBVERBS_MESSAGE_PAYLOAD "${HPX_PARCELPORT_IBVERBS_MESSAGE_PAYLOAD}")
-  hpx_add_config_define(HPX_PARCELPORT_IBVERBS_MEMORY_CHUNK_SIZE "${HPX_PARCELPORT_IBVERBS_MEMORY_CHUNK_SIZE}")
-  hpx_add_config_define(HPX_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS "${HPX_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS}")
-endif()
-
-################################################################################
-# Decide whether to use shared memory based parcelport (starting with
-# Boost V1.52)
-################################################################################
-if(HPX_PARCELPORT_IPC)
-  if(Boost_VERSION GREATER 105100)
-    hpx_add_config_define(HPX_PARCELPORT_IPC)
-  endif()
-endif()
-
-################################################################################
-# Decide whether to use the MPI based parcelport
-################################################################################
-if(HPX_PARCELPORT_MPI)
-  find_package(MPI)
-  if(NOT MPI_CXX_FOUND)
-    hpx_error("MPI could not be found and HPX_PARCELPORT_MPI=On, please specify MPI_CXX_COMPILER to point to a working MPI C++ compiler for your platform")
-  endif()
-  hpx_add_config_define(HPX_PARCELPORT_MPI)
-  if(MPI_CXX_COMPILE_FLAGS)
-    hpx_add_compile_flag(${MPI_CXX_COMPILE_FLAGS})
-  endif()
-  if(MPI_CXX_LINK_FLAGS)
-    #    hpx_add_link_flag_if_available(${MPI_CXX_LINK_FLAGS})
-  endif()
-  if(MPI_CXX_INCLUDE_PATH)
-    include_directories(${MPI_CXX_INCLUDE_PATH})
-  endif()
-  if(MPI_CXX_LIBRARIES)
-    hpx_libraries(${MPI_CXX_LIBRARIES})
-  endif()
-  if(MPI_LIBRARY)
-    hpx_libraries(${MPI_LIBRARY})
-  endif()
-  if(MPI_EXTRA_LIBRARY)
-    hpx_libraries(${MPI_LIBRARY})
-  endif()
-  # This list is to detect whether we run inside an mpi environment.
-  # If one of those environment variables is set, the MPI parcelport
-  # is enabled by default.
-  # PMI_RANK: Intel MPI and MVAPICH2
-  # OMPI_COMM_WORLD_SIZE: OpenMPI starting at version 1.3
-  if(HPX_PARCELPORT_MPI_ENV)
-    string(REPLACE ";" "," hpx_parcelport_mpi_env_ "${HPX_PARCELPORT_MPI_ENV}")
-    hpx_add_config_define(HPX_PARCELPORT_MPI_ENV "\"${hpx_parcelport_mpi_env_}\"")
-  endif()
-endif()
-
-################################################################################
-# Decide whether to use the TCP/IP based parcelport
-################################################################################
-if(HPX_PARCELPORT_TCP)
-  hpx_add_config_define(HPX_PARCELPORT_TCP)
 endif()
 
 ################################################################################
@@ -850,9 +773,6 @@ if(HPX_COMPILER_WARNINGS)
     hpx_add_compile_flag_if_available(-Wno-attributes LANGUAGES CXX)
     hpx_add_compile_flag_if_available(-Wno-cast-align LANGUAGES CXX)
 
-    # We never want trampolines
-    hpx_add_compile_flag_if_available(-Wt)
-
     # These are usually benign and can't be suppressed because of
     # interface requirements
     hpx_add_compile_flag_if_available(-Wno-unused-parameter)
@@ -1018,14 +938,6 @@ hpx_check_for_cxx11_std_unique_ptr(
   DEFINITIONS HPX_HAVE_CXX11_STD_UNIQUE_PTR
               BOOST_LOCKFREE_HAVE_CXX11_STD_UNIQUE_PTR)
 
-if(NOT HPX_UTIL_TUPLE)
-  hpx_check_for_cxx11_std_tuple(DEFINITIONS HPX_HAVE_CXX11_STD_TUPLE)
-endif()
-
-if(NOT HPX_UTIL_FUNCTION)
-  hpx_check_for_cxx11_std_bind(DEFINITIONS HPX_HAVE_CXX11_STD_FUNCTION)
-endif()
-
 hpx_check_for_cxx11_std_initializer_list(
   DEFINITIONS HPX_HAVE_CXX11_STD_INITIALIZER_LIST)
 
@@ -1097,11 +1009,7 @@ if (NOT DEFINED LIB)
 endif(NOT DEFINED LIB)
 
 if(HPX_FULL_RPATH)
-  list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/${LIB}" isSystemDir)
-  if(isSystemDir EQUAL -1)
-    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB}")
-  endif()
-  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH On)
+  hpx_include(SetFullRPATH)
 endif()
 ###############################################################################
 
@@ -1111,13 +1019,13 @@ endif()
 include(HPX_GitCommit)
 hpx_add_config_define(HPX_GIT_COMMIT "\"${HPX_GIT_COMMIT}\"")
 
-
 hpx_include(SetOutputPaths)
 ##############################################################################
 
 ################################################################################
-# # Configure compression and other plugins
-# ###############################################################################
+# Configure compression and other plugins
+################################################################################
+set(HPX_STATIC_PARCELPORT_PLUGINS "" CACHE INTERNAL "" FORCE)
 add_hpx_pseudo_target(plugins)
 add_subdirectory(plugins)
 
@@ -1154,8 +1062,6 @@ set(HPX_DEBUG_POSTFIX "d")
 # Recurse into some subdirectories. This does not actually cause another cmake
 # executable to run. The same process will walk through the project's entire
 # directory structure.
-
-
 if(HPX_BUILD_TOOLS)
   add_hpx_pseudo_target(tools)
   add_subdirectory(tools)
@@ -1199,7 +1105,6 @@ if(HPX_BUILD_TESTS)
   include_directories(tests)
   add_subdirectory(tests)
 endif()
-
 
 if(HPX_BUILD_RUNTIME)
   add_hpx_pseudo_target(runtime)
@@ -1252,6 +1157,15 @@ configure_file("${hpx_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
 ################################################################################
 # installation instructions
 ################################################################################
+install(
+  DIRECTORY ${CMAKE_BINARY_DIR}/bin/
+  DESTINATION hpx/bin/
+  COMPONENT core
+  FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                   GROUP_READ GROUP_EXECUTE
+                   WORLD_READ WORLD_EXECUTE
+  FILES_MATCHING PATTERN "hpxcxx" EXCLUDE)
+
 install( # install all hpx header files
   DIRECTORY hpx/
   DESTINATION include/hpx

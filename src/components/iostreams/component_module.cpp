@@ -58,7 +58,7 @@ namespace hpx { namespace iostreams { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool get_startup(HPX_STD_FUNCTION<void()>& startup_func, bool& pre_startup)
+    bool get_startup(util::function_nonser<void()>& startup_func, bool& pre_startup)
     {
         // return our startup-function
         startup_func = register_ostreams;   // function to run during startup
@@ -66,7 +66,7 @@ namespace hpx { namespace iostreams { namespace detail
         return true;
     }
 
-    bool get_shutdown(HPX_STD_FUNCTION<void()>& shutdown_func, bool& pre_shutdown)
+    bool get_shutdown(util::function_nonser<void()>& shutdown_func, bool& pre_shutdown)
     {
         // return our startup-function
         shutdown_func = unregister_ostreams;   // function to run during startup

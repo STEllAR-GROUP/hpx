@@ -6,7 +6,7 @@
 #if !defined(HPX_UTIL_SERIALIZE_EMPTY_TYPE_JAN_28_2013_0623AM)
 #define HPX_UTIL_SERIALIZE_EMPTY_TYPE_JAN_28_2013_0623AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 

@@ -114,7 +114,8 @@ namespace hpx { namespace components
         ///
         /// \return   Returns the GID of the first newly created component
         ///           instance.
-        naming::gid_type create_with_args(HPX_STD_FUNCTION<void(void*)> const&)
+        naming::gid_type create_with_args(
+            util::function_nonser<void(void*)> const&)
         {
             HPX_THROW_EXCEPTION(bad_request,
                 "base_lco_factory::create_with_args",
@@ -134,7 +135,7 @@ namespace hpx { namespace components
         ///           instance (this is the same as assign_gid, if successful).
         naming::gid_type create_with_args(
             naming::gid_type const& assign_gid,
-            HPX_STD_FUNCTION<void(void*)> const& f)
+            util::function_nonser<void(void*)> const& f)
         {
             HPX_THROW_EXCEPTION(bad_request,
                 "base_lco_factory::create_with_args",

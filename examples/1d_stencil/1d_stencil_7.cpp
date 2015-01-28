@@ -166,7 +166,7 @@ struct partition_server
     // wrapped into a component action. The macro below defines a new type
     // 'get_data_action' which represents the (possibly remote) member function
     // partition::get_data().
-    HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(partition_server, get_data, get_data_action);
+    HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_server, get_data, get_data_action);
 
 private:
     partition_data data_;

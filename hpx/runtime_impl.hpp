@@ -10,8 +10,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/io_service_pool.hpp>
-#include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
@@ -48,7 +48,7 @@ namespace hpx {
 
         //
         threads::thread_state run_helper(
-            HPX_STD_FUNCTION<runtime::hpx_main_function_type> func, int& result);
+            util::function_nonser<runtime::hpx_main_function_type> func, int& result);
 
         void wait_helper(boost::mutex& mtx, boost::condition& cond,
             bool& running);
@@ -66,7 +66,7 @@ namespace hpx {
         ///                       instance should be executed in.
         /// \param num_threads    [in] The initial number of threads to be started
         ///                       by the thread-manager.
-        explicit runtime_impl(util::runtime_configuration const& rtcfg,
+        explicit runtime_impl(util::runtime_configuration & rtcfg,
             runtime_mode locality_mode = runtime_mode_console,
             std::size_t num_threads = 1,
             init_scheduler_type const& init = init_scheduler_type(),
@@ -95,7 +95,7 @@ namespace hpx {
         ///                   return the value as returned as the result of the
         ///                   invocation of the function object given by the
         ///                   parameter \p func. Otherwise it will return zero.
-        int start(HPX_STD_FUNCTION<hpx_main_function_type> const& func,
+        int start(util::function_nonser<hpx_main_function_type> const& func,
                 bool blocking = false);
 
         /// \brief Start the runtime system
@@ -182,7 +182,7 @@ namespace hpx {
         /// \returns          This function will return the value as returned
         ///                   as the result of the invocation of the function
         ///                   object given by the parameter \p func.
-        int run(HPX_STD_FUNCTION<hpx_main_function_type> const& func);
+        int run(util::function_nonser<hpx_main_function_type> const& func);
 
         /// \brief Run the HPX runtime system, initially use the given number
         ///        of (OS) threads in the thread-manager and block waiting for
@@ -244,14 +244,22 @@ namespace hpx {
             return action_manager_;
         }
 
-        /// \brief Allow access to the locality this runtime instance is
+        /// \brief Allow access to the locality endpoints this runtime instance is
         /// associated with.
         ///
-        /// This accessor returns a reference to the locality this runtime
+        /// This accessor returns a reference to the locality endpoints this runtime
         /// instance is associated with.
-        naming::locality const& here() const
+        parcelset::endpoints_type const& endpoints() const
         {
-            return parcel_port_->here();
+            return parcel_handler_.endpoints();
+        }
+
+        /// \brief Returns a string of the locality endpoints (usable in debug output)
+        std::string here() const
+        {
+            std::ostringstream strm;
+            strm << get_runtime().endpoints();
+            return strm.str();
         }
 
         /// \brief Return the number of executed HPX threads
@@ -296,7 +304,7 @@ namespace hpx {
         /// \note       The difference to a startup function is that all
         ///             pre-startup functions will be (system-wide) executed
         ///             before any startup function.
-        void add_pre_startup_function(HPX_STD_FUNCTION<void()> const& f);
+        void add_pre_startup_function(util::function_nonser<void()> const& f);
 
         /// Add a function to be executed inside a HPX thread before hpx_main
         ///
@@ -304,7 +312,7 @@ namespace hpx {
         ///             thread before hpx_main is executed. This is very useful
         ///             to setup the runtime environment of the application
         ///             (install performance counters, etc.)
-        void add_startup_function(HPX_STD_FUNCTION<void()> const& f);
+        void add_startup_function(util::function_nonser<void()> const& f);
 
         /// Add a function to be executed inside a HPX thread during
         /// hpx::finalize, but guaranteed before any of teh shutdown functions
@@ -318,7 +326,7 @@ namespace hpx {
         /// \note       The difference to a shutdown function is that all
         ///             pre-shutdown functions will be (system-wide) executed
         ///             before any shutdown function.
-        void add_pre_shutdown_function(HPX_STD_FUNCTION<void()> const& f);
+        void add_pre_shutdown_function(util::function_nonser<void()> const& f);
 
         /// Add a function to be executed inside a HPX thread during hpx::finalize
         ///
@@ -326,7 +334,7 @@ namespace hpx {
         ///             thread while hpx::finalize is executed. This is very
         ///             useful to tear down the runtime environment of the
         ///             application (uninstall performance counters, etc.)
-        void add_shutdown_function(HPX_STD_FUNCTION<void()> const& f);
+        void add_shutdown_function(util::function_nonser<void()> const& f);
 
         /// Keep the factory object alive which is responsible for the given
         /// component type. This a purely internal function allowing to work
@@ -361,12 +369,11 @@ namespace hpx {
         util::io_service_pool main_pool_;
         util::io_service_pool io_pool_;
         util::io_service_pool timer_pool_;
-        boost::shared_ptr<parcelset::parcelport> parcel_port_;
         scheduling_policy_type scheduler_;
         notification_policy_type notifier_;
         boost::scoped_ptr<hpx::threads::threadmanager_base> thread_manager_;
-        naming::resolver_client agas_client_;
         parcelset::parcelhandler parcel_handler_;
+        naming::resolver_client agas_client_;
         util::detail::init_logging init_logging_;
         applier::applier applier_;
         actions::action_manager action_manager_;

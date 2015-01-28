@@ -16,6 +16,12 @@ set(tests
     local_file
     migrate_component
     remote_object
+    vector_for_each
+    vector_copy
+    vector_handle_values
+    vector_move
+    vector_transform_reduce
+    vector
    )
 
 set(action_invoke_no_more_than_PARAMETERS
@@ -59,6 +65,12 @@ set(inheritance_3_classes_concrete_FLAGS
 
 set(local_file_FLAGS
     DEPENDENCIES iostreams_component local_file_component)
+set(unordered_map_FLAGS DEPENDENCIES unordered_component)
+
+set(vector_FLAGS DEPENDENCIES vector_component)
+set(vector_algorithms_FLAGS DEPENDENCIES vector_component)
+set(vector_copy_FLAGS DEPENDENCIES vector_component)
+set(vector_handle_values_FLAGS DEPENDENCIES vector_component)
 
 foreach(test ${tests})
   set(sources

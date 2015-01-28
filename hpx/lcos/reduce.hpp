@@ -134,16 +134,14 @@ namespace hpx { namespace lcos
         template <typename Action>
         struct make_reduce_action
           : make_reduce_action_impl<
-                Action
-              , util::tuple_size<typename Action::arguments_type>::value
+                Action, Action::arity
             >
         {};
 
         template <typename Action>
         struct make_reduce_action<reduce_with_index<Action> >
           : make_reduce_action_impl<
-                reduce_with_index<Action>
-              , util::tuple_size<typename Action::arguments_type>::value - 1
+                reduce_with_index<Action>, Action::arity - 1
             >
         {};
 
@@ -498,7 +496,7 @@ namespace hpx { namespace lcos
                     reduce_invoker_type;
 
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };
@@ -539,10 +537,7 @@ namespace hpx { namespace lcos
     }
 
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
     >
@@ -550,9 +545,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > /* act */
+        hpx::actions::basic_action<Component, Signature, Derived> /* act */
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))
@@ -585,10 +578,7 @@ namespace hpx { namespace lcos
     }
 
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
     >
@@ -596,9 +586,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > /* act */
+        hpx::actions::basic_action<Component, Signature, Derived> /* act */
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))

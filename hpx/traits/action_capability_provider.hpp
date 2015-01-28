@@ -10,6 +10,7 @@
 
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/components/security/capability.hpp>
+#include <hpx/util/always_void.hpp>
 
 namespace hpx { namespace traits
 {
@@ -29,7 +30,8 @@ namespace hpx { namespace traits
     };
 
     template <typename Action>
-    struct action_capability_provider<Action, typename Action::type>
+    struct action_capability_provider<Action
+      , typename util::always_void<typename Action::type>::type>
       : action_capability_provider<typename Action::type>
     {};
 }}

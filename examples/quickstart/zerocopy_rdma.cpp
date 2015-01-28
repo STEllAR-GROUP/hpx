@@ -118,7 +118,7 @@ public:
             hpx::util::bind(&zerocopy_server::release_lock, this),
             allocator);
     }
-    HPX_DEFINE_COMPONENT_CONST_ACTION(zerocopy_server, get_here, get_here_action);
+    HPX_DEFINE_COMPONENT_ACTION(zerocopy_server, get_here, get_here_action);
 
     ///////////////////////////////////////////////////////////////////////////
     // Retrieve an array of doubles
@@ -132,7 +132,7 @@ public:
             general_buffer_type::reference,
             hpx::util::bind(&zerocopy_server::release_lock, this));
     }
-    HPX_DEFINE_COMPONENT_CONST_ACTION(zerocopy_server, get, get_action);
+    HPX_DEFINE_COMPONENT_ACTION(zerocopy_server, get, get_action);
 
 private:
     std::vector<double> data_;

@@ -33,11 +33,11 @@ void test_replace_copy_if(ExPolicy const& policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d1(c.size());
-    std::vector<std::size_t> d2(c.size());
+    std::vector<std::size_t> d2(c.size()); //-V656
 
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    std::size_t idx = std::rand() % c.size();
+    std::size_t idx = std::rand() % c.size(); //-V104
 
     hpx::parallel::replace_copy_if(policy,
         iterator(boost::begin(c)), iterator(boost::end(c)),
@@ -64,11 +64,11 @@ void test_replace_copy_if_async(ExPolicy const& p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d1(c.size());
-    std::vector<std::size_t> d2(c.size());
+    std::vector<std::size_t> d2(c.size()); //-V656
 
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    std::size_t idx = std::rand() % c.size();
+    std::size_t idx = std::rand() % c.size(); //-V104
 
     hpx::future<void> f =
         hpx::parallel::replace_copy_if(p,

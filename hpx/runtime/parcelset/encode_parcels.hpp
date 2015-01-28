@@ -11,6 +11,7 @@
 #define HPX_PARCELSET_ENCODE_PARCELS_HPP
 
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
+#include <hpx/runtime/parcelset/encode_parcel.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
@@ -41,17 +42,6 @@ namespace hpx
 
 namespace hpx { namespace parcelset
 {
-    template <typename Connection>
-    boost::shared_ptr<parcel_buffer<typename Connection::buffer_type> >
-    encode_parcels(std::vector<parcel> const &, Connection & connection, int archive_flags_);
-
-    template <typename Connection>
-    boost::shared_ptr<parcel_buffer<typename Connection::buffer_type> >
-    encode_parcels(parcel const &p, Connection & connection, int archive_flags_)
-    {
-        return encode_parcels(std::vector<parcel>(1, p), connection, archive_flags_);
-    }
-
 #if defined(HPX_HAVE_SECURITY)
     template <typename Archive, typename Connection>
     void serialize_certificate(Archive& archive, Connection & connection,
@@ -132,37 +122,32 @@ namespace hpx { namespace parcelset
 #endif
 
     template <typename Connection>
-    void
+    std::size_t
     encode_parcels(std::vector<parcel> const & pv, Connection & connection,
-        int archive_flags_, bool enable_security)
+        int archive_flags_, std::size_t max_outbound_size, bool enable_security)
     {
         typedef parcel_buffer<typename Connection::buffer_type> parcel_buffer_type;
 
-#if defined(HPX_DEBUG)
-        // make sure that all parcels go to the same locality
-        BOOST_FOREACH(parcel const& p, pv)
-        {
-            naming::locality const locality_id = p.get_destination_locality();
-            HPX_ASSERT(locality_id == connection.destination());
-        }
-#endif
         // collect argument sizes from parcels
         std::size_t arg_size = 0;
         boost::uint32_t dest_locality_id = pv[0].get_destination_locality_id();
 
-        boost::shared_ptr<parcel_buffer_type> buffer;
+        parcel_buffer_type & buffer = connection.get_buffer(pv[0]);
+        HPX_ASSERT(buffer.data_.empty());
+        std::size_t parcels_sent = 0;
 
         // guard against serialization errors
         try {
             try {
-                // preallocate data_
-                BOOST_FOREACH(parcel const & p, pv)
+                // preallocate data
+                for (/**/; parcels_sent != pv.size(); ++parcels_sent)
                 {
-                    arg_size += traits::get_type_size(p);
+                    if (arg_size >= max_outbound_size)
+                        break;
+                    arg_size += traits::get_type_size(pv[parcels_sent]);
                 }
 
-                buffer = connection.get_buffer(pv[0], arg_size);
-                buffer->clear();
+                buffer.data_.reserve(arg_size);
 
                 // mark start of serialization
                 util::high_resolution_timer timer;
@@ -174,13 +159,13 @@ namespace hpx { namespace parcelset
 
                     int archive_flags = archive_flags_;
                     if (filter.get() != 0) {
-                        filter->set_max_length(buffer->data_.capacity());
+                        filter->set_max_length(buffer.data_.capacity());
                         archive_flags |= util::enable_compression;
                     }
 
                     util::portable_binary_oarchive archive(
-                        buffer->data_
-                      , &buffer->chunks_
+                        buffer.data_
+                      , &buffer.chunks_
                       , dest_locality_id
                       , filter.get()
                       , archive_flags);
@@ -188,16 +173,15 @@ namespace hpx { namespace parcelset
 #if defined(HPX_HAVE_SECURITY)
                     std::set<boost::uint32_t> localities;
 #endif
-                    std::size_t count = pv.size();
-                    archive << count; //-V128
+                    archive << parcels_sent; //-V128
 
-                    BOOST_FOREACH(parcel const& p, pv)
+                    for (std::size_t i = 0; i != parcels_sent; ++i)
                     {
 #if defined(HPX_HAVE_SECURITY)
                         if (enable_security)
-                            serialize_certificate(archive, connection, localities, p);
+                            serialize_certificate(archive, connection, localities, pv[i]);
 #endif
-                        archive << p;
+                        archive << pv[i];
                     }
 
                     arg_size = archive.bytes_written();
@@ -207,10 +191,10 @@ namespace hpx { namespace parcelset
                 // calculate and sign the hash, but only after everything has
                 // been initialized
                 if (enable_security && !connection.first_message_)
-                    create_message_suffix(*buffer, pv[0].get_parcel_id());
+                    create_message_suffix(buffer, pv[0].get_parcel_id());
 #endif
                 // store the time required for serialization
-                buffer->data_point_.serialization_time_ = timer.elapsed_nanoseconds();
+                buffer.data_point_.serialization_time_ = timer.elapsed_nanoseconds();
             }
             catch (hpx::exception const& e) {
                 LPT_(fatal)
@@ -218,7 +202,7 @@ namespace hpx { namespace parcelset
                        "caught hpx::exception: "
                     << e.what();
                 hpx::report_error(boost::current_exception());
-                return;
+                return 0;
             }
             catch (boost::system::system_error const& e) {
                 LPT_(fatal)
@@ -226,14 +210,14 @@ namespace hpx { namespace parcelset
                        "caught boost::system::error: "
                     << e.what();
                 hpx::report_error(boost::current_exception());
-                return;
+                return 0;
             }
             catch (boost::exception const&) {
                 LPT_(fatal)
                     << "encode_parcels: "
                        "caught boost::exception";
                 hpx::report_error(boost::current_exception());
-                return;
+                return 0;
             }
             catch (std::exception const& e) {
                 // We have to repackage all exceptions thrown by the
@@ -241,6 +225,7 @@ namespace hpx { namespace parcelset
                 // e.what() description of the problem, due to slicing.
                 boost::throw_exception(boost::enable_error_info(
                     hpx::exception(serialization_error, e.what())));
+                return 0;
             }
         }
         catch (...) {
@@ -248,56 +233,13 @@ namespace hpx { namespace parcelset
                     << "encode_parcels: "
                    "caught unknown exception";
             hpx::report_error(boost::current_exception());
-            return;
+            return 0;
         }
 
-        buffer->size_ = buffer->data_.size();
-        buffer->data_size_ = arg_size;
+        buffer.data_point_.num_parcels_ = parcels_sent;
+        encode_finalize(buffer, arg_size);
 
-        performance_counters::parcels::data_point& data = buffer->data_point_;
-        data.num_parcels_ = pv.size();
-        data.bytes_ = arg_size;
-        data.raw_bytes_ = buffer->data_.size();
-
-        // prepare chunk data for transmission, the transmission_chunks data
-        // first holds all zero-copy, then all non-zero-copy chunk infos
-        typedef typename parcel_buffer_type::transmission_chunk_type
-            transmission_chunk_type;
-        typedef typename parcel_buffer_type::count_chunks_type
-            count_chunks_type;
-
-        std::vector<transmission_chunk_type>& chunks =
-            buffer->transmission_chunks_;
-
-        chunks.clear();
-        chunks.reserve(buffer->chunks_.size());
-
-        std::size_t index = 0;
-        BOOST_FOREACH(util::serialization_chunk& c, buffer->chunks_)
-        {
-            if (c.type_ == util::chunk_type_pointer) {
-                chunks.push_back(transmission_chunk_type(index, c.size_));
-            }
-            ++index;
-        }
-
-        buffer->num_chunks_ = count_chunks_type(
-                static_cast<boost::uint32_t>(chunks.size()),
-                static_cast<boost::uint32_t>(buffer->chunks_.size() - chunks.size())
-            );
-
-        if (!chunks.empty()) {
-            // the remaining number of chunks are non-zero-copy
-            BOOST_FOREACH(util::serialization_chunk& c, buffer->chunks_)
-            {
-                if (c.type_ == util::chunk_type_index) {
-                    chunks.push_back(
-                        transmission_chunk_type(c.data_.index_, c.size_));
-                }
-            }
-        }
-
-        return;
+        return parcels_sent;
     }
 }}
 

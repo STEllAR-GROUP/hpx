@@ -31,22 +31,44 @@ namespace hpx { namespace parcelset
           : data_(allocator)
           , num_chunks_(count_chunks_type(0, 0))
           , size_(0), data_size_(0)
-          , parcels_decoded_(false)
         {}
 
-        explicit parcel_buffer(BufferType const & data, allocator_type allocator = allocator_type())
+        explicit parcel_buffer(BufferType const & data,
+                allocator_type allocator = allocator_type())
           : data_(data, allocator)
           , num_chunks_(count_chunks_type(0, 0))
           , size_(0), data_size_(0)
-          , parcels_decoded_(false)
         {}
 
         explicit parcel_buffer(BufferType && data, allocator_type allocator = allocator_type())
           : data_(std::move(data), allocator)
           , num_chunks_(count_chunks_type(0, 0))
           , size_(0), data_size_(0)
-          , parcels_decoded_(false)
         {}
+
+        parcel_buffer(parcel_buffer && other)
+          : data_(std::move(other.data_))
+          , chunks_(std::move(other.chunks_))
+          , transmission_chunks_(std::move(other.transmission_chunks_))
+          , num_chunks_(other.num_chunks_)
+          , size_(other.size_)
+          , data_size_(other.data_size_)
+          , data_point_(other.data_point_)
+        {
+        }
+
+        parcel_buffer &operator=(parcel_buffer && other)
+        {
+            data_ = std::move(other.data_);
+            chunks_ = std::move(other.chunks_);
+            transmission_chunks_ = std::move(other.transmission_chunks_);
+            num_chunks_ = other.num_chunks_;
+            size_ = other.size_;
+            data_size_ = other.data_size_;
+            data_point_ = other.data_point_;
+
+            return *this;
+        }
 
         void clear()
         {
@@ -56,7 +78,7 @@ namespace hpx { namespace parcelset
             num_chunks_ = count_chunks_type(0, 0);
             size_ = 0;
             data_size_ = 0;
-            parcels_decoded_ = false;
+            data_point_ = performance_counters::parcels::data_point();
         }
 
         BufferType data_;
@@ -72,10 +94,9 @@ namespace hpx { namespace parcelset
         boost::integer::ulittle64_t size_;
         boost::integer::ulittle64_t data_size_;
 
-        boost::atomic<bool> parcels_decoded_;
-
         /// Counters and their data containers.
         performance_counters::parcels::data_point data_point_;
+        HPX_MOVABLE_BUT_NOT_COPYABLE(parcel_buffer)
     };
 }}
 

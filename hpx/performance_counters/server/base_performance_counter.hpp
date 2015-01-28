@@ -114,7 +114,7 @@ namespace hpx { namespace performance_counters { namespace server
 
         /// The \a get_counter_info_action retrieves a performance counters
         /// information.
-        HPX_DEFINE_COMPONENT_CONST_ACTION(base_performance_counter,
+        HPX_DEFINE_COMPONENT_ACTION(base_performance_counter,
             get_counter_info_nonvirt, get_counter_info_action);
 
         /// The \a get_counter_value_action queries the value of a performance
@@ -137,6 +137,12 @@ namespace hpx { namespace performance_counters { namespace server
         /// The \a stop_action
         HPX_DEFINE_COMPONENT_ACTION(base_performance_counter,
             stop_nonvirt, stop_action);
+
+        // This component type requires valid id for its actions to be invoked
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return !naming::is_locality(id);
+        }
 
         /// This is the default hook implementation for decorate_action which
         /// does no hooking at all.

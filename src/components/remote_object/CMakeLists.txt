@@ -19,20 +19,3 @@ add_hpx_pseudo_dependencies(components.remote_object
 add_hpx_pseudo_dependencies(core
                           components.remote_object)
 
-################################################################################
-# add headers to partial_preprocessing
-if(Boost_VERSION GREATER 105000)
-  hpx_partial_preprocess_header(
-      "hpx/components/remote_object/distributed_new.hpp"
-      LIMIT HPX_LIMIT
-  )
-  hpx_partial_preprocess_header(
-      "hpx/components/remote_object/ctor_fun.hpp"
-      LIMIT HPX_LIMIT
-  )
-  hpx_partial_preprocess_header(
-      "hpx/components/remote_object/new.hpp"
-      LIMIT HPX_LIMIT
-  )
-endif()
-

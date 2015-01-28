@@ -28,7 +28,7 @@ namespace hpx { namespace threads
     {
         void write_to_log(char const* valuename, std::size_t value)
         {
-            LTM_(debug) << "hwloc_topology: " << valuename << ": " << value;
+            LTM_(debug) << "hwloc_topology: " << valuename << ": " << value; //-V128
         }
 
         void write_to_log_mask(char const* valuename, mask_cref_type value)
@@ -41,13 +41,13 @@ namespace hpx { namespace threads
         void write_to_log(char const* valuename,
             std::vector<std::size_t> const& values)
         {
-            LTM_(debug) << "hwloc_topology: " << valuename << "s, size: "
+            LTM_(debug) << "hwloc_topology: " << valuename << "s, size: " //-V128
                         << values.size();
 
             std::size_t i = 0;
             BOOST_FOREACH(std::size_t value, values)
             {
-                LTM_(debug) << "hwloc_topology: " << valuename
+                LTM_(debug) << "hwloc_topology: " << valuename //-V128
                             << "(" << i++ << "): " << value;
             }
         }
@@ -55,13 +55,13 @@ namespace hpx { namespace threads
         void write_to_log_mask(char const* valuename,
             std::vector<mask_type> const& values)
         {
-            LTM_(debug) << "hwloc_topology: " << valuename << "s, size: "
+            LTM_(debug) << "hwloc_topology: " << valuename << "s, size: " //-V128
                         << values.size();
 
             std::size_t i = 0;
             BOOST_FOREACH(mask_cref_type value, values)
             {
-                LTM_(debug) << "hwloc_topology: " << valuename
+                LTM_(debug) << "hwloc_topology: " << valuename //-V128
                             << "(" << i++ << "): " HPX_CPU_MASK_PREFIX
                             << std::hex << value;
             }
@@ -990,7 +990,7 @@ namespace hpx { namespace threads
             }
 
             int const pu_depth = hwloc_get_type_or_below_depth(topo, HWLOC_OBJ_PU);
-            for (unsigned int i = 0; i != num_of_pus_; ++i)
+            for (unsigned int i = 0; i != num_of_pus_; ++i) //-V104
             {
                 hwloc_obj_t const pu_obj = hwloc_get_obj_by_depth(topo, pu_depth, i);
                 set(mask, hwloc_bitmap_isset(cpuset, pu_obj->os_index) != 0);

@@ -32,8 +32,6 @@ using hpx::find_here;
 
 using hpx::naming::id_type;
 
-using hpx::actions::plain_result_action1;
-
 using hpx::lcos::future;
 using hpx::async;
 using hpx::lcos::wait_each;
@@ -220,8 +218,9 @@ int hpx_main(
                 for (boost::uint64_t i = 0; i < count; ++i)
                     futures.push_back(async<null_action>(here, i));
 
-                wait_each(futures, hpx::util::unwrapped(
-                    [] (double r) { global_scratch += r; }));
+                wait_each(hpx::util::unwrapped(
+                    [] (double r) { global_scratch += r; }),
+                    futures);
 
                 // stop the clock
                 const double duration = walltime.elapsed();

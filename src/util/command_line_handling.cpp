@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,7 +15,6 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
-#include <hpx/util/mpi_environment.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/asio.hpp>
@@ -295,6 +294,13 @@ namespace hpx { namespace util
 
         bool debug_clp = node != std::size_t(-1) && vm.count("hpx:debug-clp");
 
+        if (vm.count("hpx:ini")) {
+            std::vector<std::string> cfg =
+                vm["hpx:ini"].as<std::vector<std::string> >();
+            std::copy(cfg.begin(), cfg.end(), std::back_inserter(ini_config));
+            cfgmap.add(cfg);
+        }
+
         // create host name mapping
         util::map_hostnames mapnames(debug_clp);
 
@@ -408,6 +414,7 @@ namespace hpx { namespace util
             if (vm.count("hpx:worker")) {
                 mode_ = hpx::runtime_mode_worker;
 
+#if !defined(HPX_RUN_MAIN_EVERYWHERE)
                 // do not execute any explicit hpx_main except if asked
                 // otherwise
                 if (!vm.count("hpx:run-hpx-main") &&
@@ -415,6 +422,7 @@ namespace hpx { namespace util
                 {
                     util::detail::reset_function(hpx_main_f_);
                 }
+#endif
             }
             else if (vm.count("hpx:connect")) {
                 mode_ = hpx::runtime_mode_connect;
@@ -427,6 +435,7 @@ namespace hpx { namespace util
             // when connecting we need to select a unique port
             hpx_port = HPX_CONNECTING_IP_PORT;
 
+#if !defined(HPX_RUN_MAIN_EVERYWHERE)
             // do not execute any explicit hpx_main except if asked
             // otherwise
             if (!vm.count("hpx:run-hpx-main") &&
@@ -434,6 +443,7 @@ namespace hpx { namespace util
             {
                 util::detail::reset_function(hpx_main_f_);
             }
+#endif
         }
         else if (node != std::size_t(-1) || vm.count("hpx:node")) {
             // command line overwrites the environment
@@ -456,6 +466,7 @@ namespace hpx { namespace util
                     hpx_port = static_cast<boost::uint16_t>(hpx_port + node);
                     mode_ = hpx::runtime_mode_worker;
 
+#if !defined(HPX_RUN_MAIN_EVERYWHERE)
                     // do not execute any explicit hpx_main except if asked
                     // otherwise
                     if (!vm.count("hpx:run-hpx-main") &&
@@ -463,18 +474,13 @@ namespace hpx { namespace util
                     {
                         util::detail::reset_function(hpx_main_f_);
                     }
+#endif
                 }
             }
 
             // store node number in configuration
             ini_config += "hpx.locality!=" +
                 boost::lexical_cast<std::string>(node);
-        }
-
-        if (vm.count("hpx:ini")) {
-            std::vector<std::string> cfg =
-                vm["hpx:ini"].as<std::vector<std::string> >();
-            std::copy(cfg.begin(), cfg.end(), std::back_inserter(ini_config));
         }
 
         if (vm.count("hpx:hpx")) {
@@ -526,6 +532,7 @@ namespace hpx { namespace util
             // should not run the AGAS server we assume to be in worker mode
             mode_ = hpx::runtime_mode_worker;
 
+#if !defined(HPX_RUN_MAIN_EVERYWHERE)
             // do not execute any explicit hpx_main except if asked
             // otherwise
             if (!vm.count("hpx:run-hpx-main") &&
@@ -533,6 +540,7 @@ namespace hpx { namespace util
             {
                 util::detail::reset_function(hpx_main_f_);
             }
+#endif
         }
 
         // write HPX and AGAS network parameters to the proper ini-file entries
@@ -686,7 +694,7 @@ namespace hpx { namespace util
             else if (0 == std::string("full").find(help_option)) {
                 // defer printing help until after dynamic part has been
                 // acquired
-                hpx::util::osstream strm;
+                std::ostringstream strm;
                 strm << help << std::endl;
                 ini_config_ += "hpx.cmd_line_help!=" +
                     detail::encode_string(strm.str());
@@ -701,23 +709,42 @@ namespace hpx { namespace util
         return false;
     }
 
+    void attach_debugger()
+    {
+#if defined(_POSIX_VERSION)
+        volatile int i = 0;
+        std::cerr
+            << "PID: " << getpid() << " on " << boost::asio::ip::host_name()
+            << " ready for attaching debugger. Once attached set i = 1 and continue"
+            << std::endl;
+        while(i == 0)
+        {
+            sleep(1);
+        }
+#elif defined(BOOST_WINDOWS)
+        DebugBreak();
+#endif
+    }
+
     void command_line_handling::handle_attach_debugger()
     {
-#if defined(_POSIX_VERSION) || defined(BOOST_MSVC)
-        if(vm_.count("hpx:attach-debugger")) {
-#if defined(_POSIX_VERSION)
-            volatile int i = 0;
-            std::cerr
-                << "PID: " << getpid() << " on " << boost::asio::ip::host_name()
-                << " ready for attaching debugger. Once attached set i = 1 and continue"
-                << std::endl;
-            while(i == 0)
-            {
-                sleep(1);
+#if defined(_POSIX_VERSION) || defined(BOOST_WINDOWS)
+        if(vm_.count("hpx:attach-debugger"))
+        {
+            std::string option = vm_["hpx:attach-debugger"].as<std::string>();
+            if (option != "startup" && option != "exception") {
+                std::cerr <<
+                    "hpx::init: command line warning: --hpx:attach-debugger: "
+                    "invalid option: " << option << ". Allowed values are "
+                    "'startup' or 'exception'" << std::endl;
             }
-#elif defined(BOOST_MSVC)
-            DebugBreak();
-#endif
+            else {
+                if (option == "startup")
+                    attach_debugger();
+
+                using namespace boost::assign;
+                ini_config_ += "hpx.attach_debugger!=" + option;
+            }
         }
 #endif
     }
@@ -730,7 +757,7 @@ namespace hpx { namespace util
         threads::topology& top = threads::create_topology();
         runtime & rt = get_runtime();
         {
-            util::osstream strm;    // make sure all output is kept together
+            std::ostringstream strm;    // make sure all output is kept together
 
             strm << std::string(79, '*') << '\n';
             strm << "locality: " << hpx::get_locality_id() << '\n';
@@ -762,7 +789,7 @@ namespace hpx { namespace util
                 }
             }
 
-            std::cout << util::osstream_get_string(strm);
+            std::cout << strm.str();
         }
     }
 #endif
@@ -771,13 +798,13 @@ namespace hpx { namespace util
     {
         runtime & rt = get_runtime();
         {
-            util::osstream strm;    // make sure all output is kept together
+            std::ostringstream strm;    // make sure all output is kept together
             strm << std::string(79, '*') << '\n';
             strm << "locality: " << hpx::get_locality_id() << '\n';
 
             rt.get_parcel_handler().list_parcelports(strm);
 
-            std::cout << util::osstream_get_string(strm);
+            std::cout << strm.str();
         }
     }
 
@@ -787,7 +814,9 @@ namespace hpx { namespace util
         int argc, char** argv)
     {
         util::manage_config cfgmap(ini_config_);
-        std::size_t node = std::size_t(-1);
+
+        std::vector<boost::shared_ptr<plugins::plugin_registry_base> >
+            plugin_registries = rtcfg_.load_modules();
 
         // Initial analysis of the command line options. This is
         // preliminary as it will not take into account any aliases as
@@ -807,7 +836,7 @@ namespace hpx { namespace util
 
             // handle all --hpx:foo options, determine node
             std::vector<std::string> ini_config;    // will be discarded
-            if (!handle_arguments(cfgmap, prevm, ini_config, node))
+            if (!handle_arguments(cfgmap, prevm, ini_config, node_))
                 return -2;
 
             // re-initialize runtime configuration object
@@ -834,11 +863,16 @@ namespace hpx { namespace util
         // Re-run program option analysis, ini settings (such as aliases)
         // will be considered now.
 
-        util::mpi_environment::init(&argc, &argv, *this, node);
+        parcelset::parcelhandler::init(&argc, &argv, *this);
+        BOOST_FOREACH(boost::shared_ptr<plugins::plugin_registry_base> & reg,
+            plugin_registries)
+        {
+            reg->init(&argc, &argv, *this);
+        }
 
         // minimally assume one locality and this is the console
-        if (node == std::size_t(-1))
-            node = 0;
+        if (node_ == std::size_t(-1))
+            node_ = 0;
 
         // Now re-parse the command line using the node number (if given).
         // This will additionally detect any --hpx:N:foo options.
@@ -846,7 +880,7 @@ namespace hpx { namespace util
         std::vector<std::string> unregistered_options;
 
         if (!util::parse_commandline(rtcfg_, desc_cmdline,
-                argc, argv, vm_, node, util::allow_unregistered, mode_,
+                argc, argv, vm_, node_, util::allow_unregistered, mode_,
                 &help, &unregistered_options))
         {
             return -1;
@@ -856,7 +890,7 @@ namespace hpx { namespace util
         handle_attach_debugger();
 
         // handle all --hpx:foo and --hpx:*:foo options
-        if (!handle_arguments(cfgmap, vm_, ini_config_, node))
+        if (!handle_arguments(cfgmap, vm_, ini_config_, node_))
             return -2;
 
         // store unregistered command line and arguments

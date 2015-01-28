@@ -210,7 +210,7 @@ if(NOT HPX_STATIC_LINKING)
         debug ${Boost_SYSTEM_LIBRARY_DEBUG}
         optimized ${Boost_SYSTEM_LIBRARY_RELEASE}
         debug ${Boost_SERIALIZATION_LIBRARY_DEBUG}
-        optimized ${Boost_SERIALIZATION_LIBRARY_DEBUG})
+        optimized ${Boost_SERIALIZATION_LIBRARY_RELEASE})
   endif()
 
   target_link_libraries(hpx_serialization
@@ -223,6 +223,11 @@ if(NOT HPX_STATIC_LINKING)
     "HPX_COROUTINE_EXPORTS")
   set(hpx_targets ${hpx_targets} hpx_serialization)
 endif()
+
+# Add static parcelport sources ...
+add_static_parcelports()
+set(hpx_HEADERS ${hpx_HEADERS} ${HPX_STATIC_PARCELPORT_PLUGINS_HEADERS})
+set(hpx_SOURCES ${hpx_SOURCES} ${HPX_STATIC_PARCELPORT_PLUGINS_SOURCES})
 
 ################################################################################
 # libhpx

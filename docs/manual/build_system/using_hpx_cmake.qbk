@@ -136,5 +136,11 @@ Optional Parameters are:
 If you do not use CMake, you can still build against __hpx__ but you should refer
 to the section on __pkg_config__.
 
+[note Since HPX relies on dynamic libraries, the dynamic linker needs to know where to look for them.
+      If HPX isn't installed into a path which is configured as a linker search path, external projects
+      need to either set RPATH or adapt LD_LIBRARY_PATH to point to where the hpx libraries reside.
+      In order to set RPATHs, you can include HPX_SetFullRPATH in your project after all libraries you want
+      to link against have been added. Please also consult the CMake documentation [@http://www.cmake.org/Wiki/CMake_RPATH_handling `here`]]
+
 [endsect] [/ Using HPX with CMake based projects]
 

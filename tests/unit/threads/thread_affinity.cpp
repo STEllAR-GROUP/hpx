@@ -128,8 +128,8 @@ void thread_affinity_foreman()
         // is the index of the future in the vector, and the second is the
         // return value of the future. hpx::lcos::wait doesn't return until
         // all the futures in the vector have returned.
-        hpx::lcos::wait_each(futures, hpx::util::unwrapped(
-            boost::bind(&check_in, boost::ref(attendance), ::_1)));
+        hpx::lcos::wait_each(hpx::util::unwrapped(
+            boost::bind(&check_in, boost::ref(attendance), ::_1)), futures);
     }
 }
 

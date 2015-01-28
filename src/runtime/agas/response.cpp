@@ -31,7 +31,7 @@
 #include <boost/fusion/include/value_at.hpp>
 
 // The number of types that response's variant can represent.
-#define HPX_AGAS_RESPONSE_SUBTYPES 11
+#define HPX_AGAS_RESPONSE_SUBTYPES 12
 
 namespace hpx { namespace agas
 {
@@ -42,12 +42,12 @@ namespace hpx { namespace agas
         {}
 
         template <typename Tuple>
-        response_data(const Tuple& tuple)
+        response_data(Tuple const & tuple)
           : data(tuple)
         {}
 
         template <typename Tuple>
-        response_data& operator=(const Tuple& tuple)
+        response_data& operator=(Tuple const & tuple)
         {
             data = tuple;
             return *this;
@@ -73,6 +73,7 @@ namespace hpx { namespace agas
           , subtype_string              = 0x8
           , subtype_resolved_localities = 0x9
           , subtype_added_credits       = 0xa
+          , subtype_endpoints           = 0xb
           // update HPX_AGAS_RESPONSE_SUBTYPES is you add more subtypes
         };
 
@@ -141,15 +142,20 @@ namespace hpx { namespace agas
                 std::string   // component typename
             >
             // 0x9
-            // primary_ns_esolved_localities
+            // primary_ns_resolved_localities
           , util::tuple<
-                std::vector<naming::locality>
+                std::map<naming::gid_type, parcelset::endpoints_type>
             >
             // 0xa
             // primary_ns_change_credit_one
           , util::tuple<
                 boost::int64_t  // added credits
               , int             // dummy
+            >
+            // 0xb
+            // locality_ns_resolved_locality_gid
+          , util::tuple<
+                parcelset::endpoints_type  // associated endpoints
             >
         > data_type;
 
@@ -328,7 +334,7 @@ namespace hpx { namespace agas
 
     response::response(
         namespace_action_code type_
-      , std::vector<naming::locality> const& localities_
+      , std::map<naming::gid_type, parcelset::endpoints_type> const & localities_
       , error status_
         )
       : mc(type_)
@@ -350,6 +356,18 @@ namespace hpx { namespace agas
         HPX_ASSERT(
             type_ == primary_ns_increment_credit
          || type_ == primary_ns_decrement_credit);
+    }
+
+    response::response(
+        namespace_action_code type_
+      , parcelset::endpoints_type const & endpoints_
+      , error status_
+        )
+      : mc(type_)
+      , status(status_)
+      , data(new response_data(util::make_tuple(endpoints_)))
+    {
+        // TODO: verification of namespace_action_code
     }
 
     response::response(
@@ -401,11 +419,20 @@ namespace hpx { namespace agas
         return data->get_data<response_data::subtype_prefixes, 0>(ec);
     }
 
-    std::vector<naming::locality> response::get_resolved_localities(
+    std::map<naming::gid_type, parcelset::endpoints_type>
+    response::get_resolved_localities(
         error_code& ec
         ) const
     {
         return data->get_data<response_data::subtype_resolved_localities, 0>(ec);
+    }
+
+    parcelset::endpoints_type
+    response::get_endpoints(
+        error_code& ec
+        ) const
+    {
+        return data->get_data<response_data::subtype_endpoints, 0>(ec);
     }
 
     boost::uint32_t response::get_num_localities(

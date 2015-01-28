@@ -2,7 +2,7 @@
 // portable_binary_iarchive.cpp
 
 // (C) Copyright 2002 Robert Ramey - http://www.rrsd.com .
-// Copyright (c) 2007-2013 Hartmut Kaiser
+// Copyright (c) 2007-2015 Hartmut Kaiser
 // Use, modification and distribution is subject to the Boost Software
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -12,8 +12,6 @@
 #include <hpx/config.hpp>
 #include <boost/version.hpp>
 #include <boost/config.hpp>
-
-#if BOOST_VERSION >= 103700
 
 // export the defined functions
 #define BOOST_ARCHIVE_SOURCE
@@ -55,6 +53,15 @@ namespace hpx { namespace util
 
 void portable_binary_iarchive::load_impl(boost::int64_t& l, char const maxsize)
 {
+#if defined(HPX_DEBUG_SERIALIZATION)
+    char type, expected_maxsize;
+    this->primitive_base_t::load(type);
+    this->primitive_base_t::load(expected_maxsize);
+
+    HPX_ASSERT(type == 'i');
+    HPX_ASSERT(expected_maxsize == maxsize);
+#endif
+
     l = 0;
 
     char size;
@@ -62,14 +69,16 @@ void portable_binary_iarchive::load_impl(boost::int64_t& l, char const maxsize)
     if (0 == size)
         return;
 
+    HPX_ASSERT(size > 0);       // sizeof(<any_int>) > 0
+
     if (size > maxsize) {
         BOOST_THROW_EXCEPTION(portable_binary_iarchive_exception());
     }
 
-    bool negative;
+    bool negative = false;
     this->primitive_base_t::load(negative);
 
-    char* cptr = reinterpret_cast<char *>(&l);
+    char* cptr = reinterpret_cast<char *>(&l); //-V206
 #ifdef BOOST_BIG_ENDIAN
     cptr += (sizeof(boost::int64_t) - size);
 #endif
@@ -89,6 +98,15 @@ void portable_binary_iarchive::load_impl(boost::int64_t& l, char const maxsize)
 
 void portable_binary_iarchive::load_impl(boost::uint64_t& ul, char const maxsize)
 {
+#if defined(HPX_DEBUG_SERIALIZATION)
+    char type, expected_maxsize;
+    this->primitive_base_t::load(type);
+    this->primitive_base_t::load(expected_maxsize);
+
+    HPX_ASSERT(type == 'u');
+    HPX_ASSERT(expected_maxsize == maxsize);
+#endif
+
     ul = 0;
 
     char size;
@@ -96,11 +114,13 @@ void portable_binary_iarchive::load_impl(boost::uint64_t& ul, char const maxsize
     if (0 == size)
         return;
 
+    HPX_ASSERT(size > 0);       // sizeof(<any_int>) > 0
+
     if (size > maxsize) {
         BOOST_THROW_EXCEPTION(portable_binary_iarchive_exception());
     }
 
-    char* cptr = reinterpret_cast<char *>(&ul);
+    char* cptr = reinterpret_cast<char *>(&ul); //-V206
 #ifdef BOOST_BIG_ENDIAN
     cptr += (sizeof(boost::uint64_t) - size);
 #endif
@@ -197,18 +217,6 @@ boost::uint32_t portable_binary_iarchive::init(boost::uint32_t flags)
 }}
 
 // explicitly instantiate for this type
-#if BOOST_VERSION < 104000
-#include <boost/archive/impl/archive_pointer_iserializer.ipp>
-
-namespace boost {
-namespace archive {
-
-    template class HPX_ALWAYS_EXPORT
-        detail::archive_pointer_iserializer<hpx::util::portable_binary_iarchive>;
-
-} // namespace archive
-} // namespace boost
-#else
 #include <boost/archive/detail/archive_serializer_map.hpp>
 #include <boost/archive/impl/archive_serializer_map.ipp>
 
@@ -221,8 +229,6 @@ namespace archive {
 } // namespace archive
 } // namespace boost
 
-#endif
-
 // explicitly instantiate for this type of stream
 #include <hpx/util/basic_binary_iprimitive_impl.hpp>
 
@@ -232,5 +238,3 @@ namespace hpx { namespace util
         hpx::util::portable_binary_iarchive
     >;
 }}
-
-#endif // BOOST_VERSION >= 103700

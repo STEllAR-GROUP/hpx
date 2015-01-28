@@ -66,7 +66,7 @@ namespace hpx { namespace util { namespace detail
             boost::is_reference_wrapper<typename util::decay<U>::type> >::type>
       : qualify_as_impl<
             T
-          , typename util::detail::decay_unwrap<U>::type&
+          , typename util::decay_unwrap<U>::type&
         >
     {};
 }}}

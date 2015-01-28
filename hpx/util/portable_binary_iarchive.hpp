@@ -22,7 +22,7 @@
 // portable_binary_iarchive.hpp
 
 // (C) Copyright 2002-7 Robert Ramey - http://www.rrsd.com .
-// Copyright (c) 2007-2013 Hartmut Kaiser
+// Copyright (c) 2007-2015 Hartmut Kaiser
 //
 // Use, modification and distribution is subject to the Boost Software
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -40,10 +40,8 @@
 #include <boost/archive/shared_ptr_helper.hpp>
 #endif
 #include <boost/archive/detail/register_archive.hpp>
-#if BOOST_VERSION >= 104400
 #include <boost/serialization/item_version_type.hpp>
 #include <boost/serialization/collection_size_type.hpp>
-#endif
 
 #include <hpx/config.hpp>
 #include <hpx/util/portable_binary_archive.hpp>
@@ -165,7 +163,7 @@ protected:
     void load(std::string& t) {
         this->primitive_base_t::load(t);
     }
-#if BOOST_VERSION >= 104400
+
     void load(boost::archive::class_id_reference_type& t) {
         boost::int64_t l = 0;
         load_impl(l, sizeof(boost::int16_t));
@@ -225,7 +223,6 @@ protected:
         }
         t = boost::serialization::collection_size_type(static_cast<unsigned int>(l)); //-V106
     }
-#endif
 #ifndef BOOST_NO_STD_WSTRING
     void load(std::wstring& t) {
         this->primitive_base_t::load(t);
@@ -273,7 +270,7 @@ public:
       : primitive_base_t(buffer, inbound_data_size, flags_value),
         archive_base_t(flags_value)
     {
-        init(flags_value);
+        this->primitive_base_t::flags_ = init(flags_value);
     }
 
     template <typename Container>
@@ -283,7 +280,7 @@ public:
       : primitive_base_t(buffer, chunks, inbound_data_size, flags_value),
         archive_base_t(flags_value)
     {
-        init(flags_value);
+        this->primitive_base_t::flags_ = init(flags_value);
     }
 
     // the optimized load_array dispatches to load_binary

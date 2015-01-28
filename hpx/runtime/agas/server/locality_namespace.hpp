@@ -17,7 +17,7 @@
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
-#include <hpx/runtime/naming/locality.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
@@ -49,14 +49,12 @@ struct HPX_EXPORT locality_namespace
 
     typedef boost::int32_t component_type;
 
-    // stores the locality id, and number of OS-threads running on this locality
+    // stores the locality endpoints, and number of OS-threads running on this locality
     typedef boost::fusion::vector2<
-        boost::uint32_t, boost::uint32_t>
+        parcelset::endpoints_type, boost::uint32_t>
     partition_type;
 
-    typedef std::map<naming::locality, partition_type> partition_table_type;
-
-    typedef std::set<boost::uint32_t> reverse_partition_table_type;
+    typedef std::map<boost::uint32_t, partition_type> partition_table_type;
     // }}}
 
   private:
@@ -66,7 +64,6 @@ struct HPX_EXPORT locality_namespace
     std::string instance_name_;
 
     partition_table_type partitions_;
-    reverse_partition_table_type prefixes_;
     boost::uint32_t prefix_counter_;
     primary_namespace* primary_;
 

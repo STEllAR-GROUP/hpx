@@ -34,13 +34,13 @@ namespace hpx { namespace util
         return boost::filesystem::current_path();
     }
 
-    template <typename String>
-    inline boost::filesystem::path create_path(String const& p)
+    inline boost::filesystem::path create_path(std::string const& p)
     {
+        char back = p[p.length()-1];
 #if BOOST_FILESYSTEM_VERSION >= 3
-        return boost::filesystem::path(p);
+        return boost::filesystem::path(back == ':' ? p.substr(0, p.size()-1) : p);
 #else
-        return boost::filesystem::path(p, boost::filesystem::native);
+        return boost::filesystem::path(back == ':' ? p.substr(0, p.size()-1) : p, boost::filesystem::native);
 #endif
     }
 
@@ -121,7 +121,7 @@ namespace hpx { namespace util
 
     inline std::string leaf(boost::filesystem::path const& p)
     {
-#if BOOST_VERSION >= 104600 && BOOST_FILESYSTEM_VERSION >= 3
+#if BOOST_FILESYSTEM_VERSION >= 3
         return p.filename().string();
 #else
         return p.filename();
@@ -140,17 +140,13 @@ namespace hpx { namespace util
 
     inline std::string native_file_string(boost::filesystem::path const& p)
     {
-#if BOOST_VERSION >= 104600
         return p.string();
-#else
-        return p.file_string();
-#endif
     }
 
     inline boost::filesystem::path complete_path(
         boost::filesystem::path const& p)
     {
-#if BOOST_VERSION >= 104600 && BOOST_FILESYSTEM_VERSION >= 3
+#if BOOST_FILESYSTEM_VERSION >= 3
         return boost::filesystem::absolute(p, initial_path());
 #else
         return boost::filesystem::complete(p, initial_path());
@@ -160,7 +156,7 @@ namespace hpx { namespace util
     inline boost::filesystem::path complete_path(
         boost::filesystem::path const& p, boost::filesystem::path const& base)
     {
-#if BOOST_VERSION >= 104600 && BOOST_FILESYSTEM_VERSION >= 3
+#if BOOST_FILESYSTEM_VERSION >= 3
         return boost::filesystem::absolute(p, base);
 #else
         return boost::filesystem::complete(p, base);

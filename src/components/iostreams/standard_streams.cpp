@@ -44,7 +44,7 @@ namespace hpx { namespace iostreams { namespace detail
                 ostream_type;
 
             naming::id_type cout_id(
-                components::server::create_with_args<ostream_type>(
+                components::server::construct<ostream_type>(
                     boost::ref(strm)),
                 naming::id_type::managed);
 

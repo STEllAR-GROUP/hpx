@@ -53,11 +53,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return hpx::util::void_guard<result_type>(),
                     for_each_n<FwdIter>().call(
-                        policy, first, std::distance(first, last),
-                        [f](type& v){
+                        policy, boost::mpl::false_(),
+                        first, std::distance(first, last),
+                        [f](type& v) {
                             v = f();
-                        },
-                        boost::mpl::false_());
+                        });
             }
         };
         /// \endcond
@@ -129,8 +129,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
 
         return detail::generate().call(
-            std::forward<ExPolicy>(policy),
-            first, last, std::forward<F>(f), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, std::forward<F>(f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -161,11 +161,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 return
                     for_each_n<OutIter>().call(
-                        policy, first, count,
+                        policy, boost::mpl::false_(), first, count,
                         [f](type& v) {
                             v = f();
-                        },
-                        boost::mpl::false_());
+                        });
             }
         };
         /// \endcond
@@ -251,9 +250,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::generate_n<OutIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, std::size_t(count), std::forward<F>(f),
-            is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, std::size_t(count), std::forward<F>(f));
     }
 }}}
 

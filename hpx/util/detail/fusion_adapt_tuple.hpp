@@ -16,7 +16,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// tag_of.hpp
 #include <boost/fusion/support/tag_of_fwd.hpp>
-#include <boost/preprocessor/repetition/enum_params.hpp>
 
 namespace hpx { namespace util { namespace detail
 {
@@ -29,9 +28,9 @@ namespace boost { namespace fusion
 
     namespace traits
     {
-        template <BOOST_PP_ENUM_PARAMS(HPX_TUPLE_LIMIT, typename T)>
+        template <typename ...Ts>
         struct tag_of<
-            hpx::util::tuple<BOOST_PP_ENUM_PARAMS(HPX_TUPLE_LIMIT, T)>
+            hpx::util::tuple<Ts...>
         >
         {
             typedef hpx::util::detail::tuple_tag type;
@@ -44,17 +43,17 @@ namespace boost { namespace mpl
     template <typename>
     struct sequence_tag;
 
-    template <BOOST_PP_ENUM_PARAMS(HPX_TUPLE_LIMIT, typename T)>
+    template <typename ...Ts>
     struct sequence_tag<hpx::util::tuple<
-        BOOST_PP_ENUM_PARAMS(HPX_TUPLE_LIMIT, T)>
+        Ts...>
     >
     {
         typedef fusion::fusion_sequence_tag type;
     };
 
-    template <BOOST_PP_ENUM_PARAMS(HPX_TUPLE_LIMIT, typename T)>
+    template <typename ...Ts>
     struct sequence_tag<hpx::util::tuple<
-        BOOST_PP_ENUM_PARAMS(HPX_TUPLE_LIMIT, T)> const
+        Ts...> const
     >
     {
         typedef fusion::fusion_sequence_tag type;
@@ -170,7 +169,7 @@ namespace boost { namespace fusion
         template <typename Iterator>
         struct deref
         {
-            typedef typename 
+            typedef typename
                 hpx::util::tuple_element<
                     Iterator::index
                   , typename Iterator::tuple_type
@@ -241,7 +240,7 @@ namespace boost { namespace fusion
             template <typename Sequence, typename I>
             struct apply
             {
-                typedef typename 
+                typedef typename
                     hpx::util::tuple_element<I::value, Sequence>::type
                     element;
                 typedef element& type;

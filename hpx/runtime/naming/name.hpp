@@ -8,9 +8,14 @@
 #if !defined(HPX_NAMING_NAME_MAR_24_2008_0942AM)
 #define HPX_NAMING_NAME_MAR_24_2008_0942AM
 
-#include <ios>
-#include <iomanip>
-#include <iostream>
+#include <hpx/config.hpp>
+#include <hpx/exception.hpp>
+#include <hpx/util/safe_bool.hpp>
+#include <hpx/util/serialize_intrusive_ptr.hpp>
+#include <hpx/util/register_locks_globally.hpp>
+#include <hpx/traits/promise_remote_result.hpp>
+#include <hpx/traits/promise_local_result.hpp>
+#include <hpx/lcos/local/spinlock_pool.hpp>
 
 #include <boost/foreach.hpp>
 #include <boost/io/ios_state.hpp>
@@ -20,16 +25,10 @@
 #include <boost/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
 
-#include <hpx/config.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/util/safe_bool.hpp>
-#include <hpx/util/serialize_intrusive_ptr.hpp>
-#include <hpx/util/stringstream.hpp>
-#include <hpx/util/register_locks_globally.hpp>
-#include <hpx/runtime/naming/address.hpp>
-#include <hpx/traits/promise_remote_result.hpp>
-#include <hpx/traits/promise_local_result.hpp>
-#include <hpx/lcos/local/spinlock_pool.hpp>
+#include <ios>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -56,6 +55,8 @@ namespace hpx { namespace naming
 
         inline boost::uint64_t strip_internal_bits_and_locality_from_gid(
                 boost::uint64_t msb) HPX_SUPER_PURE;
+
+        inline bool is_locked(gid_type const& gid);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -258,11 +259,11 @@ namespace hpx { namespace naming
 
         std::string to_string() const
         {
-            hpx::util::osstream out;
+            std::ostringstream out;
             out << std::hex
                 << std::right << std::setfill('0') << std::setw(16) << id_msb_
                 << std::right << std::setfill('0') << std::setw(16) << id_lsb_;
-            return hpx::util::osstream_get_string(out);
+            return out.str();
         }
 
         // this type is at the same time its own mutex type
@@ -280,6 +281,8 @@ namespace hpx { namespace naming
                 lcos::local::spinlock::yield(k);
             }
 
+            util::register_lock(this);
+
             HPX_ITT_SYNC_ACQUIRED(this);
         }
 
@@ -290,6 +293,7 @@ namespace hpx { namespace naming
             if (acquire_lock())
             {
                 HPX_ITT_SYNC_ACQUIRED(this);
+                util::register_lock(this);
                 return true;
             }
 
@@ -302,6 +306,7 @@ namespace hpx { namespace naming
             HPX_ITT_SYNC_RELEASING(this);
 
             reliquish_lock();
+            util::unregister_lock(this);
 
             HPX_ITT_SYNC_RELEASED(this);
         }
@@ -315,7 +320,7 @@ namespace hpx { namespace naming
         friend std::ostream& operator<< (std::ostream& os, gid_type const& id);
 
         friend class boost::serialization::access;
-        
+
         void save(util::portable_binary_oarchive& ar, const unsigned int version) const;
         void load(util::portable_binary_iarchive& ar, const unsigned int version);
 
@@ -331,7 +336,6 @@ namespace hpx { namespace naming
             bool was_locked = (id_msb_ & is_locked_mask) ? true : false;
             if (!was_locked)
             {
-                util::register_lock_globally(this);
                 id_msb_ |= is_locked_mask;
                 return true;
             }
@@ -340,15 +344,20 @@ namespace hpx { namespace naming
 
         void reliquish_lock()
         {
+            util::ignore_lock(this);
             internal_mutex_type::scoped_lock l(this);
+            util::reset_ignored(this);
+
             id_msb_ &= ~is_locked_mask;
-            util::unregister_lock_globally(this);
         }
 
+        // this is used for assertions only, no need to acquire the lock
         bool is_locked() const
         {
             return (id_msb_ & is_locked_mask) ? true : false;
         }
+
+        friend bool detail::is_locked(gid_type const& gid);
 
         // actual gid
         boost::uint64_t id_msb_;
@@ -520,7 +529,7 @@ namespace hpx { namespace naming
 
         inline bool is_locked(gid_type const& gid)
         {
-            return (gid.get_msb() & gid_type::is_locked_mask) ? true : false;
+            return gid.is_locked();
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -609,7 +618,7 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         HPX_EXPORT gid_type split_gid_if_needed(gid_type& id);
         HPX_EXPORT gid_type split_gid_if_needed_locked(gid_type& id);
-        HPX_EXPORT gid_type replenish_new_gid_if_needed_locked(gid_type const& id);
+        HPX_EXPORT gid_type replenish_new_gid_if_needed(gid_type const& id);
 
         HPX_EXPORT gid_type move_gid(gid_type& id);
         HPX_EXPORT gid_type move_gid_locked(gid_type& gid);
@@ -667,11 +676,11 @@ namespace hpx { namespace naming
 // #if defined(HPX_DEBUG)
 //         // make sure we're using the operator- in proper contexts only
 //         boost::uint64_t lhs_internal_bits = detail::get_internal_bits(lhs.id_msb_);
-// 
+//
 //         boost::uint64_t msb_test =
 //             detail::strip_internal_bits_and_locality_from_gid(lhs.id_msb_) -
 //             detail::strip_internal_bits_and_locality_from_gid(rhs.id_msb_);
-// 
+//
 //         boost::uint32_t lhs_locality_id = naming::get_locality_id_from_gid(lhs.id_msb_);
 //         boost::uint32_t rhs_locality_id = naming::get_locality_id_from_gid(rhs.id_msb_);
 //         if (rhs_locality_id != naming::invalid_locality_id)
@@ -723,7 +732,7 @@ namespace hpx { namespace naming
             unknown_deleter = -1,
             unmanaged = 0,          // unmanaged GID
             managed = 1,            // managed GID
-            managed_move_credit = 2 // managed GID which will give up all 
+            managed_move_credit = 2 // managed GID which will give up all
                                     // credits when sent
         };
 

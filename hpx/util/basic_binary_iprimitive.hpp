@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2012 Hartmut Kaiser
+// Copyright (c) 2007-2015 Hartmut Kaiser
 // (C) Copyright 2002 Robert Ramey - http://www.rrsd.com .
 //
 // Use, modification and distribution is subject to the Boost Software
@@ -135,6 +135,12 @@ namespace hpx { namespace util
             // note breaking a rule here - could be a problem on some platform
             if (l != 0)
                 load_binary(&(*s.begin()), l);
+
+#if defined(HPX_DEBUG_SERIALIZATION)
+            char string_end;
+            This()->load(string_end);
+            HPX_ASSERT(string_end == 'e');
+#endif
         }
 #ifndef BOOST_NO_STD_WSTRING
         void load(std::wstring &ws)

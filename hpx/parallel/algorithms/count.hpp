@@ -33,28 +33,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename Iter>
+        template <typename Value>
         struct count
-          : public detail::algorithm<
-                count<Iter>,
-                typename std::iterator_traits<Iter>::difference_type
-            >
+          : public detail::algorithm<count<Value>, Value>
         {
-            typedef typename std::iterator_traits<Iter>::difference_type
-                difference_type;
+            typedef Value difference_type;
 
             count()
               : count::algorithm("count")
             {}
 
-            template <typename ExPolicy, typename T>
+            template <typename ExPolicy, typename Iter, typename T>
             static difference_type
             sequential(ExPolicy const&, Iter first, Iter last, T const& value)
             {
                 return std::count(first, last, value);
             }
 
-            template <typename ExPolicy, typename T>
+            template <typename ExPolicy, typename Iter, typename T>
             static typename detail::algorithm_result<ExPolicy, difference_type>::type
             parallel(ExPolicy const& policy, Iter first, Iter last,
                 T const& value)
@@ -62,7 +58,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (first == last)
                     return detail::algorithm_result<ExPolicy, difference_type>::get(0);
 
-                return util::partitioner<ExPolicy, Iter, difference_type>::call(
+                return util::partitioner<ExPolicy, difference_type>::call(
                     policy, first, std::distance(first, last),
                     [value](Iter part_begin, std::size_t part_size) -> difference_type
                     {
@@ -84,6 +80,37 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         }));
             }
         };
+
+        template <typename ExPolicy, typename InIter, typename T>
+        inline typename detail::algorithm_result<
+            ExPolicy, typename std::iterator_traits<InIter>::difference_type
+        >::type
+        count_(ExPolicy && policy, InIter first, InIter last, T const& value,
+            boost::mpl::false_)
+        {
+            typedef typename std::iterator_traits<InIter>::iterator_category
+                category;
+
+            typedef typename boost::mpl::or_<
+                parallel::is_sequential_execution_policy<ExPolicy>,
+                boost::is_same<std::input_iterator_tag, category>
+            >::type is_seq;
+
+            typedef typename std::iterator_traits<InIter>::difference_type
+                difference_type;
+
+            return detail::count<difference_type>().call(
+                std::forward<ExPolicy>(policy), is_seq(), first, last, value);
+        }
+
+        // forward declare the segmented version of this algorithm
+        template <typename ExPolicy, typename InIter, typename T>
+        typename detail::algorithm_result<
+            ExPolicy, typename std::iterator_traits<InIter>::difference_type
+        >::type
+        count_(ExPolicy&& policy, InIter first, InIter last, T const& value,
+            boost::mpl::true_);
+
         /// \endcond
     }
 
@@ -146,14 +173,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (boost::is_base_of<std::input_iterator_tag, category>::value),
             "Required at least input iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, category>
-        >::type is_seq;
+        typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;
+        typedef typename iterator_traits::is_segmented_iterator is_segmented;
 
-        return detail::count<InIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, value, is_seq());
+        return detail::count_(
+            std::forward<ExPolicy>(policy), first, last, value,
+            is_segmented());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -161,35 +186,31 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename Iter>
+        template <typename Value>
         struct count_if
-          : public detail::algorithm<
-                count_if<Iter>,
-                typename std::iterator_traits<Iter>::difference_type
-            >
+          : public detail::algorithm<count_if<Value>, Value>
         {
-            typedef typename std::iterator_traits<Iter>::difference_type
-                difference_type;
+            typedef Value difference_type;
 
             count_if()
               : count_if::algorithm("count_if")
             {}
 
-            template <typename ExPolicy, typename Pred>
+            template <typename ExPolicy, typename Iter, typename Pred>
             static difference_type
             sequential(ExPolicy const&, Iter first, Iter last, Pred && op)
             {
                 return std::count_if(first, last, std::forward<Pred>(op));
             }
 
-            template <typename ExPolicy, typename Pred>
+            template <typename ExPolicy, typename Iter, typename Pred>
             static typename detail::algorithm_result<ExPolicy, difference_type>::type
             parallel(ExPolicy const& policy, Iter first, Iter last, Pred && op)
             {
                 if (first == last)
                     return detail::algorithm_result<ExPolicy, difference_type>::get(0);
 
-                return util::partitioner<ExPolicy, Iter, difference_type>::call(
+                return util::partitioner<ExPolicy, difference_type>::call(
                     policy, first, std::distance(first, last),
                     [op](Iter part_begin, std::size_t part_size) -> difference_type
                     {
@@ -211,6 +232,38 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         }));
             }
         };
+
+        template <typename ExPolicy, typename InIter, typename F>
+        typename detail::algorithm_result<
+            ExPolicy, typename std::iterator_traits<InIter>::difference_type
+        >::type
+        count_if_(ExPolicy && policy, InIter first, InIter last, F && f,
+            boost::mpl::false_)
+        {
+            typedef typename std::iterator_traits<InIter>::iterator_category
+                category;
+
+            typedef typename boost::mpl::or_<
+                parallel::is_sequential_execution_policy<ExPolicy>,
+                boost::is_same<std::input_iterator_tag, category>
+            >::type is_seq;
+
+            typedef typename std::iterator_traits<InIter>::difference_type
+                difference_type;
+
+            return detail::count_if<difference_type>().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, std::forward<F>(f));
+        }
+
+        // forward declare the segmented version of this algorithm
+        template <typename ExPolicy, typename InIter, typename F>
+        typename detail::algorithm_result<
+            ExPolicy, typename std::iterator_traits<InIter>::difference_type
+        >::type
+        count_if_(ExPolicy && policy, InIter first, InIter last, F && f,
+            boost::mpl::true_);
+
         /// \endcond
     }
 
@@ -289,14 +342,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (boost::is_base_of<std::input_iterator_tag, category>::value),
             "Required at least input iterator.");
 
-        typedef typename boost::mpl::or_<
-            is_sequential_execution_policy<ExPolicy>,
-            boost::is_same<std::input_iterator_tag, category>
-        >::type is_seq;
+        typedef hpx::traits::segmented_iterator_traits<InIter> iterator_traits;
+        typedef typename iterator_traits::is_segmented_iterator is_segmented;
 
-        return detail::count_if<InIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, std::forward<F>(f), is_seq());
+        return detail::count_if_(
+            std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
+            is_segmented());
     }
 }}}
 

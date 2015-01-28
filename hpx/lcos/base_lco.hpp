@@ -44,6 +44,12 @@ namespace hpx { namespace lcos
         static components::component_type get_component_type();
         static void set_component_type(components::component_type type);
 
+        // This component type requires valid id for its actions to be invoked
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return !naming::is_locality(id);
+        }
+
         /// Destructor, needs to be virtual to allow for clean destruction of
         /// derived objects
         virtual ~base_lco();

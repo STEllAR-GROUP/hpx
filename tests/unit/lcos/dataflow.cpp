@@ -30,14 +30,14 @@ int f(int i, int j)
 {
     return i + j;
 }
-typedef hpx::actions::plain_result_action2<int, int, int, &f> f_action;
+typedef hpx::actions::action<int (*)(int, int), &f> f_action;
 HPX_REGISTER_PLAIN_ACTION(f_action);
 
 int h(int i, int j)
 {
     return i + j;
 }
-typedef hpx::actions::plain_result_action2<int, int, int, &h> h_action;
+typedef hpx::actions::action<int (*)(int, int), &h> h_action;
 HPX_REGISTER_PLAIN_ACTION(h_action);
 
 int g()
@@ -45,7 +45,7 @@ int g()
     int i = 9000;
     return ++i;
 }
-typedef hpx::actions::plain_result_action0<int, &g> g_action;
+typedef hpx::actions::action<int (*)(), &g> g_action;
 HPX_REGISTER_PLAIN_ACTION(g_action);
 
 bool called_trigger = false;
@@ -53,7 +53,7 @@ void trigger()
 {
     called_trigger = true;
 }
-typedef hpx::actions::plain_action0<&trigger> trigger_action;
+typedef hpx::actions::action<void (*)(), &trigger> trigger_action;
 HPX_REGISTER_PLAIN_ACTION(trigger_action);
 
 boost::uint64_t id(boost::uint64_t i)
@@ -61,7 +61,7 @@ boost::uint64_t id(boost::uint64_t i)
     //std::cout << i << "\n";
     return i;
 }
-typedef hpx::actions::plain_result_action1<boost::uint64_t, boost::uint64_t, &id> id_action;
+typedef hpx::actions::action<boost::uint64_t (*)(boost::uint64_t), &id> id_action;
 HPX_REGISTER_PLAIN_ACTION(id_action);
 
 boost::uint64_t add(boost::uint64_t n1, boost::uint64_t n2)
@@ -69,8 +69,8 @@ boost::uint64_t add(boost::uint64_t n1, boost::uint64_t n2)
     //std::cout << n1 << " + " << n2 << "\n";
     return n1 + n2;
 }
-typedef hpx::actions::plain_result_action2<
-    boost::uint64_t, boost::uint64_t, boost::uint64_t, &add> add_action;
+typedef hpx::actions::action<
+    boost::uint64_t (*)(boost::uint64_t, boost::uint64_t), &add> add_action;
 HPX_REGISTER_PLAIN_ACTION(add_action);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -87,7 +87,7 @@ hpx::lcos::dataflow_base<boost::uint64_t> fib(boost::uint64_t n)
     {                                                                         \
         BOOST_PP_CAT(called_f, N) = true;                                     \
     }                                                                         \
-    typedef hpx::actions::plain_action0<&BOOST_PP_CAT(f, N)>                  \
+    typedef hpx::actions::action<void (*)(), &BOOST_PP_CAT(f, N)>       \
         BOOST_PP_CAT(BOOST_PP_CAT(f, N), action);                             \
     HPX_REGISTER_PLAIN_ACTION(BOOST_PP_CAT(BOOST_PP_CAT(f, N), action));      \
 /**/

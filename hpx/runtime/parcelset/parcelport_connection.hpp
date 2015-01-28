@@ -20,7 +20,8 @@ namespace hpx { namespace parcelset {
 
     boost::uint64_t get_max_inbound_size(parcelport&);
 
-    template <typename Connection, typename BufferType, typename ChunkType = util::serialization_chunk>
+    template <typename Connection, typename BufferType,
+        typename ChunkType = util::serialization_chunk>
     struct parcelport_connection
       : boost::enable_shared_from_this<Connection>
       , private boost::noncopyable
@@ -77,18 +78,15 @@ namespace hpx { namespace parcelset {
         typedef BufferType buffer_type;
         typedef parcel_buffer<buffer_type, ChunkType> parcel_buffer_type;
 
-        virtual boost::shared_ptr<parcel_buffer_type> get_buffer(parcel const & p = parcel(), std::size_t arg_size = 0)
+        virtual parcel_buffer_type & get_buffer(
+            parcel const & p = parcel(), std::size_t arg_size = 0)
         {
-            if(!buffer_ || (buffer_ && !buffer_->parcels_decoded_))
-            {
-                buffer_ = boost::make_shared<parcel_buffer_type>();
-                buffer_->data_.reserve(arg_size);
-            }
+            buffer_.data_.reserve(arg_size);
             return buffer_;
         }
 
         /// buffer for data
-        boost::shared_ptr<parcel_buffer_type> buffer_;
+        parcel_buffer_type buffer_;
     };
 }}
 

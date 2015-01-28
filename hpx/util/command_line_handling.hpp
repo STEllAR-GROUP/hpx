@@ -21,13 +21,14 @@ namespace hpx { namespace util
     struct command_line_handling
     {
         command_line_handling(hpx::runtime_mode mode,
-                HPX_STD_FUNCTION<int(boost::program_options::variables_map& vm)> const& f,
+                util::function_nonser<int(boost::program_options::variables_map& vm)> const& f,
                 std::vector<std::string> const& ini_config,
                 char const* argv0)
           : rtcfg_(argv0),
             mode_(mode),
             ini_config_(ini_config),
             hpx_main_f_(f),
+            node_(std::size_t(-1)),
             num_threads_(1),
             num_cores_(1),
             num_localities_(1)
@@ -44,8 +45,9 @@ namespace hpx { namespace util
 
         hpx::runtime_mode mode_;
         std::vector<std::string> ini_config_;
-        HPX_STD_FUNCTION<int(boost::program_options::variables_map& vm)> hpx_main_f_;
+        util::function_nonser<int(boost::program_options::variables_map& vm)> hpx_main_f_;
 
+        std::size_t node_;
         std::size_t num_threads_;
         std::size_t num_cores_;
         std::size_t num_localities_;
@@ -71,6 +73,8 @@ namespace hpx { namespace util
 #endif
 
     void handle_list_parcelports();
+
+    void attach_debugger();
 }}
 
 #endif

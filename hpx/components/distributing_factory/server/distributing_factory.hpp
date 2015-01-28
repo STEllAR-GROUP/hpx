@@ -89,8 +89,8 @@ namespace hpx { namespace components { namespace server
             partition_info const& info) const;
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_DEFINE_COMPONENT_CONST_ACTION(distributing_factory, create_components);
-        HPX_DEFINE_COMPONENT_CONST_ACTION(distributing_factory, create_partitioned);
+        HPX_DEFINE_COMPONENT_ACTION(distributing_factory, create_components);
+        HPX_DEFINE_COMPONENT_ACTION(distributing_factory, create_partitioned);
     };
 }}}
 
@@ -109,7 +109,7 @@ namespace boost { namespace serialization
 ///////////////////////////////////////////////////////////////////////////////
 // Declaration of serialization support for the distributing_factory actions
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::components::server::create_component_action0<hpx::components::server::distributing_factory>
+    hpx::components::server::create_component_action<hpx::components::server::distributing_factory>
   , distributing_factory_create_component_action
 )
 

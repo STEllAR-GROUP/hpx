@@ -15,7 +15,7 @@ namespace hpx { namespace parallel { namespace traits
     struct auto_partitioner_tag {};
     struct default_partitioner_tag {};
 
-    template <typename ExPolicy, typename Iter, typename Enable = void>
+    template <typename ExPolicy, typename Enable = void>
     struct extract_partitioner
     {
         typedef default_partitioner_tag type;

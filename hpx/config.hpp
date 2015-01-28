@@ -263,6 +263,18 @@
 #  define HPX_PARCEL_MAX_MESSAGE_SIZE 1000000000
 #endif
 
+/// This defines the maximally allowed outbound  message size for coalescing
+/// messages transferred between localities. This value can be changed at
+/// runtime by setting the configuration parameter:
+///
+///   hpx.parcel.max_outbound_message_size = ...
+///
+/// (or by setting the corresponding environment variable
+/// HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE).
+#if !defined(HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE)
+#  define HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE 1000000
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 // This defines the number of bytes of overhead it takes to serialize a
 // parcel.
@@ -304,14 +316,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// This defines the default number of OS-threads created for the different
 /// internal thread pools
-#if !defined(HPX_NUM_IO_POOL_THREADS)
-#  define HPX_NUM_IO_POOL_THREADS 2
+#if !defined(HPX_NUM_IO_POOL_SIZE)
+#  define HPX_NUM_IO_POOL_SIZE 2
 #endif
-#if !defined(HPX_NUM_PARCEL_POOL_THREADS)
-#  define HPX_NUM_PARCEL_POOL_THREADS 2
+#if !defined(HPX_NUM_PARCEL_POOL_SIZE)
+#  define HPX_NUM_PARCEL_POOL_SIZE 2
 #endif
-#if !defined(HPX_NUM_TIMER_POOL_THREADS)
-#  define HPX_NUM_TIMER_POOL_THREADS 2
+#if !defined(HPX_NUM_TIMER_POOL_SIZE)
+#  define HPX_NUM_TIMER_POOL_SIZE 2
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -374,7 +386,7 @@
 // This defines the maximum number of connect retries to the AGAS service
 // allowing for some leeway during startup of the localities
 #if !defined(HPX_MAX_NETWORK_RETRIES)
-#  define HPX_MAX_NETWORK_RETRIES 100
+#  define HPX_MAX_NETWORK_RETRIES 1000
 #endif
 
 #if !defined(HPX_NETWORK_RETRIES_SLEEP)
@@ -540,36 +552,6 @@
 #  define HPX_STD_UNIQUE_PTR ::std::auto_ptr
 #else
 #  define HPX_STD_UNIQUE_PTR ::std::unique_ptr
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-// Use std::function if it's available and movable
-#if defined(HPX_UTIL_FUNCTION)
-#  define HPX_STD_FUNCTION ::hpx::util::function_nonser
-#else
-#if !defined(HPX_HAVE_CXX11_STD_FUNCTION)
-#  define HPX_STD_FUNCTION ::boost::function
-#else
-#  define HPX_STD_FUNCTION ::std::function
-#endif
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-// Use std::tuple if it's available and movable
-#if defined(HPX_UTIL_TUPLE)
-#  define HPX_STD_TUPLE         ::hpx::util::tuple
-#  define HPX_STD_MAKE_TUPLE    ::hpx::util::make_tuple
-#  define HPX_STD_GET(N, c)     ::hpx::util::get<N>(c)
-#else
-#if !defined(HPX_HAVE_CXX11_STD_TUPLE)
-#  define HPX_STD_TUPLE         ::boost::tuple
-#  define HPX_STD_MAKE_TUPLE    ::boost::make_tuple
-#  define HPX_STD_GET(N, c)     ::boost::get<N>(c)
-#else
-#  define HPX_STD_TUPLE         ::std::tuple
-#  define HPX_STD_MAKE_TUPLE    ::std::make_tuple
-#  define HPX_STD_GET(N, c)     ::std::get<N>(c)
-#endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

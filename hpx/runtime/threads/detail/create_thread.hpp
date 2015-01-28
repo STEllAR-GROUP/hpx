@@ -29,12 +29,12 @@ namespace hpx { namespace threads { namespace detail
 
         default:
             {
-                hpx::util::osstream strm;
+                std::ostringstream strm;
                 strm << "invalid initial state: "
                      << get_thread_state_name(initial_state);
                 HPX_THROWS_IF(ec, bad_parameter,
                     "threads::detail::create_thread",
-                    hpx::util::osstream_get_string(strm));
+                    strm.str());
                 return;
             }
         }

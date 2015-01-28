@@ -17,23 +17,3 @@ add_hpx_pseudo_dependencies(components.dataflow
 add_hpx_pseudo_dependencies(core
                           components.dataflow)
 
-################################################################################
-if(Boost_VERSION GREATER 105000)
-  # add headers to preprocessing
-  hpx_partial_preprocess_header(
-      "hpx/components/dataflow/dataflow.hpp"
-      LIMIT HPX_ACTION_ARGUMENT_LIMIT
-  )
-  hpx_partial_preprocess_header(
-      "hpx/components/dataflow/server/detail/dataflow_impl.hpp"
-      LIMIT HPX_ACTION_ARGUMENT_LIMIT
-  )
-  hpx_partial_preprocess_header(
-      "hpx/components/dataflow/server/detail/apply_helper.hpp"
-      LIMIT HPX_ACTION_ARGUMENT_LIMIT
-  )
-  hpx_partial_preprocess_header(
-      "hpx/components/dataflow/server/dataflow.hpp"
-      LIMIT HPX_ACTION_ARGUMENT_LIMIT
-  )
-endif()

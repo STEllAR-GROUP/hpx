@@ -1,10 +1,13 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file lcos/wait_all.hpp
+
+#if !defined(HPX_LCOS_WAIT_ALL_APR_19_2012_1140AM)
+#define HPX_LCOS_WAIT_ALL_APR_19_2012_1140AM
 
 #if defined(DOXYGEN)
 namespace hpx
@@ -78,12 +81,8 @@ namespace hpx
     template <typename InputIter>
     InputIter wait_all_n(InputIter begin, std::size_t count);
 }
-#else
 
-#if !BOOST_PP_IS_ITERATING
-
-#if !defined(HPX_LCOS_WAIT_ALL_APR_19_2012_1140AM)
-#define HPX_LCOS_WAIT_ALL_APR_19_2012_1140AM
+#else // DOXYGEN
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
@@ -117,19 +116,24 @@ namespace hpx { namespace lcos
         ///////////////////////////////////////////////////////////////////////
         template <typename Future, typename Enable = void>
         struct is_future_or_shared_state
-          : boost::mpl::false_
-        {};
-
-        template <typename Future>
-        struct is_future_or_shared_state<Future,
-                typename boost::enable_if<traits::is_future<Future> >::type>
-          : boost::mpl::true_
+          : traits::is_future<Future>
         {};
 
         template <typename R>
         struct is_future_or_shared_state<
                 boost::intrusive_ptr<future_data<R> > >
           : boost::mpl::true_
+        {};
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Range, typename Enable = void>
+        struct is_future_or_shared_state_range
+            : boost::mpl::false_
+        {};
+
+        template <typename T>
+        struct is_future_or_shared_state_range<std::vector<T> >
+            : is_future_or_shared_state<T>
         {};
 
         ///////////////////////////////////////////////////////////////////////
@@ -151,7 +155,7 @@ namespace hpx { namespace lcos
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Tuple>
-        struct wait_all_frame
+        struct wait_all_frame //-V690
           : hpx::lcos::detail::future_data<void>
         {
         private:
@@ -180,9 +184,19 @@ namespace hpx { namespace lcos
             template <typename TupleIter, typename Iter>
             void await_range(TupleIter iter, Iter next, Iter end)
             {
+                typedef typename std::iterator_traits<Iter>::value_type
+                    future_type;
+                typedef typename detail::future_or_shared_state_result<
+                        future_type
+                    >::type future_result_type;
+
                 for (/**/; next != end; ++next)
                 {
-                    if (!next->is_ready())
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data<future_result_type>
+                    > next_future_data = lcos::detail::get_shared_state(*next);
+
+                    if (!next_future_data->is_ready())
                     {
                         // Attach a continuation to this future which will
                         // re-evaluate it and continue to the next element
@@ -190,16 +204,7 @@ namespace hpx { namespace lcos
                         void (wait_all_frame::*f)(TupleIter, Iter, Iter) =
                             &wait_all_frame::await_range;
 
-                        typedef typename std::iterator_traits<Iter>::value_type
-                            future_type;
-                        typedef typename detail::future_or_shared_state_result<
-                                future_type
-                            >::type future_result_type;
-
-                        boost::intrusive_ptr<
-                            lcos::detail::future_data<future_result_type>
-                        > next_future_data = lcos::detail::get_shared_state(*next);
-
+                        next_future_data->execute_deferred();
                         next_future_data->set_on_completed(util::bind(
                             f, this, std::move(iter),
                             std::move(next), std::move(end)));
@@ -230,7 +235,7 @@ namespace hpx { namespace lcos
             BOOST_FORCEINLINE
             void await_next(TupleIter iter, boost::mpl::true_, boost::mpl::false_)
             {
-                typedef typename util::detail::decay_unwrap<
+                typedef typename util::decay_unwrap<
                     typename boost::fusion::result_of::deref<TupleIter>::type
                 >::type future_type;
 
@@ -254,6 +259,7 @@ namespace hpx { namespace lcos
                     void (wait_all_frame::*f)(TupleIter, true_, false_) =
                         &wait_all_frame::await_next;
 
+                    next_future_data->execute_deferred();
                     next_future_data->set_on_completed(hpx::util::bind(
                         f, this, std::move(iter), true_(), false_()));
                 }
@@ -271,13 +277,14 @@ namespace hpx { namespace lcos
             BOOST_FORCEINLINE
             void await(TupleIter&& iter, boost::mpl::false_)
             {
-                typedef typename util::detail::decay_unwrap<
+                typedef typename util::decay_unwrap<
                     typename boost::fusion::result_of::deref<TupleIter>::type
                 >::type future_type;
 
                 typedef typename detail::is_future_or_shared_state<future_type>::type
                     is_future;
-                typedef typename traits::is_future_range<future_type>::type is_range;
+                typedef typename detail::is_future_or_shared_state_range<future_type>::type
+                    is_range;
 
                 await_next(std::forward<TupleIter>(iter), is_future(), is_range());
             }
@@ -369,36 +376,22 @@ namespace hpx { namespace lcos
     inline void wait_all()
     {
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename... Ts>
+    void wait_all(Ts&&... ts)
+    {
+        typedef hpx::util::tuple<
+                typename lcos::detail::shared_state_ptr_for<Ts>::type...
+            > result_type;
+        typedef detail::wait_all_frame<result_type> frame_type;
+
+        result_type values = result_type(lcos::detail::get_shared_state(ts)...);
+
+        frame_type frame(values);
+        frame.wait_all();
+    }
 }}
-
-#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/lcos/preprocessed/wait_all.hpp>
-#else
-
-#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/wait_all_" HPX_LIMIT_STR ".hpp")
-#endif
-
-#define HPX_WAIT_ALL_SHARED_STATE_FOR_FUTURE(Z, N, D)                         \
-    typename lcos::detail::shared_state_ptr_for<BOOST_PP_CAT(T, N)>::type     \
-    /**/
-#define HPX_WAIT_ALL_GET_SHARED_STATE(Z, N, D)                                \
-    lcos::detail::get_shared_state(BOOST_PP_CAT(f, N))                        \
-    /**/
-
-#define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (1, HPX_WAIT_ARGUMENT_LIMIT, <hpx/lcos/wait_all.hpp>))                \
-/**/
-#include BOOST_PP_ITERATE()
-
-#undef HPX_WAIT_ALL_GET_SHARED_STATE
-#undef HPX_WAIT_ALL_SHARED_STATE_FOR_FUTURE
-
-#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(output: null)
-#endif
-
-#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
 namespace hpx
 {
@@ -406,33 +399,5 @@ namespace hpx
     using lcos::wait_all_n;
 }
 
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-#else // BOOST_PP_IS_ITERATING
-
-#define N BOOST_PP_ITERATION()
-
-namespace hpx { namespace lcos
-{
-    ///////////////////////////////////////////////////////////////////////////
-    template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-    void wait_all(HPX_ENUM_FWD_ARGS(N, T, f))
-    {
-        typedef hpx::util::tuple<
-                BOOST_PP_ENUM(N, HPX_WAIT_ALL_SHARED_STATE_FOR_FUTURE, _)
-            > result_type;
-        typedef detail::wait_all_frame<result_type> frame_type;
-
-        result_type values(BOOST_PP_ENUM(N, HPX_WAIT_ALL_GET_SHARED_STATE, _));
-
-        frame_type frame(values);
-        frame.wait_all();
-    }
-}}
-
-#undef N
-
-#endif
-
+#endif // DOXYGEN
 #endif

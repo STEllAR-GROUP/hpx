@@ -24,6 +24,7 @@
 #include <map>
 
 #include <boost/format.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace hpx { namespace agas
 {
@@ -49,7 +50,8 @@ struct HPX_EXPORT symbol_namespace
         void(std::string const&, naming::gid_type const&)
     > iterate_names_function_type;
 
-    typedef std::map<std::string, naming::gid_type> gid_table_type;
+    typedef std::map<std::string, boost::shared_ptr<naming::gid_type> >
+        gid_table_type;
 
     typedef std::multimap<
         std::pair<std::string, namespace_action_code>, hpx::id_type

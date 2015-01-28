@@ -30,6 +30,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/lockfree/detail/branch_hints.hpp>
+#include <boost/lockfree/stack.hpp>
 
 #include <stack>
 
@@ -47,53 +48,43 @@ namespace hpx { namespace threads
         template <typename CoroutineImpl>
         struct coroutine_allocator
         {
-            typedef lcos::local::spinlock mutex_type;
-
             coroutine_allocator()
+              : heap_(128)
             {}
 
             CoroutineImpl* get()
             {
-                mutex_type::scoped_lock l(mtx_);
                 return get_locked();
             }
 
             CoroutineImpl* try_get()
             {
-                mutex_type::scoped_lock l(mtx_, boost::try_to_lock);
-                if (!l)
-                    return NULL;
                 return get_locked();
             }
 
             void deallocate(CoroutineImpl* c)
             {
-                mutex_type::scoped_lock l(mtx_);
                 heap_.push(c);
             }
 
         private:
             CoroutineImpl* get_locked()
             {
-                if (heap_.empty())
-                    return NULL;
-
-                CoroutineImpl* next = heap_.top();
-                heap_.pop();
-                return next;
+                CoroutineImpl* result = 0;
+                heap_.pop(result);
+                return result;
             }
 
-            mutex_type mtx_;
-            std::stack<CoroutineImpl*> heap_;
+            boost::lockfree::stack<CoroutineImpl*> heap_;
         };
 
         ///////////////////////////////////////////////////////////////////////
         struct thread_exit_callback_node
         {
-            HPX_STD_FUNCTION<void()> f_;
+            util::function_nonser<void()> f_;
             thread_exit_callback_node* next_;
 
-            thread_exit_callback_node(HPX_STD_FUNCTION<void()> const& f,
+            thread_exit_callback_node(util::function_nonser<void()> const& f,
                     thread_exit_callback_node* next)
               : f_(f), next_(next)
             {}
@@ -578,7 +569,7 @@ namespace hpx { namespace threads
 
         bool interruption_point(bool throw_on_interrupt = true);
 
-        bool add_thread_exit_callback(HPX_STD_FUNCTION<void()> const& f);
+        bool add_thread_exit_callback(util::function_nonser<void()> const& f);
         void run_thread_exit_callbacks();
         void free_thread_exit_callbacks();
 
@@ -652,7 +643,7 @@ namespace hpx { namespace threads
 
         // Singly linked list (heap-allocated)
         // FIXME: replace with forward_list eventually.
-        std::deque<HPX_STD_FUNCTION<void()> > exit_funcs_;
+        std::deque<util::function_nonser<void()> > exit_funcs_;
 
         // reference to scheduler which created/manages this thread
         policies::scheduler_base* scheduler_base_;

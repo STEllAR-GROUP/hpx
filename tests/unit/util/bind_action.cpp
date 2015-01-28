@@ -166,19 +166,19 @@ void function_bind_test1(hpx::naming::id_type id)
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
 
-    HPX_STD_FUNCTION<int()> f1 =
+    hpx::util::function_nonser<int()> f1 =
         hpx::util::bind<test1_action>(id, 42);
     HPX_TEST_EQ(f1(), 42);
 
-    HPX_STD_FUNCTION<int(hpx::naming::id_type)> f2 =
+    hpx::util::function_nonser<int(hpx::naming::id_type)> f2 =
         hpx::util::bind<test1_action>(_1, 42);
     HPX_TEST_EQ(f2(id), 42);
 
-    HPX_STD_FUNCTION<int(int)> f3 =
+    hpx::util::function_nonser<int(int)> f3 =
         hpx::util::bind<test1_action>(id, _1);
     HPX_TEST_EQ(f3(42), 42);
 
-    HPX_STD_FUNCTION<int(hpx::naming::id_type, int)> f4 =
+    hpx::util::function_nonser<int(hpx::naming::id_type, int)> f4 =
         hpx::util::bind<test1_action>(_1, _2);
     HPX_TEST_EQ(f4(id, 42), 42);
 }
@@ -189,19 +189,19 @@ void function_bind_test2(hpx::naming::id_type id)
     using hpx::util::placeholders::_2;
     test1_action do_test1;
 
-    HPX_STD_FUNCTION<int()> f1 =
+    hpx::util::function_nonser<int()> f1 =
         hpx::util::bind(do_test1, id, 42);
     HPX_TEST_EQ(f1(), 42);
 
-    HPX_STD_FUNCTION<int(hpx::naming::id_type)> f2 =
+    hpx::util::function_nonser<int(hpx::naming::id_type)> f2 =
         hpx::util::bind(do_test1, _1, 42);
     HPX_TEST_EQ(f2(id), 42);
 
-    HPX_STD_FUNCTION<int(int)> f3 =
+    hpx::util::function_nonser<int(int)> f3 =
         hpx::util::bind(do_test1, id, _1);
     HPX_TEST_EQ(f3(42), 42);
 
-    HPX_STD_FUNCTION<int(hpx::naming::id_type, int)> f4 =
+    hpx::util::function_nonser<int(hpx::naming::id_type, int)> f4 =
         hpx::util::bind(do_test1, _1, _2);
     HPX_TEST_EQ(f4(id, 42), 42);
 }
@@ -222,7 +222,7 @@ void function_bind_test3(hpx::naming::id_type id)
         hpx::util::bind(do_test1, _1, 42);
 
     test2_action do_test2;
-    HPX_STD_FUNCTION<int()> f2 =
+    hpx::util::function_nonser<int()> f2 =
         hpx::util::bind(do_test2, id, f1);
 
     HPX_TEST_EQ(f2(), 42);
@@ -235,7 +235,7 @@ void function_bind_test4(hpx::naming::id_type id)
     hpx::util::function<int(hpx::naming::id_type)> f1 =
         hpx::util::bind<test1_action>(_1, 42);
 
-    HPX_STD_FUNCTION<int()> f2 =
+    hpx::util::function_nonser<int()> f2 =
         hpx::util::bind<test2_action>(id, f1);
 
     HPX_TEST_EQ(f2(), 42);
@@ -253,7 +253,7 @@ void function_bind_test5(hpx::naming::id_type id)
     hpx::util::function<int()> f1 =
         hpx::util::bind<test1_action>(hpx::find_here(), 42);
 
-    HPX_STD_FUNCTION<int()> f2 =
+    hpx::util::function_nonser<int()> f2 =
         hpx::util::bind<test3_action>(id, f1);
 
     HPX_TEST_EQ(f2(), 42);
@@ -266,7 +266,7 @@ void function_bind_test6(hpx::naming::id_type id)
         hpx::util::bind(do_test1, hpx::find_here(), 42);
 
     test3_action do_test3;
-    HPX_STD_FUNCTION<int()> f2 =
+    hpx::util::function_nonser<int()> f2 =
         hpx::util::bind(do_test3, id, f1);
 
     HPX_TEST_EQ(f2(), 42);

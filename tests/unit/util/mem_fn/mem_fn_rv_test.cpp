@@ -1,4 +1,5 @@
 #include <hpx/config.hpp>
+#include <hpx/hpx_init.hpp>
 
 #if defined(BOOST_MSVC)
 #pragma warning(disable: 4786)  // identifier truncated in debug info
@@ -23,15 +24,7 @@
 #include <hpx/util/mem_fn.hpp>
 #include <boost/shared_ptr.hpp>
 
-#if defined(BOOST_MSVC) && (BOOST_MSVC < 1300)
-#pragma warning(push, 3)
-#endif
-
 #include <iostream>
-
-#if defined(BOOST_MSVC) && (BOOST_MSVC < 1300)
-#pragma warning(pop)
-#endif
 
 #include <hpx/util/lightweight_test.hpp>
 

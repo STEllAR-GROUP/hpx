@@ -197,16 +197,14 @@ namespace hpx { namespace lcos
         template <typename Action>
         struct make_broadcast_action
           : make_broadcast_action_impl<
-                Action
-              , util::tuple_size<typename Action::arguments_type>::value
+                Action, Action::arity
             >
         {};
 
         template <typename Action>
         struct make_broadcast_action<broadcast_with_index<Action> >
           : make_broadcast_action_impl<
-                broadcast_with_index<Action>
-              , util::tuple_size<typename Action::arguments_type>::value - 1
+                broadcast_with_index<Action>, Action::arity - 1
             >
         {};
 
@@ -217,16 +215,14 @@ namespace hpx { namespace lcos
         template <typename Action>
         struct make_broadcast_apply_action
           : make_broadcast_apply_action_impl<
-                Action
-              , util::tuple_size<typename Action::arguments_type>::value
+                Action, Action::arity
             >
         {};
 
         template <typename Action>
         struct make_broadcast_apply_action<broadcast_with_index<Action> >
           : make_broadcast_apply_action_impl<
-                broadcast_with_index<Action>
-              , util::tuple_size<typename Action::arguments_type>::value - 1
+                broadcast_with_index<Action>, Action::arity - 1
             >
         {};
 
@@ -913,7 +909,7 @@ namespace hpx { namespace lcos
                     broadcast_invoker_type;
 
             typedef
-                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
+                typename HPX_MAKE_ACTION(broadcast_invoker_type::call)::type
                 type;
         };
 
@@ -957,7 +953,7 @@ namespace hpx { namespace lcos
                     broadcast_invoker_type;
 
             typedef
-                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
+                typename HPX_MAKE_ACTION(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -993,19 +989,14 @@ namespace hpx { namespace lcos
     }
 
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
     >
     hpx::future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > /* act */
+        hpx::actions::basic_action<Component, Signature, Derived> /* act */
       , std::vector<hpx::id_type> const & ids
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
     {
@@ -1039,17 +1030,12 @@ namespace hpx { namespace lcos
     }
 
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
     >
     void
     broadcast_apply(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > /* act */
+        hpx::actions::basic_action<Component, Signature, Derived> /* act */
       , std::vector<hpx::id_type> const & ids
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
     {
@@ -1078,19 +1064,14 @@ namespace hpx { namespace lcos
     }
 
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
     >
     hpx::future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > /* act */
+        hpx::actions::basic_action<Component, Signature, Derived> /* act */
       , std::vector<hpx::id_type> const & ids
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
     {
@@ -1117,17 +1098,12 @@ namespace hpx { namespace lcos
     }
 
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
     >
     void
     broadcast_apply_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > /* act */
+        hpx::actions::basic_action<Component, Signature, Derived> /* act */
       , std::vector<hpx::id_type> const & ids
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
     {

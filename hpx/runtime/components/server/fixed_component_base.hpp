@@ -14,7 +14,8 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/bind_naming_wrappers.hpp>
-#include <hpx/util/stringstream.hpp>
+
+#include <sstream>
 
 namespace hpx { namespace components
 {
@@ -86,7 +87,7 @@ public:
 
         if (!gid_)
         {
-            naming::address addr(applier::get_applier().here(),
+            naming::address addr(get_locality(),
                 components::get_component_type<wrapped_type>(),
                 std::size_t(static_cast<this_component_type const*>(this)));
 
@@ -95,12 +96,12 @@ public:
             // Try to bind the preset GID first
             if (!applier::bind_gid_local(gid_, addr))
             {
-                hpx::util::osstream strm;
+                std::ostringstream strm;
                 strm << "could not bind_gid(local): " << gid_;
                 gid_ = naming::gid_type();   // invalidate GID
                 HPX_THROW_EXCEPTION(duplicate_component_address,
                     "fixed_component_base<Component>::get_base_gid",
-                    hpx::util::osstream_get_string(strm));
+                    strm.str());
             }
         }
         return gid_;
@@ -144,6 +145,12 @@ public:
     }
 #endif
 
+    // This component type requires valid id for its actions to be invoked
+    static bool is_target_valid(naming::id_type const& id)
+    {
+        return !naming::is_locality(id);
+    }
+
     // This component type does not support migration.
     static BOOST_CONSTEXPR bool supports_migration() { return false; }
 
@@ -151,6 +158,7 @@ public:
     void pin() {}
     void unpin() {}
     boost::uint32_t pin_count() const { return 0; }
+
     void mark_as_migrated()
     {
         // If this assertion is triggered then this component instance is being

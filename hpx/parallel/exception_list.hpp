@@ -55,11 +55,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     }
                 }
                 catch (...) {
-                    return make_error_future<Result>(boost::current_exception());
+                    return hpx::make_exceptional_future<Result>(boost::current_exception());
                 }
             }
         };
-
 
         template <typename Result>
         struct handle_exception<parallel_task_execution_policy, Result>
@@ -80,10 +79,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     }
                 }
                 catch (...) {
-                    return make_error_future<Result>(boost::current_exception());
+                    return hpx::make_exceptional_future<Result>(boost::current_exception());
                 }
             }
         };
+
         template <typename Result>
         struct handle_exception<parallel_vector_execution_policy, Result>
         {

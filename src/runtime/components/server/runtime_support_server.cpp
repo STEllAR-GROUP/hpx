@@ -8,7 +8,6 @@
 #include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/ini.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
 #include <hpx/util/scoped_unlock.hpp>
@@ -32,11 +31,9 @@
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
-#if !defined(HPX_GCC44_WORKAROUND)
 #include <hpx/lcos/broadcast.hpp>
 #if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
 #include <hpx/lcos/reduce.hpp>
-#endif
 #endif
 
 #include <hpx/util/assert.hpp>
@@ -49,9 +46,6 @@
 #include <hpx/plugins/message_handler_factory_base.hpp>
 #include <hpx/plugins/binary_filter_factory_base.hpp>
 
-#include <algorithm>
-#include <set>
-
 #include <boost/foreach.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
@@ -63,6 +57,10 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/export.hpp>
+
+#include <algorithm>
+#include <set>
+#include <sstream>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the runtime_support actions
@@ -250,9 +248,10 @@ namespace hpx { namespace components
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
-    runtime_support::runtime_support()
+    runtime_support::runtime_support(hpx::util::runtime_configuration & cfg)
       : stopped_(false), terminated_(false), dijkstra_color_(false),
-        shutdown_all_invoked_(false)
+        shutdown_all_invoked_(false),
+        modules_(cfg.modules())
     {}
 
     ///////////////////////////////////////////////////////////////////////////
@@ -266,7 +265,7 @@ namespace hpx { namespace components { namespace server
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end() || !(*it).second.first) {
             // we don't know anything about this component
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "attempt to query factory properties for components "
                     "invalid/unknown type: "
                  << components::get_component_type_name(type);
@@ -274,7 +273,7 @@ namespace hpx { namespace components { namespace server
             l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::factory_properties",
-                hpx::util::osstream_get_string(strm));
+                strm.str());
             return factory_invalid;
         }
 
@@ -294,14 +293,14 @@ namespace hpx { namespace components { namespace server
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end() || !(*it).second.first) {
             // we don't know anything about this component
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "attempt to create component instance of invalid/unknown type: "
                  << components::get_component_type_name(type);
 
             l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::bulk_create_components",
-                hpx::util::osstream_get_string(strm));
+                strm.str());
             return ids;
         }
 
@@ -315,12 +314,9 @@ namespace hpx { namespace components { namespace server
             ids.push_back(factory->create());
 
     // log result if requested
-        if (LHPX_ENABLED(info))
-        {
-            LRT_(info) << "successfully created " << count << " components " //-V128
-                        << " of type: "
-                        << components::get_component_type_name(type);
-        }
+        LRT_(info) << "successfully created " << count << " components " //-V128
+                    << " of type: "
+                    << components::get_component_type_name(type);
         return ids;
     }
 
@@ -373,12 +369,12 @@ namespace hpx { namespace components { namespace server
 
         delete c;
 
-        hpx::util::osstream strm;
+        std::ostringstream strm;
         strm << "global id " << gid << " is already bound to a different "
                 "component instance";
         HPX_THROW_EXCEPTION(hpx::duplicate_component_address,
             "runtime_support::create_memory_block",
-            hpx::util::osstream_get_string(strm));
+            strm.str());
 
         return naming::invalid_gid;
     }
@@ -390,17 +386,15 @@ namespace hpx { namespace components { namespace server
     {
         // Special case: component_memory_block.
         if (g.type == components::component_memory_block) {
-            applier::applier& appl = hpx::applier::get_applier();
-
             for (std::size_t i = 0; i != count; ++i)
             {
                 naming::gid_type target = gid + i;
 
                 // make sure this component is located here
-                if (appl.here() != g.endpoint)
+                if (get_locality() != g.prefix)
                 {
                     // FIXME: should the component be re-bound ?
-                    hpx::util::osstream strm;
+                    std::ostringstream strm;
                     strm << "global id " << target << " is not bound to any "
                             "local component instance";
 
@@ -408,7 +402,7 @@ namespace hpx { namespace components { namespace server
                     // What should we do instead?
                     HPX_THROW_EXCEPTION(hpx::unknown_component_address,
                         "runtime_support::free_component",
-                        hpx::util::osstream_get_string(strm));
+                        strm.str());
                     return;
                 }
 
@@ -437,7 +431,7 @@ namespace hpx { namespace components { namespace server
             component_map_type::const_iterator it = components_.find(g.type);
             if (it == components_.end()) {
                 // we don't know anything about this component
-                hpx::util::osstream strm;
+                std::ostringstream strm;
 
                 naming::resolver_client& client = naming::get_agas_client();
                 error_code ec(lightweight);
@@ -463,7 +457,7 @@ namespace hpx { namespace components { namespace server
                 l.unlock();
                 HPX_THROW_EXCEPTION(hpx::bad_component_type,
                     "runtime_support::free_component",
-                    hpx::util::osstream_get_string(strm));
+                    strm.str());
                 return;
             }
 
@@ -480,7 +474,7 @@ namespace hpx { namespace components { namespace server
         for (std::size_t i = 0; i != count; ++i)
         {
             naming::gid_type target(gid + i);
-            naming::address addr(g.endpoint, g.type, g.lva(target, gid));
+            naming::address addr(g.prefix, g.type, g.lva(target, gid));
 
 #if defined(HPX_DEBUG)
             bool found = false;
@@ -547,8 +541,6 @@ namespace hpx { namespace components { namespace server
     }
 }}}
 
-#if !defined(HPX_GCC44_WORKAROUND)
-
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::server::runtime_support::call_shutdown_functions_action
     call_shutdown_functions_action;
@@ -568,7 +560,6 @@ HPX_REGISTER_REDUCE_ACTION_DECLARATION(dijkstra_termination_action, std_logical_
 HPX_REGISTER_REDUCE_ACTION(dijkstra_termination_action, std_logical_or_type)
 
 #endif
-#endif
 
 namespace hpx { namespace components { namespace server
 {
@@ -577,23 +568,8 @@ namespace hpx { namespace components { namespace server
     void invoke_shutdown_functions(
         std::vector<naming::id_type> const& localities, bool pre_shutdown)
     {
-#if !defined(HPX_GCC44_WORKAROUND)
         call_shutdown_functions_action act;
         lcos::broadcast(act, localities, pre_shutdown).get();
-#else
-        std::vector<lcos::future<void> > lazy_actions;
-        BOOST_FOREACH(naming::id_type const& id, localities)
-        {
-            using components::stubs::runtime_support;
-            lazy_actions.push_back(
-                std::move(runtime_support::call_shutdown_functions_async(
-                    id, pre_shutdown)));
-        }
-
-        // wait for all localities to finish executing their registered
-        // shutdown functions
-        wait_all(lazy_actions);
-#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -850,7 +826,7 @@ namespace hpx { namespace components { namespace server
         std::vector<naming::id_type> locality_ids = find_all_localities();
         std::size_t count = dijkstra_termination_detection(locality_ids);
 
-        LRT_(info) << "runtime_support::shutdown_all: "
+        LRT_(info) << "runtime_support::shutdown_all: " //-V128
                       "passed first termination detection (count: "
                    << count << ").";
 
@@ -866,7 +842,7 @@ namespace hpx { namespace components { namespace server
         // functions.
         count = dijkstra_termination_detection(locality_ids);
 
-        LRT_(info) << "runtime_support::shutdown_all: "
+        LRT_(info) << "runtime_support::shutdown_all: " //-V128
                       "passed second termination detection (count: "
                    << count << ").";
 
@@ -1002,7 +978,7 @@ namespace hpx { namespace components { namespace server
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end() || !(*it).second.first) {
             // we don't know anything about this component
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "attempt to query instance count for components of "
                     "invalid/unknown type: "
                  << components::get_component_type_name(type);
@@ -1010,7 +986,7 @@ namespace hpx { namespace components { namespace server
             l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::factory_properties",
-                hpx::util::osstream_get_string(strm));
+                strm.str());
             return factory_invalid;
         }
 
@@ -1020,13 +996,13 @@ namespace hpx { namespace components { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Remove the given locality from our connection cache
-    void runtime_support::remove_from_connection_cache(naming::locality const& l)
+    void runtime_support::remove_from_connection_cache(parcelset::endpoints_type const& eps)
     {
         runtime* rt = get_runtime_ptr();
         if (rt == 0) return;
 
         // instruct our connection cache to drop all connections it is holding
-        rt->get_parcel_handler().remove_from_connection_cache(l);
+        rt->get_parcel_handler().remove_from_connection_cache(eps);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1115,7 +1091,8 @@ namespace hpx { namespace components { namespace server
             }
 
             // Drop the locality from the partition table.
-            agas_client.unregister_locality(appl.here(), ec);
+            naming::gid_type here = agas_client.get_local_locality();
+            agas_client.unregister_locality(here, ec);
 
             // unregister fixed components
             agas_client.unbind_local(appl.get_runtime_support_raw_gid(), ec);
@@ -1170,8 +1147,6 @@ namespace hpx { namespace components { namespace server
         components::initial_static_loading = false;
 
         // then dynamic ones
-        ini.load_components(modules_);
-
         naming::resolver_client& client = get_runtime().get_agas_client();
         bool result = load_components(ini, client.get_local_locality(), client);
 
@@ -1182,14 +1157,14 @@ namespace hpx { namespace components { namespace server
     {
         if (pre_startup) {
             get_runtime().set_state(runtime::state_pre_startup);
-            BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, pre_startup_functions_)
+            BOOST_FOREACH(util::function_nonser<void()> const& f, pre_startup_functions_)
             {
                 f();
             }
         }
         else {
             get_runtime().set_state(runtime::state_startup);
-            BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, startup_functions_)
+            BOOST_FOREACH(util::function_nonser<void()> const& f, startup_functions_)
             {
                 f();
             }
@@ -1201,7 +1176,7 @@ namespace hpx { namespace components { namespace server
         runtime& rt = get_runtime();
         if (pre_shutdown) {
             rt.set_state(runtime::state_pre_shutdown);
-            BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, pre_shutdown_functions_)
+            BOOST_FOREACH(util::function_nonser<void()> const& f, pre_shutdown_functions_)
             {
                 try {
                     f();
@@ -1213,7 +1188,7 @@ namespace hpx { namespace components { namespace server
         }
         else {
             rt.set_state(runtime::state_shutdown);
-            BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, shutdown_functions_)
+            BOOST_FOREACH(util::function_nonser<void()> const& f, shutdown_functions_)
             {
                 try {
                     f();
@@ -1252,7 +1227,7 @@ namespace hpx { namespace components { namespace server
         action_type act;
         BOOST_FOREACH(naming::id_type const& id, locality_ids)
         {
-            apply(act, id, rt->here());
+            apply(act, id, rt->endpoints());
         }
     }
 
@@ -1269,12 +1244,12 @@ namespace hpx { namespace components { namespace server
         plugin_map_type::const_iterator it = plugins_.find(message_handler_type);
         if (it == plugins_.end() || !(*it).second.first) {
             // we don't know anything about this component
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "attempt to create message handler plugin instance of "
                     "invalid/unknown type: " << message_handler_type;
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                 "runtime_support::create_message_handler",
-                hpx::util::osstream_get_string(strm));
+                strm.str());
             return 0;
         }
 
@@ -1288,12 +1263,12 @@ namespace hpx { namespace components { namespace server
         parcelset::policies::message_handler* mh = factory->create(action,
             pp, num_messages, interval);
         if (0 == mh) {
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "couldn't to create message handler plugin of type: "
                  << message_handler_type;
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                 "runtime_support::create_message_handler",
-                hpx::util::osstream_get_string(strm));
+                strm.str());
             return 0;
         }
 
@@ -1301,11 +1276,8 @@ namespace hpx { namespace components { namespace server
             ec = make_success_code();
 
         // log result if requested
-        if (LHPX_ENABLED(info))
-        {
-            LRT_(info) << "successfully created message handler plugin of type: "
-                       << message_handler_type;
-        }
+        LRT_(info) << "successfully created message handler plugin of type: "
+                    << message_handler_type;
         return mh;
     }
 
@@ -1319,12 +1291,12 @@ namespace hpx { namespace components { namespace server
         plugin_map_type::const_iterator it = plugins_.find(binary_filter_type);
         if (it == plugins_.end() || !(*it).second.first) {
             // we don't know anything about this component
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "attempt to create binary filter plugin instance of "
                     "invalid/unknown type: " << binary_filter_type;
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                 "runtime_support::create_binary_filter",
-                hpx::util::osstream_get_string(strm));
+                strm.str());
             return 0;
         }
 
@@ -1337,12 +1309,12 @@ namespace hpx { namespace components { namespace server
 
         util::binary_filter* bf = factory->create(compress, next_filter);
         if (0 == bf) {
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "couldn't to create binary filter plugin of type: "
                  << binary_filter_type;
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                 "runtime_support::create_binary_filter",
-                hpx::util::osstream_get_string(strm));
+                strm.str());
             return 0;
         }
 
@@ -1350,11 +1322,8 @@ namespace hpx { namespace components { namespace server
             ec = make_success_code();
 
         // log result if requested
-        if (LHPX_ENABLED(info))
-        {
-            LRT_(info) << "successfully binary filter handler plugin of type: "
-                       << binary_filter_type;
-        }
+        LRT_(info) << "successfully binary filter handler plugin of type: "
+                    << binary_filter_type;
         return bf;
     }
 
@@ -1779,7 +1748,8 @@ namespace hpx { namespace components { namespace server
         std::set<std::string>& startup_handled)
     {
         modules_map_type::iterator it = modules_.find(HPX_MANGLE_STRING(component));
-        if (it != modules_.end()) {
+        if (it != modules_.cend())
+        {
             // use loaded module, instantiate the requested factory
             if (!load_component((*it).second, ini, instance, component, lib,
                     prefix, agas_client, isdefault, isenabled, options,
@@ -2197,7 +2167,7 @@ namespace hpx { namespace components { namespace server
         component_map_mutex_type::scoped_lock l(cm_mtx_);
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end()) {
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "attempt to extract capabilities for component instance of "
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
@@ -2206,12 +2176,12 @@ namespace hpx { namespace components { namespace server
             l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::get_factory_capabilities",
-                hpx::util::osstream_get_string(strm));
+                strm.str());
             return caps;
         }
 
         if (!(*it).second.first) {
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "attempt to extract capabilities for component instance of "
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
@@ -2220,7 +2190,7 @@ namespace hpx { namespace components { namespace server
             l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::get_factory_capabilities",
-                hpx::util::osstream_get_string(strm));
+                strm.str());
             return caps;
         }
 

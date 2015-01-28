@@ -9,7 +9,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 
-/// See N4071: 1.3/3
+/// See N4310: 1.3/3
 #include <algorithm>
 
 #include <hpx/parallel/algorithms/adjacent_find.hpp>
@@ -28,8 +28,8 @@
 #include <hpx/parallel/algorithms/reduce.hpp>
 #include <hpx/parallel/algorithms/reverse.hpp>
 #include <hpx/parallel/algorithms/rotate.hpp>
+#include <hpx/parallel/algorithms/search.hpp>
 #include <hpx/parallel/algorithms/swap_ranges.hpp>
 #include <hpx/parallel/algorithms/transform.hpp>
 #include <hpx/parallel/algorithms/transform_reduce.hpp>
-
 #endif

@@ -99,12 +99,12 @@ namespace hpx { namespace components { namespace server { namespace detail
 
         ::free(c);
 
-        hpx::util::osstream strm;
+        std::ostringstream strm;
         strm << "global id " << gid << " is already bound to a different "
                 "component instance";
         HPX_THROW_EXCEPTION(hpx::duplicate_component_address,
             "server::detail::create_memory_block",
-            hpx::util::osstream_get_string(strm));
+            strm.str());
 
         return naming::invalid_gid;
     }

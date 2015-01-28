@@ -267,7 +267,7 @@ double timestep_size(boost::uint64_t timestep)
 
   double dt_cfl = 1000.0;
 
-   wait_each(grid.time_array.at(timestep).fluid_future,
+   wait_each(
       hpx::util::unwrapped([&](cell const& this_cell)
       {
       // look at all of the cells at a timestep, then pick the smallest
@@ -283,7 +283,8 @@ double timestep_size(boost::uint64_t timestep)
         }
       if (dt_cfl_here < dt_cfl)
         dt_cfl = dt_cfl_here;
-     }));
+     }),
+     grid.time_array.at(timestep).fluid_future);
 
   // initialize dt_cfl to some arbitrary high value
 
@@ -453,7 +454,7 @@ cell compute(boost::uint64_t timestep, boost::uint64_t location)
   double e_kinetic = 0.5*middle.mom*middle.mom/middle.rho;
   double e_internal = middle.etot - e_kinetic;
   //dual energy formalism
-  if ( abs(e_internal) > 0.1*middle.etot)
+  if ( std::abs(e_internal) > 0.1*middle.etot)
     {
       //cout << (boost::format("gas is shocking!\n")) << flush;
       now.tau = pow(e_internal,(1.0/fluid_gamma));
@@ -493,7 +494,7 @@ double get_pressure(cell input)
   double e_internal = input.etot - e_kinetic;
 
   // dual energy
-  if ( abs(e_internal) > 0.001*input.etot )
+  if ( std::abs(e_internal) > 0.001*input.etot )
     {
       pressure = (fluid_gamma-1.0)*e_internal;
     }

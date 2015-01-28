@@ -26,7 +26,7 @@ void test_find_first_of(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand() + 19);
     std::size_t h[] = {1, 7, 18, 3};
-    c[find_first_of_pos] = h[random_sub_seq_pos];
+    c[find_first_of_pos] = h[random_sub_seq_pos]; //-V108
 
     auto op = [](std::size_t a, std::size_t b)
     {
@@ -55,7 +55,7 @@ void test_find_first_of_async(ExPolicy const& p, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand() + 19);
     std::size_t h[] = {1, 7, 18, 3};
-    c[find_first_of_pos] = h[random_sub_seq_pos];
+    c[find_first_of_pos] = h[random_sub_seq_pos]; //-V108
 
     auto op = [](std::size_t a, std::size_t b)
     {

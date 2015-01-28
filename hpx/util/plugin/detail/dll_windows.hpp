@@ -139,14 +139,14 @@ namespace hpx { namespace util { namespace plugin {
             SymbolType address = (SymbolType)GetProcAddress(dll_handle, symbol_name.c_str());
             if (NULL == address)
             {
-                HPX_PLUGIN_OSSTREAM str;
+                std::ostringstream str;
                 str << "Hpx.Plugin: Unable to locate the exported symbol name '"
                     << symbol_name << "' in the shared library '"
                     << dll_name << "'";
 
                 // report error
                 HPX_THROWS_IF(ec, dynamic_link_failure,
-                    "plugin::get", HPX_PLUGIN_OSSTREAM_GETSTRING(str));
+                    "plugin::get", str.str());
                 return std::pair<SymbolType, Deleter>();
             }
 
@@ -156,13 +156,13 @@ namespace hpx { namespace util { namespace plugin {
             // symbol.
             HMODULE handle = ::LoadLibrary(dll_name.c_str());
             if (!handle) {
-                HPX_PLUGIN_OSSTREAM str;
+                std::ostringstream str;
                 str << "Hpx.Plugin: Could not open shared library '"
                     << dll_name << "'";
 
                 // report error
                 HPX_THROWS_IF(ec, filesystem_error,
-                    "plugin::get", HPX_PLUGIN_OSSTREAM_GETSTRING(str));
+                    "plugin::get", str.str());
                 return std::pair<SymbolType, Deleter>();
             }
             HPX_ASSERT(handle == dll_handle);
@@ -189,13 +189,13 @@ namespace hpx { namespace util { namespace plugin {
 
                 dll_handle = ::LoadLibrary(dll_name.c_str());
                 if (!dll_handle) {
-                    HPX_PLUGIN_OSSTREAM str;
+                    std::ostringstream str;
                     str << "Hpx.Plugin: Could not open shared library '"
                         << dll_name << "'";
 
                     HPX_THROWS_IF(ec, filesystem_error,
                         "plugin::LoadLibrary",
-                        HPX_PLUGIN_OSSTREAM_GETSTRING(str));
+                        str.str());
                     return;
                 }
             }
@@ -216,12 +216,12 @@ namespace hpx { namespace util { namespace plugin {
                 GetModuleFileName(dll_handle, buffer, sizeof(buffer));
 
             if (name_length <= 0) {
-                HPX_PLUGIN_OSSTREAM str;
+                std::ostringstream str;
                 str << "Hpx.Plugin: Could not extract path the shared "
                        "library '" << dll_name << "' has been loaded from.";
 
                 HPX_THROWS_IF(ec, filesystem_error,
-                    "plugin::get_directory", HPX_PLUGIN_OSSTREAM_GETSTRING(str));
+                    "plugin::get_directory", str.str());
                 return buffer;
             }
 

@@ -119,6 +119,11 @@ namespace hpx { namespace util
             This()->save(l);
             if (l != 0)
                 save_binary(s.data(), l);
+
+#if defined(HPX_DEBUG_SERIALIZATION)
+            static char const string_end = 'e';
+            This()->save(string_end);
+#endif
         }
 #ifndef BOOST_NO_STD_WSTRING
         void save(std::wstring const& s)

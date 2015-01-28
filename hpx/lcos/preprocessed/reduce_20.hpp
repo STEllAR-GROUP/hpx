@@ -165,7 +165,7 @@ namespace hpx { namespace lcos
                     >
                     reduce_invoker_type;
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };
@@ -202,10 +202,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       
     >
@@ -213,9 +210,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       )
@@ -246,10 +241,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       
     >
@@ -257,9 +249,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       )
@@ -428,7 +418,7 @@ namespace hpx { namespace lcos
                     >
                     reduce_invoker_type;
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };
@@ -465,10 +455,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0
     >
@@ -476,9 +463,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0)
@@ -509,10 +494,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0
     >
@@ -520,9 +502,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0)
@@ -691,7 +671,7 @@ namespace hpx { namespace lcos
                     >
                     reduce_invoker_type;
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };
@@ -728,10 +708,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1
     >
@@ -739,9 +716,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1)
@@ -772,10 +747,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1
     >
@@ -783,9 +755,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1)
@@ -954,7 +924,7 @@ namespace hpx { namespace lcos
                     >
                     reduce_invoker_type;
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };
@@ -991,10 +961,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2
     >
@@ -1002,9 +969,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2)
@@ -1035,10 +1000,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2
     >
@@ -1046,9 +1008,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2)
@@ -1217,7 +1177,7 @@ namespace hpx { namespace lcos
                     >
                     reduce_invoker_type;
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };
@@ -1254,10 +1214,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3
     >
@@ -1265,9 +1222,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3)
@@ -1298,10 +1253,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3
     >
@@ -1309,9 +1261,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3)
@@ -1480,7 +1430,7 @@ namespace hpx { namespace lcos
                     >
                     reduce_invoker_type;
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };
@@ -1517,10 +1467,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
     >
@@ -1528,9 +1475,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4)
@@ -1561,10 +1506,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
     >
@@ -1572,9 +1514,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4)
@@ -1743,7 +1683,7 @@ namespace hpx { namespace lcos
                     >
                     reduce_invoker_type;
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };
@@ -1780,10 +1720,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
     >
@@ -1791,9 +1728,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5)
@@ -1824,10 +1759,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
     >
@@ -1835,9 +1767,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5)
@@ -2006,7 +1936,7 @@ namespace hpx { namespace lcos
                     >
                     reduce_invoker_type;
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };
@@ -2043,10 +1973,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
     >
@@ -2054,9 +1981,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6)
@@ -2087,10 +2012,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
     >
@@ -2098,9 +2020,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6)
@@ -2269,7 +2189,7 @@ namespace hpx { namespace lcos
                     >
                     reduce_invoker_type;
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };
@@ -2306,10 +2226,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
     >
@@ -2317,9 +2234,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7)
@@ -2350,10 +2265,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
     >
@@ -2361,9 +2273,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7)
@@ -2532,7 +2442,7 @@ namespace hpx { namespace lcos
                     >
                     reduce_invoker_type;
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };
@@ -2569,10 +2479,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
     >
@@ -2580,9 +2487,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8)
@@ -2613,10 +2518,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
     >
@@ -2624,9 +2526,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8)
@@ -2795,7 +2695,7 @@ namespace hpx { namespace lcos
                     >
                     reduce_invoker_type;
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };
@@ -2832,10 +2732,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
     >
@@ -2843,9 +2740,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9)
@@ -2876,10 +2771,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
     >
@@ -2887,9 +2779,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9)
@@ -3058,7 +2948,7 @@ namespace hpx { namespace lcos
                     >
                     reduce_invoker_type;
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };
@@ -3095,10 +2985,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10
     >
@@ -3106,9 +2993,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10)
@@ -3139,10 +3024,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10
     >
@@ -3150,9 +3032,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10)
@@ -3321,7 +3201,7 @@ namespace hpx { namespace lcos
                     >
                     reduce_invoker_type;
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };
@@ -3358,10 +3238,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11
     >
@@ -3369,9 +3246,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11)
@@ -3402,10 +3277,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11
     >
@@ -3413,9 +3285,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11)
@@ -3584,7 +3454,7 @@ namespace hpx { namespace lcos
                     >
                     reduce_invoker_type;
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };
@@ -3621,10 +3491,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12
     >
@@ -3632,9 +3499,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12)
@@ -3665,10 +3530,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12
     >
@@ -3676,9 +3538,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12)
@@ -3847,7 +3707,7 @@ namespace hpx { namespace lcos
                     >
                     reduce_invoker_type;
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };
@@ -3884,10 +3744,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13
     >
@@ -3895,9 +3752,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13)
@@ -3928,10 +3783,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13
     >
@@ -3939,9 +3791,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13)
@@ -4110,7 +3960,7 @@ namespace hpx { namespace lcos
                     >
                     reduce_invoker_type;
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };
@@ -4147,10 +3997,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14
     >
@@ -4158,9 +4005,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14)
@@ -4191,10 +4036,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14
     >
@@ -4202,9 +4044,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14)
@@ -4373,7 +4213,7 @@ namespace hpx { namespace lcos
                     >
                     reduce_invoker_type;
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };
@@ -4410,10 +4250,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15
     >
@@ -4421,9 +4258,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15)
@@ -4454,10 +4289,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15
     >
@@ -4465,9 +4297,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15)
@@ -4636,7 +4466,7 @@ namespace hpx { namespace lcos
                     >
                     reduce_invoker_type;
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };
@@ -4673,10 +4503,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16
     >
@@ -4684,9 +4511,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16)
@@ -4717,10 +4542,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16
     >
@@ -4728,9 +4550,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16)
@@ -4899,7 +4719,7 @@ namespace hpx { namespace lcos
                     >
                     reduce_invoker_type;
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };
@@ -4936,10 +4756,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17
     >
@@ -4947,9 +4764,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16 , A17 const & a17)
@@ -4980,10 +4795,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17
     >
@@ -4991,9 +4803,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16 , A17 const & a17)
@@ -5162,7 +4972,7 @@ namespace hpx { namespace lcos
                     >
                     reduce_invoker_type;
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };
@@ -5199,10 +5009,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18
     >
@@ -5210,9 +5017,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16 , A17 const & a17 , A18 const & a18)
@@ -5243,10 +5048,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18
     >
@@ -5254,9 +5056,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16 , A17 const & a17 , A18 const & a18)
@@ -5425,7 +5225,7 @@ namespace hpx { namespace lcos
                     >
                     reduce_invoker_type;
                 typedef
-                    typename HPX_MAKE_ACTION_TPL(reduce_invoker_type::call)::type
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
                     type;
             };
         };
@@ -5462,10 +5262,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19
     >
@@ -5473,9 +5270,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16 , A17 const & a17 , A18 const & a18 , A19 const & a19)
@@ -5506,10 +5301,7 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19
     >
@@ -5517,9 +5309,7 @@ namespace hpx { namespace lcos
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16 , A17 const & a17 , A18 const & a18 , A19 const & a19)

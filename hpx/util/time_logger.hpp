@@ -12,6 +12,12 @@
 
 #include <hpx/util/logging.hpp>
 
+#if defined(BOOST_WINDOWS)
+#  include <process.h>
+#elif defined(BOOST_HAS_UNISTD_H)
+#  include <unistd.h>
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_INITIAL_TIMES_SIZE 64000
 

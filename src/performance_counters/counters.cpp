@@ -13,6 +13,7 @@
 #include <hpx/runtime/components/base_lco_factory.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 
+#include <hpx/util/function.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/bind.hpp>
@@ -472,8 +473,8 @@ namespace hpx { namespace performance_counters
 
     ///////////////////////////////////////////////////////////////////////////
     counter_status add_counter_type(counter_info const& info,
-        HPX_STD_FUNCTION<create_counter_func> const& create_counter,
-        HPX_STD_FUNCTION<discover_counters_func> const& discover_counters,
+        create_counter_func const& create_counter,
+        discover_counters_func const& discover_counters,
         error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
@@ -484,7 +485,7 @@ namespace hpx { namespace performance_counters
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Call the supplied function for each registered counter type
     counter_status discover_counter_types(
-        HPX_STD_FUNCTION<discover_counter_func> const& discover_counter,
+        discover_counter_func const& discover_counter,
         discover_counters_mode mode, error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
@@ -496,7 +497,7 @@ namespace hpx { namespace performance_counters
     /// \brief Call the supplied function for the given registered counter type.
     counter_status discover_counter_type(
         counter_info const& info,
-        HPX_STD_FUNCTION<discover_counter_func> const& discover_counter,
+        discover_counter_func const& discover_counter,
         discover_counters_mode mode, error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
@@ -506,7 +507,7 @@ namespace hpx { namespace performance_counters
 
     counter_status discover_counter_type(
         std::string const& name,
-        HPX_STD_FUNCTION<discover_counter_func> const& discover_counter,
+        discover_counter_func const& discover_counter,
         discover_counters_mode mode, error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
@@ -530,11 +531,11 @@ namespace hpx { namespace performance_counters
     {
         using hpx::util::placeholders::_1;
 
-        HPX_STD_FUNCTION<discover_counter_func> func(
+        discover_counter_func func(
             hpx::util::bind(&detail::discover_counters, _1, boost::ref(counters),
                 boost::ref(ec)));
 
-        return discover_counter_types(func, mode, ec);
+        return discover_counter_types(std::move(func), mode, ec);
     }
 
     counter_status discover_counter_type(
@@ -543,11 +544,11 @@ namespace hpx { namespace performance_counters
     {
         using hpx::util::placeholders::_1;
 
-        HPX_STD_FUNCTION<discover_counter_func> func(
+        discover_counter_func func(
             hpx::util::bind(&detail::discover_counters, _1, boost::ref(counters),
                 boost::ref(ec)));
 
-        return discover_counter_type(name, func, mode, ec);
+        return discover_counter_type(name, std::move(func), mode, ec);
     }
 
     counter_status discover_counter_type(
@@ -556,11 +557,11 @@ namespace hpx { namespace performance_counters
     {
         using hpx::util::placeholders::_1;
 
-        HPX_STD_FUNCTION<discover_counter_func> func(
+        discover_counter_func func(
             hpx::util::bind(&detail::discover_counters, _1, boost::ref(counters),
                 boost::ref(ec)));
 
-        return discover_counter_type(info, func, mode, ec);
+        return discover_counter_type(info, std::move(func), mode, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -597,7 +598,7 @@ namespace hpx { namespace performance_counters
         }
 
         naming::gid_type create_raw_counter(counter_info const& info,
-            HPX_STD_FUNCTION<boost::int64_t()> const& f, error_code& ec)
+            hpx::util::function_nonser<boost::int64_t()> const& f, error_code& ec)
         {
             naming::gid_type gid;
             get_runtime().get_counter_registry().create_raw_counter(
@@ -606,7 +607,7 @@ namespace hpx { namespace performance_counters
         }
 
         naming::gid_type create_raw_counter(counter_info const& info,
-            HPX_STD_FUNCTION<boost::int64_t(bool)> const& f, error_code& ec)
+            hpx::util::function_nonser<boost::int64_t(bool)> const& f, error_code& ec)
         {
             naming::gid_type gid;
             get_runtime().get_counter_registry().create_raw_counter(
@@ -669,7 +670,7 @@ namespace hpx { namespace performance_counters
             // find create function for given counter
             error_code ec;
 
-            HPX_STD_FUNCTION<create_counter_func> f;
+            create_counter_func f;
             get_runtime().get_counter_registry().get_counter_create_function(
                 info, f, ec);
             if (ec) {
@@ -724,7 +725,7 @@ namespace hpx { namespace performance_counters
         /// Expand all wild-cards in a counter base name (for aggregate counters)
         bool expand_basecounter(
             counter_info const& info, counter_path_elements& p,
-            HPX_STD_FUNCTION<discover_counter_func> const& f, error_code& ec)
+            discover_counter_func const& f, error_code& ec)
         {
             // discover all base names
             std::vector<counter_info> counter_infos;
@@ -748,7 +749,7 @@ namespace hpx { namespace performance_counters
         // expand main counter name
         bool expand_counter_info_threads(
             counter_info& i, counter_path_elements& p,
-            HPX_STD_FUNCTION<discover_counter_func> const& f, error_code& ec)
+            discover_counter_func const& f, error_code& ec)
         {
             std::size_t num_threads = get_os_thread_count();
             for (std::size_t l = 0; l != num_threads; ++l)
@@ -763,7 +764,7 @@ namespace hpx { namespace performance_counters
 
         bool expand_counter_info_localities(
             counter_info& i, counter_path_elements& p,
-            HPX_STD_FUNCTION<discover_counter_func> const& f, error_code& ec)
+            discover_counter_func const& f, error_code& ec)
         {
             bool expand_threads = false;
             if (is_thread_kind(p.instancename_))
@@ -792,7 +793,7 @@ namespace hpx { namespace performance_counters
         ///////////////////////////////////////////////////////////////////////
         bool expand_counter_info(
             counter_info const& info, counter_path_elements& p,
-            HPX_STD_FUNCTION<discover_counter_func> const& f, error_code& ec)
+            discover_counter_func const& f, error_code& ec)
         {
             // A '*' wild-card as the instance name is equivalent to no instance
             // name at all.
@@ -833,7 +834,7 @@ namespace hpx { namespace performance_counters
     /// \brief call the supplied function will all expanded versions of the
     /// supplied counter info.
     bool expand_counter_info(counter_info const& info,
-        HPX_STD_FUNCTION<discover_counter_func> const& f, error_code& ec)
+        discover_counter_func const& f, error_code& ec)
     {
         counter_path_elements p;
         counter_status status = get_counter_path_elements(info.fullname_, p, ec);

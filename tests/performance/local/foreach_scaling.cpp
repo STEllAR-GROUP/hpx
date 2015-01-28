@@ -64,7 +64,8 @@ hpx::future<void> measure_task_foreach(std::size_t size)
 
     // invoke parallel for_each
     return
-        hpx::parallel::for_each(hpx::parallel::par_task(chunk_size),
+        hpx::parallel::for_each(
+            hpx::parallel::par(hpx::parallel::task, chunk_size),
             boost::begin(*data_representation),
             boost::end(*data_representation),
             [](std::size_t) {

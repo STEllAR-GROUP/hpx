@@ -67,7 +67,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             util::cancellation_token<util::detail::no_data> tok;
             return util::partitioner_with_cleanup<
-                    ExPolicy, Iter, void, partition_result_type
+                    ExPolicy, void, partition_result_type
                 >::call(
                     policy, first, count,
                     [value, tok](Iter it, std::size_t part_size)
@@ -187,8 +187,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::uninitialized_fill().call(
-            std::forward<ExPolicy>(policy),
-            first, last, value, is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, value);
     }
 
     /////////////////////////////////////////////////////////////////////////////
@@ -290,8 +290,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
 
         return detail::uninitialized_fill_n().call(
-            std::forward<ExPolicy>(policy),
-            first, std::size_t(count), value, is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, std::size_t(count), value);
     }
 }}}
 

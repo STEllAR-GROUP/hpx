@@ -25,7 +25,7 @@ struct A : hpx::components::abstract_managed_component_base<A>
 
     virtual std::string test0() const = 0;
     std::string test0_nonvirt() const { return test0(); }
-    HPX_DEFINE_COMPONENT_CONST_ACTION(A, test0_nonvirt, test0_action);
+    HPX_DEFINE_COMPONENT_ACTION(A, test0_nonvirt, test0_action);
 };
 
 HPX_DEFINE_GET_COMPONENT_TYPE(A);
@@ -42,6 +42,7 @@ struct B : A, hpx::components::managed_component_base<B>
         wrapping_type;
     using hpx::components::managed_component_base<B>::decorate_action;
     using hpx::components::managed_component_base<B>::schedule_thread;
+    using hpx::components::managed_component_base<B>::is_target_valid;
 
     typedef B type_holder;
     typedef A base_type_holder;
@@ -52,7 +53,7 @@ struct B : A, hpx::components::managed_component_base<B>
     std::string test0() const { return "B"; }
 
     std::string test1() const { return "B"; }
-    HPX_DEFINE_COMPONENT_CONST_ACTION(B, test1, test1_action);
+    HPX_DEFINE_COMPONENT_ACTION(B, test1, test1_action);
 };
 
 typedef hpx::components::managed_component<B> serverB_type;

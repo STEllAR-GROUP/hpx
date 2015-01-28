@@ -22,6 +22,7 @@ namespace hpx { namespace naming { namespace detail
     {
         address::address_type address_;
         address::component_type type_;
+        address::address_type offset_;
     };
 }}}
 
@@ -41,14 +42,15 @@ namespace hpx { namespace naming
     void address::save(Archive& ar, const unsigned int version) const
     {
         if (ar.flags() & util::disable_array_optimization) {
-            ar << locality_ << type_ << address_;
+            ar << locality_ << type_ << address_ << offset_;
         }
         else {
-            locality_.save(ar, HPX_LOCALITY_VERSION);
+            ar << locality_;
 
             detail::name_serialization_data data;
             data.type_ = type_;
             data.address_ = address_;
+            data.offset_ = offset_;
             ar.save(data);
         }
     }
@@ -64,15 +66,16 @@ namespace hpx { namespace naming
         }
 
         if (ar.flags() & util::disable_array_optimization) {
-            ar >> locality_ >> type_ >> address_;
+            ar >> locality_ >> type_ >> address_ >> offset_;
         }
         else {
-            locality_.load(ar, HPX_LOCALITY_VERSION);
+            ar >> locality_;
 
             detail::name_serialization_data data;
             ar.load(data);
             type_ = data.type_;
             address_ = data.address_;
+            offset_ = data.offset_;
         }
     }
 

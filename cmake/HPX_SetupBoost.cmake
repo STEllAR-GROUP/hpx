@@ -8,6 +8,14 @@
 if(HPX_STATIC_LINKING)
   set(Boost_USE_STATIC_LIBS ON)
 endif()
+
+# Add additional version to recognize
+set(Boost_ADDITIONAL_VERSIONS
+    ${Boost_ADDITIONAL_VERSIONS}
+    "1.59.0" "1.59"
+    "1.58.0" "1.58"
+    "1.57.0" "1.57")
+
 find_package(Boost
   1.49
   REQUIRED
@@ -83,10 +91,17 @@ else()
   set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
 endif()
 
+
 # If the found Boost installation is < 1.56, we need to include extra
 # intrusive_ptr header file 
 if(Boost_VERSION LESS 105600)
   set(Boost_INCLUDE_DIRS  "${hpx_SOURCE_DIR}/external/intrusive_ptr" ${Boost_INCLUDE_DIRS})
+endif()
+
+# If the found Boost installation is < 1.57, we need to include extra
+# serialization headers
+if(Boost_VERSION LESS 105700)
+  set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} "${hpx_SOURCE_DIR}/external/serialization")
 endif()
 
 set(Boost_LIBRARIES ${Boost_TMP_LIBRARIES})

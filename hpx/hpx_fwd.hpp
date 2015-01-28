@@ -38,15 +38,15 @@
 #include <boost/system/error_code.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 
-#include <hpx/config/function.hpp>
 #include <hpx/traits.hpp>
 #include <hpx/lcos/local/once_fwd.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/util/function.hpp>            // this has to come before the naming/id_type.hpp below
 #include <hpx/util/move.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/coroutine/detail/default_context_impl.hpp>
 #include <hpx/util/coroutine/detail/coroutine_impl.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 
 namespace boost
@@ -104,25 +104,17 @@ namespace hpx
         // NOTE: we do not export the symbol here as id_type was already exported and generates a warning on gcc otherwise
         struct id_type;
         struct HPX_API_EXPORT address;
-        class HPX_API_EXPORT locality;
 
         HPX_API_EXPORT resolver_client& get_agas_client();
+
+        typedef boost::uint64_t address_type;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     /// \namespace parcelset
     namespace parcelset
     {
-        enum connection_type
-        {
-            connection_unknown = -1,
-            connection_tcp = 0,
-            connection_ipc = 1,
-            connection_portals4 = 2,
-            connection_ibverbs = 3,
-            connection_mpi = 4,
-            connection_last
-        };
+        class HPX_API_EXPORT locality;
 
         class HPX_API_EXPORT parcel;
         class HPX_API_EXPORT parcelport;
@@ -143,15 +135,12 @@ namespace hpx
             struct message_handler;
         }
 
-        HPX_API_EXPORT std::string get_connection_type_name(connection_type);
-        HPX_API_EXPORT connection_type get_connection_type_from_name(std::string const&);
-
         HPX_API_EXPORT policies::message_handler* get_message_handler(
             parcelhandler* ph, char const* name, char const* type, std::size_t num,
-            std::size_t interval, naming::locality const& l, connection_type t,
+            std::size_t interval, locality const& l,
             error_code& ec = throws);
 
-        HPX_API_EXPORT void do_background_work();
+        HPX_API_EXPORT void do_background_work(std::size_t num_thread = 0);
     }
 
     namespace util
@@ -477,9 +466,8 @@ namespace hpx
 
         class HPX_API_EXPORT action_manager;
 
-        template <typename Component, typename Result,
-            typename Arguments, typename Derived>
-        struct action;
+        template <typename Component, typename Signature, typename Derived>
+        struct basic_action;
     }
 
     class HPX_API_EXPORT runtime;
@@ -523,8 +511,8 @@ namespace hpx
     HPX_API_EXPORT runtime& get_runtime();
     HPX_API_EXPORT runtime* get_runtime_ptr();
 
-    /// The function \a get_locality returns a reference to the locality
-    HPX_API_EXPORT naming::locality const& get_locality();
+    /// The function \a get_locality returns a reference to the locality prefix
+    HPX_API_EXPORT naming::gid_type const& get_locality();
 
     /// The function \a get_runtime_instance_number returns a unique number
     /// associated with the runtime instance the current thread is running in.
@@ -536,7 +524,7 @@ namespace hpx
     HPX_API_EXPORT void report_error(boost::exception_ptr const& e);
 
     /// Register a function to be called during system shutdown
-    HPX_API_EXPORT bool register_on_exit(HPX_STD_FUNCTION<void()> const&);
+    HPX_API_EXPORT bool register_on_exit(util::function_nonser<void()> const&);
 
     enum logging_destination
     {
@@ -1252,7 +1240,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     /// The type of a function which is registered to be executed as a
     /// startup or pre-startup function.
-    typedef HPX_STD_FUNCTION<void()> startup_function_type;
+    typedef util::function_nonser<void()> startup_function_type;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Add a function to be executed by a HPX thread before hpx_main
@@ -1305,7 +1293,7 @@ namespace hpx
 
     /// The type of a function which is registered to be executed as a
     /// shutdown or pre-shutdown function.
-    typedef HPX_STD_FUNCTION<void()> shutdown_function_type;
+    typedef util::function_nonser<void()> shutdown_function_type;
 
     /// \brief Add a function to be executed by a HPX thread during
     /// \a hpx::finalize() but guaranteed before any shutdown function is
@@ -1385,15 +1373,48 @@ namespace hpx
     HPX_API_EXPORT boost::uint32_t get_locality_id(error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \brief Test whether the runtime system is currently being started.
+    ///
+    /// This function returns whether the runtime system is currently being
+    /// started or not, e.g. whether the current state of the runtime system is
+    /// \a hpx::runtime::state_startup
+    ///
+    /// \note   This function needs to be executed on a HPX-thread. It will
+    ///         return false otherwise.
+    HPX_API_EXPORT bool is_starting();
+
+    ///////////////////////////////////////////////////////////////////////////
     /// \brief Test whether the runtime system is currently running.
     ///
     /// This function returns whether the runtime system is currently running
     /// or not, e.g.  whether the current state of the runtime system is
-    /// \a hpx::runtime::running
+    /// \a hpx::runtime::state_running
     ///
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         return false otherwise.
     HPX_API_EXPORT bool is_running();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Test whether the runtime system is currently stopped.
+    ///
+    /// This function returns whether the runtime system is currently stopped
+    /// or not, e.g.  whether the current state of the runtime system is
+    /// \a hpx::runtime::state_stopped
+    ///
+    /// \note   This function needs to be executed on a HPX-thread. It will
+    ///         return false otherwise.
+    HPX_API_EXPORT bool is_stopped();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Test whether the runtime system is currently being shut down.
+    ///
+    /// This function returns whether the runtime system is currently being
+    /// shut down or not, e.g.  whether the current state of the runtime system
+    /// is \a hpx::runtime::state_stopped or \a hpx::runtime::state_shutdown
+    ///
+    /// \note   This function needs to be executed on a HPX-thread. It will
+    ///         return false otherwise.
+    HPX_API_EXPORT bool is_stopped_or_shutting_down();
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the name of the calling thread.
@@ -1446,39 +1467,6 @@ namespace hpx
     ///
     /// \see    \a hpx::get_colocation_id_sync()
     HPX_API_EXPORT lcos::future<naming::id_type> get_colocation_id(
-        naming::id_type const& id);
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// \fn std::string get_locality_name()
-    ///
-    /// \brief Return the name of the locality this function is called on.
-    ///
-    /// This function returns the name for the locality on which this function
-    /// is called.
-    ///
-    /// \returns  This function returns the name for the locality on which the
-    ///           function is called. The name is retrieved from the underlying
-    ///           networking layer and may be different for different parcelports.
-    ///
-    /// \see      \a future<std::string> get_locality_name(naming::id_type const& id)
-    HPX_API_EXPORT std::string get_locality_name();
-
-    /// \fn future<std::string> get_locality_name(naming::id_type const& id)
-    ///
-    /// \brief Return the name of the referenced locality.
-    ///
-    /// This function returns a future referring to the name for the locality
-    /// of the given id.
-    ///
-    /// \param id [in] The global id of the locality for which the name should
-    ///           be retrieved
-    ///
-    /// \returns  This function returns the name for the locality of the given
-    ///           id. The name is retrieved from the underlying networking layer
-    ///           and may be different for different parcel ports.
-    ///
-    /// \see      \a std::string get_locality_name()
-    HPX_API_EXPORT future<std::string> get_locality_name(
         naming::id_type const& id);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1698,6 +1686,9 @@ namespace hpx
 #endif
 #endif
 }
+
+// Including declarations of get_locality_name
+#include <hpx/runtime/get_locality_name.hpp>
 
 #include <hpx/lcos/async_fwd.hpp>
 

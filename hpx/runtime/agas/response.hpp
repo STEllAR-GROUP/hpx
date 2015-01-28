@@ -16,6 +16,7 @@
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 
 #include <boost/variant.hpp>
@@ -98,13 +99,19 @@ struct HPX_EXPORT response
 
     response(
         namespace_action_code type_
-      , std::vector<naming::locality> const& localities_
+      , std::map<naming::gid_type, parcelset::endpoints_type> const & localities_
       , error status_ = success
         );
 
     response(
         namespace_action_code type_
       , boost::int64_t added_credits_
+      , error status_ = success
+        );
+
+    response(
+        namespace_action_code type_
+      , parcelset::endpoints_type const& endpoints_
       , error status_ = success
         );
 
@@ -127,7 +134,11 @@ struct HPX_EXPORT response
         error_code& ec = throws
         ) const;
 
-    std::vector<naming::locality> get_resolved_localities(
+    std::map<naming::gid_type, parcelset::endpoints_type> get_resolved_localities(
+        error_code& ec = throws
+        ) const;
+
+    parcelset::endpoints_type get_endpoints(
         error_code& ec = throws
         ) const;
 
@@ -205,7 +216,7 @@ struct HPX_EXPORT response
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
-    namespace_action_code mc;
+    namespace_action_code mc; //-V707
     error status;
 
     // FIXME: std::unique_ptr doesn't seem to work with incomplete types
@@ -339,13 +350,24 @@ struct get_remote_result<std::vector<boost::uint32_t>, agas::response>
 };
 
 template <>
-struct get_remote_result<std::vector<naming::locality>, agas::response>
+struct get_remote_result<std::map<naming::gid_type, parcelset::endpoints_type>, agas::response>
 {
-    static std::vector<naming::locality> call(
+    static std::map<naming::gid_type, parcelset::endpoints_type> call(
         agas::response const& rep
         )
     {
         return rep.get_resolved_localities();
+    }
+};
+
+template <>
+struct get_remote_result<parcelset::endpoints_type, agas::response>
+{
+    static parcelset::endpoints_type call(
+        agas::response const& rep
+        )
+    {
+        return rep.get_endpoints();
     }
 };
 

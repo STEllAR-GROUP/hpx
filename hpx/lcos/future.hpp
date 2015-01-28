@@ -7,7 +7,7 @@
 #if !defined(HPX_LCOS_FUTURE_MAR_06_2012_1059AM)
 #define HPX_LCOS_FUTURE_MAR_06_2012_1059AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/config/forceinline.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/future_traits.hpp>
@@ -194,7 +194,7 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Archive, typename Future>
     typename boost::enable_if<
         boost::is_void<typename traits::future_traits<Future>::type>
-    >::type serialize_future_load(Archive& ar, Future& f)
+    >::type serialize_future_load(Archive& ar, Future& f) //-V659
     {
         typedef lcos::detail::future_data<void> shared_state;
 
@@ -253,7 +253,7 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Archive, typename Future>
     typename boost::enable_if<
         boost::is_void<typename traits::future_traits<Future>::type>
-    >::type serialize_future_save(Archive& ar, Future const& f)
+    >::type serialize_future_save(Archive& ar, Future const& f) //-V659
     {
         if(f.valid())
         {
@@ -1099,7 +1099,7 @@ namespace hpx { namespace lcos
         //         shared state.
         // Postcondition: valid() == false.
         typename traits::future_traits<shared_future>::result_type
-        get() const
+        get() const //-V659
         {
             if (!this->shared_state_)
             {
@@ -1115,19 +1115,27 @@ namespace hpx { namespace lcos
             return detail::future_value<R>::get(data.get_value());
         }
         typename traits::future_traits<shared_future>::result_type
-        get(error_code& ec) const
+        get(error_code& ec) const //-V659
         {
+            typedef
+                typename traits::future_traits<shared_future>::result_type
+                result_type;
             if (!this->shared_state_)
             {
                 HPX_THROWS_IF(ec, no_state,
                     "shared_future<R>::get",
                     "this future has no valid shared state");
-                return detail::future_value<R>::get_default();
+                static result_type res(detail::future_value<R>::get_default());
+                return res;
             }
 
             typedef typename shared_state_type::data_type data_type;
             data_type& data = this->shared_state_->get_result(ec);
-            if (ec) return detail::future_value<R>::get_default();
+            if (ec)
+            {
+                static result_type res(detail::future_value<R>::get_default());
+                return res;
+            }
 
             // no error has been reported, return the result
             return detail::future_value<R>::get(data.get_value());
@@ -1164,10 +1172,10 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object
     template <typename Result>
-    future<typename util::detail::decay_unwrap<Result>::type>
+    future<typename util::decay_unwrap<Result>::type>
     make_ready_future(Result && init)
     {
-        typedef typename util::detail::decay_unwrap<Result>::type result_type;
+        typedef typename util::decay_unwrap<Result>::type result_type;
         typedef lcos::detail::future_data<result_type> shared_state;
 
         boost::intrusive_ptr<shared_state> p(new shared_state());
@@ -1178,27 +1186,36 @@ namespace hpx { namespace lcos
 
     // extension: create a pre-initialized future object which holds the
     // given error
-    template <typename Result>
-    future<typename util::detail::decay_unwrap<Result>::type>
-    make_error_future(boost::exception_ptr const& e)
+    template <typename T>
+    future<T> make_exceptional_future(boost::exception_ptr const& e)
     {
-        typedef typename util::detail::decay_unwrap<Result>::type result_type;
-        typedef lcos::detail::future_data<result_type> shared_state;
+        typedef lcos::detail::future_data<T> shared_state;
 
         boost::intrusive_ptr<shared_state> p(new shared_state());
         p->set_exception(e);
 
-        return traits::future_access<future<result_type> >::create(std::move(p));
+        return traits::future_access<future<T> >::create(std::move(p));
+    }
+
+    template <typename T, typename E>
+    future<T> make_exceptional_future(E e)
+    {
+        try
+        {
+            throw e;
+        } catch (...) {
+            return lcos::make_exceptional_future<T>(boost::current_exception());
+        }
     }
 
     // extension: create a pre-initialized future object which gets ready at
     // a given point in time
     template <typename Result>
-    future<typename util::detail::decay_unwrap<Result>::type>
+    future<typename util::decay_unwrap<Result>::type>
     make_ready_future_at(util::steady_time_point const& abs_time,
         Result&& init)
     {
-        typedef typename util::detail::decay_unwrap<Result>::type result_type;
+        typedef typename util::decay_unwrap<Result>::type result_type;
         typedef lcos::detail::timed_future_data<result_type> shared_state;
 
         return traits::future_access<future<result_type> >::create(
@@ -1206,7 +1223,7 @@ namespace hpx { namespace lcos
     }
 
     template <typename Result>
-    future<typename util::detail::decay_unwrap<Result>::type>
+    future<typename util::decay_unwrap<Result>::type>
     make_ready_future_after(util::steady_duration const& rel_time,
         Result && init)
     {
@@ -1700,13 +1717,13 @@ namespace boost { namespace serialization
 namespace hpx
 {
     using lcos::make_ready_future;
-    using lcos::make_error_future;
+    using lcos::make_exceptional_future;
     using lcos::make_ready_future_at;
     using lcos::make_ready_future_after;
 }
 
-#define HPX_MAKE_ERROR_FUTURE(T, errorcode, f, msg)                    \
-    lcos::make_error_future<T>(HPX_GET_EXCEPTION(errorcode, f, msg))   \
+#define HPX_MAKE_EXCEPTIONAL_FUTURE(T, errorcode, f, msg)                    \
+    lcos::make_exceptional_future<T>(HPX_GET_EXCEPTION(errorcode, f, msg))   \
     /**/
 
 #endif

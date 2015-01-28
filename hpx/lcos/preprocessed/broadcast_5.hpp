@@ -357,7 +357,7 @@ namespace hpx { namespace lcos
                     >
                     broadcast_invoker_type;
             typedef
-                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
+                typename HPX_MAKE_ACTION(broadcast_invoker_type::call)::type
                 type;
         };
         
@@ -394,7 +394,7 @@ namespace hpx { namespace lcos
                     >
                     broadcast_invoker_type;
             typedef
-                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
+                typename HPX_MAKE_ACTION(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -427,19 +427,14 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
        
     >
     hpx::future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
        )
     {
@@ -470,17 +465,12 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
        
     >
     void
     broadcast_apply(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
        )
     {
@@ -507,19 +497,14 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
        
     >
     hpx::future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
        )
     {
@@ -544,17 +529,12 @@ namespace hpx { namespace lcos
         );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
        
     >
     void
     broadcast_apply_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
        )
     {
@@ -913,7 +893,7 @@ namespace hpx { namespace lcos
                     >
                     broadcast_invoker_type;
             typedef
-                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
+                typename HPX_MAKE_ACTION(broadcast_invoker_type::call)::type
                 type;
         };
         
@@ -950,7 +930,7 @@ namespace hpx { namespace lcos
                     >
                     broadcast_invoker_type;
             typedef
-                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
+                typename HPX_MAKE_ACTION(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -983,19 +963,14 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename A0
     >
     hpx::future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , A0 const & a0)
     {
@@ -1026,17 +1001,12 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename A0
     >
     void
     broadcast_apply(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , A0 const & a0)
     {
@@ -1063,19 +1033,14 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename A0
     >
     hpx::future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , A0 const & a0)
     {
@@ -1100,17 +1065,12 @@ namespace hpx { namespace lcos
         );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename A0
     >
     void
     broadcast_apply_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , A0 const & a0)
     {
@@ -1469,7 +1429,7 @@ namespace hpx { namespace lcos
                     >
                     broadcast_invoker_type;
             typedef
-                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
+                typename HPX_MAKE_ACTION(broadcast_invoker_type::call)::type
                 type;
         };
         
@@ -1506,7 +1466,7 @@ namespace hpx { namespace lcos
                     >
                     broadcast_invoker_type;
             typedef
-                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
+                typename HPX_MAKE_ACTION(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -1539,19 +1499,14 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename A0 , typename A1
     >
     hpx::future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1)
     {
@@ -1582,17 +1537,12 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename A0 , typename A1
     >
     void
     broadcast_apply(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1)
     {
@@ -1619,19 +1569,14 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename A0 , typename A1
     >
     hpx::future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1)
     {
@@ -1656,17 +1601,12 @@ namespace hpx { namespace lcos
         );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename A0 , typename A1
     >
     void
     broadcast_apply_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1)
     {
@@ -2025,7 +1965,7 @@ namespace hpx { namespace lcos
                     >
                     broadcast_invoker_type;
             typedef
-                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
+                typename HPX_MAKE_ACTION(broadcast_invoker_type::call)::type
                 type;
         };
         
@@ -2062,7 +2002,7 @@ namespace hpx { namespace lcos
                     >
                     broadcast_invoker_type;
             typedef
-                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
+                typename HPX_MAKE_ACTION(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -2095,19 +2035,14 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename A0 , typename A1 , typename A2
     >
     hpx::future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2)
     {
@@ -2138,17 +2073,12 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename A0 , typename A1 , typename A2
     >
     void
     broadcast_apply(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2)
     {
@@ -2175,19 +2105,14 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename A0 , typename A1 , typename A2
     >
     hpx::future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2)
     {
@@ -2212,17 +2137,12 @@ namespace hpx { namespace lcos
         );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename A0 , typename A1 , typename A2
     >
     void
     broadcast_apply_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2)
     {
@@ -2581,7 +2501,7 @@ namespace hpx { namespace lcos
                     >
                     broadcast_invoker_type;
             typedef
-                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
+                typename HPX_MAKE_ACTION(broadcast_invoker_type::call)::type
                 type;
         };
         
@@ -2618,7 +2538,7 @@ namespace hpx { namespace lcos
                     >
                     broadcast_invoker_type;
             typedef
-                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
+                typename HPX_MAKE_ACTION(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -2651,19 +2571,14 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3
     >
     hpx::future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3)
     {
@@ -2694,17 +2609,12 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3
     >
     void
     broadcast_apply(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3)
     {
@@ -2731,19 +2641,14 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3
     >
     hpx::future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3)
     {
@@ -2768,17 +2673,12 @@ namespace hpx { namespace lcos
         );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3
     >
     void
     broadcast_apply_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3)
     {
@@ -3137,7 +3037,7 @@ namespace hpx { namespace lcos
                     >
                     broadcast_invoker_type;
             typedef
-                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
+                typename HPX_MAKE_ACTION(broadcast_invoker_type::call)::type
                 type;
         };
         
@@ -3174,7 +3074,7 @@ namespace hpx { namespace lcos
                     >
                     broadcast_invoker_type;
             typedef
-                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
+                typename HPX_MAKE_ACTION(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -3207,19 +3107,14 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
     >
     hpx::future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4)
     {
@@ -3250,17 +3145,12 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
     >
     void
     broadcast_apply(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4)
     {
@@ -3287,19 +3177,14 @@ namespace hpx { namespace lcos
             );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
     >
     hpx::future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4)
     {
@@ -3324,17 +3209,12 @@ namespace hpx { namespace lcos
         );
     }
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Signature, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
     >
     void
     broadcast_apply_with_index(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::basic_action<Component, Signature, Derived> 
       , std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4)
     {

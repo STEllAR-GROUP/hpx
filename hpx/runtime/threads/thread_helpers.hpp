@@ -8,13 +8,11 @@
 #if !defined(HPX_THREAD_HELPERS_NOV_15_2008_0504PM)
 #define HPX_THREAD_HELPERS_NOV_15_2008_0504PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/threads/thread_executor.hpp>
 
 #include <boost/exception_ptr.hpp>
 
@@ -387,7 +385,7 @@ namespace hpx { namespace threads
         error_code& ec = throws);
 
     HPX_API_EXPORT bool add_thread_exit_callback(thread_id_type const& id,
-        HPX_STD_FUNCTION<void()> const& f, error_code& ec = throws);
+        util::function_nonser<void()> const& f, error_code& ec = throws);
 
     HPX_API_EXPORT void free_thread_exit_callbacks(thread_id_type const& id,
         error_code& ec = throws);
@@ -718,7 +716,7 @@ namespace hpx { namespace applier
     ///
     HPX_API_EXPORT void register_work_plain(
         threads::thread_function_type && func,
-        char const* description = 0, naming::address::address_type lva = 0,
+        char const* description = 0, naming::address_type lva = 0,
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
         std::size_t os_thread = std::size_t(-1),
@@ -729,7 +727,7 @@ namespace hpx { namespace applier
     HPX_API_EXPORT void register_work_plain(
         threads::thread_function_type && func,
         naming::id_type const& target, char const* description = 0,
-        naming::address::address_type lva = 0,
+        naming::address_type lva = 0,
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
         std::size_t os_thread = std::size_t(-1),

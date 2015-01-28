@@ -58,7 +58,7 @@ namespace hpx { namespace util { namespace plugin {
                 return make_pair(w, boost::shared_ptr<PointedType>(f, d));
             }
             else {
-                HPX_PLUGIN_OSSTREAM str;
+                std::ostringstream str;
                 str << "Hpx.Plugin: Class '" << class_name
                     << "' was not found";
 
@@ -89,7 +89,7 @@ namespace hpx { namespace util { namespace plugin {
 
                 HPX_THROWS_IF(ec, filesystem_error,
                     "get_abstract_factory_static",
-                    HPX_PLUGIN_OSSTREAM_GETSTRING(str));
+                    str.str());
                 return std::pair<abstract_factory<BasePlugin> *, dll_handle>();
             }
         }

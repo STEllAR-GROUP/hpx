@@ -10,9 +10,11 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/serialize_buffer.hpp>
+#include <hpx/parallel/algorithm.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/range/irange.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 #define MESSAGE_ALIGNMENT 64
@@ -68,7 +70,7 @@ double receive(
     hpx::util::high_resolution_timer t;
 
     std::vector<hpx::future<buffer_type> > recv_buffers;
-    recv_buffers.reserve(window_size);
+    recv_buffers.resize(window_size);
 
     message_action msg;
     for (std::size_t i = 0; i != loop + skip; ++i) {
@@ -76,14 +78,22 @@ double receive(
         if (i == skip)
             t.restart();
 
-        for(std::size_t j = 0; j < window_size; ++j)
-        {
-            recv_buffers.push_back(hpx::async(msg, dest, buffer_type(send_buffer, size,
-                buffer_type::reference)));
-        }
+        using hpx::parallel::for_each;
+        using hpx::parallel::par;
+
+        std::size_t const start = 0;
+
+        // Fill the original matrix, set transpose to known garbage value.
+        auto range = boost::irange(start, window_size);
+        for_each(par, boost::begin(range), boost::end(range),
+            [&](boost::uint64_t j)
+            {
+                recv_buffers[j] = hpx::async(msg, dest,
+                    buffer_type(send_buffer, size, buffer_type::reference));
+            }
+        );
 
         hpx::wait_all(recv_buffers);
-        recv_buffers.clear();
     }
 
     double elapsed = t.elapsed();

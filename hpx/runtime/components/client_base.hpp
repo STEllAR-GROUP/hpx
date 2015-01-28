@@ -17,10 +17,11 @@
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/traits/is_future.hpp>
+#include <hpx/traits/acquire_future.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 
 #include <utility>
 #include <boost/utility/enable_if.hpp>
-#include <boost/preprocessor/enum_params.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 
@@ -75,6 +76,21 @@ namespace hpx { namespace traits
         get_shared_state(Derived const& client)
         {
             return client.share().shared_state_;
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Derived>
+    struct acquire_future_impl<Derived,
+        typename boost::enable_if<is_client<Derived> >::type>
+    {
+        typedef Derived type;
+
+        template <typename T_>
+        BOOST_FORCEINLINE
+        Derived operator()(T_ && value) const
+        {
+            return std::forward<T_>(value);
         }
     };
 }}
@@ -223,42 +239,19 @@ namespace hpx { namespace components
         ///////////////////////////////////////////////////////////////////////
         /// Create a new instance of an object on the locality as
         /// given by the parameter \a targetgid
-        static Derived create(naming::id_type const& targetgid)
+        template <typename ...Ts>
+        static Derived create(naming::id_type const& targetgid, Ts&&... vs)
         {
-            return Derived(stub_type::create_async(targetgid));
+            return Derived(stub_type::create_async(targetgid,
+                std::forward<Ts>(vs)...));
         }
 
-        static Derived create_colocated(naming::id_type const& id)
+        template <typename ...Ts>
+        static Derived create_colocated(naming::id_type const& id, Ts&&... vs)
         {
-            return Derived(stub_type::create_colocated_async(id));
+            return Derived(stub_type::create_colocated_async(id,
+                std::forward<Ts>(vs)...));
         }
-
-#define HPX_CLIENT_BASE_CREATE(Z, N, D)                                       \
-        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>                      \
-        static Derived create(naming::id_type const& targetgid,               \
-            HPX_ENUM_FWD_ARGS(N, Arg, arg))                                   \
-        {                                                                     \
-            return Derived(stub_type::create_async(targetgid,                 \
-                HPX_ENUM_FORWARD_ARGS(N , Arg, arg)));                        \
-        }                                                                     \
-                                                                              \
-        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>                      \
-        static Derived create_colocated(naming::id_type const& id,            \
-            HPX_ENUM_FWD_ARGS(N, Arg, arg))                                   \
-        {                                                                     \
-            return Derived(stub_type::create_colocated_async(id,              \
-                HPX_ENUM_FORWARD_ARGS(N , Arg, arg)));                        \
-        }                                                                     \
-    /**/
-
-        BOOST_PP_REPEAT_FROM_TO(
-            1
-          , HPX_ACTION_ARGUMENT_LIMIT
-          , HPX_CLIENT_BASE_CREATE
-          , _
-        )
-
-#undef HPX_CLIENT_BASE_CREATE
 
         void free()
         {
@@ -289,11 +282,70 @@ namespace hpx { namespace components
             return gid_;
         }
 
+        void reset(id_type const& id)
+        {
+            gid_ = make_ready_future(id);
+        }
+
+        void reset(id_type && id)
+        {
+            gid_ = make_ready_future(std::move(id));
+        }
+
+        void reset(future_type && rhs)
+        {
+            gid_ = std::move(rhs);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // Interface mimicking future
         bool is_ready() const
         {
             return gid_.is_ready();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+    protected:
+        static void register_as_helper(shared_future<naming::id_type> f,
+            std::string const& symbolic_name)
+        {
+            hpx::agas::register_name(symbolic_name, f.get());
+        }
+
+    public:
+        // Register our id with AGAS using the given name
+        future<void> register_as(std::string const& symbolic_name)
+        {
+            using util::placeholders::_1;
+            return gid_.then(util::bind(
+                &client_base::register_as_helper, _1, symbolic_name));
+        }
+
+        // Retrieve the id associated with the given name and use it to
+        // initialize this client_base instance.
+        //
+        // F is expected to reset the underlying client_base, it is passed the
+        // future<id_type> returned from on_symbol_namespace_event()
+        template <typename F>
+        future<void> connect_to(std::string const& symbolic_name, F && f)
+        {
+            return agas::on_symbol_namespace_event(
+                symbolic_name, agas::symbol_ns_bind, true)
+                    .then(std::forward<F>(f));
+        }
+
+    protected:
+        void connect_to_helper(future<naming::id_type> f)
+        {
+            gid_ = f.share();
+        }
+
+    public:
+        future<void> connect_to(std::string const& symbolic_name)
+        {
+            using util::placeholders::_1;
+            return connect_to(symbolic_name,
+                util::bind(&client_base::connect_to_helper, this, _1));
         }
 
 //     protected:

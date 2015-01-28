@@ -12,6 +12,8 @@
 char const* argv[] =
 {
     "command_line_argument_test",
+    // We force one locality here
+    "--hpx:localities=1",
     "nx=1",
     "ny=1=5"
 };
@@ -19,9 +21,10 @@ char const* argv[] =
 int hpx_main(int argc, char** argv_init)
 {
     HPX_TEST_EQ(argc, 3);
-    for (int i = 0; i < argc; ++i)
+    HPX_TEST_EQ(0, std::strcmp(argv[0], argv_init[0]));
+    for (int i = 1; i < argc; ++i)
     {
-        HPX_TEST_EQ(0, std::strcmp(argv[i], argv_init[i]));
+        HPX_TEST_EQ(0, std::strcmp(argv[i+1], argv_init[i]));
     }
 
     return hpx::finalize();
@@ -29,6 +32,6 @@ int hpx_main(int argc, char** argv_init)
 
 int main()
 {
-    HPX_TEST_EQ(hpx::init(3, (char**)argv), 0);
+    HPX_TEST_EQ(hpx::init(4, (char**)argv), 0);
     return hpx::util::report_errors();
 }

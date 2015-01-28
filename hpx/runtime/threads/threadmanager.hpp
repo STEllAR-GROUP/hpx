@@ -386,7 +386,7 @@ namespace hpx { namespace threads
         ///                 thread is not known to the thread-manager the return
         ///                 value will be false.
         virtual bool add_thread_exit_callback(thread_id_type const& id,
-            HPX_STD_FUNCTION<void()> const& f, error_code& ec = throws) = 0;
+            util::function_nonser<void()> const& f, error_code& ec = throws) = 0;
 
         ///
         virtual void free_thread_exit_callbacks(thread_id_type const& id,
@@ -426,6 +426,17 @@ namespace hpx { namespace threads
             std::size_t num = std::size_t(-1), bool reset = false) = 0;
         virtual boost::int64_t get_executed_thread_phases(
             std::size_t num = std::size_t(-1), bool reset = false) = 0;
+
+#ifdef HPX_THREAD_MAINTAIN_IDLE_RATES
+        virtual boost::int64_t get_thread_phase_duration(
+            std::size_t num = std::size_t(-1), bool reset = false) = 0;
+        virtual boost::int64_t get_thread_duration(
+            std::size_t num = std::size_t(-1), bool reset = false) = 0;
+        virtual boost::int64_t get_thread_phase_overhead(
+            std::size_t num = std::size_t(-1), bool reset = false) = 0;
+        virtual boost::int64_t get_thread_overhead(
+            std::size_t num = std::size_t(-1), bool reset = false) = 0;
+#endif
 #endif
 
 #if defined(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)

@@ -9,6 +9,7 @@
 #define HPX_PARALLEL_EXECUTION_POLICY_MAY_27_2014_0908PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -20,11 +21,25 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/type_traits/is_base_of.hpp>
+#include <boost/serialization/serialization.hpp>
 
 #include <memory>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
+    ///////////////////////////////////////////////////////////////////////////
+    /// \cond NOINTERNAL
+    struct task_execution_policy_tag
+    {
+        task_execution_policy_tag() {}
+    };
+    /// \endcond
+
+    /// The execution policy tag \a task can be used to create a execution
+    /// policy which forces the given algorithm to be executed in an
+    /// asynchronous way.
+    static task_execution_policy_tag const task;
+
     ///////////////////////////////////////////////////////////////////////////
     /// Extension: The class sequential_task_execution_policy is an execution
     /// policy type used as a unique type to disambiguate parallel algorithm
@@ -37,6 +52,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     struct sequential_task_execution_policy
     {
         sequential_task_execution_policy() {}
+
+        /// Create a new sequential_task_execution_policy from itself
+        ///
+        /// \param tag          [in] Specify that the corresponding asynchronous
+        ///                     execution policy should be used
+        ///
+        /// \returns The new sequential_task_execution_policy
+        ///
+        sequential_task_execution_policy operator()(
+            task_execution_policy_tag tag) const
+        {
+            return *this;
+        }
     };
 
     /// Default sequential task execution policy object.
@@ -69,9 +97,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new parallel_task_execution_policy
         ///
         parallel_task_execution_policy operator()(threads::executor const& exec,
-            std::size_t chunk_size = 0) const
+            std::size_t chunk_size) const
         {
             return parallel_task_execution_policy(exec, chunk_size);
+        }
+
+        /// Create a new parallel_task_execution_policy referencing an executor and
+        /// a chunk size.
+        ///
+        /// \param exec         [in] The executor to use for the execution of
+        ///                     the parallel algorithm the returned execution
+        ///                     policy is used with
+        ///
+        /// \returns The new parallel_task_execution_policy
+        ///
+        parallel_task_execution_policy operator()(
+            threads::executor const& exec) const
+        {
+            return parallel_task_execution_policy(exec, chunk_size_);
         }
 
         /// Create a new parallel_task_execution_policy referencing a chunk size.
@@ -84,7 +127,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         parallel_task_execution_policy operator()(std::size_t chunk_size) const
         {
-            return parallel_task_execution_policy(chunk_size);
+            return parallel_task_execution_policy(exec_, chunk_size);
+        }
+
+        /// Create a new parallel_task_execution_policy from itself
+        ///
+        /// \param tag          [in] Specify that the corresponding asynchronous
+        ///                     execution policy should be used
+        ///
+        /// \returns The new parallel_task_execution_policy
+        ///
+        parallel_task_execution_policy operator()(
+            task_execution_policy_tag tag) const
+        {
+            return *this;
         }
 
         /// \cond NOINTERNAL
@@ -94,13 +150,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
     private:
         /// \cond NOINTERNAL
+        friend class boost::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive& ar, unsigned)
+        {
+            ar & chunk_size_;
+        }
+
         parallel_task_execution_policy(threads::executor const& exec,
                 std::size_t chunk_size)
           : exec_(exec), chunk_size_(chunk_size)
-        {}
-
-        parallel_task_execution_policy(std::size_t chunk_size)
-          : exec_(), chunk_size_(chunk_size)
         {}
 
         threads::executor exec_;
@@ -110,19 +170,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
     /// Default parallel task execution policy object.
     static parallel_task_execution_policy const par_task;
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// \cond NOINTERNAL
-    struct task_execution_policy_tag
-    {
-        task_execution_policy_tag() {}
-    };
-    /// \endcond
-
-    /// The execution policy tag \a task can be used to create a execution
-    /// policy which forces the given algorithm to be executed in an
-    /// asynchronous way.
-    static task_execution_policy_tag const task;
 
     ///////////////////////////////////////////////////////////////////////////
     /// The class parallel_execution_policy is an execution policy type used
@@ -148,9 +195,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new parallel_execution_policy
         ///
         parallel_execution_policy operator()(threads::executor const& exec,
-            std::size_t chunk_size = 0) const
+            std::size_t chunk_size) const
         {
             return parallel_execution_policy(exec, chunk_size);
+        }
+
+        /// Create a new parallel_execution_policy referencing an executor and
+        /// a chunk size.
+        ///
+        /// \param exec         [in] The executor to use for the execution of
+        ///                     the parallel algorithm the returned execution
+        ///                     policy is used with
+        ///
+        /// \returns The new parallel_execution_policy
+        ///
+        parallel_execution_policy operator()(threads::executor const& exec) const
+        {
+            return parallel_execution_policy(exec, chunk_size_);
         }
 
         /// Create a new parallel_execution_policy referencing a chunk size.
@@ -163,7 +224,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         parallel_execution_policy operator()(std::size_t chunk_size) const
         {
-            return parallel_execution_policy(chunk_size);
+            return parallel_execution_policy(exec_, chunk_size);
         }
 
         /// Create a new parallel_task_execution_policy referencing an executor
@@ -181,9 +242,26 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new parallel_execution_policy
         ///
         parallel_task_execution_policy operator()(task_execution_policy_tag tag,
-            threads::executor const& exec, std::size_t chunk_size = 0) const
+            threads::executor const& exec, std::size_t chunk_size) const
         {
             return par_task(exec, chunk_size);
+        }
+
+        /// Create a new parallel_task_execution_policy referencing an executor
+        /// and a chunk size.
+        ///
+        /// \param tag          [in] Specify that the corresponding asynchronous
+        ///                     execution policy should be used
+        /// \param exec         [in] The executor to use for the execution of
+        ///                     the parallel algorithm the returned execution
+        ///                     policy is used with
+        ///
+        /// \returns The new parallel_execution_policy
+        ///
+        parallel_task_execution_policy operator()(task_execution_policy_tag tag,
+            threads::executor const& exec) const
+        {
+            return par_task(exec, chunk_size_);
         }
 
         /// Create a new parallel_execution_policy referencing a chunk size.
@@ -197,9 +275,21 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new parallel_execution_policy
         ///
         parallel_task_execution_policy operator()(task_execution_policy_tag tag,
-            std::size_t chunk_size = 0) const
+            std::size_t chunk_size) const
         {
-            return par_task(chunk_size);
+            return par_task(exec_, chunk_size);
+        }
+
+        /// Create a new parallel_execution_policy referencing a chunk size.
+        ///
+        /// \param tag          [in] Specify that the corresponding asynchronous
+        ///                     execution policy should be used
+        ///
+        /// \returns The new parallel_execution_policy
+        ///
+        parallel_task_execution_policy operator()(task_execution_policy_tag tag) const
+        {
+            return par_task(exec_, chunk_size_);
         }
 
         /// \cond NOINTERNAL
@@ -209,13 +299,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
     private:
         /// \cond NOINTERNAL
+        friend class boost::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive& ar, unsigned)
+        {
+            ar & chunk_size_;
+        }
+
         parallel_execution_policy(threads::executor const& exec,
                 std::size_t chunk_size)
           : exec_(exec), chunk_size_(chunk_size)
-        {}
-
-        parallel_execution_policy(std::size_t chunk_size)
-          : exec_(), chunk_size_(chunk_size)
         {}
 
         threads::executor exec_;
@@ -269,6 +363,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         static threads::executor get_executor() { return threads::executor(); }
         static std::size_t get_chunk_size() { return 0; }
         /// \endcond
+
+        /// Create a new parallel_vector_execution_policy from itself
+        ///
+        /// \param tag [in] Specify that the corresponding asynchronous
+        ///            execution policy should be used
+        ///
+        /// \returns The new parallel_vector_execution_policy
+        ///
+        parallel_vector_execution_policy operator()(
+            task_execution_policy_tag tag) const
+        {
+            return *this;
+        }
     };
 
     /// Default vector execution policy object.
@@ -361,7 +468,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// Extension: Detect whether give execution policy enables parallelization
+    /// Extension: Detect whether given execution policy enables parallelization
     ///
     /// 1. The type is_parallel_execution_policy can be used to detect parallel
     ///    execution policies for the purpose of excluding function signatures
@@ -400,7 +507,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// Extension: Detect whether give execution policy does not enable
+    /// Extension: Detect whether given execution policy does not enable
     ///            parallelization
     ///
     /// 1. The type is_sequential_execution_policy can be used to detect
@@ -417,8 +524,70 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     // extension:
     template <typename T>
     struct is_sequential_execution_policy
-        : detail::is_sequential_execution_policy<typename hpx::util::decay<T>::type>
+      : detail::is_sequential_execution_policy<typename hpx::util::decay<T>::type>
     {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        /// \cond NOINTERNAL
+        template <typename T>
+        struct is_async_execution_policy
+          : boost::mpl::false_
+        {};
+
+        template <>
+        struct is_async_execution_policy<sequential_task_execution_policy>
+          : boost::mpl::true_
+        {};
+
+        template <>
+        struct is_async_execution_policy<parallel_task_execution_policy>
+          : boost::mpl::true_
+        {};
+        // \endcond
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Extension: Detect whether given execution policy makes algorithms
+    ///            asynchronous
+    ///
+    /// 1. The type is_async_execution_policy can be used to detect
+    ///    asynchronous execution policies for the purpose of excluding
+    ///    function signatures from otherwise ambiguous overload resolution
+    ///    participation.
+    /// 2. If T is the type of a standard or implementation-defined execution
+    ///    policy, is_async_execution_policy<T> shall be publicly derived
+    ///    from integral_constant<bool, true>, otherwise from
+    ///    integral_constant<bool, false>.
+    /// 3. The behavior of a program that adds specializations for
+    ///    is_async_execution_policy is undefined.
+    ///
+    // extension:
+    template <typename T>
+    struct is_async_execution_policy
+      : detail::is_async_execution_policy<typename hpx::util::decay<T>::type>
+    {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        /// \cond NOINTERNAL
+        namespace execution_policy_enum
+        {
+            enum {
+                unknown = -1,
+                sequential = 0,
+                sequential_task = 1,
+                parallel = 2,
+                parallel_task = 3,
+                parallel_vector = 4
+            };
+        }
+
+        int which(class parallel::execution_policy const& policy);
+        /// \endcond
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     ///
@@ -439,6 +608,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     private:
         boost::shared_ptr<void> inner_;
         std::type_info const* type_;
+
+        execution_policy(execution_policy const& rhs)
+          : inner_(rhs.inner_),
+            type_(rhs.type_)
+        {}
 
     public:
         /// Effects: Constructs an execution_policy object with a copy of
@@ -463,6 +637,38 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             type_(policy.type_)
         {
             policy.type_ = 0;
+        }
+
+        /// Extension: Create a new execution_policy holding the current policy
+        /// made asynchronous.
+        ///
+        /// \param tag  [in] Specify that the corresponding asynchronous
+        ///             execution policy should be used
+        ///
+        /// \returns The new execution_policy
+        ///
+        execution_policy operator()(task_execution_policy_tag tag) const
+        {
+            switch(detail::which(*this))
+            {
+            case detail::execution_policy_enum::sequential:
+                return (*get<sequential_execution_policy>())(task);
+
+            case detail::execution_policy_enum::parallel:
+                return (*get<parallel_execution_policy>())(task);
+
+            case detail::execution_policy_enum::parallel_vector:
+                return (*get<parallel_vector_execution_policy>())(task);
+
+            case detail::execution_policy_enum::sequential_task:
+            case detail::execution_policy_enum::parallel_task:
+                return *this;
+
+            default:
+                HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                    "hpx::parallel::execution_policy::operator()(task)",
+                    "The given execution policy is not supported");
+            }
         }
 
         /// Effects: Assigns a copy of exec's state to *this
@@ -546,18 +752,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        namespace execution_policy_enum
-        {
-            enum {
-                unknown = -1,
-                sequential = 0,
-                sequential_task = 1,
-                parallel = 2,
-                parallel_task = 3,
-                parallel_vector = 4
-            };
-        }
-
         inline int which(execution_policy const& policy)
         {
             std::type_info const& t = policy.type();

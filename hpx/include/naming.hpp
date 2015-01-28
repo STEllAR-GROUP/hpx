@@ -9,7 +9,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>

@@ -61,7 +61,7 @@ namespace hpx { namespace lcos { namespace local
             typedef typename thread_id_from_mutex<Mutex>::thread_id_type
                 thread_id_type;
 
-            boost::uint64_t recursion_count;
+            boost::atomic<boost::uint64_t> recursion_count;
             boost::atomic<thread_id_type> locking_thread_id;
             Mutex mtx;
 
@@ -102,7 +102,9 @@ namespace hpx { namespace lcos { namespace local
                 {
                     mtx.lock();
                     locking_thread_id.exchange(id);
-                    recursion_count = 1;
+                    util::ignore_lock(&mtx);
+                    util::register_lock(this);
+                    recursion_count.store(1);
                 }
             }
 
@@ -153,9 +155,11 @@ namespace hpx { namespace lcos { namespace local
             ///         outside of a HPX-thread.
             void unlock()
             {
+                util::unregister_lock(this);
                 if (0 == --recursion_count)
                 {
                     locking_thread_id.exchange(thread_id_from_mutex<Mutex>::invalid_id());
+                    util::reset_ignored(&mtx);
                     mtx.unlock();
                 }
             }
@@ -166,6 +170,7 @@ namespace hpx { namespace lcos { namespace local
                 if (locking_thread_id.load(boost::memory_order_acquire) ==
                     current_thread_id)
                 {
+                    util::register_lock(this);
                     ++recursion_count;
                     return true;
                 }
@@ -177,7 +182,9 @@ namespace hpx { namespace lcos { namespace local
                 if (mtx.try_lock())
                 {
                     locking_thread_id.exchange(current_thread_id);
-                    recursion_count = 1;
+                    util::ignore_lock(&mtx);
+                    util::register_lock(this);
+                    recursion_count.store(1);
                     return true;
                 }
                 return false;
@@ -189,7 +196,7 @@ namespace hpx { namespace lcos { namespace local
 //                 if (mtx.timed_lock(target))
 //                 {
 //                     locking_thread_id.exchange(current_thread_id);
-//                     recursion_count = 1;
+//                     recursion_count.store(1);
 //                     return true;
 //                 }
 //                 return false;

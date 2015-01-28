@@ -16,7 +16,8 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/util/stringstream.hpp>
+
+#include <sstream>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions

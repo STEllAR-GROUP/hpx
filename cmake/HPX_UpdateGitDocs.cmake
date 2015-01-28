@@ -43,7 +43,7 @@ set(doc_dir ${CMAKE_BINARY_DIR}/../share/hpx-${HPX_VERSION})
 
 string(REPLACE "\"" "" doc_dir "${doc_dir}")
 
-# disable copying source files for now, this needs to be fixed...
+# Copy all documentation related files
 file(
   COPY "${doc_dir}/docs"
   DESTINATION "${CMAKE_BINARY_DIR}/gh-pages"
@@ -56,8 +56,10 @@ if(HPX_DOCUMENTATION_FILES)
   string(REPLACE " " ";" HPX_DOCUMENTATION_FILES_LIST "${HPX_DOCUMENTATION_FILES}")
   foreach(file ${HPX_DOCUMENTATION_FILES_LIST})
     string(REPLACE "\"" "" file ${file})
+    get_filename_component(dest "${file}" PATH)
+    string(REPLACE "${HPX_SOURCE_DIR}/" "" dest ${dest})
     file(COPY "${file}"
-      DESTINATION "${CMAKE_BINARY_DIR}/gh-pages/docs/html/code")
+      DESTINATION "${CMAKE_BINARY_DIR}/gh-pages/docs/html/code/${dest}")
   endforeach()
 endif()
 
@@ -92,5 +94,5 @@ if(NOT "${git_diff_index_result}" EQUAL "0")
     RESULT_VARIABLE git_push_result)
   if(NOT "${git_push_result}" EQUAL "0")
     message(FATAL_ERROR "Pushing to the GitHub pages branch failed.")
-  endif()
+ endif()
 endif()

@@ -6,15 +6,16 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception_list.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/util/asio_util.hpp>
 
-#include <ctime>
-
+#include <boost/asio/ip/host_name.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
 #include <boost/lexical_cast.hpp>
+
+#include <ctime>
+#include <sstream>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -83,11 +84,11 @@ namespace hpx { namespace util
         }
 
         // report errors
-        hpx::util::osstream strm;
+        std::ostringstream strm;
         strm << errors.get_message() << " (while trying to resolve: "
              << hostname << ":" << port << ")";
         HPX_THROW_EXCEPTION(network_error, "util::resolve_hostname",
-            hpx::util::osstream_get_string(strm));
+            strm.str());
         return tcp::endpoint();
     }
 
@@ -121,5 +122,115 @@ namespace hpx { namespace util
             return false;
         }
         return true;
+    }
+
+
+    endpoint_iterator_type connect_begin(std::string const & address, boost::uint16_t port,
+        boost::asio::io_service& io_service)
+    {
+        using boost::asio::ip::tcp;
+
+        // collect errors here
+        exception_list errors;
+
+        std::string port_str(boost::lexical_cast<std::string>(port));
+
+        // try to directly create an endpoint from the address
+        try {
+            tcp::endpoint ep;
+            if (util::get_endpoint(address, port, ep))
+            {
+                return endpoint_iterator_type(tcp::resolver::iterator::create(
+                    ep, address, port_str));
+            }
+        }
+        catch (boost::system::system_error const&) {
+            errors.add(boost::current_exception());
+        }
+
+        // it's not an address, try to treat it as a host name
+        try {
+            // resolve the given address
+            tcp::resolver resolver(io_service);
+            tcp::resolver::query query(
+                !address.empty() ?
+                    address :
+                    boost::asio::ip::host_name(),
+                port_str);
+
+            return endpoint_iterator_type(resolver.resolve(query));
+        }
+        catch (boost::system::system_error const&) {
+            errors.add(boost::current_exception());
+        }
+
+        // report errors
+        std::ostringstream strm;
+        strm << errors.get_message() << " (while trying to connect to: "
+             << address << ":" << port << ")";
+
+        HPX_THROW_EXCEPTION(network_error, "connect_begin",
+            strm.str());
+
+        return endpoint_iterator_type();
+    }
+
+    endpoint_iterator_type accept_begin(std::string const & address, boost::uint16_t port,
+        boost::asio::io_service& io_service)
+    {
+        using boost::asio::ip::tcp;
+
+        // collect errors here
+        exception_list errors;
+
+        std::string port_str(boost::lexical_cast<std::string>(port));
+
+        // try to directly create an endpoint from the address
+        try {
+            tcp::endpoint ep;
+            if (util::get_endpoint(address, port, ep))
+            {
+                return endpoint_iterator_type(
+                    tcp::resolver::iterator::create(ep, address, port_str));
+            }
+        }
+        catch (boost::system::system_error const&) {
+            errors.add(boost::current_exception());
+        }
+
+        // it's not an address, try to treat it as a host name
+        try {
+            // resolve the given address
+            tcp::resolver resolver(io_service);
+            tcp::resolver::query query(address, port_str);
+
+            return endpoint_iterator_type(resolver.resolve(query));
+        }
+        catch (boost::system::system_error const&) {
+            errors.add(boost::current_exception());
+        }
+
+        // it's not a host name either, create a custom iterator allowing to
+        // filter the returned endpoints, for this we use "localhost" as the
+        // address to enumerate endpoints
+        try {
+            // resolve the given address
+            tcp::resolver resolver(io_service);
+            tcp::resolver::query query(boost::asio::ip::host_name(), port_str);
+
+            return endpoint_iterator_type(resolver.resolve(query));
+        }
+        catch (boost::system::system_error const&) {
+            errors.add(boost::current_exception());
+        }
+
+        // report errors
+        std::ostringstream strm;
+        strm << errors.get_message() << " (while trying to resolve: "
+             << address << ":" << port << ")";
+
+        HPX_THROW_EXCEPTION(network_error, "accept_begin",
+            strm.str());
+        return endpoint_iterator_type();
     }
 }}
