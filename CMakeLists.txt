@@ -399,8 +399,8 @@ hpx_option(HPX_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS STRING "Maximum number of ch
 
 ## mpi parcelport settings
 hpx_option(HPX_PARCELPORT_MPI_ENV STRING
-  "List of environment variables checked to detect MPI (default: PMI_RANK;OMPI_COMM_WORLD_SIZE)."
-  "PMI_RANK;OMPI_COMM_WORLD_SIZE" CATEGORY "Parcelport" ADVANCED)
+  "List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE)."
+  "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE" CATEGORY "Parcelport" ADVANCED)
 
 ## Profiling related build options
 hpx_option(HPX_WITH_APEX BOOL "Enable APEX instrumentation support." OFF CATEGORY "Profiling")

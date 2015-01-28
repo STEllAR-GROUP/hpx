@@ -299,7 +299,7 @@ namespace hpx { namespace traits
 #if defined(HPX_PARCELPORT_MPI_ENV)
                 "env = ${HPX_PARCELPORT_MPI_ENV:" HPX_PARCELPORT_MPI_ENV "}\n"
 #else
-                "env = ${HPX_PARCELPORT_MPI_ENV:PMI_RANK,OMPI_COMM_WORLD_SIZE}\n"
+                "env = ${HPX_PARCELPORT_MPI_ENV:MV2_COMM_WORLD_RANK,PMI_RANK,OMPI_COMM_WORLD_SIZE}\n"
 #endif
                 "multithreaded = ${HPX_PARCELPORT_MPI_MULTITHREADED:1}\n"
                 ;
