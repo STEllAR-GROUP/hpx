@@ -469,12 +469,10 @@ namespace hpx { namespace lcos { namespace server { namespace detail
                 << get_gid()
                 << " ";
 
-            lcos::local::spinlock::scoped_lock l(mtx);
             if(!result.is_empty())
             {
                 data_type d;
                 result.read(d);
-                l.unlock();
 
                 if(d.stores_error())
                 {

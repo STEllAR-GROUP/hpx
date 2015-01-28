@@ -93,10 +93,12 @@ namespace hpx { namespace plugins { namespace parcel
 
         switch(s) {
         case detail::message_buffer::first_message:
+            l.unlock();
             timer_.start(false);        // start deadline timer to flush buffer
             break;
 
         case detail::message_buffer::normal:
+            l.unlock();
             timer_.restart(false);      // restart timer
             break;
 
@@ -134,6 +136,7 @@ namespace hpx { namespace plugins { namespace parcel
     {
         if (!stopped_ && stop_buffering) {
             stopped_ = true;
+            l.unlock();
             timer_.stop();              // interrupt timer
         }
 
