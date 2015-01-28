@@ -1,5 +1,5 @@
 //  Copyright (c)      2013 Thomas Heller
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -121,8 +121,11 @@ namespace hpx { namespace lcos { namespace local
                   : policy_(std::move(policy))
                   , func_(std::forward<FFunc>(func))
                   , futures_(std::forward<FFutures>(futures))
+                  , done_(false)
             {}
 
+        protected:
+            ///////////////////////////////////////////////////////////////////
             BOOST_FORCEINLINE
             void execute(boost::mpl::false_)
             {
@@ -159,15 +162,15 @@ namespace hpx { namespace lcos { namespace local
             }
 
             ///////////////////////////////////////////////////////////////////
-            template <typename Iter>
             BOOST_FORCEINLINE
-            void await(
-                BOOST_SCOPED_ENUM(launch) policy, Iter && iter, boost::mpl::true_)
+            void finalize(BOOST_SCOPED_ENUM(launch) policy)
             {
+                done_ = false;      // avoid finalizing more than once
+
                 typedef
                     boost::mpl::bool_<boost::is_void<result_type>::value>
                     is_void;
-                if(policy == hpx::launch::sync)
+                if (policy == hpx::launch::sync)
                 {
                     execute(is_void());
                     return;
@@ -184,11 +187,11 @@ namespace hpx { namespace lcos { namespace local
                   , threads::thread_priority_boost);
             }
 
-            template <typename Iter>
             BOOST_FORCEINLINE
-            void await(
-                threads::executor& sched, Iter && iter, boost::mpl::true_)
+            void finalize(threads::executor& sched)
             {
+                done_ = false;      // avoid finalizing more than once
+
                 typedef
                     boost::mpl::bool_<boost::is_void<result_type>::value>
                     is_void;
@@ -196,6 +199,14 @@ namespace hpx { namespace lcos { namespace local
                 execute_function_type f = &dataflow_frame::execute;
                 boost::intrusive_ptr<dataflow_frame> this_(this);
                 hpx::apply(sched, f, this_, is_void());
+            }
+
+            ///////////////////////////////////////////////////////////////////
+            template <typename Policy, typename Iter>
+            BOOST_FORCEINLINE
+            void await(Policy &&, Iter &&, boost::mpl::true_)
+            {
+                 done_ = true;
             }
 
             // Current element is a not a future or future range, e.g. a just plain
@@ -215,6 +226,9 @@ namespace hpx { namespace lcos { namespace local
                         boost::is_same<next_type, end_type>::value
                     >()
                 );
+
+                if (done_)
+                    finalize(policy_);
             }
 
             template <typename TupleIter, typename Iter>
@@ -269,6 +283,9 @@ namespace hpx { namespace lcos { namespace local
                         boost::is_same<next_type, end_type>::value
                     >()
                 );
+
+                if (done_)
+                    finalize(policy_);
             }
 
             // Current element is a range (vector) of futures
@@ -337,6 +354,9 @@ namespace hpx { namespace lcos { namespace local
                         boost::is_same<next_type, end_type>::value
                     >()
                 );
+
+                if (done_)
+                    finalize(policy_);
             }
 
             ///////////////////////////////////////////////////////////////////////
@@ -361,6 +381,7 @@ namespace hpx { namespace lcos { namespace local
                 await_next(std::move(iter), is_future(), is_range());
             }
 
+        public:
             BOOST_FORCEINLINE void await()
             {
                 typedef
@@ -374,11 +395,16 @@ namespace hpx { namespace lcos { namespace local
                         boost::is_same<begin_type, end_type>::value
                     >()
                 );
+
+                if (done_)
+                    finalize(policy_);
             }
 
+        private:
             Policy policy_;
             Func func_;
             Futures futures_;
+            bool done_;
         };
     }
 
