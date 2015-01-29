@@ -22,7 +22,7 @@ functions ([funcref hpx::async_continue `hpx::async_continue`],
 
 A second foxus of this release was to improve the reliability of large scale
 runs. We believe to have achieved this goal as we now can reliably run __hpx__
-applications on up to 16k cores. This is a huge step forward in terms of
+applications on up to ~16k cores. This is a huge step forward in terms of
 the usability of __hpx__.
 
 The third very important improvement introduced with this release is the
