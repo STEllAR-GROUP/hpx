@@ -58,6 +58,8 @@ double ireceive(hpx::naming::id_type dest, std::size_t size, std::size_t window_
         loop = LOOP_LARGE;
         skip = SKIP_LARGE;
     }
+    
+    typedef hpx::util::serialize_buffer<char> buffer_type;
 
     // align used buffers on page boundaries
     unsigned long align_size = getpagesize();
