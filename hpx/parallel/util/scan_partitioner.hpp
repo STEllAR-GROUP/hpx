@@ -72,7 +72,7 @@ namespace hpx { namespace parallel { namespace util
                     while (count != 0)
                     {
                         std::size_t chunk = (std::min)(chunk_size, count);
-                        BOOST_SCOPED_ENUM(hpx::launch) p = (++parts % 8) ?
+                        BOOST_SCOPED_ENUM(hpx::launch) p = (++parts & 0x7) ?
                             hpx::launch::sync : hpx::launch::async;
 
                         if (exec)
@@ -158,7 +158,7 @@ namespace hpx { namespace parallel { namespace util
                     while (count != 0)
                     {
                         std::size_t chunk = (std::min)(chunk_size, count);
-                        BOOST_SCOPED_ENUM(hpx::launch) p = (++parts % 8) ?
+                        BOOST_SCOPED_ENUM(hpx::launch) p = (++parts & 0x7) ?
                             hpx::launch::sync : hpx::launch::async;
 
                         if (exec)
