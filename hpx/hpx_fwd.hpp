@@ -140,7 +140,7 @@ namespace hpx
             std::size_t interval, locality const& l,
             error_code& ec = throws);
 
-        HPX_API_EXPORT void do_background_work(std::size_t num_thread = 0);
+        HPX_API_EXPORT bool do_background_work(std::size_t num_thread = 0);
     }
 
     namespace util

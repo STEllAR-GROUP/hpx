@@ -102,8 +102,11 @@ namespace hpx { namespace parcelset
         /// \brief Stop all parcelports associated with this parcelhandler
         void stop(bool blocking = true);
 
-        /// \ brief do background work in the parcel layer
-        void do_background_work(std::size_t num_thread = 0, bool stop_buffering = false);
+        /// \brief do background work in the parcel layer
+        ///
+        /// \returns Whether any work has been performed
+        bool do_background_work(std::size_t num_thread = 0,
+            bool stop_buffering = false);
 
         /// \brief Allow access to AGAS resolver instance.
         ///

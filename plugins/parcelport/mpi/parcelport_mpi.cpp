@@ -231,10 +231,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             //do_background_work();
         }
 
-        void do_background_work(std::size_t num_thread)
+        bool do_background_work(std::size_t num_thread)
         {
-            if(stopped_) return;
-            receiver_.receive();
+            if (stopped_)
+                return false;
+            return receiver_.receive();
         }
 
     private:
@@ -272,7 +273,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             {
                 rt->unregister_thread();
                 throw;
-                return;
             }
             rt->unregister_thread();
         }

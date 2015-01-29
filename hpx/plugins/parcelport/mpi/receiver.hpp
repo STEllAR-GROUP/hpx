@@ -85,12 +85,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
         }
 
-        void receive(bool background = true)
+        bool receive(bool background = true)
         {
             typedef header_list::iterator iterator;
-            int source;
-            header h;
+
             bool has_work = true;
+            bool did_some_work = false;
 
             while(has_work)
             {
@@ -102,18 +102,22 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                     handle_header handle(it, *this);
                     if(handle.handles_)
                     {
-                        source = it->first;
-                        h = it->second;
+                        int source = it->first;
+                        header h = it->second;
                         headers_.erase(it);
+
                         {
                             hpx::util::scoped_unlock<mutex_type::scoped_lock> ul(l);
                             receive_message(source, h);
                             h.reset();
                         }
+
                         if(background)
                             it = headers_.begin();
                         else
                             it = headers_.end();
+
+                        did_some_work = true;
                     }
                     else
                     {
@@ -122,6 +126,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 }
                 if(it == headers_.end()) has_work = false;
             }
+            return did_some_work;
         }
 
         void receive_message(int source, header h)

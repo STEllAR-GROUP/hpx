@@ -1171,9 +1171,9 @@ namespace hpx { namespace naming
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {
-    void do_background_work(std::size_t num_thread)
+    bool do_background_work(std::size_t num_thread)
     {
-        get_runtime().get_parcel_handler().do_background_work(num_thread);
+        return get_runtime().get_parcel_handler().do_background_work(num_thread);
     }
 }}
 

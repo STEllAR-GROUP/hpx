@@ -145,7 +145,9 @@ namespace hpx { namespace parcelset
         void stop(bool blocking = true)
         {
             do_background_work(0);
-            // make sure no more work is pending, wait for service pool to get empty
+
+            // make sure no more work is pending, wait for service pool to get
+            // empty
             io_service_pool_.stop();
             if (blocking) {
                 connection_cache_.shutdown();
@@ -227,13 +229,15 @@ namespace hpx { namespace parcelset
             return 0;
         }
 
-        void do_background_work(std::size_t num_thread)
+        bool do_background_work(std::size_t num_thread)
         {
+            bool did_some_work = false;
             if(num_thread == 0)
             {
-                do_background_work_impl<ConnectionHandler>();
+                did_some_work = do_background_work_impl<ConnectionHandler>();
                 trigger_pending_work();
             }
+            return did_some_work;
         }
 
         /// support enable_shared_from_this
@@ -369,21 +373,24 @@ namespace hpx { namespace parcelset
         typename boost::enable_if<
             typename connection_handler_traits<
                 ConnectionHandler_
-            >::do_background_work
+            >::do_background_work,
+            bool
         >::type
         do_background_work_impl()
         {
-            connection_handler().background_work();
+            return connection_handler().background_work();
         }
 
         template <typename ConnectionHandler_>
         typename boost::disable_if<
             typename connection_handler_traits<
                 ConnectionHandler_
-            >::do_background_work
+            >::do_background_work,
+            bool
         >::type
         do_background_work_impl()
         {
+            return false;
         }
 
         ///////////////////////////////////////////////////////////////////////

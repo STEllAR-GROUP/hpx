@@ -256,9 +256,11 @@ namespace hpx { namespace parcelset
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void parcelhandler::do_background_work(std::size_t num_thread,
+    bool parcelhandler::do_background_work(std::size_t num_thread,
         bool stop_buffering)
     {
+        bool did_some_work = false;
+
         // flush all parcel buffers
         if(0 == num_thread)
         {
@@ -274,7 +276,7 @@ namespace hpx { namespace parcelset
                     {
                         boost::shared_ptr<policies::message_handler> p((*it).second);
                         util::scoped_unlock<mutex_type::scoped_try_lock> ul(l);
-                        p->flush(stop_buffering);
+                        did_some_work = p->flush(stop_buffering) || did_some_work;
                     }
                 }
             }
@@ -285,9 +287,12 @@ namespace hpx { namespace parcelset
         {
             if(pp.first > 0)
             {
-                pp.second->do_background_work(num_thread);
+                did_some_work = pp.second->do_background_work(num_thread) ||
+                    did_some_work;
             }
         }
+
+        return did_some_work;
     }
 
     void parcelhandler::stop(bool blocking)
