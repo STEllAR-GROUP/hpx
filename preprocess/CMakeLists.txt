@@ -9,11 +9,6 @@
 ################################################################################
 
 # add headers to preprocessing
-set(tuple_argument_limit_preprocessing_files
-  "hpx/util/tuple.hpp")
-foreach(file ${tuple_argument_limit_preprocessing_files})
-  hpx_partial_preprocess_header(${file} LIMIT HPX_LIMIT)
-endforeach()
 
 # invoke preprocessing routines
 hpx_setup_partial_preprocess_headers()
