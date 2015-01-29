@@ -185,10 +185,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                     spawn_thread = true;
                 else
                 {
-                    std::ptrdiff_t const huge_size
-                        = threads::get_stack_size(threads::thread_stacksize_huge);
+                    std::ptrdiff_t const large_size
+                        = threads::get_stack_size(threads::thread_stacksize_large);
                     spawn_thread =
-                        threads::get_stack_size(threads::get_self_id()) != huge_size;
+                        threads::get_stack_size(threads::get_self_id()) < large_size;
                 }
             }
 
