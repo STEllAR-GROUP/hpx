@@ -63,6 +63,8 @@ namespace hpx { namespace parallel { namespace util
                     workitems[1] = lcos::local::dataflow(hpx::launch::sync,
                         f2, workitems[0], workitems[1]);
 
+                    std::size_t parts = 0;
+
                     // Schedule first step of scan algorithm, step 2 is
                     // performed as soon as the current partition and the
                     // partition to the left is ready.
@@ -70,12 +72,14 @@ namespace hpx { namespace parallel { namespace util
                     while (count != 0)
                     {
                         std::size_t chunk = (std::min)(chunk_size, count);
+                        BOOST_SCOPED_ENUM(hpx::launch) p = (++parts % 8) ?
+                            hpx::launch::sync : hpx::launch::async;
+
                         if (exec)
                         {
                             workitems.push_back(
                                 lcos::local::dataflow(
-                                    hpx::launch::sync, f2,
-                                    workitems.back(),
+                                    p, f2, workitems.back(),
                                     hpx::async(exec, f1, first, chunk)
                                 ));
                         }
@@ -83,8 +87,7 @@ namespace hpx { namespace parallel { namespace util
                         {
                             workitems.push_back(
                                 lcos::local::dataflow(
-                                    hpx::launch::sync, f2,
-                                    workitems.back(),
+                                    p, f2, workitems.back(),
                                     hpx::async(hpx::launch::fork,
                                         f1, first, chunk)
                                 ));
@@ -146,6 +149,8 @@ namespace hpx { namespace parallel { namespace util
                     workitems[1] = lcos::local::dataflow(hpx::launch::sync,
                         f2, workitems[0], workitems[1]);
 
+                    std::size_t parts = 0;
+
                     // Schedule first step of scan algorithm, step 2 is
                     // performed as soon as the current partition and the
                     // partition to the left is ready.
@@ -153,12 +158,14 @@ namespace hpx { namespace parallel { namespace util
                     while (count != 0)
                     {
                         std::size_t chunk = (std::min)(chunk_size, count);
+                        BOOST_SCOPED_ENUM(hpx::launch) p = (++parts % 8) ?
+                            hpx::launch::sync : hpx::launch::async;
+
                         if (exec)
                         {
                             workitems.push_back(
                                 lcos::local::dataflow(
-                                    hpx::launch::sync, f2,
-                                    workitems.back(),
+                                    p, f2, workitems.back(),
                                     hpx::async(exec, f1, first, chunk)
                                 ));
                         }
@@ -166,8 +173,7 @@ namespace hpx { namespace parallel { namespace util
                         {
                             workitems.push_back(
                                 lcos::local::dataflow(
-                                    hpx::launch::sync, f2,
-                                    workitems.back(),
+                                    p, f2, workitems.back(),
                                     hpx::async(hpx::launch::fork,
                                         f1, first, chunk)
                                 ));
