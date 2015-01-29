@@ -20,15 +20,49 @@ functions ([funcref hpx::async_continue `hpx::async_continue`],
 [funcref hpx::when_each `hpx::when_each`],
 [funcref hpx::wait_each `hpx::wait_each`]).
 
+A second foxus of this release was to improve the reliability of large scale
+runs. We believe to have achieved this goal as we now can reliably run __hpx__
+applications on up to 16k cores. This is a huge step forward in terms of
+the usability of __hpx__.
+
+The third very important improvement introduced with this release is the
+refactoring of the code representing our parcel-port implementation. Parcel-
+ports now can be implemented by 3rd parties as independent plug-ins which are
+dynamically loaded at runtime (static linking of parcel-ports is also
+supported). This refactoring also include a massive improvement the performance
+of our existing parcel-ports. We were able to significantly reduce the
+networking latencies and to improve the available networking bandwidth.
+
+A fourth corner stone of this release is our work towards a complete
+implementation of __cpp11_n4104__ (Working Draft, Technical Specification for
+C++ Extensions for Parallelism), which defines a set of parallel algorithms.
+We hnow have implemented about 70% of all specified parallel algorithms (see
+[link hpx.manual.parallel.parallel_algorithms Parallel Algorithms] for more
+details). We also implemented some extensions to __cpp11_n4104__ allowing to
+invoke all of the algorithms asynchronously. We started to work on allowing to
+use the parallel algorithms with `hpx::vector`. At this point we have
+implemented only a few of the parallel algorithms to support distributed data
+structures (like `hpx::vector`) for testing purposes.
+
 
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1367] - One last batch of variadic templates support
+* [issue 1366] - Fixing symbolic namespace hang
+* [issue 1365] - More held locks
+* [issue 1364] - Add counters 1363
+* [issue 1363] - Add thread overhead counters
+* [issue 1362] - Std config removal
+* [issue 1361] - Parcelport plugins
+* [issue 1360] - Detuplify transfer_action
 * [issue 1359] - Removed obsolete checks
 * [issue 1358] - Fixing 1352
+* [issue 1357] - Variadic templates support for runtime_support and components
 * [issue 1356] - fixed coordinate test for intel13
 * [issue 1355] - fixed coordinate.hpp
+* [issue 1354] - Lexicographical Compare completed
 * [issue 1353] - HPX should set `Boost_ADDITIONAL_VERSIONS` flags
 * [issue 1352] - Error: Cannot find action '' in type registry: HPX(bad_action_code)
 * [issue 1351] - Variadic templates support for appliers
@@ -57,9 +91,9 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1329] - Distributed vector cleanup
 * [issue 1328] - Sync docs and comments with code in hello_world example
 * [issue 1327] - Typos in docs
+* [issue 1324] - fixed bandwidth calculation
 * [issue 1323] - mmap() failed to allocate thread stack due to insufficient
                  resources
-* [issue 1324] - fixed bandwidth calculation
 * [issue 1322] - HPX fails to build aa182cf
 * [issue 1321] - Limiting size of outgoing messages while coalescing parcels
 * [issue 1320] - passing a future with launch::deferred in remote function call
