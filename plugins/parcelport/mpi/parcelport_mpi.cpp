@@ -178,7 +178,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             write_handler_type f)
         {
             if(stopped_) return;
-            /*
             bool spawn_thread = false;
             if(!hpx::is_starting())
             {
@@ -205,7 +204,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                     os_thread, threads::thread_stacksize_huge);
                 return;
             }
-            */
 
             util::high_resolution_timer timer;
 
