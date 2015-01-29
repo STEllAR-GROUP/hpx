@@ -16,8 +16,6 @@
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/detail/qualify_as.hpp>
 
-#include <boost/function_types/components.hpp>
-#include <boost/function_types/function_pointer.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/ref.hpp>
 #include <boost/type_traits/has_dereference.hpp>
@@ -58,7 +56,7 @@ namespace hpx { namespace traits
         template <std::size_t Arity, std::size_t ...Is>
         struct make_fallback_signature<Arity, util::detail::pack_c<std::size_t, Is...> >
         {
-            typedef fallback_call const& (type)(
+            typedef fallback_call const& type(
                 typename make_fallback_argument<Is>::type...);
         };
 
