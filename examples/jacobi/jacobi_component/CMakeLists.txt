@@ -5,12 +5,12 @@
 
 if(HPX_WITH_CXX11_LAMBDAS)
 
-  set(jacobi_component_FLAGS
+  set(jacobi_component_component_FLAGS
       DEPENDENCIES iostreams_component
                       distributing_factory_component
                       remote_object_component)
 
-  add_hpx_component(jacobi
+  add_hpx_component(jacobi_component
       AUTOGLOB
       SOURCE_GLOB "*.c*"
       HEADER_GLOB "*.h*"
