@@ -15,8 +15,9 @@ set(tests
     inheritance_3_classes_concrete
     migrate_component
     remote_object
-    vector_for_each
+    unordered_map
     vector_copy
+    vector_for_each
     vector_handle_values
     vector_move
     vector_transform_reduce
