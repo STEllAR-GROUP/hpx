@@ -211,36 +211,37 @@ namespace hpx { namespace server
         }
 
         /// Macros to define HPX component actions for all exported functions.
-        HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_TPL(partition_unordered_map, size);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_unordered_map, size);
 
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL(partition_unordered_map, get_value);
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL(partition_unordered_map, get_values);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_unordered_map, get_value);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_unordered_map, get_values);
 
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL(partition_unordered_map, set_value);
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL(partition_unordered_map, set_values);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_unordered_map, set_value);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_unordered_map, set_values);
     };
 }}
 
+///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_UNORDERED_MAP_DECLARATION(...)                           \
     HPX_REGISTER_UNORDERED_MAP_DECLARATION_(__VA_ARGS__)                      \
-    /**/
+/**/
 #define HPX_REGISTER_UNORDERED_MAP_DECLARATION_(...)                          \
     HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
         HPX_REGISTER_UNORDERED_MAP_DECLARATION_, HPX_UTIL_PP_NARG(__VA_ARGS__)\
     )(__VA_ARGS__))                                                           \
-    /**/
+/**/
 
 #define HPX_REGISTER_UNORDERED_MAP_DECLARATION_2(key, type)                   \
     HPX_REGISTER_UNORDERED_MAP_DECLARATION_5(key, type, std::hash<key>,       \
         std::equal_to<key>, type)                                             \
-    /**/
+/**/
 #define HPX_REGISTER_UNORDERED_MAP_DECLARATION_3(key, type, hash)             \
     HPX_REGISTER_UNORDERED_MAP_DECLARATION_5(key, type, hash,                 \
         std::equal_to<key>, type)                                             \
-    /**/
+/**/
 #define HPX_REGISTER_UNORDERED_MAP_DECLARATION_4(key, type, hash, equal)      \
     HPX_REGISTER_UNORDERED_MAP_DECLARATION_5(key, type, hash, equal, type)    \
-    /**/
+/**/
 
 #define HPX_REGISTER_UNORDERED_MAP_DECLARATION_5(key, type, hash, equal, name)\
     typedef ::hpx::server::partition_unordered_map<key, type, hash, equal>    \
@@ -260,28 +261,28 @@ namespace hpx { namespace server
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         BOOST_PP_CAT(partition_unordered_map, __LINE__)::size_action,         \
         BOOST_PP_CAT(__unordered_map_size_action_, name));                    \
-    /**/
+/**/
 
 #define HPX_REGISTER_UNORDERED_MAP(...)                                       \
     HPX_REGISTER_UNORDERED_MAP_(__VA_ARGS__)                                  \
-    /**/
+/**/
 #define HPX_REGISTER_UNORDERED_MAP_(...)                                      \
     HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
         HPX_REGISTER_UNORDERED_MAP_, HPX_UTIL_PP_NARG(__VA_ARGS__)            \
     )(__VA_ARGS__))                                                           \
-    /**/
+/**/
 
 #define HPX_REGISTER_UNORDERED_MAP_2(key, type)                               \
     HPX_REGISTER_UNORDERED_MAP_5(key, type, std::hash<key>,                   \
         std::equal_to<key>, type)                                             \
-    /**/
+/**/
 #define HPX_REGISTER_UNORDERED_MAP_3(key, type, hash)                         \
     HPX_REGISTER_UNORDERED_MAP_5(key, type, hash,                             \
         std::equal_to<key>, type)                                             \
-    /**/
+/**/
 #define HPX_REGISTER_UNORDERED_MAP_4(key, type, hash, equal)                  \
     HPX_REGISTER_UNORDERED_MAP_5(key, type, hash, equal, type)                \
-    /**/
+/**/
 
 #define HPX_REGISTER_UNORDERED_MAP_5(key, type, hash, equal, name)            \
     typedef ::hpx::server::partition_unordered_map<key, type, hash, equal>    \
@@ -305,7 +306,7 @@ namespace hpx { namespace server
         BOOST_PP_CAT(partition_unordered_map, __LINE__)                       \
     > BOOST_PP_CAT(__unordered_map_, name);                                   \
     HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(BOOST_PP_CAT(__unordered_map_, name)) \
-    /**/
+/**/
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx

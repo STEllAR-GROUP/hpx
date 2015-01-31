@@ -12,12 +12,12 @@
 #include <hpx/include/util.hpp>
 #include <hpx/include/components.hpp>
 
-#include <hpx/components/unordered/distribution_policy.hpp>
-#include <hpx/components/unordered/unordered_map_segmented_iterator.hpp>
-#include <hpx/components/unordered/partition_unordered_map_component.hpp>
+#include <hpx/components/containers/unordered/unordered_distribution_policy.hpp>
+#include <hpx/components/containers/unordered/partition_unordered_map_component.hpp>
 
 #include <cstdint>
 #include <memory>
+#include <type_traits>
 
 #include <boost/cstdint.hpp>
 
@@ -70,17 +70,13 @@ namespace hpx { namespace server
         };
 
         unordered_map_config_data()
-          : policy_(0)
         {}
 
-        unordered_map_config_data(std::vector<partition_data> const& partitions,
-                int policy)
-          : partitions_(std::move(partitions)),
-            policy_(policy)
+        unordered_map_config_data(std::vector<partition_data> const& partitions)
+          : partitions_(std::move(partitions))
         {}
 
         std::vector<partition_data> partitions_;
-        int policy_;
 
     private:
         friend class boost::serialization::access;
@@ -88,7 +84,7 @@ namespace hpx { namespace server
         template <typename Archive>
         void serialize(Archive& ar, unsigned)
         {
-            ar & partitions_ & policy_;
+            ar & partitions_;
         }
     };
 }}
@@ -124,19 +120,24 @@ namespace hpx
         typedef T reference;
         typedef T const const_reference;
 
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40700
+#if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700) || defined(HPX_NATIVE_MIC)
+        typedef T* pointer;
+        typedef T const* const_pointer;
+#else
         typedef typename std::allocator_traits<allocator_type>::pointer pointer;
         typedef typename std::allocator_traits<allocator_type>::const_pointer
             const_pointer;
-#else
-        typedef T* pointer;
-        typedef T const* const_pointer;
 #endif
 
     private:
         typedef hpx::components::client_base<
                 unordered_map, server::unordered_map_config_data
             > base_type;
+
+        typedef hpx::server::partition_unordered_map<Key, T, Hash, KeyEqual>
+            partition_unordered_map_server;
+        typedef hpx::partition_unordered_map<Key, T, Hash, KeyEqual>
+            partition_unordered_map_client;
 
         // The list of partitions belonging to this vector.
         //
@@ -148,9 +149,6 @@ namespace hpx
         // This is the vector representing the base_index and corresponding
         // global ID's of the underlying partition_vectors.
         partitions_vector_type partitions_;
-
-        // parameters taken from distribution policy
-        BOOST_SCOPED_ENUM(unordered_distribution_policy) policy_; // policy to use
 
         // will be set for created (non-attached) objects
         std::string registered_name_;
@@ -164,8 +162,6 @@ namespace hpx
             server::unordered_map_config_data data = f.get();
 
             std::swap(partitions_, data.partitions_);
-            policy_ = static_cast<BOOST_SCOPED_ENUM(unordered_distribution_policy)>(
-                data.policy_);
             base_type::reset(std::move(id));
         }
 
@@ -192,7 +188,7 @@ namespace hpx
         // Register this vector with AGAS using the given symbolic name
         future<void> register_as(std::string const& symbolic_name)
         {
-            server::unordered_map_config_data data(partitions_, int(policy_));
+            server::unordered_map_config_data data(partitions_);
 
             base_type::reset(hpx::new_<
                     typename base_type::server_component_type> >(
@@ -207,37 +203,33 @@ namespace hpx
         /// \a num_partitions = 1 and \a partition_size = 0. Hence overall size
         /// of the unordered_map is 0.
         unordered_map()
-          : policy_(unordered_distribution_policy::hash)
         {
         }
 
         explicit unordered_map(std::size_t bucket_count,
                 Hash const& hash = Hash(), KeyEqual const& equal = KeyEqual())
-          : policy_(unordered_distribution_policy::hash)
         {
-            create(bucket_count, hpx::hash);
+            create(bucket_count);
         }
 
         template <typename DistPolicy>
         unordered_map(DistPolicy const& policy,
-                typename boost::enable_if<
-                        is_unordered_distribution_policy<DistPolicy>
+                typename std::enable_if<
+                        is_unordered_distribution_policy<DistPolicy>::value
                     >::type* = 0)
-          : policy_(policy_.get_policy_type())
         {
-            create(bucket_count, policy);
+            create(bucket_count);
         }
 
         template <typename DistPolicy>
         unordered_map(std::size_t bucket_count,
                 DistPolicy const& policy, Hash const& hash = Hash(),
                 KeyEqual const& equal = KeyEqual(),
-                typename boost::enable_if<
-                        is_unordered_distribution_policy<DistPolicy>
+                typename std::enable_if<
+                        is_unordered_distribution_policy<DistPolicy>::value
                     >::type* = 0)
-          : policy_(policy_.get_policy_type())
         {
-            create(bucket_count, policy);
+            create(bucket_count);
         }
 
         /// Construct a new unordered_map representation from the data
@@ -249,17 +241,14 @@ namespace hpx
 
         /// Construct a new unordered_map
         unordered_map(std::size_t bucket_count)
-          : policy_(unordered_distribution_policy::hash)
         {
-            create(bucket_count, hpx::hash);
+            create(bucket_count);
         }
 
         unordered_map(unordered_map const& rhs)
-          : policy_(rhs.policy_)
         {}
 
         unordered_map(unordered_map && rhs)
-          : policy_(rhs.policy_)
         {}
 
         ~unordered_map()
@@ -285,13 +274,13 @@ namespace hpx
         /// \note The non-const version of is operator returns a proxy object
         ///       instead of a real reference to the element.
         ///
-        detail::unordered_map_value_proxy<Key, T, Hash, KeyEqual>
-        operator[](Key const& pos)
-        {
-            return detail::unordered_map_value_proxy<
-                    Key, T, Hash, KeyEqual
-                >(*this, pos);
-        }
+//         detail::unordered_map_value_proxy<Key, T, Hash, KeyEqual>
+//         operator[](Key const& pos)
+//         {
+//             return detail::unordered_map_value_proxy<
+//                     Key, T, Hash, KeyEqual
+//                 >(*this, pos);
+//         }
         T operator[](Key const& pos) const
         {
             return get_value_sync(pos);

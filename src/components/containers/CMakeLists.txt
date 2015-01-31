@@ -6,21 +6,14 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(subdirs
-    binpacking_factory
-    containers
-    dataflow
-    distributing_factory
-    iostreams
-    memory
-    papi_counters
-    remote_object
-    security
+    unordered
+    vector
    )
 
 add_hpx_pseudo_target(components)
 
 foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(components.${subdir})
+  add_hpx_pseudo_target(components.containers.${subdir})
   add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(components components.${subdir})
+  add_hpx_pseudo_dependencies(components.containers components.containers.${subdir})
 endforeach()

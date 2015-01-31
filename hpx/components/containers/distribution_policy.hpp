@@ -4,14 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_VECTOR_DISTRIBUTION_POLICY_HPP
-#define HPX_VECTOR_DISTRIBUTION_POLICY_HPP
+#ifndef HPX_DISTRIBUTION_POLICY_HPP
+#define HPX_DISTRIBUTION_POLICY_HPP
 
-#include <hpx/hpx_fwd.hpp>
-#include <boost/detail/scoped_enum_emulation.hpp>
-
-#include <vector>
-#include <iostream>
+#include <hpx/config.hpp>
 
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/vector.hpp>
@@ -77,28 +73,6 @@ namespace hpx
     };
 
     static distribution_policy const layout;
-
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        /// \cond NOINTERNAL
-        template <typename T>
-        struct is_vector_distribution_policy
-          : boost::mpl::false_
-        {};
-
-        template <>
-        struct is_vector_distribution_policy<distribution_policy>
-          : boost::mpl::true_
-        {};
-        // \endcond
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    struct is_vector_distribution_policy
-      : detail::is_vector_distribution_policy<typename hpx::util::decay<T>::type>
-    {};
 }
 
 #endif

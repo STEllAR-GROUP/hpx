@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Anuj R. Sharma
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -328,18 +328,19 @@ namespace hpx { namespace server
     };
 }}
 
+///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_VECTOR_DECLARATION(...)                                  \
     HPX_REGISTER_VECTOR_DECLARATION_(__VA_ARGS__)                             \
-    /**/
+/**/
 #define HPX_REGISTER_VECTOR_DECLARATION_(...)                                 \
     HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
         HPX_REGISTER_VECTOR_DECLARATION_, HPX_UTIL_PP_NARG(__VA_ARGS__)       \
     )(__VA_ARGS__))                                                           \
-    /**/
+/**/
 
 #define HPX_REGISTER_VECTOR_DECLARATION_1(type)                               \
     HPX_REGISTER_VECTOR_DECLARATION_2(type, type)                             \
-    /**/
+/**/
 #define HPX_REGISTER_VECTOR_DECLARATION_2(type, name)                         \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         hpx::server::partition_vector<type>::get_value_action,                \
@@ -359,20 +360,20 @@ namespace hpx { namespace server
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         hpx::server::partition_vector<type>::resize_action,                   \
         BOOST_PP_CAT(__vector_resize_action_, name));                         \
-    /**/
+/**/
 
 #define HPX_REGISTER_VECTOR(...)                                              \
     HPX_REGISTER_VECTOR_(__VA_ARGS__)                                         \
-    /**/
+/**/
 #define HPX_REGISTER_VECTOR_(...)                                             \
     HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
         HPX_REGISTER_VECTOR_, HPX_UTIL_PP_NARG(__VA_ARGS__)                   \
     )(__VA_ARGS__))                                                           \
-    /**/
+/**/
 
 #define HPX_REGISTER_VECTOR_1(type)                                           \
     HPX_REGISTER_VECTOR_2(type, type)                                         \
-    /**/
+/**/
 #define HPX_REGISTER_VECTOR_2(type, name)                                     \
     HPX_REGISTER_ACTION(                                                      \
         ::hpx::server::partition_vector<type>::get_value_action,              \
@@ -396,7 +397,7 @@ namespace hpx { namespace server
         ::hpx::server::partition_vector<type>                                 \
     > BOOST_PP_CAT(__vector_, name);                                          \
     HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(BOOST_PP_CAT(__vector_, name))     \
-    /**/
+/**/
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
