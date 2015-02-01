@@ -1,16 +1,14 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#define HPX_LIMIT 7
-
 #include <hpx/hpx_main.hpp>
-#include <hpx/components/vector/vector.hpp>
-#include <hpx/util/lightweight_test.hpp>
-
+#include <hpx/include/vector.hpp>
 #include <hpx/include/parallel_for_each.hpp>
-#include <hpx/parallel/segmented_algorithms/transform_reduce.hpp>
+#include <hpx/include/parallel_transform_reduce.hpp>
+
+#include <hpx/util/lightweight_test.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.

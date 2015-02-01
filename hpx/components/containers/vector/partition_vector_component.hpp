@@ -21,7 +21,7 @@
 #include <hpx/include/util.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/include/util.hpp>
 
 #include <iostream>
 #include <tuple>

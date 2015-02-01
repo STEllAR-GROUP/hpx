@@ -30,7 +30,6 @@
 #include <algorithm>
 #include <type_traits>
 
-#include <boost/format.hpp>
 #include <boost/cstdint.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

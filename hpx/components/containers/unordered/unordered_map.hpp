@@ -95,6 +95,116 @@ HPX_DISTRIBUTED_METADATA_DECLARATION(hpx::server::unordered_map_config_data,
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
+    template <typename Key, typename T, typename Hash = std::hash<Key>,
+        typename KeyEqual = std::equal_to<Key> >
+    class unordered_map;
+
+    namespace detail
+    {
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Key, typename T, typename Hash, typename KeyEqual>
+        struct unordered_map_value_proxy
+        {
+            unordered_map_value_proxy(
+                    hpx::unordered_map<Key, T, Hash, KeyEqual>& um,
+                    Key const& key)
+              : um_(um), key_(key)
+            {}
+
+            operator T() const
+            {
+                return um_.get_value_sync(key_);
+            }
+
+            template <typename T_>
+            unordered_map_value_proxy& operator=(T_ && value)
+            {
+                um_.set_value_sync(key_, std::forward<T_>(value));
+                return *this;
+            }
+
+            hpx::unordered_map<Key, T, Hash, KeyEqual>& um_;
+            Key const& key_;
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Hash, typename IsEmpty = std::is_empty<Hash> >
+        struct unordered_hasher
+        {
+            unordered_hasher() : hasher_() {}
+
+            unordered_hasher(Hash const& hasher)
+              : hasher_(hasher)
+            {}
+
+            template <typename Key>
+            std::size_t operator()(Key const& key) const
+            {
+                return hasher_(key);
+            }
+
+            Hash hasher_;
+        };
+
+        template <typename Hash>
+        struct unordered_hasher<Hash, std::true_type>
+        {
+            unordered_hasher() {}
+            unordered_hasher(Hash const&) {}
+
+            template <typename Key>
+            std::size_t operator()(Key const& key) const
+            {
+                return Hash()(key);
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename KeyEqual, typename IsEmpty = std::is_empty<KeyEqual> >
+        struct unordered_comparator
+        {
+            unordered_comparator() : equal_() {}
+            unordered_comparator(KeyEqual const& equal)
+              : equal_(equal)
+            {}
+
+            template <typename Key>
+            bool operator()(Key const& lhs, Key const& rhs) const
+            {
+                return equal_(lhs, rhs);
+            }
+
+            KeyEqual equal_;
+        };
+
+        template <typename KeyEqual>
+        struct unordered_comparator<KeyEqual, std::true_type>
+        {
+            unordered_comparator() {}
+            unordered_comparator(KeyEqual const&) {}
+
+            template <typename Key>
+            bool operator()(Key const& lhs, Key const& rhs) const
+            {
+                return KeyEqual()(lhs, rhs);
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Hash, typename KeyEqual>
+        struct unordered_base
+        {
+            unordered_base() {}
+
+            unordered_base(Hash const& hasher, KeyEqual const& equal)
+              : hash_(hasher), equal_(equal)
+            {}
+
+            unordered_hasher<Hash> hasher_;
+            unordered_comparator<KeyEqual> equal_;
+        };
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     /// This is the unordered_map class which defines hpx::unordered_map
     /// functionality.
@@ -108,7 +218,8 @@ namespace hpx
       : hpx::components::client_base<
             unordered_map<Key, T, Hash, KeyEqual>,
             hpx::components::server::distributed_metadata_base<
-                server::unordered_map_config_data> >
+                server::unordered_map_config_data> >,
+        detail::unordered_base<Hash, KeyEqual>
     {
     public:
         typedef std::allocator<T> allocator_type;
@@ -133,18 +244,40 @@ namespace hpx
         typedef hpx::components::client_base<
                 unordered_map, server::unordered_map_config_data
             > base_type;
+        typedef detail::unordered_base<Hash, KeyEqual> hash_base_type;
 
         typedef hpx::server::partition_unordered_map<Key, T, Hash, KeyEqual>
             partition_unordered_map_server;
         typedef hpx::partition_unordered_map<Key, T, Hash, KeyEqual>
             partition_unordered_map_client;
 
+        struct partition_data
+          : server::unordered_map_config_data::partition_data
+        {
+            typedef server::unordered_map_config_data::partition_data base_type;
+
+            partition_data(future<id_type> && part, std::size_t size,
+                    boost::uint32_t locality_id)
+              : base_type(std::move(part), size, locality_id)
+            {}
+
+            partition_data(id_type const& part, std::size_t size,
+                    boost::uint32_t locality_id)
+              : base_type(part, size, locality_id)
+            {}
+
+            partition_data(base_type && base)
+              : base_type(std::move(base))
+            {}
+
+            boost::shared_ptr<partition_unordered_map_server> local_data_;
+        };
+
         // The list of partitions belonging to this vector.
         //
         // Each partition is described by it's corresponding client object, its
         // size, and locality id.
-        typedef std::vector<server::unordered_map_config_data::partition_data>
-            partitions_vector_type;
+        typedef std::vector<partition_data> partitions_vector_type;
 
         // This is the vector representing the base_index and corresponding
         // global ID's of the underlying partition_vectors.
@@ -175,6 +308,134 @@ namespace hpx
             id_type id = f.get();
             return async(act(), id).then(
                 util::bind(&unordered_map::get_data_helper, this, id, _1));
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        std::size_t get_partition(Key const& key) const
+        {
+            return this->hasher_(key) % partitions_.size();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        void get_ptr_helper(std::size_t loc,
+            partitions_vector_type& partitions,
+            future<boost::shared_ptr<partition_unordered_map_server> > && f)
+        {
+            partitions[loc].local_data_ = f.get();
+        }
+
+        template <typename DistPolicy>
+        void create(std::vector<id_type> const& localities,
+            DistPolicy const& policy, std::size_t bucket_count,
+            Hash const& hash, KeyEqual const& equal)
+        {
+            std::size_t num_parts = policy.get_num_partitions();
+            std::size_t num_localities = localities.size();
+            std::size_t num_parts_per_loc =
+                (num_parts + num_localities - 1) / num_localities;
+
+            // create as many partitions as required
+            std::vector<future<std::vector<id_type> > > ids;
+            ids.reserve(num_localities);
+            for (std::size_t loc = 0; loc != num_localities; ++loc)
+            {
+                // create as many partitions on a given locality as required
+                ids.push_back(partition_vector_client::bulk_create_async(
+                    localities[loc], num_parts_per_loc, bucket_count,
+                    hash, equal));
+            }
+            hpx::wait_all(ids);
+
+            // now initialize our data structures
+            boost::uint32_t this_locality = get_locality_id();
+            std::vector<future<void> > ptrs;
+
+            std::size_t num_part = 0;
+            std::size_t allocated_size = 0;
+            for (std::size_t loc = 0; loc != num_localities; ++loc)
+            {
+                boost::uint32_t locality =
+                    naming::get_locality_id_from_id(localities[loc]);
+                std::vector<id_type> objs = ids[loc].get();
+
+                HPX_ASSERT(objs.size() == num_parts_per_loc);
+                for (std::size_t l = 0; l != num_parts_per_loc; ++l)
+                {
+                    partitions_.push_back(partition_data(objs[l], locality));
+                    if (locality == this_locality)
+                    {
+                        using util::placeholders::_1;
+                        ptrs.push_back(get_ptr<partition_unordered_map_server>(
+                            partitions_.back().partition_.get()).then(
+                                util::bind(&vector::get_ptr_helper, this, l,
+                                    std::ref(partitions_), _1)));
+                    }
+                }
+            }
+
+            wait_all(ptrs);
+        }
+
+        // This function is called when we are creating the vector. It
+        // initializes the partitions based on the give parameters.
+        template <typename DistPolicy>
+        void create(std::size_t bucket_count, DistPolicy const& policy,
+            Hash const& hash = Hash(), KeyEqual const& equal = KeyEqual())
+        {
+            std::vector<id_type> const& localities = policy.get_localities();
+            if (localities.empty())
+            {
+                create(std::vector<id_type>(1, find_here()), policy,
+                    bucket_count, hash, equal);
+            }
+            else
+            {
+                create(localities, policy, bucket_count, hash, equal);
+            }
+        }
+
+        // Perform a deep copy from the given unordered_map
+        void copy_from(unordered_map const& rhs)
+        {
+            typedef typename partitions_vector_type::const_iterator
+                const_iterator;
+
+            std::vector<future<id_type> > objs;
+            const_iterator end = rhs.partitions_.end();
+            for (const_iterator it = rhs.partitions_.begin(); it != end; ++it)
+            {
+                typedef partition_unordered_map_server component_type;
+                objs.push_back(hpx::components::copy<component_type>(
+                    it->partition_.get()));
+            }
+            wait_all(objs);
+
+            boost::uint32_t this_locality = get_locality_id();
+            std::vector<future<void> > ptrs;
+
+            partitions_vector_type partitions;
+            partitions.reserve(rhs.partitions_.size());
+            for (std::size_t i = 0; i != rhs.partitions_.size(); ++i)
+            {
+                boost::uint32_t locality = rhs.partitions_[i].locality_id_;
+
+                partitions.push_back(partition_data(std::move(objs[i]),
+                    rhs.partitions_[i].size_, locality));
+
+                if (locality == this_locality)
+                {
+                    using util::placeholders::_1;
+                    ptrs.push_back(get_ptr<partition_unordered_map_server>(
+                        partitions[i].partition_.get()).then(
+                            util::bind(&unordered_map::get_ptr_helper, this, i,
+                                std::ref(partitions), _1)));
+                }
+            }
+
+            wait_all(ptrs);
+
+            std::swap(partitions_, partitions);
+            registered_name_.clear();
         }
 
     public:
@@ -208,8 +469,17 @@ namespace hpx
 
         explicit unordered_map(std::size_t bucket_count,
                 Hash const& hash = Hash(), KeyEqual const& equal = KeyEqual())
+          : hash_base_type(hash, equal)
         {
-            create(bucket_count);
+            create(bucket_count, hpx::layout, hash, equal);
+        }
+        unordered_map(std::size_t bucket_count,
+                std::string const& symbolic_name,
+                Hash const& hash = Hash(), KeyEqual const& equal = KeyEqual())
+          : hash_base_type(hash, equal)
+        {
+            create(bucket_count, hpx::layout, hash, equal);
+            register_as(symbolic_name).get();
         }
 
         template <typename DistPolicy>
@@ -218,18 +488,43 @@ namespace hpx
                         is_unordered_distribution_policy<DistPolicy>::value
                     >::type* = 0)
         {
-            create(bucket_count);
+            create(bucket_count, policy);
         }
-
         template <typename DistPolicy>
-        unordered_map(std::size_t bucket_count,
-                DistPolicy const& policy, Hash const& hash = Hash(),
-                KeyEqual const& equal = KeyEqual(),
+        unordered_map(DistPolicy const& policy,
+                std::string const& symbolic_name,
                 typename std::enable_if<
                         is_unordered_distribution_policy<DistPolicy>::value
                     >::type* = 0)
         {
-            create(bucket_count);
+            create(bucket_count, policy);
+            register_as(symbolic_name).get();
+        }
+
+        template <typename DistPolicy>
+        unordered_map(std::size_t bucket_count,
+                DistPolicy const& policy,
+                Hash const& hash = Hash(),
+                KeyEqual const& equal = KeyEqual(),
+                typename std::enable_if<
+                        is_unordered_distribution_policy<DistPolicy>::value
+                    >::type* = 0)
+          : hash_base_type(hash, equal)
+        {
+            create(bucket_count, policy, hash, equal);
+        }
+        template <typename DistPolicy>
+        unordered_map(std::size_t bucket_count, DistPolicy const& policy,
+                std::string const& symbolic_name,
+                Hash const& hash = Hash(),
+                KeyEqual const& equal = KeyEqual(),
+                typename std::enable_if<
+                        is_unordered_distribution_policy<DistPolicy>::value
+                    >::type* = 0)
+          : hash_base_type(hash, equal)
+        {
+            create(bucket_count, policy, hash, equal);
+            register_as(symbolic_name).get();
         }
 
         /// Construct a new unordered_map representation from the data
@@ -239,27 +534,44 @@ namespace hpx
             connect_to(symbolic_name).get();
         }
 
-        /// Construct a new unordered_map
-        unordered_map(std::size_t bucket_count)
+        unordered_map(unordered_map const& rhs)
+          : base_type(), hash_base_type(rhs)
         {
-            create(bucket_count);
+            copy_from(rhs);
         }
 
-        unordered_map(unordered_map const& rhs)
-        {}
-
         unordered_map(unordered_map && rhs)
+          : base_type(std::move(rhs)),
+            hash_base_type(std::move(rhs)),
+            partitions_(std::move(rhs.partitions_)),
+            registered_name_(std::move(rhs.registered_name_))
         {}
 
         ~unordered_map()
-        {}
+        {
+            if (!registered_name_.empty())
+            {
+                error_code ec;      // ignore all exceptions
+                agas::unregister_name_sync(registered_name_, ec);
+            }
+        }
 
         unordered_map& operator=(unordered_map const& rhs)
         {
+            if (this != &rhs)
+                copy_from(rhs);
             return *this;
         }
         unordered_map& operator=(unordered_map && rhs)
         {
+            if (this != &rhs)
+            {
+                this->base_type::operator=(std::move(rhs));
+                this->hash_base_type::operator=(std::move(rhs));
+
+                partitions_ = std::move(rhs.partitions_);
+                registered_name_ = std::move(rhs.registered_name_);
+            }
             return *this;
         }
 
@@ -274,13 +586,13 @@ namespace hpx
         /// \note The non-const version of is operator returns a proxy object
         ///       instead of a real reference to the element.
         ///
-//         detail::unordered_map_value_proxy<Key, T, Hash, KeyEqual>
-//         operator[](Key const& pos)
-//         {
-//             return detail::unordered_map_value_proxy<
-//                     Key, T, Hash, KeyEqual
-//                 >(*this, pos);
-//         }
+        detail::unordered_map_value_proxy<Key, T, Hash, KeyEqual>
+        operator[](Key const& pos)
+        {
+            return detail::unordered_map_value_proxy<
+                    Key, T, Hash, KeyEqual
+                >(*this, pos);
+        }
         T operator[](Key const& pos) const
         {
             return get_value_sync(pos);
