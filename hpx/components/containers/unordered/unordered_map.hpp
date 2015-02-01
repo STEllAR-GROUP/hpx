@@ -197,7 +197,7 @@ namespace hpx
             unordered_base() {}
 
             unordered_base(Hash const& hasher, KeyEqual const& equal)
-              : hash_(hasher), equal_(equal)
+              : hasher_(hasher), equal_(equal)
             {}
 
             unordered_hasher<Hash> hasher_;
@@ -256,14 +256,12 @@ namespace hpx
         {
             typedef server::unordered_map_config_data::partition_data base_type;
 
-            partition_data(future<id_type> && part, std::size_t size,
-                    boost::uint32_t locality_id)
-              : base_type(std::move(part), size, locality_id)
+            partition_data(future<id_type> && part, boost::uint32_t locality_id)
+              : base_type(std::move(part), locality_id)
             {}
 
-            partition_data(id_type const& part, std::size_t size,
-                    boost::uint32_t locality_id)
-              : base_type(part, size, locality_id)
+            partition_data(id_type const& part, boost::uint32_t locality_id)
+              : base_type(part, locality_id)
             {}
 
             partition_data(base_type && base)
@@ -340,9 +338,10 @@ namespace hpx
             for (std::size_t loc = 0; loc != num_localities; ++loc)
             {
                 // create as many partitions on a given locality as required
-                ids.push_back(partition_vector_client::bulk_create_async(
-                    localities[loc], num_parts_per_loc, bucket_count,
-                    hash, equal));
+                ids.push_back(
+                    partition_unordered_map_client::bulk_create_async(
+                        localities[loc], num_parts_per_loc, bucket_count,
+                        hash, equal));
             }
             hpx::wait_all(ids);
 
@@ -367,8 +366,8 @@ namespace hpx
                         using util::placeholders::_1;
                         ptrs.push_back(get_ptr<partition_unordered_map_server>(
                             partitions_.back().partition_.get()).then(
-                                util::bind(&vector::get_ptr_helper, this, l,
-                                    std::ref(partitions_), _1)));
+                                util::bind(&unordered_map::get_ptr_helper,
+                                    this, l, std::ref(partitions_), _1)));
                     }
                 }
             }
@@ -474,16 +473,30 @@ namespace hpx
             create(bucket_count, hpx::layout, hash, equal);
         }
         unordered_map(std::size_t bucket_count,
-                std::string const& symbolic_name,
-                Hash const& hash = Hash(), KeyEqual const& equal = KeyEqual())
-          : hash_base_type(hash, equal)
+                std::string const& symbolic_name)
+          : hash_base_type(Hash(), KeyEqual())
+        {
+            create(bucket_count, hpx::layout);
+            register_as(symbolic_name).get();
+        }
+        unordered_map(std::size_t bucket_count,
+                Hash const& hash, std::string const& symbolic_name)
+          : hash_base_type(hash, KeyEqual())
         {
             create(bucket_count, hpx::layout, hash, equal);
             register_as(symbolic_name).get();
         }
+        unordered_map(std::size_t bucket_count,
+                Hash const& hash, KeyEqual const& equal,
+                std::string const& symbolic_name)
+          : hash_base_type(hash, equal)
+        {
+            create(bucket_count, hpx::layout, hash);
+            register_as(symbolic_name).get();
+        }
 
         template <typename DistPolicy>
-        unordered_map(DistPolicy const& policy,
+        unordered_map(std::size_t bucket_count, DistPolicy const& policy,
                 typename std::enable_if<
                         is_unordered_distribution_policy<DistPolicy>::value
                     >::type* = 0)
@@ -491,7 +504,7 @@ namespace hpx
             create(bucket_count, policy);
         }
         template <typename DistPolicy>
-        unordered_map(DistPolicy const& policy,
+        unordered_map(std::size_t bucket_count, DistPolicy const& policy,
                 std::string const& symbolic_name,
                 typename std::enable_if<
                         is_unordered_distribution_policy<DistPolicy>::value
@@ -503,9 +516,30 @@ namespace hpx
 
         template <typename DistPolicy>
         unordered_map(std::size_t bucket_count,
+                Hash const& hash, DistPolicy const& policy,
+                typename std::enable_if<
+                        is_unordered_distribution_policy<DistPolicy>::value
+                    >::type* = 0)
+          : hash_base_type(hash, KeyEqual())
+        {
+            create(bucket_count, policy, hash);
+        }
+        template <typename DistPolicy>
+        unordered_map(std::size_t bucket_count,
+                Hash const& hash, DistPolicy const& policy,
+                std::string const& symbolic_name,
+                typename std::enable_if<
+                        is_unordered_distribution_policy<DistPolicy>::value
+                    >::type* = 0)
+          : hash_base_type(hash, KeyEqual())
+        {
+            create(bucket_count, policy, hash);
+            register_as(symbolic_name).get();
+        }
+        template <typename DistPolicy>
+        unordered_map(std::size_t bucket_count,
+                Hash const& hash, KeyEqual const& equal,
                 DistPolicy const& policy,
-                Hash const& hash = Hash(),
-                KeyEqual const& equal = KeyEqual(),
                 typename std::enable_if<
                         is_unordered_distribution_policy<DistPolicy>::value
                     >::type* = 0)
@@ -514,10 +548,10 @@ namespace hpx
             create(bucket_count, policy, hash, equal);
         }
         template <typename DistPolicy>
-        unordered_map(std::size_t bucket_count, DistPolicy const& policy,
+        unordered_map(std::size_t bucket_count,
+                Hash const& hash, KeyEqual const& equal,
+                DistPolicy const& policy,
                 std::string const& symbolic_name,
-                Hash const& hash = Hash(),
-                KeyEqual const& equal = KeyEqual(),
                 typename std::enable_if<
                         is_unordered_distribution_policy<DistPolicy>::value
                     >::type* = 0)

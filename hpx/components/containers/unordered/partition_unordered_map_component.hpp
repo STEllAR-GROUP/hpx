@@ -65,15 +65,9 @@ namespace hpx { namespace server
           : partition_unordered_map_(bucket_count)
         {}
 
-        /// Constructor which create and initialize partition_unordered_map with
-        /// all elements as \a val.
-        ///
-        /// param partition_size The size of vector
-        /// param val Default value for the elements in partition_unordered_map
-        ///
         partition_unordered_map(size_type bucket_count, Hash const& hash,
                 KeyEqual const& equal)
-          : partition_unordered_map_(partition_size, hash, equal)
+          : partition_unordered_map_(bucket_count, hash, equal)
         {}
 
         ///////////////////////////////////////////////////////////////////////

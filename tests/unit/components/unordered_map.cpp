@@ -22,10 +22,12 @@
 HPX_REGISTER_UNORDERED_MAP(std::string, double);
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename Key, typename Value>
-void test_global_iteration(hpx::unordered_map<Key, Value>& m,
-    std::size_t size, Value const& val)
+template <typename Key, typename Value, typename Hash, typename KeyEqual>
+void test_global_iteration(hpx::unordered_map<Key, Value, Hash, KeyEqual>& m,
+    Value const& val)
 {
+    std::size_t size = m.size();
+
 //     typedef typename hpx::unordered_map<Key, Value>::iterator iterator;
 //     typedef hpx::traits::segmented_iterator_traits<iterator> traits;
 //     HPX_TEST(traits::is_segmented_iterator::value);
@@ -34,7 +36,6 @@ void test_global_iteration(hpx::unordered_map<Key, Value>& m,
 //     typedef hpx::traits::segmented_iterator_traits<const_iterator> const_traits;
 //     HPX_TEST(const_traits::is_segmented_iterator::value);
 
-    HPX_TEST_EQ(m.size(), size);
     for(std::size_t i = 0; i != size; ++i)
     {
         std::string idx = boost::lexical_cast<std::string>(i);
@@ -64,19 +65,68 @@ void test_global_iteration(hpx::unordered_map<Key, Value>& m,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename Key, typename Value, typename DistPolicy>
+void trivial_tests(DistPolicy const& policy)
+{
+    // bucket_count
+    {
+        hpx::unordered_map<Key, Value> m(17, policy);
+        test_global_iteration(m, Value());
+    }
+
+    // bucket_count, hash
+    {
+        hpx::unordered_map<Key, Value> m(17, std::hash<std::string>(),
+            std::equal_to<std::string>(), policy);
+        test_global_iteration(m, Value());
+    }
+
+    // bucket_count, hash, key_equal
+    {
+        hpx::unordered_map<Key, Value> m(17, std::hash<std::string>(), policy);
+        test_global_iteration(m, Value());
+    }
+}
+
 template <typename Key, typename Value>
 void trivial_tests()
 {
+    // default constructed
     {
         hpx::unordered_map<Key, Value> m;
+        test_global_iteration(m, Value());
+    }
 
-        test_global_iteration(m, 0, Value());
+    // bucket_count
+    {
+        hpx::unordered_map<Key, Value> m(17);
+        test_global_iteration(m, Value());
+    }
+
+    // bucket_count, hash
+    {
+        hpx::unordered_map<Key, Value> m(17, std::hash<std::string>());
+        test_global_iteration(m, Value());
+    }
+
+    // bucket_count, hash, key_equal
+    {
+        hpx::unordered_map<Key, Value> m(17, std::hash<std::string>(),
+            std::equal_to<std::string>());
+        test_global_iteration(m, Value());
     }
 }
 
 int main()
 {
     trivial_tests<std::string, double>();
+
+    std::vector<hpx::id_type> localities = hpx::find_all_localities();
+
+    trivial_tests<std::string, double>(hpx::layout);
+    trivial_tests<std::string, double>(hpx::layout(3));
+    trivial_tests<std::string, double>(hpx::layout(3, localities));
+    trivial_tests<std::string, double>(hpx::layout(localities));
 
     return 0;
 }
