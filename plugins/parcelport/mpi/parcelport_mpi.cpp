@@ -51,7 +51,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
           , archive_flags_(boost::archive::no_header)
           , stopped_(false)
           , bootstrapping_(true)
-          , chunk_pool_(4194304, 512)
+          , chunk_pool_(4194304, 128)
           , sender_(stopped_)
           , receiver_(*this, chunk_pool_, stopped_)
         {

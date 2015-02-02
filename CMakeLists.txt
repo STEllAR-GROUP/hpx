@@ -138,9 +138,6 @@ hpx_option(HPX_BUILD_DOCUMENTATION BOOL "Build the HPX documentation (default OF
 
 hpx_option(HPX_BUILD_DOCUMENTATION_SINGLEPAGE BOOL "The HPX documentation should be build as a single page HTML (default OFF)." OFF CATEGORY "Build Targets")
 
-hpx_option(HPX_AUTOMATIC_PREPROCESSING BOOL "True if the automatic header preprocessing target should be created (default: OFF)." OFF ADVANCED)
-hpx_option(HPX_WAVE_ADDITIONAL_INCLUDE_DIRS STRING "Additional (compiler specific) include directories for the wave preprocessing tool." "" CATEGORY "Generic" ADVANCED)
-
 ################################################################################
 # Some platforms do not support dynamic linking. Enable this to link all
 # libraries statically. This also changes some of the internals of HPX related
@@ -181,16 +178,6 @@ hpx_option(HPX_NATIVE_TLS BOOL "Use native TLS support if available (default: ON
 if(HPX_NATIVE_TLS)
   hpx_info("Native TLS is enabled.")
   hpx_add_config_define(HPX_HAVE_NATIVE_TLS)
-endif()
-
-################################################################################
-# Disable the use of partially preprocessed header files
-################################################################################
-hpx_option(HPX_PREPROCESSOR_LIMIT_EXPANSION BOOL "Do not use preprocessed headers (default: OFF)" OFF ADVANCED)
-
-if(HPX_PREPROCESSOR_LIMIT_EXPANSION)
-  hpx_info("Use of preprocessed headers is disabled.")
-  hpx_add_config_define(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 endif()
 
 ################################################################################
@@ -1047,11 +1034,6 @@ hpx_add_config_define(HPX_HAVE_PARCEL_COALESCING)
 ################################################################################
 hpx_include(Documentation)
 
-################################################################################
-# Creating the partially preprocessed header requires a recent version of Wave
-################################################################################
-hpx_include(Preprocessing)
-
 # Debug library postfix
 set(CMAKE_DEBUG_POSTFIX "d")
 set(HPX_DEBUG_POSTFIX "d")
@@ -1113,10 +1095,6 @@ endif()
 
 if(HPX_BUILD_DOCUMENTATION)
   add_subdirectory(docs)
-endif()
-
-if(HPX_AUTOMATIC_PREPROCESSING)
-  add_subdirectory(preprocess)
 endif()
 
 ################################################################################
