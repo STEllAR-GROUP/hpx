@@ -8,8 +8,8 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#if HPX_ACTION_ARGUMENT_LIMIT < 10
-#error "Please define HPX_ACTION_ARGUMENT_LIMIT to be at least 10."
+#if HPX_LIMIT < 10
+#error "Please define HPX_LIMIT to be at least 10."
 #endif
 
 #include <hpx/components/dataflow/dataflow.hpp>

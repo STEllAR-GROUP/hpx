@@ -57,12 +57,6 @@ directory for `BOOST`, specify `BOOST_ROOT=/custom/boost/root`.
       counters as __hpx__ performance counters. This is not available on
       the Windows platform.]
     ]
-    [[`BOOSTWAVE_ROOT:PATH`]
-     [Specifies where to look for a built __boost_wave__ binary. Set this if
-      you want to recreate the preprocessed header files used by __hpx__.
-      Normally this will not be necessary, unless you modified the sources
-      those preprocessed headers depend on.]
-    ]
     [[`AMPLIFIER_ROOT:PATH`]
      [Specifies where to look for one of the tools of the Intel Parallel
       Studio(tm) product, either Intel Amplifier(tm) or Intel Inspector(tm).

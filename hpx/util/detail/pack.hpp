@@ -112,6 +112,21 @@ namespace hpx { namespace util { namespace detail
     struct contains
       : any_of<boost::is_same<T, Ts>...>
     {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <std::size_t I, typename ...Ts>
+    struct at_index;
+
+    template <std::size_t I, typename T, typename ...Ts>
+    struct at_index<I, T, Ts...>
+      : at_index<I - 1, Ts...>
+    {};
+
+    template <typename T, typename ...Ts>
+    struct at_index<0, T, Ts...>
+    {
+        typedef T type;
+    };
 }}}
 
 #endif
