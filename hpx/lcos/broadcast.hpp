@@ -759,6 +759,17 @@ namespace hpx { namespace lcos
             typename detail::broadcast_result<Action>::action_result
             action_result;
 
+        if (ids.empty())
+        {
+            typedef typename detail::broadcast_result<Action>::type
+                result_type;
+
+            return hpx::make_exceptional_future<result_type>(
+                    hpx::exception(hpx::bad_parameter,
+                        "array of targets is empty")
+                );
+        }
+
         return
             hpx::async_colocated<broadcast_impl_action>(
                 ids[0]
@@ -801,6 +812,13 @@ namespace hpx { namespace lcos
         typedef
             typename detail::make_broadcast_apply_action<Action>::type
             broadcast_impl_action;
+
+        if (ids.empty())
+        {
+            HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                "hpx::lcos::broadcast_apply", "array of targets is empty");
+            return;
+        }
 
         hpx::apply_colocated<broadcast_impl_action>(
                 ids[0]

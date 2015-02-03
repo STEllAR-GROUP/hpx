@@ -593,6 +593,14 @@ namespace hpx { namespace lcos
                 template fold_invoker<FoldOp>::type
             fold_impl_action;
 
+        if (ids.empty())
+        {
+            return hpx::make_exceptional_future<action_result>(
+                    hpx::exception(hpx::bad_parameter,
+                        "array of targets is empty")
+                );
+        }
+
         return
             hpx::async_colocated<fold_impl_action>(
                 inverted_ids[0]
