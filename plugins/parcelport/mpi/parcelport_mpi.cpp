@@ -192,32 +192,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             write_handler_type f)
         {
             if(stopped_) return;
-            bool spawn_thread = false;
-            if(!hpx::is_starting())
-            {
-                if(threads::get_self_ptr() == 0)
-                    spawn_thread = true;
-                else
-                {
-                    std::ptrdiff_t const huge_size
-                        = threads::get_stack_size(threads::thread_stacksize_huge);
-                    spawn_thread =
-                        threads::get_stack_size(threads::get_self_id()) < huge_size;
-                }
-            }
-
-            if(spawn_thread)
-            {
-                std::size_t os_thread = get_worker_thread_num();
-                hpx::applier::register_thread_nullary(
-                    util::bind(
-                        &parcelport::put_parcel,
-                        this, std::move(dest), std::move(p), std::move(f)),
-                    "put_parcel",
-                    threads::pending, true, threads::thread_priority_boost,
-                    os_thread, threads::thread_stacksize_huge);
-                return;
-            }
 
             util::high_resolution_timer timer;
 
