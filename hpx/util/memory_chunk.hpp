@@ -30,7 +30,7 @@ namespace hpx { namespace util
 #endif
         }
 
-        memory_chunk(std::size_t chunk_size)
+        explicit memory_chunk(std::size_t chunk_size)
           : chunk_size_(chunk_size)
           , allocated_(0)
           , current_(0)

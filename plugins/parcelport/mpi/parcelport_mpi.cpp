@@ -16,12 +16,18 @@
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 #include <hpx/runtime/parcelset/encode_parcels.hpp>
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
+
+#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/lcos/local/condition_variable.hpp>
+
 #include <hpx/plugins/parcelport/mpi/locality.hpp>
 #include <hpx/plugins/parcelport/mpi/header.hpp>
 #include <hpx/plugins/parcelport/mpi/sender.hpp>
 #include <hpx/plugins/parcelport/mpi/receiver.hpp>
 
 #include <hpx/util/memory_chunk_pool.hpp>
+#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 
 namespace hpx
 {
@@ -43,6 +49,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                     )
                 );
         }
+
+        static std::size_t max_connections(util::runtime_configuration const& ini)
+        {
+            return hpx::util::get_entry_as<std::size_t>(
+                ini, "hpx.parcel.mpi.max_connections", HPX_PARCEL_MAX_CONNECTIONS);
+        }
     public:
         parcelport(util::runtime_configuration const& ini,
             util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
@@ -51,9 +63,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
           , archive_flags_(boost::archive::no_header)
           , stopped_(false)
           , bootstrapping_(true)
-          , chunk_pool_(4194304, 128)
+          , chunk_pool_(4096, max_connections(ini))
+          , max_connections_(max_connections(ini))
+          , num_connections_(0)
           , sender_(stopped_)
-          , receiver_(*this, chunk_pool_, stopped_)
+          , receiver_(*this, chunk_pool_, stopped_, connections_mtx_, connections_cond_, max_connections_, num_connections_)
         {
 #ifdef BOOST_BIG_ENDIAN
             std::string endian_out = get_config_entry("hpx.parcel.endian_out", "big");
@@ -216,6 +230,16 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             int dest_rank = dest.get<locality>().rank();
             HPX_ASSERT(dest_rank != util::mpi_environment::rank());
 
+            if(threads::get_self_ptr())
+            {
+                mutex_type::scoped_lock l(connections_mtx_);
+                while(num_connections_ >= max_connections_)
+                {
+                    connections_cond_.wait(l);
+                }
+                ++num_connections_;
+            }
+
             sender_.send(
                 dest_rank
               , buffer
@@ -229,6 +253,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             parcels_sent_.add_data(buffer.data_point_);
 
             //do_background_work();
+            if(threads::get_self_ptr())
+            {
+                mutex_type::scoped_lock l(connections_mtx_);
+                --num_connections_;
+                connections_cond_.notify_all();
+            }
         }
 
         bool do_background_work(std::size_t num_thread)
@@ -246,6 +276,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             data_type;
         typedef parcel_buffer<data_type> snd_buffer_type;
         typedef parcel_buffer<data_type, data_type> rcv_buffer_type;
+        typedef lcos::local::spinlock mutex_type;
 
         int archive_flags_;
 
@@ -254,6 +285,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         memory_pool_type chunk_pool_;
 
+        mutex_type connections_mtx_;
+        lcos::local::condition_variable connections_cond_;
+        std::size_t const max_connections_;
+        std::size_t num_connections_;
         sender sender_;
         receiver receiver_;
 
