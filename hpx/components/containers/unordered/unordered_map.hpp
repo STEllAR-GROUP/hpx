@@ -314,6 +314,17 @@ namespace hpx
             return this->hasher_(key) % partitions_.size();
         }
 
+        std::vector<hpx::id_type> get_partition_ids() const
+        {
+            std::vector<hpx::id_type> ids;
+            ids.reserve(partitions_.size());
+            for (partition_data const& pd: partitions_)
+            {
+                ids.push_back(pd.get_id());
+            }
+            return ids;
+        }
+
         ///////////////////////////////////////////////////////////////////////
         void get_ptr_helper(std::size_t loc,
             partitions_vector_type& partitions,
@@ -373,6 +384,24 @@ namespace hpx
             }
 
             wait_all(ptrs);
+        }
+
+        // default construct a local partition
+        void create()
+        {
+            future<boost::shared_ptr<partition_unordered_map_server> > ptr =
+                partition_unordered_map_client::create_async(find_here()).then(
+                    [this](future<id_type> && fid) ->
+                        future<boost::shared_ptr<partition_unordered_map_server> >
+                    {
+                        // now initialize our data structures
+                        id_type id = fid.get();
+                        boost::uint32_t locality = naming::get_locality_id_from_id(id);
+                        partitions_.push_back(partition_data(id, locality));
+                        return hpx::get_ptr<partition_unordered_map_server>(id);
+                    });
+
+            partitions_[0].local_data_ = ptr.get();
         }
 
         // This function is called when we are creating the vector. It
@@ -464,6 +493,7 @@ namespace hpx
         /// of the unordered_map is 0.
         unordered_map()
         {
+            create();
         }
 
         explicit unordered_map(std::size_t bucket_count,
@@ -770,13 +800,28 @@ namespace hpx
                 .set_value(pos, std::forward<T_>(val));
         }
 
-        /// \brief Compute the size as the number of elements it contains.
+        /// Asynchronously compute the size of the unordered_map.
+        ///
+        /// \return Return the number of elements in the vector
+        ///
+        hpx::future<std::size_t> size_async() const
+        {
+            std::vector<hpx::id_type> ids = get_partition_ids();
+            if (ids.empty())
+                return make_ready_future(std::size_t(0));
+
+            return hpx::lcos::reduce<
+                    typename partition_unordered_map_server::size_action>(
+                ids, std::plus<std::size_t>());
+        }
+
+        /// Compute the size compute the size of the unordered_map.
         ///
         /// \return Return the number of elements in the vector
         ///
         std::size_t size() const
         {
-            return 0;
+            return size_async().get();
         }
     };
 }

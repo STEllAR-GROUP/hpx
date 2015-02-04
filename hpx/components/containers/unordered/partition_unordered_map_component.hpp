@@ -58,7 +58,6 @@ namespace hpx { namespace server
         /// with size 0.
         partition_unordered_map()
         {
-            HPX_ASSERT(false);  // shouldn't ever be called
         }
 
         explicit partition_unordered_map(size_type bucket_count)
@@ -255,6 +254,15 @@ namespace hpx { namespace server
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         BOOST_PP_CAT(partition_unordered_map, __LINE__)::size_action,         \
         BOOST_PP_CAT(__unordered_map_size_action_, name));                    \
+    typedef std::plus<std::size_t>                                            \
+        BOOST_PP_CAT(partition_unordered_map_size_reduceop, __LINE__);        \
+    typedef BOOST_PP_CAT(partition_unordered_map, __LINE__)::size_action      \
+        BOOST_PP_CAT(BOOST_PP_CAT(partition_unordered_map, size_action),      \
+            __LINE__);                                                        \
+    HPX_REGISTER_REDUCE_ACTION_DECLARATION(                                   \
+        BOOST_PP_CAT(BOOST_PP_CAT(partition_unordered_map, size_action),      \
+            __LINE__),                                                        \
+        BOOST_PP_CAT(partition_unordered_map_size_reduceop, __LINE__));       \
 /**/
 
 #define HPX_REGISTER_UNORDERED_MAP(...)                                       \
@@ -296,6 +304,15 @@ namespace hpx { namespace server
     HPX_REGISTER_ACTION(                                                      \
         BOOST_PP_CAT(partition_unordered_map, __LINE__)::size_action,         \
         BOOST_PP_CAT(__unordered_map_size_action_, name));                    \
+    typedef std::plus<std::size_t>                                            \
+        BOOST_PP_CAT(partition_unordered_map_size_reduceop, __LINE__);        \
+    typedef BOOST_PP_CAT(partition_unordered_map, __LINE__)::size_action      \
+        BOOST_PP_CAT(BOOST_PP_CAT(partition_unordered_map, size_action),      \
+            __LINE__);                                                        \
+    HPX_REGISTER_REDUCE_ACTION(                                               \
+        BOOST_PP_CAT(BOOST_PP_CAT(partition_unordered_map, size_action),      \
+            __LINE__),                                                        \
+        BOOST_PP_CAT(partition_unordered_map_size_reduceop, __LINE__));       \
     typedef ::hpx::components::simple_component<                              \
         BOOST_PP_CAT(partition_unordered_map, __LINE__)                       \
     > BOOST_PP_CAT(__unordered_map_, name);                                   \
