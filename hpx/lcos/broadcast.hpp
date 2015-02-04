@@ -765,8 +765,9 @@ namespace hpx { namespace lcos
                 result_type;
 
             return hpx::make_exceptional_future<result_type>(
-                    hpx::exception(hpx::bad_parameter,
-                        "array of targets is empty")
+                HPX_GET_EXCEPTION(bad_parameter,
+                    "hpx::lcos::broadcast",
+                    "empty list of targets for broadcast operation")
                 );
         }
 
@@ -816,7 +817,8 @@ namespace hpx { namespace lcos
         if (ids.empty())
         {
             HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                "hpx::lcos::broadcast_apply", "array of targets is empty");
+                "hpx::lcos::broadcast_apply",
+                "empty list of of targets for broadcast operation");
             return;
         }
 
