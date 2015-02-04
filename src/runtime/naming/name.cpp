@@ -241,14 +241,17 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         gid_type split_gid_if_needed(gid_type& gid)
         {
-            typedef gid_type::mutex_type::scoped_lock scoped_lock;
+            typedef gid_type::mutex_type::scoped_try_lock scoped_lock;
             scoped_lock l(gid.get_mutex());
-            return split_gid_if_needed_locked(l, gid);
+            if(l)
+                return split_gid_if_needed_locked(l, gid);
+
+            return replenish_new_gid_if_needed(gid);
         }
 
-        gid_type split_gid_if_needed_locked(gid_type::mutex_type::scoped_lock &l, gid_type& gid)
+        gid_type split_gid_if_needed_locked(gid_type::mutex_type::scoped_try_lock &l, gid_type& gid)
         {
-            typedef gid_type::mutex_type::scoped_lock scoped_lock;
+            typedef gid_type::mutex_type::scoped_try_lock scoped_lock;
             naming::gid_type new_gid;
 
             if (naming::detail::has_credits(gid))
@@ -279,7 +282,7 @@ namespace hpx { namespace naming
                     boost::int64_t new_credit = (HPX_GLOBALCREDIT_INITIAL - 1) * 2;
                     agas::incref(new_gid, new_credit);
                 }
-                
+
                 // Mark the gids as being split
                 set_credit_split_mask_for_gid(gid);
                 set_credit_split_mask_for_gid(new_gid);
@@ -351,9 +354,17 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         gid_type move_gid(gid_type& gid)
         {
-            gid_type::mutex_type::scoped_lock l(gid.get_mutex());
-            // move credit normally
-            return move_gid_locked(gid);
+            gid_type::mutex_type::scoped_try_lock l(gid.get_mutex());
+            if(l)
+            {
+                // move credit normally
+                return move_gid_locked(gid);
+            }
+
+            // Just replenish the credit of the new gid and don't touch the
+            // local gid instance. This is less efficient than necessary but
+            // avoids deadlocks during serialization.
+            return replenish_new_gid_if_needed(gid);
         }
 
         gid_type move_gid_locked(gid_type& gid)
