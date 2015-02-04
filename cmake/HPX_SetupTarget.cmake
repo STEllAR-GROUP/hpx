@@ -104,6 +104,7 @@ function(hpx_setup_target target)
                  "HPX_PREFIX=\"${_prefix}\""
                  "HPX_APPLICATION_EXPORTS")
   endif()
+
   if("${_type}" STREQUAL "LIBRARY")
     set(nohpxinit FALSE)
     if(DEFINED HPX_LIBRARY_VERSION AND DEFINED HPX_SOVERSION)
@@ -126,9 +127,8 @@ function(hpx_setup_target target)
 
     set_property(TARGET ${target} APPEND
                  PROPERTY COMPILE_DEFINITIONS
-                   "HPX_LIBRARY_EXPORTS"
-                   ${plugin_name})
-
+                 "HPX_LIBRARY_EXPORTS"
+                 ${plugin_name})
   endif()
 
   if("${_type}" STREQUAL "COMPONENT")
@@ -159,7 +159,7 @@ function(hpx_setup_target target)
   # ABI differences
   if(CMAKE_MAJOR_VERSION GREATER 2)
     set_property(TARGET ${target} APPEND PROPERTY
-	    COMPILE_DEFINITIONS $<$<CONFIG:Debug>:HPX_DEBUG>)
+      COMPILE_DEFINITIONS $<$<CONFIG:Debug>:HPX_DEBUG>)
   else()
     set_property(TARGET ${target} APPEND PROPERTY
       COMPILE_DEFINITIONS_DEBUG HPX_DEBUG)
