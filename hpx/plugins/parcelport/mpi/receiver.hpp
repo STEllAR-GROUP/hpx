@@ -72,7 +72,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         receiver(parcelport & pp, memory_pool_type & chunk_pool,
                 boost::atomic<bool> & stopped
               , mutex_type & connections_mtx
-              , lcos::local::condition_variable & connections_cond
+              , lcos::local::detail::condition_variable & connections_cond
               , std::size_t max_connections
               , std::size_t & num_connections)
           : pp_(pp)
@@ -112,7 +112,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 {
                     mutex_type::scoped_lock l(this_->connections_mtx_);
                     --this_->num_connections_;
-                    this_->connections_cond_.notify_all();
+                    this_->connections_cond_.notify_all(l);
                 }
             }
 
@@ -126,10 +126,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
             bool has_work = true;
             bool did_some_work = false;
-            check_num_connections chk(this);
 
-            while(has_work && chk.decrement_)
+            while(has_work)
             {
+                check_num_connections chk(this);
+                if(!chk.decrement_) break;
                 mutex_type::scoped_lock l(headers_mtx_);
                 accept_locked();
                 iterator it = headers_.begin();
@@ -329,7 +330,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         boost::atomic<bool> & stopped_;
 
         mutex_type & connections_mtx_;
-        lcos::local::condition_variable & connections_cond_;
+        lcos::local::detail::condition_variable & connections_cond_;
         std::size_t const max_connections_;
         std::size_t & num_connections_;
 
