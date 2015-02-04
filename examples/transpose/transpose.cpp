@@ -7,7 +7,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/local/detail/invoke_when_ready.hpp>
 
-#include <hpx/parallel/algorithm.hpp>
+#include <hpx/include/parallel_algorithm.hpp>
+#include <hpx/include/parallel_numeric.hpp>
 
 #include <boost/range/irange.hpp>
 
