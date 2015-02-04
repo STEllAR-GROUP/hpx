@@ -362,8 +362,8 @@ namespace hpx { namespace lcos
                 std::vector<hpx::future<Result> > fres = std::move(r.get());
                 HPX_ASSERT(!fres.empty());
 
-                // we're at the beginning of the folding chain, incroporate the initial
-                // value
+                // we're at the beginning of the folding chain, incorporate the
+                // initial value
                 if (fres.size() == 1)
                     return fold_op_(init_, fres[0].get());
 
