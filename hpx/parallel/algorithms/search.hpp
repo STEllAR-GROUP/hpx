@@ -66,7 +66,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 s_difference_type diff = std::distance(s_first, s_last);
                 if (diff <= 0)
-		  return result::get(std::move(first));
+                    return result::get(std::move(first));
 
                 difference_type count = std::distance(first, last);
                 if (diff > count)
