@@ -1247,6 +1247,7 @@ namespace hpx { namespace components { namespace server
             std::ostringstream strm;
             strm << "attempt to create message handler plugin instance of "
                     "invalid/unknown type: " << message_handler_type;
+            l.unlock();
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                 "runtime_support::create_message_handler",
                 strm.str());

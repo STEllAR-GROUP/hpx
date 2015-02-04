@@ -74,17 +74,59 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
     struct sender
     {
-        sender(boost::atomic<bool> & stopped)
+        typedef hpx::lcos::local::spinlock mutex_type;
+        sender(
+                boost::atomic<bool> & stopped
+              , mutex_type & connections_mtx
+              , lcos::local::detail::condition_variable & connections_cond
+              , std::size_t max_connections
+              , std::size_t & num_connections)
           : stopped_(stopped)
+          , connections_mtx_(connections_mtx)
+          , connections_cond_(connections_cond)
+          , max_connections_(max_connections)
+          , num_connections_(num_connections)
         {}
 
         void stop()
         {
         }
 
+        struct check_num_connections
+        {
+            check_num_connections(sender *s)
+             : this_(s)
+             , decrement_(false)
+            {
+                if(!threads::get_self_ptr()) return;
+                
+                mutex_type::scoped_lock l(this_->connections_mtx_);
+                while(this_->num_connections_ >= this_->max_connections_)
+                {
+                    this_->connections_cond_.wait(l);
+                }
+                ++this_->num_connections_;
+                decrement_ = true;
+            }
+            
+            ~check_num_connections()
+            {
+                if(decrement_)
+                {
+                    mutex_type::scoped_lock l(this_->connections_mtx_);
+                    --this_->num_connections_;
+                    this_->connections_cond_.notify_all(l);
+                }
+            }
+
+            sender *this_;
+            bool decrement_;
+        };
+
         template <typename Buffer, typename Background>
         void send(int dest, Buffer & buffer, Background background)
         {
+            check_num_connections chk(this);
             tag_provider::tag tag(tag_provider_());
 
             header h(buffer, tag);
@@ -178,6 +220,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
     private:
         tag_provider tag_provider_;
         boost::atomic<bool> & stopped_;
+
+        mutex_type & connections_mtx_;
+        lcos::local::detail::condition_variable & connections_cond_;
+        std::size_t const max_connections_;
+        std::size_t & num_connections_;
 
         template <typename Background>
         void wait_done(MPI_Request *& request, Background const & background)

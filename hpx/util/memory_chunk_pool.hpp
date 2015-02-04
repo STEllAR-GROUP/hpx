@@ -33,7 +33,8 @@ namespace hpx { namespace util
         static const std::size_t offset_ = sizeof(memory_chunk_type *);
 
         memory_chunk_pool(std::size_t chunk_size, std::size_t max_chunks)
-          : memory_chunks_(max_chunks, memory_chunk_type(chunk_size))
+          : last_used_chunk_(0)
+          , memory_chunks_(max_chunks, memory_chunk_type(chunk_size))
           , chunk_size_(chunk_size)
           , max_chunks_(max_chunks)
           , backup_size_(0)
@@ -119,7 +120,7 @@ namespace hpx { namespace util
             int ret = posix_memalign(
                 reinterpret_cast<void **>(&result),
                 EXEC_PAGESIZE, size + offset_);
-            if(ret != 0)
+            if(ret != 0 && !result)
                 throw std::bad_alloc();
 #else
             result = new char[size];

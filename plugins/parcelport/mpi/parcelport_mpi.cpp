@@ -16,12 +16,18 @@
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 #include <hpx/runtime/parcelset/encode_parcels.hpp>
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
+
+#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/lcos/local/condition_variable.hpp>
+
 #include <hpx/plugins/parcelport/mpi/locality.hpp>
 #include <hpx/plugins/parcelport/mpi/header.hpp>
 #include <hpx/plugins/parcelport/mpi/sender.hpp>
 #include <hpx/plugins/parcelport/mpi/receiver.hpp>
 
 #include <hpx/util/memory_chunk_pool.hpp>
+#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 
 namespace hpx
 {
@@ -43,6 +49,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                     )
                 );
         }
+
+        static std::size_t max_connections(util::runtime_configuration const& ini)
+        {
+            return hpx::util::get_entry_as<std::size_t>(
+                ini, "hpx.parcel.mpi.max_connections", HPX_PARCEL_MAX_CONNECTIONS);
+        }
     public:
         parcelport(util::runtime_configuration const& ini,
             util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
@@ -51,9 +63,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
           , archive_flags_(boost::archive::no_header)
           , stopped_(false)
           , bootstrapping_(true)
-          , chunk_pool_(4194304, 128)
-          , sender_(stopped_)
-          , receiver_(*this, chunk_pool_, stopped_)
+          , chunk_pool_(4096, max_connections(ini))
+          , max_connections_(max_connections(ini))
+          , num_connections_(0)
+          , sender_(stopped_, connections_mtx_, connections_cond_, max_connections_, num_connections_)
+          , receiver_(*this, chunk_pool_, stopped_, connections_mtx_, connections_cond_, max_connections_, num_connections_)
         {
 #ifdef BOOST_BIG_ENDIAN
             std::string endian_out = get_config_entry("hpx.parcel.endian_out", "big");
@@ -178,32 +192,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             write_handler_type f)
         {
             if(stopped_) return;
-            bool spawn_thread = false;
-            if(!hpx::is_starting())
-            {
-                if(threads::get_self_ptr() == 0)
-                    spawn_thread = true;
-                else
-                {
-                    std::ptrdiff_t const huge_size
-                        = threads::get_stack_size(threads::thread_stacksize_huge);
-                    spawn_thread =
-                        threads::get_stack_size(threads::get_self_id()) < huge_size;
-                }
-            }
-
-            if(spawn_thread)
-            {
-                std::size_t os_thread = get_worker_thread_num();
-                hpx::applier::register_thread_nullary(
-                    util::bind(
-                        &parcelport::put_parcel,
-                        this, std::move(dest), std::move(p), std::move(f)),
-                    "put_parcel",
-                    threads::pending, true, threads::thread_priority_boost,
-                    os_thread, threads::thread_stacksize_huge);
-                return;
-            }
 
             util::high_resolution_timer timer;
 
@@ -246,6 +234,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             data_type;
         typedef parcel_buffer<data_type> snd_buffer_type;
         typedef parcel_buffer<data_type, data_type> rcv_buffer_type;
+        typedef lcos::local::spinlock mutex_type;
 
         int archive_flags_;
 
@@ -254,6 +243,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         memory_pool_type chunk_pool_;
 
+        mutex_type connections_mtx_;
+        lcos::local::detail::condition_variable connections_cond_;
+        std::size_t const max_connections_;
+        std::size_t num_connections_;
         sender sender_;
         receiver receiver_;
 
@@ -328,6 +321,7 @@ namespace hpx { namespace traits
                 "env = ${HPX_PARCELPORT_MPI_ENV:MV2_COMM_WORLD_RANK,PMI_RANK,OMPI_COMM_WORLD_SIZE}\n"
 #endif
                 "multithreaded = ${HPX_PARCELPORT_MPI_MULTITHREADED:1}\n"
+                "max_connections = ${HPX_PARCELPORT_MPI_MAX_CONNECTIONS:8192}\n"
                 ;
         }
     };

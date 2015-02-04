@@ -6,7 +6,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
-#include <hpx/parallel/algorithm.hpp>
+#include <hpx/include/parallel_algorithm.hpp>
+#include <hpx/include/parallel_numeric.hpp>
 
 #include <boost/range/irange.hpp>
 
