@@ -14,6 +14,7 @@ set(subdirs
     threads
     traits
     util
+    parallel
    )
 
 if(HPX_HAVE_CXX11_LAMBDAS)
