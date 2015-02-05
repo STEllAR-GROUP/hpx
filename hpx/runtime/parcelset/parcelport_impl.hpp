@@ -757,10 +757,10 @@ namespace hpx { namespace parcelset
             sender_connection->verify(parcel_locality_id);
 #endif
             // encode the parcels
-            std::size_t num_parcels = encode_parcels(parcels,
-                *sender_connection, archive_flags_,
-                this->get_max_outbound_message_size(),
-                this->enable_security());
+            std::size_t num_parcels = encode_parcels(&parcels[0],
+                parcels.size(), sender_connection->buffer_,
+                archive_flags_,
+                this->get_max_outbound_message_size());
 
             using hpx::parcelset::detail::call_for_each;
             if (num_parcels == parcels.size())

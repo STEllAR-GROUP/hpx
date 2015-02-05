@@ -77,15 +77,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         typedef hpx::lcos::local::spinlock mutex_type;
         sender(
                 boost::atomic<bool> & stopped
-              , mutex_type & connections_mtx
-              , lcos::local::detail::condition_variable & connections_cond
-              , std::size_t max_connections
-              , std::size_t & num_connections)
+              , std::size_t max_connections)
           : stopped_(stopped)
-          , connections_mtx_(connections_mtx)
-          , connections_cond_(connections_cond)
           , max_connections_(max_connections)
-          , num_connections_(num_connections)
+          , num_connections_(0)
         {}
 
         void stop()
@@ -221,10 +216,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         tag_provider tag_provider_;
         boost::atomic<bool> & stopped_;
 
-        mutex_type & connections_mtx_;
-        lcos::local::detail::condition_variable & connections_cond_;
+        mutex_type connections_mtx_;
+        lcos::local::detail::condition_variable connections_cond_;
         std::size_t const max_connections_;
-        std::size_t & num_connections_;
+        std::size_t num_connections_;
 
         template <typename Background>
         void wait_done(MPI_Request *& request, Background const & background)

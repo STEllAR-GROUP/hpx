@@ -15,7 +15,6 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 #include <hpx/runtime/parcelset/encode_parcels.hpp>
-#include <hpx/runtime/parcelset/decode_parcels.hpp>
 
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
@@ -63,11 +62,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
           , archive_flags_(boost::archive::no_header)
           , stopped_(false)
           , bootstrapping_(true)
-          , chunk_pool_(4096, max_connections(ini))
           , max_connections_(max_connections(ini))
-          , num_connections_(0)
-          , sender_(stopped_, connections_mtx_, connections_cond_, max_connections_, num_connections_)
-          , receiver_(*this, chunk_pool_, stopped_, connections_mtx_, connections_cond_, max_connections_, num_connections_)
+          , chunk_pool_(4096, max_connections_)
+          , sender_(stopped_, max_connections_)
+          , receiver_(*this, chunk_pool_, stopped_, max_connections_)
         {
 #ifdef BOOST_BIG_ENDIAN
             std::string endian_out = get_config_entry("hpx.parcel.endian_out", "big");
@@ -197,7 +195,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
             allocator_type alloc(chunk_pool_);
             snd_buffer_type buffer(alloc);
-            encode_parcel(p, buffer, archive_flags_, this->get_max_outbound_message_size());
+            encode_parcels(&p, std::size_t(-1), buffer, archive_flags_, this->get_max_outbound_message_size());
 
             buffer.data_point_.time_ = timer.elapsed_nanoseconds();
 
@@ -240,13 +238,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         boost::atomic<bool> stopped_;
         boost::atomic<bool> bootstrapping_;
+        std::size_t const max_connections_;
 
         memory_pool_type chunk_pool_;
 
         mutex_type connections_mtx_;
         lcos::local::detail::condition_variable connections_cond_;
-        std::size_t const max_connections_;
-        std::size_t num_connections_;
         sender sender_;
         receiver receiver_;
 
