@@ -313,7 +313,8 @@ namespace hpx { namespace naming
                     boost::int64_t overflow_credit = new_credit - HPX_GLOBALCREDIT_INITIAL;
 
                     new_credit
-                        = new_credit >= HPX_GLOBALCREDIT_INITIAL ? HPX_GLOBALCREDIT_INITIAL : new_credit;
+                        = (std::min)(static_cast<boost::int64_t>(HPX_GLOBALCREDIT_INITIAL)
+                                , new_credit);
                     naming::detail::set_credit_for_gid(gid, new_credit);
                     // Account for a possible overflow ...
                     if(overflow_credit > 0)
