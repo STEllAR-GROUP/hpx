@@ -31,7 +31,6 @@ using boost::program_options::options_description;
 using boost::program_options::value;
 
 using hpx::naming::id_type;
-using hpx::actions::plain_result_action1;
 using hpx::util::high_resolution_timer;
 using hpx::init;
 using hpx::finalize;
@@ -138,7 +137,7 @@ RESULT local_file_test(test_info_type const& test_info, int const proc)
            }
        }
 
-       hpx::lcos::wait_each(futures,
+       hpx::lcos::wait_each(
                hpx::util::unwrapped([&](ssize_t rt)
                    {
                    if (rt != test_info.bufsiz)
@@ -146,7 +145,8 @@ RESULT local_file_test(test_info_type const& test_info, int const proc)
                    hpx::cerr << "loc " << hpx::get_locality_id() << " proc " << proc
                    << ": error! not writing all bytes of one block ."<<hpx::endl;
                    }
-                   }));
+                   }),
+               futures);
        end = times(&t2);
    }
    else
@@ -179,7 +179,7 @@ RESULT local_file_test(test_info_type const& test_info, int const proc)
            }
        }
 
-       hpx::lcos::wait_each(futures,
+       hpx::lcos::wait_each(
                hpx::util::unwrapped([&](std::vector<char> buf)
                    {
                    if (static_cast<ssize_t>(buf.size()) != test_info.bufsiz)
@@ -187,7 +187,7 @@ RESULT local_file_test(test_info_type const& test_info, int const proc)
                    hpx::cerr << "loc " << hpx::get_locality_id() << " proc " << proc
                    << ": error! not reading all bytes of one block ."<<hpx::endl;
                    }
-                   }));
+                   }),futures);
 
        end = times(&t2);
    }
@@ -231,11 +231,12 @@ void run_local_file_test(test_info_type const& test_info)
     }
 
     hpx::lcos::local::spinlock mtx;
-    hpx::lcos::wait_each(futures,
+    hpx::lcos::wait_each(
             hpx::util::unwrapped([&](RESULT r) {
                 hpx::lcos::local::spinlock::scoped_lock lk(mtx);
                 result_vector.push_back(r);
-                }));
+                }),
+            futures);
 
     // overall performance
     double tt = t.elapsed();
