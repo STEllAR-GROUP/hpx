@@ -10,12 +10,12 @@ add_definitions(-DHPX_IOSTREAMS_MODULE_EXPORTS)
 
 if(HPX_BUILD_DEFAULT_TARGETS)
   add_hpx_component(iostreams
-    FOLDER "Core/Components"
+    FOLDER "Core/Components/IO"
     HEADER_ROOT ${root}
     AUTOGLOB)
 else()
   add_hpx_component(iostreams
-    FOLDER "Core/Components"
+    FOLDER "Core/Components/IO"
     HEADER_ROOT ${root}
     AUTOGLOB
     EXCLUDE_FROM_ALL)
