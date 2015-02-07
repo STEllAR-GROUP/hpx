@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -28,7 +28,7 @@ namespace hpx { namespace components { namespace server
             naming::id_type const& to_migrate)
         {
             ptr->mark_as_migrated();
-            return to_migrate;
+            return f.get();
         }
 
         // trigger the actual migration
@@ -51,6 +51,7 @@ namespace hpx { namespace components { namespace server
                     "already migrated");
                 return make_ready_future(naming::invalid_id);
             }
+
             if (pin_count > 1)
             {
                 HPX_THROW_EXCEPTION(invalid_status,
@@ -79,6 +80,7 @@ namespace hpx { namespace components { namespace server
         {
             return make_ready_future(to_migrate);
         }
+
         if (!Component::supports_migration())
         {
             HPX_THROW_EXCEPTION(invalid_status,
