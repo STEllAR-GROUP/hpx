@@ -12,6 +12,7 @@ set(subdirs
     distributing_factory
     iostreams
     memory
+    migrate_to_storage
     papi_counters
     remote_object
     security

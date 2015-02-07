@@ -14,6 +14,7 @@ set(tests
     inheritance_3_classes_2_abstract
     inheritance_3_classes_concrete
     migrate_component
+    migrate_component_to_storage
     remote_object
     unordered_map
     vector_copy
@@ -65,6 +66,9 @@ set(inheritance_3_classes_concrete_FLAGS
     DEPENDENCIES iostreams_component)
 
 set(unordered_map_FLAGS DEPENDENCIES unordered_component)
+
+set(migrate_component_to_storage_FLAGS
+    DEPENDENCIES unordered_component migrate_to_storage_component)
 
 set(vector_FLAGS DEPENDENCIES vector_component)
 set(vector_algorithms_FLAGS DEPENDENCIES vector_component)
