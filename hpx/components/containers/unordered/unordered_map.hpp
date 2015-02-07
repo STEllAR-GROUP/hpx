@@ -684,6 +684,8 @@ namespace hpx
         ///
         T get_value_sync(size_type part, Key const& pos) const
         {
+            HPX_ASSERT(part < partitions_.size());
+
             partition_data const& part_data = partitions_[part];
             if (part_data.local_data_)
                 return part_data.local_data_->get_value(pos);
@@ -716,6 +718,8 @@ namespace hpx
         ///
         future<T> get_value(size_type part, Key const& pos) const
         {
+            HPX_ASSERT(part < partitions_.size());
+
             if (partitions_[part].local_data_)
             {
                 return make_ready_future(
@@ -749,6 +753,8 @@ namespace hpx
         template <typename T_>
         void set_value_sync(size_type part, Key const& pos, T_ && val)
         {
+            HPX_ASSERT(part < partitions_.size());
+
             partition_data const& part_data = partitions_[part];
             if (part_data.local_data_)
             {
@@ -789,6 +795,8 @@ namespace hpx
         template <typename T_>
         future<void> set_value(size_type part, Key const& pos, T_ && val)
         {
+            HPX_ASSERT(part < partitions_.size());
+
             partition_data const& part_data = partitions_[part];
             if (part_data.local_data_)
             {
@@ -822,6 +830,54 @@ namespace hpx
         std::size_t size() const
         {
             return size_async().get();
+        }
+
+        /// Erase all values with the given key from the partition_unordered_map
+        /// container.
+        ///
+        /// \param key   Key of the element in the partition_unordered_map
+        ///
+        /// \return Returns the number of elements erased
+        ///
+        std::size_t erase_sync(Key const& key)
+        {
+            return erase(key).get();
+        }
+
+        std::size_t erase_sync(size_type part, Key const& key)
+        {
+            HPX_ASSERT(part < partitions_.size());
+
+            partition_data const& part_data = partitions_[part];
+            if (part_data.local_data_)
+                return part_data.local_data_->erase(key);
+
+            return partition_unordered_map_client(
+                part_data.partition_).erase_sync(key);
+        }
+        /// Erase all values with the given key from the partition_unordered_map
+        /// container.
+        ///
+        /// \param key  Key of the element in the partition_unordered_map
+        ///
+        /// \return This returns the hpx::future containing the number of
+        ///         elements erased
+        ///
+        future<std::size_t> erase(Key const& key)
+        {
+            return erase(get_partition(key), key);
+        }
+
+        future<std::size_t> erase(size_type part, Key const& key)
+        {
+            HPX_ASSERT(part < partitions_.size());
+
+            partition_data const& part_data = partitions_[part];
+            if (part_data.local_data_)
+                return make_ready_future(part_data.local_data_->erase(key));
+
+            return partition_unordered_map_client(
+                part_data.partition_).erase(key);
         }
     };
 }

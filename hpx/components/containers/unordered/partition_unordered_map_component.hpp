@@ -203,6 +203,12 @@ namespace hpx { namespace server
             partition_unordered_map_.clear();
         }
 
+        /// Erase the given element
+        std::size_t erase(Key const& key)
+        {
+            return partition_unordered_map_.erase(key);
+        }
+
         /// Macros to define HPX component actions for all exported functions.
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_unordered_map, size);
 
@@ -211,6 +217,8 @@ namespace hpx { namespace server
 
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_unordered_map, set_value);
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_unordered_map, set_values);
+
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_unordered_map, erase);
     };
 }}
 
@@ -254,6 +262,9 @@ namespace hpx { namespace server
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         BOOST_PP_CAT(partition_unordered_map, __LINE__)::size_action,         \
         BOOST_PP_CAT(__unordered_map_size_action_, name));                    \
+    HPX_REGISTER_ACTION_DECLARATION(                                          \
+        BOOST_PP_CAT(partition_unordered_map, __LINE__)::erase_action,        \
+        BOOST_PP_CAT(__unordered_map_erase_action_, name));                   \
     typedef std::plus<std::size_t>                                            \
         BOOST_PP_CAT(partition_unordered_map_size_reduceop, __LINE__);        \
     typedef BOOST_PP_CAT(partition_unordered_map, __LINE__)::size_action      \
@@ -304,6 +315,9 @@ namespace hpx { namespace server
     HPX_REGISTER_ACTION(                                                      \
         BOOST_PP_CAT(partition_unordered_map, __LINE__)::size_action,         \
         BOOST_PP_CAT(__unordered_map_size_action_, name));                    \
+    HPX_REGISTER_ACTION(                                                      \
+        BOOST_PP_CAT(partition_unordered_map, __LINE__)::erase_action,        \
+        BOOST_PP_CAT(__unordered_map_erase_action_, name));                   \
     typedef std::plus<std::size_t>                                            \
         BOOST_PP_CAT(partition_unordered_map_size_reduceop, __LINE__);        \
     typedef BOOST_PP_CAT(partition_unordered_map, __LINE__)::size_action      \
@@ -489,6 +503,33 @@ namespace hpx
             HPX_ASSERT(this->get_gid());
             return hpx::async<typename server_type::set_values_action>(
                 this->get_gid(), keys, vals);
+        }
+
+        /// Erase all values with the given key from the partition_unordered_map
+        /// container.
+        ///
+        /// \param key   Key of the element in the partition_unordered_map
+        ///
+        /// \return Returns the number of elements erased
+        ///
+        std::size_t erase_sync(Key const& key)
+        {
+            return erase(key).get();
+        }
+
+        /// Erase all values with the given key from the partition_unordered_map
+        /// container.
+        ///
+        /// \param key  Key of the element in the partition_unordered_map
+        ///
+        /// \return This returns the hpx::future containing the number of
+        ///         elements erased
+        ///
+        future<std::size_t> erase(Key const& key)
+        {
+            HPX_ASSERT(this->get_gid());
+            return hpx::async<typename server_type::erase_action>(
+                this->get_gid(), key);
         }
     };
 }
