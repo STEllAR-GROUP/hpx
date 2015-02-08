@@ -447,8 +447,8 @@ namespace hpx
             {
                 boost::uint32_t locality = rhs.partitions_[i].locality_id_;
 
-                partitions.push_back(partition_data(std::move(objs[i]),
-                    rhs.partitions_[i].size_, locality));
+                partitions.push_back(partition_data(
+                    std::move(objs[i]), locality));
 
                 if (locality == this_locality)
                 {
@@ -599,7 +599,7 @@ namespace hpx
         }
 
         unordered_map(unordered_map const& rhs)
-          : base_type(), hash_base_type(rhs)
+          : hash_base_type(rhs)
         {
             copy_from(rhs);
         }
@@ -716,7 +716,8 @@ namespace hpx
         /// \return Returns the hpx::future to value of the element at position
         ///         represented by \a pos.
         ///
-        future<T> get_value(size_type part, Key const& pos, bool erase = false) const
+        future<T>
+        get_value(size_type part, Key const& pos, bool erase = false) const
         {
             HPX_ASSERT(part < partitions_.size());
 

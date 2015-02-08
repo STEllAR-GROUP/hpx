@@ -47,6 +47,11 @@ namespace hpx { namespace server
         typedef typename data_type::iterator iterator_type;
         typedef typename data_type::const_iterator const_iterator_type;
 
+        typedef components::locking_hook<
+                hpx::components::simple_component_base<
+                    partition_unordered_map<Key, T, Hash, KeyEqual> > >
+            base_type;
+
     private:
         data_type partition_unordered_map_;
 
@@ -69,6 +74,37 @@ namespace hpx { namespace server
                 KeyEqual const& equal)
           : partition_unordered_map_(bucket_count, hash, equal)
         {}
+
+        // support components::copy
+        partition_unordered_map(partition_unordered_map const& rhs)
+          : base_type(rhs),
+            partition_unordered_map_(rhs.partition_unordered_map_)
+        {}
+
+        partition_unordered_map operator=(partition_unordered_map const& rhs)
+        {
+            if (this != &rhs)
+            {
+                this->base_type::operator=(rhs);
+                partition_unordered_map_ = rhs.partition_unordered_map_;
+            }
+            return *this;
+        }
+
+        partition_unordered_map(partition_unordered_map && rhs)
+          : base_type(std::move(rhs)),
+            partition_unordered_map_(std::move(rhs.partition_unordered_map_))
+        {}
+
+        partition_unordered_map operator=(partition_unordered_map && rhs)
+        {
+            if (this != &rhs)
+            {
+                this->base_type::operator=(std::move(rhs));
+                partition_unordered_map_ = std::move(rhs.partition_unordered_map_);
+            }
+            return *this;
+        }
 
         ///////////////////////////////////////////////////////////////////////
         iterator_type begin()
