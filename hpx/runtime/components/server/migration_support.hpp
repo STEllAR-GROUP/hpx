@@ -22,13 +22,9 @@ namespace hpx { namespace components
         typedef typename base_type::this_component_type this_component_type;
 
     public:
-        migration_support()
-          : pin_count_(0)
-        {}
-
-        template <typename Arg>
-        migration_support(Arg && arg)
-          : base_type(std::forward<Arg>(arg))
+        template <typename ...Arg>
+        migration_support(Arg &&... arg)
+          : base_type(std::forward<Arg>(arg)...)
           , pin_count_(0)
         {}
 
