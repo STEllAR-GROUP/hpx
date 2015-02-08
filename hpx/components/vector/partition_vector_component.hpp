@@ -36,7 +36,8 @@ namespace hpx { namespace server
     /// functionality.
     template <typename T>
     class partition_vector
-      : public hpx::components::simple_component_base<partition_vector<T> >
+      : public components::locking_hook<
+                components::simple_component_base<partition_vector<T> > >
     {
     public:
         typedef std::vector<T> data_type;
