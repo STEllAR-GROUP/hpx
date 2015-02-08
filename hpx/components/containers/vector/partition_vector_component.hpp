@@ -46,6 +46,10 @@ namespace hpx { namespace server
         typedef typename data_type::iterator iterator_type;
         typedef typename data_type::const_iterator const_iterator_type;
 
+        typedef components::locking_hook<
+                components::simple_component_base<partition_vector<T> > >
+            base_type;
+
     private:
         data_type partition_vector_;
 
@@ -73,6 +77,37 @@ namespace hpx { namespace server
         partition_vector(size_type partition_size, T const& val)
           : partition_vector_(partition_size, val)
         {}
+
+        // support components::copy
+        partition_vector(partition_vector const& rhs)
+          : base_type(rhs),
+            partition_vector_(rhs.partition_vector_)
+        {}
+
+        partition_vector operator=(partition_vector const& rhs)
+        {
+            if (this != &rhs)
+            {
+                this->base_type::operator=(rhs);
+                partition_vector_ = rhs.partition_vector_;
+            }
+            return *this;
+        }
+
+        partition_vector(partition_vector && rhs)
+          : base_type(std::move(rhs)),
+            partition_vector_(std::move(rhs.partition_vector_))
+        {}
+
+        partition_vector operator=(partition_vector && rhs)
+        {
+            if (this != &rhs)
+            {
+                this->base_type::operator=(std::move(rhs));
+                partition_vector_ = std::move(rhs.partition_vector_);
+            }
+            return *this;
+        }
 
         ///////////////////////////////////////////////////////////////////////
         data_type& get_data()

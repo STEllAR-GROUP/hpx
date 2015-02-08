@@ -102,6 +102,12 @@ namespace hpx { namespace naming
             id_lsb_(rhs.get_lsb())
         {
         }
+        gid_type (gid_type && rhs)
+          : id_msb_(naming::detail::strip_lock_from_gid(rhs.get_msb())),
+            id_lsb_(rhs.get_lsb())
+        {
+            rhs.id_lsb_ = rhs.id_msb_ = 0;
+        }
 
         ~gid_type()
         {
@@ -123,6 +129,18 @@ namespace hpx { namespace naming
                 HPX_ASSERT(!is_locked());
                 id_msb_ = naming::detail::strip_lock_from_gid(rhs.get_msb());
                 id_lsb_ = rhs.get_lsb();
+            }
+            return *this;
+        }
+        gid_type& operator=(gid_type && rhs)
+        {
+            if (this != &rhs)
+            {
+                HPX_ASSERT(!is_locked());
+                id_msb_ = naming::detail::strip_lock_from_gid(rhs.get_msb());
+                id_lsb_ = rhs.get_lsb();
+
+                rhs.id_lsb_ = rhs.id_msb_ = 0;
             }
             return *this;
         }

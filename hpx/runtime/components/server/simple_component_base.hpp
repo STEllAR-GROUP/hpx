@@ -54,11 +54,22 @@ namespace hpx { namespace components
         }
 
         // Copy construction and copy assignment should not copy the gid_.
-        simple_component_base(simple_component_base const&)
-        {}
+        simple_component_base(simple_component_base const&) {}
 
         simple_component_base& operator=(simple_component_base const&)
         {
+            return *this;
+        }
+
+        // just move our gid_
+        simple_component_base(simple_component_base && rhs)
+          : gid_(std::move(rhs.gid_))
+        {}
+
+        simple_component_base& operator=(simple_component_base && rhs)
+        {
+            if (this != &rhs)
+                gid_ = std::move(rhs.gid_);
             return *this;
         }
 
