@@ -9,11 +9,13 @@ add_definitions(-DHPX_MIGRATE_TO_STORAGE_MODULE_EXPORTS)
 
 if(HPX_BUILD_DEFAULT_TARGETS)
   add_hpx_component(migrate_to_storage
+    DEPENDENCIES unordered_component
     FOLDER "Core/Components/IO"
     HEADER_ROOT ${root}
     AUTOGLOB)
 else()
   add_hpx_component(migrate_to_storage
+    DEPENDENCIES unordered_component
     FOLDER "Core/Components/IO"
     HEADER_ROOT ${root}
     AUTOGLOB
