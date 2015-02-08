@@ -39,7 +39,7 @@ namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_MIGRATE_TO_STORAGE_EXPORT component_storage
-      : public migration_support<simple_component_base<component_storage> >
+      : public simple_component_base<component_storage>
     {
         typedef lcos::local::spinlock mutex_type;
 
@@ -54,9 +54,6 @@ namespace hpx { namespace components { namespace server
         HPX_DEFINE_COMPONENT_ACTION(component_storage, migrate_from_here);
 
     private:
-        template <typename Archive>
-        void serialize(Archive&ar, unsigned version) {}
-
         hpx::unordered_map<naming::gid_type, std::vector<char> > data_;
     };
 }}}
