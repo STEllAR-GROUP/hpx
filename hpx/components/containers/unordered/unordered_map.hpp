@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -669,9 +669,9 @@ namespace hpx
         /// \return Returns the value of the element at position represented by
         ///         \a pos.
         ///
-        T get_value_sync(Key const& pos) const
+        T get_value_sync(Key const& pos, bool erase = false) const
         {
-            return get_value_sync(get_partition(pos), pos);
+            return get_value_sync(get_partition(pos), pos, erase);
         }
 
         /// Returns the element at position \a pos in the vector container.
@@ -682,16 +682,16 @@ namespace hpx
         /// \return Returns the value of the element at position represented by
         ///         \a pos.
         ///
-        T get_value_sync(size_type part, Key const& pos) const
+        T get_value_sync(size_type part, Key const& pos, bool erase = false) const
         {
             HPX_ASSERT(part < partitions_.size());
 
             partition_data const& part_data = partitions_[part];
             if (part_data.local_data_)
-                return part_data.local_data_->get_value(pos);
+                return part_data.local_data_->get_value(pos, erase);
 
             return partition_unordered_map_client(part_data.partition_)
-                .get_value_sync(pos);
+                .get_value_sync(pos, erase);
         }
 
         /// Returns the element at position \a pos in the vector container
@@ -702,9 +702,9 @@ namespace hpx
         /// \return Returns the hpx::future to value of the element at position
         ///         represented by \a pos.
         ///
-        future<T> get_value(Key const& pos) const
+        future<T> get_value(Key const& pos, bool erase = false) const
         {
-            return get_value(get_partition(pos), pos);
+            return get_value(get_partition(pos), pos, erase);
         }
 
         /// Returns the element at position \a pos in the given partition in
@@ -716,18 +716,18 @@ namespace hpx
         /// \return Returns the hpx::future to value of the element at position
         ///         represented by \a pos.
         ///
-        future<T> get_value(size_type part, Key const& pos) const
+        future<T> get_value(size_type part, Key const& pos, bool erase = false) const
         {
             HPX_ASSERT(part < partitions_.size());
 
             if (partitions_[part].local_data_)
             {
                 return make_ready_future(
-                    partitions_[part].local_data_->get_value(pos));
+                    partitions_[part].local_data_->get_value(pos, erase));
             }
 
             return partition_unordered_map_client(partitions_[part].partition_)
-                .get_value(pos);
+                .get_value(pos, erase);
         }
 
         /// Copy the value of \a val in the element at position \a pos in

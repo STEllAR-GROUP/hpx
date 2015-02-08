@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -36,8 +36,9 @@ namespace hpx { namespace server
     template <typename Key, typename T, typename Hash = std::hash<Key>,
         typename KeyEqual = std::equal_to<Key> >
     class partition_unordered_map
-      : public hpx::components::simple_component_base<
-            partition_unordered_map<Key, T, Hash, KeyEqual> >
+      : public components::locking_hook<
+            hpx::components::simple_component_base<
+                partition_unordered_map<Key, T, Hash, KeyEqual> > >
     {
     public:
         typedef std::unordered_map<Key, T, Hash, KeyEqual> data_type;
@@ -138,9 +139,36 @@ namespace hpx { namespace server
         /// \return Return the value of the element at position represented
         ///         by \a pos.
         ///
-        T get_value(Key const& key)
+        struct erase_on_exit
         {
-            return partition_unordered_map_[key];
+            erase_on_exit(data_type& m, typename data_type::iterator const& it)
+              : m_(m), it_(it)
+            {}
+            ~erase_on_exit()
+            {
+                m_.erase(it_);
+            }
+
+            data_type m_;
+            typename data_type::iterator it_;
+        };
+
+        T get_value(Key const& key, bool erase)
+        {
+            typename data_type::iterator it = partition_unordered_map_.find(key);
+            if (it == partition_unordered_map_.end())
+            {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "partition_unordered_map::get_value",
+                    "unable to find requested key in this partition of the "
+                    "unordered_map");
+            }
+
+            if (!erase)
+                return it->second;
+
+            erase_on_exit t(partition_unordered_map_, it);
+            return it->second;
         }
 
         /// Return the element at the position \a pos in the partition_unordered_map
@@ -403,9 +431,9 @@ namespace hpx
         /// \return Returns the value of the element at position represented
         ///         by \a pos
         ///
-        T get_value_sync(Key const& pos) const
+        T get_value_sync(Key const& pos, bool erase) const
         {
-            return get_value(pos).get();
+            return get_value(pos, erase).get();
         }
 
         /// Return the element at the position \a pos in the
@@ -415,11 +443,11 @@ namespace hpx
         ///
         /// \return This returns the value as the hpx::future
         ///
-        future<T> get_value(Key const& pos) const
+        future<T> get_value(Key const& pos, bool erase) const
         {
             HPX_ASSERT(this->get_gid());
             return hpx::async<typename server_type::get_value_action>(
-                this->get_gid(), pos);
+                this->get_gid(), pos, erase);
         }
 
         /// Returns the value at position \a pos in the partition_unordered_map
