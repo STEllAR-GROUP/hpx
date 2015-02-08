@@ -9,6 +9,7 @@
 #define HPX_PARCELSET_POLICIES_MPI_RECEIVER_HPP
 
 #include <hpx/plugins/parcelport/mpi/header.hpp>
+#include <hpx/runtime/parcelset/decode_parcels.hpp>
 
 #include <hpx/util/memory_chunk_pool.hpp>
 
@@ -71,17 +72,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         receiver(parcelport & pp, memory_pool_type & chunk_pool,
                 boost::atomic<bool> & stopped
-              , mutex_type & connections_mtx
-              , lcos::local::detail::condition_variable & connections_cond
-              , std::size_t max_connections
-              , std::size_t & num_connections)
+              , std::size_t max_connections)
           : pp_(pp)
           , chunk_pool_(chunk_pool)
           , stopped_(stopped)
-          , connections_mtx_(connections_mtx)
-          , connections_cond_(connections_cond)
           , max_connections_(max_connections)
-          , num_connections_(num_connections)
+          , num_connections_(0)
         {}
 
         void run()
@@ -99,7 +95,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
              : this_(r)
              , decrement_(false)
             {
-                mutex_type::scoped_lock l(this_->connections_mtx_);
                 if(this_->num_connections_ >= this_->max_connections_)
                     return;
                 decrement_ = true;
@@ -110,9 +105,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             {
                 if(decrement_)
                 {
-                    mutex_type::scoped_lock l(this_->connections_mtx_);
                     --this_->num_connections_;
-                    this_->connections_cond_.notify_all(l);
                 }
             }
 
@@ -329,10 +322,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         boost::atomic<bool> & stopped_;
 
-        mutex_type & connections_mtx_;
-        lcos::local::detail::condition_variable & connections_cond_;
+        mutex_type connections_mtx_;
         std::size_t const max_connections_;
-        std::size_t & num_connections_;
+        boost::atomic<std::size_t> num_connections_;
 
         void wait_done(MPI_Request *& request)
         {

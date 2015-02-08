@@ -392,9 +392,8 @@ namespace hpx { namespace lcos
         if (ids.empty())
         {
             return hpx::make_exceptional_future<action_result>(
-                    hpx::exception(hpx::bad_parameter,
-                        "array of targets is empty")
-                );
+                HPX_GET_EXCEPTION(bad_parameter, "hpx::lcos::reduce",
+                    "empty list of targets for reduce operation"));
         }
 
         return

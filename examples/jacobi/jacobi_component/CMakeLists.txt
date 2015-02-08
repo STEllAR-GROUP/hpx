@@ -4,16 +4,11 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(HPX_WITH_CXX11_LAMBDAS)
-
-  set(jacobi_component_FLAGS
-      DEPENDENCIES iostreams_component
-                      distributing_factory_component
-                      remote_object_component)
-
-  add_hpx_component(jacobi
+  add_hpx_component(jacobi_component
       AUTOGLOB
       SOURCE_GLOB "*.c*"
       HEADER_GLOB "*.h*"
       ${jacobi_component_FLAGS}
-      FOLDER "Examples/Jacobi")
+      FOLDER "Examples/Jacobi"
+      COMPONENT_DEPENDENCIES iostreams distributing_factory remote_object)
 endif()

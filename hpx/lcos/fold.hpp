@@ -362,8 +362,8 @@ namespace hpx { namespace lcos
                 std::vector<hpx::future<Result> > fres = std::move(r.get());
                 HPX_ASSERT(!fres.empty());
 
-                // we're at the beginning of the folding chain, incroporate the initial
-                // value
+                // we're at the beginning of the folding chain, incorporate the
+                // initial value
                 if (fres.size() == 1)
                     return fold_op_(init_, fres[0].get());
 
@@ -582,7 +582,7 @@ namespace hpx { namespace lcos
             return hpx::make_exceptional_future<action_result>(
                 HPX_GET_EXCEPTION(bad_parameter,
                     "hpx::lcos::inverse_fold",
-                    "empty list of targets for fold operation"));
+                    "empty list of targets for inverse_fold operation"));
         }
 
         std::vector<id_type> inverted_ids;

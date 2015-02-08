@@ -8,13 +8,18 @@ set(tests
     any_serialization
     boost_any
     bind_action
-    coordinate
     function
     parse_slurm_nodelist
     serialize_buffer
     tuple
     zero_copy_serialization
    )
+
+if(HPX_WITH_CXX11_STD_INITIALIZER_LIST)
+  set(tests ${tests}
+    coordinate
+  )
+endif()
 
 set(subdirs
     bind
