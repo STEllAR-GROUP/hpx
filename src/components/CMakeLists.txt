@@ -7,12 +7,12 @@
 
 set(subdirs
     binpacking_factory
+    component_storage
     containers
     dataflow
     distributing_factory
     iostreams
     memory
-    migrate_to_storage
     papi_counters
     remote_object
     security

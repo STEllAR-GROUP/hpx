@@ -68,7 +68,7 @@ set(inheritance_3_classes_concrete_FLAGS
 set(unordered_map_FLAGS DEPENDENCIES unordered_component)
 
 set(migrate_component_to_storage_FLAGS
-    DEPENDENCIES unordered_component migrate_to_storage_component)
+    DEPENDENCIES unordered_component component_storage_component)
 
 set(vector_FLAGS DEPENDENCIES vector_component)
 set(vector_algorithms_FLAGS DEPENDENCIES vector_component)

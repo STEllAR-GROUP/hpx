@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -11,8 +11,8 @@
 #include <hpx/include/naming.hpp>
 #include <hpx/include/util.hpp>
 
-#include <hpx/components/migrate_to_storage/export_definitions.hpp>
-#include <hpx/components/migrate_to_storage/server/component_storage.hpp>
+#include <hpx/components/component_storage/export_definitions.hpp>
+#include <hpx/components/component_storage/server/component_storage.hpp>
 
 namespace hpx { namespace components { namespace server
 {
@@ -91,7 +91,7 @@ namespace hpx { namespace components { namespace server
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "hpx::components::server::migrate_to_storage_here",
-                "attempting to migrate an instance of a component which is "
+                "attempting to migrate an instance of a component which "
                 "does not support migration");
             return make_ready_future(naming::invalid_id);
         }

@@ -12,7 +12,7 @@
 #include <hpx/include/util.hpp>
 #include <hpx/include/unordered_map.hpp>
 
-#include <hpx/components/migrate_to_storage/export_definitions.hpp>
+#include <hpx/components/component_storage/export_definitions.hpp>
 
 #include <vector>
 

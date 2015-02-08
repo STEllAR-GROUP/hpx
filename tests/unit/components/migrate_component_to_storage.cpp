@@ -7,7 +7,7 @@
 #include <hpx/include/naming.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/include/migrate_to_storage.hpp>
+#include <hpx/include/component_storage.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/atomic/atomic.hpp>
@@ -80,6 +80,8 @@ HPX_PLAIN_ACTION(get_instances);
 bool test_migrate_component_to_storage(hpx::id_type const& source,
     hpx::components::component_storage storage)
 {
+    hpx::id_type oldid;
+
     {
         // create component on given locality
         test_client t1(source);
@@ -87,6 +89,9 @@ bool test_migrate_component_to_storage(hpx::id_type const& source,
 
         // the new object should live on the source locality
         HPX_TEST_EQ(t1.call(), source);
+
+        // remember the original id for later resurrection
+        oldid = hpx::id_type(t1.get_gid().get_gid(), hpx::id_type::unmanaged);
 
         try {
             // migrate of t1 to the target storage
@@ -104,6 +109,8 @@ bool test_migrate_component_to_storage(hpx::id_type const& source,
     HPX_TEST_EQ(hpx::async<get_instances_action>(source).get(), 0);
 
     {
+        test_client t1(hpx::components::migrate_from_storage<test_server>(
+            oldid, storage));
     }
 
     return true;
