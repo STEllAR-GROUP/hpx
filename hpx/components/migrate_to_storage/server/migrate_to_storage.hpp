@@ -65,16 +65,20 @@ namespace hpx { namespace components { namespace server
 
             {
                 util::portable_binary_oarchive archive(
-                    data, boost::archive::no_header);
+                    data, (util::binary_filter*)0, boost::archive::no_header);
                 archive << ptr;
             }
 
+            naming::address addr(ptr->get_current_address());
+
             typedef typename server::component_storage::migrate_to_here_action
                 action_type;
-            return hpx::async<action_type>(target_storage, data, to_migrate)
-                .then(util::bind(
+            return hpx::async<action_type>(
+                    target_storage, std::move(data), to_migrate, addr
+                ).then(util::bind(
                     &migrate_to_storage_here_cleanup<Component>,
-                    util::placeholders::_1, ptr, to_migrate));
+                    util::placeholders::_1, ptr, to_migrate)
+                );
         }
     }
 

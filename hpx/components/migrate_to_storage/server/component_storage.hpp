@@ -47,7 +47,7 @@ namespace hpx { namespace components { namespace server
         component_storage() {}
 
         naming::gid_type migrate_to_here(std::vector<char> const&,
-            naming::id_type);
+            naming::id_type, naming::address const&);
         std::vector<char> migrate_from_here(naming::gid_type);
 
         HPX_DEFINE_COMPONENT_ACTION(component_storage, migrate_to_here);
@@ -57,7 +57,6 @@ namespace hpx { namespace components { namespace server
         template <typename Archive>
         void serialize(Archive&ar, unsigned version) {}
 
-        mutable mutex_type mtx_;
         hpx::unordered_map<naming::gid_type, std::vector<char> > data_;
     };
 }}}

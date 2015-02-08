@@ -8,22 +8,34 @@
 namespace hpx { namespace components { namespace server
 {
     naming::gid_type component_storage::migrate_to_here(
-        std::vector<char> const& data, naming::id_type id)
+        std::vector<char> const& data, naming::id_type id,
+        naming::address const& current_lva)
     {
-        mutex_type::scoped_lock l(mtx_);
         data_[id.get_gid()] = data;
 
-        id.make_unmanaged();            // we can now release the object
+        // rebind the object to this storage locality
+        naming::address addr(current_lva);
+        addr.address_ = 0;       // invalidate lva
+        if (!agas::bind_sync(id.get_gid(), addr, this->gid_))
+        {
+            std::ostringstream strm;
+            strm << "failed to rebind id " << id
+                 << "to storage locality: " << gid_;
 
+            HPX_THROW_EXCEPTION(duplicate_component_address,
+                "component_storage::migrate_to_here",
+                strm.str());
+            return naming::invalid_gid;
+        }
+
+        id.make_unmanaged();            // we can now release the object
         return naming::invalid_gid;
     }
 
     std::vector<char> component_storage::migrate_from_here(naming::gid_type id)
     {
-        mutex_type::scoped_lock l(mtx_);
-        std::vector<char> data(std::move(data_[id]));
-        data_.erase(id);
-        return data;
+        // return the stored data and erase it from the map
+        return data_.get_value_sync(id, true);
     }
 }}}
 

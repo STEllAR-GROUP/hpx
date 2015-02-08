@@ -27,11 +27,11 @@ namespace hpx { namespace components
         component_storage(hpx::id_type target_locality);
 
         hpx::future<naming::id_type> migrate_to_here(std::vector<char> const&,
-            naming::id_type);
+            naming::id_type, naming::address const&);
         hpx::future<std::vector<char> > migrate_from_here(naming::gid_type);
 
         naming::id_type migrate_to_here_sync(std::vector<char> const&,
-            naming::id_type);
+            naming::id_type, naming::address const&);
         std::vector<char> migrate_from_here_sync(naming::gid_type);
     };
 }}
