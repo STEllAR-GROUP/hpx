@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -51,14 +51,14 @@ struct HPX_EXPORT response
         namespace_action_code type_
       , naming::gid_type const& gidbase_
       , gva const& gva_
-      , boost::uint32_t locality_id_
+      , naming::gid_type locality_
       , error status_ = success
         );
 
     response(
         namespace_action_code type_
       , gva const& gva_
-      , boost::uint32_t locality_id_
+      , naming::gid_type const& locality_
       , error status_ = success
         );
 
@@ -242,6 +242,7 @@ struct get_remote_result<naming::id_type, agas::response>
         case agas::primary_ns_statistics_counter:
         case agas::component_ns_statistics_counter:
         case agas::symbol_ns_statistics_counter:
+        case agas::primary_ns_resolve_gid:
             {
                 naming::gid_type raw_gid = rep.get_gid();
 
@@ -249,12 +250,6 @@ struct get_remote_result<naming::id_type, agas::response>
                     return naming::id_type(raw_gid, naming::id_type::managed);
 
                 return naming::id_type(raw_gid, naming::id_type::unmanaged);
-            }
-
-        case agas::primary_ns_resolve_gid:
-            {
-                // return the wrapped locality_id
-                return naming::get_id_from_locality_id(rep.get_locality_id());
             }
             break;
 

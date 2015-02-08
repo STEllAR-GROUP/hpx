@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -91,13 +91,13 @@ namespace hpx { namespace agas
           , util::tuple<
                 naming::gid_type // idbase
               , gva              // gva
-              , boost::uint32_t  // prefix
+              , naming::gid_type // locality
             >
             // 0x2
             // primary_ns_unbind_gid
           , util::tuple<
                 gva              // gva
-              , boost::uint32_t  // locality_id
+              , naming::gid_type // locality
             >
             // 0x3
             // component_ns_bind_prefix
@@ -238,12 +238,12 @@ namespace hpx { namespace agas
         namespace_action_code type_
       , naming::gid_type const& gidbase_
       , gva const& gva_
-      , boost::uint32_t locality_id_
+      , naming::gid_type locality_
       , error status_
         )
       : mc(type_)
       , status(status_)
-      , data(new response_data(util::make_tuple(gidbase_, gva_, locality_id_)))
+      , data(new response_data(util::make_tuple(gidbase_, gva_, locality_)))
     {
         HPX_ASSERT(type_ == primary_ns_resolve_gid);
     }
@@ -251,12 +251,12 @@ namespace hpx { namespace agas
     response::response(
         namespace_action_code type_
       , gva const& gva_
-      , boost::uint32_t locality_id_
+      , naming::gid_type const& locality_
       , error status_
         )
       : mc(type_)
       , status(status_)
-      , data(new response_data(util::make_tuple(gva_, locality_id_)))
+      , data(new response_data(util::make_tuple(gva_, locality_)))
     {
         HPX_ASSERT(type_ == primary_ns_unbind_gid);
     }
@@ -480,7 +480,8 @@ namespace hpx { namespace agas
         switch (data->which())
         {
             case response_data::subtype_gid_gva_prefix:
-                return data->get_data<response_data::subtype_gid_gva_prefix, 2>(ec);
+                return naming::get_locality_id_from_gid(
+                    data->get_data<response_data::subtype_gid_gva_prefix, 2>(ec));
 
             case response_data::subtype_gid_gid_prefix:
                 return data->get_data<response_data::subtype_gid_gid_prefix, 2>(ec);
@@ -508,7 +509,21 @@ namespace hpx { namespace agas
         error_code& ec
         ) const
     {
-        return data->get_data<response_data::subtype_gid, 0>(ec);
+        switch (data->which())
+        {
+            case response_data::subtype_gid:
+                return data->get_data<response_data::subtype_gid, 0>(ec);
+
+            case response_data::subtype_gid_gva_prefix:
+                return data->get_data<response_data::subtype_gid_gva_prefix, 2>(ec);
+
+            default: {
+                HPX_THROWS_IF(ec, bad_parameter,
+                    "response::get_gid",
+                    "invalid operation for response type");
+                return naming::invalid_gid;
+            }
+        }
     }
 
     naming::gid_type response::get_lower_bound(

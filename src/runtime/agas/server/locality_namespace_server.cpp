@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2013 Hartmut Kaiser
+//  Copyright (c) 2012-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -359,9 +359,9 @@ response locality_namespace::allocate(
     if (primary_)
     {
         naming::gid_type id(naming::get_gid_from_locality_id(prefix));
-        const gva g(id, components::component_runtime_support, count);
+        gva const g(id, components::component_runtime_support, count);
 
-        request req(primary_ns_bind_gid, id, g, prefix);
+        request req(primary_ns_bind_gid, id, g, id);
         response resp = primary_->service(req, ec);
         if (ec) return resp;
     }
@@ -374,8 +374,7 @@ response locality_namespace::allocate(
     if (&ec != &throws)
         ec = make_success_code();
 
-    return response(locality_ns_allocate
-                  , prefix);
+    return response(locality_ns_allocate, prefix);
 } // }}}
 
 response locality_namespace::resolve_locality(

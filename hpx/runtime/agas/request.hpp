@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2015 Hartmut Kaiser
 //  Copyright (c) 2014 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -67,7 +67,7 @@ struct HPX_EXPORT request
         namespace_action_code type_
       , naming::gid_type const& gid_
       , gva const& gva_
-      , boost::uint32_t locality_
+      , naming::gid_type locality_
         );
 
     request(
@@ -169,6 +169,10 @@ struct HPX_EXPORT request
         ) const;
 
     boost::uint32_t get_locality_id(
+        error_code& ec = throws
+        ) const;
+
+    naming::gid_type get_locality(
         error_code& ec = throws
         ) const;
 
