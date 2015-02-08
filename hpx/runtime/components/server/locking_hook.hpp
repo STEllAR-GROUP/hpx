@@ -27,11 +27,9 @@ namespace hpx { namespace components
         typedef typename base_type::this_component_type this_component_type;
 
     public:
-        locking_hook() : base_type() {}
-
-        template <typename Arg>
-        locking_hook(Arg && arg)
-          : base_type(std::forward<Arg>(arg))
+        template <typename ...Arg>
+        locking_hook(Arg &&... arg)
+          : base_type(std::forward<Arg>(arg)...)
         {}
 
         /// This is the hook implementation for decorate_action which locks
