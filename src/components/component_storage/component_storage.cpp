@@ -41,4 +41,15 @@ namespace hpx { namespace components
     {
         return migrate_from_here(id).get();
     }
+
+    hpx::future<std::size_t> component_storage::size() const
+    {
+        typedef server::component_storage::size_action action_type;
+        return hpx::async<action_type>(this->get_gid());
+    }
+
+    std::size_t component_storage::size_sync() const
+    {
+        return size().get();
+    }
 }}

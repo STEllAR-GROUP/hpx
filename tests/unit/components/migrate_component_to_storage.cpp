@@ -24,20 +24,20 @@ struct test_server
     test_server() { ++count_instances; }
     ~test_server() { --count_instances; }
 
+    // Components which should be migrated using hpx::migrate<> need to
+    // be Serializable and CopyConstructable. Components can be
+    // MoveConstructable in which case the serialized data is moved into the
+    // components constructor.
+    test_server(test_server const&) { ++count_instances; }
+    test_server(test_server &&) { ++count_instances; }
+
+    test_server& operator=(test_server const&) { ++count_instances; return *this; }
+    test_server& operator=(test_server &&) { ++count_instances; return *this; }
+
     hpx::id_type call() const
     {
         return hpx::find_here();
     }
-
-    // Components which should be migrated using hpx::migrate<> need to
-    // be Serializable and CopyConstructable. Components can be
-    // MoveConstructable in which case the serialized  is moved into the
-    // components constructor.
-    test_server(test_server const& rhs) {}
-    test_server(test_server && rhs) {}
-
-    test_server& operator=(test_server const &) { return *this; }
-    test_server& operator=(test_server &&) { return *this; }
 
     HPX_DEFINE_COMPONENT_ACTION(test_server, call, call_action);
 
@@ -102,8 +102,12 @@ bool test_migrate_component_to_storage(hpx::id_type const& source,
             return false;
         }
 
+        HPX_TEST_EQ(storage.size_sync(), 1ul);
+
         // make sure all references go out of scope
     }
+
+    HPX_TEST_EQ(storage.size_sync(), 1ul);
 
     // make sure the object is not alive anymore
     HPX_TEST_EQ(hpx::async<get_instances_action>(source).get(), 0);
@@ -111,6 +115,17 @@ bool test_migrate_component_to_storage(hpx::id_type const& source,
     {
         test_client t1(hpx::components::migrate_from_storage<test_server>(
             oldid, storage));
+
+        // the id of the newly resurrected object should be the same as the old id
+        HPX_TEST_EQ(oldid, t1.get_gid());
+
+        // make sure the object is alive again
+        HPX_TEST_EQ(hpx::async<get_instances_action>(source).get(), 1);
+
+        // the new object should live on the (original) source locality
+        HPX_TEST_EQ(t1.call(), source);
+
+        HPX_TEST_EQ(storage.size_sync(), 0ul);
     }
 
     return true;

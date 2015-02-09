@@ -17,24 +17,6 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace std
-{
-    // specialize std::hash for hpx::naming::gid_type
-    template <>
-    struct hash<hpx::naming::gid_type>
-    {
-        typedef hpx::naming::gid_type argument_type;
-        typedef std::size_t result_type;
-
-        result_type operator()(argument_type const& gid) const
-        {
-            result_type const h1 (std::hash<boost::uint64_t>()(gid.get_lsb()));
-            result_type const h2 (std::hash<boost::uint64_t>()(gid.get_msb()));
-            return h1 ^ (h2 << 1);
-        }
-    };
-}
-
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -44,14 +26,16 @@ namespace hpx { namespace components { namespace server
         typedef lcos::local::spinlock mutex_type;
 
     public:
-        component_storage() {}
+        component_storage();
 
         naming::gid_type migrate_to_here(std::vector<char> const&,
             naming::id_type, naming::address const&);
         std::vector<char> migrate_from_here(naming::gid_type);
+        std::size_t size() const { return data_.size(); }
 
         HPX_DEFINE_COMPONENT_ACTION(component_storage, migrate_to_here);
         HPX_DEFINE_COMPONENT_ACTION(component_storage, migrate_from_here);
+        HPX_DEFINE_COMPONENT_ACTION(component_storage, size);
 
     private:
         hpx::unordered_map<naming::gid_type, std::vector<char> > data_;
@@ -60,10 +44,13 @@ namespace hpx { namespace components { namespace server
 
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::component_storage::migrate_to_here_action,
-    migrate_component_to_here_action);
+    component_storage_migrate_component_to_here_action);
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::component_storage::migrate_from_here_action,
-    migrate_component_from_here_action);
+    component_storage_migrate_component_from_here_action);
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::components::server::component_storage::size_action,
+    component_storage_size_action);
 
 typedef std::vector<char> hpx_component_storage_data_type;
 HPX_REGISTER_UNORDERED_MAP_DECLARATION(

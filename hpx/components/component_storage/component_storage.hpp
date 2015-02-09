@@ -33,6 +33,9 @@ namespace hpx { namespace components
         naming::id_type migrate_to_here_sync(std::vector<char> const&,
             naming::id_type, naming::address const&);
         std::vector<char> migrate_from_here_sync(naming::gid_type);
+
+        future<std::size_t> size() const;
+        std::size_t size_sync() const;
     };
 }}
 

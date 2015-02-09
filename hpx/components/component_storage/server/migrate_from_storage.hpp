@@ -19,9 +19,33 @@ namespace hpx { namespace components { namespace server
 {
     namespace detail
     {
+        template <typename Component>
+        future<naming::id_type> migrate_from_storage_here_id(
+            naming::id_type const& target_locality,
+            boost::shared_ptr<Component> ptr,
+            naming::id_type const& to_resurrect)
+        {
+            // and resurrect it on the specified locality
+            using hpx::components::runtime_support;
+            return runtime_support::migrate_component_async<Component>(
+                        target_locality, ptr, to_resurrect)
+                .then(util::bind(
+                    &detail::migrate_component_cleanup<Component>,
+                    util::placeholders::_1, ptr, to_resurrect));
+        }
+
+        template <typename Component>
+        future<naming::id_type> migrate_from_storage_here_address(
+            future<naming::address> && f, boost::shared_ptr<Component> ptr,
+            naming::id_type const& to_resurrect)
+        {
+            naming::id_type id(f.get().locality_, id_type::unmanaged);
+            return migrate_from_storage_here_id(id, ptr, to_resurrect);
+        }
+
         // convert the extracted data into a living component instance
         template <typename Component>
-        future<naming::id_type> migrate_from_storage_here_postproc(
+        future<naming::id_type> migrate_from_storage_here(
             future<std::vector<char> > f,
             naming::id_type const& to_resurrect,
             naming::id_type const& target_locality)
@@ -39,13 +63,24 @@ namespace hpx { namespace components { namespace server
             // make sure the migration code works properly
             ptr->pin();
 
-            // and resurrect it on the specified locality
-            using hpx::components::runtime_support;
-            return runtime_support::migrate_component_async<Component>(
-                        target_locality, ptr, to_resurrect)
-                .then(util::bind(
-                    &detail::migrate_component_cleanup<Component>,
-                    util::placeholders::_1, ptr, to_resurrect));
+            // if target locality is not specified, ask AGAS for the address
+            // the object was living on before
+            if (target_locality == naming::invalid_id)
+            {
+                // FIXME: This could be less efficient than possible if the
+                //        responsible AGAS locality is not the same as
+                //        the target locality where the object should be
+                //        resurrected.
+                return agas::resolve(to_resurrect).then(
+                    util::bind(
+                        &migrate_from_storage_here_address<Component>,
+                        util::placeholders::_1, ptr, to_resurrect));
+            }
+
+            // otherwise directly refer to the locality where the object should
+            // be resurrected
+            return migrate_from_storage_here_id(target_locality, ptr,
+                to_resurrect);
         }
     }
 
@@ -70,7 +105,7 @@ namespace hpx { namespace components { namespace server
             action_type;
         return async<action_type>(source_storage, to_resurrect.get_gid())
             .then(util::bind(
-                &detail::migrate_from_storage_here_postproc<Component>,
+                &detail::migrate_from_storage_here<Component>,
                 util::placeholders::_1, to_resurrect, target_locality));
     }
 

@@ -7,16 +7,22 @@
 
 namespace hpx { namespace components { namespace server
 {
+    component_storage::component_storage()
+      : data_(layout(find_all_localities()))
+    {}
+
+    ///////////////////////////////////////////////////////////////////////////
     naming::gid_type component_storage::migrate_to_here(
         std::vector<char> const& data, naming::id_type id,
         naming::address const& current_lva)
     {
-        data_[id.get_gid()] = data;
+        naming::gid_type gid(naming::detail::get_stripped_gid(id.get_gid()));
+        data_[gid] = data;
 
         // rebind the object to this storage locality
         naming::address addr(current_lva);
         addr.address_ = 0;       // invalidate lva
-        if (!agas::bind_sync(id.get_gid(), addr, this->gid_))
+        if (!agas::bind_sync(gid, addr, this->gid_))
         {
             std::ostringstream strm;
             strm << "failed to rebind id " << id
@@ -35,7 +41,7 @@ namespace hpx { namespace components { namespace server
     std::vector<char> component_storage::migrate_from_here(naming::gid_type id)
     {
         // return the stored data and erase it from the map
-        return data_.get_value_sync(id, true);
+        return data_.get_value_sync(naming::detail::get_stripped_gid(id), true);
     }
 }}}
 
