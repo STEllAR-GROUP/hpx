@@ -10,8 +10,6 @@ set(subdirs
     vector
    )
 
-add_hpx_pseudo_target(components.containers)
-
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(components.containers.${subdir})
   add_subdirectory(${subdir})
