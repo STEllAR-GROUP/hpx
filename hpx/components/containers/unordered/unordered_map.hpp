@@ -522,7 +522,7 @@ namespace hpx
         /// of the unordered_map is 0.
         unordered_map()
         {
-            create(simple_layout);
+            create(layout);
         }
 
         template <typename DistPolicy>
