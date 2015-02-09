@@ -34,7 +34,7 @@ namespace hpx
         distribution_policy operator()(
             std::vector<id_type> const& localities) const
         {
-            if (num_partitions_ == std::size_t(-1))
+            if (num_partitions_ != std::size_t(-1))
                 return distribution_policy(num_partitions_, localities);
             return distribution_policy(localities.size(), localities);
         }

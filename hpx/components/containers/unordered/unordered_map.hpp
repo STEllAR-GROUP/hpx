@@ -561,7 +561,7 @@ namespace hpx
                 Hash const& hash, std::string const& symbolic_name)
           : hash_base_type(hash, KeyEqual())
         {
-            create(bucket_count, hpx::layout, hash, equal);
+            create(bucket_count, hpx::layout, hash);
             register_as(symbolic_name).get();
         }
         unordered_map(std::size_t bucket_count,
@@ -569,7 +569,7 @@ namespace hpx
                 std::string const& symbolic_name)
           : hash_base_type(hash, equal)
         {
-            create(bucket_count, hpx::layout, hash);
+            create(bucket_count, hpx::layout, hash, equal);
             register_as(symbolic_name).get();
         }
 
