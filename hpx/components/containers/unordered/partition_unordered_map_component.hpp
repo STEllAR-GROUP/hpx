@@ -177,7 +177,7 @@ namespace hpx { namespace server
         ///
         struct erase_on_exit
         {
-            erase_on_exit(data_type& m, typename data_type::iterator const& it)
+            erase_on_exit(data_type& m, typename data_type::iterator& it)
               : m_(m), it_(it)
             {}
             ~erase_on_exit()
@@ -185,8 +185,8 @@ namespace hpx { namespace server
                 m_.erase(it_);
             }
 
-            data_type m_;
-            typename data_type::iterator it_;
+            data_type& m_;
+            typename data_type::iterator& it_;
         };
 
         T get_value(Key const& key, bool erase)

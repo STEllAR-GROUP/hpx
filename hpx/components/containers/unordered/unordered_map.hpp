@@ -333,30 +333,12 @@ namespace hpx
             partitions[loc].local_data_ = f.get();
         }
 
-        template <typename DistPolicy>
-        void create(std::vector<id_type> const& localities,
-            DistPolicy const& policy, std::size_t bucket_count,
-            Hash const& hash, KeyEqual const& equal)
+        void init(std::vector<id_type> const& localities,
+            std::vector<future<std::vector<id_type> > >& ids,
+            std::size_t num_parts_per_loc)
         {
-            std::size_t num_parts = policy.get_num_partitions();
             std::size_t num_localities = localities.size();
-            std::size_t num_parts_per_loc =
-                (num_parts + num_localities - 1) / num_localities;
 
-            // create as many partitions as required
-            std::vector<future<std::vector<id_type> > > ids;
-            ids.reserve(num_localities);
-            for (std::size_t loc = 0; loc != num_localities; ++loc)
-            {
-                // create as many partitions on a given locality as required
-                ids.push_back(
-                    partition_unordered_map_client::bulk_create_async(
-                        localities[loc], num_parts_per_loc, bucket_count,
-                        hash, equal));
-            }
-            hpx::wait_all(ids);
-
-            // now initialize our data structures
             boost::uint32_t this_locality = get_locality_id();
             std::vector<future<void> > ptrs;
 
@@ -386,22 +368,69 @@ namespace hpx
             wait_all(ptrs);
         }
 
-        // default construct a local partition
-        void create()
+        ///////////////////////////////////////////////////////////////////////
+        template <typename DistPolicy>
+        void create(std::vector<id_type> const& localities,
+            DistPolicy const& policy)
         {
-            future<boost::shared_ptr<partition_unordered_map_server> > ptr =
-                partition_unordered_map_client::create_async(find_here()).then(
-                    [this](future<id_type> && fid) ->
-                        future<boost::shared_ptr<partition_unordered_map_server> >
-                    {
-                        // now initialize our data structures
-                        id_type id = fid.get();
-                        boost::uint32_t locality = naming::get_locality_id_from_id(id);
-                        partitions_.push_back(partition_data(id, locality));
-                        return hpx::get_ptr<partition_unordered_map_server>(id);
-                    });
+            std::size_t num_parts = policy.get_num_partitions();
+            std::size_t num_localities = localities.size();
+            std::size_t num_parts_per_loc =
+                (num_parts + num_localities - 1) / num_localities;
 
-            partitions_[0].local_data_ = ptr.get();
+            // create as many partitions as required
+            std::vector<future<std::vector<id_type> > > ids;
+            ids.reserve(num_localities);
+            for (std::size_t loc = 0; loc != num_localities; ++loc)
+            {
+                // create as many partitions on a given locality as required
+                ids.push_back(
+                    partition_unordered_map_client::bulk_create_async(
+                        localities[loc], num_parts_per_loc));
+            }
+            hpx::wait_all(ids);
+
+            // now initialize our data structures
+            init(localities, ids, num_parts_per_loc);
+        }
+
+        // default construct a local partition
+        template <typename DistPolicy>
+        void create(DistPolicy const& policy)
+        {
+            std::vector<id_type> const& localities = policy.get_localities();
+            if (localities.empty())
+                create(std::vector<id_type>(1, find_here()), policy);
+            else
+                create(localities, policy);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename DistPolicy>
+        void create(std::vector<id_type> const& localities,
+            DistPolicy const& policy, std::size_t bucket_count,
+            Hash const& hash, KeyEqual const& equal)
+        {
+            std::size_t num_parts = policy.get_num_partitions();
+            std::size_t num_localities = localities.size();
+            std::size_t num_parts_per_loc =
+                (num_parts + num_localities - 1) / num_localities;
+
+            // create as many partitions as required
+            std::vector<future<std::vector<id_type> > > ids;
+            ids.reserve(num_localities);
+            for (std::size_t loc = 0; loc != num_localities; ++loc)
+            {
+                // create as many partitions on a given locality as required
+                ids.push_back(
+                    partition_unordered_map_client::bulk_create_async(
+                        localities[loc], num_parts_per_loc, bucket_count,
+                        hash, equal));
+            }
+            hpx::wait_all(ids);
+
+            // now initialize our data structures
+            init(localities, ids, num_parts_per_loc);
         }
 
         // This function is called when we are creating the vector. It
@@ -493,7 +522,26 @@ namespace hpx
         /// of the unordered_map is 0.
         unordered_map()
         {
-            create();
+            create(simple_layout);
+        }
+
+        template <typename DistPolicy>
+        unordered_map(DistPolicy const& policy,
+                typename std::enable_if<
+                        is_unordered_distribution_policy<DistPolicy>::value
+                    >::type* = 0)
+        {
+            create(policy);
+        }
+        template <typename DistPolicy>
+        unordered_map(DistPolicy const& policy,
+                std::string const& symbolic_name,
+                typename std::enable_if<
+                        is_unordered_distribution_policy<DistPolicy>::value
+                    >::type* = 0)
+        {
+            create(policy);
+            register_as(symbolic_name).get();
         }
 
         explicit unordered_map(std::size_t bucket_count,
