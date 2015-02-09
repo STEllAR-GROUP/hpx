@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2010 Hartmut Kaiser
+# Copyright (c) 2007-2015 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2013 Jeroen Habraken
 #
@@ -10,7 +10,7 @@ set(subdirs
     vector
    )
 
-add_hpx_pseudo_target(components)
+add_hpx_pseudo_target(components.containers)
 
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(components.containers.${subdir})
