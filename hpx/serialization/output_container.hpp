@@ -18,6 +18,7 @@
 #include <vector>
 
 namespace hpx { namespace serialization {
+
     template <typename Container>
     struct output_container
       : container
@@ -179,6 +180,7 @@ namespace hpx { namespace serialization {
         std::vector<serialization_chunk>* chunks_;
         std::size_t current_chunk_;
     };
+
 }}
 
 #endif

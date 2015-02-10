@@ -151,9 +151,47 @@ namespace hpx { namespace serialization {
             load_binary(&b, sizeof(bool));
         }
 
-        void load_impl(boost::int64_t & l);
-        void load_impl(boost::uint64_t & ul);
-        void load_binary(void * address, std::size_t count);
+        void load_impl(boost::int64_t & l)
+        {
+            const std::size_t size = sizeof(boost::int64_t);
+            char* cptr = reinterpret_cast<char *>(&l);
+            load_binary(cptr, static_cast<std::size_t>(size));
+
+#ifdef BOOST_BIG_ENDIAN
+            if (endian_little())
+                reverse_bytes(size, cptr);
+#else
+            if (endian_big())
+                reverse_bytes(size, cptr);
+#endif
+        }
+
+        void load_impl(boost::uint64_t & ul)
+        {
+            const std::size_t size = sizeof(boost::uint64_t);
+            char* cptr = reinterpret_cast<char *>(&ul);
+            load_binary(cptr, static_cast<std::size_t>(size));
+
+#ifdef BOOST_BIG_ENDIAN
+            if (endian_little())
+                reverse_bytes(size, cptr);
+#else
+            if (endian_big())
+                reverse_bytes(size, cptr);
+#endif
+        }
+
+        void load_binary(void * address, std::size_t count)
+        {
+            if (0 == count) return;
+
+            if(disable_data_chunking())
+              buffer_->load_binary(address, count);
+            else
+              buffer_->load_binary_chunk(address, count);
+
+            size_ += count;
+        }
 
         std::size_t bytes_read() const
         {
@@ -179,13 +217,18 @@ namespace hpx { namespace serialization {
         pointer_tracker pointer_tracker_;
     };
 
-    void register_pointer(input_archive & ar, std::size_t pos, HPX_STD_UNIQUE_PTR<detail::ptr_helper> helper);
+    BOOST_FORCEINLINE
+    void register_pointer(input_archive & ar, std::size_t pos, HPX_STD_UNIQUE_PTR<detail::ptr_helper> helper)
+    {
+        ar.register_pointer(pos, std::move(helper));
+    }
 
     template <typename Helper>
       Helper & tracked_pointer(input_archive & ar, std::size_t pos)
     {
         return ar.tracked_pointer<Helper>(pos);
     }
+
 }}
 
 #endif

@@ -19,6 +19,7 @@
 #include <boost/utility/enable_if.hpp>
 
 namespace hpx { namespace serialization {
+
     struct HPX_ALWAYS_EXPORT output_archive
       : archive<output_archive>
     {
@@ -147,9 +148,45 @@ namespace hpx { namespace serialization {
             save_binary(&b, sizeof(bool));
         }
 
-        void save_impl(boost::int64_t t);
-        void save_impl(boost::uint64_t t);
-        void save_binary(void const * address, std::size_t count);
+        void save_impl(boost::int64_t l)
+        {
+            const std::size_t size = sizeof(boost::int64_t);
+            char* cptr = reinterpret_cast<char *>(&l);
+#ifdef BOOST_BIG_ENDIAN
+            if(endian_little())
+                reverse_bytes(size, cptr);
+#else
+            if(endian_big())
+                reverse_bytes(size, cptr);
+#endif
+
+            save_binary(cptr, size);
+        }
+
+        void save_impl(boost::uint64_t ul)
+        {
+            const std::size_t size = sizeof(boost::uint64_t);
+            char* cptr = reinterpret_cast<char*>(&ul);
+
+#ifdef BOOST_BIG_ENDIAN
+            if(endian_little())
+                reverse_bytes(size, cptr);
+#else
+            if(endian_big())
+                reverse_bytes(size, cptr);
+#endif
+
+            save_binary(cptr, size);
+        }
+
+        void save_binary(void const * address, std::size_t count)
+        {
+            size_ += count;
+            if(disable_data_chunking())
+              buffer_->save_binary(address, count);
+            else
+              buffer_->save_binary_chunk(address, count);
+        }
 
         std::size_t track_pointer(void * p)
         {
@@ -176,7 +213,12 @@ namespace hpx { namespace serialization {
         boost::uint32_t dest_locality_id_;
     };
 
-    std::size_t track_pointer(output_archive & ar, void * pos);
+    BOOST_FORCEINLINE
+    std::size_t track_pointer(output_archive & ar, void * pos)
+    {
+        return ar.track_pointer(pos);
+    }
+
 }}
 
 #endif
