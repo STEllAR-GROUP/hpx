@@ -66,7 +66,8 @@ set(inheritance_3_classes_concrete_FLAGS
     DEPENDENCIES iostreams_component)
 
 set(unordered_map_FLAGS
-    DEPENDENCIES unordered_component
+    DEPENDENCIES unordered_component)
+set(unordered_map_PARAMETERS
     LOCALITIES 2
     THREADS_PER_LOCALITY 2)
 
