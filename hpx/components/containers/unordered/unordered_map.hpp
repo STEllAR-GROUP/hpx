@@ -342,8 +342,6 @@ namespace hpx
             boost::uint32_t this_locality = get_locality_id();
             std::vector<future<void> > ptrs;
 
-            std::size_t num_part = 0;
-            std::size_t allocated_size = 0;
             for (std::size_t loc = 0; loc != num_localities; ++loc)
             {
                 boost::uint32_t locality =
