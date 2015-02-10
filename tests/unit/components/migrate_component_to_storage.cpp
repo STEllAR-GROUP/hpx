@@ -102,15 +102,15 @@ bool test_migrate_component_to_storage(hpx::id_type const& source,
             return false;
         }
 
-        HPX_TEST_EQ(storage.size_sync(), 1ul);
+        HPX_TEST_EQ(storage.size_sync(), std::size_t(1));
 
         // make sure all references go out of scope
     }
 
-    HPX_TEST_EQ(storage.size_sync(), 1ul);
+    HPX_TEST_EQ(storage.size_sync(), std::size_t(1));
 
     // make sure the object is not alive anymore
-    HPX_TEST_EQ(hpx::async<get_instances_action>(source).get(), 0);
+    HPX_TEST_EQ(hpx::async<get_instances_action>(source).get(), std::size_t(0));
 
     {
         test_client t1(hpx::components::migrate_from_storage<test_server>(
@@ -120,12 +120,12 @@ bool test_migrate_component_to_storage(hpx::id_type const& source,
         HPX_TEST_EQ(oldid, t1.get_gid());
 
         // make sure the object is alive again
-        HPX_TEST_EQ(hpx::async<get_instances_action>(source).get(), 1);
+        HPX_TEST_EQ(hpx::async<get_instances_action>(source).get(), std::size_t(1));
 
         // the new object should live on the (original) source locality
         HPX_TEST_EQ(t1.call(), source);
 
-        HPX_TEST_EQ(storage.size_sync(), 0ul);
+        HPX_TEST_EQ(storage.size_sync(), std::size_t(0));
     }
 
     return true;
@@ -145,12 +145,10 @@ void test_storage(hpx::id_type const& here, hpx::id_type const& there)
 int main()
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
-    BOOST_FOREACH(hpx::id_type const& id, localities)
+    for(hpx::id_type const& id: localities)
     {
         test_storage(hpx::find_here(), id);
-
-//         HPX_TEST(test_migrate_component(hpx::find_here(), id));
-//         HPX_TEST(test_migrate_component(id, hpx::find_here()));
+        test_storage(id, hpx::find_here());
     }
 
     return hpx::util::report_errors();
