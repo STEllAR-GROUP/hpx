@@ -13,26 +13,22 @@
 #include <boost/atomic/atomic.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<std::size_t> count_instances(0);
-
-///////////////////////////////////////////////////////////////////////////////
 struct test_server
   : hpx::components::migration_support<
         hpx::components::simple_component_base<test_server>
     >
 {
-    test_server() { ++count_instances; }
-    ~test_server() { --count_instances; }
+    test_server() {}
 
     // Components which should be migrated using hpx::migrate<> need to
     // be Serializable and CopyConstructable. Components can be
     // MoveConstructable in which case the serialized data is moved into the
     // components constructor.
-    test_server(test_server const&) { ++count_instances; }
-    test_server(test_server &&) { ++count_instances; }
+    test_server(test_server const&) {}
+    test_server(test_server &&) {}
 
-    test_server& operator=(test_server const&) { ++count_instances; return *this; }
-    test_server& operator=(test_server &&) { ++count_instances; return *this; }
+    test_server& operator=(test_server const&) { return *this; }
+    test_server& operator=(test_server &&) { return *this; }
 
     hpx::id_type call() const
     {
@@ -69,14 +65,6 @@ struct test_client
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-std::size_t get_instances()
-{
-    return count_instances;
-}
-
-HPX_PLAIN_ACTION(get_instances);
-
-///////////////////////////////////////////////////////////////////////////////
 bool test_migrate_component_to_storage(hpx::id_type const& source,
     hpx::components::component_storage storage)
 {
@@ -109,18 +97,12 @@ bool test_migrate_component_to_storage(hpx::id_type const& source,
 
     HPX_TEST_EQ(storage.size_sync(), std::size_t(1));
 
-    // make sure the object is not alive anymore
-    HPX_TEST_EQ(hpx::async<get_instances_action>(source).get(), std::size_t(0));
-
     {
         test_client t1(hpx::components::migrate_from_storage<test_server>(
             oldid, storage));
 
         // the id of the newly resurrected object should be the same as the old id
         HPX_TEST_EQ(oldid, t1.get_gid());
-
-        // make sure the object is alive again
-        HPX_TEST_EQ(hpx::async<get_instances_action>(source).get(), std::size_t(1));
 
         // the new object should live on the (original) source locality
         HPX_TEST_EQ(t1.call(), source);
