@@ -11,12 +11,12 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
+#include <hpx/serialization/serialize.hpp>
 
 #include <hpx/components/vector/distribution_policy.hpp>
 #include <hpx/components/vector/partition_vector_component.hpp>
 
 #include <boost/cstdint.hpp>
-#include <boost/serialization/serialization.hpp>
 
 namespace hpx { namespace server
 {
@@ -95,20 +95,20 @@ namespace hpx { namespace server
 
 ///////////////////////////////////////////////////////////////////////////////
 // Non-intrusive serialization.
-namespace boost { namespace serialization
+namespace hpx { namespace serialization
 {
     HPX_COMPONENT_EXPORT void
-    serialize(hpx::util::portable_binary_iarchive& ar,
+    serialize(input_archive& ar,
         hpx::server::vector_configuration::partition_data& cfg, unsigned int const);
     HPX_COMPONENT_EXPORT void
-    serialize(hpx::util::portable_binary_oarchive& ar,
+    serialize(output_archive& ar,
         hpx::server::vector_configuration::partition_data& cfg, unsigned int const);
 
     HPX_COMPONENT_EXPORT void
-    serialize(hpx::util::portable_binary_iarchive& ar,
+    serialize(input_archive& ar,
         hpx::server::vector_configuration::config_data& cfg, unsigned int const);
     HPX_COMPONENT_EXPORT void
-    serialize(hpx::util::portable_binary_oarchive& ar,
+    serialize(output_archive& ar,
         hpx::server::vector_configuration::config_data& cfg, unsigned int const);
 }}
 

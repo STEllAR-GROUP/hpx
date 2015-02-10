@@ -167,6 +167,12 @@ namespace hpx { namespace actions
             plain_result_action0, Derived
         >::type derived_type;
 
+        template <class T>
+        void serialize(T& t, unsigned)
+        {
+          std::cout << "serialization make action" << std::endl;
+        }
+
         typedef boost::mpl::false_ direct_execution;
     };
 

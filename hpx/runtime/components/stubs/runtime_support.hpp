@@ -25,8 +25,6 @@
 #include <boost/preprocessor/inc.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 
-#include <boost/serialization/vector.hpp>
-
 namespace hpx { namespace components { namespace stubs
 {
     ///////////////////////////////////////////////////////////////////////////

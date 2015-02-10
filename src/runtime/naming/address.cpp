@@ -5,14 +5,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/address.hpp>
-
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/export.hpp>
-#include <boost/serialization/is_bitwise_serializable.hpp>
-#include <boost/serialization/array.hpp>
+#include <hpx/serialization/serialize.hpp>
 
 #include <boost/mpl/bool.hpp>
 
@@ -26,7 +19,7 @@ namespace hpx { namespace naming { namespace detail
     };
 }}}
 
-namespace boost { namespace serialization
+namespace hpx { namespace traits
 {
     template <>
     struct is_bitwise_serializable<
@@ -41,7 +34,7 @@ namespace hpx { namespace naming
     template <typename Archive>
     void address::save(Archive& ar, const unsigned int version) const
     {
-        if (ar.flags() & util::disable_array_optimization) {
+        if (ar.flags() & serialization::disable_array_optimization) {
             ar << locality_ << type_ << address_ << offset_;
         }
         else {
@@ -65,7 +58,7 @@ namespace hpx { namespace naming
                 "trying to load address with unknown version");
         }
 
-        if (ar.flags() & util::disable_array_optimization) {
+        if (ar.flags() & serialization::disable_array_optimization) {
             ar >> locality_ >> type_ >> address_ >> offset_;
         }
         else {
@@ -80,8 +73,8 @@ namespace hpx { namespace naming
     }
 
     template HPX_EXPORT
-    void address::save(util::portable_binary_oarchive&, const unsigned int) const;
+    void address::save(serialization::output_archive&, const unsigned int) const;
 
     template HPX_EXPORT
-    void address::load(util::portable_binary_iarchive&, const unsigned int);
+    void address::load(serialization::input_archive&, const unsigned int);
 }}

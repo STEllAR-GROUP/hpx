@@ -5,37 +5,35 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/vector.hpp>
 
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <hpx/components/vector/vector_configuration.hpp>
 
-#include <boost/serialization/vector.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace serialization
+namespace hpx { namespace serialization
 {
     ///////////////////////////////////////////////////////////////////////////
     // Implement the serialization functions.
-    void serialize(hpx::util::portable_binary_iarchive& ar,
+    void serialize(input_archive& ar,
         hpx::server::vector_configuration::partition_data& pd, unsigned int const)
     {
         ar & pd.partition_ & pd.size_ & pd.locality_id_;
     }
-    void serialize(hpx::util::portable_binary_oarchive& ar,
+    void serialize(output_archive& ar,
         hpx::server::vector_configuration::partition_data& pd, unsigned int const)
     {
         ar & pd.partition_ & pd.size_ & pd.locality_id_;
     }
 
-    void serialize(hpx::util::portable_binary_iarchive& ar,
+    void serialize(input_archive& ar,
         hpx::server::vector_configuration::config_data& cfg, unsigned int const)
     {
         ar & cfg.size_ & cfg.block_size_ & cfg.partitions_ & cfg.policy_;
     }
-    void serialize(hpx::util::portable_binary_oarchive& ar,
+    void serialize(output_archive& ar,
         hpx::server::vector_configuration::config_data& cfg, unsigned int const)
     {
         ar & cfg.size_ & cfg.block_size_ & cfg.partitions_ & cfg.policy_;

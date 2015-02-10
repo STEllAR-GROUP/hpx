@@ -16,9 +16,11 @@
 #include <boost/fusion/iterator/equal_to.hpp>
 #include <boost/fusion/include/is_sequence.hpp>
 
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/array.hpp>
-#include <boost/serialization/is_bitwise_serializable.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/vector.hpp>
+#include <hpx/serialization/map.hpp>
+#include <hpx/traits/is_bitwise_serializable.hpp>
+//#include <hpx/util/serialize_buffer.hpp>
 
 namespace hpx { namespace util
 {
@@ -39,7 +41,10 @@ namespace hpx { namespace util
             template <typename Archive, typename Element>
             static void serialize_element(Archive & ar, Element & e, boost::mpl::true_)
             {
-                ar & boost::serialization::make_array(&e, 1);;
+                //hpx::util::serialize_buffer<Element> buf(&e, 1,
+                    //hpx::util::serialize_buffer<Element>::reference);
+                //ar & buf;
+                static_assert(true, ""); // TODO:bikineev
             }
 
             template <typename Archive, typename Element>
@@ -47,10 +52,10 @@ namespace hpx { namespace util
             {
                 typedef typename boost::remove_const<Element>::type element_type;
                 typedef typename
-                    boost::serialization::is_bitwise_serializable<element_type>::type
+                    hpx::traits::is_bitwise_serializable<element_type>::type
                 predicate;
 
-                if(ar.flags() & disable_array_optimization)
+                if(ar.disable_array_optimization())
                 {
                     serialize_element(ar, e, boost::mpl::false_());
                 }
@@ -121,7 +126,10 @@ namespace hpx { namespace util
         inline void
         serialize_sequence(Archive& ar, Sequence& seq, boost::mpl::true_)
         {
-            ar & boost::serialization::make_array(&seq, 1);
+            //hpx::util::serialize_buffer<Element> buf(&seq, 1,
+                //hpx::util::serialize_buffer<Element>::reference);
+            //ar & buf;
+            static_assert(true, ""); // TODO
         }
     }
 
@@ -132,10 +140,10 @@ namespace hpx { namespace util
     {
         typedef typename boost::remove_const<Sequence>::type sequence_type;
         typedef typename
-            boost::serialization::is_bitwise_serializable<sequence_type>::type
+            hpx::traits::is_bitwise_serializable<sequence_type>::type
         predicate;
 
-        if(ar.flags() & disable_array_optimization)
+        if(ar.disable_array_optimization())
         {
             detail::serialize_sequence(ar, seq, boost::mpl::false_());
         }

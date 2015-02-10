@@ -19,8 +19,6 @@
 #endif
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/detail/serialization_registration.hpp>
 #include <hpx/runtime/actions/guid_initialization.hpp>
 #include <hpx/util/assert.hpp>
@@ -29,6 +27,7 @@
 #include <hpx/util/move.hpp>
 #include <hpx/util/void_cast.hpp>
 #include <hpx/traits/supports_streaming_with_any.hpp>
+#include <hpx/serialization/serialize.hpp>
 
 #include <boost/config.hpp>
 #include <boost/type_traits/is_reference.hpp>
@@ -39,11 +38,6 @@
 #include <boost/mpl/bool.hpp>
 #include <boost/detail/sp_typeinfo.hpp>
 #include <boost/functional/hash.hpp>
-
-#include <boost/serialization/utility.hpp>
-#include <boost/serialization/base_object.hpp>
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/tracking.hpp>
 
 #include <stdexcept>
 #include <typeinfo>
@@ -100,6 +94,8 @@ namespace hpx { namespace util
 
             template <typename Archive>
             void serialize(Archive & ar, unsigned) {}
+
+            HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(fxn_ptr_table);
         };
 
         // function pointer table
@@ -340,8 +336,11 @@ namespace hpx { namespace util
             template <typename Archive>
             void serialize(Archive & ar, unsigned)
             {
-                ar & boost::serialization::base_object<base_type>(*this);
+                hpx::serialization::base_object_type<fxn_ptr, base_type> base =
+                    hpx::serialization::base_object<base_type>(*this);
+                ar & base;
             }
+            HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE(fxn_ptr);
         };
 
         template <typename Vtable, typename Char>
@@ -435,36 +434,37 @@ namespace hpx { namespace util
     }} // namespace hpx::util::detail::any
 }}  // namespace hpx::util
 
+//TODO:bikineev
 ///////////////////////////////////////////////////////////////////////////////
 // Make sure any serialization is properly initialized
-HPX_SERIALIZATION_REGISTER_TEMPLATE(
-    (template <typename IArchive, typename OArchive, typename Vtable, typename Char>)
-  , (hpx::util::detail::any::fxn_ptr<IArchive, OArchive, Vtable, Char>)
-)
+//HPX_SERIALIZATION_REGISTER_TEMPLATE(
+    //(template <typename IArchive, typename OArchive, typename Vtable, typename Char>)
+  //, (hpx::util::detail::any::fxn_ptr<IArchive, OArchive, Vtable, Char>)
+//)
 
 ///////////////////////////////////////////////////////////////////////////////
 // disable tracking for function pointer table
-namespace boost { namespace serialization
-{
-    template <typename IArchive, typename OArchive, typename Char>
-    struct tracking_level<
-            hpx::util::detail::any::fxn_ptr_table<IArchive, OArchive, Char> >
-      : boost::mpl::int_<boost::serialization::track_never>
-    {};
+//namespace boost { namespace serialization
+//{
+    //template <typename IArchive, typename OArchive, typename Char>
+    //struct tracking_level<
+            //hpx::util::detail::any::fxn_ptr_table<IArchive, OArchive, Char> >
+      //: boost::mpl::int_<boost::serialization::track_never>
+    //{};
 
-    template <typename IArchive, typename OArchive, typename Vtable, typename Char>
-    struct tracking_level<
-            hpx::util::detail::any::fxn_ptr<IArchive, OArchive, Vtable, Char> >
-      : boost::mpl::int_<boost::serialization::track_never>
-    {};
-}}
+    //template <typename IArchive, typename OArchive, typename Vtable, typename Char>
+    //struct tracking_level<
+            //hpx::util::detail::any::fxn_ptr<IArchive, OArchive, Vtable, Char> >
+      //: boost::mpl::int_<boost::serialization::track_never>
+    //{};
+//}}
 
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
     template <
-        typename IArchive = portable_binary_iarchive,
-        typename OArchive = portable_binary_oarchive,
+        typename IArchive = serialization::input_archive,
+        typename OArchive = serialization::output_archive,
         typename Char = char>
     class basic_any
     {
@@ -685,7 +685,7 @@ namespace hpx { namespace util
 
     private:
 
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         void load(IArchive &ar, const unsigned version)
         {
@@ -717,7 +717,7 @@ namespace hpx { namespace util
             }
         }
 
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
+        HPX_SERIALIZATION_SPLIT_MEMBER();
 
 #ifndef BOOST_NO_MEMBER_TEMPLATE_FRIENDS
     private: // types
@@ -1041,8 +1041,8 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////////
     // backwards compatibility
-    typedef basic_any<portable_binary_iarchive, portable_binary_oarchive, char> any;
-    typedef basic_any<portable_binary_iarchive, portable_binary_oarchive, wchar_t> wany;
+    typedef basic_any<serialization::input_archive, serialization::output_archive, char> any;
+    typedef basic_any<serialization::input_archive, serialization::output_archive, wchar_t> wany;
 
     typedef basic_any<void, void, char> any_nonser;
     typedef basic_any<void, void, wchar_t> wany_nonser;
@@ -1087,15 +1087,17 @@ namespace hpx { namespace util
     {
         template <typename Char>
         size_t operator()(const basic_any<
-                portable_binary_iarchive, portable_binary_oarchive, Char
+                serialization::input_archive,
+                serialization::output_archive,
+                Char
             > &elem) const
         {
             detail::hash_binary_filter hasher;
 
             {
                 std::vector<char> data;
-                portable_binary_oarchive ar (
-                        data, &hasher, boost::archive::no_header);
+                serialization::output_archive ar (
+                        data, boost::archive::no_header, ~0U, 0, &hasher);
                 ar << elem;
             }  // let archive go out of scope
 

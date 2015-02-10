@@ -7,17 +7,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/util/polymorphic_factory.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-#include <hpx/util/serialize_intrusive_ptr.hpp>
 #include <hpx/util/stringstream.hpp>
-
-#include <boost/serialization/string.hpp>
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/export.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/array.hpp>
-#include <boost/serialization/shared_ptr.hpp>
+#include <hpx/serialization/intrusive_ptr.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
@@ -42,7 +33,7 @@ namespace hpx { namespace parcelset
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
-        void parcel_data::save(util::portable_binary_oarchive& ar,
+        void parcel_data::save(serialization::output_archive& ar,
             bool has_source_id, bool has_continuation) const
         {
             // If we have a source id, serialize it.
@@ -50,7 +41,7 @@ namespace hpx { namespace parcelset
                 ar << source_id_;
 
             std::string action_name = action_->get_action_name();
-            ar.save(action_name);
+            ar << action_name;
 
             action_->save(ar);
 
@@ -64,7 +55,7 @@ namespace hpx { namespace parcelset
             }
         }
 
-        void parcel_data::load(util::portable_binary_iarchive& ar,
+        void parcel_data::load(serialization::input_archive& ar,
             bool has_source_id, bool has_continuation)
         {
             // Check for a source id.
@@ -91,7 +82,7 @@ namespace hpx { namespace parcelset
 
         ///////////////////////////////////////////////////////////////////////
         void single_destination_parcel_data::save_optimized(
-            util::portable_binary_oarchive& ar) const
+            serialization::output_archive& ar) const
         {
             data_.has_source_id_ = source_id_ != naming::invalid_id;
 
@@ -103,7 +94,7 @@ namespace hpx { namespace parcelset
         }
 
         void single_destination_parcel_data::save_normal(
-            util::portable_binary_oarchive& ar) const
+            serialization::output_archive& ar) const
         {
             data_.has_source_id_ = source_id_ != naming::invalid_id;
 
@@ -119,9 +110,9 @@ namespace hpx { namespace parcelset
         }
 
         void single_destination_parcel_data::save(
-            util::portable_binary_oarchive& ar) const
+            serialization::output_archive& ar) const
         {
-            if (ar.flags() & util::disable_array_optimization)
+            if (ar.disable_array_optimization())
                 save_normal(ar);
             else
                 save_optimized(ar);
@@ -129,7 +120,7 @@ namespace hpx { namespace parcelset
 
         ///////////////////////////////////////////////////////////////////////
         void single_destination_parcel_data::load_optimized(
-            util::portable_binary_iarchive & ar)
+            serialization::input_archive & ar)
         {
             ar.load(data_);
             ar >> dest_ >> addr_;
@@ -139,7 +130,7 @@ namespace hpx { namespace parcelset
         }
 
         void single_destination_parcel_data::load_normal(
-            util::portable_binary_iarchive & ar)
+            serialization::input_archive & ar)
         {
             ar >> data_.parcel_id_;
             ar >> data_.start_time_ >> data_.creation_time_;
@@ -153,9 +144,9 @@ namespace hpx { namespace parcelset
         }
 
         void single_destination_parcel_data::load(
-            util::portable_binary_iarchive& ar)
+            serialization::input_archive& ar)
         {
-            if (ar.flags() & util::disable_array_optimization)
+            if (ar.disable_array_optimization())
                 load_normal(ar);
             else
                 load_optimized(ar);
@@ -164,7 +155,7 @@ namespace hpx { namespace parcelset
         ///////////////////////////////////////////////////////////////////////
 #if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
         void multi_destination_parcel_data::save_optimized(
-            util::portable_binary_oarchive& ar) const
+            serialization::output_archive& ar) const
         {
             data_.has_source_id_ = source_id_ != naming::invalid_id;
 
@@ -176,7 +167,7 @@ namespace hpx { namespace parcelset
         }
 
         void multi_destination_parcel_data::save_normal(
-            util::portable_binary_oarchive& ar) const
+            serialization::output_archive& ar) const
         {
             data_.has_source_id_ = source_id_ != naming::invalid_id;
 
@@ -191,7 +182,7 @@ namespace hpx { namespace parcelset
         }
 
         void multi_destination_parcel_data::save(
-            util::portable_binary_oarchive& ar) const
+            serialization::output_archive& ar) const
         {
             if (ar.flags() & util::disable_array_optimization)
                 save_normal(ar);
@@ -201,7 +192,7 @@ namespace hpx { namespace parcelset
 
         ///////////////////////////////////////////////////////////////////////
         void multi_destination_parcel_data::load_optimized(
-            util::portable_binary_iarchive& ar)
+            serialization::input_archive& ar)
         {
             ar.load(data_);
             ar >> dests_ >> addrs_;
@@ -211,7 +202,7 @@ namespace hpx { namespace parcelset
         }
 
         void multi_destination_parcel_data::load_normal(
-            util::portable_binary_iarchive& ar)
+            serialization::input_archive& ar)
         {
             ar >> data_.parcel_id_;
             ar >> data_.start_time_ >> data_.creation_time_;
@@ -224,7 +215,7 @@ namespace hpx { namespace parcelset
         }
 
         void multi_destination_parcel_data::load(
-            util::portable_binary_iarchive& ar)
+            serialization::input_archive& ar)
         {
             if (ar.flags() & util::disable_array_optimization)
                 load_normal(ar);
@@ -256,7 +247,7 @@ namespace hpx { namespace parcelset
 #endif
     }
 
-    void parcel::save(util::portable_binary_oarchive& ar,
+    void parcel::save(serialization::output_archive& ar,
         const unsigned int version) const
     {
         HPX_ASSERT(data_.get() != 0);
@@ -279,7 +270,7 @@ namespace hpx { namespace parcelset
         }
     }
 
-    void parcel::load(util::portable_binary_iarchive& ar,
+    void parcel::load(serialization::input_archive& ar,
         const unsigned int version)
     {
         if (version > HPX_PARCEL_VERSION)

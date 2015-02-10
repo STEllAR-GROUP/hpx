@@ -7,6 +7,7 @@
 #ifndef HPX_UTIL_BIND_HPP
 #define HPX_UTIL_BIND_HPP
 
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_bind_expression.hpp>
 #include <hpx/traits/is_callable.hpp>
@@ -16,8 +17,6 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/move.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/detail/pack.hpp>
@@ -487,12 +486,12 @@ namespace hpx { namespace traits
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace serialization
+namespace hpx { namespace serialization
 {
     // serialization of the bound object
     template <typename F, typename BoundArgs>
     void serialize(
-        ::hpx::util::portable_binary_iarchive& ar
+        ::hpx::serialization::input_archive& ar
       , ::hpx::util::detail::bound<F, BoundArgs>& bound
       , unsigned int const /*version*/)
     {
@@ -502,7 +501,7 @@ namespace boost { namespace serialization
 
     template <typename F, typename BoundArgs>
     void serialize(
-        ::hpx::util::portable_binary_oarchive& ar
+        ::hpx::serialization::output_archive& ar
       , ::hpx::util::detail::bound<F, BoundArgs>& bound
       , unsigned int const /*version*/)
     {
@@ -513,7 +512,7 @@ namespace boost { namespace serialization
     // serialization of the bound object
     template <typename F>
     void serialize(
-        ::hpx::util::portable_binary_iarchive& ar
+        ::hpx::serialization::input_archive& ar
       , ::hpx::util::detail::one_shot_wrapper<F>& one_shot_wrapper
       , unsigned int const /*version*/)
     {
@@ -523,7 +522,7 @@ namespace boost { namespace serialization
 
     template <typename F>
     void serialize(
-        ::hpx::util::portable_binary_oarchive& ar
+        ::hpx::serialization::output_archive& ar
       , ::hpx::util::detail::one_shot_wrapper<F>& one_shot_wrapper
       , unsigned int const /*version*/)
     {
@@ -534,14 +533,14 @@ namespace boost { namespace serialization
     // serialization of placeholders is trivial, just provide empty functions
     template <std::size_t I>
     void serialize(
-        ::hpx::util::portable_binary_iarchive& ar
+        ::hpx::serialization::input_archive& ar
       , ::hpx::util::detail::placeholder<I>& bound
       , unsigned int const /*version*/)
     {}
 
     template <std::size_t I>
     void serialize(
-        ::hpx::util::portable_binary_oarchive& ar
+        ::hpx::serialization::output_archive& ar
       , ::hpx::util::detail::placeholder<I>& bound
       , unsigned int const /*version*/)
     {}

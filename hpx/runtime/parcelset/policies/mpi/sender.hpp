@@ -9,6 +9,7 @@
 
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
+#include <hpx/serialization/serialization_chunk.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
@@ -258,7 +259,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 return recv_ack();
             }
 
-            util::serialization_chunk & c = buffer_->chunks_[sent_chunks_];
+            serialization::serialization_chunk & c = buffer_->chunks_[sent_chunks_];
             ++sent_chunks_;
 
 

@@ -5,6 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/lcos/local/detail/invoke_when_ready.hpp>
 
 #include <hpx/parallel/algorithm.hpp>
@@ -80,7 +81,7 @@ struct sub_block
         return data_[i];
     }
 
-    void load(hpx::util::portable_binary_iarchive & ar, unsigned version)
+    void load(hpx::serialization::input_archive & ar, unsigned version)
     {
         ar & size_;
         if(size_ > 0)
@@ -92,7 +93,7 @@ struct sub_block
         }
     }
 
-    void save(hpx::util::portable_binary_oarchive & ar, unsigned version) const
+    void save(hpx::serialization::output_archive & ar, unsigned version) const
     {
         ar & size_;
         if(size_ > 0)
@@ -102,7 +103,7 @@ struct sub_block
         }
     }
 
-    BOOST_SERIALIZATION_SPLIT_MEMBER()
+    HPX_SERIALIZATION_SPLIT_MEMBER()
 
     boost::uint64_t size_;
     double * data_;

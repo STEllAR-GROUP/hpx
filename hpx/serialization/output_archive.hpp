@@ -13,6 +13,9 @@
 #include <hpx/serialization/output_container.hpp>
 #include <hpx/serialization/polymorphic_nonintrusive_factory.hpp>
 
+#include <boost/mpl/or.hpp>
+#include <boost/type_traits/is_integral.hpp>
+#include <boost/type_traits/is_enum.hpp>
 #include <boost/utility/enable_if.hpp>
 
 namespace hpx { namespace serialization {
@@ -23,15 +26,25 @@ namespace hpx { namespace serialization {
         typedef std::map<void *, std::size_t> pointer_tracker;
 
         template <typename Container>
-        static HPX_STD_UNIQUE_PTR<container> make_container(Container & buffer)
+        static HPX_STD_UNIQUE_PTR<container> make_container(
+            Container & buffer,
+            std::vector<serialization_chunk>* chunks = 0,
+            util::binary_filter* filter = 0)
         {
-            return HPX_STD_UNIQUE_PTR<container>(new output_container<Container>(buffer));
+            return HPX_STD_UNIQUE_PTR<container>(
+                new output_container<Container>(buffer, chunks, filter));
         }
 
         template <typename Container>
-        output_archive(Container & buffer)
-          : base_type(0, make_container(buffer))
-        {}
+        output_archive(Container & buffer,
+          boost::uint32_t flags = 0U,
+          boost::uint32_t dest_locality_id = ~0U,
+          std::vector<serialization_chunk>* chunks = 0,
+          util::binary_filter* filter = 0)
+          : base_type(make_container(buffer, chunks, filter), flags),
+            dest_locality_id_(dest_locality_id)
+        {
+        }
 
         template <typename T>
         void invoke_impl(T const & t)
@@ -41,7 +54,10 @@ namespace hpx { namespace serialization {
 
         template <typename T>
         typename boost::disable_if<
-            boost::is_integral<T>
+            boost::mpl::or_<
+                boost::is_integral<T>
+              , boost::is_enum<T>
+            >
         >::type
         save(T const & t)
         {
@@ -56,19 +72,21 @@ namespace hpx { namespace serialization {
                 hpx::traits::is_nonintrusive_polymorphic<T>());
         }
 
+        //think about remaining this commented stuff below
+        //and adding new free function save_bitwise
         template <typename T>
         void save_bitwise(T const & t, boost::mpl::true_)
         {
             BOOST_STATIC_ASSERT_MSG(!boost::is_abstract<T>::value,
                 "Can not bitwise serialize a class that is abstract");
-            if(disable_array_optimization())
-            {
-                serialize(*this, const_cast<T &>(t), 0);
-            }
-            else
-            {
+            //if(disable_array_optimization()) //TODO
+            //{
+                //serialize(*this, const_cast<T &>(t), 0);
+            //}
+            //else
+            //{
                 save_binary(&t, sizeof(t));
-            }
+            //}
         }
 
         template <typename T>
@@ -85,7 +103,10 @@ namespace hpx { namespace serialization {
 
         template <typename T>
         typename boost::enable_if<
-            boost::is_integral<T>
+            boost::mpl::or_<
+                boost::is_integral<T>
+              , boost::is_enum<T>
+            >
         >::type
         save(T t)
         {
@@ -141,7 +162,18 @@ namespace hpx { namespace serialization {
             return it->second;
         }
 
+        boost::uint32_t get_dest_locality_id() const
+        {
+          return dest_locality_id_;
+        }
+
+        std::size_t bytes_written() const
+        {
+          return size_;
+        }
+
         pointer_tracker pointer_tracker_;
+        boost::uint32_t dest_locality_id_;
     };
 
     std::size_t track_pointer(output_archive & ar, void * pos);

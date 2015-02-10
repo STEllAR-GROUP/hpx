@@ -17,8 +17,7 @@
 #include <new>
 
 #include <boost/cstdint.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/split_member.hpp>
+#include <hpx/serialization/serialize.hpp>
 
 namespace hpx { namespace util { namespace numerics
 {
@@ -122,9 +121,9 @@ namespace hpx { namespace util { namespace numerics
         void    bit (unsigned int n, bool val) throw ();
 
     private:
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
+        HPX_SERIALIZATION_SPLIT_MEMBER()
 
         template <typename Archive>
         void save(Archive& ar, const unsigned int version) const;

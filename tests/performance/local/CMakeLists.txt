@@ -102,6 +102,7 @@ set(benchmarks ${benchmarks}
     function_object_wrapper_overhead
     coroutines_call_overhead
     serialization_overhead
+    serialization_overhead_master
     future_overhead
     sizeof
    )

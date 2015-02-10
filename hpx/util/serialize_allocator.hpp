@@ -7,18 +7,18 @@
 #define HPX_UTIL_SERIALIZE_ALLOCATOR_FEB_19_2014_0711PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <boost/serialization/serialization.hpp>
+#include <hpx/serialization/serialize.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace serialization
+namespace hpx { namespace serialization
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Archive, typename T>
-    void save(Archive& ar, std::allocator<T> const&, unsigned int) {}
+    void save(Archive&, std::allocator<T> const&, unsigned int) {}
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Archive, typename T>
-    void load(Archive& ar, std::allocator<T>&, unsigned int) {}
+    void load(Archive&, std::allocator<T>&, unsigned int) {}
 }}
 
 #endif

@@ -1,4 +1,5 @@
 //  Copyright (c) 2014 Thomas Heller
+//  Copyright (c) 2015 Anton Bikineev
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -60,7 +61,7 @@ namespace hpx { namespace serialization {
     {
         static const std::size_t npos = -1;
 
-        archive(boost::uint32_t flags, HPX_STD_UNIQUE_PTR<container> buffer)
+        archive(HPX_STD_UNIQUE_PTR<container> buffer, boost::uint32_t flags)
           : flags_(flags)
           , buffer_(std::move(buffer))
           , size_(0)
@@ -108,7 +109,17 @@ namespace hpx { namespace serialization {
             return flags_ & hpx::serialization::disable_data_chunking;
         }
 
-        boost::uint64_t flags_;
+        boost::uint32_t flags() const
+        {
+            return flags_;
+        }
+
+        void set_filter(util::binary_filter* filter)
+        {
+            buffer_->set_filter(filter);
+        }
+
+        boost::uint32_t flags_;
         HPX_STD_UNIQUE_PTR<container> buffer_;
         std::size_t size_;
     };

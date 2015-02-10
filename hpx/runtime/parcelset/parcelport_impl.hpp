@@ -108,12 +108,12 @@ namespace hpx { namespace parcelset
             }
 
             if (!this->allow_array_optimizations()) {
-                archive_flags_ |= util::disable_array_optimization;
-                archive_flags_ |= util::disable_data_chunking;
+                archive_flags_ |= serialization::disable_array_optimization;
+                archive_flags_ |= serialization::disable_data_chunking;
             }
             else {
                 if (!this->allow_zero_copy_optimizations())
-                    archive_flags_ |= util::disable_data_chunking;
+                    archive_flags_ |= serialization::disable_data_chunking;
             }
         }
 

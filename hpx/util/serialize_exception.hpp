@@ -47,7 +47,7 @@ namespace hpx { namespace util
 }}  // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace serialization
+namespace hpx { namespace serialization
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Archive>
@@ -58,6 +58,11 @@ namespace boost { namespace serialization
     void load(Archive& ar, boost::exception_ptr& e, unsigned int);
 }}
 
-BOOST_SERIALIZATION_SPLIT_FREE(boost::exception_ptr)
+namespace hpx { namespace traits {
+
+  template <>
+  struct is_bitwise_serializable<boost::exception_ptr>: boost::mpl::true_ {};
+
+}}
 
 #endif

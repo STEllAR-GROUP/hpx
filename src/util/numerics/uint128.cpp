@@ -13,11 +13,6 @@
 #include <cmath>
 #include <algorithm>
 
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-
-#include <boost/serialization/serialization.hpp>
-
 // IMPLEMENTATION
 
 namespace hpx { namespace util { namespace numerics
@@ -363,10 +358,8 @@ namespace hpx { namespace util { namespace numerics
         ar & lo_ & hi_;
     }
 
-    template void uint128::save<util::portable_binary_oarchive>(
-        util::portable_binary_oarchive& ar, const unsigned int version) const;
-    template void uint128::save<util::portable_binary_iarchive>(
-        util::portable_binary_iarchive& ar, const unsigned int version) const;
+    template void uint128::save<serialization::output_archive>(
+        serialization::output_archive& ar, const unsigned int version) const;
 
     template <typename Archive>
     void uint128::load(Archive& ar, const unsigned int version)
@@ -378,9 +371,7 @@ namespace hpx { namespace util { namespace numerics
         lo = lo_;
     }
 
-    template void uint128::load<util::portable_binary_oarchive>(
-        util::portable_binary_oarchive& ar, const unsigned int version);
-    template void uint128::load<util::portable_binary_iarchive>(
-        util::portable_binary_iarchive& ar, const unsigned int version);
+    template void uint128::load<serialization::input_archive>(
+        serialization::input_archive& ar, const unsigned int version);
 }}}
 

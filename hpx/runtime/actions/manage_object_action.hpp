@@ -9,16 +9,18 @@
 
 #include <cstring>
 #include <boost/config.hpp>
-#include <boost/serialization/serialization.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/util/void_cast.hpp>
 #include <hpx/util/base_object.hpp>
 #include <hpx/util/reinitializable_static.hpp>
+#include <hpx/util/serialize_buffer.hpp>
+
+#define HPX_SINGLE_ARG(...) __VA_ARGS__
+#define HPX_COMMA ,
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
@@ -31,8 +33,8 @@ namespace hpx { namespace actions
         typedef void (*assign_function)(void*, void const*, std::size_t);
         typedef void (*destruct_function)(void*);
 
-        typedef util::portable_binary_oarchive oarchive_type;
-        typedef util::portable_binary_iarchive iarchive_type;
+        typedef serialization::output_archive oarchive_type;
+        typedef serialization::input_archive iarchive_type;
 
         typedef void (*serialize_save_function)(
             boost::uint8_t const*, std::size_t, oarchive_type&,
@@ -59,15 +61,17 @@ namespace hpx { namespace actions
             oarchive_type& ar, const unsigned int,
             boost::uint8_t const*)
         {
-            using boost::serialization::make_array;
-            ar << make_array(data, size);
+            typedef hpx::util::serialize_buffer<boost::uint8_t> buffer_type;
+            buffer_type buf = buffer_type(data, size, buffer_type::reference);
+            ar << buf;
         }
         static void load_(boost::uint8_t* data, std::size_t size,
             iarchive_type& ar, const unsigned int,
             boost::uint8_t const*)
         {
-            using boost::serialization::make_array;
-            ar >> make_array(data, size);
+            typedef hpx::util::serialize_buffer<boost::uint8_t> buffer_type;
+            buffer_type buf = buffer_type(data, size, buffer_type::reference);
+            ar >> buf;
         }
 
     public:
@@ -108,10 +112,12 @@ namespace hpx { namespace actions
 
     private:
         // serialization support, just serialize the type
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template<class Archive>
         void serialize(Archive&, const unsigned int) {}
+
+        HPX_SERIALIZATION_POLYMORPHIC(manage_object_action_base);
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -202,18 +208,24 @@ namespace hpx { namespace actions
         /// serialization support
         static void register_base()
         {
+            // TODO:bikineev: should be deleted
             util::void_cast_register_nonvirt<manage_object_action, manage_object_action_base>();
         }
 
     private:
         // serialization support, just serialize the type
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template<class Archive>
         void serialize(Archive& ar, const unsigned int)
         {
-            ar & util::base_object_nonvirt<manage_object_action_base>(*this);
+            //ar & util::base_object_nonvirt<manage_object_action<T> >(*this);
+            hpx::serialization::base_object_type<
+              manage_object_action<T, void>, manage_object_action_base> base(*this);
+            ar & base;
         }
+
+        HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE(manage_object_action);
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -225,18 +237,24 @@ namespace hpx { namespace actions
         /// serialization support
         static void register_base()
         {
+            // TODO:bikineev: should be deleted
             util::void_cast_register_nonvirt<manage_object_action, manage_object_action_base>();
         }
 
     private:
         // serialization support, just serialize the type
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template<class Archive>
         void serialize(Archive& ar, const unsigned int)
         {
-            ar & util::base_object_nonvirt<manage_object_action_base>(*this);
+            //ar & util::base_object_nonvirt<manage_object_action<T> >(*this);
+            hpx::serialization::base_object_type<
+              manage_object_action<boost::uint8_t>, manage_object_action_base> base(*this);
+            ar & base;
         }
+
+        HPX_SERIALIZATION_POLYMORPHIC(manage_object_action);
     };
 
     inline manage_object_action_base const&
@@ -303,25 +321,32 @@ namespace hpx { namespace actions
         /// serialization support
         static void register_base()
         {
+            // TODO:bikineev: should be deleted
             util::void_cast_register_nonvirt<manage_object_action, manage_object_action<T> >();
             manage_object_action<T>::register_base();
         }
 
     private:
         // serialization support, just serialize the type
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template<class Archive>
         void serialize(Archive& ar, const unsigned int)
         {
-            ar & util::base_object_nonvirt<manage_object_action<T> >(*this);
+            //ar & util::base_object_nonvirt<manage_object_action<T> >(*this);
+            hpx::serialization::base_object_type<
+              manage_object_action<T, Config>, manage_object_action<T> > base(*this);
+            ar & base;
         }
+
+        HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE(manage_object_action);
     };
 }}
 
+//TODO:bikineev
 #define HPX_REGISTER_MANAGE_OBJECT_ACTION(object_action, name)                \
-        BOOST_CLASS_EXPORT(object_action)                                     \
-        HPX_REGISTER_BASE_HELPER(object_action, name)                         \
+        //BOOST_CLASS_EXPORT(object_action)                                     \
+        //HPX_REGISTER_BASE_HELPER(object_action, name)                         \
     /***/
 
 #include <hpx/config/warnings_suffix.hpp>

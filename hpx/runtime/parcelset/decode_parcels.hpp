@@ -8,7 +8,8 @@
 #define HPX_PARCELSET_DECODE_PARCELS_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/portable_binary_archive.hpp>
+
+#include <hpx/serialization/serialize.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/components/security/hash.hpp>
@@ -21,6 +22,8 @@
 #include <boost/shared_ptr.hpp>
 
 #include <vector>
+
+// TODO:bikineev: delete chunks stuff
 
 #if defined(HPX_HAVE_SECURITY)
 namespace hpx
@@ -101,16 +104,16 @@ namespace hpx { namespace parcelset
     template <typename Parcelport, typename Buffer>
     void decode_message(Parcelport & pp,
         boost::shared_ptr<Buffer> buffer,
-        std::vector<util::serialization_chunk> const *chunks,
+        std::vector<serialization::serialization_chunk> const *chunks,
         bool first_message = false)
     {
         unsigned archive_flags = boost::archive::no_header;
         if (!pp.allow_array_optimizations()) {
-            archive_flags |= util::disable_array_optimization;
-            archive_flags |= util::disable_data_chunking;
+            archive_flags |= serialization::disable_array_optimization;
+            archive_flags |= serialization::disable_data_chunking;
         }
         else if (!pp.allow_zero_copy_optimizations()) {
-            archive_flags |= util::disable_data_chunking;
+            archive_flags |= serialization::disable_data_chunking;
         }
         boost::uint64_t inbound_data_size = buffer->data_size_;
 
@@ -125,8 +128,8 @@ namespace hpx { namespace parcelset
 
                 {
                     // De-serialize the parcel data
-                    util::portable_binary_iarchive archive(buffer->data_,
-                        chunks, inbound_data_size, archive_flags);
+                    serialization::input_archive archive(buffer->data_,
+                        archive_flags, chunks, inbound_data_size);
 
                     std::size_t parcel_count = 0;
                     archive >> parcel_count; //-V128
@@ -222,14 +225,14 @@ namespace hpx { namespace parcelset
     void decode_parcels_impl(
         Parcelport & parcelport
       , boost::shared_ptr<Buffer> buffer
-      , boost::shared_ptr<std::vector<util::serialization_chunk> > chunks
+      , boost::shared_ptr<std::vector<serialization::serialization_chunk> > chunks
       , bool first_message)
     {
-        std::vector<util::serialization_chunk> *chunks_ = 0;
+        std::vector<serialization::serialization_chunk> *chunks_ = 0;
         if(chunks) chunks_ = chunks.get();
 
 #if defined(HPX_HAVE_SECURITY)
-        decode_message(parcelport, buffer, chunks_, first_message);
+s       decode_message(parcelport, buffer, chunks_, first_message);
 #else
         decode_message(parcelport, buffer, chunks_);
 #endif
@@ -247,10 +250,10 @@ namespace hpx { namespace parcelset
             static_cast<std::size_t>(
                 static_cast<boost::uint32_t>(buffer->num_chunks_.first));
 
-        boost::shared_ptr<std::vector<util::serialization_chunk> > chunks;
+        boost::shared_ptr<std::vector<serialization::serialization_chunk> > chunks;
         if (num_zero_copy_chunks != 0) {
             // decode chunk information
-            chunks = boost::make_shared<std::vector<util::serialization_chunk> >();
+            chunks = boost::make_shared<std::vector<serialization::serialization_chunk> >();
 
             std::size_t num_non_zero_copy_chunks =
                 static_cast<std::size_t>(
@@ -266,7 +269,7 @@ namespace hpx { namespace parcelset
 
                 HPX_ASSERT(buffer->chunks_[i].size() == second);
 
-                (*chunks)[first] = util::create_pointer_chunk(
+                (*chunks)[first] = serialization::create_pointer_chunk(
                         buffer->chunks_[i].data(), second);
             }
 
@@ -283,7 +286,7 @@ namespace hpx { namespace parcelset
                     ++index;
 
                 // place the index based chunk at the right spot
-                (*chunks)[index] = util::create_index_chunk(first, second);
+                (*chunks)[index] = serialization::create_index_chunk(first, second);
                 ++index;
             }
 #if defined(HPX_DEBUG)

@@ -41,7 +41,8 @@
             std::pair<                                                        \
                 function_vtable_ptr<                                          \
                     Sig                                                       \
-                  , portable_binary_iarchive, portable_binary_oarchive        \
+                  , ::hpx::serialization::input_archive                       \
+                  , ::hpx::serialization::output_archive                      \
                 >                                                             \
               , util::decay<HPX_UTIL_STRIP(Functor)>::type                    \
             >                                                                 \

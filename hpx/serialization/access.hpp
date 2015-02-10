@@ -29,7 +29,7 @@ namespace hpx { namespace serialization {
 
   } // namespace detail
 
-  struct access
+  class access
   {
     template <class T>
     class serialize_dispatcher
@@ -85,6 +85,7 @@ namespace hpx { namespace serialization {
       >::type type;
     };
 
+  public:
     template <class Archive, class T>
     static void serialize(Archive& ar, T& t, unsigned)
     {
@@ -108,7 +109,7 @@ namespace hpx { namespace serialization {
     }
 
     template <typename T> BOOST_FORCEINLINE
-    static const char* get_name(const T* t)
+    static std::string get_name(const T* t)
     {
       return t->hpx_serialization_get_name();
     }

@@ -33,8 +33,8 @@ set(subdirs
   set(subdirs ${subdirs}
      1d_stencil
      diskperf
-     tuplespace
-     transpose
+     #tuplespace
+     #transpose
       )
 endif()
 

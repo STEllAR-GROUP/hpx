@@ -201,11 +201,11 @@ namespace hpx { namespace actions
         virtual char const* get_continuation_name() const = 0;
 
         // serialization support
-        virtual void load(hpx::util::portable_binary_iarchive& ar)
+        virtual void load(serialization::input_archive& ar)
         {
             ar >> gid_;
         }
-        virtual void save(hpx::util::portable_binary_oarchive& ar) const
+        virtual void save(serialization::output_archive& ar) const
         {
             ar << gid_;
         }
@@ -274,7 +274,7 @@ namespace hpx { namespace actions
 
     private:
         // serialization support
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         BOOST_FORCEINLINE void serialize(Archive& ar, unsigned int const)
@@ -324,7 +324,7 @@ namespace hpx { namespace actions
 
     private:
         // serialization support
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         BOOST_FORCEINLINE void serialize(Archive& ar, unsigned int const)
@@ -408,7 +408,7 @@ namespace hpx { namespace actions
         }
 
         /// serialization support
-        void load(hpx::util::portable_binary_iarchive& ar)
+        void load(serialization::input_archive& ar)
         {
             // serialize base class
             typedef continuation base_type;
@@ -420,7 +420,7 @@ namespace hpx { namespace actions
             if (have_function)
                 ar >> f_;
         }
-        void save(hpx::util::portable_binary_oarchive& ar) const
+        void save(serialization::output_archive& ar) const
         {
             // serialize base class
             typedef continuation base_type;
@@ -430,7 +430,7 @@ namespace hpx { namespace actions
             bool have_function = !f_.empty();
             ar.save(have_function);
             if (have_function)
-                ar << f_;
+                ar << f_; //TODO:should give error;
         }
 
         util::function<void(naming::id_type, Result)> f_;
@@ -524,7 +524,7 @@ namespace hpx { namespace actions
         }
 
         /// serialization support
-        void load(hpx::util::portable_binary_iarchive& ar)
+        void load(serialization::input_archive& ar)
         {
             // serialize base class
             typedef continuation base_type;
@@ -536,7 +536,7 @@ namespace hpx { namespace actions
             if (have_function)
                 ar >> f_;
         }
-        void save(hpx::util::portable_binary_oarchive& ar) const
+        void save(serialization::output_archive& ar) const
         {
             // serialize base class
             typedef continuation base_type;

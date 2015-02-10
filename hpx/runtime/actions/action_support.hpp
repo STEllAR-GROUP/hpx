@@ -17,6 +17,7 @@
 #include <hpx/config/function.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/void_guard.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_stacksize.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
@@ -29,6 +30,7 @@
 #include <hpx/traits/action_schedule_thread.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_future.hpp>
+#include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/traits/type_size.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -58,9 +60,9 @@
 #include <boost/fusion/include/transform_view.hpp>
 #include <boost/ref.hpp>
 #include <boost/foreach.hpp>
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/is_bitwise_serializable.hpp>
-#include <boost/serialization/array.hpp>
+//#include <boost/serialization/access.hpp>
+//#include <boost/serialization/is_bitwise_serializable.hpp>
+//#include <boost/serialization/array.hpp>
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/type_traits/is_convertible.hpp>
@@ -90,7 +92,7 @@ namespace hpx { namespace actions { namespace detail
     };
 }}}
 
-namespace boost { namespace serialization
+namespace hpx { namespace traits
 {
     template <>
     struct is_bitwise_serializable<
@@ -304,8 +306,8 @@ namespace hpx { namespace actions
         /// Return whether the embedded action is part of termination detection
         virtual bool does_termination_detection() const = 0;
 
-        virtual void load(hpx::util::portable_binary_iarchive & ar) = 0;
-        virtual void save(hpx::util::portable_binary_oarchive & ar) const = 0;
+        virtual void load(serialization::input_archive & ar) = 0;
+        virtual void save(serialization::output_archive & ar) const = 0;
 
         /// Wait for embedded futures to become ready
         virtual void wait_for_futures() = 0;
@@ -741,14 +743,14 @@ namespace hpx { namespace actions
         }
 
         // serialization support
-        void load(hpx::util::portable_binary_iarchive & ar)
+        void load(serialization::input_archive & ar)
         {
             util::serialize_sequence(ar, arguments_);
 
             // Always serialize the parent information to maintain binary
             // compatibility on the wire.
 
-            if (ar.flags() & util::disable_array_optimization) {
+            if (ar.disable_array_optimization()) {
 #if !defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
                 boost::uint32_t parent_locality_ = naming::invalid_locality_id;
                 boost::uint64_t parent_id_ = boost::uint64_t(-1);
@@ -763,7 +765,7 @@ namespace hpx { namespace actions
             }
             else {
                 detail::action_serialization_data data;
-                ar.load(data);
+                ar.load(data); //TODO
 
 #if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
                 parent_id_ = data.parent_id_;
@@ -775,7 +777,7 @@ namespace hpx { namespace actions
             }
         }
 
-        void save(hpx::util::portable_binary_oarchive & ar) const
+        void save(serialization::output_archive & ar) const
         {
             util::serialize_sequence(ar, arguments_);
 
@@ -787,7 +789,7 @@ namespace hpx { namespace actions
             boost::uint64_t parent_id_ = boost::uint64_t(-1);
             boost::uint64_t parent_phase_ = 0;
 #endif
-            if (ar.flags() & util::disable_array_optimization) {
+            if (ar.disable_array_optimization()) {
                 ar << parent_locality_;
                 ar << parent_id_;
                 ar << parent_phase_;
@@ -913,7 +915,7 @@ namespace hpx { namespace actions
 
     private:
         // serialization support
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         BOOST_FORCEINLINE void serialize(Archive& ar, const unsigned int) {}
@@ -1003,6 +1005,7 @@ namespace hpx { namespace actions
 #include <hpx/config/warnings_suffix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
+//TODO:bikineev should be useless
 #define HPX_REGISTER_BASE_HELPER(action, actionname)                          \
     hpx::actions::detail::register_base_helper<action>                        \
             BOOST_PP_CAT(                                                     \

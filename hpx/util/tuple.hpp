@@ -11,6 +11,8 @@
 #define HPX_UTIL_TUPLE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/serialize_sequence.hpp>
@@ -36,7 +38,6 @@
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/repeat.hpp>
 #include <boost/ref.hpp>
-#include <boost/serialization/is_bitwise_serializable.hpp>
 #include <boost/type_traits/add_const.hpp>
 #include <boost/type_traits/add_cv.hpp>
 #include <boost/type_traits/add_volatile.hpp>
@@ -773,16 +774,20 @@ namespace hpx { namespace util
 
 #include <hpx/util/detail/fusion_adapt_tuple.hpp>
 
-namespace boost { namespace serialization
+namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename ...Ts>
     struct is_bitwise_serializable<
         ::hpx::util::tuple<Ts...>
     > : ::hpx::util::detail::all_of< ::hpx::util::detail::pack<
-            boost::serialization::is_bitwise_serializable<Ts>...
+            hpx::traits::is_bitwise_serializable<Ts>...
         > >
     {};
+
+}}
+
+namespace hpx { namespace serialization {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Archive, typename ...Ts>

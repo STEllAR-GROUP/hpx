@@ -11,9 +11,8 @@
 #include <hpx/util/serialize_sequence.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
-
-#include <boost/serialization/vector.hpp>
 
 #include <boost/variant.hpp>
 #include <boost/mpl/at.hpp>
@@ -688,10 +687,10 @@ namespace hpx { namespace agas
     struct save_visitor : boost::static_visitor<void>
     {
       private:
-        hpx::util::portable_binary_oarchive& ar;
+        hpx::serialization::output_archive& ar;
 
       public:
-        save_visitor(hpx::util::portable_binary_oarchive& ar_)
+        save_visitor(hpx::serialization::output_archive& ar_)
           : ar(ar_)
         {}
 
@@ -705,7 +704,7 @@ namespace hpx { namespace agas
         }
     };
 
-    void request::save(hpx::util::portable_binary_oarchive& ar, const unsigned int) const
+    void request::save(serialization::output_archive& ar, const unsigned int) const
     { // {{{
         // TODO: versioning?
         int which = data->which();
@@ -727,7 +726,7 @@ namespace hpx { namespace agas
         }                                                                     \
     /**/
 
-    void request::load(hpx::util::portable_binary_iarchive& ar, const unsigned int)
+    void request::load(serialization::input_archive& ar, const unsigned int)
     { // {{{
         // TODO: versioning
         int which = -1;

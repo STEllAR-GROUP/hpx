@@ -14,13 +14,13 @@
 #include <hpx/runtime/components/server/wrapper_heap_list.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/shared_ptr.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/stringstream.hpp>
 
 #include <boost/noncopyable.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/array.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
 
@@ -271,7 +271,7 @@ namespace hpx { namespace components
         /// \note Serializing memory_blocks is not platform independent as
         ///       such things as endianess, alignment, and data type sizes are
         ///       not considered.
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         ///////////////////////////////////////////////////////////////////////
         template <class Archive>
@@ -280,9 +280,10 @@ namespace hpx { namespace components
             server::detail::memory_block_header* config = 0)
         {
             std::size_t size = data->get_size();
-            actions::manage_object_action_base* act =
+            boost::shared_ptr<actions::manage_object_action_base> act( //TODO:bikineev
                 const_cast<actions::manage_object_action_base*>(
-                    &data->get_managing_object().get_instance());
+                    &data->get_managing_object().get_instance())
+            );
 
             HPX_ASSERT(act);
 
@@ -316,7 +317,7 @@ namespace hpx { namespace components
             server::detail::memory_block_header* config = 0)
         {
             std::size_t size = 0;
-            actions::manage_object_action_base* act = 0;
+            boost::shared_ptr<actions::manage_object_action_base> act; //TODO:bikineev raw_pointer has been changed to shared_ptr
 
             ar >> size; //-V128
             ar >> act;
@@ -335,8 +336,6 @@ namespace hpx { namespace components
                 act->load()(p->get_ptr(), size, ar, version, 0);
             }
 
-            delete act;
-
             return p;
         }
 
@@ -349,7 +348,7 @@ namespace hpx { namespace components
                 config_.reset(load_(ar, version));
             data_.reset(load_(ar, version, config_.get()));
         }
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
+        HPX_SERIALIZATION_SPLIT_MEMBER();
 
     private:
         boost::intrusive_ptr<server::detail::memory_block_header> data_;

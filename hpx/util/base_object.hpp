@@ -11,7 +11,7 @@
 
 #include <hpx/util/void_cast.hpp>
 
-#include <boost/serialization/base_object.hpp>
+#include <hpx/serialization/base_object.hpp>
 
 namespace hpx { namespace util
 {

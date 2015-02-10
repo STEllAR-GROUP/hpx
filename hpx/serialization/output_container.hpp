@@ -49,13 +49,10 @@ namespace hpx { namespace serialization {
         }
 
     public:
-        output_container(Container& cont)
-          : cont_(cont), current_(0), start_compressing_at_(0), filter_(0),
-            chunks_(0), current_chunk_(std::size_t(-1))
-        {}
-
-        output_container(Container& cont, std::vector<serialization_chunk>* chunks)
-          : cont_(cont), current_(0), start_compressing_at_(0), filter_(0),
+        output_container(Container& cont,
+            std::vector<serialization_chunk>* chunks,
+            util::binary_filter* filter)
+          : cont_(cont), current_(0), start_compressing_at_(0), filter_(filter),
             chunks_(chunks), current_chunk_(std::size_t(-1))
         {
             if (chunks_)
@@ -64,6 +61,7 @@ namespace hpx { namespace serialization {
                 chunks_->push_back(create_index_chunk(0, 0));
                 current_chunk_ = 0;
             }
+            if (filter_) set_filter(filter_);
         }
 
         ~output_container()
@@ -106,7 +104,7 @@ namespace hpx { namespace serialization {
             }
         }
 
-        void set_filter(util::binary_filter* filter)
+        void set_filter(util::binary_filter* filter) // override
         {
             HPX_ASSERT(0 == filter_);
             filter_ = filter;
@@ -118,7 +116,7 @@ namespace hpx { namespace serialization {
             }
         }
 
-        void save_binary(void const* address, std::size_t count)
+        void save_binary(void const* address, std::size_t count) // override
         {
             HPX_ASSERT(count != 0);
             {
@@ -147,7 +145,7 @@ namespace hpx { namespace serialization {
             }
         }
 
-        void save_binary_chunk(void const* address, std::size_t count)
+        void save_binary_chunk(void const* address, std::size_t count) // override
         {
             if (filter_ || chunks_ == 0 || count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD) {
                 // fall back to serialization_chunk-less archive

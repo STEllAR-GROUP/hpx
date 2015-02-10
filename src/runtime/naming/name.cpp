@@ -8,8 +8,6 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/base_object.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
@@ -20,10 +18,8 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/export.hpp>
-#include <boost/serialization/is_bitwise_serializable.hpp>
-#include <boost/serialization/array.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <boost/mpl/bool.hpp>
 
@@ -99,7 +95,7 @@ namespace hpx { namespace naming { namespace detail
     struct gid_serialization_data;
 }}}
 
-namespace boost { namespace serialization
+namespace hpx { namespace traits
 {
     template <>
     struct is_bitwise_serializable<
@@ -359,7 +355,7 @@ namespace hpx { namespace naming
         };
 
         // serialization
-        void id_type_impl::save(util::portable_binary_oarchive& ar) const
+        void id_type_impl::save(serialization::output_archive& ar) const
         {
             boost::uint32_t dest_locality_id = ar.get_dest_locality_id();
 
@@ -367,7 +363,7 @@ namespace hpx { namespace naming
             if (managed_move_credit == type)
                 type = managed;
 
-            if(ar.flags() & util::disable_array_optimization) {
+            if(ar.flags() & serialization::disable_array_optimization) {
                 naming::gid_type split_id(preprocess_gid(dest_locality_id));
                 ar << split_id << type;
             }
@@ -380,9 +376,9 @@ namespace hpx { namespace naming
             }
         }
 
-        void id_type_impl::load(util::portable_binary_iarchive& ar)
+        void id_type_impl::load(serialization::input_archive& ar)
         {
-            if(ar.flags() & util::disable_array_optimization) {
+            if(ar.flags() & serialization::disable_array_optimization) {
                 // serialize base class and management type
                 ar >> static_cast<gid_type&>(*this);
                 ar >> type_;
@@ -415,21 +411,23 @@ namespace hpx { namespace naming
     }   // detail
 
     ///////////////////////////////////////////////////////////////////////////
+    template <class T>
     void gid_type::save(
-        util::portable_binary_oarchive& ar
+        T& ar
       , const unsigned int version) const
     {
-        if(ar.flags() & util::disable_array_optimization)
+        if(ar.flags() & serialization::disable_array_optimization)
             ar << id_msb_ << id_lsb_;
         else
             ar.save(*this);
     }
 
+    template <class T>
     void gid_type::load(
-        util::portable_binary_iarchive& ar
+        T& ar
       , const unsigned int /*version*/)
     {
-        if(ar.flags() & util::disable_array_optimization)
+        if(ar.flags() & serialization::disable_array_optimization)
             ar >> id_msb_ >> id_lsb_;
         else
             ar.load(*this);
@@ -437,8 +435,16 @@ namespace hpx { namespace naming
         id_msb_ &= ~is_locked_mask;     // strip lock-bit upon receive
     }
 
+    template void gid_type::save<serialization::output_archive>(
+        serialization::output_archive&
+      , const unsigned int) const;
+    template void gid_type::load<serialization::input_archive>(
+        serialization::input_archive&
+      , const unsigned int);
+
     ///////////////////////////////////////////////////////////////////////////
-    void id_type::save(util::portable_binary_oarchive& ar,
+    template <class T>
+    void id_type::save(T& ar,
         const unsigned int version) const
     {
         bool isvalid = gid_ != 0;
@@ -447,7 +453,8 @@ namespace hpx { namespace naming
             gid_->save(ar);
     }
 
-    void id_type::load(util::portable_binary_iarchive& ar,
+    template <class T>
+    void id_type::load(T& ar,
         const unsigned int version)
     {
         if (version > HPX_IDTYPE_VERSION) {
@@ -464,6 +471,11 @@ namespace hpx { namespace naming
             std::swap(gid_, gid);
         }
     }
+
+    template void id_type::save<serialization::output_archive>(
+        serialization::output_archive&, const unsigned int) const;
+    template void id_type::load<serialization::input_archive>(
+        serialization::input_archive&, const unsigned int);
 
     ///////////////////////////////////////////////////////////////////////////
     char const* const management_type_names[] =

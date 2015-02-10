@@ -66,7 +66,7 @@ namespace hpx { namespace serialization {
 
         ~input_container() {}
 
-        void set_filter(util::binary_filter* filter)
+        void set_filter(util::binary_filter* filter) // override
         {
             filter_.reset(filter);
             if (filter) {
@@ -111,7 +111,6 @@ namespace hpx { namespace serialization {
 
                 if (chunks_) {
                     current_chunk_size_ += count;
-
                     // make sure we switch to the next serialization_chunk if necessary
                     std::size_t current_chunk_size = get_chunk_size(current_chunk_);
                     if (current_chunk_size != 0 && current_chunk_size_ >= current_chunk_size)
@@ -134,7 +133,7 @@ namespace hpx { namespace serialization {
             }
         }
 
-        void load_binary_chunk(void* address, std::size_t count)
+        void load_binary_chunk(void* address, std::size_t count) // override
         {
             if (filter_.get() || chunks_ == 0 || count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD) {
                 // fall back to serialization_chunk-less archive

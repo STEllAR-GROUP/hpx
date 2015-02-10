@@ -13,9 +13,6 @@
 #include <hpx/components/iostreams/ostream.hpp>
 #include <hpx/components/iostreams/standard_streams.hpp>
 
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/export.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_COMPONENT_MODULE()
 

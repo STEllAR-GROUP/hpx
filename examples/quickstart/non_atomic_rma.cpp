@@ -15,14 +15,13 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/vector.hpp>
 #include <hpx/util/locking_helpers.hpp>
 
 //Boost includes
 #include <boost/program_options.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/export.hpp>
 
 #include <boost/thread/locks.hpp>
 #include <boost/foreach.hpp>
@@ -50,7 +49,7 @@ struct data
 
 private:
     // serialization support
-    friend class boost::serialization::access;
+    friend class hpx::serialization::access;
 
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version)

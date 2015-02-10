@@ -14,7 +14,10 @@
 #include <hpx/serialization/polymorphic_nonintrusive_factory.hpp>
 
 #include <boost/shared_ptr.hpp>
+#include <boost/type_traits/is_integral.hpp>
+#include <boost/type_traits/is_enum.hpp>
 #include <boost/utility/enable_if.hpp>
+#include <boost/mpl/or.hpp>
 
 namespace hpx { namespace serialization {
 
@@ -28,14 +31,21 @@ namespace hpx { namespace serialization {
             pointer_tracker;
 
         template <typename Container>
-        static HPX_STD_UNIQUE_PTR<container> make_container(Container & buffer)
+        static HPX_STD_UNIQUE_PTR<container> make_container(
+            Container & buffer,
+            const std::vector<serialization_chunk>* chunks,
+            std::size_t inbound_data_size)
         {
-            return HPX_STD_UNIQUE_PTR<container>(new input_container<Container>(buffer, 0));
+            return HPX_STD_UNIQUE_PTR<container>(
+                new input_container<Container>(buffer, chunks, inbound_data_size));
         }
 
         template <typename Container>
-        input_archive(Container & buffer)
-          : base_type(0, make_container(buffer))
+        input_archive(Container & buffer,
+            boost::uint32_t flags = 0U,
+            const std::vector<serialization_chunk>* chunks = 0,
+            std::size_t inbound_data_size = 0)
+          : base_type(make_container(buffer, chunks, inbound_data_size), flags)
         {}
 
         template <typename T>
@@ -46,7 +56,10 @@ namespace hpx { namespace serialization {
 
         template <typename T>
         typename boost::disable_if<
-            boost::is_integral<T>
+            boost::mpl::or_<
+                boost::is_integral<T>
+              , boost::is_enum<T>
+            >
         >::type
         load(T & t)
         {
@@ -66,14 +79,14 @@ namespace hpx { namespace serialization {
         {
             BOOST_STATIC_ASSERT_MSG(!boost::is_abstract<T>::value,
                 "Can not bitwise serialize a class that is abstract");
-            if(disable_array_optimization())
-            {
-                serialize(*this, t, 0);
-            }
-            else
-            {
+            //if(disable_array_optimization())
+            //{
+                //serialize(*this, t, 0);
+            //}
+            //else
+            //{
                 load_binary(&t, sizeof(t));
-            }
+            //}
         }
 
         template <class T>
@@ -90,7 +103,10 @@ namespace hpx { namespace serialization {
 
         template <typename T>
         typename boost::enable_if<
-            boost::is_integral<T>
+            boost::mpl::or_<
+                boost::is_integral<T>
+              , boost::is_enum<T>
+            >
         >::type
         load(T & t)
         {
@@ -139,6 +155,11 @@ namespace hpx { namespace serialization {
         void load_impl(boost::uint64_t & ul);
         void load_binary(void * address, std::size_t count);
 
+        std::size_t bytes_read() const
+        {
+          return size_;
+        }
+
         void register_pointer(std::size_t pos, HPX_STD_UNIQUE_PTR<detail::ptr_helper> helper)
         {
             HPX_ASSERT(pointer_tracker_.find(pos) == pointer_tracker_.end());
@@ -161,7 +182,7 @@ namespace hpx { namespace serialization {
     void register_pointer(input_archive & ar, std::size_t pos, HPX_STD_UNIQUE_PTR<detail::ptr_helper> helper);
 
     template <typename Helper>
-    Helper & tracked_pointer(input_archive & ar, std::size_t pos)
+      Helper & tracked_pointer(input_archive & ar, std::size_t pos)
     {
         return ar.tracked_pointer<Helper>(pos);
     }
