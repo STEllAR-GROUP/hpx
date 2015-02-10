@@ -55,7 +55,7 @@ namespace hpx
         {
             std::size_t num_parts = (num_partitions_ == std::size_t(-1)) ?
                 localities_.size() : num_partitions_;
-            return (std::min)(num_parts, std::size_t(1));
+            return (std::max)(num_parts, std::size_t(1));
         }
 
     private:
