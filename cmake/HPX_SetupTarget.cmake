@@ -157,9 +157,26 @@ function(hpx_setup_target target)
 
   # We force the -DDEBUG and -D_DEBUG defines in debug mode to avoid
   # ABI differences
+  # if hpx is an imported target, get the config debug/release
+  set(HPX_IMPORT_CONFIG "NOTFOUND")
+  if (TARGET "hpx")
+    get_target_property(HPX_IMPORT_CONFIG "hpx" IMPORTED_CONFIGURATIONS)
+  endif()
+  if(HPX_IMPORT_CONFIG MATCHES NOTFOUND)
+    # we are building HPX not importing, so we should use the $<CONFIG:variable
+    set(_USE_CONFIG 1)
+  else()
+    # hpx is an imported target, so set HPX_DEBUG based on build config of hpx library
+    set(_USE_CONFIG 0)
+  endif()
   if(CMAKE_MAJOR_VERSION GREATER 2)
-    set_property(TARGET ${target} APPEND PROPERTY
-      COMPILE_DEFINITIONS $<$<CONFIG:Debug>:HPX_DEBUG>)
+    if(_USE_CONFIG)
+      set_property(TARGET ${target} APPEND PROPERTY
+        COMPILE_DEFINITIONS $<$<CONFIG:Debug>:HPX_DEBUG>)
+    else()
+      set_property(TARGET ${target} APPEND PROPERTY
+        COMPILE_DEFINITIONS $<$<STREQUAL:${HPX_IMPORT_CONFIG},DEBUG>:HPX_DEBUG>)
+    endif()
   else()
     set_property(TARGET ${target} APPEND PROPERTY
       COMPILE_DEFINITIONS_DEBUG HPX_DEBUG)
