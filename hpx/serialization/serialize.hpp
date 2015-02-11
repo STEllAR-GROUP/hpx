@@ -37,13 +37,6 @@
 /**/
 
 namespace hpx { namespace serialization {
-    namespace detail {
-        template <typename Archive, typename T>
-        void invoke(archive<Archive> & ar, T & t)
-        {
-            ar.invoke(t);
-        }
-    }
 
     template <typename Archive, typename T>
     void serialize(Archive & ar, T & t, unsigned)
@@ -54,19 +47,26 @@ namespace hpx { namespace serialization {
     template <typename T>
     output_archive & operator<<(output_archive & ar, T const & t)
     {
-        detail::invoke(ar, t);
+        ar.invoke(t);
         return ar;
     }
 
     template <typename T>
     input_archive & operator>>(input_archive & ar, T & t)
     {
-        detail::invoke(ar, t);
+        ar.invoke(t);
         return ar;
     }
 
-    template <typename Archive, typename T>
-    Archive & operator&(Archive & ar, T & t)
+    template <typename T>
+    output_archive & operator&(output_archive & ar, T const & t)
+    {
+        ar.invoke(t);
+        return ar;
+    }
+
+    template <typename T>
+    input_archive & operator&(input_archive & ar, T & t)
     {
         ar.invoke(t);
         return ar;

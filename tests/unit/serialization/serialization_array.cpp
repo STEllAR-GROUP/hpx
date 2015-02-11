@@ -3,6 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <numeric>
+
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/array.hpp>
 #include <hpx/serialization/vector.hpp>
@@ -41,10 +43,10 @@ void test(T min, T max)
             os.push_back(c);
         }
         oarchive << hpx::serialization::make_array(&os[0], os.size());
+
         hpx::serialization::input_archive iarchive(buffer);
         std::vector<T> is; is.resize(os.size());
-        hpx::serialization::array<T> iarr(&is[0], is.size());
-        iarchive >> iarr;
+        iarchive >> hpx::serialization::make_array(&is[0], is.size());
         HPX_TEST_EQ(os.size(), is.size());
         for(std::size_t i = 0; i < os.size(); ++i)
         {
@@ -60,10 +62,10 @@ void test(T min, T max)
             os.push_back(c);
         }
         oarchive << hpx::serialization::make_array(&os[0], os.size());
+
         hpx::serialization::input_archive iarchive(buffer);
         std::vector<A<T> > is; is.resize(os.size());
-        hpx::serialization::array<A<T> > iarr(&is[0], is.size());
-        iarchive >> iarr;
+        iarchive >> hpx::serialization::make_array(&is[0], is.size());
         HPX_TEST_EQ(os.size(), is.size());
         for(std::size_t i = 0; i < os.size(); ++i)
         {
@@ -84,10 +86,10 @@ void test_fp(T min, T max)
             os.push_back(c);
         }
         oarchive << hpx::serialization::make_array(&os[0], os.size());
+
         hpx::serialization::input_archive iarchive(buffer);
         std::vector<T> is; is.resize(os.size());
-        hpx::serialization::array<T> iarr(&is[0], is.size());
-        iarchive >> iarr;
+        iarchive >> hpx::serialization::make_array(&is[0], is.size());
         HPX_TEST_EQ(os.size(), is.size());
         for(std::size_t i = 0; i < os.size(); ++i)
         {
@@ -103,14 +105,49 @@ void test_fp(T min, T max)
             os.push_back(c);
         }
         oarchive << hpx::serialization::make_array(&os[0], os.size());
+
         hpx::serialization::input_archive iarchive(buffer);
         std::vector<A<T> > is; is.resize(os.size());
-        hpx::serialization::array<A<T> > iarr(&is[0], is.size());
-        iarchive >> iarr;
+        iarchive >> hpx::serialization::make_array(&is[0], is.size());
         HPX_TEST_EQ(os.size(), is.size());
         for(std::size_t i = 0; i < os.size(); ++i)
         {
             HPX_TEST_EQ(os[i].t_, is[i].t_);
+        }
+    }
+}
+
+template <class T, std::size_t N>
+void test_boost_array(T first)
+{
+    {
+        std::vector<char> buffer;
+        hpx::serialization::output_archive oarchive(buffer);
+        boost::array<T, N> oarray;
+        std::iota(oarray.begin(), oarray.end(), first);
+        oarchive << oarray;
+
+        hpx::serialization::input_archive iarchive(buffer);
+        boost::array<T, N> iarray;
+        iarchive >> iarray;
+        for(std::size_t i = 0; i < oarray.size(); ++i)
+        {
+            HPX_TEST_EQ(oarray[i], iarray[i]);
+        }
+    }
+    {
+        std::vector<char> buffer;
+        hpx::serialization::output_archive oarchive(buffer);
+        boost::array<A<T>, N> oarray;
+        std::iota(oarray.begin(), oarray.end(), first);
+        oarchive << oarray;
+
+        hpx::serialization::input_archive iarchive(buffer);
+        boost::array<A<T> , N> iarray;
+        iarchive >> iarray;
+        for(std::size_t i = 0; i < oarray.size(); ++i)
+        {
+            HPX_TEST_EQ(oarray[i].t_, iarray[i].t_);
         }
     }
 }
@@ -133,5 +170,8 @@ int main()
     test<double>(std::numeric_limits<double>::min(), std::numeric_limits<double>::min() + 100);
     test<double>(-100, 100);
 
+    test_boost_array<char, 100U>('\0');
+    test_boost_array<double, 40U>(std::numeric_limits<double>::min());
+    test_boost_array<float, 100U>(0.f);
     return hpx::util::report_errors();
 }

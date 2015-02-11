@@ -12,6 +12,11 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
+#include <boost/array.hpp>
+#ifndef BOOST_NO_CXX11_HDR_ARRAY
+#include <array>
+#endif
+
 namespace hpx { namespace serialization {
 
   template <class T>
@@ -140,12 +145,59 @@ namespace hpx { namespace serialization {
     serialize_optimized(ar, v, boost::mpl::true_());
   }
 
+  // make_array function
   template <class T> BOOST_FORCEINLINE
   array<T> make_array(T* begin, std::size_t size)
   {
     return array<T>(begin, size);
   }
 
+  // implement serialization for boost::array
+  template <class Archive, class T, std::size_t N>
+  void serialize(Archive& ar, boost::array<T,N>& a, const unsigned int /* version */)
+  {
+    ar & hpx::serialization::make_array(a.begin(), a.size());
+  }
+
+#ifndef BOOST_NO_CXX11_HDR_ARRAY
+  // implement serialization for std::array
+  template <class Archive, class T, std::size_t N>
+  void serialize(Archive& ar, std::array<T,N>& a, const unsigned int /* version */)
+  {
+    ar & hpx::serialization::make_array(a.begin(), a.size());
+  }
+#endif
+
+  // allow out array to be serialized as prvalue
+  // compiler should support good ADL implementation
+  // but it is rather for all hpx serialization library
+  template <typename T> BOOST_FORCEINLINE
+  output_archive & operator<<(output_archive & ar, array<T> t)
+  {
+      ar.invoke(t);
+      return ar;
+  }
+
+  template <typename T> BOOST_FORCEINLINE
+  input_archive & operator>>(input_archive & ar, array<T> t)
+  {
+      ar.invoke(t);
+      return ar;
+  }
+
+  template <typename T> BOOST_FORCEINLINE
+  output_archive & operator&(output_archive & ar, array<T> t)
+  {
+      ar.invoke(t);
+      return ar;
+  }
+
+  template <typename T> BOOST_FORCEINLINE
+  input_archive & operator&(input_archive & ar, array<T> t)
+  {
+      ar.invoke(t);
+      return ar;
+  }
 }}
 
 #endif // HPX_SERIALIZATION_ARRAY_HPP
