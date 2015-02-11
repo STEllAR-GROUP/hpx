@@ -49,15 +49,13 @@ struct B: A
 template <class Archive>
 void load(Archive& ar, B& b, unsigned)
 {
-  auto t = hpx::serialization::base_object<A>(b);
-  ar & t;
+  ar & hpx::serialization::base_object<A>(b);
   ar & b.b;
 }
 template <class Archive>
 void save(Archive& ar, const B& b, unsigned)
 {
-  auto t = hpx::serialization::base_object<A>(b);
-  ar & t;
+  ar & hpx::serialization::base_object<A>(b);
   ar & b.b;
 }
 HPX_SERIALIZATION_SPLIT_FREE(B);
@@ -83,8 +81,7 @@ struct C: public B
 template <class Archive>
 void serialize(Archive& ar, C& c, unsigned)
 {
-  auto t = hpx::serialization::base_object<B>(c);
-  ar & t;
+  ar & hpx::serialization::base_object<B>(c);
   ar & c.c;
 }
 HPX_SERIALIZATION_REGISTER_CLASS(C);
@@ -174,15 +171,13 @@ HPX_SERIALIZATION_REGISTER_CLASS(E);
 template <class Archive>
 void load(Archive& ar, E& e, unsigned)
 {
-  auto t = hpx::serialization::base_object<D>(e);
-  ar & t;
+  ar & hpx::serialization::base_object<D>(e);
   ar & e.b;
 }
 template <class Archive>
 void save(Archive& ar, const E& e, unsigned)
 {
-  auto t = hpx::serialization::base_object<D>(e);
-  ar & t;
+  ar & hpx::serialization::base_object<D>(e);
   ar & e.b;
 }
 HPX_SERIALIZATION_SPLIT_FREE(E);
@@ -208,8 +203,7 @@ HPX_SERIALIZATION_REGISTER_CLASS(F);
 template <class Archive>
 void serialize(Archive& ar, F& f, unsigned)
 {
-  auto t = hpx::serialization::base_object<E>(f);
-  ar & t;
+  ar & hpx::serialization::base_object<E>(f);
   ar & f.c;
 }
 

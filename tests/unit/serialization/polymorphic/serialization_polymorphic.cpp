@@ -58,8 +58,7 @@ struct D : B
     void serialize(Archive & ar, unsigned)
     {
         b = 4711;
-        auto t = hpx::serialization::base_object<B>(*this);
-        ar & t;
+        ar & hpx::serialization::base_object<B>(*this);;
         ar & d;
     }
     HPX_SERIALIZATION_POLYMORPHIC(D);

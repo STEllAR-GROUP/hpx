@@ -46,15 +46,13 @@ struct B: A
   template <class Archive>
   void load(Archive& ar, unsigned)
   {
-    auto t = hpx::serialization::base_object<A>(*this);
-    ar & t;
+    ar & hpx::serialization::base_object<A>(*this);
     ar & b;
   }
   template <class Archive>
   void save(Archive& ar, unsigned) const
   {
-    auto t = hpx::serialization::base_object<A>(*this);
-    ar & t;
+    ar & hpx::serialization::base_object<A>(*this);
     ar & b;
   }
   HPX_SERIALIZATION_SPLIT_MEMBER();
@@ -69,8 +67,7 @@ class C: public B
   template <class Archive>
   void serialize(Archive& ar, unsigned)
   {
-    auto t = hpx::serialization::base_object<B>(*this);
-    ar & t;
+    ar & hpx::serialization::base_object<B>(*this);
     ar & c;
   }
   HPX_SERIALIZATION_POLYMORPHIC(C)
@@ -173,15 +170,13 @@ struct E: D
   template <class Archive>
   void load(Archive& ar, unsigned)
   {
-    auto t = hpx::serialization::base_object<D>(*this);
-    ar & t;
+    ar & hpx::serialization::base_object<D>(*this);
     ar & b;
   }
   template <class Archive>
   void save(Archive& ar, unsigned) const
   {
-    auto t = hpx::serialization::base_object<D>(*this);
-    ar & t;
+    ar & hpx::serialization::base_object<D>(*this);
     ar & b;
   }
   HPX_SERIALIZATION_SPLIT_MEMBER();
@@ -196,8 +191,7 @@ class F: public E
   template <class Archive>
   void serialize(Archive& ar, unsigned)
   {
-    auto t = hpx::serialization::base_object<E>(*this);
-    ar & t;
+    ar & hpx::serialization::base_object<E>(*this);
     ar & c;
   }
   HPX_SERIALIZATION_POLYMORPHIC(F)

@@ -62,8 +62,7 @@ template <class Archive>
 void serialize(Archive& ar, D& d, unsigned)
 {
   d.b = 4711;
-  auto t = hpx::serialization::base_object<B>(d);
-  ar & t;
+  ar & hpx::serialization::base_object<B>(d);
   ar & d.d;
 }
 
