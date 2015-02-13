@@ -72,7 +72,6 @@ include(CMakeDependentOption)
 include(HPX_Utils)
 include(HPX_ExportTargets)
 include(HPX_Libraries)
-include(HPX_LibraryDir)
 include(HPX_AddConfigTest)
 include(HPX_AddDefinitions)
 
