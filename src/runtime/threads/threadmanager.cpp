@@ -1618,7 +1618,7 @@ namespace hpx { namespace threads
 
                 LTM_(info) << "run: create OS thread " << thread_num //-V128
                     << ": will run on processing units within this mask: "
-#if !defined(HPX_HAVE_MORE_THAN_64_THREADS) || (defined(HPX_MAX_CPU_COUNT) && HPX_MAX_CPU_COUNT <= 64)
+#if !defined(HPX_WITH_MORE_THAN_64_THREADS) || (defined(HPX_MAX_CPU_COUNT) && HPX_MAX_CPU_COUNT <= 64)
                     << std::hex << "0x" << mask;
 #else
                     << "0b" << mask;

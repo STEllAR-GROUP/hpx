@@ -482,8 +482,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Make sure we have support for more than 64 threads for Xeon Phi
-#if defined(__MIC__) && !defined(HPX_HAVE_MORE_THAN_64_THREADS)
-#  define HPX_HAVE_MORE_THAN_64_THREADS
+#if defined(__MIC__) && !defined(HPX_WITH_MORE_THAN_64_THREADS)
+#  define HPX_WITH_MORE_THAN_64_THREADS
 #endif
 #if defined(__MIC__) && !defined(HPX_MAX_CPU_COUNT)
 #  define HPX_MAX_CPU_COUNT 256

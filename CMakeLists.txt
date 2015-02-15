@@ -227,6 +227,14 @@ hpx_option(HPX_MAX_CPU_COUNT STRING
   CATEGORY "Thread Manager" ADVANCED)
 hpx_add_config_define(HPX_MAX_CPU_COUNT ${HPX_MAX_CPU_COUNT})
 
+if(NOT (${HPX_MAX_CPU_COUNT} LESS 65))
+  set(HPX_WITH_MORE_THAN_64_THREADS_DEFAULT OFF)
+  hpx_option(HPX_WITH_MORE_THAN_64_THREADS STRING
+    "HPX applications will be able to run on more than 64 cores"
+    ${HPX_WITH_MORE_THAN_64_THREADS_DEFAULT}
+    CATEGORY "Thread Manager" ADVANCED)
+endif()
+
 hpx_option(HPX_THREAD_STACK_MMAP BOOL
   "Use mmap for stack allocation on appropriate platforms"
   ON
