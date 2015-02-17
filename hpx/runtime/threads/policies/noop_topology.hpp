@@ -151,7 +151,7 @@ public:
 
     std::size_t get_number_of_cores() const
     {
-        return ~std::size_t(0);
+        return noop_topology::hardware_concurrency();
     }
 
     std::size_t get_number_of_pus() const

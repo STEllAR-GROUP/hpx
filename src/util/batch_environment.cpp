@@ -498,7 +498,7 @@ namespace hpx { namespace util
             }
             result = (*it).second.second / num_tasks_;
         }
-        if (debug_)
+        if (debug_ && result!=-1)
             std::cerr << "retrieve_number_of_threads (repeat count of node/num_tasks): " 
                 << result << std::endl;
         return result;
