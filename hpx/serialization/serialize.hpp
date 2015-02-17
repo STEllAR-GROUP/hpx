@@ -8,33 +8,12 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/access.hpp>
 #include <hpx/serialization/archive.hpp>
 
 #include <boost/type_traits/add_const.hpp>
 #include <boost/utility/enable_if.hpp>
-
-#define HPX_SERIALIZATION_SPLIT_MEMBER()                                        \
-    void serialize(hpx::serialization::input_archive & ar, unsigned)            \
-    {                                                                           \
-        load(ar, 0);                                                            \
-    }                                                                           \
-    void serialize(hpx::serialization::output_archive & ar, unsigned) const     \
-    {                                                                           \
-        save(ar, 0);                                                            \
-    }                                                                           \
-/**/
-#define HPX_SERIALIZATION_SPLIT_FREE(T)                                         \
-    void serialize(hpx::serialization::input_archive & ar, T & t, unsigned)     \
-    {                                                                           \
-        load(ar, t, 0);                                                         \
-    }                                                                           \
-    void serialize(hpx::serialization::output_archive & ar, T & t, unsigned)    \
-    {                                                                           \
-        save(ar, const_cast<typename boost::add_const<T>::type &>(t)            \
-            , 0);                                                               \
-    }                                                                           \
-/**/
 
 namespace hpx { namespace serialization {
 

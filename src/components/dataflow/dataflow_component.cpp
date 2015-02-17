@@ -19,11 +19,7 @@
 #include <hpx/components/dataflow/server/dataflow_trigger.hpp>
 #include <hpx/components/dataflow/dataflow_base.hpp>
 
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
-
-#include <boost/serialization/version.hpp>
 
 HPX_REGISTER_COMPONENT_MODULE()
 

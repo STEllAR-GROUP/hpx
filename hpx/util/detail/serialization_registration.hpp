@@ -10,6 +10,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 
+#if 0
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/void_cast.hpp>
 #include <boost/serialization/access.hpp>
@@ -189,6 +190,8 @@ namespace boost {                                                               
     }}}                                                                         \
 }                                                                               \
 /**/
+
+#endif // if 0
 
 #endif
 

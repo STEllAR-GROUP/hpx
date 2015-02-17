@@ -30,7 +30,6 @@
 #include <boost/format.hpp>
 #include <boost/icl/closed_interval.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/serialization/vector.hpp>
 
 namespace hpx { namespace detail
 {

@@ -58,11 +58,6 @@
 #include <boost/filesystem/convenience.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 
-//#include <boost/serialization/serialization.hpp>
-//#include <boost/serialization/version.hpp>
-//#include <boost/serialization/vector.hpp>
-//#include <boost/serialization/export.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the runtime_support actions
 HPX_REGISTER_ACTION(

@@ -205,12 +205,12 @@ namespace hpx { namespace actions
             return instance.get();
         }
 
-        /// serialization support
-        static void register_base()
-        {
-            // TODO:bikineev: should be deleted
-            util::void_cast_register_nonvirt<manage_object_action, manage_object_action_base>();
-        }
+        ///// serialization support //TODO: delete this!
+        //static void register_base()
+        //{
+            //// TODO:bikineev: should be deleted
+            //util::void_cast_register_nonvirt<manage_object_action, manage_object_action_base>();
+        //}
 
     private:
         // serialization support, just serialize the type
@@ -234,12 +234,12 @@ namespace hpx { namespace actions
     {
         manage_object_action() {}
 
-        /// serialization support
-        static void register_base()
-        {
-            // TODO:bikineev: should be deleted
-            util::void_cast_register_nonvirt<manage_object_action, manage_object_action_base>();
-        }
+        ///// serialization support //TODO: delete this!
+        //static void register_base()
+        //{
+            //// TODO:bikineev: should be deleted
+            //util::void_cast_register_nonvirt<manage_object_action, manage_object_action_base>();
+        //}
 
     private:
         // serialization support, just serialize the type
@@ -318,13 +318,13 @@ namespace hpx { namespace actions
             return instance.get();
         }
 
-        /// serialization support
-        static void register_base()
-        {
-            // TODO:bikineev: should be deleted
-            util::void_cast_register_nonvirt<manage_object_action, manage_object_action<T> >();
-            manage_object_action<T>::register_base();
-        }
+        ///// serialization support //TODO:delete this!
+        //static void register_base()
+        //{
+            //// TODO:bikineev: should be deleted
+            //util::void_cast_register_nonvirt<manage_object_action, manage_object_action<T> >();
+            //manage_object_action<T>::register_base();
+        //}
 
     private:
         // serialization support, just serialize the type
@@ -343,11 +343,11 @@ namespace hpx { namespace actions
     };
 }}
 
-//TODO:bikineev
-#define HPX_REGISTER_MANAGE_OBJECT_ACTION(object_action, name)                \
+////TODO:bikineev
+//#define HPX_REGISTER_MANAGE_OBJECT_ACTION(object_action, name)                \
         //BOOST_CLASS_EXPORT(object_action)                                     \
         //HPX_REGISTER_BASE_HELPER(object_action, name)                         \
-    /***/
+    //[>*<]
 
 #include <hpx/config/warnings_suffix.hpp>
 

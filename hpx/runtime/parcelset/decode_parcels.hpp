@@ -107,7 +107,7 @@ namespace hpx { namespace parcelset
         std::vector<serialization::serialization_chunk> const *chunks,
         bool first_message = false)
     {
-        unsigned archive_flags = boost::archive::no_header;
+        unsigned archive_flags = 0U;
         if (!pp.allow_array_optimizations()) {
             archive_flags |= serialization::disable_array_optimization;
             archive_flags |= serialization::disable_data_chunking;
@@ -127,6 +127,8 @@ namespace hpx { namespace parcelset
                     buffer->data_point_;
 
                 {
+                    archive_flags |= serialization::disable_data_chunking; //TODO:bikineev
+                    archive_flags |= serialization::disable_array_optimization; //TODO:bikineev
                     // De-serialize the parcel data
                     serialization::input_archive archive(buffer->data_,
                         archive_flags, chunks, inbound_data_size);

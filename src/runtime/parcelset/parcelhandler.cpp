@@ -9,7 +9,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/mpi_environment.hpp>

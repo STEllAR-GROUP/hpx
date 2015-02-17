@@ -92,7 +92,6 @@ namespace hpx { namespace parcelset
           , io_service_pool_(thread_pool_size(ini),
                 on_start_thread, on_stop_thread, pool_name(), pool_name_postfix())
           , connection_cache_(max_connections(ini), max_connections_per_loc(ini))
-          , archive_flags_(boost::archive::no_header)
         {
 #ifdef BOOST_BIG_ENDIAN
             std::string endian_out = get_config_entry("hpx.parcel.endian_out", "big");
@@ -100,9 +99,9 @@ namespace hpx { namespace parcelset
             std::string endian_out = get_config_entry("hpx.parcel.endian_out", "little");
 #endif
             if (endian_out == "little")
-                archive_flags_ |= util::endian_little;
+                archive_flags_ |= serialization::endian_little;
             else if (endian_out == "big")
-                archive_flags_ |= util::endian_big;
+                archive_flags_ |= serialization::endian_big;
             else {
                 HPX_ASSERT(endian_out =="little" || endian_out == "big");
             }

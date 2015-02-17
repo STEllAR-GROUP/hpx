@@ -13,6 +13,7 @@
 #include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke.hpp>
@@ -25,7 +26,6 @@
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 
 #include <boost/mpl/bool.hpp>
-#include <boost/serialization/serialization.hpp>
 
 #include <string>
 

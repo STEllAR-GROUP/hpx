@@ -7,13 +7,12 @@
 #define HPX_BLOCK_DISTRIBUTION_POLICY_HPP
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/vector.hpp>
 #include <boost/detail/scoped_enum_emulation.hpp>
 
 #include <vector>
 #include <iostream>
-
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/vector.hpp>
 
 namespace hpx
 {
@@ -75,7 +74,7 @@ namespace hpx
         }
 
     private:
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         void serialize(Archive & ar, const unsigned int version)
@@ -144,7 +143,7 @@ namespace hpx
         }
 
     private:
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template<class Archive>
         void serialize(Archive & ar, const unsigned int version)
@@ -238,7 +237,7 @@ namespace hpx
         }
 
     private:
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         void serialize(Archive & ar, const unsigned int version)

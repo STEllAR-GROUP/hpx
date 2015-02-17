@@ -6,6 +6,7 @@
 #if !defined(HPX_UTIL_SERIALIZE_INTRUSIVE_PTR_FEB_20_2012_1137AM)
 #define HPX_UTIL_SERIALIZE_INTRUSIVE_PTR_FEB_20_2012_1137AM
 
+#if 0
 #include <hpx/hpx_fwd.hpp>
 
 #include <boost/config.hpp>
@@ -59,5 +60,7 @@ namespace boost { namespace serialization
         boost::serialization::split_free(ar, t, version);
     }
 }}
+
+#endif // if 0
 
 #endif // HPX_UTIL_SERIALIZE_INTRUSIVE_PTR_FEB_20_2012_1137AM

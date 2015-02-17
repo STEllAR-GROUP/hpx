@@ -167,12 +167,6 @@ namespace hpx { namespace actions
             plain_result_action0, Derived
         >::type derived_type;
 
-        template <class T>
-        void serialize(T& t, unsigned)
-        {
-          std::cout << "serialization make action" << std::endl;
-        }
-
         typedef boost::mpl::false_ direct_execution;
     };
 
@@ -503,8 +497,8 @@ namespace hpx { namespace traits
 ///       HPX_REGISTER_PLAIN_ACTION_TEMPLATE((template <typename T>), (app::some_global_action<T>));
 /// \endcode
 ///
+//TODO:bikineev
 #define HPX_REGISTER_PLAIN_ACTION_TEMPLATE(template_, action_type)            \
-    HPX_REGISTER_ACTION_DECLARATION_TEMPLATE(template_, action_type);         \
     HPX_DEFINE_GET_COMPONENT_TYPE_TEMPLATE(template_,                         \
         (hpx::components::server::plain_function<HPX_UTIL_STRIP(action_type)>)) \
 /**/

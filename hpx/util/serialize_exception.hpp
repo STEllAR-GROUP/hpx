@@ -8,11 +8,11 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <boost/config.hpp>
 #include <boost/exception_ptr.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/split_free.hpp>
 
 namespace hpx { namespace util
 {

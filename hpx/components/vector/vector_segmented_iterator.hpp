@@ -16,6 +16,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/naming.hpp>
 #include <hpx/include/util.hpp>
+#include <hpx/serialization/serialize.hpp>
 
 #include <hpx/components/vector/partition_vector_component.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
@@ -26,8 +27,6 @@
 #include <boost/integer.hpp>
 #include <boost/iterator/iterator_facade.hpp>
 #include <boost/iterator/filter_iterator.hpp>
-
-#include <boost/serialization/serialization.hpp>
 
 namespace hpx
 {
@@ -167,7 +166,7 @@ namespace hpx
         }
 
     private:
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         void load(Archive& ar, unsigned version)
@@ -182,7 +181,7 @@ namespace hpx
             ar & partition_ & local_index_;
         }
 
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
+        HPX_SERIALIZATION_SPLIT_MEMBER()
 
         bool is_at_end() const
         {
@@ -324,7 +323,7 @@ namespace hpx
         }
 
     private:
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         void load(Archive& ar, unsigned version)
@@ -339,7 +338,7 @@ namespace hpx
             ar & partition_ & local_index_;
         }
 
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
+        HPX_SERIALIZATION_SPLIT_MEMBER()
 
         bool is_at_end() const
         {

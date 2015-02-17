@@ -22,6 +22,7 @@ struct A
     template <typename Archive>
     void serialize(Archive & ar, unsigned)
     {
+        //std::cout << __PRETTY_FUNCTION__ << std::endl;
         ar & a;
     }
     HPX_SERIALIZATION_POLYMORPHIC(A);
@@ -41,7 +42,8 @@ struct B
     template <typename Archive>
     void serialize(Archive & ar, unsigned)
     {
-        ar & b;
+        //std::cout << __PRETTY_FUNCTION__ << std::endl;
+        //ar & b;
     }
     HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(B);
 };
@@ -57,8 +59,9 @@ struct D : B
     template <typename Archive>
     void serialize(Archive & ar, unsigned)
     {
-        b = 4711;
-        ar & hpx::serialization::base_object<B>(*this);;
+        //b = 4711;
+        //ar & hpx::serialization::base_object<B>(*this);;
+        std::cout << __PRETTY_FUNCTION__ << std::endl;
         ar & d;
     }
     HPX_SERIALIZATION_POLYMORPHIC(D);

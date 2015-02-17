@@ -11,15 +11,9 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
-
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
+#include <hpx/util/serialize_exception.hpp>
 
 #include <boost/lexical_cast.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/export.hpp>
-
-#include <hpx/util/serialize_exception.hpp>
 
 #include <vector>
 #include <iostream>

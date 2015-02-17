@@ -8,12 +8,12 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/traits/is_bitwise_serializable.hpp>
+#include <hpx/serialization/serialize.hpp>
 
 #include "certificate_signing_request.hpp"
 #include "public_key.hpp"
 
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/is_bitwise_serializable.hpp>
 #include <boost/io/ios_state.hpp>
 
 namespace hpx { namespace components { namespace security
@@ -98,12 +98,12 @@ namespace hpx { namespace components { namespace security
         }
 
     private:
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         void serialize(Archive & ar, const unsigned int)
         {
-            ar & boost::serialization::make_array(begin(), size());
+            ar & boost::serialization::make_array(begin(), size()); // TODO:
         }
 
         naming::gid_type issuer_;
@@ -119,7 +119,7 @@ namespace hpx { namespace components { namespace security
 #endif
 }}}
 
-namespace boost { namespace serialization
+namespace hpx { namespace traits {
 {
     template <>
     struct is_bitwise_serializable<

@@ -9,10 +9,10 @@
 #define HPX_SERIALIZATION_POLYMORPHIC_INTRUSIVE_FACTORY_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/get_unparenthised_name.hpp>
 #include <hpx/util/jenkins_hash.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/static.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
 
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/noncopyable.hpp>

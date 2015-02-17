@@ -15,15 +15,9 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/server/console_logging.hpp>
 
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/export.hpp>
-#include <boost/serialization/vector.hpp>
 
 #include <hpx/util/logging/format/named_write_fwd.hpp>
 #include <hpx/util/logging/format_fwd.hpp>

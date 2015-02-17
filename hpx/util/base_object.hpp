@@ -9,6 +9,7 @@
 #if !defined(HPX_DFDB7D1E_F238_4803_BA38_16F1CFD77622)
 #define HPX_DFDB7D1E_F238_4803_BA38_16F1CFD77622
 
+#if 0
 #include <hpx/util/void_cast.hpp>
 
 #include <hpx/serialization/base_object.hpp>
@@ -88,6 +89,8 @@ typename detail::base_cast<Base, Derived>::type& base_object_nonvirt(
 }
 
 }}
+
+#endif
 
 #endif // HPX_DFDB7D1E_F238_4803_BA38_16F1CFD77622
 

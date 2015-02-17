@@ -179,7 +179,6 @@ namespace hpx { namespace lcos
 
 #include <vector>
 
-#include <boost/serialization/vector.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_trailing.hpp>
 #include <boost/preprocessor/repetition/enum_trailing_params.hpp>

@@ -21,13 +21,6 @@ HPX_REGISTER_BINARY_FILTER_FACTORY(
     zlib_serialization_filter);
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_SERIALIZATION_REGISTER_TYPE_DEFINITION(
-    hpx::plugins::compression::zlib_serialization_filter);
-HPX_REGISTER_BASE_HELPER(
-    hpx::plugins::compression::zlib_serialization_filter,
-    zlib_serialization_filter);
-
-///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace plugins { namespace compression
 {
     namespace detail
@@ -80,12 +73,6 @@ namespace hpx { namespace plugins { namespace compression
     zlib_serialization_filter::~zlib_serialization_filter()
     {
         hpx::actions::detail::guid_initialization<zlib_serialization_filter>();
-    }
-
-    void zlib_serialization_filter::register_base()
-    {
-        util::void_cast_register_nonvirt<
-            zlib_serialization_filter, util::binary_filter>();
     }
 
     void zlib_serialization_filter::set_max_length(std::size_t size)

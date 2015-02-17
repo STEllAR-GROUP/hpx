@@ -118,13 +118,13 @@ namespace hpx { namespace serialization {
         template <typename T>
         void save_integral(T val, boost::mpl::false_)
         {
-            save_impl(static_cast<boost::int64_t>(val));
+            save_integral_impl(static_cast<boost::int64_t>(val));
         }
 
         template <typename T>
         void save_integral(T val, boost::mpl::true_)
         {
-            save_impl(static_cast<boost::uint64_t>(val));
+            save_integral_impl(static_cast<boost::uint64_t>(val));
         }
 
         void save(float f)
@@ -148,7 +148,7 @@ namespace hpx { namespace serialization {
             save_binary(&b, sizeof(bool));
         }
 
-        void save_impl(boost::int64_t l)
+        void save_integral_impl(boost::int64_t l)
         {
             const std::size_t size = sizeof(boost::int64_t);
             char* cptr = reinterpret_cast<char *>(&l);
@@ -163,7 +163,7 @@ namespace hpx { namespace serialization {
             save_binary(cptr, size);
         }
 
-        void save_impl(boost::uint64_t ul)
+        void save_integral_impl(boost::uint64_t ul)
         {
             const std::size_t size = sizeof(boost::uint64_t);
             char* cptr = reinterpret_cast<char*>(&ul);

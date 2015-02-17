@@ -60,9 +60,6 @@
 #include <boost/fusion/include/transform_view.hpp>
 #include <boost/ref.hpp>
 #include <boost/foreach.hpp>
-//#include <boost/serialization/access.hpp>
-//#include <boost/serialization/is_bitwise_serializable.hpp>
-//#include <boost/serialization/array.hpp>
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/type_traits/is_convertible.hpp>
@@ -1004,14 +1001,14 @@ namespace hpx { namespace actions
 
 #include <hpx/config/warnings_suffix.hpp>
 
-///////////////////////////////////////////////////////////////////////////////
-//TODO:bikineev should be useless
-#define HPX_REGISTER_BASE_HELPER(action, actionname)                          \
-    hpx::actions::detail::register_base_helper<action>                        \
-            BOOST_PP_CAT(                                                     \
-                BOOST_PP_CAT(__hpx_action_register_base_helper_, __LINE__),   \
-                _##actionname);                                               \
-/**/
+/////////////////////////////////////////////////////////////////////////////////
+////TODO:bikineev should be useless
+//#define HPX_REGISTER_BASE_HELPER(action, actionname)                          \
+    //hpx::actions::detail::register_base_helper<action>                        \
+            //BOOST_PP_CAT(                                                     \
+                //BOOST_PP_CAT(__hpx_action_register_base_helper_, __LINE__),   \
+                //_##actionname);                                               \
+//[><]
 
 ///////////////////////////////////////////////////////////////////////////////
 // Helper macro for action serialization, each of the defined actions needs to
@@ -1290,8 +1287,8 @@ namespace hpx { namespace actions
 /// defined as above. It has to be visible in all translation units using the
 /// action, thus it is recommended to place it into the header file defining the
 /// component.
-#define HPX_REGISTER_ACTION_DECLARATION_TEMPLATE(TEMPLATE, TYPE)              \
-    HPX_SERIALIZATION_REGISTER_TEMPLATE_ACTION(TEMPLATE, TYPE)                \
+#define HPX_REGISTER_ACTION_DECLARATION_TEMPLATE(TEMPLATE, TYPE)              \ //TODO:bikineev
+    //HPX_SERIALIZATION_REGISTER_TEMPLATE_ACTION(TEMPLATE, TYPE)                \
 /**/
 
 /// \def HPX_REGISTER_ACTION(action)

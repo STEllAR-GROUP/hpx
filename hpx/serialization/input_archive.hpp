@@ -118,7 +118,7 @@ namespace hpx { namespace serialization {
         void load_integral(T & val, boost::mpl::false_)
         {
             boost::int64_t l;
-            load_impl(l);
+            load_integral_impl(l);
             val = static_cast<T>(l);
         }
 
@@ -126,7 +126,7 @@ namespace hpx { namespace serialization {
         void load_integral(T & val, boost::mpl::true_)
         {
             boost::uint64_t ul;
-            load_impl(ul);
+            load_integral_impl(ul);
             val = static_cast<T>(ul);
         }
 
@@ -151,7 +151,7 @@ namespace hpx { namespace serialization {
             load_binary(&b, sizeof(bool));
         }
 
-        void load_impl(boost::int64_t & l)
+        void load_integral_impl(boost::int64_t & l)
         {
             const std::size_t size = sizeof(boost::int64_t);
             char* cptr = reinterpret_cast<char *>(&l);
@@ -166,7 +166,7 @@ namespace hpx { namespace serialization {
 #endif
         }
 
-        void load_impl(boost::uint64_t & ul)
+        void load_integral_impl(boost::uint64_t & ul)
         {
             const std::size_t size = sizeof(boost::uint64_t);
             char* cptr = reinterpret_cast<char *>(&ul);

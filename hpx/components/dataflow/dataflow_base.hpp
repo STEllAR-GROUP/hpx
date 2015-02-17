@@ -46,7 +46,7 @@ namespace hpx { namespace lcos
         }
 
     private:
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         boost::intrusive_ptr<detail::dataflow_base_impl> impl;
 

@@ -12,14 +12,6 @@
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/util/assert.hpp>
 
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/export.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the memory_block actions
 HPX_REGISTER_ACTION(
@@ -52,9 +44,10 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE(
     hpx::components::memory_block_data,
     memory_data_type)
 
-HPX_REGISTER_MANAGE_OBJECT_ACTION(
-    hpx::actions::manage_object_action<boost::uint8_t>,
-    manage_object_action_uint8_t)
+//TODO:bikineev
+//HPX_REGISTER_MANAGE_OBJECT_ACTION(
+    //hpx::actions::manage_object_action<boost::uint8_t>,
+    //manage_object_action_uint8_t)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server { namespace detail

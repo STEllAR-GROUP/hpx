@@ -10,11 +10,11 @@
 #include <hpx/util/bind.hpp>
 
 #include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/array.hpp>
 #include <hpx/util/serialize_allocator.hpp>
 
 #include <boost/shared_array.hpp>
 #include <boost/mpl/bool.hpp>
-#include <boost/serialization/array.hpp> // TODO:temporarily
 
 #include <algorithm>
 
@@ -233,13 +233,8 @@ namespace hpx { namespace util
         {
             ar << size_ << alloc_; //-V128
 
-            //typedef typename
-                //boost::serialization::use_array_optimization<Archive>::template apply< // TODO
-                    //typename boost::remove_const<T>::type
-                //>::type use_optimized;
             typedef typename hpx::traits::is_bitwise_serializable<
               typename boost::remove_const<T>::type>::type use_optimized;
-
 
             //save_optimized(ar, version, use_optimized());
             save_optimized(ar, version, boost::mpl::false_());
@@ -259,8 +254,7 @@ namespace hpx { namespace util
         {
             if (size_ != 0)
             {
-                boost::serialization::array<T> arr(data_.get(), size_); //TODO
-                ar.save_array(arr, version);
+                ar << hpx::serialization::make_array(data_.get(), size_);
             }
         }
 
@@ -274,11 +268,6 @@ namespace hpx { namespace util
             data_.reset(alloc_.allocate(size_),
                 util::bind(&serialize_buffer::deleter<allocator_type>, _1,
                     alloc_, size_));
-
-            //typedef typename
-                //boost::serialization::use_array_optimization<Archive>::template apply< // TODO
-                    //typename boost::remove_const<T>::type
-                //>::type use_optimized;
 
             typedef typename hpx::traits::is_bitwise_serializable<
               typename boost::remove_const<T>::type>::type use_optimized;
@@ -302,8 +291,7 @@ namespace hpx { namespace util
         {
             if (size_ != 0)
             {
-                boost::serialization::array<T> arr(data_.get(), size_); //TODO
-                ar.load_array(arr, version);
+                ar << hpx::serialization::make_array(data_.get(), size_);
             }
         }
 
@@ -473,10 +461,8 @@ namespace hpx { namespace util
             typedef typename hpx::traits::is_bitwise_serializable<
               typename boost::remove_const<T>::type>::type use_optimized;
 
-            //if (ar.disable_array_optimization())
-              save_optimized(ar, version, boost::mpl::false_());
-            //else
-              //save_optimized(ar, version, use_optimized());
+            //save_optimized(ar, version, use_optimized());
+            save_optimized(ar, version, boost::mpl::false_());
         }
 
         template <typename Archive>
@@ -493,8 +479,7 @@ namespace hpx { namespace util
         {
             if (size_ != 0)
             {
-                boost::serialization::array<T> arr(data_.get(), size_); //TODO:
-                ar.save_array(arr, version);
+                ar << hpx::serialization::make_array(data_.get(), size_);
             }
         }
 
@@ -505,17 +490,11 @@ namespace hpx { namespace util
             ar >> size_; //-V128
             data_.reset(new T[size_]);
 
-            //typedef typename
-                //boost::serialization::use_array_optimization<Archive>::template apply< //TODO:
-                    //typename boost::remove_const<T>::type
-                //>::type use_optimized;
             typedef typename hpx::traits::is_bitwise_serializable<
               typename boost::remove_const<T>::type>::type use_optimized;
 
-            //if (ar.disable_array_optimization())
-              load_optimized(ar, version, boost::mpl::false_());
-            //else
-              //load_optimized(ar, version, use_optimized());
+            //load_optimized(ar, version, use_optimized());
+            load_optimized(ar, version, boost::mpl::false_());
         }
 
         template <typename Archive>
@@ -532,8 +511,7 @@ namespace hpx { namespace util
         {
             if (size_ != 0)
             {
-                boost::serialization::array<T> arr(data_.get(), size_); //TODO:
-                ar.load_array(arr, version);
+                ar << hpx::serialization::make_array(data_.get(), size_);
             }
         }
 

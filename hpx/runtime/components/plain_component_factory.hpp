@@ -20,7 +20,6 @@
 #include <hpx/util/ini.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 
-#include <boost/serialization/export.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/detail/atomic_count.hpp>

@@ -8,6 +8,7 @@
 #if !defined(HPX_16218775_E5D0_4B5A_BBA5_3C561B9E322F)
 #define HPX_16218775_E5D0_4B5A_BBA5_3C561B9E322F
 
+#if 0
 #include <boost/serialization/void_cast.hpp>
 
 namespace hpx { namespace util
@@ -28,7 +29,11 @@ void_cast_register_nonvirt(
     return boost::serialization::singleton<type>::get_const_instance();
 }
 
+
+
 }}
+
+#endif // if 0
 
 #endif // HPX_16218775_E5D0_4B5A_BBA5_3C561B9E322F
 

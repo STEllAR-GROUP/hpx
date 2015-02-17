@@ -47,7 +47,7 @@ namespace hpx { namespace lcos { namespace detail
         lcos::shared_future<naming::id_type> gid_promise;
 
     private:
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         boost::detail::atomic_count count_;
 
@@ -66,7 +66,7 @@ namespace hpx { namespace lcos { namespace detail
             ar & id;
         }
 
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
+        HPX_SERIALIZATION_SPLIT_MEMBER()
 
         friend void intrusive_ptr_add_ref(dataflow_base_impl * p)
         {

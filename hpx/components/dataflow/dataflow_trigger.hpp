@@ -10,7 +10,8 @@
 #include <hpx/components/dataflow/dataflow_base.hpp>
 #include <hpx/components/dataflow/stubs/dataflow_trigger.hpp>
 
-#include <boost/serialization/vector.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/base_object.hpp>
 
 namespace hpx { namespace lcos
 {
@@ -62,12 +63,16 @@ namespace hpx { namespace lcos
 
     private:
 
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         void serialize(Archive & ar, unsigned)
         {
-            ar & boost::serialization::base_object<base_type>(*this);
+            using namespace hpx::serialization;
+
+            base_object_type<dataflow_trigger, base_type> base
+              = base_object<base_type>(*this);
+            ar & base;
         }
     };
 }}

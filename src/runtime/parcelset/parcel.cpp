@@ -41,6 +41,7 @@ namespace hpx { namespace parcelset
                 ar << source_id_;
 
             std::string action_name = action_->get_action_name();
+            std::cout << "saving action_name \"" << action_name << "\" with size: " << action_name.size() << std::endl;
             ar << action_name;
 
             action_->save(ar);

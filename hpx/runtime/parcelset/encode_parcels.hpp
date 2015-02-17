@@ -157,6 +157,8 @@ namespace hpx { namespace parcelset
                         pv[0].get_serialization_filter());
 
                     int archive_flags = archive_flags_;
+                    archive_flags |= serialization::disable_data_chunking;
+                    archive_flags |= serialization::disable_array_optimization;
                     if (filter.get() != 0) {
                         filter->set_max_length(buffer->data_.capacity());
                         archive_flags |= serialization::enable_compression;

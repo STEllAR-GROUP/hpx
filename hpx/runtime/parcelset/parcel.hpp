@@ -21,7 +21,6 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/traits/type_size.hpp>
 #include <hpx/traits/serialize_as_future.hpp>
-#include <hpx/util/portable_binary_archive.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>

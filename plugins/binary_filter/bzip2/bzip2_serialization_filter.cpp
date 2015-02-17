@@ -21,13 +21,6 @@ HPX_REGISTER_BINARY_FILTER_FACTORY(
     bzip2_serialization_filter);
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_SERIALIZATION_REGISTER_TYPE_DEFINITION(
-    hpx::plugins::compression::bzip2_serialization_filter);
-HPX_REGISTER_BASE_HELPER(
-    hpx::plugins::compression::bzip2_serialization_filter,
-    bzip2_serialization_filter);
-
-///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace plugins { namespace compression
 {
     namespace detail
@@ -109,12 +102,6 @@ namespace hpx { namespace plugins { namespace compression
     bzip2_serialization_filter::~bzip2_serialization_filter()
     {
         hpx::actions::detail::guid_initialization<bzip2_serialization_filter>();
-    }
-
-    void bzip2_serialization_filter::register_base()
-    {
-        util::void_cast_register_nonvirt<
-            bzip2_serialization_filter, util::binary_filter>();
     }
 
     void bzip2_serialization_filter::set_max_length(std::size_t size)

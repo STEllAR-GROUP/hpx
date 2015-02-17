@@ -9,6 +9,8 @@
 
 #include <memory>
 
+#include <hpx/serialization/polymorphic_intrusive_factory.hpp>
+
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -27,6 +29,9 @@ namespace hpx { namespace util
         virtual std::size_t init_data(char const* buffer,
             std::size_t size, std::size_t buffer_size) = 0;
         virtual void load(void* dst, std::size_t dst_count) = 0;
+
+        template <class T> void serialize(T& ar, unsigned){}
+        HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(binary_filter);
     };
 }}
 

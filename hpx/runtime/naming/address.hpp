@@ -132,8 +132,8 @@ namespace hpx { namespace naming
 #endif
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 #endif
-BOOST_CLASS_VERSION(hpx::naming::address, HPX_ADDRESS_VERSION)
-BOOST_CLASS_TRACKING(hpx::naming::address, boost::serialization::track_never)
+//BOOST_CLASS_VERSION(hpx::naming::address, HPX_ADDRESS_VERSION) //TODO:
+//BOOST_CLASS_TRACKING(hpx::naming::address, boost::serialization::track_never)
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER)
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic pop

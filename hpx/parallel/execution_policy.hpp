@@ -12,6 +12,7 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/serialization/serialize.hpp>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
@@ -20,7 +21,6 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/type_traits/is_base_of.hpp>
-#include <boost/serialization/serialization.hpp>
 
 #include <memory>
 
@@ -110,7 +110,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
     private:
         /// \cond NOINTERNAL
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         void serialize(Archive& ar, unsigned)
@@ -272,7 +272,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
     private:
         /// \cond NOINTERNAL
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         void serialize(Archive& ar, unsigned)

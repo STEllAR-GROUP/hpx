@@ -8,7 +8,6 @@
 #include <hpx/include/serialization.hpp>
 #include <hpx/components/distributing_factory/server/distributing_factory.hpp>
 
-#include <boost/serialization/vector.hpp>
 #include <boost/move/move.hpp>
 #include <vector>
 

@@ -7,6 +7,7 @@
 #if !defined(HPX_RUNTIME_ACTIONS_CONTINUATION_HPP)
 #define HPX_RUNTIME_ACTIONS_CONTINUATION_HPP
 
+#if 0
 #include <hpx/traits/needs_guid_initialization.hpp>
 //#include <hpx/util/detail/serialization_registration.hpp>
 
@@ -55,6 +56,8 @@ namespace hpx { namespace actions
         };
     }
 }}
+
+#endif // if 0
 
 #endif
 

@@ -9,7 +9,7 @@
 #include <hpx/components/dataflow/dataflow_base_fwd.hpp>
 #include <hpx/components/dataflow/dataflow_base_impl.hpp>
 #include <hpx/components/dataflow/stubs/dataflow.hpp>
-#include <boost/serialization/shared_ptr.hpp>
+#include <hpx/serialization/intrusive_ptr.hpp>
 
 namespace hpx { namespace lcos
 {
@@ -44,7 +44,7 @@ namespace hpx { namespace lcos
         }
 
     private:
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         boost::intrusive_ptr<detail::dataflow_base_impl> impl;
 
